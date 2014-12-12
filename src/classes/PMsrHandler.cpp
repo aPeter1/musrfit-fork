@@ -5086,15 +5086,20 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
         }
         // check fit range
         if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
-          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << ">>   Fit range is not defined. Necessary for single histogram fits." << endl;
-          return false;
+          if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) {
+            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << ">>   Fit range is not defined, neither in the RUN block, nor in the GLOBAL block.";
+            cerr << endl << ">>   Necessary for non muSR fits." << endl;
+            return false;
+          }
         }
         // check packing
         if (fRuns[i].GetPacking() == -1) {
-          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
-          cerr << endl << ">>   Packing is not defined, will set it to 1." << endl;
-          fRuns[i].SetPacking(1);
+          if (fGlobal.GetPacking() == -1) {
+            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
+            cerr << endl << ">>   Packing is not defined, will set it to 1." << endl;
+            fRuns[i].SetPacking(1);
+          }
         }
         break;
       default:
@@ -5722,7 +5727,7 @@ void PMsrHandler::CheckLegacyLifetimecorrection()
   UInt_t idx=0;
   for (UInt_t i=0; i<fPlots.size(); i++) {
     for (UInt_t j=0; j<fPlots[i].fRuns.size(); j++) {
-      idx = fPlots[i].fRuns[j];
+      idx = fPlots[i].fRuns[j]-1;
       if (fRuns[idx].IsLifetimeCorrected()) {
         fPlots[i].fLifeTimeCorrection = true;
       }

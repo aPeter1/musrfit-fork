@@ -614,7 +614,7 @@ void PMusrCanvas::UpdateDataTheoryPad()
     if (runs[runNo].GetFitType() != -1) { // fit type found in RUN block, hence overwrite the GLOBAL block
       fitType = runs[runNo].GetFitType();
     }
-    if (fitType) {
+    if (fitType == -1) {
       fValid = false;
       cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << fPlotType;
       cerr << ", fittype = " << runs[runNo].GetFitType() << "(RUN block)/";

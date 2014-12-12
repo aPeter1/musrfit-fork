@@ -59,8 +59,9 @@ class PRunMuMinus : public PRunBase
 
   private:
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
+    Int_t  fPacking;        ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
 
-    Int_t fGoodBins[2];        ///< keep first/last good bins. 0=fgb, 1=lgb
+    Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
 
     PDoubleVector fForward; ///< forward histo data
 };

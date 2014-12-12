@@ -858,8 +858,6 @@ Bool_t PRunSingleHisto::PrepareData()
   // keep good bins for potential later use
   fGoodBins[0] = start;
   fGoodBins[1] = end;
-cout << endl << "debug> PRunSingleHisto::PrepareData(): start=" << start << ", end=" << end << endl;
-
 
   // set fit start/end time; first check RUN Block
   fFitStartTime = fRunInfo->GetFitRange(0);
@@ -1477,6 +1475,22 @@ void PRunSingleHisto::EstimateN0()
     return;
   }
 
+  // check that 'backgr.fit' in the msr-file run block is indeed a parameter number.
+  // in case it is a function, nothing will be done.
+  Int_t paramNoBkg = fRunInfo->GetBkgFitParamNo();
+  Bool_t scaleBkg = true;
+  Double_t bkg=0.0, errBkg=1.0;
+  if ((paramNoBkg > 10000) || (paramNoBkg == -1)) { // i.e. fun or map
+    scaleBkg = false;
+  } else {
+    if (paramNoBkg-1 < (Int_t)param->size()) {
+      bkg = param->at(paramNoBkg-1).fValue;
+      errBkg = param->at(paramNoBkg-1).fStep;
+    }
+  }
+
+
+
   // estimate N0
   Double_t dt = fTimeResolution;
   Double_t tau = PMUON_LIFETIME;
@@ -1503,7 +1517,7 @@ void PRunSingleHisto::EstimateN0()
     if (dval > 0)
       denom += xx*xx/dval;
   }
-  Double_t N0 = nom/denom;
+  Double_t N0 = nom/denom;  
 
   if (fScaleN0AndBkg) {
     N0 /= fTimeResolution*1.0e3;
@@ -1511,9 +1525,22 @@ void PRunSingleHisto::EstimateN0()
     N0 *= fPacking;
   }
 
+  Double_t rescale = 1;
+  if ((param->at(paramNo-1).fValue != 0.0) && scaleBkg) {
+    rescale = N0 / param->at(paramNo-1).fValue;
+    bkg *= rescale;
+    errBkg *= rescale;
+  }
+
   cout << ">> PRunSingleHisto::EstimateN0: found N0=" << param->at(paramNo-1).fValue << ", will set it to N0=" << N0 << endl;
+  if (scaleBkg)
+    cout << ">> PRunSingleHisto::EstimateN0: found Bkg=" << param->at(paramNoBkg-1).fValue << ", will set it to Bkg=" << bkg << endl;
   fMsrInfo->SetMsrParamValue(paramNo-1, N0);
   fMsrInfo->SetMsrParamStep(paramNo-1, sqrt(fabs(N0)));
+  if (scaleBkg) {
+    fMsrInfo->SetMsrParamValue(paramNoBkg-1, bkg);
+    fMsrInfo->SetMsrParamStep(paramNoBkg-1, errBkg);
+  }
 }
 
 //--------------------------------------------------------------------------

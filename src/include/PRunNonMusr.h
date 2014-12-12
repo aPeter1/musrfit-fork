@@ -64,6 +64,7 @@ class PRunNonMusr : public PRunBase
     PRawRunData *fRawRunData; ///< raw run data handler
 
     UInt_t fNoOfFitBins;    ///< number of bins to be be fitted
+    Int_t  fPacking;        ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
 };
 
 #endif // _PRUNNONMUSR_H_

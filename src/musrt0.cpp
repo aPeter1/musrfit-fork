@@ -345,7 +345,7 @@ Int_t main(Int_t argc, Char_t *argv[])
     }
     return status;
   }
-  msrHandler->CopyMsrStatisticBlock(); // just copy the statistics block since no fit is preformed
+  msrHandler->CopyMsrStatisticBlock(); // just copy the statistics block since no fit is performed
 
   // check if the fittype is not NonMusr
   PMsrRunList *runList = msrHandler->GetMsrRunList();
@@ -384,6 +384,7 @@ Int_t main(Int_t argc, Char_t *argv[])
     for (UInt_t i=0; i<runList->size(); i++) {
       switch (runList->at(i).GetFitType()) {
       case MSR_FITTYPE_SINGLE_HISTO:
+      case MSR_FITTYPE_MU_MINUS:
         if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // no addruns / no grouping
           // get histo number
           histoNo = runList->at(i).GetForwardHistoNo();
@@ -627,8 +628,6 @@ Int_t main(Int_t argc, Char_t *argv[])
           }
         }
         break;
-      case MSR_FITTYPE_MU_MINUS:
-        break;
       default:
         break;
       }
@@ -657,6 +656,7 @@ Int_t main(Int_t argc, Char_t *argv[])
       for (UInt_t i=0; i<runList->size(); i++) {
         switch (runList->at(i).GetFitType()) {
         case MSR_FITTYPE_SINGLE_HISTO:
+        case MSR_FITTYPE_MU_MINUS:
           if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // no addruns / no grouping
             // feed necessary data
             musrT0Data.InitData();
@@ -1020,8 +1020,6 @@ Int_t main(Int_t argc, Char_t *argv[])
               exit(0);
             }
           }
-          break;
-        case MSR_FITTYPE_MU_MINUS:
           break;
         default:
           break;

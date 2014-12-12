@@ -40,6 +40,7 @@
 PRunNonMusr::PRunNonMusr() : PRunBase()
 {
   fNoOfFitBins  = 0;
+  fPacking = 1;
 
   fHandleTag = kEmpty;
 
@@ -129,6 +130,8 @@ Double_t PRunNonMusr::CalcChiSquare(const std::vector<Double_t>& par)
  */
 Double_t PRunNonMusr::CalcChiSquareExpected(const std::vector<Double_t>& par)
 {
+  cout << endl << "PRunNonMusr::CalcChiSquareExpected(): not implemented yet ..." << endl;
+
   return 0.0;
 }
 
@@ -136,7 +139,10 @@ Double_t PRunNonMusr::CalcChiSquareExpected(const std::vector<Double_t>& par)
 // CalcMaxLikelihood
 //--------------------------------------------------------------------------
 /**
- * <p>NOT IMPLEMENTED!!
+ * <p>Calculate log maximum-likelihood. Currently not implemented since not clear what to be done.
+ *
+ * <b>return:</b>
+ * - log maximum-likelihood value == 1.0
  *
  * \param par parameter vector iterated by minuit2
  */
@@ -196,6 +202,24 @@ Bool_t PRunNonMusr::PrepareData()
     cerr << endl << ">> PRunNonMusr::PrepareData(): **WARNING** ADDRUN NOT SUPPORTED FOR THIS FIT TYPE, WILL IGNORE IT." << endl;
   }
 
+  // get packing info
+  fPacking = fRunInfo->GetPacking();
+  if (fPacking == -1) { // packing not present in the RUN block, will try the GLOBAL block
+    fPacking = fMsrInfo->GetMsrGlobal()->GetPacking();
+  }
+  if (fPacking == -1) { // packing NOT present, in neither the RUN block, nor in the GLOBAL block
+    cerr << endl << ">> PRunNonMusr::PrepareData(): **ERROR** couldn't find any packing information." << endl;
+    return false;
+  }
+
+  // get fit start/end time
+  fFitStartTime = fRunInfo->GetFitRange(0);
+  fFitEndTime   = fRunInfo->GetFitRange(1);
+  if (fFitStartTime == PMUSR_UNDEFINED) { // not present in the RUN block, will try GLOBAL block
+    fFitStartTime = fMsrInfo->GetMsrGlobal()->GetFitRange(0);
+    fFitEndTime   = fMsrInfo->GetMsrGlobal()->GetFitRange(1);
+  }
+
   if (fHandleTag == kFit)
     success = PrepareFitData();
   else if (fHandleTag == kView)
@@ -228,13 +252,13 @@ Bool_t PRunNonMusr::PrepareFitData()
   Double_t value  = 0.0;
   Double_t err = 0.0;
   for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetData()->at(xIndex).size(); i++) {
-    if (fRunInfo->GetPacking() == 1) {
+    if (fPacking == 1) {
       fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i));
       fData.AppendValue(fRawRunData->fDataNonMusr.GetData()->at(yIndex).at(i));
       fData.AppendErrorValue(fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i));
-    } else { // packed data, i.e. fRunInfo->GetPacking() > 1
-      if ((i % fRunInfo->GetPacking() == 0) && (i != 0)) { // fill data
-        fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fRunInfo->GetPacking()))/2.0);
+    } else { // packed data, i.e. fPacking > 1
+      if ((i % fPacking == 0) && (i != 0)) { // fill data
+        fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fPacking))/2.0);
         fData.AppendValue(value);
         fData.AppendErrorValue(TMath::Sqrt(err));
         value = 0.0;
@@ -281,13 +305,13 @@ Bool_t PRunNonMusr::PrepareViewData()
   Double_t value  = 0.0;
   Double_t err = 0.0;
   for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetData()->at(xIndex).size(); i++) {
-    if (fRunInfo->GetPacking() == 1) {
+    if (fPacking == 1) {
       fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i));
       fData.AppendValue(fRawRunData->fDataNonMusr.GetData()->at(yIndex).at(i));
       fData.AppendErrorValue(fRawRunData->fDataNonMusr.GetErrData()->at(yIndex).at(i));
-    } else { // packed data, i.e. fRunInfo->GetPacking() > 1
-      if ((i % fRunInfo->GetPacking() == 0) && (i != 0)) { // fill data
-        fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fRunInfo->GetPacking()))/2.0);
+    } else { // packed data, i.e. fPacking > 1
+      if ((i % fPacking == 0) && (i != 0)) { // fill data
+        fData.AppendXValue(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-(fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i)-fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i-fPacking))/2.0);
         fData.AppendValue(value);
         fData.AppendErrorValue(TMath::Sqrt(err));
         value = 0.0;
