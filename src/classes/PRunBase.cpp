@@ -122,6 +122,9 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
 PRunBase::~PRunBase()
 {
   fT0s.clear();
+  for (UInt_t i=0; i<fAddT0s.size(); i++)
+    fAddT0s[i].clear();
+  fAddT0s.clear();
 
   fFuncValues.clear();
 }

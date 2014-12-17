@@ -67,14 +67,15 @@ class PRunBase
 
     EPMusrHandleTag fHandleTag; ///< tag telling whether this is used for fit, view, ...
 
-    Int_t fRunNo;               ///< number of the run within the msr file
+    Int_t fRunNo;               ///< number of the run within the msr-file
     PMsrHandler      *fMsrInfo; ///< msr-file handler
     PMsrRunBlock     *fRunInfo; ///< run info used to filter out needed infos of a run
     PRunDataHandler  *fRawData; ///< holds the raw run data
 
     PRunData fData;             ///< data to be fitted, viewed, i.e. binned data
     Double_t fTimeResolution;   ///< time resolution in (us)
-    PDoubleVector fT0s;         ///< all t0 bins of a run! The derived classes will handle it
+    PDoubleVector fT0s;         ///< all t0 bins of a run! The derived classes will handle it.
+    vector<PDoubleVector> fAddT0s; ///< all t0 bins of all addrun's of a run! The derived classes will handle it.
 
     Double_t fFitStartTime;     ///< fit start time
     Double_t fFitEndTime;       ///< fit end time
