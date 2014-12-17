@@ -800,6 +800,80 @@ void PMsrGlobalBlock::SetT0Bin(Double_t dval, Int_t idx)
 }
 
 //--------------------------------------------------------------------------
+// GetAddT0BinSize (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> get add T0 size of the addrun at index addRunIdx
+ *
+ * <b>return:</b>
+ * - addt0 value, if idx is within proper boundaries
+ * - -1, otherwise
+ *
+ * \param addRunIdx index of the addrun
+ */
+Int_t PMsrGlobalBlock::GetAddT0BinSize(UInt_t addRunIdx)
+{
+  if (fAddT0.empty())
+    return -1;
+
+  if (addRunIdx >= fAddT0.size())
+    return -1;
+
+  return fAddT0[addRunIdx].size();
+}
+
+//--------------------------------------------------------------------------
+// GetAddT0Bin (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> get add T0 of the addrun (index addRunIdx) at index histoIdx
+ *
+ * <b>return:</b>
+ * - addt0 value, if indices are within proper boundaries
+ * - -1, otherwise
+ *
+ * \param addRunIdx index of the addrun
+ * \param histoIdx index of the add backward histo number value
+ */
+Double_t PMsrGlobalBlock::GetAddT0Bin(UInt_t addRunIdx, UInt_t histoIdx)
+{
+  if (fAddT0.empty())
+    return -1.0;
+
+  if (addRunIdx >= fAddT0.size())
+    return -1.0;
+
+  if (fAddT0[addRunIdx].empty())
+    return -1.0;
+
+  if (histoIdx >= fAddT0[addRunIdx].size())
+    return -1.0;
+
+  return fAddT0[addRunIdx][histoIdx];
+}
+
+//--------------------------------------------------------------------------
+// SetAddT0Bin (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set add T0 bin of the addrun at index histoNoIdx
+ *
+ * \param ival T0 bin
+ * \param addRunIdx addrun index
+ * \param histoNoIdx index whithin the fAddT0 vector where to set the value.
+ */
+void PMsrGlobalBlock::SetAddT0Bin(Double_t dval, UInt_t addRunIdx, UInt_t histoNoIdx)
+{
+  if (addRunIdx >= fAddT0.size())
+    fAddT0.resize(addRunIdx+1);
+
+  if (histoNoIdx >= fAddT0[addRunIdx].size())
+    fAddT0[addRunIdx].resize(histoNoIdx+1);
+
+  fAddT0[addRunIdx][histoNoIdx] = dval;
+}
+
+//--------------------------------------------------------------------------
 // GetFitRange (public)
 //--------------------------------------------------------------------------
 /**
