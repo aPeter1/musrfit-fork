@@ -221,6 +221,7 @@ Int_t main(Int_t argc, Char_t *argv[])
   Bool_t firstGoodBinOffsetPresent = false;
   Int_t firstGoodBinOffset = 0;
   Int_t timeout = 0;
+  Int_t fitType = -1;
 
   if (argc == 1) {
     musrt0_syntax();
@@ -350,8 +351,12 @@ Int_t main(Int_t argc, Char_t *argv[])
   // check if the fittype is not NonMusr
   PMsrRunList *runList = msrHandler->GetMsrRunList();
   for (UInt_t i=0; i<runList->size(); i++) {
-    if (runList->at(i).GetFitType() == MSR_FITTYPE_NON_MUSR) {
-      cout << endl << ">> musrt0 **ERROR** t0 setting for NonMusr fittype doesn't make any sense, will quit ..." << endl;
+    fitType = runList->at(i).GetFitType();
+    if (fitType == -1) { // i.e. not found in the RUN block, check the GLOBAL block
+      fitType = msrHandler->GetMsrGlobal()->GetFitType();
+    }
+    if (fitType == MSR_FITTYPE_NON_MUSR) {
+      cout << endl << ">> musrt0 **ERROR** t0 setting for NonMusr fit type doesn't make any sense, will quit ..." << endl;
       success = false;
       break;
     }
@@ -382,7 +387,11 @@ Int_t main(Int_t argc, Char_t *argv[])
 
     // go through all runs in the msr-file
     for (UInt_t i=0; i<runList->size(); i++) {
-      switch (runList->at(i).GetFitType()) {
+      fitType = runList->at(i).GetFitType();
+      if (fitType == -1) { // i.e. not found in the RUN block, check the GLOBAL block
+        fitType = msrHandler->GetMsrGlobal()->GetFitType();
+      }
+      switch (fitType) {
       case MSR_FITTYPE_SINGLE_HISTO:
       case MSR_FITTYPE_MU_MINUS:
         if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // no addruns / no grouping
@@ -654,7 +663,11 @@ Int_t main(Int_t argc, Char_t *argv[])
       PIntVector backwardHistos;
       // generate vector of all necessary PMusrT0 objects
       for (UInt_t i=0; i<runList->size(); i++) {
-        switch (runList->at(i).GetFitType()) {
+        fitType = runList->at(i).GetFitType();
+        if (fitType == -1) { // i.e. not found in the RUN block, check the GLOBAL block
+          fitType = msrHandler->GetMsrGlobal()->GetFitType();
+        }
+        switch (fitType) {
         case MSR_FITTYPE_SINGLE_HISTO:
         case MSR_FITTYPE_MU_MINUS:
           if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // no addruns / no grouping
