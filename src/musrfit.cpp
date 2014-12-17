@@ -612,7 +612,7 @@ int main(int argc, char *argv[])
     for (unsigned int i=0; i < msrHandler->GetMsrRunList()->size(); i++) {
       success = runListCollection->Add(i, kFit);
       if (!success) {
-        cout << endl << ">> musrfit **ERROR** Couldn't handle run no " << i << " ";
+        cout << endl << ">> musrfit **ERROR** Couldn't handle run no " << i+1 << ": ";
         cout << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
         break;
       }
