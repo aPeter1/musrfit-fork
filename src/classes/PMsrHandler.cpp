@@ -384,6 +384,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 
   // add some counters needed in connection to addruns
   Int_t addT0Counter = 0;
+  Int_t addT0GlobalCounter = 0;
 
   ifstream fin;
   ofstream fout;
@@ -643,6 +644,17 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             fout << left << fGlobal.GetT0Bin(j);
           }
           fout << endl;
+        } else if (sstr.BeginsWith("addt0")) {
+          fout.width(16);
+          fout << left << "addt0";
+          for (Int_t j=0; j<fGlobal.GetAddT0BinSize(addT0GlobalCounter); j++) {
+            fout.width(8);
+            fout.precision(1);
+            fout.setf(ios::fixed,ios::floatfield);
+            fout << left << fGlobal.GetAddT0Bin(addT0GlobalCounter, j);
+          }
+          fout << endl;
+          addT0GlobalCounter++;
         } else if (sstr.BeginsWith("fit")) {
           fout.width(16);
           fout << left << "fit";
@@ -684,6 +696,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         sstr = str;
         sstr.Remove(TString::kLeading, ' ');
         if (sstr.BeginsWith("RUN")) {
+          addRunNo = 0; // reset counter
           fout << "RUN " << fRuns[runNo].GetRunName()->Data() << " ";
           pstr = fRuns[runNo].GetBeamline();
           if (pstr == 0) {
@@ -731,7 +744,6 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           pstr->ToUpper();
           fout << pstr->Data() << "   (name beamline institute data-file-format)" << endl;
         } else if (sstr.BeginsWith("fittype")) {
-          addRunNo = 0;
           fout.width(16);
           switch (fRuns[runNo].GetFitType()) {
           case MSR_FITTYPE_SINGLE_HISTO:
@@ -2653,6 +2665,7 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
   TObjString *ostr = 0;
   Int_t ival;
   Double_t dval;
+  UInt_t addT0Counter = 0;
 
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
@@ -2727,6 +2740,25 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
           }
         }
       }
+    } else if (iter->fLine.BeginsWith("addt0", TString::kIgnoreCase)) { // addt0
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        for (Int_t i=1; i<tokens->GetEntries(); i++) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(i));
+          str = ostr->GetString();
+          if (str.IsFloat()) {
+            dval = str.Atof();
+            if (dval >= 0.0)
+              global.SetAddT0Bin(dval, addT0Counter, i-1);
+            else
+              error = true;
+          } else {
+            error = true;
+          }
+        }
+      }
+      addT0Counter++;
     } else if (iter->fLine.BeginsWith("fit", TString::kIgnoreCase)) { // fit range
       if (tokens->GetEntries() < 3) {
         error = true;
@@ -2812,18 +2844,25 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
     fGlobal = global;
   }
 
-  cout << endl << "debug> Global: fittype   : " << fGlobal.GetFitType();
-  cout << endl << "debug> Global: data bin range: ";
+  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fittype   : " << fGlobal.GetFitType();
+  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: data bin range: ";
   for (UInt_t i=0; i<4; i++) {
     cout << fGlobal.GetDataRange(i) << ", ";
   }
-  cout << endl << "debug> Global: t0's      : ";
+  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: t0's      : ";
   for (UInt_t i=0; i<fGlobal.GetT0BinSize(); i++)
     cout << fGlobal.GetT0Bin(i) << ", ";
-  cout << endl << "debug> Global: fit in bin: " << fGlobal.IsFitRangeInBin();
-  cout << endl << "debug> Global: fit offset: " << fGlobal.GetFitRangeOffset(0) << ", " << fGlobal.GetFitRangeOffset(1);
-  cout << endl << "debug> Global: fit       : " << fGlobal.GetFitRange(0) << ", " << fGlobal.GetFitRange(1);
-  cout << endl << "debug> Global: packing   : " << fGlobal.GetPacking();
+  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: addt0's   : ";
+  for (UInt_t i=0; i<fGlobal.GetAddT0BinEntries(); i++) {
+    cout << endl << "  debug> --> " << i << ": ";
+    for (UInt_t j=0; j<(UInt_t)fGlobal.GetAddT0BinSize(i); j++) {
+      cout << fGlobal.GetAddT0Bin(i,j) << ", ";
+    }
+  }
+  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fit in bin: " << fGlobal.IsFitRangeInBin();
+  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fit offset: " << fGlobal.GetFitRangeOffset(0) << ", " << fGlobal.GetFitRangeOffset(1);
+  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fit       : " << fGlobal.GetFitRange(0) << ", " << fGlobal.GetFitRange(1);
+  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: packing   : " << fGlobal.GetPacking();
   cout << endl;
 
   return !error;
@@ -3546,7 +3585,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
     // tokenize line
     tokens = iter->fLine.Tokenize(" \t");
     if (!tokens) {
-      cerr << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
+      cerr << endl << ">> PMsrHandler::HandleFourierEntry: **SEVERE ERROR** Couldn't tokenize Parameters in line " << iter->fLineNo;
       cerr << endl << endl;
       return false;
     }
