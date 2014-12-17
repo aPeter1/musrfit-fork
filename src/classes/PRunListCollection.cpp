@@ -284,6 +284,9 @@ Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Doubl
   }
 
   Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
+  if (type == -1) { // i.e. not forun in the RUN block, try the GLOBAL block
+    type = fMsrInfo->GetMsrGlobal()->GetFitType();
+  }
 
   // count how many entries of this fit-type are present up to idx
   UInt_t subIdx = 0;
@@ -335,6 +338,9 @@ Double_t PRunListCollection::GetSingleRunChisq(const std::vector<Double_t>& par,
   }
 
   Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
+  if (type == -1) { // i.e. not forun in the RUN block, try the GLOBAL block
+    type = fMsrInfo->GetMsrGlobal()->GetFitType();
+  }
 
   // count how many entries of this fit-type are present up to idx
   UInt_t subIdx = 0;
@@ -472,6 +478,9 @@ UInt_t PRunListCollection::GetNoOfBinsFitted(const UInt_t idx) const
   }
 
   Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
+  if (type == -1) { // i.e. not forun in the RUN block, try the GLOBAL block
+    type = fMsrInfo->GetMsrGlobal()->GetFitType();
+  }
 
   // count how many entries of this fit-type are present up to idx
   UInt_t subIdx = 0;
