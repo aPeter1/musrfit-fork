@@ -64,6 +64,10 @@ class PRunMuMinus : public PRunBase
     Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
 
     PDoubleVector fForward; ///< forward histo data
+
+    virtual Bool_t GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &histoNo);
+    virtual Bool_t GetProperDataRange();
+    virtual void GetProperFitRange(PMsrGlobalBlock *globalBlock);
 };
 
 #endif // _PRUNMUMINUS_H_

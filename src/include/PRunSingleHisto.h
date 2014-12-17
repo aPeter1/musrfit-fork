@@ -68,6 +68,9 @@ class PRunSingleHisto : public PRunBase
 
     PDoubleVector fForward;    ///< forward histo data
 
+    virtual Bool_t GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &histoNo);
+    virtual Bool_t GetProperDataRange();
+    virtual void GetProperFitRange(PMsrGlobalBlock *globalBlock);
     virtual void EstimateN0();
     virtual Bool_t EstimateBkg(UInt_t histoNo);
     virtual Bool_t IsScaleN0AndBkg();

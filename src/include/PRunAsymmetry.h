@@ -55,24 +55,28 @@ class PRunAsymmetry : public PRunBase
   protected:
     virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
-    virtual Bool_t PrepareFitData(PRawRunData* runData, UInt_t histoNo[2]);
+    virtual Bool_t PrepareFitData();
     virtual Bool_t PrepareViewData(PRawRunData* runData, UInt_t histoNo[2]);
     virtual Bool_t PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]);
 
   private:
     UInt_t fAlphaBetaTag; ///< \f$ 1 \to \alpha = \beta = 1\f$; \f$ 2 \to \alpha \neq 1, \beta = 1\f$; \f$ 3 \to \alpha = 1, \beta \neq 1\f$; \f$ 4 \to \alpha \neq 1, \beta \neq 1\f$.
-
-    UInt_t fNoOfFitBins;    ///< number of bins to be be fitted
+    UInt_t fNoOfFitBins;  ///< number of bins to be be fitted
+    Int_t fPacking;       ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
 
     PDoubleVector fForward;     ///< forward histo data
     PDoubleVector fForwardErr;  ///< forward histo errors
     PDoubleVector fBackward;    ///< backward histo data
     PDoubleVector fBackwardErr; ///< backward histo errors
 
-    Int_t fGoodBins[2];        ///< keep first/last good bins. 0=fgb, 1=lgb
+    Int_t fGoodBins[4];   ///< keep first/last good bins. 0=fgb, 1=lgb (forward); 2=fgb, 3=lgb (backward)
 
     Bool_t SubtractFixBkg();
     Bool_t SubtractEstimatedBkg();
+
+    virtual Bool_t GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &forwardHisto, PUIntVector &backwardHistoNo);
+    virtual Bool_t GetProperDataRange(PRawRunData* runData, UInt_t histoNo[2]);
+    virtual void GetProperFitRange(PMsrGlobalBlock *globalBlock);
 };
 
 #endif // _PRUNASYMMETRY_H_

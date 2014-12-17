@@ -647,58 +647,29 @@ Bool_t PRunSingleHisto::PrepareData()
     }
   }
 
-  // feed all T0's
-  // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
-  fT0s.clear();
-  fT0s.resize(histoNo.size());
-  for (UInt_t i=0; i<fT0s.size(); i++) {
-    fT0s[i] = -1.0;
+  // keep the time resolution in (us)
+  fTimeResolution = runData->GetTimeResolution()/1.0e3;
+  cout.precision(10);
+  cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
+
+  // get all the proper t0's and addt0's for the current RUN block
+  if (!GetProperT0(runData, globalBlock, histoNo)) {
+    return false;
   }
 
-  // fill in the T0's from the msr-file (if present)
-  for (UInt_t i=0; i<fRunInfo->GetT0BinSize(); i++) {
-    fT0s[i] = fRunInfo->GetT0Bin(i);
+/* remove eventually as35
+  cout << endl << "debug> PRunSingleHisto::PrepareData(): fT0s.size()=" << fT0s.size();
+  cout << endl << "debug> PRunSingleHisto::PrepareData(): fT0s : ";
+  for (UInt_t i=0; i<fT0s.size(); i++)
+    cout << fT0s[i] << ", ";
+  cout << endl << "debug> PRunSingleHisto::PrepareData(): fAddT0s.size()=" << fAddT0s.size();
+  for (UInt_t i=0; i<fAddT0s.size(); i++) {
+    cout << endl << "debug> PRunSingleHisto::PrepareData(): fAddT0s[" << i << "].size()=" << fAddT0s[i].size();
+    cout << endl << "debug> PRunSingleHisto::PrepareData(): fAddT0s : " << i << ": ";
+    for (UInt_t j=0; j<fAddT0s[i].size(); j++)
+      cout << fAddT0s[i][j] << ", ";
   }
-
-  // fill in the T0's from the GLOBAL block section (if present)
-  for (UInt_t i=0; i<globalBlock->GetT0BinSize(); i++) {
-    if (fT0s[i] == -1) { // i.e. not given in the RUN block section
-      fT0s[i] = globalBlock->GetT0Bin(i);
-    }
-  }
-
-  // fill in the T0's from the data file, if not already present in the msr-file
-  for (UInt_t i=0; i<histoNo.size(); i++) {
-    if (fT0s[i] == -1.0) { // i.e. not present in the msr-file, try the data file
-      if (runData->GetT0Bin(histoNo[i]) > 0.0) {
-        fT0s[i] = runData->GetT0Bin(histoNo[i]);
-        fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
-      }
-    }
-  }
-
-  // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
-  for (UInt_t i=0; i<histoNo.size(); i++) {
-    if (fT0s[i] == -1.0) { // i.e. not present in the msr-file and data file, use the estimated T0
-      fT0s[i] = runData->GetT0BinEstimated(histoNo[i]);
-      fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
-
-      cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-      cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-      cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
-      cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-      cerr << endl;
-    }
-  }
-
-  // check if t0 is within proper bounds
-  for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
-    if ((fT0s[i] < 0) || (fT0s[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunSingleHisto::PrepareData(): **ERROR** t0 data bin (" << fT0s[i] << ") doesn't make any sense!";
-      cerr << endl;
-      return false;
-    }
-  }
+*/
 
   // keep the histo of each group at this point (addruns handled below)
   vector<PDoubleVector> forward;
@@ -721,72 +692,24 @@ Bool_t PRunSingleHisto::PrepareData()
         return false;
       }
 
-      // feed all T0's
-      // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
-      PDoubleVector t0Add;
-      t0Add.resize(histoNo.size());
-      for (UInt_t j=0; j<t0Add.size(); j++) {
-        t0Add[j] = -1.0;
-      }
-
-      // fill in the T0's from the msr-file (if present)
-      for (UInt_t j=0; j<fRunInfo->GetT0BinSize(); j++) {
-        t0Add[j] = fRunInfo->GetAddT0Bin(i-1,j); // addRunIdx starts at 0
-      }
-
-      // fill in the T0's from the data file, if not already present in the msr-file
-      for (UInt_t j=0; j<histoNo.size(); j++) {
-        if (t0Add[j] == -1.0) // i.e. not present in the msr-file, try the data file
-          if (addRunData->GetT0Bin(histoNo[j]) > 0.0) {
-            t0Add[j] = addRunData->GetT0Bin(histoNo[j]);
-            fRunInfo->SetAddT0Bin(t0Add[j], i-1, j); // keep value for the msr-file
-          }
-      }
-
-      // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
-      for (UInt_t j=0; j<histoNo.size(); j++) {
-        if (t0Add[j] == -1.0) { // i.e. not present in the msr-file and data file, use the estimated T0
-          t0Add[j] = addRunData->GetT0BinEstimated(histoNo[j]);
-          fRunInfo->SetAddT0Bin(t0Add[j], i-1, j); // keep value for the msr-file
-
-          cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-          cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
-          cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
-          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-          cerr << endl;
-        }
-      }
-
-      // check if t0 is within proper bounds
-      for (UInt_t j=0; j<fRunInfo->GetForwardHistoNoSize(); j++) {
-        if ((t0Add[j] < 0) || (t0Add[j] > (Int_t)addRunData->GetDataBin(histoNo[j])->size())) {
-          cerr << endl << ">> PRunSingleHisto::PrepareData(): **ERROR** addt0 data bin (" << t0Add[j] << ") doesn't make any sense!";
-          cerr << endl;
-          return false;
-        }
-      }
-
       // add forward run
       UInt_t addRunSize;
       for (UInt_t k=0; k<histoNo.size(); k++) { // fill each group
         addRunSize = addRunData->GetDataBin(histoNo[k])->size();
         for (UInt_t j=0; j<addRunData->GetDataBin(histoNo[k])->size(); j++) { // loop over the bin indices
           // make sure that the index stays in the proper range
-          if ((j+(Int_t)t0Add[k]-(Int_t)fT0s[k] >= 0) && (j+(Int_t)t0Add[k]-(Int_t)fT0s[k] < addRunSize)) {
-            forward[k][j] += addRunData->GetDataBin(histoNo[k])->at(j+(Int_t)t0Add[k]-(Int_t)fT0s[k]);
+          if ((j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k] >= 0) && (j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k] < addRunSize)) {
+            forward[k][j] += addRunData->GetDataBin(histoNo[k])->at(j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k]);
           }
         }
       }
-
-      // clean up
-      t0Add.clear();
     }
   }
 
   // set forward histo data of the first group
   fForward.resize(forward[0].size());
   for (UInt_t i=0; i<fForward.size(); i++) {
-    fForward[i]  = forward[0][i];
+    fForward[i] = forward[0][i];
   }
 
   // group histograms, add all the remaining forward histograms of the group
@@ -799,99 +722,20 @@ Bool_t PRunSingleHisto::PrepareData()
     }
   }
 
-  // keep the time resolution in (us)
-  fTimeResolution = runData->GetTimeResolution()/1.0e3;
-  cout.precision(10);
-  cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
-
-  // first get start data, end data, and t0
-  Int_t start;
-  Int_t end;
-  start = fRunInfo->GetDataRange(0);
-  end   = fRunInfo->GetDataRange(1);
-
-  // check if data range has been given in the RUN block, if not try to get it from the GLOBAL block
-  if (start < 0) {
-    start = fMsrInfo->GetMsrGlobal()->GetDataRange(0);
-  }
-  if (end < 0) {
-    end = fMsrInfo->GetMsrGlobal()->GetDataRange(1);
-  }
-
-  // check if data range has been provided, and if not try to estimate them
-  if (start < 0) {
-    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
-    start = (Int_t)fT0s[0]+offset;
-    fRunInfo->SetDataRange(start, 0);
-    cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
-  }
-  if (end < 0) {
-    end = fForward.size();
-    fRunInfo->SetDataRange(end, 1);
-    cerr << endl << ">> PRunSingleHisto::PrepareData(): **WARNING** data range was not provided, will try data range end = " << end << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
-  }
-
-  // check if start and end make any sense
-  // 1st check if start and end are in proper order
-  if (end < start) { // need to swap them
-    Int_t keep = end;
-    end = start;
-    start = keep;
-  }
-  // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunSingleHisto::PrepareFitData(): **ERROR** start data bin doesn't make any sense!";
-    cerr << endl;
-    return false;
-  }
-  // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunSingleHisto::PrepareFitData(): **ERROR** end data bin doesn't make any sense!";
-    cerr << endl;
+  // get the data range (fgb/lgb) for the current RUN block
+  if (!GetProperDataRange()) {
     return false;
   }
 
-  // keep good bins for potential later use
-  fGoodBins[0] = start;
-  fGoodBins[1] = end;
+  // get the fit range for the current RUN block
+  GetProperFitRange(globalBlock);
 
-  // set fit start/end time; first check RUN Block
-  fFitStartTime = fRunInfo->GetFitRange(0);
-  fFitEndTime   = fRunInfo->GetFitRange(1);
-  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
-  if (fRunInfo->IsFitRangeInBin()) {
-    fFitStartTime = (start + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
-    fFitEndTime = (end - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
-    // write these times back into the data structure. This way it is available when writting the log-file
-    fRunInfo->SetFitRange(fFitStartTime, 0);
-    fRunInfo->SetFitRange(fFitEndTime, 1);
-  }
-  if (fFitStartTime == PMUSR_UNDEFINED) { // fit start/end NOT found in the RUN block, check GLOBAL block
-    fFitStartTime = globalBlock->GetFitRange(0);
-    fFitEndTime   = globalBlock->GetFitRange(1);
-    // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
-    if (globalBlock->IsFitRangeInBin()) {
-      fFitStartTime = (start + globalBlock->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
-      fFitEndTime = (end - globalBlock->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
-      // write these times back into the data structure. This way it is available when writting the log-file
-      globalBlock->SetFitRange(fFitStartTime, 0);
-      globalBlock->SetFitRange(fFitEndTime, 1);
-    }
-  }
-  if ((fFitStartTime == PMUSR_UNDEFINED) || (fFitEndTime == PMUSR_UNDEFINED)) {
-    cerr << "PRunSingleHisto::PrepareData(): **ERROR** Couldn't get fit start/end time!" << endl;
-    return false;
-  }
-cout << endl << "debug> PRunSingleHisto::PrepareData(): fFitStartTime=" << fFitStartTime << ", fFitEndTime=" << fFitEndTime << endl;
-
+  // get the lifetimecorrection flag
   Bool_t lifetimecorrection = false;
   PMsrPlotList *plot = fMsrInfo->GetMsrPlotList();
   lifetimecorrection = plot->at(0).fLifeTimeCorrection;
 
+  // do the more fit/view specific stuff
   if (fHandleTag == kFit)
     success = PrepareFitData(runData, histoNo[0]);
   else if ((fHandleTag == kView) && !lifetimecorrection)
@@ -1453,6 +1297,266 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
 }
 
 //--------------------------------------------------------------------------
+// GetProperT0 (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the proper t0 for the single histogram run.
+ * -# the t0 vector size = number of detectors (grouping) for forward.
+ * -# initialize t0's with -1
+ * -# fill t0's from RUN block
+ * -# if t0's are missing (i.e. t0 == -1), try to fill from the GLOBAL block.
+ * -# if t0's are missing, try t0's from the data file
+ * -# if t0's are missing, try to estimate them
+ *
+ * \param runData pointer to the current RUN block entry from the msr-file
+ * \param globalBlock pointer to the GLOBLA block entry from the msr-file
+ * \param histoNo histogram number vector of forward; histoNo = msr-file forward + redGreen_offset - 1
+ *
+ * <b>return:</b>
+ * - true if everthing went smooth
+ * - false, otherwise.
+ */
+Bool_t PRunSingleHisto::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &histoNo)
+{
+  // feed all T0's
+  // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
+  fT0s.clear();
+  fT0s.resize(histoNo.size());
+  for (UInt_t i=0; i<fT0s.size(); i++) {
+    fT0s[i] = -1.0;
+  }
+
+  // fill in the T0's from the msr-file (if present)
+  for (UInt_t i=0; i<fRunInfo->GetT0BinSize(); i++) {
+    fT0s[i] = fRunInfo->GetT0Bin(i);
+  }
+
+  // fill in the T0's from the GLOBAL block section (if present)
+  for (UInt_t i=0; i<globalBlock->GetT0BinSize(); i++) {
+    if (fT0s[i] == -1) { // i.e. not given in the RUN block section
+      fT0s[i] = globalBlock->GetT0Bin(i);
+    }
+  }
+
+  // fill in the T0's from the data file, if not already present in the msr-file
+  for (UInt_t i=0; i<histoNo.size(); i++) {
+    if (fT0s[i] == -1.0) { // i.e. not present in the msr-file, try the data file
+      if (runData->GetT0Bin(histoNo[i]) > 0.0) {
+        fT0s[i] = runData->GetT0Bin(histoNo[i]);
+        fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
+      }
+    }
+  }
+
+  // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
+  for (UInt_t i=0; i<histoNo.size(); i++) {
+    if (fT0s[i] == -1.0) { // i.e. not present in the msr-file and data file, use the estimated T0
+      fT0s[i] = runData->GetT0BinEstimated(histoNo[i]);
+      fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
+
+      cerr << endl << ">> PRunSingleHisto::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+      cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
+      cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
+      cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+      cerr << endl;
+    }
+  }
+
+  // check if t0 is within proper bounds
+  for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
+    if ((fT0s[i] < 0) || (fT0s[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
+      cerr << endl << ">> PRunSingleHisto::GetProperT0(): **ERROR** t0 data bin (" << fT0s[i] << ") doesn't make any sense!";
+      cerr << endl;
+      return false;
+    }
+  }
+
+  // check if there are runs to be added to the current one. If yes keep the needed t0's
+  if (fRunInfo->GetRunNameSize() > 1) { // runs to be added present
+    PRawRunData *addRunData;
+    fAddT0s.resize(fRunInfo->GetRunNameSize()-1); // resize to the number of addruns
+    for (UInt_t i=1; i<fRunInfo->GetRunNameSize(); i++) {
+
+      // get run to be added to the main one
+      addRunData = fRawData->GetRunData(*fRunInfo->GetRunName(i));
+      if (addRunData == 0) { // couldn't get run
+        cerr << endl << ">> PRunSingleHisto::GetProperT0(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
+        cerr << endl;
+        return false;
+      }
+
+      // feed all T0's
+      // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
+      fAddT0s[i-1].resize(histoNo.size());
+      for (UInt_t j=0; j<fAddT0s[i-1].size(); j++) {
+        fAddT0s[i-1][j] = -1.0;
+      }
+
+      // fill in the T0's from the msr-file (if present)
+      for (UInt_t j=0; j<fRunInfo->GetT0BinSize(); j++) {
+        fAddT0s[i-1][j] = fRunInfo->GetAddT0Bin(i-1,j); // addRunIdx starts at 0
+      }
+
+      // fill in the T0's from the data file, if not already present in the msr-file
+      for (UInt_t j=0; j<histoNo.size(); j++) {
+        if (fAddT0s[i-1][j] == -1.0) // i.e. not present in the msr-file, try the data file
+          if (addRunData->GetT0Bin(histoNo[j]) > 0.0) {
+            fAddT0s[i-1][j] = addRunData->GetT0Bin(histoNo[j]);
+            fRunInfo->SetAddT0Bin(fAddT0s[i-1][j], i-1, j); // keep value for the msr-file
+          }
+      }
+
+      // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
+      for (UInt_t j=0; j<histoNo.size(); j++) {
+        if (fAddT0s[i-1][j] == -1.0) { // i.e. not present in the msr-file and data file, use the estimated T0
+          fAddT0s[i-1][j] = addRunData->GetT0BinEstimated(histoNo[j]);
+          fRunInfo->SetAddT0Bin(fAddT0s[i-1][j], i-1, j); // keep value for the msr-file
+
+          cerr << endl << ">> PRunSingleHisto::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+          cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
+          cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
+          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+          cerr << endl;
+        }
+      }
+
+      // check if t0 is within proper bounds
+      for (UInt_t j=0; j<fRunInfo->GetForwardHistoNoSize(); j++) {
+        if ((fAddT0s[i-1][j] < 0) || (fAddT0s[i-1][j] > (Int_t)addRunData->GetDataBin(histoNo[j])->size())) {
+          cerr << endl << ">> PRunSingleHisto::GetProperT0(): **ERROR** addt0 data bin (" << fAddT0s[i-1][j] << ") doesn't make any sense!";
+          cerr << endl;
+          return false;
+        }
+      }
+    }
+  }
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// GetProperDataRange (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the proper data range, i.e. first/last good bin (fgb/lgb).
+ * -# get fgb/lgb from the RUN block
+ * -# if fgb/lgb still undefined, try to get it from the GLOBAL block
+ * -# if fgb/lgb still undefined, try to estimate them.
+ *
+ * <b>return:</b>
+ * - true if everthing went smooth
+ * - false, otherwise.
+ */
+Bool_t PRunSingleHisto::GetProperDataRange()
+{
+  // get start/end data
+  Int_t start;
+  Int_t end;
+  start = fRunInfo->GetDataRange(0);
+  end   = fRunInfo->GetDataRange(1);
+
+  // check if data range has been given in the RUN block, if not try to get it from the GLOBAL block
+  if (start < 0) {
+    start = fMsrInfo->GetMsrGlobal()->GetDataRange(0);
+  }
+  if (end < 0) {
+    end = fMsrInfo->GetMsrGlobal()->GetDataRange(1);
+  }
+
+  // check if data range has been provided, and if not try to estimate them
+  if (start < 0) {
+    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
+    start = (Int_t)fT0s[0]+offset;
+    fRunInfo->SetDataRange(start, 0);
+    cerr << endl << ">> PRunSingleHisto::GetProperDataRange(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
+    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
+  if (end < 0) {
+    end = fForward.size();
+    fRunInfo->SetDataRange(end, 1);
+    cerr << endl << ">> PRunSingleHisto::GetProperDataRange(): **WARNING** data range was not provided, will try data range end = " << end << ".";
+    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl;
+  }
+
+  // check if start and end make any sense
+  // 1st check if start and end are in proper order
+  if (end < start) { // need to swap them
+    Int_t keep = end;
+    end = start;
+    start = keep;
+  }
+  // 2nd check if start is within proper bounds
+  if ((start < 0) || (start > (Int_t)fForward.size())) {
+    cerr << endl << ">> PRunSingleHisto::GetProperDataRange(): **ERROR** start data bin (" << start << ") doesn't make any sense!";
+    cerr << endl;
+    return false;
+  }
+  // 3rd check if end is within proper bounds
+  if ((end < 0) || (end > (Int_t)fForward.size())) {
+    cerr << endl << ">> PRunSingleHisto::GetProperDataRange(): **ERROR** end data bin (" << end << ") doesn't make any sense!";
+    cerr << endl;
+    return false;
+  }
+
+  // keep good bins for potential later use
+  fGoodBins[0] = start;
+  fGoodBins[1] = end;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// GetProperFitRange (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the proper fit range. There are two possible fit range commands:
+ * fit <start> <end> given in (usec), or
+ * fit fgb+offset_0 lgb-offset_1 given in (bins), therefore it works the following way:
+ * -# get fit range assuming given in time from RUN block
+ * -# if fit range in RUN block is given in bins, replace start/end
+ * -# if fit range is NOT given yet, try fit range assuming given in time from GLOBAL block
+ * -# if fit range in GLOBAL block is given in bins, replace start/end
+ * -# if still no fit range is given, use fgb/lgb.
+ *
+ * \param globalBlock pointer to the GLOBAL block information form the msr-file.
+ */
+void PRunSingleHisto::GetProperFitRange(PMsrGlobalBlock *globalBlock)
+{
+  // set fit start/end time; first check RUN Block
+  fFitStartTime = fRunInfo->GetFitRange(0);
+  fFitEndTime   = fRunInfo->GetFitRange(1);
+  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
+  if (fRunInfo->IsFitRangeInBin()) {
+    fFitStartTime = (fGoodBins[0] + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
+    fFitEndTime = (fGoodBins[1] - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
+    // write these times back into the data structure. This way it is available when writting the log-file
+    fRunInfo->SetFitRange(fFitStartTime, 0);
+    fRunInfo->SetFitRange(fFitEndTime, 1);
+  }
+  if (fFitStartTime == PMUSR_UNDEFINED) { // fit start/end NOT found in the RUN block, check GLOBAL block
+    fFitStartTime = globalBlock->GetFitRange(0);
+    fFitEndTime   = globalBlock->GetFitRange(1);
+    // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
+    if (globalBlock->IsFitRangeInBin()) {
+      fFitStartTime = (fGoodBins[0] + globalBlock->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
+      fFitEndTime = (fGoodBins[1] - globalBlock->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
+      // write these times back into the data structure. This way it is available when writting the log-file
+      globalBlock->SetFitRange(fFitStartTime, 0);
+      globalBlock->SetFitRange(fFitEndTime, 1);
+    }
+  }
+  if ((fFitStartTime == PMUSR_UNDEFINED) || (fFitEndTime == PMUSR_UNDEFINED)) {
+    fFitStartTime = (fGoodBins[0] - fT0s[0]) * fTimeResolution; // (fgb-t0)*dt
+    fFitEndTime = (fGoodBins[1] - fT0s[0]) * fTimeResolution;   // (lgb-t0)*dt
+    cerr << ">> PRunSingleHisto::GetProperFitRange(): **WARNING** Couldn't get fit start/end time!" << endl;
+    cerr << ">>    Will set it to fgb/lgb which given in time is: " << fFitStartTime << "..." << fFitEndTime << " (usec)" << endl;
+  }
+cout << endl << "debug> PRunSingleHisto::GetProperFitRange(): fFitStartTime=" << fFitStartTime << ", fFitEndTime=" << fFitEndTime << endl;
+}
+
+//--------------------------------------------------------------------------
 // EstimateN0 (private)
 //--------------------------------------------------------------------------
 /**
@@ -1489,8 +1593,6 @@ void PRunSingleHisto::EstimateN0()
     }
   }
 
-
-
   // estimate N0
   Double_t dt = fTimeResolution;
   Double_t tau = PMUON_LIFETIME;
@@ -1509,7 +1611,7 @@ void PRunSingleHisto::EstimateN0()
     nom += xx;
   }
 
-  // calc: denominator
+  // calc denominator
   for (UInt_t i=t0; i<fForward.size(); i++) {
     xx = exp(-dt*(Double_t)(i-t0)/tau);
     xx += alpha;
