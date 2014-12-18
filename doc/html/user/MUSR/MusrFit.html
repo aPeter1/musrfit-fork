@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en_US" lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 04 Dec 2014 09:16:22 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 18 Dec 2014 13:46:12 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1417684542" type="application/x-wiki" title="edit MusrFit" />
+<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1418910331" type="application/x-wiki" title="edit MusrFit" />
 <meta name="TEXT_NUM_TOPICS" content="Number of topics:" />
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 <meta name="robots" content="noindex" /><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRsshtml.html" />
@@ -140,11 +140,12 @@ pre {
 </li> <li> <a href="MusrFit.html#A_4.3.3_User_Functions"> 4.3.3  User Functions </a>
 </li></ul> 
 </li> <li> <a href="MusrFit.html#A_4.4_The_FUNCTIONS_Block"> 4.4  The FUNCTIONS Block </a>
-</li> <li> <a href="MusrFit.html#A_4.5_The_RUN_Block"> 4.5  The RUN Block </a>
-</li> <li> <a href="MusrFit.html#A_4.6_The_COMMANDS_Block"> 4.6  The COMMANDS Block </a>
-</li> <li> <a href="MusrFit.html#A_4.7_The_FOURIER_Block"> 4.7  The FOURIER Block </a>
-</li> <li> <a href="MusrFit.html#A_4.8_The_PLOT_Block"> 4.8  The PLOT Block </a>
-</li> <li> <a href="MusrFit.html#A_4.9_The_STATISTIC_Block"> 4.9  The STATISTIC Block </a>
+</li> <li> <a href="MusrFit.html#A_4.5_The_GLOBAL_Block"> 4.5  The GLOBAL Block </a>
+</li> <li> <a href="MusrFit.html#A_4.6_The_RUN_Block"> 4.6  The RUN Block </a>
+</li> <li> <a href="MusrFit.html#A_4.7_The_COMMANDS_Block"> 4.7  The COMMANDS Block </a>
+</li> <li> <a href="MusrFit.html#A_4.8_The_FOURIER_Block"> 4.8  The FOURIER Block </a>
+</li> <li> <a href="MusrFit.html#A_4.9_The_PLOT_Block"> 4.9  The PLOT Block </a>
+</li> <li> <a href="MusrFit.html#A_4.10_The_STATISTIC_Block"> 4.10  The STATISTIC Block </a>
 </li></ul> 
 </li> <li> <a href="MusrFit.html#A_5_The_Fit_Types"> 5  The Fit Types </a> <ul>
 <li> <a href="MusrFit.html#A_5.1_Single_Histogram_Fit"> 5.1  Single Histogram Fit </a>
@@ -753,8 +754,91 @@ It follows an example to illustrate the usage of functions in the THEORY block. 
 <p></p>
 In the case that functions have to be fitted which cannot be defined in the FUNCTIONS block, the functions can be implemented externally and made usable through the <a href="#UserFunctions" class="foswikiCurrentTopicLink">userFunc mechanism</a>.
 <p></p>
+<a name="TheGlobalBlock"></a>
+<h2><a name="A_4.5_The_GLOBAL_Block"></a> 4.5  The GLOBAL Block </h2>
+The GLOBAL block is used to collect data which otherwise need to be specified in every single run entry of the RUN block. Therefore, this block is only present to potential shorten the msr-file and to ease the handling for the user. 
+The logic will by like that: <ol>
+<li> check it the property is found in the RUN block.
+</li> <li> if not present in the RUN block, check whether it is present in the GLOBAL block
+</li> <li> if still not found, try the data file
+</li> <li> if still not found, either try to estimate it, or fire an error message
+</li></ol> 
+This means that an entry in the RUN block will <strong>overwrite</strong> a setting from the GLOBAL block.
+<p></p>
+The currently supported GLOBAL block entries are: <ul>
+<li> <code>fittype</code>
+</li> <li> <code>data</code>
+</li> <li> <code>t0</code>
+</li> <li> <code>addt0</code>
+</li> <li> <code>fit</code>
+</li> <li> <code>packing</code>
+</li></ul> 
+<p></p>
+For a detailed discussion of these entries see Sec <a href="#TheRunBlock" class="foswikiCurrentTopicLink">RUN block</a>.
+<p></p>
+An example snippet with, and without GLOBAL section:
+With GLOBAL block:
+<pre>
+...
+###############################################################
+GLOBAL
+fittype         0         (single histogram fit)
+fit             0.0005  10     
+packing         5
+
+###############################################################
+RUN data/tdc&#95;hifi&#95;2014&#95;00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+map             5    6    7    0    0    0    0    0    0    0    0
+norm            8
+backgr.fit      9
+forward         2 
+data            20120   409500  
+t0              20108.0 
+#--------------------------------------------------------------
+RUN data/tdc&#95;hifi&#95;2014&#95;00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+map            10   11   12    0    0    0    0    0    0    0    0
+norm            13
+backgr.fit      14
+forward         3 
+data            20111   409500  
+t0              20088.0 
+#--------------------------------------------------------------
+RUN data/tdc&#95;hifi&#95;2014&#95;00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+...
+</pre>
+Without GLOBAL block:
+<pre>
+...
+###############################################################
+RUN data/tdc&#95;hifi&#95;2014&#95;00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+map             5    6    7    0    0    0    0    0    0    0    0
+norm            8
+backgr.fit      9
+forward         2 
+data            20120   409500  
+t0              20108.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc&#95;hifi&#95;2014&#95;00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+map            10   11   12    0    0    0    0    0    0    0    0
+norm            13
+backgr.fit      14
+forward         3 
+data            20111   409500  
+t0              20088.0 
+fit             0.0005  10     
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc&#95;hifi&#95;2014&#95;00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+... and many more detectors here ...
+</pre>
+<p></p>
 <a name="TheRunBlock"></a>
-<h2><a name="A_4.5_The_RUN_Block"></a> 4.5  The RUN Block </h2>
+<h2><a name="A_4.6_The_RUN_Block"></a> 4.6  The RUN Block </h2>
 The RUN block is used to collect the data needed for a particular run to be fitted. This includes the run name, fit type, data format, etc. The RUN block is slightly differently organized than the other blocks. The information is collected via labels followed by the information. Each run to be fitted has its own RUN block. A RUN block starts with a run-file line which has the structure
 <pre>
    RUN &#60;run&#95;file&#95;name&#62; &#60;beamline&#62; &#60;facility&#62; &#60;file&#95;format&#62;
@@ -851,9 +935,8 @@ etc.
 <p></p> <dl>
 <dt> lifetime (fit type 0) </dt><dd> Fit parameter representing the lifetime of the muon. If it is not specified the value &#964;<sub>&#956;</sub>=2.197019 &#956;s is used in the calculations.
 </dd></dl> 
-<p></p>
-<a name="LifeTimeCorrection"></a> <dl>
-<dt> lifetimecorrection (fit type 0) </dt><dd> Does not accept any arguments. If present, the output in <code>musrview</code> is corrected for the exponential decay of the muon.
+<p></p> <dl>
+<dt> lifetimecorrection (fit type 0) <img src="../pub/Main/SmiliesPluginPSI/eek.gif" alt="eek!" title="eek!" border="0" /> <strong>obsolete</strong> <img src="../pub/Main/SmiliesPluginPSI/eek.gif" alt="eek!" title="eek!" border="0" />  </dt><dd> Does not accept any arguments. If present, the output in <code>musrview</code> is corrected for the exponential decay of the muon. This item is <strong>obsolete</strong> in the RUN block and will be transferred to the <a href="#ThePlotBlock" class="foswikiCurrentTopicLink">PLOT block</a>, which allows switching between histogram view and asymmetry view much quicker.  
 </dd></dl> 
 <p></p> <dl>
 <dt> map </dt><dd> On this line the mapping of run-dependent parameters is done. Parameter numbers given here may be accessed through <code><b>map1</b></code>, <code><b>map2</b></code>, etc. in the THEORY and FUNCTIONS blocks (see also <a href="#MaPs" class="foswikiCurrentTopicLink">here</a>). The first ten maps are always present and have the value 0 if not used; however, the total number of maps is not restricted!
@@ -890,11 +973,12 @@ etc.
 </dd></dl> 
 <p></p>
 <a name="DataRange"></a> <dl>
-<dt> data (fit type 0, 4) </dt><dd> The numbers of the first and the last channel of an interval from which the data is taken are specified here. In case histograms are being grouped, the specified channels are interpreted with respect to the first histogram.
+<dt> data (fit type 0, 4) </dt><dd> The numbers of the first and the last channel of an interval from which the data is taken are specified here. In case histograms are being grouped, the specified channels are interpreted with respect to the first histogram. Typically these channels are referred to as <code>first good bin</code> / <code>last good bin</code> (fgb/lgb).
 </dd></dl> 
 <p></p> <dl>
-<dt> data (fit types 2) </dt><dd> The numbers of the first and the last channel of an interval from which the data is taken are specified here. For all the histograms this is done together in the following order: <i>k</i><sub>f,first</sub> <i>k</i><sub>f,last</sub> <i>k</i><sub>b,first</sub> <i>k</i><sub>b,last</sub> [<i>k</i><sub>r,first</sub> <i>k</i><sub>r,last</sub> <i>k</i><sub>l,first</sub> <i>k</i><sub>l,last</sub>]. In case histograms are being grouped, the specified channels are interpreted with respect to the first histograms.
+<dt> data (fit types 2) </dt><dd> The numbers of the first and the last channel of an interval from which the data is taken are specified here. Typically these channels are referred to as <code>first good bin</code> / <code>last good bin</code> (fgb/lgb). For all the histograms this is done together in the following order: <i>k</i><sub>f,first</sub> <i>k</i><sub>f,last</sub> <i>k</i><sub>b,first</sub> <i>k</i><sub>b,last</sub> [<i>k</i><sub>r,first</sub> <i>k</i><sub>r,last</sub> <i>k</i><sub>l,first</sub> <i>k</i><sub>l,last</sub>]. In case histograms are being grouped, the specified channels are interpreted with respect to the first histograms.
 </dd></dl> 
+<p></p>
 <a name="TimeZero"></a> <dl>
 <dt> t0 (fit type 0, 4) </dt><dd> The number of the time-zero channel of the histogram. Example: <pre>
   t0 3419        # t0 channel &#61; 3419
@@ -927,7 +1011,7 @@ fit 0.2 8.5
 </dd></dl> 
 <p></p>
 <a name="TheCommandsBlock"></a>
-<h2><a name="A_4.6_The_COMMANDS_Block"></a> 4.6  The COMMANDS Block </h2>
+<h2><a name="A_4.7_The_COMMANDS_Block"></a> 4.7  The COMMANDS Block </h2>
 The COMMANDS block is used to specify the commands which are passed from <code>musrfit</code> to <code>MINUIT2</code>. The supported commands after the COMMANDS keyword are <strong>STRATEGY</strong>, <strong>MIGRAD</strong>, <strong>SIMPLEX</strong>, <strong>MINIMIZE</strong>, <strong>MINOS</strong>, <strong>HESSE</strong>, <strong>SAVE</strong>, some additional commands described below, and for compatibility reasons <strong>SET BATCH</strong> and <strong>END RETURN</strong>. The last two commands may appear in the COMMANDS block but are simply ignored.
 A detailed description of all of these commands can be found in the <a href="http://seal.web.cern.ch/seal/documents/minuit/mnusersguide.pdf" target="_top">MINUIT2 users guide</a> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/pdf.png" width="16" height="16" alt="pdf" /></span>.
 <p></p>
@@ -1004,7 +1088,7 @@ For debug purposes it is possible to force MINUIT2 to print out additional infor
 Here the <code>MINOS</code> command will print out lot of additional information to the standard output. Notice there are 2 <code>SAVE</code> commands here. This will write the result of <code>MIGRAD</code> to the <code>MINUIT2.OUTPUT</code> file and at the end <em>append</em> the <code>MINOS</code> results to this file.
 <p></p>
 <a name="TheFourierBlock"></a>
-<h2><a name="A_4.7_The_FOURIER_Block"></a> 4.7  The FOURIER Block </h2>
+<h2><a name="A_4.8_The_FOURIER_Block"></a> 4.8  The FOURIER Block </h2>
 The Fourier transform is done and the results are plotted within <code>musrview</code> &mdash;as input data the actual data shown in <code>musrview</code> is used. In the FOURIER block of the msr file all necessary parameters for calculating and presenting the Fourier transform of the data specified in the <a href="#ThePlotBlock" class="foswikiCurrentTopicLink">PLOT block</a> is given. If the FOURIER block is not present in the msr file, either the parameters set in the <a href="#MusrfitStartupXml" class="foswikiCurrentTopicLink">XML startup file</a> or the system defaults are taken when the Fourier transform is performed. The block starts with the FOURIER keyword and may contain the following entries on the successive lines: <dl>
 <dt> units </dt><dd> Here is specified in which domain the Fourier-transformed data is presented. One may choose between the fields (<strong>Gauss</strong>) or (<strong>Tesla</strong>), the frequency (<strong>MHz</strong>), and the angular-frequency domain (<strong>Mc/s</strong>).
 </dd> <dt> fourier_power </dt><dd> It is possible (but not necessary) to set the number of data points used for the Fourier transform here. As argument the exponent <i>n</i>&lt;21 of a power of 2 is accepted. The number of data points is then 2<sup><i>n</i></sup>. <strong>Attention:</strong> If the number of points given here is bigger than the actual number of available data points, the input data vector is filled with zeros until the number of requested points is reached (zero padding)!
@@ -1041,17 +1125,18 @@ Altogether, a possible FOURIER block might look like that:
 <p></p>
 <p></p>
 <a name="ThePlotBlock"></a>
-<h2><a name="A_4.8_The_PLOT_Block"></a> 4.8  The PLOT Block </h2>
+<h2><a name="A_4.9_The_PLOT_Block"></a> 4.9  The PLOT Block </h2>
 The PLOT block is intended to collect all the information needed for the graphical presentation of the data and fits using <code>musrview</code>. The PLOT keyword at the beginning of the block is followed by a number which indicates the plot type. The plot types match the <a href="#FitTypes" class="foswikiCurrentTopicLink">fit types</a>. Additionally, it is possible to provide information using the following keywords: <dl>
-<dt> runs </dt><dd> The numbers of the runs to be plotted have to be put here. The runs are numbered according to their appearance in the RUN block.
+<dt> lifetimecorrection </dt><dd> Does not accept any arguments. If present, the output in <code>musrview</code> is corrected for the exponential decay of the muon. Only relevant for (type 0). 
+</dd> <dt> runs </dt><dd> The numbers of the runs to be plotted have to be put here. The runs are numbered according to their appearance in the RUN block.
 </dd> <dt> range </dt><dd> Here it is possible to define the plotting range explicitly. Depending on the plot type the following settings are allowed where the times are given in microseconds and the <i>N</i> in counts (type 0, 4) or in counts/nsec (type 0): <dl>
-<dt> 0 without <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a>, 4 </dt><dd> <i>t</i><sub>min</sub> <i>t</i><sub>max</sub> [ <i>N</i><sub>min</sub> <i>N</i><sub>max</sub> ]
-</dd> <dt> 0 with <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a>, 2 </dt><dd> <i>t</i><sub>min</sub> <i>t</i><sub>max</sub> [ <i>A</i><sub>min</sub> <i>A</i><sub>max</sub> ]
+<dt> 0 without lifetimecorrection, 4 </dt><dd> <i>t</i><sub>min</sub> <i>t</i><sub>max</sub> [ <i>N</i><sub>min</sub> <i>N</i><sub>max</sub> ]
+</dd> <dt> 0 with lifetimecorrection, 2 </dt><dd> <i>t</i><sub>min</sub> <i>t</i><sub>max</sub> [ <i>A</i><sub>min</sub> <i>A</i><sub>max</sub> ]
 </dd> <dt> 8 </dt><dd> <i>x</i><sub>min</sub> <i>x</i><sub>max</sub> [ <i>y</i><sub>min</sub> <i>y</i><sub>max</sub> ]
 </dd></dl> 
 </dd> <dt> sub_ranges </dt><dd> Here it is possible to define the plotting range for each run individually. For the different plot types the command has the structure <dl>
-<dt> 0 without <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a>, 4 </dt><dd> <i>t</i><sub>min</sub><sup>1</sup> <i>t</i><sub>max</sub><sup>1</sup> <i>t</i><sub>min</sub><sup>2</sup> <i>t</i><sub>max</sub><sup>2</sup> ... <i>t</i><sub>min</sub><sup><i>n</i></sup> <i>t</i><sub>max</sub><sup><i>n</i></sup> [ <i>N</i><sub>min</sub> <i>N</i><sub>max</sub> ] (<i>n</i> = the number of runs to be plotted)
-</dd> <dt> 0 with <a href="#LifeTimeCorrection" class="foswikiCurrentTopicLink">lifetimecorrection</a>, 2 </dt><dd> <i>t</i><sub>min</sub><sup>1</sup> <i>t</i><sub>max</sub><sup>1</sup> <i>t</i><sub>min</sub><sup>2</sup> <i>t</i><sub>max</sub><sup>2</sup> ... <i>t</i><sub>min</sub><sup><i>n</i></sup> <i>t</i><sub>max</sub><sup><i>n</i></sup> [ <i>A</i><sub>min</sub> <i>A</i><sub>max</sub> ] (<i>n</i> = the number of runs to be plotted)
+<dt> 0 without lifetimecorrection, 4 </dt><dd> <i>t</i><sub>min</sub><sup>1</sup> <i>t</i><sub>max</sub><sup>1</sup> <i>t</i><sub>min</sub><sup>2</sup> <i>t</i><sub>max</sub><sup>2</sup> ... <i>t</i><sub>min</sub><sup><i>n</i></sup> <i>t</i><sub>max</sub><sup><i>n</i></sup> [ <i>N</i><sub>min</sub> <i>N</i><sub>max</sub> ] (<i>n</i> = the number of runs to be plotted)
+</dd> <dt> 0 with lifetimecorrection, 2 </dt><dd> <i>t</i><sub>min</sub><sup>1</sup> <i>t</i><sub>max</sub><sup>1</sup> <i>t</i><sub>min</sub><sup>2</sup> <i>t</i><sub>max</sub><sup>2</sup> ... <i>t</i><sub>min</sub><sup><i>n</i></sup> <i>t</i><sub>max</sub><sup><i>n</i></sup> [ <i>A</i><sub>min</sub> <i>A</i><sub>max</sub> ] (<i>n</i> = the number of runs to be plotted)
 </dd> <dt> 8 </dt><dd>  not yet implemented.
 </dd></dl> 
 </dd> <dt> use_fit_ranges [ <i>y</i><sub>min</sub> <i>y</i><sub>max</sub>] </dt><dd> The fit ranges of the individual runs are used to present the data. Optionally, an ordinate range can be provided.
@@ -1079,7 +1164,7 @@ The PLOT block is intended to collect all the information needed for the graphic
 </pre>
 <p></p>
 <a name="TheStatisticBlock"></a>
-<h2><a name="A_4.9_The_STATISTIC_Block"></a> 4.9  The STATISTIC Block </h2>
+<h2><a name="A_4.10_The_STATISTIC_Block"></a> 4.10  The STATISTIC Block </h2>
 The STATISTIC block is the last block of a msr file. It contains some information on the fit: the date and time as well as the absolute and normalized values of &#967;<sup>2</sup> and the number of degrees of freedom in the fit.<br>
 If enabled in the <a href="#MusrfitStartupXml" class="foswikiCurrentTopicLink">XML file</a> for &chi;<sup>2</sup>-<a href="#SingleHistogramFit" class="foswikiCurrentTopicLink">single-histogram fits</a> also <a href="http://en.wikipedia.org/wiki/Pearson's_chi-square_test" target="_top">Pearson's &chi;<sup>2</sup></a> will be written to the STATISTIC block.<br>
 These information only have a meaning if the fitting procedure has been executed at least once and the fit has converged!
@@ -1441,7 +1526,7 @@ A technical description of the musrfit framework can be found <a href="http://lm
 <a name="BugTracking"></a>
 <h1><a name="A_8_Bugtracking"></a> 8  Bugtracking </h1>
 <p></p>
-For reporting bugs or requesting new features and improvements please use the <a href="https://tracker.intranet.psi.ch/jira/browse/MUSR" target="_top">PSI Tracker</a> or send an e-mail to A. Suter.
+For reporting bugs or requesting new features and improvements please use the <a href="https://bitbucket.org/muonspin/musrfit/issues" target="_top">bitbucket-repo</a> (preferred), <a href="https://tracker.psi.ch/jira/browse/MUSR" target="_top">PSI Tracker</a> or send an e-mail to A. Suter.
 <p></p>
 -- <a href="http://lmu.web.psi.ch/lem/group.html" target="_top">AS</a> &amp; <a href="http://www.fsf.org/register_form?referrer=8369" target="_top">BMW</a> </div>
 <div class="foswikiContentFooter"></div><!-- -->
@@ -1455,7 +1540,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 <!-- -->
 <!-- --><!-- -->
 <!-- -->
-<!-- TAB --><div id='jqTab5201' class="attachments jqAjaxTab jqTab {url: 'https://intranet.psi.ch/wiki/bin/rest/RenderPlugin/template?name=metadata;expand=attachments;topic=MUSR.MusrFit;render=on;1417684542'}">
+<!-- TAB --><div id='jqTab7232' class="attachments jqAjaxTab jqTab {url: 'https://intranet.psi.ch/wiki/bin/rest/RenderPlugin/template?name=metadata;expand=attachments;topic=MUSR.MusrFit;render=on;1418910331'}">
 <h2 class='jqTabLabel'>Attachments <span class='foswikiAttachmentsCount'>(2)</span></h2>
 <div class='jqTabContents' >
   <div class='foswikiFormSteps foswikiAttachmentsProcess'><span class='jqAjaxLoader'>&nbsp;</span></div>
@@ -1477,9 +1562,9 @@ For reporting bugs or requesting new features and improvements please use the <a
 <div class="foswikiFormSteps">
 <a name="topic-actions"></a>
   <div class="patternTopicActions foswikiFormStep">
-	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1417684542' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFit' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/php/pdf.php?url=MUSR/MusrFit?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r115&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=114;rev2=115">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=114">r114</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=113;rev2=114">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=113">r113</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=112;rev2=113">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=112">r112</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=more&amp;maxrev=115&amp;currrev=115' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
+	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1418910331' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFit' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/php/pdf.php?url=MUSR/MusrFit?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r117&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=116;rev2=117">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=116">r116</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=115;rev2=116">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=115">r115</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=114;rev2=115">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=114">r114</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=more&amp;maxrev=117&amp;currrev=117' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
   </div>
-</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r115 - 04 Dec 2014, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
+</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r117 - 18 Dec 2014, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
 </div>
 </div><div id="patternSideBar"><div id="patternClearHeaderLeft"></div>
 <div id="patternSideBarContents">
@@ -1528,7 +1613,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 </div>
 </div>
 </div></body>
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 04 Dec 2014 09:16:44 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 18 Dec 2014 13:46:34 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>
