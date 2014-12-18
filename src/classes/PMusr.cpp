@@ -705,6 +705,7 @@ void PRawRunData::SetTempError(const UInt_t idx, const Double_t errTemp)
  */
 PMsrGlobalBlock::PMsrGlobalBlock()
 {
+  fGlobalPresent = false;
   fFitType = -1; // undefined fit type
   for (UInt_t i=0; i<4; i++) {
     fDataRange[i] = -1; // undefined data bin range

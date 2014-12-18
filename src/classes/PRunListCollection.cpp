@@ -99,7 +99,6 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
   if (fitType == -1) { // fit type NOT given in the RUN block, check the GLOBAL block
     fitType = (*fMsrInfo->GetMsrGlobal()).GetFitType();
   }
-cout << endl << "debug> PRunListCollection::Add(): fitType=" << fitType << endl;
 
   switch (fitType) {
     case PRUN_SINGLE_HISTO:

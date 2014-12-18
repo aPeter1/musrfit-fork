@@ -657,20 +657,6 @@ Bool_t PRunSingleHisto::PrepareData()
     return false;
   }
 
-/* remove eventually as35
-  cout << endl << "debug> PRunSingleHisto::PrepareData(): fT0s.size()=" << fT0s.size();
-  cout << endl << "debug> PRunSingleHisto::PrepareData(): fT0s : ";
-  for (UInt_t i=0; i<fT0s.size(); i++)
-    cout << fT0s[i] << ", ";
-  cout << endl << "debug> PRunSingleHisto::PrepareData(): fAddT0s.size()=" << fAddT0s.size();
-  for (UInt_t i=0; i<fAddT0s.size(); i++) {
-    cout << endl << "debug> PRunSingleHisto::PrepareData(): fAddT0s[" << i << "].size()=" << fAddT0s[i].size();
-    cout << endl << "debug> PRunSingleHisto::PrepareData(): fAddT0s : " << i << ": ";
-    for (UInt_t j=0; j<fAddT0s[i].size(); j++)
-      cout << fAddT0s[i][j] << ", ";
-  }
-*/
-
   // keep the histo of each group at this point (addruns handled below)
   vector<PDoubleVector> forward;
   forward.resize(histoNo.size());   // resize to number of groups
@@ -1553,7 +1539,6 @@ void PRunSingleHisto::GetProperFitRange(PMsrGlobalBlock *globalBlock)
     cerr << ">> PRunSingleHisto::GetProperFitRange(): **WARNING** Couldn't get fit start/end time!" << endl;
     cerr << ">>    Will set it to fgb/lgb which given in time is: " << fFitStartTime << "..." << fFitEndTime << " (usec)" << endl;
   }
-cout << endl << "debug> PRunSingleHisto::GetProperFitRange(): fFitStartTime=" << fFitStartTime << ", fFitEndTime=" << fFitEndTime << endl;
 }
 
 //--------------------------------------------------------------------------

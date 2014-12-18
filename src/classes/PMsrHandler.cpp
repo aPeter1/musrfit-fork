@@ -1589,7 +1589,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
   fout << hline.Data() << endl;
 
   // write GLOBAL block
-  // STILL MISSING
+  if (fGlobal.IsPresent()) {
+    // not sure that anything needs to be done here ...
+  }
 
   // write RUN blocks
   for (i = 0; i < fRuns.size(); ++i) {
@@ -2667,6 +2669,9 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
   Double_t dval;
   UInt_t addT0Counter = 0;
 
+  // since this routine is called, a GLOBAL block is present
+  global.SetGlobalPresent(true);
+
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
     // remove potential comment at the end of lines
@@ -2844,6 +2849,7 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
     fGlobal = global;
   }
 
+/*
   cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fittype   : " << fGlobal.GetFitType();
   cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: data bin range: ";
   for (UInt_t i=0; i<4; i++) {
@@ -2864,6 +2870,7 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
   cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fit       : " << fGlobal.GetFitRange(0) << ", " << fGlobal.GetFitRange(1);
   cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: packing   : " << fGlobal.GetPacking();
   cout << endl;
+*/
 
   return !error;
 }

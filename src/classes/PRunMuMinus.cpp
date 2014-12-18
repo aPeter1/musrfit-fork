@@ -503,59 +503,6 @@ Bool_t PRunMuMinus::PrepareData()
     return false;
   }
 
-/*
-  // feed all T0's
-  // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
-  fT0s.clear();
-  fT0s.resize(histoNo.size());
-  for (UInt_t i=0; i<fT0s.size(); i++) {
-    fT0s[i] = -1.0;
-  }
-
-  // fill in the T0's from the msr-file (if present)
-  for (UInt_t i=0; i<fRunInfo->GetT0BinSize(); i++) {
-    fT0s[i] = fRunInfo->GetT0Bin(i);
-  }
-
-  // fill in the T0's from the GLOBAL block section (if present)
-  for (UInt_t i=0; i<globalBlock->GetT0BinSize(); i++) {
-    if (fT0s[i] == -1) { // i.e. not given in the RUN block section
-      fT0s[i] = globalBlock->GetT0Bin(i);
-    }
-  }
-
-  // fill in the T0's from the data file, if not already present in the msr-file
-  for (UInt_t i=0; i<histoNo.size(); i++) {
-    if (fT0s[i] == -1.0) // i.e. not present in the msr-file, try the data file
-      if (runData->GetT0Bin(histoNo[i]) > 0.0) {
-        fT0s[i] = runData->GetT0Bin(histoNo[i]);
-        fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
-      }
-  }
-
-  // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
-  for (UInt_t i=0; i<histoNo.size(); i++) {
-    if (fT0s[i] == -1.0) { // i.e. not present in the msr-file and data file, use the estimated T0
-      fT0s[i] = runData->GetT0BinEstimated(histoNo[i]);
-      fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
-
-      cerr << endl << ">> PRunMuMinus::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-      cerr << endl << ">> run: " << fRunInfo->GetRunName();
-      cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
-      cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-      cerr << endl;
-    }
-  }
-
-  // check if t0 is within proper bounds
-  for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
-    if ((fT0s[i] < 0) || (fT0s[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunMuMinus::PrepareData(): **ERROR** t0 data bin (" << fT0s[i] << ") doesn't make any sense!";
-      cerr << endl;
-      return false;
-    }
-  }
-*/
   // keep the histo of each group at this point (addruns handled below)
   vector<PDoubleVector> forward;
   forward.resize(histoNo.size());   // resize to number of groups
@@ -577,52 +524,6 @@ Bool_t PRunMuMinus::PrepareData()
         return false;
       }
 
-/*
-      // feed all T0's
-      // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
-      PDoubleVector t0Add;
-      t0Add.resize(histoNo.size());
-      for (UInt_t j=0; j<t0Add.size(); j++) {
-        t0Add[j] = -1.0;
-      }
-
-      // fill in the T0's from the msr-file (if present)
-      for (UInt_t j=0; j<fRunInfo->GetT0BinSize(); j++) {
-        t0Add[j] = fRunInfo->GetAddT0Bin(i-1,j); // addRunIdx starts at 0
-      }
-
-      // fill in the T0's from the data file, if not already present in the msr-file
-      for (UInt_t j=0; j<histoNo.size(); j++) {
-        if (t0Add[j] == -1.0) // i.e. not present in the msr-file, try the data file
-          if (addRunData->GetT0Bin(histoNo[j]) > 0.0) {
-            t0Add[j] = addRunData->GetT0Bin(histoNo[j]);
-            fRunInfo->SetAddT0Bin(t0Add[j], i-1, j); // keep value for the msr-file
-          }
-      }
-
-      // fill in the T0's gaps, i.e. in case the T0's are NOT in the msr-file and NOT in the data file
-      for (UInt_t j=0; j<histoNo.size(); j++) {
-        if (t0Add[j] == -1.0) { // i.e. not present in the msr-file and data file, use the estimated T0
-          t0Add[j] = addRunData->GetT0BinEstimated(histoNo[j]);
-          fRunInfo->SetAddT0Bin(t0Add[j], i-1, j); // keep value for the msr-file
-
-          cerr << endl << ">> PRunMuMinus::PrepareData(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-          cerr << endl << ">> run: " << fRunInfo->GetRunName();
-          cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
-          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-          cerr << endl;
-        }
-      }
-
-      // check if t0 is within proper bounds
-      for (UInt_t j=0; j<fRunInfo->GetForwardHistoNoSize(); j++) {
-        if ((t0Add[j] < 0) || (t0Add[j] > (Int_t)addRunData->GetDataBin(histoNo[j])->size())) {
-          cerr << endl << ">> PRunMuMinus::PrepareData(): **ERROR** addt0 data bin (" << t0Add[j] << ") doesn't make any sense!";
-          cerr << endl;
-          return false;
-        }
-      }
-*/
       // add forward run
       UInt_t addRunSize;
       for (UInt_t k=0; k<histoNo.size(); k++) { // fill each group
@@ -661,92 +562,6 @@ Bool_t PRunMuMinus::PrepareData()
   // get the fit range for the current RUN block
   GetProperFitRange(globalBlock);
 
-/*
-  // first get start data, end data, and t0
-  Int_t start;
-  Int_t end;
-  start = fRunInfo->GetDataRange(0);
-  end   = fRunInfo->GetDataRange(1);
-
-  // check if data range has been given in the RUN block, if not try to get it from the GLOBAL block
-  if (start < 0) {
-    start = fMsrInfo->GetMsrGlobal()->GetDataRange(0);
-  }
-  if (end < 0) {
-    end = fMsrInfo->GetMsrGlobal()->GetDataRange(1);
-  }
-
-  // check if data range has been provided, and if not try to estimate them
-  if (start < 0) {
-    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
-    start = (Int_t)fT0s[0]+offset;
-    fRunInfo->SetDataRange(start, 0);
-    cerr << endl << ">> PRunMuMinus::PrepareData(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
-  }
-  if (end < 0) {
-    end = fForward.size();
-    fRunInfo->SetDataRange(end, 1);
-    cerr << endl << ">> PRunMuMinus::PrepareData(): **WARNING** data range was not provided, will try data range end = " << end << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
-  }
-
-  // check if start and end make any sense
-  // 1st check if start and end are in proper order
-  if (end < start) { // need to swap them
-    Int_t keep = end;
-    end = start;
-    start = keep;
-  }
-  // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunMuMinus::PrepareFitData(): **ERROR** start data bin doesn't make any sense!";
-    cerr << endl;
-    return false;
-  }
-  // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunMuMinus::PrepareFitData(): **ERROR** end data bin doesn't make any sense!";
-    cerr << endl;
-    return false;
-  }
-
-  // keep good bins for potential later use
-  fGoodBins[0] = start;
-  fGoodBins[1] = end;
-
-  // set fit start/end time; first check RUN Block
-  fFitStartTime = fRunInfo->GetFitRange(0);
-  fFitEndTime   = fRunInfo->GetFitRange(1);
-  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
-  if (fRunInfo->IsFitRangeInBin()) {
-    fFitStartTime = (start + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
-    fFitEndTime = (end - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
-    // write these times back into the data structure. This way it is available when writting the log-file
-    fRunInfo->SetFitRange(fFitStartTime, 0);
-    fRunInfo->SetFitRange(fFitEndTime, 1);
-  }
-  if (fFitStartTime == PMUSR_UNDEFINED) { // fit start/end NOT found in the RUN block, check GLOBAL block
-    fFitStartTime = globalBlock->GetFitRange(0);
-    fFitEndTime   = globalBlock->GetFitRange(1);
-    // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
-    if (globalBlock->IsFitRangeInBin()) {
-      fFitStartTime = (start + globalBlock->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
-      fFitEndTime = (end - globalBlock->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
-      // write these times back into the data structure. This way it is available when writting the log-file
-      globalBlock->SetFitRange(fFitStartTime, 0);
-      globalBlock->SetFitRange(fFitEndTime, 1);
-    }
-  }
-  if ((fFitStartTime == PMUSR_UNDEFINED) || (fFitEndTime == PMUSR_UNDEFINED)) {
-    cerr << "PRunMuMinus::PrepareData(): **ERROR** Couldn't get fit start/end time!" << endl;
-    return false;
-  }
-cout << endl << "debug> PRunMuMinus::PrepareData(): fFitStartTime=" << fFitStartTime << ", fFitEndTime=" << fFitEndTime << endl;
-*/
-
   // do the more fit/view specific stuff
   if (fHandleTag == kFit)
     success = PrepareFitData(runData, histoNo[0]);
@@ -783,64 +598,7 @@ Bool_t PRunMuMinus::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
   // transform raw histo data. This is done the following way (for details see the manual):
   // for the single histo fit, just the rebinned raw data are copied
 
-/*
-  // first get start data, end data, and t0
-  Int_t start;
-  Int_t end;
-  start = fRunInfo->GetDataRange(0);
-  end   = fRunInfo->GetDataRange(1);
-  // check if data range has been provided, and if not try to estimate them
-  if (start < 0) {
-    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
-    start = (Int_t)fT0s[0]+offset;
-    fRunInfo->SetDataRange(start, 0);
-    cerr << endl << ">> PRunMuMinus::PrepareData(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
-  }
-  if (end < 0) {
-    end = fForward.size();
-    fRunInfo->SetDataRange(end, 1);
-    cerr << endl << ">> PRunMuMinus::PrepareData(): **WARNING** data range was not provided, will try data range end = " << end << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
-  }
-
-  // check if start and end make any sense
-  // 1st check if start and end are in proper order
-  if (end < start) { // need to swap them
-    Int_t keep = end;
-    end = start;
-    start = keep;
-  }
-  // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunMuMinus::PrepareFitData(): **ERROR** start data bin doesn't make any sense!";
-    cerr << endl;
-    return false;
-  }
-  // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunMuMinus::PrepareFitData(): **ERROR** end data bin doesn't make any sense!";
-    cerr << endl;
-    return false;
-  }
-
-  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
-  if (fRunInfo->IsFitRangeInBin()) {
-    fFitStartTime = (fRunInfo->GetDataRange(0) + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
-    fFitEndTime = (fRunInfo->GetDataRange(1) - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
-    // write these times back into the data structure. This way it is available when writting the log-file
-    fRunInfo->SetFitRange(fFitStartTime, 0);
-    fRunInfo->SetFitRange(fFitEndTime, 1);
-  }
-
-  // keep good bins for potential latter use
-  fGoodBins[0] = start;
-  fGoodBins[1] = end;
-*/
-
-  // everything looks fine, hence fill data set
+  // fill data set
   Int_t t0 = (Int_t)fT0s[0];
   Double_t value = 0.0;
   // data start at data_start-t0
@@ -1263,5 +1021,4 @@ void PRunMuMinus::GetProperFitRange(PMsrGlobalBlock *globalBlock)
     cerr << ">> PRunMuMinus::GetProperFitRange(): **WARNING** Couldn't get fit start/end time!" << endl;
     cerr << ">>    Will set it to fgb/lgb which given in time is: " << fFitStartTime << "..." << fFitEndTime << " (usec)" << endl;
   }
-cout << endl << "debug> PRunMuMinus::GetProperFitRange(): fFitStartTime=" << fFitStartTime << ", fFitEndTime=" << fFitEndTime << endl;
 }

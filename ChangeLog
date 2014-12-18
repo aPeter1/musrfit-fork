@@ -2,6 +2,17 @@
 # ChangeLog
 #---------------------------------------------------------------------
 
+changes since 0.13.0
+===================================
+NEW 2014-12-18 first implementation of a GLOBAL block which allows to shorten
+               a typical msr-file. Duplicate entries from the RUN blocks can be
+               added here. Furthermore, the 'lifetimecorrection' flag is 
+               transferred from the RUN blocks to the PLOT block which allows
+               a quicker switching between asymmetry and histogram representation.
+               In order to make the code more readable a lot of setup collection
+               parameters (t0, data, fit) has been encapsulated into its own 
+               functions.
+
 changes since 0.12.0
 ===================================
 NEW 2014-12-04 Fourier: added the unit 'Tesla' needed e.g. for HAL-9500

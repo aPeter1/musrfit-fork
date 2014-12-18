@@ -533,6 +533,7 @@ class PMsrGlobalBlock {
     PMsrGlobalBlock();
     virtual ~PMsrGlobalBlock() {}
 
+    virtual Bool_t IsPresent() { return fGlobalPresent; }
     virtual Int_t GetFitType() { return fFitType; }
     virtual Int_t GetDataRange(UInt_t idx);
     virtual UInt_t GetT0BinSize() { return fT0.size(); }
@@ -545,6 +546,7 @@ class PMsrGlobalBlock {
     virtual Int_t GetFitRangeOffset(UInt_t idx);
     virtual Int_t GetPacking() { return fPacking; }
 
+    virtual void SetGlobalPresent(Bool_t bval) { fGlobalPresent = bval; }
     virtual void SetFitType(Int_t ival) { fFitType = ival; }
     virtual void SetDataRange(Int_t ival, Int_t idx);
     virtual void SetT0Bin(Double_t dval, Int_t idx=-1);
@@ -555,6 +557,7 @@ class PMsrGlobalBlock {
     virtual void SetPacking(Int_t ival) { fPacking = ival; }
 
   private:
+    Bool_t fGlobalPresent;    ///< flag showing if a GLOBAL block is present at all.
     Int_t fFitType;           ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
     Int_t fDataRange[4];      ///< data bin range (fit type 0, 2, 4)
     PDoubleVector fT0;        ///< t0 bins (fit type 0, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
