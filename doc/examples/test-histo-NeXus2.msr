@@ -26,27 +26,24 @@ fun1 = par2 + map1
 fun2 = gamma_mu * par3
 
 ###############################################################
-RUN data/EMU00005989_v2 XXXX ISIS NEXUS   (name beamline institute data-file-format)
+GLOBAL
 fittype         0         (single histogram fit)
-norm            7
-backgr.fit      8
-lifetimecorrection
-map             1    0    0    0    0    0    0    0    0    0
-forward         1-16 
 data            40      1500    
 fit             0.2     14     
 packing         1
 
+###############################################################
 RUN data/EMU00005989_v2 XXXX ISIS NEXUS   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
+norm            7
+backgr.fit      8
+map             1    0    0    0    0    0    0    0    0    0
+forward         1-16 
+
+RUN data/EMU00005989_v2 XXXX ISIS NEXUS   (name beamline institute data-file-format)
 norm            9
 backgr.fit      10
-lifetimecorrection
 map            11    0    0    0    0    0    0    0    0    0
 forward         17-32 
-data            40      1500    
-fit             0.2     14     
-packing         1
 
 ###############################################################
 COMMANDS
@@ -61,11 +58,12 @@ units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
 fourier_power    10
 apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
 plot             REAL    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
-range            0    100
+range            0    200
 phase            par2
 
 ###############################################################
 PLOT 0   (single histo plot)
+lifetimecorrection
 runs     1   2   
 range    0   14   -0.22   0.22
 view_packing 2

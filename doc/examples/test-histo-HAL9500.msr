@@ -121,197 +121,139 @@ fun3 = par2 * gamma_mu
 fun4 = par4 * gamma_mu
 
 ###############################################################
-RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+GLOBAL
 fittype         0         (single histogram fit)
-lifetimecorrection
+fit             0.0005  10     
+packing         5
+
+###############################################################
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
 map             5    6    7    0    0    0    0    0    0    0    0
 norm            8
 backgr.fit      9
 forward         2 
 data            20120   409500  
 t0              20108.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            10   11   12    0    0    0    0    0    0    0    0
 norm            13
 backgr.fit      14
 forward         3 
 data            20111   409500  
 t0              20088.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            15   16   17    0    0    0    0    0    0    0    0
 norm            18
 backgr.fit      19
 forward         4 
 data            20090   409500  
 t0              20061.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            20   21   22    0    0    0    0    0    0    0    0
 norm            23
 backgr.fit      24
 forward         5 
 data            20106   409500  
 t0              20071.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            25   26   27    0    0    0    0    0    0    0    0
 norm            28
 backgr.fit      29
 forward         6 
 data            20120   409500  
 t0              20080.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            30   31   32    0    0    0    0    0    0    0    0
 norm            33
 backgr.fit      34
 forward         7 
 data            20120   409500  
 t0              20071.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            35   36   37    0    0    0    0    0    0    0    0
 norm            38
 backgr.fit      39
 forward         8 
 data            20120   409500  
 t0              20066.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            40   41   42    0    0    0    0    0    0    0    0
 norm            43
 backgr.fit      44
 forward         9 
 data            20058   409500  
 t0              20032.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            45   46   47    0    0    0    0    0    0    0    0
 norm            48
 backgr.fit      49
 forward         10 
 data            20043   409500  
 t0              20022.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            50   51   52    0    0    0    0    0    0    0    0
 norm            53
 backgr.fit      54
 forward         11 
 data            20043   409500  
 t0              20026.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            55   56   57    0    0    0    0    0    0    0    0
 norm            58
 backgr.fit      59
 forward         12 
 data            20031   409500  
 t0              20010.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            60   61   62    0    0    0    0    0    0    0    0
 norm            63
 backgr.fit      64
 forward         13 
 data            20043   409500  
 t0              20013.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            65   66   67    0    0    0    0    0    0    0    0
 norm            68
 backgr.fit      69
 forward         14 
 data            20043   409500  
 t0              20017.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            70   71   72    0    0    0    0    0    0    0    0
 norm            73
 backgr.fit      74
 forward         15 
 data            20043   409500  
 t0              20019.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            75   76   77    0    0    0    0    0    0    0    0
 norm            78
 backgr.fit      79
 forward         16 
 data            20043   409500  
 t0              20019.0 
-fit             0.0005  10     
-packing         5
 #--------------------------------------------------------------
 RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-lifetimecorrection
 map            80   81   82    0    0    0    0    0    0    0    0
 norm            83
 backgr.fit      84
 forward         17 
 data            20058   409500  
 t0              20039.0 
-fit             0.0005  10     
-packing         5
 
 ###############################################################
 COMMANDS
@@ -322,6 +264,7 @@ SAVE
 
 ###############################################################
 PLOT 0   (single histo plot)
+lifetimecorrection
 runs    1 11   
 range    0   9.07   -0.5   0.5
 

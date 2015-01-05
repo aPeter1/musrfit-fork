@@ -3,16 +3,16 @@ Temperature = 300 K, Magnetic Field = 20 Gauss, Sample = CAS
 FITPARAMETER
 #       No Name        Value     Step        Pos_Error   Boundaries
         1 zero        0         0           none        
-        2 phase       11.45     -0.34       0.35        0       100     
+        2 phase       11.45     -0.35       0.34        0       100     
         3 field       20.179    -0.028      0.028       0       none    
         4 asym        0.1877    -0.0010     0.0010      0       0.3     
-        5 rate        0.1257    -0.0024     0.0023      0       100     
+        5 rate        0.1257    -0.0023     0.0024      0       100     
         6 beta        1         0           none        
         7 Norm_L      2863.4    -1.4        1.4         
         8 BG_L        0         0           none        
-        9 Norm_R      2024.3    -1.1        1.2         0       none    
+        9 Norm_R      2024.3    -1.1        1.1         0       none    
        10 BG_R        0         0           none        0       none    
-       11 relPhase    172.25    -0.37       0.36        0       none    
+       11 relPhase    172.25    -0.37       0.37        0       none    
 
 ###############################################################
 THEORY
@@ -26,27 +26,24 @@ fun1 = par2 + map1
 fun2 = gamma_mu * par3
 
 ###############################################################
-RUN data/32482 XXXX ISIS NEXUS   (name beamline institute data-file-format)
+GLOBAL
 fittype         0         (single histogram fit)
-norm            7
-backgr.fit      8
-lifetimecorrection
-map             1    0    0    0    0    0    0    0    0    0
-forward         1-16 
 data            40      1500    
 fit             0.2     20     
 packing         1
 
+###############################################################
 RUN data/32482 XXXX ISIS NEXUS   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
+norm            7
+backgr.fit      8
+map             1    0    0    0    0    0    0    0    0    0
+forward         1-16 
+
+RUN data/32482 XXXX ISIS NEXUS   (name beamline institute data-file-format)
 norm            9
 backgr.fit      10
-lifetimecorrection
 map            11    0    0    0    0    0    0    0    0    0
 forward         17-32 
-data            40      1500    
-fit             0.2     20     
-packing         1
 
 ###############################################################
 COMMANDS
@@ -56,7 +53,7 @@ SAVE
 
 ###############################################################
 FOURIER
-units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+units            Gauss   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
 fourier_power    10
 apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
 plot             REAL    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
@@ -65,10 +62,11 @@ phase            par2
 
 ###############################################################
 PLOT 0   (single histo plot)
-runs     1   2   
+lifetimecorrection
+runs        1   2
 range    0   20   -0.3   0.3
 view_packing 5
 
 ###############################################################
-STATISTIC --- 2012-03-20 10:28:21
+STATISTIC --- 2015-01-05 14:06:13
   chisq = 3272.6, NDF = 2469, chisq/NDF = 1.325481

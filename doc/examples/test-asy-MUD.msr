@@ -13,9 +13,6 @@ asymmetry      2
 generExpo      3     4       (rate exponent)
 
 ###############################################################
-#FUNCTIONS
-
-###############################################################
 RUN data/000100 XXXX TRIUMF MUD   (name beamline institute data-file-format)
 fittype         2         (asymmetry fit)
 alpha           1

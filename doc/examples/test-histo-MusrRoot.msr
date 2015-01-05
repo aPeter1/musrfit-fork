@@ -2,21 +2,21 @@ LSCO x=0.02 (224-227), T=12.00 (K), E=5.57 keV, WEW B=~49(G)/8.62(A), Tr=15.02 (
 ###############################################################
 FITPARAMETER
 #       No Name        Value     Step        Pos_Error   Boundaries
-        1 AsymT       0.05053   -0.00072    0.00072     0       0.33    
-        2 Field       48.299    -0.095      0.094       
+        1 AsymT       0.05052   -0.00071    0.00072     0       0.33    
+        2 Field       48.298    -0.094      0.095       
         3 RateT       0.129     -0.010      0.010       0       none    
         4 AsymL       0         0           none        0       0.33    
         5 RateL       0         0           none        
         6 AlphaLR     0.9784    -0.0013     0.0013      
         7 PhaseL      6.6       -1.6        1.6         -40     40      
         8 BkgL        6.920     -0.048      0.048       
-        9 RelPhaseR   178.8     -1.9        1.9         150     210     
+        9 RelPhaseR   178.7     -1.9        1.9         150     210     
        10 NormR       419.47    -0.40       0.40        
        11 BkgR        8.393     -0.050      0.050       
-       12 AlphaTB     1.1024    -0.0015     0.0015      
-       13 RelPhaseT   269.0     -1.9        2.0         240     300     
-       14 BkgT        7.466     -0.050      0.049       
-       15 NormB       393.08    -0.39       0.39        
+       12 AlphaTB     1.1025    -0.0015     0.0015      
+       13 RelPhaseT   269.0     -1.9        1.9         240     300     
+       14 BkgT        7.466     -0.049      0.049       
+       15 NormB       393.08    -0.39       0.38        
        16 RelPhaseB   90.7      -2.0        2.0         60      120     
        17 BkgB        7.091     -0.047      0.048       
        18 One         1         0           none        
@@ -39,53 +39,37 @@ fun3 = map2 * map3
 fun4 = par4 * cos(pi / 180.0 * (par7 + map1))
 
 ###############################################################
-RUN data/lem12_his_2466 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+GLOBAL
 fittype         0         (single histogram fit)
+data            2741    63000   
+t0              2741.0  2741.0  
+fit             0.2     10     
+packing         50
+
+###############################################################
+RUN data/lem12_his_2466 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
 norm            fun3
 backgr.fit      8
-lifetimecorrection
 map            19    6   10    0    0    0    0    0    0    0
 forward         1 5 
-data            2741    63000   
-t0              2741.0  2741.0  
-fit             0.2     10     
-packing         50
 
 RUN data/lem12_his_2466 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
 norm            fun3
 backgr.fit      11
-lifetimecorrection
 map             9   18   10    0    0    0    0    0    0    0
 forward         3 7 
-data            2741    63000   
-t0              2741.0  2741.0  
-fit             0.2     10     
-packing         50
 
 RUN data/lem12_his_2466 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
 norm            fun3
 backgr.fit      14
-lifetimecorrection
 map            13   12   15    0    0    0    0    0    0    0
 forward         2 6 
-data            2741    63000   
-t0              2741.0  2741.0  
-fit             0.2     10     
-packing         50
 
 RUN data/lem12_his_2466 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
 norm            fun3
 backgr.fit      17
-lifetimecorrection
 map            16   18   15    0    0    0    0    0    0    0
 forward         4 8 
-data            2741    63000   
-t0              2741.0  2741.0  
-fit             0.2     10     
-packing         50
 
 ###############################################################
 COMMANDS
@@ -97,7 +81,7 @@ SAVE
 
 ###############################################################
 FOURIER
-units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+units            Gauss   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
 fourier_power    10
 apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
 plot             REAL    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
@@ -106,10 +90,11 @@ phase            par7
 
 ###############################################################
 PLOT 0   (single histo plot)
-runs     1   3   
+lifetimecorrection
+runs        1   3
 range    0   9   -0.15   0.15
 view_packing 500
 
 ###############################################################
-STATISTIC --- 2013-11-12 10:21:48
+STATISTIC --- 2015-01-05 13:58:40
   maxLH = 3971.7, NDF = 4001, maxLH/NDF = 0.992668

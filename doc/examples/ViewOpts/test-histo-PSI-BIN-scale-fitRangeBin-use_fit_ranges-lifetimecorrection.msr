@@ -23,8 +23,13 @@ FUNCTIONS
 fun1 = par3 * gamma_mu
 
 ###############################################################
-RUN data/deltat_pta_gpd_0423 PIE1 PSI PSI-BIN   (name beamline institute data-file-format)
+GLOBAL
 fittype         0         (single histogram fit)
+fit             fgb   lgb  # in time: 0.00375..9.705 (usec)
+packing         25
+
+###############################################################
+RUN data/deltat_pta_gpd_0423 PIE1 PSI PSI-BIN   (name beamline institute data-file-format)
 norm            6
 backgr.fit      8
 map             4    0    0    0    0    0    0    0    0    0
@@ -32,11 +37,8 @@ forward         1
 #background      30      152        # estimated bkg: 49.2393
 data            165     7965    
 t0              162.0   
-fit             fgb   lgb  # in time: 0.00375..9.75375 (usec)
-packing         25
 
 RUN data/deltat_pta_gpd_0423 PIE1 PSI PSI-BIN   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
 norm            7
 backgr.fit      9
 map             5    0    0    0    0    0    0    0    0    0
@@ -44,8 +46,6 @@ forward         2
 #background      30      152        # estimated bkg: 43.1545
 data            205     7965    
 t0              202.0   
-fit             fgb   lgb  # in time: 0.00375..9.70375 (usec)
-packing         25
 
 ###############################################################
 COMMANDS
@@ -66,10 +66,10 @@ units            Gauss   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
 fourier_power    12
 apodization      NONE    # NONE, WEAK, MEDIUM, STRONG
 plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
-phase            8.5
+phase            8
 #range_for_phase_correction 50.0 70.0
-range            0.0    200.0
+range            0    200
 
 ###############################################################
-STATISTIC --- 2014-12-29 11:50:45
+STATISTIC --- 2015-01-05 15:18:49
   chisq = 798.0, NDF = 612, chisq/NDF = 1.303881
