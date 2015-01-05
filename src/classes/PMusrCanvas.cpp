@@ -1871,10 +1871,16 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   // check if 'use_fit_ranges' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
     start = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0); // needed to estimate size
+    if (start == PMUSR_UNDEFINED) { // not given in the run block, try the global block entry
+      start = fMsrHandler->GetMsrGlobal()->GetFitRange(0);
+    }
     end   = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1); // needed to estimate size
+    if (end == PMUSR_UNDEFINED) { // not given in the run block, try the global block entry
+      end = fMsrHandler->GetMsrGlobal()->GetFitRange(1);
+    }
     size  = (Int_t) ((end - start) / data->GetDataTimeStep()) + 1;
     start = data->GetDataTimeStart() +
-            (Int_t)((fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0) - data->GetDataTimeStart())/data->GetDataTimeStep()) * data->GetDataTimeStep() -
+            (Int_t)((start - data->GetDataTimeStart())/data->GetDataTimeStep()) * data->GetDataTimeStep() -
             data->GetDataTimeStep()/2.0; // closesd start value compatible with the user given
     end   = start + size * data->GetDataTimeStep(); // closesd end value compatible with the user given
     dataSet.dataRange->SetXRange(start, end);
@@ -1952,7 +1958,11 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
-    Double_t dval = (fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0) - data->GetDataTimeStart())/data->GetDataTimeStep();
+    Double_t startFitRange = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0);
+    if (startFitRange == PMUSR_UNDEFINED) { // not given in the run block, try the global block entry
+      startFitRange = fMsrHandler->GetMsrGlobal()->GetFitRange(0);
+    }
+    Double_t dval = (startFitRange - data->GetDataTimeStart())/data->GetDataTimeStep();
     if (dval < 0.0) { // make sure that startBin >= 0
       startBin = 0;
       cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found startBin data < 0 for 'use_fit_range', will set it to 0" << endl << endl;
@@ -1964,7 +1974,11 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
       startBin = (UInt_t)dval;
     }
 
-    dval = (fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1) - data->GetDataTimeStart())/data->GetDataTimeStep();
+    Double_t endFitRange = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1);
+    if (endFitRange == PMUSR_UNDEFINED) { // not given in the run block, try the global block entry
+      endFitRange = fMsrHandler->GetMsrGlobal()->GetFitRange(1);
+    }
+    dval = (endFitRange - data->GetDataTimeStart())/data->GetDataTimeStep();
     if (dval < 0.0) { // make sure that endBin >= 0
       endBin = 0;
       cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found endBin data < 0 for 'use_fit_range', will set it to 0" << endl << endl;
@@ -2042,10 +2056,16 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
     start = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0); // needed to estimate size
+    if (start == PMUSR_UNDEFINED) { // not given in the run block, try the global block entry
+      start = fMsrHandler->GetMsrGlobal()->GetFitRange(0);
+    }
     end   = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1); // needed to estimate size
+    if (end  == PMUSR_UNDEFINED) { // not given in the run block, try the global block entry
+      end = fMsrHandler->GetMsrGlobal()->GetFitRange(1);
+    }
     size  = (Int_t) ((end - start) / data->GetTheoryTimeStep()) + 1;
     start = data->GetTheoryTimeStart() +
-            (Int_t)((fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0) - data->GetTheoryTimeStart())/data->GetTheoryTimeStep()) * data->GetTheoryTimeStep() -
+            (Int_t)((start - data->GetTheoryTimeStart())/data->GetTheoryTimeStep()) * data->GetTheoryTimeStep() -
             data->GetTheoryTimeStep()/2.0; // closesd start value compatible with the user given
     end   = start + size * data->GetTheoryTimeStep(); // closesd end value compatible with the user given
   }
@@ -2059,7 +2079,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
             (Int_t)((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetTheoryTimeStart())/data->GetTheoryTimeStep()) * data->GetTheoryTimeStep() -
             data->GetTheoryTimeStep()/2.0; // closesd start value compatible with the user given
     end   = start + size * data->GetTheoryTimeStep(); // closesd end value compatible with the user given
-}
+  }
 
   // invoke histo
   theoHisto = new TH1F(name, name, size, start, end);
@@ -2070,7 +2090,11 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 
   // check if 'use_fit_range' plotting is whished
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) {
-    Double_t dval = (fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0) - data->GetDataTimeStart())/data->GetTheoryTimeStep();
+    Double_t startFitRange = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(0);
+    if (startFitRange == PMUSR_UNDEFINED) { // not given in the run block, try the global block entry
+      startFitRange = fMsrHandler->GetMsrGlobal()->GetFitRange(0);
+    }
+    Double_t dval = (startFitRange - data->GetDataTimeStart())/data->GetTheoryTimeStep();
     if (dval < 0.0) { // make sure that startBin >= 0
       startBin = 0;
       cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found startBin theory < 0 for 'use_fit_range', will set it to 0" << endl << endl;
@@ -2082,7 +2106,11 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
       startBin = (UInt_t)dval;
     }
 
-    dval = (fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1) - data->GetDataTimeStart())/data->GetTheoryTimeStep();
+    Double_t endFitRange = fMsrHandler->GetMsrRunList()->at(runNo).GetFitRange(1);
+    if (endFitRange == PMUSR_UNDEFINED) { // not given in the run block, try the global block entry
+      endFitRange = fMsrHandler->GetMsrGlobal()->GetFitRange(1);
+    }
+    dval = (endFitRange - data->GetDataTimeStart())/data->GetTheoryTimeStep();
     if (dval < 0.0) { // make sure that endBin >= 0
       endBin = 0;
       cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found endBin theory < 0 for 'use_fit_range', will set it to 0" << endl << endl;
