@@ -60,8 +60,8 @@ typedef vector<TString> TStringVector;
 template <class T> class TMusrRunObject : public TObject
 {
 public:
-  TMusrRunObject() { fPathName = "n/a"; fType = "n/a"; }
-  TMusrRunObject(TString pathName, TString type, T value) : fPathName(pathName), fType(type), fValue(value) {}
+  TMusrRunObject() : TObject() { fPathName = "n/a"; fType = "n/a"; }
+  TMusrRunObject(TString pathName, TString type, T value) : TObject(), fPathName(pathName), fType(type), fValue(value) {}
   virtual ~TMusrRunObject() {}
 
   virtual TString GetPathName() { return fPathName; }

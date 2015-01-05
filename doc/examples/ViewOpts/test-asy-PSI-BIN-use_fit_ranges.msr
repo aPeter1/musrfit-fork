@@ -1,0 +1,58 @@
+FeSe 9p4 TF100 p107apr09_sample*1p02                          
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+        1 alpha       0.954734  0           none        0       2       
+        2 asy         0.2624    0.0014      none        0       0.33    
+        3 phase       -0.10     0.33        none        
+        4 field       97.912    0.055       none        0       none    
+        5 rate        0.3164    0.0044      none        0       none    
+ 
+###############################################################
+THEORY
+asymmetry      2
+simplExpo      5          (rate)
+TFieldCos      3  fun1       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = par4 * gamma_mu
+
+###############################################################
+RUN data/deltat_pta_gpd_0423 PIE1 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         2         (asymmetry fit)
+alpha           1
+map             0    0    0    0    0    0    0    0    0    0    0
+forward         2 
+backward        1 
+background      61      184     57      145     
+data            207     7994    167     8009    
+t0              202.0   162.0   
+fit             0       8      
+packing         18
+
+###############################################################
+COMMANDS
+MINIMIZE
+#MINOS
+HESSE
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      NONE    # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8
+range            0    200
+
+###############################################################
+PLOT 2   (asymmetry plot)
+runs     1   
+use_fit_ranges  -0.3   0.3
+view_packing 25
+
+###############################################################
+STATISTIC --- 2012-03-20 11:22:25
+  chisq = 554.2, NDF = 351, chisq/NDF = 1.578917

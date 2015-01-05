@@ -51,7 +51,7 @@ ClassImp(TMusrRunPhysicalQuantity)
 /**
  * <p>Constructor.
  */
-TMusrRunPhysicalQuantity::TMusrRunPhysicalQuantity()
+TMusrRunPhysicalQuantity::TMusrRunPhysicalQuantity() : TObject()
 {
   fLabel  = "n/a";
   fDemand = MRH_UNDEFINED;
@@ -75,7 +75,7 @@ TMusrRunPhysicalQuantity::TMusrRunPhysicalQuantity()
  * \param description additional more detailed description of the physical quantity
  */
 TMusrRunPhysicalQuantity::TMusrRunPhysicalQuantity(TString label, Double_t demand, Double_t value, Double_t error, TString unit, TString description) :
-    fLabel(label), fDemand(demand), fValue(value), fError(error), fUnit(unit)
+     TObject(), fLabel(label), fDemand(demand), fValue(value), fError(error), fUnit(unit)
 {
   if (description.IsWhitespace())
     fDescription = "n/a";
@@ -96,7 +96,7 @@ TMusrRunPhysicalQuantity::TMusrRunPhysicalQuantity(TString label, Double_t deman
  * \param description additional more detailed description of the physical quantity
  */
 TMusrRunPhysicalQuantity::TMusrRunPhysicalQuantity(TString label, Double_t demand, Double_t value, TString unit, TString description) :
-    fLabel(label), fDemand(demand), fValue(value), fUnit(unit)
+     TObject(), fLabel(label), fDemand(demand), fValue(value), fUnit(unit)
 {
   fError = MRH_UNDEFINED;
   if (description.IsWhitespace())
@@ -117,7 +117,7 @@ TMusrRunPhysicalQuantity::TMusrRunPhysicalQuantity(TString label, Double_t deman
  * \param description additional more detailed description of the physical quantity
  */
 TMusrRunPhysicalQuantity::TMusrRunPhysicalQuantity(TString label, Double_t value, TString unit, TString description) :
-    fLabel(label), fValue(value), fUnit(unit)
+     TObject(), fLabel(label), fValue(value), fUnit(unit)
 {
   fDemand = MRH_UNDEFINED;
   fError  = MRH_UNDEFINED;
@@ -214,7 +214,7 @@ ClassImp(TMusrRunHeader)
   *
   * \param quiet if set to true, warnings will be omited. Default is false.
   */
-TMusrRunHeader::TMusrRunHeader(bool quiet) : fQuiet(quiet)
+TMusrRunHeader::TMusrRunHeader(bool quiet) : TObject(), fQuiet(quiet)
 {
   Init();
 }
@@ -228,7 +228,7 @@ TMusrRunHeader::TMusrRunHeader(bool quiet) : fQuiet(quiet)
   * \param fileName file name of the MusrRoot file.
   * \param quiet if set to true, warnings will be omited. Default is false.
   */
-TMusrRunHeader::TMusrRunHeader(const char *fileName, bool quiet)
+TMusrRunHeader::TMusrRunHeader(const char *fileName, bool quiet) : TObject()
 {
   fQuiet = quiet;
   Init(TString(fileName));

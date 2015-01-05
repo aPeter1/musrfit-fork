@@ -1,0 +1,75 @@
+FeSe 9p4 TF100 p107apr09_sample*1p02                          
+###############################################################
+FITPARAMETER
+#      Nr. Name       Value     Step      Pos_Error Boundaries   
+        1 Asy         0.2622    -0.0014     0.0014      0       0.33    
+        2 Rate        0.3189    -0.0043     0.0044      
+        3 Field       97.854    -0.056      0.055       0       200     
+        4 Phase_L     178.95    -0.41       0.41        
+        5 Phase_R     1.74      -0.39       0.40        
+        6 N0_L        1097.79   -0.94       0.93        
+        7 N0_R        1159.41   -0.93       0.95        
+        8 Bkg_L       54.50     -0.15       0.15        
+        9 Bkg_R       46.82     -0.15       0.14        
+
+###############################################################
+THEORY
+asymmetry      1
+simplExpo      2          (rate)
+TFieldCos   map1  fun1       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = par3 * gamma_mu
+
+###############################################################
+RUN data/deltat_pta_gpd_0423 PIE1 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            6
+backgr.fit      8
+map             4    0    0    0    0    0    0    0    0    0
+forward         1 
+#background      30      152        # estimated bkg: 49.2393
+data            165     7965    
+t0              162.0   
+fit             fgb   lgb  # in time: 0.00375..9.75375 (usec)
+packing         25
+
+RUN data/deltat_pta_gpd_0423 PIE1 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+norm            7
+backgr.fit      9
+map             5    0    0    0    0    0    0    0    0    0
+forward         2 
+#background      30      152        # estimated bkg: 43.1545
+data            205     7965    
+t0              202.0   
+fit             fgb   lgb  # in time: 0.00375..9.70375 (usec)
+packing         25
+
+###############################################################
+COMMANDS
+SCALE_N0_BKG TRUE
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+PLOT 0   (single histo plot)
+lifetimecorrection
+runs     1   2   
+use_fit_ranges -0.3 0.3
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      NONE    # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8.5
+#range_for_phase_correction 50.0 70.0
+range            0.0    200.0
+
+###############################################################
+STATISTIC --- 2014-12-29 11:50:45
+  chisq = 798.0, NDF = 612, chisq/NDF = 1.303881
