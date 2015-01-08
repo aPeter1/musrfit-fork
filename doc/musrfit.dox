@@ -6,8 +6,6 @@
 
   content:    Description of musrfit framework.
 
-  $Id$
-
 **********************************************************************************************/
 
 /**
@@ -18,18 +16,18 @@
 
 <p>People merely intrested in the handling of the programs should check this link:
 \htmlonly
-<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>
+<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>
 \endhtmlonly
 \latexonly
-musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html}
+musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html}
 \endlatexonly 
 
 <p>People which would like to know how to install the musrfit framework, please check this link:
 \htmlonly
-<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFitSetup.html">How to setup musrfit on different platforms</a>
+<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html">How to setup musrfit on different platforms</a>
 \endhtmlonly
 \latexonly
-How to setup musrfit on different platforms: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFitSetup.html}
+How to setup musrfit on different platforms: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html}
 \endlatexonly
 
 //****************************************************************************************************
@@ -77,26 +75,25 @@ This two points are somewhat contradictory, and currently it is not clear which 
 
 \section bugs How to report bugs
 
-<p>Bugs, unexpected features, can be reported directly to me: \verbatim andreas.suter@psi.ch, \endverbatim or entered in the bug-tracking tool at PSI \verbatim https://tracker.intranet.psi.ch/ \endverbatim (access to within
-PSI firewall required).
+<p>Bugs, unexpected features, can be reported directly to me: \verbatim andreas.suter@psi.ch, \endverbatim or entered in the bug-tracking tool at bitbkucket \verbatim https://bitbucket.org/muonspin/musrfit/issues \endverbatim.
 
 //****************************************************************************************************
 \page musrfitPage
 \section musrfit musrfit
 
-<p>Here will eventually follow a more technical description of musrfit. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
+<p>Here will eventually follow a more technical description of musrfit. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page musrviewPage
 \section musrview musrview
 
-<p>Here will eventually follow a more technical description of musrview. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
+<p>Here will eventually follow a more technical description of musrview. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page musrt0Page
 \section musrt0 musrt0
 
-<p>Here will eventually follow a more technical description of musrt0. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
+<p>Here will eventually follow a more technical description of musrt0. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page musrparamPage
