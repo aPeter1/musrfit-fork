@@ -1040,7 +1040,7 @@ case "$host" in
     ;;
   *-*-darwin*)
     ARCH=DARWIN
-    LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D__linux__"
+    LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D_Darwin_"
     ;;
   *)
     ARCH=OTHERUNIX
