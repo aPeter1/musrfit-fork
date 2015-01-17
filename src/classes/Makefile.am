@@ -73,6 +73,13 @@ dict_cpp_sources = \
 dict_cpp_sources_userFcn = \
   PUserFcnBaseDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  PMusrCanvasDict_rdict.pcm \
+  PMusrT0Dict_rdict.pcm \
+  PStartupHandlerDict_rdict.pcm \
+  PUserFcnBaseDict_rdict.pcm
+
 include_HEADERS = $(h_sources) $(h_sources_userFcn)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources) $(h_linkdef_userFcn) $(dict_h_sources_userFcn)
 

@@ -19,6 +19,9 @@ cpp_sources = \
 dict_cpp_sources = \
   BMWStartupHandlerDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = BMWStartupHandlerDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 

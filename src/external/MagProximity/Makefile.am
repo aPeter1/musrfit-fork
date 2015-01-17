@@ -23,6 +23,11 @@ dict_cpp_sources = \
   PMagProximityFitterDict.cpp \
   PMPStartupHandlerDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  PMagProximityFitterDict_rdict.pcm \
+  PMPStartupHandlerDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 

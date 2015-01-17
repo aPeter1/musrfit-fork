@@ -20,6 +20,11 @@ dict_cpp_sources = \
   TLemStatsDict.cxx \
   TLemRunHeaderDict.cxx
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  TLemStatsDict_rdict.pcm \
+  TLemRunHeaderDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 

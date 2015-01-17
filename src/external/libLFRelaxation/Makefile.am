@@ -15,6 +15,9 @@ cpp_sources = \
 dict_cpp_sources = \
   TLFRelaxationDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = TLFRelaxationDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 

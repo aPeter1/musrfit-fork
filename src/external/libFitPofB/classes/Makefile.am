@@ -33,6 +33,12 @@ dict_cpp_sources = \
   TSkewedGssDict.cpp \
   TVortexDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  TLondon1DDict_rdict.pcm \
+  TSkewedGssDict_rdict.pcm \
+  TVortexDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 

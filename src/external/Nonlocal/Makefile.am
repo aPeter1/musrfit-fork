@@ -23,6 +23,11 @@ dict_cpp_sources = \
   PNL_PippardFitterDict.cpp \
   PNL_StartupHandlerDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  PNL_PippardFitterDict_rdict.pcm \
+  PNL_StartupHandlerDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
