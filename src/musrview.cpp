@@ -67,6 +67,8 @@ void musrview_syntax()
   cout << endl << "           eps, pdf, gif, jpg, png, svg, xpm, root";
   cout << endl << "           example: musrview 3310.msr --png, will produce a files 3310_X.png";
   cout << endl << "                    where 'X' stands for the plot number (starting form 0)";
+  cout << endl << "       --ascii: ";
+  cout << endl << "           will produce an ascii dump of the data and fit as plotted.";
   cout << endl << "       --timeout <timeout>: <timeout> given in seconds after which musrview terminates.";
   cout << endl << "           If <timeout> <= 0, no timeout will take place. Default <timeout> is 0.";
   cout << endl;
@@ -100,6 +102,7 @@ int main(int argc, char *argv[])
   bool success = true;
   char fileName[128];
   bool graphicsOutput = false;
+  bool asciiOutput = false;
   char graphicsExtension[128];
   int  timeout = 0;
 
@@ -135,6 +138,8 @@ int main(int argc, char *argv[])
 
       graphicsOutput = true;
       strcpy(graphicsExtension, argv[i]+2);
+    } else if (!strcmp(argv[i], "--ascii")) {
+      asciiOutput = true;
     } else if (!strcmp(argv[i], "--timeout")) {
       if (i+1 < argc) {
         TString str(argv[i+1]);
@@ -332,6 +337,10 @@ int main(int argc, char *argv[])
 
       if (graphicsOutput) {
         musrCanvas->SaveGraphicsAndQuit(fileName, graphicsExtension);
+      }
+
+      if (asciiOutput) {
+        musrCanvas->SaveDataAsciiAndQuit();
       }
 
       // keep musrCanvas objects
