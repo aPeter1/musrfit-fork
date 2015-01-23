@@ -229,6 +229,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void LastCanvasClosed(); // SLOT
 
     virtual void SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat);
+    virtual void SaveDataAsciiAndQuit();
 
   private:
     Int_t  fTimeout;          ///< timeout after which the Done signal should be emited. If timeout <= 0, no timeout is taking place
