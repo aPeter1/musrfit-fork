@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
 
   if (success) {
     // generate Root application needed for PMusrCanvas
-    if (graphicsOutput) {
+    if (graphicsOutput || asciiOutput) {
       argv[argc] = (char*)malloc(16*sizeof(char));
       strcpy(argv[argc], "-b");
       argc++;
@@ -304,10 +304,10 @@ int main(int argc, char *argv[])
                                      startupHandler->GetFourierDefaults(),
                                      startupHandler->GetMarkerList(),
                                      startupHandler->GetColorList(),
-                                     graphicsOutput);
+                                     graphicsOutput||asciiOutput);
       else
         musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
-                                     10+i*100, 10+i*100, 800, 600, graphicsOutput);
+                                     10+i*100, 10+i*100, 800, 600, graphicsOutput||asciiOutput);
 
       if (!musrCanvas->IsValid()) {
         cerr << endl << ">> musrview **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";

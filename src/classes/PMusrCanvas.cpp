@@ -1382,637 +1382,637 @@ void PMusrCanvas::SaveDataAsciiAndQuit()
   Double_t xval, yval;
 
   switch (fPlotType) {
-    case MSR_PLOT_SINGLE_HISTO:
-    case MSR_PLOT_ASYM:
-    case MSR_PLOT_MU_MINUS:
-      if (fDifferenceView) { // difference view plot
-        switch (fCurrentPlotView) {
-          case PV_DATA:
-            // get current x-range
-            xminBin = fHistoFrame->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fHistoFrame->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fHistoFrame->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fHistoFrame->GetXaxis()->GetBinCenter(xmaxBin);
+  case MSR_PLOT_SINGLE_HISTO:
+  case MSR_PLOT_ASYM:
+  case MSR_PLOT_MU_MINUS:
+    if (fDifferenceView) { // difference view plot
+      switch (fCurrentPlotView) {
+      case PV_DATA:
+	// get current x-range
+	xminBin = fHistoFrame->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fHistoFrame->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fHistoFrame->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fHistoFrame->GetXaxis()->GetBinCenter(xmaxBin);
 
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all difference data bins
+	  for (Int_t j=1; j<fData[i].diff->GetNbinsX(); j++) {
+	    // get time
+	    time = fData[i].diff->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((time >= xmin) && (time <= xmax)) {
+	      dump.dataX.push_back(time);
+	      dump.data.push_back(fData[i].diff->GetBinContent(j));
+	      dump.dataErr.push_back(fData[i].diff->GetBinError(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	break;
+      case PV_FOURIER_REAL:
+	// get current x-range
+	xminBin = fData[0].diffFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fData[0].diffFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fData[0].diffFourierRe->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fData[0].diffFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
 
-              // go through all difference data bins
-              for (Int_t j=1; j<fData[i].diff->GetNbinsX(); j++) {
-                // get time
-                time = fData[i].diff->GetBinCenter(j);
-                // check if time is in the current range
-                if ((time >= xmin) && (time <= xmax)) {
-                  dump.dataX.push_back(time);
-                  dump.data.push_back(fData[i].diff->GetBinContent(j));
-                  dump.dataErr.push_back(fData[i].diff->GetBinError(j));
-                }
-              }
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].diffFourierRe->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].diffFourierRe->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].diffFourierRe->GetBinContent(j));
+	    }
+	  }
 
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-            break;
-          case PV_FOURIER_REAL:
-            // get current x-range
-            xminBin = fData[0].diffFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].diffFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].diffFourierRe->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].diffFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].diffFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierRe->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-            break;
-          case PV_FOURIER_IMAG:
-            // get current x-range
-            xminBin = fData[0].diffFourierIm->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].diffFourierIm->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].diffFourierIm->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].diffFourierIm->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].diffFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierIm->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-            break;
-          case PV_FOURIER_REAL_AND_IMAG:
-            // get current x-range
-            xminBin = fData[0].diffFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].diffFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].diffFourierRe->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].diffFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].diffFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierRe->GetBinContent(j));
-                }
-              }
-              for (Int_t j=1; j<fData[i].diffFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierIm->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-            break;
-          case PV_FOURIER_PWR:
-            // get current x-range
-            xminBin = fData[0].diffFourierPwr->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].diffFourierPwr->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].diffFourierPwr->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].diffFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].diffFourierPwr->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierPwr->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierPwr->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-            break;
-          case PV_FOURIER_PHASE:
-            // get current x-range
-            xminBin = fData[0].diffFourierPhase->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].diffFourierPhase->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].diffFourierPhase->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].diffFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].diffFourierPhase->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierPhase->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierPhase->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-            break;
-          default:
-            break;
-        }
-      } else { // not a difference view plot
-        switch (fCurrentPlotView) {
-          case PV_DATA:
-            // get current x-range
-            xminBin = fHistoFrame->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fHistoFrame->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fHistoFrame->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fHistoFrame->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].data->GetNbinsX(); j++) {
-                // get time
-                time = fData[i].data->GetBinCenter(j);
-                // check if time is in the current range
-                if ((time >= xmin) && (time <= xmax)) {
-                  dump.dataX.push_back(time);
-                  dump.data.push_back(fData[i].data->GetBinContent(j));
-                  dump.dataErr.push_back(fData[i].data->GetBinError(j));
-                }
-              }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theory->GetNbinsX(); j++) {
-                // get time
-                time = fData[i].theory->GetBinCenter(j);
-                // check if time is in the current range
-                if ((time >= xmin) && (time <= xmax)) {
-                  dump.theoryX.push_back(time);
-                  dump.theory.push_back(fData[i].theory->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-
-            break;
-          case PV_FOURIER_REAL:
-            // get current x-range
-            xminBin = fData[0].dataFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].dataFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierRe->GetBinContent(j));
-                }
-              }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierRe->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-            break;
-          case PV_FOURIER_IMAG:
-            // get current x-range
-            xminBin = fData[0].dataFourierIm->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].dataFourierIm->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].dataFourierIm->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].dataFourierIm->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierIm->GetBinContent(j));
-                }
-              }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierIm->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-            break;
-          case PV_FOURIER_REAL_AND_IMAG:
-            // get current x-range
-            xminBin = fData[0].dataFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].dataFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              //-----------------------------
-              // Re
-              //-----------------------------
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierRe->GetBinContent(j));
-                }
-              }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierRe->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-
-              //-----------------------------
-              // Im
-              //-----------------------------
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierIm->GetBinContent(j));
-                }
-              }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierIm->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-
-            }
-            break;
-          case PV_FOURIER_PWR:
-            // get current x-range
-            xminBin = fData[0].dataFourierPwr->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].dataFourierPwr->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierPwr->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierPwr->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierPwr->GetBinContent(j));
-                }
-              }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierPwr->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierPwr->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierPwr->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-            break;
-          case PV_FOURIER_PHASE:
-            // get current x-range
-            xminBin = fData[0].dataFourierPhase->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fData[0].dataFourierPhase->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierPhase->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierPhase->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierPhase->GetBinContent(j));
-                }
-              }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierPhase->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierPhase->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierPhase->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-            break;
-          default:
-            break;
-        }
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	break;
+      case PV_FOURIER_IMAG:
+	// get current x-range
+	xminBin = fData[0].diffFourierIm->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fData[0].diffFourierIm->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fData[0].diffFourierIm->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fData[0].diffFourierIm->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].diffFourierIm->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].diffFourierIm->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].diffFourierIm->GetBinContent(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	break;
+      case PV_FOURIER_REAL_AND_IMAG:
+	// get current x-range
+	xminBin = fData[0].diffFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fData[0].diffFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fData[0].diffFourierRe->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fData[0].diffFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].diffFourierRe->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].diffFourierRe->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].diffFourierRe->GetBinContent(j));
+	    }
+	  }
+	  for (Int_t j=1; j<fData[i].diffFourierIm->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].diffFourierIm->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].diffFourierIm->GetBinContent(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	break;
+      case PV_FOURIER_PWR:
+	// get current x-range
+	xminBin = fData[0].diffFourierPwr->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fData[0].diffFourierPwr->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fData[0].diffFourierPwr->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fData[0].diffFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].diffFourierPwr->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].diffFourierPwr->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].diffFourierPwr->GetBinContent(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	break;
+      case PV_FOURIER_PHASE:
+	// get current x-range
+	xminBin = fData[0].diffFourierPhase->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fData[0].diffFourierPhase->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fData[0].diffFourierPhase->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fData[0].diffFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].diffFourierPhase->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].diffFourierPhase->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].diffFourierPhase->GetBinContent(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	break;
+      default:
+	break;
       }
-      break;
-    case MSR_PLOT_NON_MUSR:
-      if (fDifferenceView) { // difference view plot
-        switch (fCurrentPlotView) {
-          case PV_DATA:
-            // get current x-range
-            xminBin = fMultiGraphData->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fMultiGraphData->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fMultiGraphData->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fMultiGraphData->GetXaxis()->GetBinCenter(xmaxBin);
+    } else { // not a difference view plot
+      switch (fCurrentPlotView) {
+      case PV_DATA:
+	// get current x-range
+	xminBin = fHistoFrame->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fHistoFrame->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fHistoFrame->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fHistoFrame->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].data->GetNbinsX(); j++) {
+	    // get time
+	    time = fData[i].data->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((time >= xmin) && (time <= xmax)) {
+	      dump.dataX.push_back(time);
+	      dump.data.push_back(fData[i].data->GetBinContent(j));
+	      dump.dataErr.push_back(fData[i].data->GetBinError(j));
+	    }
+	  }
+	  
+	  // go through all theory bins
+	  for (Int_t j=1; j<fData[i].theory->GetNbinsX(); j++) {
+	    // get time
+	    time = fData[i].theory->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((time >= xmin) && (time <= xmax)) {
+	      dump.theoryX.push_back(time);
+	      dump.theory.push_back(fData[i].theory->GetBinContent(j));
+	    }
+	  }
 
-            // fill ascii dump data
-            for (UInt_t i=0; i<fNonMusrData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
 
-              // go through all data bins
-              for (Int_t j=0; j<fNonMusrData[i].diff->GetN(); j++) {
-                // get x and y value
-                fNonMusrData[i].diff->GetPoint(j,xval,yval);
-                // check if time is in the current range
-                if ((xval >= xmin) && (xval <= xmax)) {
-                  dump.dataX.push_back(xval);
-                  dump.data.push_back(yval);
-                  dump.dataErr.push_back(fNonMusrData[i].diff->GetErrorY(j));
-                }
-              }
+	break;
+      case PV_FOURIER_REAL:
+	// get current x-range
+	xminBin = fData[0].dataFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fData[0].dataFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].dataFourierRe->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].dataFourierRe->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].dataFourierRe->GetBinContent(j));
+	    }
+	  }
+	  
+	  // go through all theory bins
+	  for (Int_t j=1; j<fData[i].theoryFourierRe->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].theoryFourierRe->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.theoryX.push_back(freq);
+	      dump.theory.push_back(fData[i].theoryFourierRe->GetBinContent(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	break;
+      case PV_FOURIER_IMAG:
+	// get current x-range
+	xminBin = fData[0].dataFourierIm->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fData[0].dataFourierIm->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fData[0].dataFourierIm->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fData[0].dataFourierIm->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].dataFourierIm->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].dataFourierIm->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].dataFourierIm->GetBinContent(j));
+	    }
+	  }
+	  
+	  // go through all theory bins
+	  for (Int_t j=1; j<fData[i].theoryFourierIm->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].theoryFourierIm->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.theoryX.push_back(freq);
+	      dump.theory.push_back(fData[i].theoryFourierIm->GetBinContent(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	break;
+      case PV_FOURIER_REAL_AND_IMAG:
+	// get current x-range
+	xminBin = fData[0].dataFourierRe->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fData[0].dataFourierRe->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  //-----------------------------
+	  // Re
+	  //-----------------------------
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].dataFourierRe->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].dataFourierRe->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].dataFourierRe->GetBinContent(j));
+	    }
+	  }
+	  
+	  // go through all theory bins
+	  for (Int_t j=1; j<fData[i].theoryFourierRe->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].theoryFourierRe->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.theoryX.push_back(freq);
+	      dump.theory.push_back(fData[i].theoryFourierRe->GetBinContent(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	  
+	  //-----------------------------
+	  // Im
+	  //-----------------------------
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
 
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].dataFourierIm->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].dataFourierIm->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].dataFourierIm->GetBinContent(j));
+	    }
+	  }
 
-            break;
-          case PV_FOURIER_REAL:
-            break;
-          case PV_FOURIER_IMAG:
-            break;
-          case PV_FOURIER_REAL_AND_IMAG:
-            break;
-          case PV_FOURIER_PWR:
-            break;
-          case PV_FOURIER_PHASE:
-            break;
-          default:
-            break;
-        }
-      } else { // not a difference view plot
-        switch (fCurrentPlotView) {
-          case PV_DATA:
-            // get current x-range
-            xminBin = fMultiGraphData->GetXaxis()->GetFirst(); // first bin of the zoomed range
-            xmaxBin = fMultiGraphData->GetXaxis()->GetLast();  // last bin of the zoomed range
-            xmin = fMultiGraphData->GetXaxis()->GetBinCenter(xminBin);
-            xmax = fMultiGraphData->GetXaxis()->GetBinCenter(xmaxBin);
-
-            // fill ascii dump data
-            for (UInt_t i=0; i<fNonMusrData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=0; j<fNonMusrData[i].data->GetN(); j++) {
-                // get x and y value
-                fNonMusrData[i].data->GetPoint(j,xval,yval);
-                // check if time is in the current range
-                if ((xval >= xmin) && (xval <= xmax)) {
-                  dump.dataX.push_back(xval);
-                  dump.data.push_back(yval);
-                  dump.dataErr.push_back(fNonMusrData[i].data->GetErrorY(j));
-                }
-              }
-
-              // go through all theory bins
-              for (Int_t j=0; j<fNonMusrData[i].theory->GetN(); j++) {
-                // get x and y value
-                fNonMusrData[i].theory->GetPoint(j,xval,yval);
-                // check if time is in the current range
-                if ((xval >= xmin) && (xval <= xmax)) {
-                  dump.theoryX.push_back(xval);
-                  dump.theory.push_back(yval);
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-            }
-
-            break;
-          case PV_FOURIER_REAL:
-            break;
-          case PV_FOURIER_IMAG:
-            break;
-          case PV_FOURIER_REAL_AND_IMAG:
-            break;
-          case PV_FOURIER_PWR:
-            break;
-          case PV_FOURIER_PHASE:
-            break;
-          default:
-            break;
-        }
+	  // go through all theory bins
+	  for (Int_t j=1; j<fData[i].theoryFourierIm->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].theoryFourierIm->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.theoryX.push_back(freq);
+	      dump.theory.push_back(fData[i].theoryFourierIm->GetBinContent(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	  
+	}
+	break;
+      case PV_FOURIER_PWR:
+	// get current x-range
+	xminBin = fData[0].dataFourierPwr->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fData[0].dataFourierPwr->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].dataFourierPwr->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].dataFourierPwr->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].dataFourierPwr->GetBinContent(j));
+	    }
+	  }
+	  
+	  // go through all theory bins
+	  for (Int_t j=1; j<fData[i].theoryFourierPwr->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].theoryFourierPwr->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.theoryX.push_back(freq);
+	      dump.theory.push_back(fData[i].theoryFourierPwr->GetBinContent(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	break;
+      case PV_FOURIER_PHASE:
+	// get current x-range
+	xminBin = fData[0].dataFourierPhase->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fData[0].dataFourierPhase->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=1; j<fData[i].dataFourierPhase->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].dataFourierPhase->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.dataX.push_back(freq);
+	      dump.data.push_back(fData[i].dataFourierPhase->GetBinContent(j));
+	    }
+	  }
+	  
+	  // go through all theory bins
+	  for (Int_t j=1; j<fData[i].theoryFourierPhase->GetNbinsX(); j++) {
+	    // get frequency
+	    freq = fData[i].theoryFourierPhase->GetBinCenter(j);
+	    // check if time is in the current range
+	    if ((freq >= xmin) && (freq <= xmax)) {
+	      dump.theoryX.push_back(freq);
+	      dump.theory.push_back(fData[i].theoryFourierPhase->GetBinContent(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	break;
+      default:
+	break;
       }
-      break;
-    default:
-      break;
+    }
+    break;
+  case MSR_PLOT_NON_MUSR:
+    if (fDifferenceView) { // difference view plot
+      switch (fCurrentPlotView) {
+      case PV_DATA:
+	// get current x-range
+	xminBin = fMultiGraphData->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fMultiGraphData->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fMultiGraphData->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fMultiGraphData->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fNonMusrData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=0; j<fNonMusrData[i].diff->GetN(); j++) {
+	    // get x and y value
+	    fNonMusrData[i].diff->GetPoint(j,xval,yval);
+	    // check if time is in the current range
+	    if ((xval >= xmin) && (xval <= xmax)) {
+	      dump.dataX.push_back(xval);
+	      dump.data.push_back(yval);
+	      dump.dataErr.push_back(fNonMusrData[i].diff->GetErrorY(j));
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	
+	break;
+      case PV_FOURIER_REAL:
+	break;
+      case PV_FOURIER_IMAG:
+	break;
+      case PV_FOURIER_REAL_AND_IMAG:
+	break;
+      case PV_FOURIER_PWR:
+	break;
+      case PV_FOURIER_PHASE:
+	break;
+      default:
+	break;
+      }
+    } else { // not a difference view plot
+      switch (fCurrentPlotView) {
+      case PV_DATA:
+	// get current x-range
+	xminBin = fMultiGraphData->GetXaxis()->GetFirst(); // first bin of the zoomed range
+	xmaxBin = fMultiGraphData->GetXaxis()->GetLast();  // last bin of the zoomed range
+	xmin = fMultiGraphData->GetXaxis()->GetBinCenter(xminBin);
+	xmax = fMultiGraphData->GetXaxis()->GetBinCenter(xmaxBin);
+	
+	// fill ascii dump data
+	for (UInt_t i=0; i<fNonMusrData.size(); i++) { // go through all the histogramms
+	  // clean up dump
+	  dump.dataX.clear();
+	  dump.data.clear();
+	  dump.dataErr.clear();
+	  dump.theoryX.clear();
+	  dump.theory.clear();
+	  
+	  // go through all data bins
+	  for (Int_t j=0; j<fNonMusrData[i].data->GetN(); j++) {
+	    // get x and y value
+	    fNonMusrData[i].data->GetPoint(j,xval,yval);
+	    // check if time is in the current range
+	    if ((xval >= xmin) && (xval <= xmax)) {
+	      dump.dataX.push_back(xval);
+	      dump.data.push_back(yval);
+	      dump.dataErr.push_back(fNonMusrData[i].data->GetErrorY(j));
+	    }
+	  }
+	  
+	  // go through all theory bins
+	  for (Int_t j=0; j<fNonMusrData[i].theory->GetN(); j++) {
+	    // get x and y value
+	    fNonMusrData[i].theory->GetPoint(j,xval,yval);
+	    // check if time is in the current range
+	    if ((xval >= xmin) && (xval <= xmax)) {
+	      dump.theoryX.push_back(xval);
+	      dump.theory.push_back(yval);
+	    }
+	  }
+	  
+	  // if anything found keep it
+	  if (dump.dataX.size() > 0)
+	    dumpVector.push_back(dump);
+	}
+	
+	break;
+      case PV_FOURIER_REAL:
+	break;
+      case PV_FOURIER_IMAG:
+	break;
+      case PV_FOURIER_REAL_AND_IMAG:
+	break;
+      case PV_FOURIER_PWR:
+	break;
+      case PV_FOURIER_PHASE:
+	break;
+      default:
+	break;
+      }
+    }
+    break;
+  default:
+    break;
   }
 
   // generate output filename
