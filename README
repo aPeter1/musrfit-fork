@@ -2,10 +2,10 @@
 
 ### Contents ###
 
-This is a data analysis package to analyze time differential muSR data. 
+This is a data analysis package to analyze time differential muSR and beta-NMR data. 
 Currently it allows the following things:
 
-* setting up most commonly used fitting functions for muSR
+* setting up most commonly used fitting functions for muSR and beta-NMR
 * fitting data, including global fits
 * showing the fit results and the residuals
 * showing the Fourier transform of the data
@@ -30,4 +30,3 @@ For a more exhaustive user documentation see:
 ### Contact ###
 
 <andreas.suter@psi.ch>
-
