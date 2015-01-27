@@ -340,7 +340,9 @@ int main(int argc, char *argv[])
       }
 
       if (asciiOutput) {
-        musrCanvas->SaveDataAsciiAndQuit();
+	// save data in batch mode
+        musrCanvas->SaveDataAscii();
+	musrCanvas->Done(0);
       }
 
       // keep musrCanvas objects
