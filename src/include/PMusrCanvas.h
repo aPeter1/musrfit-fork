@@ -229,6 +229,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void LastCanvasClosed(); // SLOT
 
     virtual void SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat);
+    virtual void SaveDataAscii();
 
   private:
     Int_t  fTimeout;          ///< timeout after which the Done signal should be emited. If timeout <= 0, no timeout is taking place
@@ -328,8 +329,6 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void PlotAverage(Bool_t unzoom=false);
     virtual void IncrementFourierPhase();
     virtual void DecrementFourierPhase();
-
-    virtual void SaveDataAscii();
 
     virtual Bool_t IsScaleN0AndBkg();
     virtual UInt_t GetNeededAccuracy(PMsrParamStructure param);

@@ -1,0 +1,73 @@
+
+# Run Numbers: 1111
+###############################################################
+FITPARAMETER
+###############################################################
+#     No     Name       Value    Err     Min  Max                  
+        1 Alphap      1.11662   0.00020     none        
+        2 Asyp        0   0.00038     none        
+        3 T           1e6         0           none        
+        4 Rlx         0.969e6     0.020       none        
+        5 Pos         1         0           none        
+        6 Neg         -1        0           none        
+
+###############################################################
+THEORY
+###############################################################
+asymmetry   fun1
+userFcn  libBNMR.so ExpRlx 3 4
+
+###############################################################
+FUNCTIONS
+###############################################################
+fun1 = map1 * map2
+
+###############################################################
+RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
+fittype         2         (asymmetry fit)
+alpha           1
+forward         3 
+backward        4 
+data            11      799     11      799     
+background      800     900     800     900        # estimated bkg: 416.9700 / 465.7600
+t0              0.0     0.0     
+map             2    5    0    0    0    0    0    0    0    0
+fit             5e5     8e6    
+packing         5
+
+RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
+fittype         2         (asymmetry fit)
+alpha           1
+forward         5 
+backward        6 
+data            11      799     11      799     
+background      800     900     800     900        # estimated bkg: 430.9200 / 479.4500
+t0              0.0     0.0     
+map             2    6    0    0    0    0    0    0    0    0
+fit             5e5     8e6    
+packing         5
+
+
+###############################################################
+COMMANDS
+MINIMIZE
+HESSE
+SAVE
+
+###############################################################
+PLOT 2   (asymmetry plot)
+runs     1   2   
+use_fit_ranges
+
+
+###############################################################
+FOURIER
+units            MHz    # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8
+#range            FRQMIN  FRQMAX
+###############################################################
+STATISTIC --- 2014-11-14 16:37:41
+  chisq = 372.2, NDF = 295, chisq/NDF = 1.261744
