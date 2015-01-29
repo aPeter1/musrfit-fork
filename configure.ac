@@ -734,6 +734,12 @@ dnl -----------------------------------------------
 AC_ARG_ENABLE([ASlibs], [AS_HELP_STRING([--enable-ASlibs],[build optional AS plug-ins [default=no]])],[BUILD_AS_LIBS=1], [BUILD_AS_LIBS=0])
 
 dnl -----------------------------------------------
+dnl Ask user if BNMRlibs should be built
+dnl -----------------------------------------------
+
+AC_ARG_ENABLE([BNMRlibs], [AS_HELP_STRING([--enable-BNMRlibs],[build optional BNMR plug-ins [default=no]])],[BUILD_BNMR_LIBS=1], [BUILD_BNMR_LIBS=0])
+
+dnl -----------------------------------------------
 dnl Set some paths and flags for PMusr, MusrRoot, TLemRunHeader, Class_MuSR_PSI, mud, NeXus (if enabled), etc.
 dnl -----------------------------------------------
 
@@ -1111,6 +1117,7 @@ AM_CONDITIONAL([PNEXUS_ENABLED], [test "${PNEXUS_ENABLED}" = "1"])
 AM_CONDITIONAL([BUILD_CUBALIB], [test "${BUILD_CUBA}" = "1"])
 AM_CONDITIONAL([BUILD_BMWLIBS], [test "${BUILD_BMW_LIBS}" = "1"])
 AM_CONDITIONAL([BUILD_ASLIBS], [test "${BUILD_AS_LIBS}" = "1"])
+AM_CONDITIONAL([BUILD_BNMRLIBS], [test "${BUILD_BNMR_LIBS}" = "1"])
 
 AC_CONFIG_FILES([Makefile \
                  src/Makefile \
@@ -1269,6 +1276,11 @@ if test "${BUILD_AS_LIBS}" -eq 1; then
   echo "     ASlibs:                              yes"
 else
   echo "     ASlibs:                              no"
+fi
+if test "${BUILD_BNMR_LIBS}" -eq 1; then
+  echo "     BNMRlibs:                            yes"
+else
+  echo "     BNMRlibs:                            no"
 fi
 if test "${BUILD_BMW_LIBS}" -eq 1; then
   echo "     BMWlibs:                             yes"
