@@ -12,6 +12,7 @@ h_sources = \
   ../include/PMusrCanvas.h \
   ../include/PMusr.h \
   ../include/PMusrT0.h \
+  ../include/PPrepFourier.h \
   ../include/PRunAsymmetry.h \
   ../include/PRunBase.h \
   ../include/PRunDataHandler.h \
@@ -52,6 +53,7 @@ cpp_sources = \
   PMusrCanvas.cpp \
   PMusr.cpp \
   PMusrT0.cpp \
+  PPrepFourier.cpp \
   PRunAsymmetry.cpp \
   PRunBase.cpp \
   PRunDataHandler.cpp \

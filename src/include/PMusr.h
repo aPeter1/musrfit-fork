@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2015 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -44,6 +44,7 @@ using namespace std;
 #define PMUSR_TOKENIZE_ERROR           -5
 #define PMUSR_MSR_LOG_FILE_WRITE_ERROR -6
 #define PMUSR_MSR_FILE_WRITE_ERROR     -7
+#define PMUSR_DATA_FILE_READ_ERROR     -8
 
 #define PRUN_SINGLE_HISTO 0
 #define PRUN_ASYMMETRY    2

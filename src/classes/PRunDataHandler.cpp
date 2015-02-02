@@ -218,6 +218,7 @@ PRunDataHandler::~PRunDataHandler()
 //--------------------------------------------------------------------------
 /**
  * <p>Checks if runName is found, and if so return these data.
+ * runName is as given in the msr-file.
  *
  * <b>return:</b>
  * - if data are found: pointer to the data.
@@ -238,6 +239,26 @@ PRawRunData* PRunDataHandler::GetRunData(const TString &runName)
     return 0;
   else
     return &fData[i];
+}
+
+//--------------------------------------------------------------------------
+// GetRunData
+//--------------------------------------------------------------------------
+/**
+ * <p>return data-set with index idx.
+ *
+ * <b>return:</b>
+ * - if data are found: pointer to the data.
+ * - otherwise the null pointer will be returned.
+ *
+ * \param idx index of the raw data set.
+ */
+PRawRunData* PRunDataHandler::GetRunData(const UInt_t idx)
+{
+  if (idx >= fData.size())
+    return 0;
+  else
+    return &fData[idx];
 }
 
 //--------------------------------------------------------------------------

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2015 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -68,7 +68,7 @@ class PFourier
 
     Int_t fApodization; ///< 0=none, 1=weak, 2=medium, 3=strong
 
-    Double_t fTimeResolution; ///< time resolution of the data histogram
+    Double_t fTimeResolution; ///< time resolution of the data histogram in (us)
     Double_t fStartTime; ///< start time of the data histogram
     Double_t fEndTime; ///< end time of the data histogram
     Bool_t fDCCorrected; ///< if true, removed DC offset from signal before Fourier transformation, otherwise not
