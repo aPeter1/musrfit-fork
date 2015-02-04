@@ -786,6 +786,14 @@ if test "${PNEXUS_ENABLED}" = "1"; then
   AC_SUBST(PNEXUS_CXXFLAGS)
 fi
 
+if test "${BUILD_BNMR_LIBS}" = "1"; then
+  BNMRLIBS_SRCDIR="${SRCDIR}/external/libBNMR"
+  BNMRLIBS_LIBS="${BNMRLIBS_SRCDIR}/libBNMR.la"
+  BNMRLIBS_CFLAGS="-I${BNMRLIBS_SRCDIR}"
+  AC_SUBST(BNMRLIBS_LIBS)
+  AC_SUBST(BNMRLIBS_CFLAGS)
+fi
+
 if test "${BUILD_BMW_LIBS}" = "1"; then
   BMWTOOLS_SRCDIR="${SRCDIR}/external/BMWtools"
   BMWTOOLS_LIBS="${BMWTOOLS_SRCDIR}/libBMWtools.la"
@@ -1158,6 +1166,7 @@ AC_CONFIG_FILES([Makefile \
 		 src/external/libSpinValve/classes/Makefile \
                  src/external/libPhotoMeissner/Makefile \
                  src/external/libPhotoMeissner/classes/Makefile \
+                 src/external/libBNMR/Makefile \
                  src/musredit/musredit_startup.xml \
                  src/musrgui/musrgui_startup.xml])
 

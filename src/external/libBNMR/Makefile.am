@@ -18,7 +18,7 @@ dict_cpp_sources = \
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
-AM_CPPFLAGS = -I$(top_srcdir)/src/include $(LEM_CFLAGS) $(PMUSR_CFLAGS) $(CUBA_CFLAGS) -I$(ROOTINCDIR)
+AM_CPPFLAGS = -I$(top_srcdir)/src/include -I../include $(PMUSR_CFLAGS) $(FFTW3_CFLAGS) -I$(ROOTINCDIR)
 AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
@@ -26,7 +26,7 @@ AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
 CLEANFILES = *Dict.cpp *Dict.h *~ core
 
 %Dict.cpp %Dict.h: %.h %LinkDef.h
-	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(INCLUDES) $^
+	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^
 
 lib_LTLIBRARIES = libBNMR.la
 

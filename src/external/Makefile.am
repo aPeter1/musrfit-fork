@@ -19,4 +19,8 @@ if BUILD_BMWLIBS
             libCalcMeanFieldsLEM
 endif
 
-SUBDIRS = $(ASDIRS) $(CUBADIRS) $(BMWDIRS)
+if BUILD_BNMRLIBS
+  BNMRDIRS = libBNMR
+endif
+
+SUBDIRS = $(ASDIRS) $(CUBADIRS) $(BMWDIRS) $(BNMRDIRS)
