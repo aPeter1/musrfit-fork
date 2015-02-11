@@ -155,6 +155,11 @@ void PPrepFourier::DoBkgCorrection()
 {
   cout << endl << "debug> DoBkgCorrection ...";
 
+  // make sure fData are already present, and if not create the necessary data sets
+  if (fData.size() != fRawData.size()) {
+    InitData();
+  }
+
   // if no bkg-range is given, nothing needs to be done
   if ((fBkgRange[0] == -1) && (fBkgRange[1] == -1)) {
     cout << endl << "debug> no background range given ...";
@@ -167,11 +172,6 @@ void PPrepFourier::DoBkgCorrection()
       cerr << endl << "PPrepFourier::DoBkgCorrection() **ERROR** bkg-range out of data-range!";
       return;
     }
-  }
-
-  // make sure fData are already present, and if not create the necessary data sets
-  if (fData.size() != fRawData.size()) {
-    InitData();
   }
 
   Double_t bkg=0.0;
@@ -198,7 +198,12 @@ void PPrepFourier::DoBkgCorrection()
  */
 void PPrepFourier::DoPacking()
 {
-  cout << endl << "debug> DoPacking ...";
+  cout << endl << "debug> DoPacking : pack=" << fPacking << " ...";
+
+  // make sure fData are already present, and if not create the necessary data sets
+  if (fData.size() != fRawData.size()) {
+    InitData();
+  }
 
   if (fPacking == 1) // nothing to be done
     return;
@@ -236,6 +241,53 @@ void PPrepFourier::DoPacking()
 void PPrepFourier::DoFiltering()
 {
   cout << endl << "debug> DoFiltering not yet implemented ...";
+
+  // make sure fData are already present, and if not create the necessary data sets
+  if (fData.size() != fRawData.size()) {
+    InitData();
+  }
+
+}
+
+//--------------------------------------------------------------------------
+// DoLifeTimeCorrection
+//--------------------------------------------------------------------------
+/**
+ * <p>
+ *
+ * \param fudge
+ */
+void PPrepFourier::DoLifeTimeCorrection(Double_t fudge)
+{
+  // make sure fData are already present, and if not create the necessary data sets
+  if (fData.size() != fRawData.size()) {
+    InitData();
+  }
+
+  // calc exp(+t/tau)*N(t), where N(t) is already background corrected
+  Double_t scale;
+  for (unsigned int i=0; i<fData.size(); i++) {
+    scale = fRawData[i].timeResolution / PMUON_LIFETIME;
+    for (unsigned int j=0; j<fData[i].size(); j++) {
+      fData[i][j] *= exp(j*scale);
+    }
+  }
+
+  // calc N0
+  Double_t dval;
+  Double_t N0;
+  for (unsigned int i=0; i<fData.size(); i++) {
+    dval = 0.0;
+    for (unsigned int j=0; j<fData[i].size(); j++) {
+      dval += fData[i][j];
+    }
+    N0 = dval/fData[i].size();
+    N0 *= fudge;
+    for (unsigned int j=0; j<fData[i].size(); j++) {
+      fData[i][j] -= N0;
+      fData[i][j] /= N0;
+    }
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -267,6 +319,10 @@ vector<TH1F*> PPrepFourier::GetData()
 {
   vector<TH1F*> data;
   data.resize(fData.size());
+
+  // if not data are present, just return an empty vector
+  if (fData.size() == 0)
+    return data;
 
   TString name("");
   Double_t dt=0.0;
@@ -330,7 +386,10 @@ vector<TH1F*> PPrepFourier::GetData()
  */
 TH1F *PPrepFourier::GetData(const UInt_t idx)
 {
-  if (idx > fData.size())
+  if (fData.size() == 0) // no data present
+    return 0;
+
+  if (idx > fData.size()) // requested index out of range
     return 0;
 
   TString name = TString::Format("histo%2d", idx);
@@ -381,8 +440,13 @@ TH1F *PPrepFourier::GetData(const UInt_t idx)
 void PPrepFourier::InitData()
 {
   fData.resize(fRawData.size());
+  unsigned int t0;
   for (unsigned int i=0; i<fRawData.size(); i++) {
-    for (unsigned int j=fRawData[i].t0; j<fRawData[i].rawData.size(); j++) {
+    if (fRawData[i].t0 >= 0)
+      t0 = fRawData[i].t0;
+    else
+      t0 = 0;
+    for (unsigned int j=t0; j<fRawData[i].rawData.size(); j++) {
       fData[i].push_back(fRawData[i].rawData[j]);
     }
   }

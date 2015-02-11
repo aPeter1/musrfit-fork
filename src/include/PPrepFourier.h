@@ -67,6 +67,7 @@ class PPrepFourier {
     void DoBkgCorrection();
     void DoPacking();
     void DoFiltering();
+    void DoLifeTimeCorrection(Double_t fudge);
 
     TString GetInfo(const UInt_t idx);
     UInt_t GetNoOfData() { return fRawData.size(); }
