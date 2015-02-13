@@ -142,7 +142,6 @@ void musrFT_syntax()
   cout << endl << "    --title <title> : give a global title for the plot.";
   cout << endl << "    --create-msr-file <fln> : creates a msr-file based on the command line options";
   cout << endl << "                 provided. This will help on the way to a full fitting model.";
-  cout << endl << "                 ***TO BE WRITTEN YET.***";
   cout << endl << "    -lc, --lifetimecorrection <fudge>: try to eliminate muon life time decay. Only makes sense for low";
   cout << endl << "                 transverse fields. <fudge> is a tweaking factor and should be kept around 1.0.";
   cout << endl << "    --timeout <timeout> : <timeout> given in seconds after which musrFT terminates.";
