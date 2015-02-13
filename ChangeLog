@@ -4,10 +4,10 @@
 
 changes since 0.13.0
 ===================================
-NEW 2015-02-02 first partial implementation of a standalone Fourier transform/plotter: 
-               musrFT. A LOT of the functionality is still missing! Initially it is 
-               meant to be used for HAL-9500, i.e. Fourier transform WITHOUT lifetime
-               correction.                
+NEW 2015-02-13 first implementation of a standalone Fourier transform/plotter: 
+               musrFT. Initially it is meant to be used for HAL-9500, 
+               i.e. Fourier transform WITHOUT lifetime correction.
+               A first simple minded lifetime correction is implemented as well.                
 NEW 2014-12-18 first implementation of a GLOBAL block which allows to shorten
                a typical msr-file. Duplicate entries from the RUN blocks can be
                added here. Furthermore, the 'lifetimecorrection' flag is 

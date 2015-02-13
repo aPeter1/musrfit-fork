@@ -3797,15 +3797,10 @@ void PMusrCanvas::HandleAverage()
   // calculate all the average data sets
   double dval;
   if (fDataAvg.data != 0) {
-    if (!CalcAlignment(eTime)) {
-      cerr << endl << ">> PMusrCanvas::HandleAverage: data: **WARNING** only approx. alignment possible." << endl;
-    }
     for (Int_t i=0; i<fData[0].data->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        if ((i-fAlignmentOffset[j]) > 0) {
-          dval += fData[j].data->GetBinContent(i-fAlignmentOffset[j]);
-        }
+        dval += GetInterpolatedValue(fData[j].data, fData[0].data->GetBinContent(i));
       }
       fDataAvg.data->SetBinContent(i, dval/fData.size());
     }
@@ -3816,15 +3811,10 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.data->SetMarkerStyle(fData[0].data->GetMarkerStyle());
   }
   if (fDataAvg.dataFourierRe != 0) {
-    if (!CalcAlignment(eFreq)) {
-      cerr << endl << ">> PMusrCanvas::HandleAverage: Fourier Re: **WARNING** only approx. alignment possible." << endl;
-    }
     for (Int_t i=0; i<fData[0].dataFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        if ((i-fAlignmentOffset[j]) > 0) {
-          dval += fData[j].dataFourierRe->GetBinContent(i-fAlignmentOffset[j]);
-        }
+        dval += GetInterpolatedValue(fData[j].dataFourierRe, fData[0].dataFourierRe->GetBinContent(i));
       }
       fDataAvg.dataFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3835,15 +3825,10 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.dataFourierRe->SetMarkerStyle(fData[0].dataFourierRe->GetMarkerStyle());
   }
   if (fDataAvg.dataFourierIm != 0) {
-    if (!CalcAlignment(eFreq)) {
-      cerr << endl << ">> PMusrCanvas::HandleAverage: Fourier Im: **WARNING** only approx. alignment possible." << endl;
-    }
     for (Int_t i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        if ((i-fAlignmentOffset[j]) > 0) {
-          dval += fData[j].dataFourierIm->GetBinContent(i-fAlignmentOffset[j]);
-        }
+        dval += GetInterpolatedValue(fData[j].dataFourierIm, fData[0].dataFourierIm->GetBinContent(i));
       }
       fDataAvg.dataFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3854,15 +3839,10 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.dataFourierIm->SetMarkerStyle(fData[0].dataFourierIm->GetMarkerStyle());
   }
   if (fDataAvg.dataFourierPwr != 0) {
-    if (!CalcAlignment(eFreq)) {
-      cerr << endl << ">> PMusrCanvas::HandleAverage: Fourier Pwr: **WARNING** only approx. alignment possible." << endl;
-    }
     for (Int_t i=0; i<fData[0].dataFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        if ((i-fAlignmentOffset[j]) > 0) {
-          dval += fData[j].dataFourierPwr->GetBinContent(i-fAlignmentOffset[j]);
-        }
+        dval += GetInterpolatedValue(fData[j].dataFourierPwr, fData[0].dataFourierPwr->GetBinContent(i));
       }
       fDataAvg.dataFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3873,15 +3853,10 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.dataFourierPwr->SetMarkerStyle(fData[0].dataFourierPwr->GetMarkerStyle());
   }
   if (fDataAvg.dataFourierPhase != 0) {
-    if (!CalcAlignment(eFreq)) {
-      cerr << endl << ">> PMusrCanvas::HandleAverage: Fourier Phase: **WARNING** only approx. alignment possible." << endl;
-    }
     for (Int_t i=0; i<fData[0].dataFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        if ((i-fAlignmentOffset[j]) > 0) {
-          dval += fData[j].dataFourierPhase->GetBinContent(i-fAlignmentOffset[j]);
-        }
+        dval += GetInterpolatedValue(fData[j].dataFourierPhase, fData[0].dataFourierPhase->GetBinContent(i));
       }
       fDataAvg.dataFourierPhase->SetBinContent(i, dval/fData.size());
     }
@@ -3892,15 +3867,10 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.dataFourierPhase->SetMarkerStyle(fData[0].dataFourierPhase->GetMarkerStyle());
   }
   if (fDataAvg.theory != 0) {
-    if (!CalcAlignment(eTheoTime)) {
-      cerr << endl << ">> PMusrCanvas::HandleAverage: theory: **WARNING** only approx. alignment possible." << endl;
-    }
     for (Int_t i=0; i<fData[0].theory->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        if ((i-fAlignmentOffset[j]) > 0) {
-          dval += fData[j].theory->GetBinContent(i-fAlignmentOffset[j]);
-        }
+        dval += GetInterpolatedValue(fData[j].theory, fData[0].theory->GetBinContent(i));
       }
       fDataAvg.theory->SetBinContent(i, dval/fData.size());
     }
@@ -3910,7 +3880,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += fData[j].theoryFourierRe->GetBinContent(i);
+        dval += GetInterpolatedValue(fData[j].theoryFourierRe, fData[0].theoryFourierRe->GetBinContent(i));
       }
       fDataAvg.theoryFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3924,7 +3894,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += fData[j].theoryFourierIm->GetBinContent(i);
+        dval += GetInterpolatedValue(fData[j].theoryFourierIm, fData[0].theoryFourierIm->GetBinContent(i));
       }
       fDataAvg.theoryFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3938,7 +3908,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += fData[j].theoryFourierPwr->GetBinContent(i);
+        dval += GetInterpolatedValue(fData[j].theoryFourierPwr, fData[0].theoryFourierPwr->GetBinContent(i));
       }
       fDataAvg.theoryFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3952,7 +3922,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += fData[j].theoryFourierPhase->GetBinContent(i);
+        dval += GetInterpolatedValue(fData[j].theoryFourierPhase, fData[0].theoryFourierPhase->GetBinContent(i));
       }
       fDataAvg.theoryFourierPhase->SetBinContent(i, dval/fData.size());
     }
@@ -3963,15 +3933,10 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.theoryFourierPhase->SetMarkerStyle(fData[0].theoryFourierPhase->GetMarkerStyle());
   }
   if (fDataAvg.diff != 0) {
-    if (!CalcAlignment(eTime)) {
-      cerr << endl << ">> PMusrCanvas::HandleAverage: diff: **WARNING** only approx. alignment possible." << endl;
-    }
     for (Int_t i=0; i<fData[0].diff->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        if ((i-fAlignmentOffset[j]) > 0) {
-          dval += fData[j].diff->GetBinContent(i-fAlignmentOffset[j]);
-        }
+        dval += GetInterpolatedValue(fData[j].diff, fData[0].diff->GetBinContent(i));
       }
       fDataAvg.diff->SetBinContent(i, dval/fData.size());
     }
@@ -3985,7 +3950,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += fData[j].diffFourierRe->GetBinContent(i);
+        dval += GetInterpolatedValue(fData[j].diffFourierRe, fData[0].diffFourierRe->GetBinContent(i));
       }
       fDataAvg.diffFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3999,7 +3964,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += fData[j].diffFourierIm->GetBinContent(i);
+        dval += GetInterpolatedValue(fData[j].diffFourierIm, fData[0].diffFourierIm->GetBinContent(i));
       }
       fDataAvg.diffFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -4013,7 +3978,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += fData[j].diffFourierPwr->GetBinContent(i);
+        dval += GetInterpolatedValue(fData[j].diffFourierPwr, fData[0].diffFourierPwr->GetBinContent(i));
       }
       fDataAvg.diffFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -4027,7 +3992,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += fData[j].diffFourierPhase->GetBinContent(i);
+        dval += GetInterpolatedValue(fData[j].diffFourierPhase, fData[0].diffFourierPhase->GetBinContent(i));
       }
       fDataAvg.diffFourierPhase->SetBinContent(i, dval/fData.size());
     }
@@ -6314,130 +6279,40 @@ UInt_t PMusrCanvas::GetNeededAccuracy(PMsrParamStructure param)
 
 
 //--------------------------------------------------------------------------
-// CalcAlignment (private)
+// GetInterpolatedValue (private)
 //--------------------------------------------------------------------------
 /**
- * <p>Calculates the alignment index for each data set needed to average the data.
+ * <p>search for xVal in histo. If xVal is not found exactly, interpolate and
+ * return the interpolated y-value.
  *
  * <b>return:</b>
- * - true for perfect alignment
- * - false for approximate alignment
+ * - interpolated value if xVal is within histo range, 0 otherwise.
  *
- * \param tag to distinguish time data sets from Fourier data sets.
+ * \param histo pointer of the histogram
+ * \param xVal x-value to be looked for
  */
-Bool_t PMusrCanvas::CalcAlignment(const EAlignTag tag)
+Double_t PMusrCanvas::GetInterpolatedValue(TH1F* histo, Double_t xVal)
 {
-  Bool_t result = true;
+  if (histo == 0)
+    return 0.0;
 
-  fAlignmentOffset.clear();
+  Int_t idx = histo->FindBin(xVal);
 
-  UInt_t idx=0;
-  Double_t dval;
-  if (tag == eTime) {
-    // first find the data vector with the lowest initial time
-    dval = fData[0].data->GetXaxis()->GetBinCenter(1);
-    for (UInt_t i=1; i<fData.size(); i++) {
-      if (fData[i].data->GetXaxis()->GetBinCenter(1) < dval) {
-        idx = i;
-        dval = fData[i].data->GetXaxis()->GetBinCenter(1);
-      }
-    }
+  // make sure idx is within range
+  if ((idx < 1) || (idx > histo->GetNbinsX()))
+    return 0.0;
 
-    // next setp: find all the alignment indices
-    fAlignmentOffset.resize(fData.size());
-    for (UInt_t i=0; i<fData.size(); i++) {
-      dval = fData[i].data->GetXaxis()->GetBinCenter(1);
-      Int_t j=1;
-      Bool_t found = false;
-      do {
-        if (fData[idx].data->GetXaxis()->GetBinCenter(j) >= dval) {
-          fAlignmentOffset[i] = (UInt_t)(j-1);
-          if (fData[idx].data->GetXaxis()->GetBinCenter(j) != dval) {
-            result = false;
-          }
-          found = true;
-        }
-      } while (!found && (++j<fData[idx].data->GetNbinsX()));
-    }
-  } else if (tag == eTheoTime) {
-    // first find the data vector with the lowest initial time
-    dval = fData[0].theory->GetXaxis()->GetBinCenter(1);
-    for (UInt_t i=1; i<fData.size(); i++) {
-      if (fData[i].theory->GetXaxis()->GetBinCenter(1) < dval) {
-        idx = i;
-        dval = fData[i].theory->GetXaxis()->GetBinCenter(1);
-      }
-    }
+  // make sure the lower bound idx is found. This is needed since
+  // FindBin rounds towards the closer idx.
+  if (histo->GetBinCenter(idx) > xVal)
+    --idx;
 
-    // next setp: find all the alignment indices
-    fAlignmentOffset.resize(fData.size());
-    for (UInt_t i=0; i<fData.size(); i++) {
-      dval = fData[i].theory->GetXaxis()->GetBinCenter(1);
-      Int_t j=1;
-      Bool_t found = false;
-      do {
-        if (fData[idx].theory->GetXaxis()->GetBinCenter(j) >= dval) {
-          fAlignmentOffset[i] = (UInt_t)(j-1);
-          if (fData[idx].theory->GetXaxis()->GetBinCenter(j) != dval) {
-            result = false;
-          }
-          found = true;
-        }
-      } while (!found && (++j<fData[idx].theory->GetNbinsX()));
-    }
-  } else if (tag == eFreq) {
-    // first find the data vector with the lowest initial time
-    dval = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(1);
-    for (UInt_t i=1; i<fData.size(); i++) {
-      if (fData[i].dataFourierRe->GetXaxis()->GetBinCenter(1) < dval) {
-        idx = i;
-        dval = fData[i].dataFourierRe->GetXaxis()->GetBinCenter(1);
-      }
-    }
+  Double_t x0, x1, y0, y1;
+  x0 = histo->GetBinCenter(idx);
+  x1 = histo->GetBinCenter(idx+1);
+  y0 = histo->GetBinContent(idx);
+  y1 = histo->GetBinContent(idx+1);
 
-    // next setp: find all the alignment indices
-    fAlignmentOffset.resize(fData.size());
-    for (UInt_t i=0; i<fData.size(); i++) {
-      dval = fData[i].dataFourierRe->GetXaxis()->GetBinCenter(1);
-      Int_t j=1;
-      Bool_t found = false;
-      do {
-        if (fData[idx].dataFourierRe->GetXaxis()->GetBinCenter(j) >= dval) {
-          fAlignmentOffset[i] = (UInt_t)(j-1);
-          if (fData[idx].dataFourierRe->GetXaxis()->GetBinCenter(j) != dval) {
-            result = false;
-          }
-          found = true;
-        }
-      } while (!found && (++j<fData[idx].dataFourierRe->GetNbinsX()));
-    }
-  } else if (tag == eTheoFreq) {
-    // first find the data vector with the lowest initial time
-    dval = fData[0].theoryFourierRe->GetXaxis()->GetBinCenter(1);
-    for (UInt_t i=1; i<fData.size(); i++) {
-      if (fData[i].theoryFourierRe->GetXaxis()->GetBinCenter(1) < dval) {
-        idx = i;
-        dval = fData[i].theoryFourierRe->GetXaxis()->GetBinCenter(1);
-      }
-    }
-
-    // next setp: find all the alignment indices
-    fAlignmentOffset.resize(fData.size());
-    for (UInt_t i=0; i<fData.size(); i++) {
-      dval = fData[i].theoryFourierRe->GetXaxis()->GetBinCenter(1);
-      Int_t j=1;
-      Bool_t found = false;
-      do {
-        if (fData[idx].theoryFourierRe->GetXaxis()->GetBinCenter(j) >= dval) {
-          fAlignmentOffset[i] = (UInt_t)(j-1);
-          if (fData[idx].theoryFourierRe->GetXaxis()->GetBinCenter(j) != dval) {
-            result = false;
-          }
-          found = true;
-        }
-      } while (!found && (++j<fData[idx].theoryFourierRe->GetNbinsX()));
-    }
-  }
-
-  return result;
+  return (y1-y0)*(xVal-x0)/(x1-x0)+y0;
 }
+

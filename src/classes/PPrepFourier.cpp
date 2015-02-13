@@ -70,14 +70,12 @@ PPrepFourier::~PPrepFourier()
 // SetBkgRange
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>set the background range.
  *
- * \param bkgRange
+ * \param bkgRange array with background range
  */
 void PPrepFourier::SetBkgRange(const Int_t *bkgRange)
 {
-  cout << endl << "debug> bkgRange: " << bkgRange[0] << ", " << bkgRange[1] << endl;
-
   int err=0;
   if (bkgRange[0] >= -1) {
     fBkgRange[0] = bkgRange[0];
@@ -118,9 +116,9 @@ void PPrepFourier::SetBkgRange(const Int_t *bkgRange)
 // SetPacking
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>set the packing for the histograms.
  *
- * \param packing
+ * \param packing number to be used.
  */
 void PPrepFourier::SetPacking(const Int_t packing)
 {
@@ -135,9 +133,10 @@ void PPrepFourier::SetPacking(const Int_t packing)
 // AddData
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>add a data-set (time domain data + meta information) to the internal
+ * data vector.
  *
- * \param data
+ * \param data set to be added
  */
 void PPrepFourier::AddData(musrFT_data &data)
 {
@@ -148,13 +147,10 @@ void PPrepFourier::AddData(musrFT_data &data)
 // DoBkgCorrection
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Correct the internal data sets according to a background interval given.
  */
 void PPrepFourier::DoBkgCorrection()
 {
-  cout << endl << "debug> DoBkgCorrection ...";
-
   // make sure fData are already present, and if not create the necessary data sets
   if (fData.size() != fRawData.size()) {
     InitData();
@@ -162,7 +158,6 @@ void PPrepFourier::DoBkgCorrection()
 
   // if no bkg-range is given, nothing needs to be done
   if ((fBkgRange[0] == -1) && (fBkgRange[1] == -1)) {
-    cout << endl << "debug> no background range given ...";
     return;
   }
 
@@ -181,7 +176,6 @@ void PPrepFourier::DoBkgCorrection()
       bkg += fRawData[i].rawData[j];
     }
     bkg /= (fBkgRange[1]-fBkgRange[0]+1);
-    cout << endl << "debug> histo: " << i << ", bkg=" << bkg;
 
     // correct data
     for (unsigned int j=0; j<fData[i].size(); j++)
@@ -193,13 +187,10 @@ void PPrepFourier::DoBkgCorrection()
 // DoPacking
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Rebin (pack) the internal data.
  */
 void PPrepFourier::DoPacking()
 {
-  cout << endl << "debug> DoPacking : pack=" << fPacking << " ...";
-
   // make sure fData are already present, and if not create the necessary data sets
   if (fData.size() != fRawData.size()) {
     InitData();
@@ -224,10 +215,6 @@ void PPrepFourier::DoPacking()
     // change the original data set with the packed one
     fData[i].clear();
     fData[i] = tmpData;
-
-    cout << endl << "debug> histo " << i+1 << ": packed data: ";
-    for (unsigned int j=0; j<15; j++)
-      cout << fData[i][j] << ", ";
   }
 }
 
@@ -235,27 +222,25 @@ void PPrepFourier::DoPacking()
 // DoFiltering
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Not implemented yet.
  */
 void PPrepFourier::DoFiltering()
 {
-  cout << endl << "debug> DoFiltering not yet implemented ...";
-
   // make sure fData are already present, and if not create the necessary data sets
   if (fData.size() != fRawData.size()) {
     InitData();
   }
-
 }
 
 //--------------------------------------------------------------------------
 // DoLifeTimeCorrection
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Try to do a muon life time correction. The idea is to estimate N0 without
+ * any theory. This will be OK for high fields (> couple kGauss) but not so good
+ * for low fields.
  *
- * \param fudge
+ * \param fudge rescaling factor for the estimated N0. Should be around 1
  */
 void PPrepFourier::DoLifeTimeCorrection(Double_t fudge)
 {
@@ -294,9 +279,9 @@ void PPrepFourier::DoLifeTimeCorrection(Double_t fudge)
 // GetInfo
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Returns the meta information of a data set.
  *
- * \param idx
+ * \param idx index of the object
  */
 TString PPrepFourier::GetInfo(const UInt_t idx)
 {
@@ -312,8 +297,8 @@ TString PPrepFourier::GetInfo(const UInt_t idx)
 // GetData
 //--------------------------------------------------------------------------
 /**
- * <p>
- *
+ * <p>Creates the requested TH1F objects and returns them. The ownership is with
+ * the caller.
  */
 vector<TH1F*> PPrepFourier::GetData()
 {
@@ -382,7 +367,7 @@ vector<TH1F*> PPrepFourier::GetData()
  * <p>Creates the requested TH1F object and returns it. The ownership is with
  * the caller.
  *
- * \param idx
+ * \param idx index of the requested histogram
  */
 TH1F *PPrepFourier::GetData(const UInt_t idx)
 {

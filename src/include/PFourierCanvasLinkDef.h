@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PPrepFourier.h
+  PMusrCanvasLinkDef.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -27,62 +27,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PPREPFOURIER_H_
-#define _PPREPFOURIER_H_
+#ifdef __CINT__
 
-#include <iostream>
-#include <vector>
-using namespace std;
+#pragma link off all globals;
+#pragma link off all classes;
+#pragma link off all functions;
 
-#include "TH1F.h"
+#pragma link C++ class PFourierCanvas+;
 
-#include "PMusr.h"
-
-//----------------------------------------------------------------------------
-/**
- * <p>Data structure holding raw time domain uSR data together with some
- * necessary meta information.
- */
-typedef struct {
-  TString info;          ///< keeps all the meta information
-  double timeResolution; ///< time resolution in (usec)
-  int t0;                ///< keep the t0 bin
-  Double_t timeRange[2]; ///< time range to be used, given in (usec).
-  PDoubleVector rawData; ///< a single time domain data vector
-} musrFT_data;
-
-//----------------------------------------------------------------------------
-/**
- * <p>Little helper class to prepare time-domain data for Fourier transform, without
- * theory, etc.
- */
-class PPrepFourier {
-  public:
-    PPrepFourier();
-    PPrepFourier(const Int_t *bkgRange, const Int_t packing);
-    virtual ~PPrepFourier();
-
-    void SetBkgRange(const Int_t *bkgRange);
-    void SetPacking(const Int_t packing);
-    void AddData(musrFT_data &data);
-    void DoBkgCorrection();
-    void DoPacking();
-    void DoFiltering();
-    void DoLifeTimeCorrection(Double_t fudge);
-
-    TString GetInfo(const UInt_t idx);
-    UInt_t GetNoOfData() { return fRawData.size(); }
-    vector<TH1F*> GetData();
-    TH1F *GetData(const UInt_t idx);
-
-  private:
-    vector<musrFT_data> fRawData;
-    vector<PDoubleVector>fData;
-    Int_t fBkgRange[2];
-    Int_t fPacking;
-
-    void InitData();
-};
-
-#endif // _PPREPFOURIER_H_
+#endif
 

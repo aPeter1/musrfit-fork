@@ -278,9 +278,7 @@ class PMusrCanvas : public TObject, public TQObject
     PRunListCollection *fRunList;    ///< data handler
 #endif // __MAKECINT__
 
-    enum EAlignTag {eTime, eTheoTime, eFreq, eTheoFreq};
     PMusrCanvasDataSet fDataAvg; ///< set of all averaged data to be plotted (asymmetry/single histogram)
-    PIntVector fAlignmentOffset; ///< holds the vector with the time/freq alignment offsets
 
     PMusrCanvasDataList fData; ///< list of all histogram data to be plotted (asymmetry/single histogram)
     PMusrCanvasNonMusrDataList fNonMusrData; ///< list of all error graphs to be plotted (non-muSR)
@@ -333,7 +331,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual Bool_t IsScaleN0AndBkg();
     virtual UInt_t GetNeededAccuracy(PMsrParamStructure param);
 
-    virtual Bool_t CalcAlignment(const EAlignTag tag);
+    virtual Double_t GetInterpolatedValue(TH1F* histo, Double_t xVal);
 
   ClassDef(PMusrCanvas, 1)
 };

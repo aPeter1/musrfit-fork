@@ -38,6 +38,8 @@
 #include <vector>
 using namespace std;
 
+#include <TApplication.h>
+#include <TROOT.h>
 #include <TString.h>
 #include <TObjArray.h>
 #include <TObjString.h>
@@ -50,36 +52,39 @@ using namespace std;
 #include "PRunDataHandler.h"
 #include "PPrepFourier.h"
 #include "PFourier.h"
+#include "PFourierCanvas.h"
 
 //----------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Structure keeping the command line options.
  */
 typedef struct {
-  vector<TString> msrFln;
-  vector<TString> dataFln;
-  vector<TString> dataFileFormat;
-  TString graphicFormat;
-  TString dumpFln;
-  int bkg[2];
-  TString fourierOpt;
-  TString apotization;
-  int fourierPower;
-  TString fourierUnits;
-  double initialPhase;
-  double fourierRange[2];
-  double timeRange[2];
-  vector<int> histo;
-  bool showAverage;
-  vector<int> t0;
-  int packing;
-  TString title;
-  double lifetimecorrection; //< is == 0.0 for NO life time correction, otherwise it holds the fudge factor
+  vector<TString> msrFln;         ///< msr-file names to be used.
+  vector<TString> dataFln;        ///< raw-data-file names to be used.
+  vector<TString> dataFileFormat; ///< file format guess
+  TString graphicFormat;          ///< format for the graphical output dump
+  TString dumpFln;                ///< dump file name for Fourier data output
+  TString msrFlnOut;              ///< dump file name for msr-file generation
+  int bkg[2];                     ///< background range
+  TString fourierOpt;             ///< Fourier options, i.e. real, imag, power, phase
+  TString apodization;            ///< apodization setting: none, weak, medium, strong
+  int fourierPower;               ///< Fourier power for zero padding, i.e. 2^fourierPower points
+  TString fourierUnits;           ///< wished Fourier units: Gauss, Tesla, MHz, Mc/s
+  double initialPhase;            ///< inital Fourier phase for Real/Imag
+  double fourierRange[2];         ///< Fourier range to be plotted. Given in the choosen units.
+  double timeRange[2];            ///< time range used for the Fourier
+  vector<int> histo;              ///< selection of the histos used from at data file for Fourier
+  bool showAverage;               ///< flag indicating if initially the Fourier average over the given histos shall be plotted.
+  vector<int> t0;                 ///< t0 vector for the histos. If not given t0's will be estimated.
+  int packing;                    ///< packing for rebinning the time histograms before Fourier transform.
+  TString title;                  ///< title to be shown for the Fourier plot.
+  double lifetimecorrection;      ///< is == 0.0 for NO life time correction, otherwise it holds the fudge factor
+  Int_t timeout;                  ///< timeout in (sec) after which musrFT will terminate. if <= 0, no automatic termination will take place.
 } musrFT_startup_param;
 
 //-------------------------------------------------------------------------
 /**
- * <p>
+ * <p>prints the musrFT usage.
  */
 void musrFT_syntax()
 {
@@ -104,9 +109,9 @@ void musrFT_syntax()
   cout << endl << "    --filter  : filter and filter-specific-information -- ***TO BE WRITTEN YET***.";
   cout << endl << "    -b, --background <start> <end>: background interval used to estimate the backround to be";
   cout << endl << "                subtracted before the Fourier transform. <start>, <end> to be given in bins.";
-  cout << endl << "    -fo, --fourier-option <fopt>: <fopt> can be 'real', 'power', 'imag', 'real+imag', of 'phase'.";
+  cout << endl << "    -fo, --fourier-option <fopt>: <fopt> can be 'real', 'imag', 'real+imag', 'power', or 'phase'.";
   cout << endl << "                If this is not defined (neither on the command line nor in the musrFT_startup.xml),";
-  cout << endl << "                default will be 'real'.";
+  cout << endl << "                default will be 'power'.";
   cout << endl << "    -apod, --apodization <val> : <val> can be either 'none', 'weak', 'medium', 'strong'.";
   cout << endl << "                Default will be 'none'.";
   cout << endl << "    -fp, --fourier-power <N> : <N> being the Fourier power, i.e. 2^<N> used for zero padding.";
@@ -115,7 +120,7 @@ void musrFT_syntax()
   cout << endl << "                One may choose between the fields (Gauss) or (Tesla), the frequency (MHz),";
   cout << endl << "                and the angular-frequency domain (Mc/s).";
   cout << endl << "                Default will be 'MHz'.";
-  cout << endl << "    -ph, --phase <val> : defines the inital phase <val>. This only is of concern for 'real',";
+  cout << endl << "    -ph, --phase <val> : defines the initial phase <val>. This only is of concern for 'real',";
   cout << endl << "                '<imag>', and 'real+imag'.";
   cout << endl << "                 Default will be 0.0.";
   cout << endl << "    -fr, --fourier-range <start> <end> : Fourier range. <start>, <end> are interpreted in the units given.";
@@ -134,12 +139,14 @@ void musrFT_syntax()
   cout << endl << "                 to all histos.";
   cout << endl << "                 Example: musrFT -df lem15_his_01234.root -fo real --t0 2750 --histo 1 3";
   cout << endl << "    -pa, --packing <N> : if <N> (an integer), the time domain data will first be packed/rebinned by <N>.";
-  cout << endl << "    -t, --title <title> : give a global title for the plot.";
+  cout << endl << "    --title <title> : give a global title for the plot.";
   cout << endl << "    --create-msr-file <fln> : creates a msr-file based on the command line options";
   cout << endl << "                 provided. This will help on the way to a full fitting model.";
   cout << endl << "                 ***TO BE WRITTEN YET.***";
   cout << endl << "    -lc, --lifetimecorrection <fudge>: try to eliminate muon life time decay. Only makes sense for low";
   cout << endl << "                 transverse fields. <fudge> is a tweaking factor and should be kept around 1.0.";
+  cout << endl << "    --timeout <timeout> : <timeout> given in seconds after which musrFT terminates.";
+  cout << endl << "                 If <timeout> <= 0, no timeout will take place. Default <timeout> is 3600.";
   cout << endl << endl;
 }
 
@@ -147,16 +154,17 @@ void musrFT_syntax()
 /**
  * <p>initialize startup parameters.
  *
- * \param startupParam
+ * \param startupParam command line options
  */
 void musrFT_init(musrFT_startup_param &startupParam)
 {
   startupParam.graphicFormat = TString("");
   startupParam.dumpFln = TString("");
+  startupParam.msrFlnOut = TString("");
   startupParam.bkg[0] = -1;
   startupParam.bkg[1] = -1;
-  startupParam.fourierOpt = TString("real");
-  startupParam.apotization = TString("none");
+  startupParam.fourierOpt = TString("??");
+  startupParam.apodization = TString("none");
   startupParam.fourierPower = -1;
   startupParam.fourierUnits = TString("??");
   startupParam.initialPhase = 0.0;
@@ -168,6 +176,7 @@ void musrFT_init(musrFT_startup_param &startupParam)
   startupParam.packing = 1;
   startupParam.title = TString("");
   startupParam.lifetimecorrection = 0.0;
+  startupParam.timeout = 3600;
 }
 
 //-------------------------------------------------------------------------
@@ -273,9 +282,9 @@ bool musrFT_filter_histo(int &i, int argc, char *argv[], musrFT_startup_param &s
  *
  * <b>return:</b> 0 if everything is OK, 1 for --version or --help, 2 for an error.
  *
- * \param argc
- * \param argv
- * \param startupParam
+ * \param argc number of command line arguments
+ * \param argv command line argument array
+ * \param startupParam command line data structure
  */
 int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupParam)
 {
@@ -356,7 +365,7 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
         cerr << endl << ">> musrFT **ERROR** found option --apodization with unrecognized argument '" << topt << "'." << endl;
         return 2;
       }
-      startupParam.apotization = topt;
+      startupParam.apodization = topt;
       i++;
     } else if (tstr.BeginsWith("-fp") || tstr.BeginsWith("--fourier-power")) {
       if (i+1 >= argc) { // something is wrong since there needs to be two arguments here
@@ -449,7 +458,7 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
         cerr << endl << ">> musrFT **ERROR** found option --t0 without argument!" << endl;
         return 2;
       }
-    } else if (tstr.BeginsWith("-t ") || tstr.BeginsWith("--title")) {
+    } else if (tstr.BeginsWith("--title")) {
       if (i+1 >= argc) { // something is wrong since there needs to be an argument here
         cerr << endl << ">> musrFT **ERROR** found option --title without argument!" << endl;
         return 2;
@@ -468,6 +477,13 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
         return 2;
       }
       startupParam.packing = pack.Atoi();
+    } else if (tstr.BeginsWith("--create-msr-file")) {
+      if (i+1 >= argc) { // something is wrong since there needs to be an argument here
+        cerr << endl << ">> musrFT **ERROR** found option --create-msr-file without argument!" << endl;
+        return 2;
+      }
+      ++i;
+      startupParam.msrFlnOut = TString(argv[i]);
     } else if (tstr.BeginsWith("-lc") || tstr.BeginsWith("--lifetimecorrection")) {
       if (i+1 >= argc) { // something is wrong since there needs to be an argument here
         cerr << endl << ">> musrFT **ERROR** found option --lifetimecorrection without argument!" << endl;
@@ -476,10 +492,22 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
       ++i;
       TString fudge(argv[i]);
       if (!fudge.IsFloat()) {
-        cerr << endl << ">> musrFT **ERROR** found option --lifetimecorrection with a fudge which is not an double '" << fudge << "'." << endl;
+        cerr << endl << ">> musrFT **ERROR** found option --lifetimecorrection with a fudge which is not a double '" << fudge << "'." << endl;
         return 2;
       }
       startupParam.lifetimecorrection = fudge.Atof();
+    } else if (tstr.BeginsWith("--timeout")) {
+      if (i+1 >= argc) { // something is wrong since there needs to be an argument here
+        cerr << endl << ">> musrFT **ERROR** found option --timeout without argument!" << endl;
+        return 2;
+      }
+      ++i;
+      TString tt(argv[i]);
+      if (!tt.IsDigit()) {
+        cerr << endl << ">> musrFT **ERROR** found option --timeout with a <timeout> which is not an integer '" << tt << "'." << endl;
+        return 2;
+      }
+      startupParam.timeout = tt.Atoi();
     } else if (tstr.BeginsWith("-df") || tstr.BeginsWith("--data-file")) {
       while (++i < argc) {
         if (argv[i][0] == '-') {
@@ -541,7 +569,11 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
 
 //----------------------------------------------------------------------------------------
 /**
+ * <p>Collects the meta information form the raw-data-file.
  *
+ * \param fln file name of the raw-data-file
+ * \param rawRunData raw-data-file object
+ * \param metaInfo return string which will contain the meta information.
  */
 void musrFT_getMetaInfo(const TString fln, PRawRunData *rawRunData, TString &metaInfo)
 {
@@ -581,6 +613,13 @@ void musrFT_getMetaInfo(const TString fln, PRawRunData *rawRunData, TString &met
 }
 
 //-------------------------------------------------------------------------
+/**
+ * <p>Estimates the t0's of the raw-data-files. It simply is looking for the
+ * maximum of the raw-data (assuming a prompt peak). This will fail for LEM
+ * and ISIS data for sure.
+ *
+ * \param rd raw-data-file collection (see PPrepFourier.h)
+ */
 void musrFT_estimateT0(musrFT_data &rd)
 {
   cout << endl << ">> musrFT **WARNING** try to estimate t0 from maximum in the data set";
@@ -600,12 +639,12 @@ void musrFT_estimateT0(musrFT_data &rd)
 }
 
 //-------------------------------------------------------------------------
-void musrFT_cleanup(TH1F *h)
 /**
- * <p>
+ * <p> deletes a histogram.
  *
- * \param h histogram to be deleted
+ * \param h point to a ROOT histogram object
  */
+void musrFT_cleanup(TH1F *h)
 {
   if (h) {
     delete h;
@@ -615,9 +654,12 @@ void musrFT_cleanup(TH1F *h)
 
 //-------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Dump the Fourier transformed data into an ascii file.
  *
- * \param data
+ * \param fln dump file name
+ * \param fourierData collection of all the Fourier transformed data.
+ * \param start starting point from where the data shall be written to file.
+ * \param end ending point up to where the data shall be written to file.
  */
 int musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, double start, double end)
 {
@@ -691,14 +733,15 @@ int musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, double start, d
   return 0;
 }
 
-//---------------------------------------------------
+//-------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Groups the histograms before Fourier transform. This is used to group
+ * detectors.
  *
- * \param runDataHandler
- * \param global
- * \param run
- * \param rd
+ * \param runDataHandler raw-run-data object containing the data
+ * \param global pointer to the GLOBAL block of the msr-file
+ * \param run reference to the relevant RUN block of the msr-file
+ * \param rd data collection which will hold the grouped histograms.
  */
 int musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *global, PMsrRunBlock &run, musrFT_data &rd)
 {
@@ -779,7 +822,115 @@ int musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *global,
   return 0;
 }
 
-//---------------------------------------------------
+//-------------------------------------------------------------------------
+/**
+ * <p>Dumps an msr-file according to the given command line settings. This
+ * is meant to generate an initial msr-file for a given data-file. This
+ * routine is 'stupid' in the sense that it knows nothing about the data-files.
+ * Hence when feeding it with senseless command line settings, the resulting
+ * msr-file fed back to musrFT might do funny things!
+ *
+ * \param param command line options
+ */
+void musrFT_dumpMsrFile(musrFT_startup_param &param)
+{
+  ofstream fout(param.msrFlnOut.Data(), ofstream::out);
+
+  // write title
+  if (param.title.Length() == 0) { // create title if not given
+    if (param.dataFln.size() != 0) {
+      param.title = param.dataFln[0];
+    } else {
+      param.title = param.msrFlnOut;
+    }
+  }
+  fout << param.title << endl;
+  fout << "###############################################################" << endl;
+
+  // write GLOBAL block
+  fout << "GLOBAL" << endl;
+  fout << "fittype         0         (single histogram fit)" << endl;
+  if (param.t0.size() == 1) { // only a single t0 value given, hence assume it is valid for ALL histos
+    fout << "t0              " << param.t0[0] << endl;
+  }
+  if ((param.timeRange[0] != -1.0) && (param.timeRange[1] != -1.0)) {
+    fout << "fit             " << param.timeRange[0] << "  " << param.timeRange[1] << endl;
+  }
+  fout << "packing         " << param.packing << endl;
+  fout << endl;
+  fout << "###############################################################" << endl;
+
+  // write RUN block
+  // get extension of the data file
+  TString fileFormat("MUSR-ROOT");
+  for (unsigned int i=0; i<param.dataFln.size(); i++) {
+    if (param.dataFileFormat[i].BeginsWith("PsiBin"))
+      fileFormat = TString("PSI-MDU");
+    else if (param.dataFileFormat[i].BeginsWith("NeXus"))
+      fileFormat = TString("NEXUS");
+    else if (param.dataFileFormat[i].BeginsWith("Mud"))
+      fileFormat = TString("MUD");
+    for (unsigned int j=0; j<param.histo.size(); j++) {
+      fout << "RUN " << param.dataFln[i] << " BXXX IXX " << fileFormat << "   (name beamline institute data-file-format)" << endl;
+      fout << "forward         " << param.histo[j] << endl;
+      if ((param.t0.size() > 1) && (j < param.t0.size())) {
+        fout << "t0              " << param.t0[j] << endl;
+      }
+      if ((param.bkg[0] > -1) && (param.bkg[1] > -1))
+        fout << "background      " << param.bkg[0] << "     " << param.bkg[1] << endl;
+      fout << "#--------------------------------------------------------------" << endl;
+    }
+  }
+  fout << endl;
+  fout << "###############################################################" << endl;
+
+  // write PLOT block
+  fout << "PLOT 0   (single histo plot)" << endl;
+  if (param.histo.size() == 0) {
+    fout << "runs     1" << endl;
+  } else {
+    fout << "runs     ";
+    for (unsigned int i=0; i<param.histo.size(); i++)
+      fout << i+1 << " ";
+    fout << endl;
+  }
+  if ((param.timeRange[0] == -1.0) && (param.timeRange[1] == -1.0)) {
+    fout << "range    0    10" << endl;
+  } else {
+    fout << "range    " << param.timeRange[0] << "   " << param.timeRange[1] << endl;
+  }
+  fout << endl;
+  fout << "###############################################################" << endl;
+
+  // write FOURIER block
+  fout << "FOURIER" << endl;
+  if (param.fourierUnits.BeginsWith("??")) { // Fourier units not given, hence choose MHz
+    fout << "units            MHz   # units either 'Gauss', 'MHz', or 'Mc/s'" << endl;
+  } else {
+    fout << "units            " << param.fourierUnits << "   # units either 'Gauss', 'MHz', or 'Mc/s'" << endl;
+  }
+  if (param.fourierOpt.BeginsWith("??")) { // Fourier plot option not given, hence choose POWER
+    fout << "plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE" << endl;
+  } else {
+    fout << "plot             " << param.fourierOpt << "     # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE" << endl;
+  }
+  if (param.fourierPower > 1) {
+    fout << "fourier_power    " << param.fourierPower << endl;
+  }
+  fout << "apodization      " << param.apodization << "        # NONE, WEAK, MEDIUM, STRONG" << endl;
+  if ((param.fourierRange[0] > -1.0) && (param.fourierRange[1] > -1.0)) {
+    fout << "range            " << param.fourierRange[0] << "   " << param.fourierRange[1] << endl;
+  }
+
+  fout.close();
+}
+
+//-------------------------------------------------------------------------
+/**
+ * <p>Gets time a time stamp in msec. Used to measure the calculation time.
+ *
+ * <b>return:</b> time stamp with msec resolution.
+ */
 double millitime()
 {
   struct timeval now;
@@ -790,15 +941,20 @@ double millitime()
 
 //-------------------------------------------------------------------------
 /**
- * <p>
+ * <p>musrFT is used to do a Fourier transform of uSR data without any fitting.
+ * It directly Fourier transforms the raw histogram data (exception see --lifetimecorrection),
+ * and hence only will give staisfactory results for applied fields of larger a
+ * couple of kGauss. It is meant to be used to get a feeling what time-domain
+ * model will be appropriate. It is NOT meant for ANY quantitative analysis!
  *
- * \param argc
- * \param argv
+ * \param argc number of command line arguments
+ * \param argv command line argument array
  */
 int main(int argc, char *argv[])
 {
   Int_t unitTag = FOURIER_UNIT_NOT_GIVEN;
   Int_t apodTag = F_APODIZATION_NONE;
+  Int_t fourierPlotTag = FOURIER_PLOT_NOT_GIVEN;
 
   // only program name alone
   if (argc == 1) {
@@ -819,6 +975,12 @@ int main(int argc, char *argv[])
       retVal = PMUSR_WRONG_STARTUP_SYNTAX;
     }
     return retVal;
+  }
+
+  // dump msr-file
+  if (startupParam.msrFlnOut.Length() > 0) {
+    musrFT_dumpMsrFile(startupParam);
+    return PMUSR_SUCCESS;
   }
 
   // read startup file
@@ -903,7 +1065,6 @@ int main(int argc, char *argv[])
 
   // load data-file(s) provided directly
   for (unsigned int i=msrHandler.size(); i<msrHandler.size()+startupParam.dataFln.size(); i++) {
-//    cout << endl << "debug> dataFln[" << i-msrHandler.size() << "]=" << startupParam.dataFln[i-msrHandler.size()];
     // create run data handler
     if (startupHandler)
       runDataHandler[i] = new PRunDataHandler(startupParam.dataFln[i-msrHandler.size()], startupParam.dataFileFormat[i-msrHandler.size()], startupHandler->GetDataPathList());
@@ -956,6 +1117,9 @@ int main(int argc, char *argv[])
     unsigned int idx=0;
     // get meta info, time resolution, time range, raw data sets
     if (i < msrHandler.size()) { // obtain info from msr-files
+      // keep title if not overwritten by the command line
+      if (startupParam.title.Length() == 0)
+        startupParam.title = *(msrHandler[0]->GetMsrTitle());
       // keep PLOT block info
       PMsrPlotList *plot = msrHandler[i]->GetMsrPlotList();
       if (plot == 0) {
@@ -993,7 +1157,11 @@ int main(int argc, char *argv[])
           // get range
           if ((startupParam.fourierRange[0] == -1) && (startupParam.fourierRange[1] == -1)) { // no Fourier range given from the command line
             startupParam.fourierRange[0] = fourierBlock->fPlotRange[0];
-            startupParam.fourierRange[1] = fourierBlock->fPlotRange[1];
+            startupParam.fourierRange[1] = fourierBlock->fPlotRange[1];            
+          }
+          // get Fourier plot option, i.e. real, imag, power, phase
+          if (startupParam.fourierOpt.BeginsWith("??")) { // only do something if not overwritten by the command line
+            fourierPlotTag = fourierBlock->fPlotTag;
           }
         }
       }
@@ -1030,8 +1198,10 @@ int main(int argc, char *argv[])
           rd.timeRange[0] = startupParam.timeRange[0];
           rd.timeRange[1] = startupParam.timeRange[1];
         } else {
-          rd.timeRange[0] = plot->at(0).fTmin[0];
-          rd.timeRange[1] = plot->at(0).fTmax[0];
+          if (plot->at(0).fTmin.size() > 0) {
+            rd.timeRange[0] = plot->at(0).fTmin[0];
+            rd.timeRange[1] = plot->at(0).fTmax[0];
+          }
         }
 
         // handle data set(s)
@@ -1089,6 +1259,22 @@ int main(int argc, char *argv[])
     }
   }
 
+  // make sure Fourier plot tag is set
+  if (fourierPlotTag == FOURIER_PLOT_NOT_GIVEN) {
+    if (!startupParam.fourierOpt.CompareTo("real", TString::kIgnoreCase))
+      fourierPlotTag = FOURIER_PLOT_REAL;
+    else if (!startupParam.fourierOpt.CompareTo("imag", TString::kIgnoreCase))
+      fourierPlotTag = FOURIER_PLOT_IMAG;
+    else if (!startupParam.fourierOpt.CompareTo("real+imag", TString::kIgnoreCase))
+      fourierPlotTag = FOURIER_PLOT_REAL_AND_IMAG;
+    else if (!startupParam.fourierOpt.CompareTo("power", TString::kIgnoreCase))
+      fourierPlotTag = FOURIER_PLOT_POWER;
+    else if (!startupParam.fourierOpt.CompareTo("phase", TString::kIgnoreCase))
+      fourierPlotTag = FOURIER_PLOT_PHASE;
+    else
+      fourierPlotTag = FOURIER_PLOT_POWER;
+  }
+
   // calculate background levels and subtract them from the data
   data.DoBkgCorrection();
 
@@ -1124,14 +1310,12 @@ int main(int argc, char *argv[])
   }
 
   // Fourier transform data
-  if (startupParam.apotization.BeginsWith("weak", TString::kIgnoreCase))
+  if (startupParam.apodization.BeginsWith("weak", TString::kIgnoreCase))
     apodTag = F_APODIZATION_WEAK;
-  else if (startupParam.apotization.BeginsWith("medium", TString::kIgnoreCase))
+  else if (startupParam.apodization.BeginsWith("medium", TString::kIgnoreCase))
     apodTag = F_APODIZATION_MEDIUM;
-  else if (startupParam.apotization.BeginsWith("strong", TString::kIgnoreCase))
+  else if (startupParam.apodization.BeginsWith("strong", TString::kIgnoreCase))
     apodTag = F_APODIZATION_STRONG;
-
-  cout << endl << "debug> apodTag = " << apodTag << endl;
 
   double start = millitime();
   for (unsigned int i=0; i<fourier.size(); i++) {
@@ -1140,19 +1324,83 @@ int main(int argc, char *argv[])
   double end = millitime();
   cout << endl << "debug> after FFT. calculation time: " << (end-start)/1.0e3  << " (sec)." << endl;
 
+  PFourierCanvas *fourierCanvas = 0;
+
   // if Fourier dumped if whished do it now
   if (startupParam.dumpFln.Length() > 0) {
     musrFT_dumpData(startupParam.dumpFln, fourier, startupParam.fourierRange[0], startupParam.fourierRange[1]);
-  } else {
+  } else { // do Canvas
 
-  // if Fourier graphical export is whished, switch to batch mode
+    // if Fourier graphical export is whished, switch to batch mode
+    Bool_t batch = false;
+    if (startupParam.graphicFormat.Length() != 0) {
+      batch = true;
+      argv[argc] = (char*)malloc(16*sizeof(char));
+      strcpy(argv[argc], "-b");
+      argc++;
+    }
 
-  // plot the Fourier transform
+    // plot the Fourier transform
+    TApplication app("App", &argc, argv);
 
+    if (startupHandler) {
+      fourierCanvas = new PFourierCanvas(fourier, startupParam.title.Data(),
+                                   startupParam.showAverage, fourierPlotTag,
+                                   startupParam.fourierRange, startupParam.initialPhase,
+                                   10, 10, 800, 800,
+                                   startupHandler->GetMarkerList(),
+                                   startupHandler->GetColorList(),
+                                   batch);
+    } else {
+      fourierCanvas = new PFourierCanvas(fourier, startupParam.title.Data(),
+                                   startupParam.showAverage, fourierPlotTag,
+                                   startupParam.fourierRange, startupParam.initialPhase,
+                                   10, 10, 800, 800,
+                                   batch);
+    }
+
+    fourierCanvas->UpdateFourierPad();
+    fourierCanvas->UpdateInfoPad();
+
+    Bool_t ok = true;
+    if (!fourierCanvas->IsValid()) {
+      cerr << endl << ">> musrFT **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
+      cerr << endl;
+      ok = false;
+    } else {
+      // connect signal/slot
+      TQObject::Connect("TCanvas", "Closed()", "PFourierCanvas", fourierCanvas, "LastCanvasClosed()");
+
+      fourierCanvas->SetTimeout(startupParam.timeout);
+
+      fourierCanvas->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
+
+      if (startupParam.graphicFormat.Length() != 0) {
+        TString fileName("");
+        // create output filename based on the msr- or raw-data-filename
+        if (startupParam.dataFln.size() > 0) {
+          fileName = startupParam.dataFln[0];
+        }
+        if (startupParam.msrFln.size() > 0) {
+          fileName = startupParam.msrFln[0];
+        }
+        Ssiz_t idx = fileName.Last('.');
+        fileName.Remove(idx, fileName.Length());
+        fileName += ".";
+        fileName += startupParam.graphicFormat;
+        fourierCanvas->SaveGraphicsAndQuit(fileName.Data());
+      }
+    }
+    // check that everything is ok
+    if (ok)
+      app.Run(true); // true needed that Run will return after quit so that cleanup works
   }
 
 
   // cleanup
+  if (fourierCanvas)
+    delete fourierCanvas;
+
   if (startupHandler)
     delete startupHandler;
 
