@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2015 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -60,6 +60,7 @@ class PRunDataHandler
 
     virtual Bool_t IsAllDataAvailable() const { return fAllDataAvailable; }
     virtual PRawRunData* GetRunData(const TString &runName);
+    virtual PRawRunData* GetRunData(const UInt_t idx=0);
     virtual TString GetRunPathName() {return fRunPathName; }
 
   private:

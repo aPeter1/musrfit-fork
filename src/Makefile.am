@@ -34,13 +34,14 @@ SUBDIRS += $(EDITORDIR)
 EXTRA_DIST = $(EDITORDIR)/Makefile
 endif
 
-bin_PROGRAMS = musrfit musrview musrt0 msr2msr msr2data any2many
+bin_PROGRAMS = musrfit musrview musrt0 musrFT msr2msr msr2data any2many
 bin_PROGRAMS += write_musrRoot_runHeader musrRootValidation
 bin_PROGRAMS += dump_header
 
 musrfit_SOURCES = musrfit.cpp
 musrview_SOURCES = musrview.cpp
 musrt0_SOURCES = musrt0.cpp
+musrFT_SOURCES = musrFT.cpp
 msr2msr_SOURCES = msr2msr.cpp
 msr2data_SOURCES = msr2data.cpp
 any2many_SOURCES = any2many.cpp

@@ -4,6 +4,10 @@
 
 changes since 0.13.0
 ===================================
+NEW 2015-02-13 first implementation of a standalone Fourier transform/plotter: 
+               musrFT. Initially it is meant to be used for HAL-9500, 
+               i.e. Fourier transform WITHOUT lifetime correction.
+               A first simple minded lifetime correction is implemented as well.                
 NEW 2015-01-17 adding a branch for ROOT 6.x. This needs some minor adaptations due
                to the new rootcint/rootclang and the stricter c++11.
 NEW 2014-12-18 first implementation of a GLOBAL block which allows to shorten

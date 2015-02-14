@@ -67,6 +67,8 @@ void musrview_syntax()
   cout << endl << "           eps, pdf, gif, jpg, png, svg, xpm, root";
   cout << endl << "           example: musrview 3310.msr --png, will produce a files 3310_X.png";
   cout << endl << "                    where 'X' stands for the plot number (starting form 0)";
+  cout << endl << "       --ascii: ";
+  cout << endl << "           will produce an ascii dump of the data and fit as plotted.";
   cout << endl << "       --timeout <timeout>: <timeout> given in seconds after which musrview terminates.";
   cout << endl << "           If <timeout> <= 0, no timeout will take place. Default <timeout> is 0.";
   cout << endl;
@@ -100,6 +102,7 @@ int main(int argc, char *argv[])
   bool success = true;
   char fileName[128];
   bool graphicsOutput = false;
+  bool asciiOutput = false;
   char graphicsExtension[128];
   int  timeout = 0;
 
@@ -135,6 +138,8 @@ int main(int argc, char *argv[])
 
       graphicsOutput = true;
       strcpy(graphicsExtension, argv[i]+2);
+    } else if (!strcmp(argv[i], "--ascii")) {
+      asciiOutput = true;
     } else if (!strcmp(argv[i], "--timeout")) {
       if (i+1 < argc) {
         TString str(argv[i+1]);
@@ -280,7 +285,7 @@ int main(int argc, char *argv[])
 
   if (success) {
     // generate Root application needed for PMusrCanvas
-    if (graphicsOutput) {
+    if (graphicsOutput || asciiOutput) {
       argv[argc] = (char*)malloc(16*sizeof(char));
       strcpy(argv[argc], "-b");
       argc++;
@@ -299,10 +304,10 @@ int main(int argc, char *argv[])
                                      startupHandler->GetFourierDefaults(),
                                      startupHandler->GetMarkerList(),
                                      startupHandler->GetColorList(),
-                                     graphicsOutput);
+                                     graphicsOutput||asciiOutput);
       else
         musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
-                                     10+i*100, 10+i*100, 800, 600, graphicsOutput);
+                                     10+i*100, 10+i*100, 800, 600, graphicsOutput||asciiOutput);
 
       if (!musrCanvas->IsValid()) {
         cerr << endl << ">> musrview **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
@@ -334,6 +339,12 @@ int main(int argc, char *argv[])
         musrCanvas->SaveGraphicsAndQuit(fileName, graphicsExtension);
       }
 
+      if (asciiOutput) {
+        // save data in batch mode
+        musrCanvas->SaveDataAscii();
+        musrCanvas->Done(0);
+      }
+
       // keep musrCanvas objects
       canvasVector.push_back(musrCanvas);
     }
@@ -349,7 +360,6 @@ int main(int argc, char *argv[])
       sprintf(canvasName, "fMainCanvas%d", i);
       if (gROOT->GetListOfCanvases()->FindObject(canvasName) != 0) {
         canvasVector[i]->~PMusrCanvas();
-      } else {
       }
     }
     canvasVector.empty();

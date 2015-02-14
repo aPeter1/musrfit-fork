@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2015 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -44,6 +44,7 @@ using namespace std;
 #define PMUSR_TOKENIZE_ERROR           -5
 #define PMUSR_MSR_LOG_FILE_WRITE_ERROR -6
 #define PMUSR_MSR_FILE_WRITE_ERROR     -7
+#define PMUSR_DATA_FILE_READ_ERROR     -8
 
 #define PRUN_SINGLE_HISTO 0
 #define PRUN_ASYMMETRY    2
@@ -703,7 +704,7 @@ typedef vector<PMsrRunBlock> PMsrRunList;
  */
 typedef struct {
   Bool_t fFourierBlockPresent; ///< flag indicating if a Fourier block is present in the msr-file
-  Int_t  fUnits;               ///< flag used to indicate the units. 0=field units (G); 1=frequency units (MHz); 2=Mc/s
+  Int_t  fUnits;               ///< flag used to indicate the units. 1=field units (G); 2=field units (T); 3=frequency units (MHz); 4=Mc/s
   Bool_t fDCCorrected;         ///< if set true, the dc offset of the signal/theory will be removed before the FFT is made.
   Int_t  fFourierPower;        ///< i.e. zero padding up to 2^fFourierPower, default = 0 which means NO zero padding
   Int_t  fApodization;         ///< tag indicating the kind of apodization wished, 0=no appodization (default), 1=weak, 2=medium, 3=strong (for details see the docu)
