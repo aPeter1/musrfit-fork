@@ -40,7 +40,7 @@
 // Canvas menu id's
 #define P_MENU_ID_FOURIER       10001
 #define P_MENU_ID_AVERAGE       10002
-#define P_MENU_ID_SAVE_DATA     10003
+#define P_MENU_ID_EXPORT_DATA   10003
 
 #define P_MENU_ID_FOURIER_REAL          100
 #define P_MENU_ID_FOURIER_IMAG          101
@@ -49,8 +49,6 @@
 #define P_MENU_ID_FOURIER_PHASE         104
 #define P_MENU_ID_FOURIER_PHASE_PLUS    105
 #define P_MENU_ID_FOURIER_PHASE_MINUS   106
-
-#define P_MENU_ID_SAVE_ASCII    200
 
 //------------------------------------------------------------------------
 /**
@@ -99,7 +97,7 @@ class PFourierCanvas : public TObject, public TQObject
     virtual void SetTimeout(Int_t ival);
 
     virtual void SaveGraphicsAndQuit(const Char_t *fileName);
-    virtual void SaveDataAscii();
+    virtual void ExportData(const Char_t *pathFileName);
 
   private:
     Int_t  fTimeout;         ///< timeout after which the Done signal should be emited. If timeout <= 0, no timeout is taking place
@@ -129,7 +127,7 @@ class PFourierCanvas : public TObject, public TQObject
     TRootCanvas *fImp;           ///< ROOT native GUI version of main window with menubar and drawing area
     TGMenuBar   *fBar;           ///< menu bar
     TGPopupMenu *fPopupMain;     ///< popup menu MusrFT in the main menu bar
-    TGPopupMenu *fPopupSave;     ///< popup menu of the MusrFT/Save Data sub menu
+//    TGPopupMenu *fPopupSave;     ///< popup menu of the MusrFT/Save Data sub menu
     TGPopupMenu *fPopupFourier;  ///< popup menu of the MusrFT/Fourier sub menu
 
     // canvas related variables
