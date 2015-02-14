@@ -36,11 +36,16 @@ using namespace std;
 #include <TROOT.h>
 #include <TDatime.h>
 #include <TMath.h>
+#include <TGFileDialog.h>
 
 #include "PFourierCanvas.h"
 
 #define YINFO  0.2
 #define YTITLE 0.95
+
+static const char *gFiletypes[] = { "All files",  "*",
+                                    "Data files", "*.dat",
+                                    0,            0 };
 
 ClassImpQ(PFourierCanvas)
 
@@ -70,7 +75,6 @@ PFourierCanvas::PFourierCanvas()
   fImp = 0;
   fBar = 0;
   fPopupMain = 0;
-  fPopupSave = 0;
   fPopupFourier = 0;
 
   fMainCanvas = 0;
@@ -170,8 +174,6 @@ PFourierCanvas::PFourierCanvas(vector<PFourier*> &fourier, const Char_t* title, 
  */
 PFourierCanvas::~PFourierCanvas()
 {
-  cout << endl << "debug> in ~PFourierCanvas()." << endl;
-
   if (fTimeoutTimer)
     delete fTimeoutTimer;
 
@@ -345,8 +347,16 @@ void PFourierCanvas::HandleMenuPopup(Int_t id)
       CleanupAverage();
       PlotFourier();
     }
-  } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_ID_SAVE_ASCII) {
-    cout << endl << "debug> Save still missing ..." << endl;
+  } else if (id == P_MENU_ID_EXPORT_DATA) {
+    static TString dir(".");
+    TGFileInfo fi;
+    fi.fFileTypes = gFiletypes;
+    fi.fIniDir = StrDup(dir);
+    fi.fOverwrite = true;
+    new TGFileDialog(0, fImp, kFDSave, &fi);
+    if (fi.fFilename && strlen(fi.fFilename)) {
+      ExportData(fi.fFilename);
+    }
   }
 }
 
@@ -460,14 +470,176 @@ void PFourierCanvas::SaveGraphicsAndQuit(const Char_t *fileName)
 }
 
 //--------------------------------------------------------------------------
-// SaveDataAscii
+// ExportData
 //--------------------------------------------------------------------------
 /**
- * <p>Saves the currently displayed Fourier data set in ascii column format.
+ * <p>Exports the currently displayed Fourier data set in ascii column format.
  */
-void PFourierCanvas::SaveDataAscii()
+void PFourierCanvas::ExportData(const Char_t *pathFileName)
 {
-  // STILL MISSING
+  TString pfn("");
+
+  if (pathFileName) { // path file name provided
+    pfn = TString(pathFileName);
+  } else { // path file name NOT provided, generate a default path file name
+    cerr << endl << ">> PFourierCanvas::ExportData **ERROR** NO path file name provided. Will do nothing." << endl;
+    return;
+  }
+
+  TString xAxis(""), yAxis("");
+  Int_t xMinBin, xMaxBin;
+  if (fAveragedView) {
+    switch (fCurrentPlotView) {
+      case FOURIER_PLOT_REAL:
+        xAxis = fFourierHistos[0].dataFourierRe->GetXaxis()->GetTitle();
+        yAxis = TString("<Real>");
+        xMinBin = fFourierHistos[0].dataFourierRe->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierRe->GetXaxis()->GetLast();
+        break;
+      case FOURIER_PLOT_IMAG:
+        xAxis = fFourierHistos[0].dataFourierIm->GetXaxis()->GetTitle();
+        yAxis = TString("<Imag>");
+        xMinBin = fFourierHistos[0].dataFourierIm->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierIm->GetXaxis()->GetLast();
+        break;
+      case FOURIER_PLOT_POWER:
+        xAxis = fFourierHistos[0].dataFourierPwr->GetXaxis()->GetTitle();
+        yAxis = TString("<Power>");
+        xMinBin = fFourierHistos[0].dataFourierPwr->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierPwr->GetXaxis()->GetLast();
+        break;
+      case FOURIER_PLOT_PHASE:
+        xAxis = fFourierHistos[0].dataFourierPhase->GetXaxis()->GetTitle();
+        yAxis = TString("<Phase>");
+        xMinBin = fFourierHistos[0].dataFourierPhase->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierPhase->GetXaxis()->GetLast();
+        break;
+      default:
+        xAxis = TString("??");
+        yAxis = TString("??");
+        xMinBin = 0;
+        xMaxBin = 0;
+        break;
+    }
+  } else {
+    switch (fCurrentPlotView) {
+      case FOURIER_PLOT_REAL:
+        xAxis = fFourierHistos[0].dataFourierRe->GetXaxis()->GetTitle();
+        yAxis = TString("Real");
+        xMinBin = fFourierHistos[0].dataFourierRe->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierRe->GetXaxis()->GetLast();
+        break;
+      case FOURIER_PLOT_IMAG:
+        xAxis = fFourierHistos[0].dataFourierIm->GetXaxis()->GetTitle();
+        yAxis = TString("Imag");
+        xMinBin = fFourierHistos[0].dataFourierIm->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierIm->GetXaxis()->GetLast();
+        break;
+      case FOURIER_PLOT_POWER:
+        xAxis = fFourierHistos[0].dataFourierPwr->GetXaxis()->GetTitle();
+        yAxis = TString("Power");
+        xMinBin = fFourierHistos[0].dataFourierPwr->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierPwr->GetXaxis()->GetLast();
+        break;
+      case FOURIER_PLOT_PHASE:
+        xAxis = fFourierHistos[0].dataFourierPhase->GetXaxis()->GetTitle();
+        yAxis = TString("Phase");
+        xMinBin = fFourierHistos[0].dataFourierPhase->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierPhase->GetXaxis()->GetLast();
+        break;
+      default:
+        xAxis = TString("??");
+        yAxis = TString("??");
+        xMinBin = 0;
+        xMaxBin = 0;
+        break;
+    }
+  }
+
+  // write data to file
+  ofstream fout(pfn.Data(), ofstream::out);
+
+  if (fAveragedView) {
+    // write header
+    fout << "% " << pfn << endl;
+    fout << "% averaged data of:" << endl;
+    for (unsigned int i=0; i<fFourierHistos.size(); i++) {
+      fout << "%   " << fFourierHistos[i].dataFourierRe->GetTitle() << endl;
+    }
+    fout << "%------------" << endl;
+    fout << "% " << xAxis << ", " << yAxis << endl;
+    for (int i=xMinBin; i<xMaxBin; i++) {
+      switch (fCurrentPlotView) {
+        case FOURIER_PLOT_REAL:
+          fout << fFourierAverage.dataFourierRe->GetBinCenter(i) << ", " << fFourierAverage.dataFourierRe->GetBinContent(i) << endl;
+          break;
+        case FOURIER_PLOT_IMAG:
+          fout << fFourierAverage.dataFourierIm->GetBinCenter(i) << ", " << fFourierAverage.dataFourierIm->GetBinContent(i) << endl;
+          break;
+        case FOURIER_PLOT_POWER:
+          fout << fFourierAverage.dataFourierPwr->GetBinCenter(i) << ", " << fFourierAverage.dataFourierPwr->GetBinContent(i) << endl;
+          break;
+        case FOURIER_PLOT_PHASE:
+          fout << fFourierAverage.dataFourierPhase->GetBinCenter(i) << ", " << fFourierAverage.dataFourierPhase->GetBinContent(i) << endl;
+          break;
+        default:
+          break;
+      }
+    }
+  } else {
+    // write header
+    fout << "% " << pfn << endl;
+    fout << "% data of:" << endl;
+    for (unsigned int i=0; i<fFourierHistos.size(); i++) {
+      fout << "%   " << fFourierHistos[i].dataFourierRe->GetTitle() << endl;
+    }
+    fout << "%------------" << endl;
+    fout << "% ";
+    for (unsigned int i=0; i<fFourierHistos.size()-1; i++) {
+      fout << xAxis << i << ", " << yAxis << i << ", ";
+    }
+    fout << xAxis << fFourierHistos.size()-1 << ", " << yAxis << fFourierHistos.size()-1 << endl;
+
+    // write data
+    for (int i=xMinBin; i<xMaxBin; i++) {
+      for (unsigned int j=0; j<fFourierHistos.size()-1; j++) {
+        switch (fCurrentPlotView) {
+          case FOURIER_PLOT_REAL:
+              fout << fFourierHistos[j].dataFourierRe->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierRe->GetBinContent(i) << ", ";
+              break;
+          case FOURIER_PLOT_IMAG:
+              fout << fFourierHistos[j].dataFourierIm->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierIm->GetBinContent(i) << ", ";
+              break;
+          case FOURIER_PLOT_POWER:
+              fout << fFourierHistos[j].dataFourierPwr->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierPwr->GetBinContent(i) << ", ";
+              break;
+          case FOURIER_PLOT_PHASE:
+              fout << fFourierHistos[j].dataFourierPhase->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierPhase->GetBinContent(i) << ", ";
+              break;
+          default:
+              break;
+        }
+      }
+      switch (fCurrentPlotView) {
+        case FOURIER_PLOT_REAL:
+            fout << fFourierHistos[fFourierHistos.size()-1].dataFourierRe->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierRe->GetBinContent(i) << endl;
+            break;
+        case FOURIER_PLOT_IMAG:
+            fout << fFourierHistos[fFourierHistos.size()-1].dataFourierIm->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierIm->GetBinContent(i) << endl;
+            break;
+        case FOURIER_PLOT_POWER:
+            fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPwr->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPwr->GetBinContent(i) << endl;
+            break;
+        case FOURIER_PLOT_PHASE:
+            fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinContent(i) << endl;
+            break;
+        default:
+            break;
+      }
+    }
+  }
+
+  fout.close();
 }
 
 //--------------------------------------------------------------------------
@@ -664,7 +836,6 @@ void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t w
   fImp   = 0;
   fBar   = 0;
   fPopupMain    = 0;
-  fPopupSave    = 0;
   fPopupFourier = 0;
 
   fMainCanvas  = 0;
@@ -726,10 +897,7 @@ void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t w
       fPopupMain->CheckEntry(P_MENU_ID_AVERAGE);
     fPopupMain->AddSeparator();
 
-    fPopupSave = new TGPopupMenu();
-    fPopupSave->AddEntry("Save ascii", P_MENU_ID_SAVE_DATA+P_MENU_ID_SAVE_ASCII);
-
-    fPopupMain->AddPopup("&Save Data", fPopupSave);
+    fPopupMain->AddEntry("Export Data", P_MENU_ID_EXPORT_DATA);
     fBar->MapSubwindows();
     fBar->Layout();
 
