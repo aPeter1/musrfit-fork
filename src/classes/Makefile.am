@@ -82,6 +82,7 @@ dict_cpp_sources_userFcn = \
 
 pcmdir = $(libdir)
 pcm_DATA = \
+  PFourierCanvasDict_rdict.pcm \
   PMusrCanvasDict_rdict.pcm \
   PMusrT0Dict_rdict.pcm \
   PStartupHandlerDict_rdict.pcm \
