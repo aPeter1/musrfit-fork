@@ -340,9 +340,9 @@ int main(int argc, char *argv[])
       }
 
       if (asciiOutput) {
-	// save data in batch mode
+        // save data in batch mode
         musrCanvas->SaveDataAscii();
-	musrCanvas->Done(0);
+        musrCanvas->Done(0);
       }
 
       // keep musrCanvas objects
@@ -360,7 +360,6 @@ int main(int argc, char *argv[])
       sprintf(canvasName, "fMainCanvas%d", i);
       if (gROOT->GetListOfCanvases()->FindObject(canvasName) != 0) {
         canvasVector[i]->~PMusrCanvas();
-      } else {
       }
     }
     canvasVector.empty();

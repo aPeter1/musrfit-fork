@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2015 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -52,6 +52,8 @@ class PFourier
 
     virtual void Transform(UInt_t apodizationTag = 0);
 
+    virtual const char* GetDataTitle() { return fData->GetTitle(); }
+    virtual const Int_t GetUnitTag() { return fUnitTag; }
     virtual Double_t GetResolution() { return fResolution; }
     virtual TH1F* GetRealFourier(const Double_t scale = 1.0);
     virtual TH1F* GetImaginaryFourier(const Double_t scale = 1.0);
@@ -68,7 +70,7 @@ class PFourier
 
     Int_t fApodization; ///< 0=none, 1=weak, 2=medium, 3=strong
 
-    Double_t fTimeResolution; ///< time resolution of the data histogram
+    Double_t fTimeResolution; ///< time resolution of the data histogram in (us)
     Double_t fStartTime; ///< start time of the data histogram
     Double_t fEndTime; ///< end time of the data histogram
     Bool_t fDCCorrected; ///< if true, removed DC offset from signal before Fourier transformation, otherwise not

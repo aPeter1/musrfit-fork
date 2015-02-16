@@ -4,6 +4,7 @@ h_sources = \
   ../include/PFitterFcn.h \
   ../include/PFitter.h \
   ../include/PFourier.h \
+  ../include/PFourierCanvas.h \
   ../include/PFunctionGrammar.h \
   ../include/PFunction.h \
   ../include/PFunctionHandler.h \
@@ -12,6 +13,7 @@ h_sources = \
   ../include/PMusrCanvas.h \
   ../include/PMusr.h \
   ../include/PMusrT0.h \
+  ../include/PPrepFourier.h \
   ../include/PRunAsymmetry.h \
   ../include/PRunBase.h \
   ../include/PRunDataHandler.h \
@@ -26,6 +28,7 @@ h_sources_userFcn = \
   ../include/PUserFcnBase.h
 
 h_linkdef = \
+  ../include/PFourierCanvasLinkDef.h \
   ../include/PMusrCanvasLinkDef.h \
   ../include/PMusrT0LinkDef.h \
   ../include/PStartupHandlerLinkDef.h
@@ -34,6 +37,7 @@ h_linkdef_userFcn = \
   ../include/PUserFcnBaseLinkDef.h
 
 dict_h_sources = \
+  PFourierCanvasDict.h \
   PMusrCanvasDict.h \
   PMusrT0Dict.h \
   PStartupHandlerDict.h
@@ -45,6 +49,7 @@ cpp_sources = \
   PFitter.cpp \
   PFitterFcn.cpp \
   PFourier.cpp \
+  PFourierCanvas.cpp \
   PFunction.cpp \
   PFunctionHandler.cpp \
   PMsr2Data.cpp \
@@ -52,6 +57,7 @@ cpp_sources = \
   PMusrCanvas.cpp \
   PMusr.cpp \
   PMusrT0.cpp \
+  PPrepFourier.cpp \
   PRunAsymmetry.cpp \
   PRunBase.cpp \
   PRunDataHandler.cpp \
@@ -66,6 +72,7 @@ cpp_sources_userFcn = \
   PUserFcnBase.cpp
 
 dict_cpp_sources = \
+  PFourierCanvasDict.cpp \
   PMusrCanvasDict.cpp \
   PMusrT0Dict.cpp \
   PStartupHandlerDict.cpp

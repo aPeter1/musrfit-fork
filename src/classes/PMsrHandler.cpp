@@ -269,7 +269,7 @@ Int_t PMsrHandler::ReadMsrFile()
   }
 
   // fill parameter-in-use vector
-  if (result == PMUSR_SUCCESS)
+  if ((result == PMUSR_SUCCESS) && !fFourierOnly)
     FillParameterInUse(theory, functions, run);
 
   // check that each run fulfills the minimum requirements
@@ -278,7 +278,7 @@ Int_t PMsrHandler::ReadMsrFile()
       result = PMUSR_MSR_SYNTAX_ERROR;
 
   // check that parameter names are unique
-  if (result == PMUSR_SUCCESS) {
+  if ((result == PMUSR_SUCCESS) && !fFourierOnly) {
     UInt_t parX, parY;
     if (!CheckUniquenessOfParamNames(parX, parY)) {
       cerr << endl << ">> PMsrHandler::ReadMsrFile: **SEVERE ERROR** parameter name " << fParam[parX].fName.Data() << " is identical for parameter no " << fParam[parX].fNo << " and " << fParam[parY].fNo << "!";
@@ -290,7 +290,7 @@ Int_t PMsrHandler::ReadMsrFile()
 
   // check that if maps are present in the theory- and/or function-block,
   // that there are really present in the run block
-  if (result == PMUSR_SUCCESS)
+  if ((result == PMUSR_SUCCESS) && !fFourierOnly)
     if (!CheckMaps())
       result = PMUSR_MSR_SYNTAX_ERROR;
 
@@ -2387,6 +2387,10 @@ Int_t PMsrHandler::ParameterInUse(UInt_t paramNo)
  */
 Bool_t PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
 {
+  // If msr-file is used for musrFT only, nothing needs to be done here.
+  if (fFourierOnly)
+    return true;
+
   PMsrParamStructure param;
   Bool_t    error = false;
 
@@ -2599,6 +2603,10 @@ Bool_t PMsrHandler::HandleFitParameterEntry(PMsrLines &lines)
  */
 Bool_t PMsrHandler::HandleTheoryEntry(PMsrLines &lines)
 {
+  // If msr-file is used for musrFT only, nothing needs to be done here.
+  if (fFourierOnly)
+    return true;
+
   // store the theory lines
   fTheory = lines;
 
@@ -2619,6 +2627,10 @@ Bool_t PMsrHandler::HandleTheoryEntry(PMsrLines &lines)
  */
 Bool_t PMsrHandler::HandleFunctionsEntry(PMsrLines &lines)
 {
+  // If msr-file is used for musrFT only, nothing needs to be done here.
+  if (fFourierOnly)
+    return true;
+
   // store the functions lines
   fFunctions = lines;
 
@@ -3157,11 +3169,13 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         }
       }
       // check map entries, i.e. if the map values are within parameter bounds
-      for (UInt_t i=0; i<param.GetMap()->size(); i++) {
-        if ((param.GetMap(i) < 0) || (param.GetMap(i) > (Int_t) fParam.size())) {
-          cerr << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** map value " << param.GetMap(i) << " in line " << iter->fLineNo << " is out of range!";
-          error = true;
-          break;
+      if (!fFourierOnly) {
+        for (UInt_t i=0; i<param.GetMap()->size(); i++) {
+          if ((param.GetMap(i) < 0) || (param.GetMap(i) > (Int_t) fParam.size())) {
+            cerr << endl << ">> PMsrHandler::HandleRunEntry: **SEVERE ERROR** map value " << param.GetMap(i) << " in line " << iter->fLineNo << " is out of range!";
+            error = true;
+            break;
+          }
         }
       }
     }
@@ -3515,9 +3529,13 @@ Bool_t PMsrHandler::FilterNumber(TString str, const Char_t *filter, Int_t offset
  */
 Bool_t PMsrHandler::HandleCommandsEntry(PMsrLines &lines)
 {
+  // If msr-file is used for musrFT only, nothing needs to be done here.
+  if (fFourierOnly)
+    return true;
+
   PMsrLines::iterator iter;
 
-  if (lines.empty() && !fFourierOnly) {
+  if (lines.empty()) {
     cerr << endl << ">> PMsrHandler::HandleCommandsEntry(): **WARNING**: There is no COMMAND block! Do you really want this?";
     cerr << endl;
   }
@@ -4352,7 +4370,11 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
  */
 Bool_t PMsrHandler::HandleStatisticEntry(PMsrLines &lines)
 {
-  if (lines.empty() && !fFourierOnly) {
+  // If msr-file is used for musrFT only, nothing needs to be done here.
+  if (fFourierOnly)
+    return true;
+
+  if (lines.empty()) {
     cerr << endl << ">> PMsrHandler::HandleStatisticEntry: **WARNING** There is no STATISTIC block! Do you really want this?";
     cerr << endl;
     fStatistic.fValid = false;
@@ -5042,7 +5064,7 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           }
         }
         // check fit range
-        if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec (RUN block)
+        if (!fRuns[i].IsFitRangeInBin() && !fFourierOnly) { // fit range given as times in usec (RUN block)
           if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in RUN block
             if (!fGlobal.IsFitRangeInBin()) { // fit range given as times in usec (GLOBAL block)
               if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in GLOBAL block
