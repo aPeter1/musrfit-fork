@@ -4,10 +4,14 @@
 
 changes since 0.13.0
 ===================================
+NEW 2015-02-16 changed the data export handling from musrview. It is now more
+               main line and follows the implementation of musrFT.
 NEW 2015-02-13 first implementation of a standalone Fourier transform/plotter: 
                musrFT. Initially it is meant to be used for HAL-9500, 
                i.e. Fourier transform WITHOUT lifetime correction.
                A first simple minded lifetime correction is implemented as well.                
+NEW 2015-02-04 Integration of libBNMR for fitting beta-NMR relaxation data
+	       into automake of musrfit.
 NEW 2014-12-18 first implementation of a GLOBAL block which allows to shorten
                a typical msr-file. Duplicate entries from the RUN blocks can be
                added here. Furthermore, the 'lifetimecorrection' flag is 
@@ -16,9 +20,6 @@ NEW 2014-12-18 first implementation of a GLOBAL block which allows to shorten
                In order to make the code more readable a lot of setup collection
                parameters (t0, data, fit) has been encapsulated into its own 
                functions.
-
-NEW 2015-02-04 Integration of libBNMR for fitting beta-NMR relaxation data
-	       into automake of musrfit.
 
 changes since 0.12.0
 ===================================

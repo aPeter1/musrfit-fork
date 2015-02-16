@@ -127,7 +127,6 @@ class PFourierCanvas : public TObject, public TQObject
     TRootCanvas *fImp;           ///< ROOT native GUI version of main window with menubar and drawing area
     TGMenuBar   *fBar;           ///< menu bar
     TGPopupMenu *fPopupMain;     ///< popup menu MusrFT in the main menu bar
-//    TGPopupMenu *fPopupSave;     ///< popup menu of the MusrFT/Save Data sub menu
     TGPopupMenu *fPopupFourier;  ///< popup menu of the MusrFT/Fourier sub menu
 
     // canvas related variables

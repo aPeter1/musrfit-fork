@@ -35,9 +35,14 @@ using namespace std;
 #include <TRandom.h>
 #include <TROOT.h>
 #include <TObjString.h>
+#include <TGFileDialog.h>
 
 #include "PMusrCanvas.h"
 #include "PFourier.h"
+
+static const char *gFiletypes[] = { "Data files", "*.dat",
+                                    "All files",  "*",
+                                    0,            0 };
 
 ClassImp(PMusrCanvasPlotRange)
 
@@ -128,7 +133,6 @@ PMusrCanvas::PMusrCanvas()
   fImp   = 0;
   fBar   = 0;
   fPopupMain    = 0;
-  fPopupSave    = 0;
   fPopupFourier = 0;
 
   fStyle               = 0;
@@ -1282,8 +1286,16 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
       cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << endl;
       return;
     }
-  } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII) {
-    SaveDataAscii();
+  } else if (id == P_MENU_ID_EXPORT_DATA+P_MENU_PLOT_OFFSET*fPlotNumber) {
+    static TString dir(".");
+    TGFileInfo fi;
+    fi.fFileTypes = gFiletypes;
+    fi.fIniDir = StrDup(dir);
+    fi.fOverwrite = true;
+    new TGFileDialog(0, fImp, kFDSave, &fi);
+    if (fi.fFilename && strlen(fi.fFilename)) {
+      ExportData(fi.fFilename);
+    }
   }
 
   // check if phase increment/decrement needs to be ghost
@@ -1362,13 +1374,20 @@ void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
 }
 
 //--------------------------------------------------------------------------
-// SaveDataAscii 
+// ExportData
 //--------------------------------------------------------------------------
 /**
  * <p>Saves the currently seen data (data, difference, Fourier spectra, ...) in ascii column format.
+ *
+ * \param fileName file name to be used to save the data.
  */
-void PMusrCanvas::SaveDataAscii()
+void PMusrCanvas::ExportData(const Char_t *fileName)
 {
+  if (fileName == 0) { // path file name NOT provided, generate a default path file name
+    cerr << endl << ">> PMusrCanvas::ExportData **ERROR** NO path file name provided. Will do nothing." << endl;
+    return;
+  }
+
   // collect relevant data
   PMusrCanvasAsciiDump dump;
   PMusrCanvasAsciiDumpVector dumpVector;
@@ -2014,35 +2033,13 @@ void PMusrCanvas::SaveDataAscii()
       break;
   }
 
-  // generate output filename
-
-  // in order to handle names with "." correctly this slightly odd data-filename generation
-  TObjArray *tokens = fMsrHandler->GetFileName().Tokenize(".");
-  TObjString *ostr;
-  TString str;
-  TString fln = TString("");
-  for (Int_t i=0; i<tokens->GetEntries()-1; i++) {
-    ostr = dynamic_cast<TObjString*>(tokens->At(i));
-    fln += ostr->GetString() + TString(".");
-  }
-  if (!fDifferenceView) {
-    fln += "data.ascii";
-  } else {
-    fln += "diff.ascii";
-  }
-
-  if (tokens) {
-    delete tokens;
-    tokens = 0;
-  }
-
   // open file
   ofstream fout;
 
   // open output data-file
-  fout.open(fln.Data(), iostream::out);
+  fout.open(fileName, iostream::out);
   if (!fout.is_open()) {
-    cerr << endl << ">> PMusrCanvas::SaveDataAscii: **ERROR** couldn't open file " << fln.Data() << " for writing." << endl;
+    cerr << endl << ">> PMusrCanvas::ExportData: **ERROR** couldn't open file " << fileName << " for writing." << endl;
     return;
   }
 
@@ -2366,7 +2363,6 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   fImp   = 0;
   fBar   = 0;
   fPopupMain    = 0;
-  fPopupSave    = 0;
   fPopupFourier = 0;
 
   fMainCanvas          = 0;
@@ -2415,10 +2411,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
     fPopupMain->AddEntry("Average", P_MENU_ID_AVERAGE+P_MENU_PLOT_OFFSET*fPlotNumber);
     fPopupMain->AddSeparator();
 
-    fPopupSave = new TGPopupMenu();
-    fPopupSave->AddEntry("Save ascii", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII);
-
-    fPopupMain->AddPopup("&Save Data", fPopupSave);
+    fPopupMain->AddEntry("Export Data", P_MENU_ID_EXPORT_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
     fBar->MapSubwindows();
     fBar->Layout();
 
