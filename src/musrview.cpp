@@ -340,8 +340,12 @@ int main(int argc, char *argv[])
       }
 
       if (asciiOutput) {
+        // generate export data file name
+        TString str(fileName);
+        str.Remove(str.Last('.'));
+        str += ".dat";
         // save data in batch mode
-        musrCanvas->SaveDataAscii();
+        musrCanvas->ExportData(str.Data());
         musrCanvas->Done(0);
       }
 
