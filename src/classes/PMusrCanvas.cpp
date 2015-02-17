@@ -3793,7 +3793,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].data->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].data, fData[0].data->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].data, fData[0].data->GetBinCenter(i));
       }
       fDataAvg.data->SetBinContent(i, dval/fData.size());
     }
@@ -3807,7 +3807,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierRe, fData[0].dataFourierRe->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierRe, fData[0].dataFourierRe->GetBinCenter(i));
       }
       fDataAvg.dataFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3821,7 +3821,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierIm, fData[0].dataFourierIm->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierIm, fData[0].dataFourierIm->GetBinCenter(i));
       }
       fDataAvg.dataFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3835,7 +3835,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierPwr, fData[0].dataFourierPwr->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierPwr, fData[0].dataFourierPwr->GetBinCenter(i));
       }
       fDataAvg.dataFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3849,7 +3849,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierPhase, fData[0].dataFourierPhase->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierPhase, fData[0].dataFourierPhase->GetBinCenter(i));
       }
       fDataAvg.dataFourierPhase->SetBinContent(i, dval/fData.size());
     }
@@ -3863,7 +3863,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theory->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theory, fData[0].theory->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theory, fData[0].theory->GetBinCenter(i));
       }
       fDataAvg.theory->SetBinContent(i, dval/fData.size());
     }
@@ -3873,7 +3873,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierRe, fData[0].theoryFourierRe->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierRe, fData[0].theoryFourierRe->GetBinCenter(i));
       }
       fDataAvg.theoryFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3887,7 +3887,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierIm, fData[0].theoryFourierIm->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierIm, fData[0].theoryFourierIm->GetBinCenter(i));
       }
       fDataAvg.theoryFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3901,7 +3901,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierPwr, fData[0].theoryFourierPwr->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierPwr, fData[0].theoryFourierPwr->GetBinCenter(i));
       }
       fDataAvg.theoryFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3915,7 +3915,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierPhase, fData[0].theoryFourierPhase->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierPhase, fData[0].theoryFourierPhase->GetBinCenter(i));
       }
       fDataAvg.theoryFourierPhase->SetBinContent(i, dval/fData.size());
     }
@@ -3929,7 +3929,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diff->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diff, fData[0].diff->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diff, fData[0].diff->GetBinCenter(i));
       }
       fDataAvg.diff->SetBinContent(i, dval/fData.size());
     }
@@ -3943,7 +3943,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierRe, fData[0].diffFourierRe->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierRe, fData[0].diffFourierRe->GetBinCenter(i));
       }
       fDataAvg.diffFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3957,7 +3957,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierIm, fData[0].diffFourierIm->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierIm, fData[0].diffFourierIm->GetBinCenter(i));
       }
       fDataAvg.diffFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3971,7 +3971,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierPwr, fData[0].diffFourierPwr->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierPwr, fData[0].diffFourierPwr->GetBinCenter(i));
       }
       fDataAvg.diffFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3985,7 +3985,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierPhase, fData[0].diffFourierPhase->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierPhase, fData[0].diffFourierPhase->GetBinCenter(i));
       }
       fDataAvg.diffFourierPhase->SetBinContent(i, dval/fData.size());
     }

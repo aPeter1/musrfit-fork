@@ -65,7 +65,8 @@ typedef struct {
   TString graphicFormat;          ///< format for the graphical output dump
   TString dumpFln;                ///< dump file name for Fourier data output
   TString msrFlnOut;              ///< dump file name for msr-file generation
-  int bkg[2];                     ///< background range
+  int bkg_range[2];               ///< background range
+  vector<double> bkg;             ///< background value
   TString fourierOpt;             ///< Fourier options, i.e. real, imag, power, phase
   TString apodization;            ///< apodization setting: none, weak, medium, strong
   int fourierPower;               ///< Fourier power for zero padding, i.e. 2^fourierPower points
@@ -106,13 +107,13 @@ void musrFT_syntax()
   cout << endl << "                Supported graphic-format-extension: eps, pdf, gif, jpg, png, svg, xpm, root";
   cout << endl << "    --dump <fln> : rather than starting a root session and showing Fourier graphs of the data,";
   cout << endl << "                it will output the Fourier data in an ascii file <fln>.";
-  cout << endl << "    --filter  : filter and filter-specific-information -- ***TO BE WRITTEN YET***.";
-  cout << endl << "    -b, --background <start> <end>: background interval used to estimate the backround to be";
+  cout << endl << "    -br, --background-range <start> <end>: background interval used to estimate the backround to be";
   cout << endl << "                subtracted before the Fourier transform. <start>, <end> to be given in bins.";
+  cout << endl << "    -bg, --background <list> : gives the background explicit for each histogram.";
   cout << endl << "    -fo, --fourier-option <fopt>: <fopt> can be 'real', 'imag', 'real+imag', 'power', or 'phase'.";
   cout << endl << "                If this is not defined (neither on the command line nor in the musrFT_startup.xml),";
   cout << endl << "                default will be 'power'.";
-  cout << endl << "    -apod, --apodization <val> : <val> can be either 'none', 'weak', 'medium', 'strong'.";
+  cout << endl << "    -ap, --apodization <val> : <val> can be either 'none', 'weak', 'medium', 'strong'.";
   cout << endl << "                Default will be 'none'.";
   cout << endl << "    -fp, --fourier-power <N> : <N> being the Fourier power, i.e. 2^<N> used for zero padding.";
   cout << endl << "                Default is -1, i.e. no zero padding will be performed.";
@@ -160,8 +161,8 @@ void musrFT_init(musrFT_startup_param &startupParam)
   startupParam.graphicFormat = TString("");
   startupParam.dumpFln = TString("");
   startupParam.msrFlnOut = TString("");
-  startupParam.bkg[0] = -1;
-  startupParam.bkg[1] = -1;
+  startupParam.bkg_range[0] = -1;
+  startupParam.bkg_range[1] = -1;
   startupParam.fourierOpt = TString("??");
   startupParam.apodization = TString("none");
   startupParam.fourierPower = -1;
@@ -321,27 +322,44 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
       }
       startupParam.dumpFln = argv[i+1];
       i++;
-    } else if (tstr.Contains("--filter")) {
-      cout << endl << "debug> found option filter. NOT YET ANY FUNCTIONALITY." << endl;
-    } else if (tstr.Contains("-b") || tstr.Contains("--background")) {
+    } else if (tstr.Contains("-br") || tstr.Contains("--background-range")) {
       if (i+2 >= argc) { // something is wrong since there needs to be two arguments here
-        cerr << endl << ">> musrFT **ERROR** found option --background with wrong number of arguments." << endl;
+        cerr << endl << ">> musrFT **ERROR** found option --background-range with wrong number of arguments." << endl;
         return 2;
       }
-      TString bkg[2];
-      bkg[0] = argv[i+1];
-      bkg[1] = argv[i+2];
-      if (!bkg[0].IsDigit()) {
-        cerr << endl << ">> musrFT **ERROR** <start> bin of option --background is NOT an int-number! ('" << bkg[0] << "')." << endl;
+      TString bkgRange[2];
+      bkgRange[0] = argv[i+1];
+      bkgRange[1] = argv[i+2];
+      if (!bkgRange[0].IsDigit()) {
+        cerr << endl << ">> musrFT **ERROR** <start> bin of option --background-range is NOT an int-number! ('" << bkgRange[0] << "')." << endl;
         return 2;
       }
-      if (!bkg[1].IsDigit()) {
-        cerr << endl << ">> musrFT **ERROR** <end> bin of option --background is NOT an int-number! ('" << bkg[1] << "')." << endl;
+      if (!bkgRange[1].IsDigit()) {
+        cerr << endl << ">> musrFT **ERROR** <end> bin of option --background-range is NOT an int-number! ('" << bkgRange[1] << "')." << endl;
         return 2;
       }
-      startupParam.bkg[0] = bkg[0].Atoi();
-      startupParam.bkg[1] = bkg[1].Atoi();
+      startupParam.bkg_range[0] = bkgRange[0].Atoi();
+      startupParam.bkg_range[1] = bkgRange[1].Atoi();
       i += 2;
+    } else if (tstr.BeginsWith("-bg") || !tstr.CompareTo("--background")) {
+      TString topt("");
+      while (++i < argc) {
+        if (argv[i][0] == '-') {
+          --i;
+          break;
+        } else {
+          topt = argv[i];
+          if (!topt.IsFloat()) {
+            cerr << endl << ">> musrFT **ERROR** found option --background='" << topt << "' which is not a float" << endl;
+            return 2;
+          }
+          startupParam.bkg.push_back(topt.Atoi());
+        }
+      }
+      if (startupParam.bkg.size() == 0) { // something is wrong since there needs to be an argument here
+        cerr << endl << ">> musrFT **ERROR** found option --background without argument!" << endl;
+        return 2;
+      }
     } else if (tstr.BeginsWith("-fo") || tstr.BeginsWith("--fourier-option")) {
       if (i+1 >= argc) { // something is wrong since there needs to be two arguments here
         cerr << endl << ">> musrFT **ERROR** found option --fourier-option without arguments." << endl;
@@ -354,7 +372,7 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
       }
       startupParam.fourierOpt = topt;
       i++;
-    } else if (tstr.BeginsWith("-apod") || tstr.BeginsWith("--apodization")) {
+    } else if (tstr.BeginsWith("-ap") || tstr.BeginsWith("--apodization")) {
       if (i+1 >= argc) { // something is wrong since there needs to be two arguments here
         cerr << endl << ">> musrFT **ERROR** found option --apodization without arguments." << endl;
         return 2;
@@ -453,7 +471,7 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
           startupParam.t0.push_back(topt.Atoi());
         }
       }
-      if (startupParam.dataFln.size() == 0) { // something is wrong since there needs to be an argument here
+      if (startupParam.t0.size() == 0) { // something is wrong since there needs to be an argument here
         cerr << endl << ">> musrFT **ERROR** found option --t0 without argument!" << endl;
         return 2;
       }
@@ -550,11 +568,11 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
     cerr << endl << ">> musrFT **ERROR** neither <msr-file> nor <data-file> defined." << endl;
     return 2;
   }
-  if (startupParam.bkg[0] > startupParam.bkg[1]) {
-    cerr << endl << ">> musrFT **WARNING** in --background, start=" << startupParam.bkg[0] << " > end=" << startupParam.bkg[1] << ", will swap them." << endl;
-    double swap = startupParam.bkg[0];
-    startupParam.bkg[0] = startupParam.bkg[1];
-    startupParam.bkg[1] = swap;
+  if (startupParam.bkg_range[0] > startupParam.bkg_range[1]) {
+    cerr << endl << ">> musrFT **WARNING** in --background-range, start=" << startupParam.bkg_range[0] << " > end=" << startupParam.bkg_range[1] << ", will swap them." << endl;
+    double swap = startupParam.bkg_range[0];
+    startupParam.bkg_range[0] = startupParam.bkg_range[1];
+    startupParam.bkg_range[1] = swap;
   }
   if (startupParam.fourierRange[0] > startupParam.fourierRange[1]) {
     cerr << endl << ">> musrFT **WARNING** in --fourier-range, start=" << startupParam.fourierRange[0] << " > end=" << startupParam.fourierRange[1] << ", will swap them." << endl;
@@ -875,8 +893,8 @@ void musrFT_dumpMsrFile(musrFT_startup_param &param)
       if ((param.t0.size() > 1) && (j < param.t0.size())) {
         fout << "t0              " << param.t0[j] << endl;
       }
-      if ((param.bkg[0] > -1) && (param.bkg[1] > -1))
-        fout << "background      " << param.bkg[0] << "     " << param.bkg[1] << endl;
+      if ((param.bkg_range[0] > -1) && (param.bkg_range[1] > -1))
+        fout << "background      " << param.bkg_range[0] << "     " << param.bkg_range[1] << endl;
       fout << "#--------------------------------------------------------------" << endl;
     }
   }
@@ -1027,7 +1045,7 @@ int main(int argc, char *argv[])
   startupHandler->SetStartupOptions(startup_options);
 
   // defines the raw time-domain data vector
-  PPrepFourier data(startupParam.bkg, startupParam.packing);
+  PPrepFourier data(startupParam.packing, startupParam.bkg_range, startupParam.bkg);
 
   // load msr-file(s)
   vector<PMsrHandler*> msrHandler;
@@ -1146,6 +1164,24 @@ int main(int argc, char *argv[])
         if (fourierBlock->fFourierBlockPresent) {
           // get units
           unitTag = fourierBlock->fUnits;
+          if (startupParam.fourierUnits.BeginsWith("??")) {
+            switch (unitTag) {
+              case FOURIER_UNIT_GAUSS:
+                startupParam.fourierUnits = TString("Gauss");
+                break;
+              case FOURIER_UNIT_TESLA:
+                startupParam.fourierUnits = TString("Tesla");
+                break;
+              case FOURIER_UNIT_FREQ:
+                startupParam.fourierUnits = TString("MHz");
+                break;
+              case FOURIER_UNIT_CYCLES:
+                startupParam.fourierUnits = TString("Mc/s");
+                break;
+              default:
+                break;
+            }
+          }
           // get fourier power
           if (startupParam.fourierPower == -1) { // no Fourier power given from the command line, hence check FOURIER block
             if (fourierBlock->fFourierPower > 1)
@@ -1277,9 +1313,6 @@ int main(int argc, char *argv[])
   // calculate background levels and subtract them from the data
   data.DoBkgCorrection();
 
-  // do the time domain filtering now
-  data.DoFiltering();
-
   // do lifetime correction
   if (startupParam.lifetimecorrection != 0.0)
     data.DoLifeTimeCorrection(startupParam.lifetimecorrection);
@@ -1321,7 +1354,13 @@ int main(int argc, char *argv[])
     fourier[i]->Transform(apodTag);
   }
   double end = millitime();
-  cout << endl << "debug> after FFT. calculation time: " << (end-start)/1.0e3  << " (sec)." << endl;
+  cout << endl << "info> after FFT. calculation time: " << (end-start)/1.0e3  << " (sec)." << endl;
+
+  // make sure that a Fourier range is provided, if not calculate one
+  if ((startupParam.fourierRange[0] == -1.0) && (startupParam.fourierRange[1] == -1.0)) {
+    startupParam.fourierRange[0] = 0.0;
+    startupParam.fourierRange[1] = fourier[0]->GetMaxFreq();
+  }
 
   PFourierCanvas *fourierCanvas = 0;
 

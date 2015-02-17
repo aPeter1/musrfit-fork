@@ -201,6 +201,23 @@ void PFourier::Transform(UInt_t apodizationTag)
 }
 
 //--------------------------------------------------------------------------
+// GetMaxFreq
+//--------------------------------------------------------------------------
+/**
+ * <p>returns the maximal frequency in units choosen, i.e. Gauss, Tesla, MHz, Mc/s
+ */
+Double_t PFourier::GetMaxFreq()
+{
+  UInt_t noOfFourierBins = 0;
+  if (fNoOfBins % 2 == 0)
+    noOfFourierBins = fNoOfBins/2;
+  else
+    noOfFourierBins = (fNoOfBins+1)/2;
+
+  return fResolution*noOfFourierBins;
+}
+
+//--------------------------------------------------------------------------
 // GetRealFourier
 //--------------------------------------------------------------------------
 /**
