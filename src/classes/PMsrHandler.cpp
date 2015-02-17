@@ -5054,7 +5054,7 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           cerr << endl << ">>   forward parameter number not defined. Necessary for single histogram fits." << endl;
           return false;
         }
-        if (fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) {
+        if ((fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) && !fFourierOnly) {
           // check if forward histogram number is a function
           if (fRuns[i].GetNormParamNo() - MSR_PARAM_FUN_OFFSET > static_cast<Int_t>(fParam.size())) {
             cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
@@ -5337,6 +5337,9 @@ Bool_t PMsrHandler::CheckMaps()
 Bool_t PMsrHandler::CheckFuncs()
 {
   Bool_t result = true;
+
+  if (fFourierOnly)
+    return result;
 
   PIntVector funVec;
   PIntVector funBlock;

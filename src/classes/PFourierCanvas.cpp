@@ -43,8 +43,8 @@ using namespace std;
 #define YINFO  0.2
 #define YTITLE 0.95
 
-static const char *gFiletypes[] = { "All files",  "*",
-                                    "Data files", "*.dat",
+static const char *gFiletypes[] = { "Data files", "*.dat",
+                                    "All files",  "*",
                                     0,            0 };
 
 ClassImpQ(PFourierCanvas)
@@ -119,7 +119,7 @@ PFourierCanvas::PFourierCanvas(vector<PFourier*> &fourier, const Char_t* title, 
   CreateXaxisTitle();
   CreateStyle();
   InitFourierDataSets();
-  InitFourierCanvas(title, wtopx, wtopy, ww, wh);
+  InitFourierCanvas(fTitle, wtopx, wtopy, ww, wh);
 
   gStyle->SetHistMinimumZero(kTRUE); // needed to enforce proper bar option handling
 }
@@ -163,7 +163,7 @@ PFourierCanvas::PFourierCanvas(vector<PFourier*> &fourier, const Char_t* title, 
   CreateXaxisTitle();
   CreateStyle();
   InitFourierDataSets();
-  InitFourierCanvas(title, wtopx, wtopy, ww, wh);
+  InitFourierCanvas(fTitle, wtopx, wtopy, ww, wh);
 
   gStyle->SetHistMinimumZero(kTRUE); // needed to enforce proper bar option handling
 }
@@ -856,7 +856,7 @@ void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t w
   if (!fBatchMode) {
     fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp();
     fBar = fImp->GetMenuBar();
-    fPopupMain = fBar->AddPopup("&MusrFT");
+    fPopupMain = fBar->AddPopup("MusrFT");
 
     fPopupFourier = new TGPopupMenu();
 
@@ -918,7 +918,7 @@ void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t w
   fTitlePad->Draw();
 
   // fourier pad
-  fFourierPad = new TPad("fourierPad", "fourierPad", 0.0, YINFO, 1.0, YTITLE);
+  fFourierPad = new TPad("fFourierPad", "fFourierPad", 0.0, YINFO, 1.0, YTITLE);
   if (fFourierPad == 0) {
     cerr << endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: Couldn't invoke fFourierPad";
     cerr << endl;
@@ -1345,8 +1345,8 @@ void PFourierCanvas::DecrementFourierPhase()
     if ((fFourierHistos[i].dataFourierRe != 0) && (fFourierHistos[i].dataFourierIm != 0)) {
       for (Int_t j=0; j<fFourierHistos[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
-        re = fFourierHistos[i].dataFourierRe->GetBinContent(j) * cp + fFourierHistos[i].dataFourierIm->GetBinContent(j) * sp;
-        im = fFourierHistos[i].dataFourierIm->GetBinContent(j) * cp - fFourierHistos[i].dataFourierRe->GetBinContent(j) * sp;
+        re = fFourierHistos[i].dataFourierRe->GetBinContent(j) * cp - fFourierHistos[i].dataFourierIm->GetBinContent(j) * sp;
+        im = fFourierHistos[i].dataFourierIm->GetBinContent(j) * cp + fFourierHistos[i].dataFourierRe->GetBinContent(j) * sp;
         // overwrite fourier data set value
         fFourierHistos[i].dataFourierRe->SetBinContent(j, re);
         fFourierHistos[i].dataFourierIm->SetBinContent(j, im);
