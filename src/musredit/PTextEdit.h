@@ -131,6 +131,7 @@ private slots:
   void musrMsr2Data();
   void musrView();
   void musrT0();
+  void musrFT();
   void musrPrefs();
   void musrSwapMsrMlog();
   void musrDump();
@@ -157,6 +158,7 @@ private:
   bool fFileSystemWatcherActive; ///< flag to enable/disable the file system watcher
   QTimer fFileSystemWatcherTimeout; ///< timer used to re-enable file system watcher. Needed to delay the re-enabling
   QString fLastDirInUse; ///< string holding the path from where the last file was loaded.
+  QStringList fMusrFTPrevCmd;
 
   QAction *fMusrT0Action;
 

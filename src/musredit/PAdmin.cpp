@@ -130,7 +130,9 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
   } else if (qName == "musr_web_statistic") {
     fKeyWord = eHelpStatistic;
   } else if (qName == "musr_web_msr2data") {
-    fKeyWord = eHelpMsr2Data;    
+    fKeyWord = eHelpMsr2Data;
+  } else if (qName == "musr_web_musrFT") {
+    fKeyWord = eHelpMusrFT;
   } else if (qName == "chain_fit") {
     fKeyWord = eChainFit;
   } else if (qName == "write_data_header") {
@@ -337,6 +339,9 @@ bool PAdminXMLParser::characters(const QString& str)
       break;
     case eHelpMsr2Data:
       fAdmin->setHelpUrl("msr2data", str);
+      break;
+    case eHelpMusrFT:
+      fAdmin->setHelpUrl("musrFT", str);
       break;
     case eChainFit:
       if (str == "y")
