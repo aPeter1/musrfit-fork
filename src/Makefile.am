@@ -22,15 +22,17 @@ SUBDIRS = external/MusrRoot \
           external/mud \
           $(PNEXUSDIRS) \
           classes \
-          external
+          external \
+          musredit \
+          musrgui 
 
 if BUILD_MUSRGUI
-SUBDIRS += $(EDITORDIR)
+#SUBDIRS += $(EDITORDIR)
 EXTRA_DIST = $(EDITORDIR)/Makefile
 endif
 
 if BUILD_MUSREDIT
-SUBDIRS += $(EDITORDIR)
+#SUBDIRS += $(EDITORDIR)
 EXTRA_DIST = $(EDITORDIR)/Makefile
 endif
 
