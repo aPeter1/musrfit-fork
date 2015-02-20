@@ -2191,7 +2191,10 @@ void PTextEdit::musrView()
   str = *fFilenames.find( currentEditor() );
   QString numStr;
   numStr.setNum(fAdmin->getTimeout());
-  cmd += str + "\" --timeout " + numStr + " &";
+  cmd += str + "\" --timeout " + numStr;
+  if (fAdmin->getMusrviewShowFourierFlag())
+    cmd += " -f ";
+  cmd += " &";
 
   int status=system(cmd.toLatin1());
 }
@@ -2272,6 +2275,7 @@ void PTextEdit::musrPrefs()
   }
 
   if (dlg->exec() == QDialog::Accepted) {
+    fAdmin->setMusrviewShowFourierFlag(dlg->getMusrviewShowFourierFlag());
     fAdmin->setKeepMinuit2OutputFlag(dlg->getKeepMinuit2OutputFlag());
     fAdmin->setTitleFromDataFileFlag(dlg->getTitleFromDataFileFlag());
     fAdmin->setEnableMusrT0Flag(dlg->getEnableMusrT0Flag());

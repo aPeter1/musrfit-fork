@@ -85,6 +85,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eDefaultSavePath;
   } else if (qName == "title_from_data_file") {
     fKeyWord = eTitleFromDataFile;
+  } else if (qName == "musrview_show_fourier") {
+    fKeyWord = eMusrviewShowFourier;
   } else if (qName == "enable_musrt0") {
     fKeyWord = eEnableMusrT0;
   } else if (qName == "keep_minuit2_output") {
@@ -241,6 +243,13 @@ bool PAdminXMLParser::characters(const QString& str)
       else
         flag = false;
       fAdmin->setTitleFromDataFileFlag(flag);
+      break;
+    case eMusrviewShowFourier:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setMusrviewShowFourierFlag(flag);
       break;
     case eEnableMusrT0:
       if (str == "y")
@@ -602,6 +611,8 @@ PAdmin::PAdmin() : QObject()
   fBeamline   = QString("");
   fInstitute  = QString("");
   fFileFormat = QString("");
+
+  fMusrviewShowFourier = false;
 
   fTitleFromDataFile  = false;
   fEnableMusrT0       = false;

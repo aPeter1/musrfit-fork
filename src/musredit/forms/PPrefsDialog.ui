@@ -33,9 +33,9 @@
     <item>
      <widget class="QTabWidget" name="fTabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="tab_3">
+      <widget class="QWidget" name="fGeneral_tab">
        <attribute name="title">
         <string>general</string>
        </attribute>
@@ -75,7 +75,7 @@
         </layout>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab">
+      <widget class="QWidget" name="fMusrfit_tab">
        <attribute name="title">
         <string>musrfit</string>
        </attribute>
@@ -158,7 +158,25 @@
         </property>
        </widget>
       </widget>
-      <widget class="QWidget" name="tab_2">
+      <widget class="QWidget" name="fMusrview_tab">
+       <attribute name="title">
+        <string>musrview</string>
+       </attribute>
+       <widget class="QCheckBox" name="fFourier_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>141</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>start with Fourier</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="fMusrt0_tab">
        <attribute name="title">
         <string>musrt0</string>
        </attribute>

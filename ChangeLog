@@ -4,6 +4,8 @@
 
 changes since 0.13.0
 ===================================
+NEW 2015-02-20 add a switch to musrview that it plots initially the Fouier data rather
+               than the time domain data.
 NEW 2015-02-19 added a first preliminary user interface for musrFT within musredit.
 NEW 2015-02-16 changed the data export handling from musrview. It is now more
                main line and follows the implementation of musrFT.
