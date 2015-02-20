@@ -55,6 +55,7 @@ class PFourier
     virtual const char* GetDataTitle() { return fData->GetTitle(); }
     virtual const Int_t GetUnitTag() { return fUnitTag; }
     virtual Double_t GetResolution() { return fResolution; }
+    virtual Double_t GetMaxFreq();
     virtual TH1F* GetRealFourier(const Double_t scale = 1.0);
     virtual TH1F* GetImaginaryFourier(const Double_t scale = 1.0);
     virtual TH1F* GetPowerFourier(const Double_t scale = 1.0);

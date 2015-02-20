@@ -36,6 +36,12 @@ using namespace std;
 
 #include <TString.h>
 
+// the following ifdef is needed for GCC 4.6 or higher, fftw 3.3 or higher and root 5.30.03 or lower
+#ifdef __CINT__
+typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
+#endif
+#include "fftw3.h"
+
 #define PMUSR_SUCCESS                   0
 #define PMUSR_WRONG_STARTUP_SYNTAX     -1
 #define PMUSR_MSR_FILE_NOT_FOUND       -2

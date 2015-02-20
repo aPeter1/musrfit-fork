@@ -1,7 +1,7 @@
 AC_REVISION([m4_esyscmd_s([git describe --always])])
 
 AC_PREREQ(2.63)
-AC_INIT([musrfit],[0.13.0],[andreas.suter@psi.ch])
+AC_INIT([musrfit],[0.14.0],[andreas.suter@psi.ch])
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_HOST
 #AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
@@ -35,7 +35,7 @@ dnl -----------------------------------------------
 
 #release versioning
 MUSR_MAJOR_VERSION=0
-MUSR_MINOR_VERSION=13
+MUSR_MINOR_VERSION=14
 MUSR_MICRO_VERSION=0
 
 #release versioning
@@ -734,6 +734,12 @@ dnl -----------------------------------------------
 AC_ARG_ENABLE([ASlibs], [AS_HELP_STRING([--enable-ASlibs],[build optional AS plug-ins [default=no]])],[BUILD_AS_LIBS=1], [BUILD_AS_LIBS=0])
 
 dnl -----------------------------------------------
+dnl Ask user if BNMRlibs should be built
+dnl -----------------------------------------------
+
+AC_ARG_ENABLE([BNMRlibs], [AS_HELP_STRING([--enable-BNMRlibs],[build optional BNMR plug-ins [default=no]])],[BUILD_BNMR_LIBS=1], [BUILD_BNMR_LIBS=0])
+
+dnl -----------------------------------------------
 dnl Set some paths and flags for PMusr, MusrRoot, TLemRunHeader, Class_MuSR_PSI, mud, NeXus (if enabled), etc.
 dnl -----------------------------------------------
 
@@ -778,6 +784,14 @@ if test "${PNEXUS_ENABLED}" = "1"; then
   PNEXUS_CXXFLAGS="-I${PNEXUS_SRCDIR}"
   AC_SUBST(PNEXUS_LIBS)
   AC_SUBST(PNEXUS_CXXFLAGS)
+fi
+
+if test "${BUILD_BNMR_LIBS}" = "1"; then
+  BNMRLIBS_SRCDIR="${SRCDIR}/external/libBNMR"
+  BNMRLIBS_LIBS="${BNMRLIBS_SRCDIR}/libBNMR.la"
+  BNMRLIBS_CFLAGS="-I${BNMRLIBS_SRCDIR}"
+  AC_SUBST(BNMRLIBS_LIBS)
+  AC_SUBST(BNMRLIBS_CFLAGS)
 fi
 
 if test "${BUILD_BMW_LIBS}" = "1"; then
@@ -1114,6 +1128,7 @@ AM_CONDITIONAL([PNEXUS_ENABLED], [test "${PNEXUS_ENABLED}" = "1"])
 AM_CONDITIONAL([BUILD_CUBALIB], [test "${BUILD_CUBA}" = "1"])
 AM_CONDITIONAL([BUILD_BMWLIBS], [test "${BUILD_BMW_LIBS}" = "1"])
 AM_CONDITIONAL([BUILD_ASLIBS], [test "${BUILD_AS_LIBS}" = "1"])
+AM_CONDITIONAL([BUILD_BNMRLIBS], [test "${BUILD_BNMR_LIBS}" = "1"])
 
 AC_CONFIG_FILES([Makefile \
                  src/Makefile \
@@ -1154,6 +1169,9 @@ AC_CONFIG_FILES([Makefile \
 		 src/external/libSpinValve/classes/Makefile \
                  src/external/libPhotoMeissner/Makefile \
                  src/external/libPhotoMeissner/classes/Makefile \
+                 src/external/libBNMR/Makefile \
+                 src/musredit/Makefile \
+                 src/musrgui/Makefile \
                  src/musredit/musredit_startup.xml \
                  src/musrgui/musrgui_startup.xml])
 
@@ -1272,6 +1290,11 @@ if test "${BUILD_AS_LIBS}" -eq 1; then
   echo "     ASlibs:                              yes"
 else
   echo "     ASlibs:                              no"
+fi
+if test "${BUILD_BNMR_LIBS}" -eq 1; then
+  echo "     BNMRlibs:                            yes"
+else
+  echo "     BNMRlibs:                            no"
 fi
 if test "${BUILD_BMW_LIBS}" -eq 1; then
   echo "     BMWlibs:                             yes"

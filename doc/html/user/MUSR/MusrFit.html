@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en_US" lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 18 Dec 2014 13:46:12 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 19 Feb 2015 13:51:44 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1418910331" type="application/x-wiki" title="edit MusrFit" />
+<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1424353866" type="application/x-wiki" title="edit MusrFit" />
 <meta name="TEXT_NUM_TOPICS" content="Number of topics:" />
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 <meta name="robots" content="noindex" /><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRsshtml.html" />
@@ -108,9 +108,9 @@ pre {
 <div id="patternMainContents"><div class="patternTop"><span class="patternHomePath foswikiLeft"></span><span class="patternToolBar foswikiRight"><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><a href="https://intranet.psi.ch/MUSR/MusrFit?restrictions=on" id="restriction_link"><img src='../pub/System/PsiSkin/lock_open.png' class='lock' height='16' width='23' title='open in PSI - click for more information'/></a></span><div class="foswikiClear"></div></div><div class="foswikiContentHeader">
 <p></p>
 <p></p>
-      	
-      	
-      	
+  
+  
+  
 <p></p>
 <p></p>
 <p></p>
@@ -124,11 +124,12 @@ pre {
 </li> <li> <a href="MusrFit.html#A_2_Available_Executables_44_Configuration_Files_and_their_Basic_Usage"> 2  Available Executables, Configuration Files and their Basic Usage </a> <ul>
 <li> <a href="MusrFit.html#A_2.1_musrfit"> 2.1  musrfit </a>
 </li> <li> <a href="MusrFit.html#A_2.2_musrview"> 2.2  musrview </a>
-</li> <li> <a href="MusrFit.html#A_2.3_musrt0"> 2.3  musrt0 </a>
-</li> <li> <a href="MusrFit.html#A_2.4_musrfit_startup.xml"> 2.4  musrfit_startup.xml </a>
-</li> <li> <a href="MusrFit.html#A_2.5_msr2msr"> 2.5  msr2msr </a>
-</li> <li> <a href="MusrFit.html#A_2.6_any2many"> 2.6  any2many </a>
-</li> <li> <a href="MusrFit.html#A_2.7_dump_header"> 2.7  dump_header </a>
+</li> <li> <a href="MusrFit.html#A_2.3_musrFT"> 2.3  musrFT <img src="../pub/System/DocumentGraphics/new.png" alt="NEW" title="NEW" width="30" height="16" /> </a>
+</li> <li> <a href="MusrFit.html#A_2.4_musrt0"> 2.4  musrt0 </a>
+</li> <li> <a href="MusrFit.html#A_2.5_musrfit_startup.xml"> 2.5  musrfit_startup.xml </a>
+</li> <li> <a href="MusrFit.html#A_2.6_msr2msr"> 2.6  msr2msr </a>
+</li> <li> <a href="MusrFit.html#A_2.7_any2many"> 2.7  any2many </a>
+</li> <li> <a href="MusrFit.html#A_2.8_dump_header"> 2.8  dump_header </a>
 </li></ul> 
 </li> <li> <a href="MusrFit.html#A_3_Auxiliary_Programs"> 3  Auxiliary Programs </a>
 </li> <li> <a href="MusrFit.html#A_4_Description_of_the_msr_File_Format"> 4  Description of the msr File Format </a> <ul>
@@ -210,7 +211,7 @@ In the menu bar the <strong>Musrfit</strong> menu can be found. From there some 
 <dt> Fourier </dt><dd> performs the Fourier transformation of the selected data and shows the result
 </dd> <dt> Difference </dt><dd> shows the difference between the selected data and the fit
 </dd> <dt> Average </dt><dd> toggle between the current view and the averaged data view. Useful if the averaged Fourier power spectrum of lots of detectors shall be shown. 
-</dd> <dt> Save Data </dt><dd> saves the selected data in a simple multi-column ASCII file
+</dd> <dt> Export Data </dt><dd> saves the selected data in a simple multi-column ASCII file
 </dd></dl> 
 <p></p>
 Additionally, some functions can be accessed using key-shortcuts: <dl>
@@ -221,8 +222,56 @@ Additionally, some functions can be accessed using key-shortcuts: <dl>
 </dd> <dt> u </dt><dd> reset the plotting range to the area given in the msr file ("unzoom")
 </dd></dl> 
 <p></p>
+<a name="MusrFT"></a>
+<h2><a name="A_2.3_musrFT"></a> 2.3  musrFT <img src="../pub/System/DocumentGraphics/new.png" alt="NEW" title="NEW" width="30" height="16" /> </h2>
+<code>musrFT</code> is an interactive graphical user interface for the presentation of Fourier transforms of raw &#956;SR histograms. It's purpose is to get a quick overview for high TF-field data, as found e.g. at the HAL-9500 instrument at PSI. It Fourier transforms the raw histogram data, i.e. N(t) rather than A(t), and hence shows the lifetime contribution of the muon. This is no problem for large enough fields, but will be a severe problem at very low fields. <code>musrFT</code> is still in its early stage and should be considered a <strong>beta-version</strong>.
+<p></p>
+If called from within a shell it accepts the following parameters: <dl>
+<dt> &lt;msr_files&gt; </dt><dd> msr-file name(s). These msr-files are used for the Fourier transform. It can be a list of msr-files, e.g. <code>musrFT 3110.msr 3111.msr</code> 
+</dd> <dt> -df, --data-file &lt;data-file&gt;  </dt><dd> This allows to feed only &#956;SR data file(s) to perform the Fourier transform. Since the extended &lt;msr-file&gt; information are missing, they will need to be provided by to options, or <code>musrFT</code> tries to guess, based on <code>musrfit_startup.xml</code> settings.
+</dd> <dt> --help  </dt><dd> display a help and exit
+</dd> <dt> --version  </dt><dd> output version information and exit
+</dd> <dt> -g, --graphic-format &lt;graphic-format-extension&gt;  </dt><dd> will produce a graphic-output-file without starting a root session. The name is based either on the &lt;msr-file&gt; or the &lt;data-file&gt;, e.g. 3310.msr -&gt; 3310_0.png. Supported graphic-format-extension: eps, pdf, gif, jpg, png, svg, xpm, root
+</dd> <dt> --dump &lt;fln&gt;  </dt><dd> rather than starting a root session and showing Fourier graphs of the data, it will output the Fourier data in an ascii file &lt;fln&gt;.
+</dd> <dt> -br, --background-range &lt;start&gt; &lt;end&gt; </dt><dd> background interval used to estimate the background to be subtracted before the Fourier transform. &lt;start&gt;, &lt;end&gt; to be given in bins.
+</dd> <dt> -bg, --background <list>  </dt><dd> gives the background explicit for each histogram.
+</dd> <dt> -fo, --fourier-option &lt;fopt&gt; </dt><dd> &lt;fopt&gt; can be 'real', 'imag', 'real+imag', 'power', or 'phase'. If this is not defined (neither on the command line nor in the <code>musrfit_startup.xml</code>). Default will be 'power'.
+</dd> <dt> -ap, --apodization &lt;val&gt;  </dt><dd> &lt;val&gt; can be either 'none', 'weak', 'medium', 'strong'. Default will be 'none'.
+</dd> <dt> -fp, --fourier-power &lt;N&gt;  </dt><dd> &lt;N&gt; being the Fourier power, i.e. 2^&lt;N&gt; used for zero padding. Default is -1, i.e. no zero padding will be performed.
+</dd> <dt> -u, --units &lt;units&gt;  </dt><dd> &lt;units&gt; is used to define the x-axis of the Fourier transform. One may choose between the fields (Gauss) or (Tesla), the frequency (MHz), and the angular-frequency domain (Mc/s). Default will be 'MHz'.
+</dd> <dt> -ph, --phase &lt;val&gt;  </dt><dd> defines the initial phase &lt;val&gt;. This only is of concern for 'real', 'imag', and 'real+imag'. Default will be 0.0.
+</dd> <dt> -fr, --fourier-range &lt;start&gt; &lt;end&gt;  </dt><dd> Fourier range. &lt;start&gt;, &lt;end&gt; are interpreted in the units given. Default will be -1.0 for both which means, take the full Fourier range.
+</dd> <dt> -tr, --time-range &lt;start&gt; &lt;end&gt;  </dt><dd> time domain range to be used for Fourier transform. &lt;start&gt;, &lt;end&gt; are to be given in (&#956;sec). If nothing is given, the full time range found in the data file(s) will be used.
+</dd> <dt> --histo &lt;list&gt;  </dt><dd> give the &lt;list&gt; of histograms to be used for the Fourier transform. E.g. <code>musrFT -df lem15_his_01234.root --histo 1 3</code>, will only be needed together with the option <code>--data-file</code>. If multiple data file are given, &lt;list&gt; will apply to all data-files given. If <code>--histo</code> is not given, all histos of a data file will be used. &lt;list&gt; can be anything like: 2 3 6, or 2-17, or 1-6 9, etc.
+</dd> <dt> -a, --average  </dt><dd> show the average of all Fourier transformed data.
+</dd> <dt> --t0 &lt;list&gt;  </dt><dd> A list of t0's can be provided. This in conjunction with <code>--data-file</code> and <code>--fourier-option</code> real allows to get the proper initial phase if t0's are known. If a single t0 for multiple histos is given, it is assume, that this t0 is common to all histos. <strong>Example</strong>: <code>musrFT -df lem15_his_01234.root -fo real --t0 2750 --histo 1 3</code>. 
+</dd> <dt> -pa, --packing &lt;N&gt;  </dt><dd> if &lt;N&gt; (an integer), the time domain data will first be packed/rebinned by &lt;N&gt;.
+</dd> <dt> --title &lt;title&gt;  </dt><dd> give a global title for the plot.
+</dd> <dt> --create-msr-file &lt;fln&gt;  </dt><dd> creates a msr-file based on the command line options provided. This will help on the way to a full fitting model.
+</dd> <dt> -lc, --lifetimecorrection &lt;fudge&gt; </dt><dd> try to eliminate muon life time decay. Only makes sense for low transverse fields. &lt;fudge&gt; is a tweaking factor (scaling factor for the estimated t0) and should be kept around 1.0.
+</dd> <dt> --timeout &lt;timeout&gt;  </dt><dd> &lt;timeout&gt; given in seconds after which musrFT terminates. If &lt;timeout&gt; &lt;= 0, no timeout will take place. Default &lt;timeout&gt; is 3600 sec.
+</dd></dl> 
+<p></p> <dl>
+<dt> Example 1 </dt><dd> <pre class=bash>musrFT -df tdc&#95;hifi&#95;2014&#95;00153.mdu --title &#34;MnSi&#34; -tr 0 10 -fr 7.0 7.6 -u Tesla --histo 2-17 -a</pre> will take time range from t=0..10&#956;sec, will show the Fourier transform in units of Tesla from B=7.0..7.6 Tesla of the detectors 2-17. Rather than showing the 16 individual Fourier transforms, the average of all Fourier spectra will be shown. t0's will be guessed by the maximum of the time domain histogram (assuming a prompt peak).
+</dd> <dt> Example 2 </dt><dd> <pre class=bash>musrFT -df tdc&#95;hifi&#95;2014&#95;00153.mdu -tr 0 10 -fr 7.0 7.6 -u Tesla --histo 2-17 --title &#34;MnSi average, T&#61;50K, B&#61;7.5T&#34; -a -g pdf</pre> as <strong>Example 1</strong> but rather than showing an interactive GUI, the output will be dumped into a pdf-file. The file name will be <code>tdc_hifi_2014_00153.pdf</code>.
+</dd> <dt> Example 3 </dt><dd> <pre class=bash>musrFT -df tdc&#95;hifi&#95;2014&#95;00153.mdu -tr 0 10 -fr 7.0 7.6 -u Tesla --histo 2-17 --title &#34;MnSi average, T&#61;50K, B&#61;7.5T&#34; -a --dump MnSi.dat</pre> as <strong>Example 1</strong> but rather than showing an interactive GUI, the output will be dumped into the ascii file <code>MnSi.dat</code>.
+</dd></dl> 
+<p></p>
+Within the drawn canvas all standard actions applicable to <code>ROOT</code> canvases might be performed.
+In the menu bar the <strong>MusrFT</strong> menu can be found. From there some <code>musrFT</code>-specific actions might be taken: <dl>
+<dt> Fourier </dt><dd> allows to switch between different Fourier transform representations 'Power', 'Real', ...
+</dd> <dt> Average </dt><dd> toggle between the current view and the averaged data view.
+</dd> <dt> Export Data </dt><dd> saves the selected data in a simple multi-column ASCII file
+</dd></dl> 
+<p></p>
+Additionally, some functions can be accessed using key-shortcuts: <dl>
+<dt> q </dt><dd> quits <code>musrFT</code>
+</dd> <dt> a </dt><dd> toggle between average of the presented data and single Fourier histos, e.g. the averaged Fourier power spectra of various detectors.
+</dd> <dt> u </dt><dd> reset the plotting range to the area given in the msr-file or the form the command line ("unzoom")
+</dd></dl> 
+<p></p>
 <a name="MusrT0"></a>
-<h2><a name="A_2.3_musrt0"></a> 2.3  musrt0 </h2>
+<h2><a name="A_2.4_musrt0"></a> 2.4  musrt0 </h2>
 <code>musrt0</code> is a user interface for the determination of <strong>t0</strong> and the time windows of <strong>data</strong> and <strong>background</strong> needed to be specified in the <a href="#TheRunBlock" class="foswikiCurrentTopicLink">RUN blocks</a> of the msr file. It can be operated either as an interactive program or in a non-interactive mode. In the non-interactive mode it accepts the following parameters: <dl>
 <dt> &lt;msr_file&gt; </dt><dd> name of an msr file
 </dd> <dt> -g, --getT0FromPromptPeak [&lt;firstGoodBinOffset&gt;] </dt><dd> tries to estimate <strong>t0</strong> from the <em>prompt peak</em> (maximum entry) in each histogram and writes the corresponding values to the <a href="#TimeZero" class="foswikiCurrentTopicLink">t0 lines</a> in the <a href="#TheRunBlock" class="foswikiCurrentTopicLink">RUN blocks</a> of the msr file. If an optional number <strong>&lt;firstGoodBinOffset&gt;</strong> is given, the lower limit of the <a href="#DataRange" class="foswikiCurrentTopicLink"><b>data</b> range</a> will be set to <strong>t0 + &lt;firstGoodBinOffset&gt;</strong>.
@@ -253,7 +302,7 @@ Using the key <strong>Q</strong>, <code>musrt0</code> can be interrupted. No cha
 Closing a window by clicking the <strong>X</strong> button is equivalent to pressing <strong>Q</strong>, i.e. <code>musrt0</code> is simply terminated.
 <p></p>
 <a name="MusrfitStartupXml"></a>
-<h2><a name="A_2.4_musrfit_startup.xml"></a> 2.4  musrfit_startup.xml </h2>
+<h2><a name="A_2.5_musrfit_startup.xml"></a> 2.5  musrfit_startup.xml </h2>
 <code><b>musrfit_startup.xml</b></code> is a configuration file located at the <code>musrfit</code> binary path. In this file the following XML tags are allowed to define settings: <dl>
 <dt> &lt;data_path&gt;PATH_TO_DATA&lt;/data_path&gt; </dt><dd> add the new path <strong>PATH_TO_DATA</strong> where <code>musrfit</code> and <code>musrview</code> will search for data files
 </dd> <dt> &lt;write_per_run_block_chisq&gt;<b>y/n</b>&lt;/write_per_run_block_chisq&gt; </dt><dd> if enabled &chi;<sup>2</sup> for each RUN block will be written to the <a href="#TheStatisticBlock" class="foswikiCurrentTopicLink">STATISTIC block</a> of the resulting <code>msr</code> file. Additionally, in case a &chi;<sup>2</sup> <a href="#SingleHistogramFit" class="foswikiCurrentTopicLink">single-histogram fit</a> is done, also <a href="http://en.wikipedia.org/wiki/Pearson's_chi-square_test" target="_top">Pearson's &chi;<sup>2</sup></a> will be added.
@@ -309,7 +358,7 @@ An example would look like:
 </pre>
 <p></p>
 <a name="Msr2Msr"></a>
-<h2><a name="A_2.5_msr2msr"></a> 2.5  msr2msr </h2>
+<h2><a name="A_2.6_msr2msr"></a> 2.6  msr2msr </h2>
 <code>msr2msr</code> is a small utility for converting existing <code>WKM</code> msr files into <code>musrfit</code> msr files. It accepts the following parameters: <dl>
 <dt> &lt;msr_file_in&gt; </dt><dd> input <code>WKM</code> msr file (mandatory first parameter)
 </dd> <dt> &lt;msr_file_out&gt; </dt><dd> converted output <code>musrfit</code> msr file (mandatory second parameter)
@@ -321,7 +370,7 @@ A typical example then looks like:
 If the input file has already the <code>musrfit</code> msr file structure, the output file will be just a copy of the input file.
 <p></p>
 <a name="Any2Many"></a>
-<h2><a name="A_2.6_any2many"></a> 2.6  any2many </h2>
+<h2><a name="A_2.7_any2many"></a> 2.7  any2many </h2>
 <code>any2many</code> is a muSR data file converter. Currently different facilities (PSI, TRIUMF, ISIS, J-PARC) are saving their muSR data files in different formats, or even worse some instruments are using other muSR data formats than others. The aim of <code>any2many</code> is that these files can be converted into each other. Of course only a subset of header information can be converted. 
 <p></p>
 Currently <code>any2many</code> can convert the following muSR data file formats: <ul>
@@ -367,7 +416,7 @@ Will take the runs 100 through 117 and convert the <code>NeXus</code> input file
 Will read the two files <code>'2010/lem10_his_0123.root'</code> and <code>'2010/lem10_his_0012.root'</code>, rebin them with 25 and export them as <code>LEM ROOT</code> files with adding <code>rebin25</code> to the name, e.g. <code>2010/lem10_his_0123_rebin25.root</code>.
 <p></p>
 <a name="DumpHeader"></a>
-<h2><a name="A_2.7_dump_header"></a> 2.7  dump_header </h2>
+<h2><a name="A_2.8_dump_header"></a> 2.8  dump_header </h2>
 <code>dump_header</code> is a little program which tries to read a &#956;SR data file and sends the relevant information (required header info, start of the histos, etc.) to the standard output. Currently the following &#956;SR data file formats are supported: <code>MusrROOT</code>, <code>ROOT</code> (old LEM format), <code>PSI-BIN</code>, <code>PSI-MDU</code>, <code>NeXus</code> (IDF1 and IDF2), <code>MUD</code>, and <code>WKM</code>.
 <p></p>
 <a name="AuxiliaryPrograms"></a>
@@ -1540,19 +1589,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 <!-- -->
 <!-- --><!-- -->
 <!-- -->
-<!-- TAB --><div id='jqTab7232' class="attachments jqAjaxTab jqTab {url: 'https://intranet.psi.ch/wiki/bin/rest/RenderPlugin/template?name=metadata;expand=attachments;topic=MUSR.MusrFit;render=on;1418910331'}">
-<h2 class='jqTabLabel'>Attachments <span class='foswikiAttachmentsCount'>(2)</span></h2>
-<div class='jqTabContents' >
-  <div class='foswikiFormSteps foswikiAttachmentsProcess'><span class='jqAjaxLoader'>&nbsp;</span></div>
-  </div></div><!-- //ENDTAB --><!-- -->
-<!-- -->
-<!-- -->
 <!-- --><!-- -->
-<!-- --><!-- -->
-<!-- --><!-- -->
-<!-- -->
-<!-- -->
-<!-- --><!-- --><!-- -->
 <!-- --><!-- -->
 <!-- -->
 </div><!-- //ENDTABPANE --> 
@@ -1562,9 +1599,9 @@ For reporting bugs or requesting new features and improvements please use the <a
 <div class="foswikiFormSteps">
 <a name="topic-actions"></a>
   <div class="patternTopicActions foswikiFormStep">
-	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1418910331' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFit' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/php/pdf.php?url=MUSR/MusrFit?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r117&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=116;rev2=117">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=116">r116</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=115;rev2=116">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=115">r115</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=114;rev2=115">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=114">r114</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=more&amp;maxrev=117&amp;currrev=117' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
+	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1424353866' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFit' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/php/pdf.php?url=MUSR/MusrFit?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r123&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=122;rev2=123">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=122">r122</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=121;rev2=122">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=121">r121</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=120;rev2=121">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=120">r120</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=more&amp;maxrev=123&amp;currrev=123' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
   </div>
-</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r117 - 18 Dec 2014, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
+</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r123 - 19 Feb 2015, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
 </div>
 </div><div id="patternSideBar"><div id="patternClearHeaderLeft"></div>
 <div id="patternSideBarContents">
@@ -1586,7 +1623,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 <li> <a href="https://intranet.psi.ch/MUSR/WebCreateNewTopic?parent=MusrFit" target="_top"><span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/newtopic.png" width="16" height="16" alt="newtopic" /></span> Create New Topic</a> 
 </li> <li> <a href="WebTopicList.html"> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/index.png" width="16" height="16" alt="index" /></span> Show All Topics</a> 
 </li> <li> <a href="WebSearch.html"> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/searchtopic.png" width="16" height="16" alt="searchtopic" /></span> Search in Topics</a> 
-</li> <li> <a href="WebChanges.html"> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/changes.png" width="16" height="16" alt="changes" /></span> Recent Changes</a>
+</li> <li> <a href="https://intranet.psi.ch/search/#?fq=%20-web_search:Applications%26fq%3D%7B!tag%3Dweb%20q.op%3DOR%7Dweb:(MUSR)&amp;sort=date%20desc"> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/changes.png" width="16" height="16" alt="changes" /></span> Recent Changes</a>
 </li> <li> <a href="WebNotify.html"> <span class="foswikiIcon"><img src="../pub/System/DocumentGraphics/notify.png" width="16" height="16" alt="notify" /></span> Define Notifications</a>
 </li></ul> 
 <p></p>
@@ -1599,10 +1636,9 @@ For reporting bugs or requesting new features and improvements please use the <a
 <tr><td valign="middle"><span id="foswikiLogo" class="foswikiImage"><a href="WebHome.html"><img src="../pub/Main/WebPreferences/psi_logo_150.gif" border="0" alt="Paul Scherrer Institut" style="border:none; margin: -8px 0 0 15px;" /></a></span></td>
 <td align="right" valign="top" class="patternMetaMenu" id="psimetanav">
 <p></p> <ul>
-<li> <form name="quickSearchForm" id="solrSearchForm" action="https://intranet.psi.ch/PSI/Search"><input type="hidden" name="filter" value="web:MUSR" /><input type="text" class="foswikiInputField" id="quickSearchBox" name="search" value="" size="18" /><input type="hidden" name="scope" value="all" /><!-- <input type="hidden" name="web" value="MUSR" /> --> <noscript>&nbsp;<input type="submit" size="5" class="foswikiButton" name="submit" value="Search" />&nbsp;</noscript><input type="image" class="searchsubmit" alt="Search" value="Suche..." name="sa" src="../webbase/img/search.png">	</form>
+<li> <form name="quickSearchForm" id="solrSearchForm" action="https://intranet.psi.ch/search/">		<input type="text" class="foswikiInputField" id="quickSearchBox" name="q" value="" size="18" />		<input type="image" class="searchsubmit" alt="Search" value="Suche..." name="sa" src="../webbase/img/search.png">	</form>
 </li> <li> <form name="changeLanguage"    action="https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit" method="get">    <input type="hidden" name="redirectto" value="/MUSR/MusrFit?cover=print" />    <select name="language" class="foswikiSelect"        onchange="document.changeLanguage.submit()">    <option  value="de">Deutsch</option> <option selected="selected" value="en">English</option></select>    <input type="hidden" name="template" value="oopslanguagechanged" />    <noscript>        <input class="foswikiButton" type="submit"            value="Change language" />    </noscript> </form>
 </li></ul> 
-<p></p>
 <p></p>
 <p></p>
 </td></tr></table>
@@ -1613,7 +1649,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 </div>
 </div>
 </div></body>
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 18 Dec 2014 13:46:34 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 19 Feb 2015 13:52:08 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>

@@ -2861,29 +2861,6 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
     fGlobal = global;
   }
 
-/*
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fittype   : " << fGlobal.GetFitType();
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: data bin range: ";
-  for (UInt_t i=0; i<4; i++) {
-    cout << fGlobal.GetDataRange(i) << ", ";
-  }
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: t0's      : ";
-  for (UInt_t i=0; i<fGlobal.GetT0BinSize(); i++)
-    cout << fGlobal.GetT0Bin(i) << ", ";
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: addt0's   : ";
-  for (UInt_t i=0; i<fGlobal.GetAddT0BinEntries(); i++) {
-    cout << endl << "  debug> --> " << i << ": ";
-    for (UInt_t j=0; j<(UInt_t)fGlobal.GetAddT0BinSize(i); j++) {
-      cout << fGlobal.GetAddT0Bin(i,j) << ", ";
-    }
-  }
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fit in bin: " << fGlobal.IsFitRangeInBin();
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fit offset: " << fGlobal.GetFitRangeOffset(0) << ", " << fGlobal.GetFitRangeOffset(1);
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fit       : " << fGlobal.GetFitRange(0) << ", " << fGlobal.GetFitRange(1);
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: packing   : " << fGlobal.GetPacking();
-  cout << endl;
-*/
-
   return !error;
 }
 
@@ -5054,7 +5031,7 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           cerr << endl << ">>   forward parameter number not defined. Necessary for single histogram fits." << endl;
           return false;
         }
-        if (fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) {
+        if ((fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) && !fFourierOnly) {
           // check if forward histogram number is a function
           if (fRuns[i].GetNormParamNo() - MSR_PARAM_FUN_OFFSET > static_cast<Int_t>(fParam.size())) {
             cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
@@ -5337,6 +5314,9 @@ Bool_t PMsrHandler::CheckMaps()
 Bool_t PMsrHandler::CheckFuncs()
 {
   Bool_t result = true;
+
+  if (fFourierOnly)
+    return result;
 
   PIntVector funVec;
   PIntVector funBlock;

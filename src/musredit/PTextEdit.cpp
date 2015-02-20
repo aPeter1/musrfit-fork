@@ -55,6 +55,7 @@ using namespace std;
 #include <QTextBlock>
 #include <QTextDocumentFragment>
 #include <QTextList>
+#include <QProcess>
 
 #include <QtDebug>
 
@@ -68,6 +69,7 @@ using namespace std;
 #include "PFitOutputHandler.h"
 #include "PDumpOutputHandler.h"
 #include "PPrefsDialog.h"
+#include "PGetMusrFTOptionsDialog.h"
 #include "PGetDefaultDialog.h"
 #include "PMusrEditAbout.h"
 #include "PMsr2DataDialog.h"
@@ -549,6 +551,12 @@ void PTextEdit::setupMusrActions()
   tb->addAction(fMusrT0Action);
   menu->addAction(fMusrT0Action);
   fMusrT0Action->setEnabled(fAdmin->getEnableMusrT0Flag());
+
+  a = new QAction( QIcon( QPixmap (":/images/musrFT.xpm") ), tr( "Raw Fourier" ), this );
+  a->setStatusTip( tr("Start musrFT") );
+  connect( a, SIGNAL( triggered() ), this, SLOT( musrFT() ) );
+  tb->addAction(a);
+  menu->addAction(a);
 
   a = new QAction( QIcon( QPixmap( ":/images/musrprefs.xpm" ) ), tr( "&Preferences" ), this );
   a->setStatusTip( tr("Show Preferences") );
@@ -2183,7 +2191,10 @@ void PTextEdit::musrView()
   str = *fFilenames.find( currentEditor() );
   QString numStr;
   numStr.setNum(fAdmin->getTimeout());
-  cmd += str + "\" --timeout " + numStr + " &";
+  cmd += str + "\" --timeout " + numStr;
+  if (fAdmin->getMusrviewShowFourierFlag())
+    cmd += " -f ";
+  cmd += " &";
 
   int status=system(cmd.toLatin1());
 }
@@ -2225,6 +2236,33 @@ void PTextEdit::musrT0()
 
 //----------------------------------------------------------------------------------------------------
 /**
+ * <p>Calls musrFT via selection/option dialog. It will ask the user if he/she wants to overwrite some
+ * of the default settings.
+ */
+void PTextEdit::musrFT()
+{
+
+  PGetMusrFTOptionsDialog *dlg = new PGetMusrFTOptionsDialog(*fFilenames.find( currentEditor() ), fMusrFTPrevCmd, fAdmin->getHelpUrl("musrFT"));
+
+  if (dlg == 0) {
+    QMessageBox::critical(this, "**ERROR** musrFT", "Couldn't invoke musrFT Options Dialog.");
+    return;
+  }
+
+  if (dlg->exec() == QDialog::Accepted) {
+    fMusrFTPrevCmd = dlg->getMusrFTOptions();
+    QProcess proc(this);
+    proc.setStandardOutputFile("musrFT.log");
+    proc.setStandardErrorFile("musrFT.log");
+    proc.startDetached("musrFT", fMusrFTPrevCmd);
+  }
+
+  delete dlg;
+  dlg = 0;
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
  * <p>Calls the preferences dialog which is used to set some global options.
  */
 void PTextEdit::musrPrefs()
@@ -2237,6 +2275,7 @@ void PTextEdit::musrPrefs()
   }
 
   if (dlg->exec() == QDialog::Accepted) {
+    fAdmin->setMusrviewShowFourierFlag(dlg->getMusrviewShowFourierFlag());
     fAdmin->setKeepMinuit2OutputFlag(dlg->getKeepMinuit2OutputFlag());
     fAdmin->setTitleFromDataFileFlag(dlg->getTitleFromDataFileFlag());
     fAdmin->setEnableMusrT0Flag(dlg->getEnableMusrT0Flag());

@@ -1,6 +1,6 @@
 /****************************************************************************
 
-  PPrefsDialog.h
+  PGetMusrFTOptionsDialog.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010-2014 by Andreas Suter                              *
+ *   Copyright (C) 2010-2015 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -27,40 +27,43 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PPREFSDIALOG_H_
-#define _PPREFSDIALOG_H_
+#ifndef _PGETMUSRFTOPTIONSDIALOG_H_
+#define _PGETMUSRFTOPTIONSDIALOG_H_
 
-#include <QCheckBox>
+#include <QDialog>
+#include <QStringList>
 
-#include <PAdmin.h>
+#include "ui_PGetMusrFTOptionsDialog.h"
 
-#include "ui_PPrefsDialog.h"
-
-/**
- * <p>Class handling the content of the MusrFit/Preferences.
- */
-class PPrefsDialog : public QDialog, private Ui::PPrefsDialog
+class PGetMusrFTOptionsDialog : public QDialog, private Ui::PGetMusrFTOptionsDialog
 {
   Q_OBJECT
 
   public:
-    PPrefsDialog(PAdmin *admin);
-
-    bool getMusrviewShowFourierFlag() { return fFourier_checkBox->isChecked(); }
-    bool getKeepMinuit2OutputFlag() { return fKeepMn2Output_checkBox->isChecked(); }
-    bool getTitleFromDataFileFlag() { return fTitleFromData_checkBox->isChecked(); }
-    bool getEnableMusrT0Flag()      { return fEnableMusrT0_checkBox->isChecked(); }
-    bool getKeepRunPerBlockChisqFlag() { return fPerRunBlockChisq_checkBox->isChecked(); }
-    bool getEstimateN0Flag()        { return fEstimateN0_checkBox->isChecked(); }
-    int  getDump();    
-    int  getTimeout() { return fTimeout_lineEdit->text().toInt(); }
+    PGetMusrFTOptionsDialog(QString currentMsrFile, QStringList &prevCmd, const QString helpUrl);
+    QStringList getMusrFTOptions();
 
   public slots:
-    void dumpAscii();
-    void dumpRoot();
+    void helpContent();
+
+  private slots:
+    void currentMsrFileTagChanged(int state);
+    void allMsrFileTagChanged(int state);
+    void selectMsrFileNames();
+    void clearMsrFileNames();
+    void selectDataFileNames();
+    void clearDataFileNames();
+    void createMsrFileChanged(int state);
+    void resetAll();
 
   private:
-    PAdmin *fAdmin;
+    QStringList fMsrFilePaths;   ///< list keeping all the paths from the msr-file path-name list
+    QStringList fMsrFileNames;   ///< list keeping all the names from the msr-file path-name list
+    QStringList fDataFilePaths;  ///< list keeping all the paths from the data-file path-name list
+    QStringList fDataFileNames;  ///< list keeping all the names from the data-file path-name list
+    QString fCreateMsrFileName;  ///< keeps the msr-path-file name for msr-file creation
+    QString fCurrentMsrFileName; ///< keeps the msr-path-file name of the currently active msr-file in musredit.
+    QString fHelpUrl; ///< help url for the asymmetry run block
 };
 
-#endif // _PPREFSDIALOG_H_
+#endif // _PGETMUSRFTOPTIONSDIALOG_H_

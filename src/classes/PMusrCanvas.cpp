@@ -35,9 +35,14 @@ using namespace std;
 #include <TRandom.h>
 #include <TROOT.h>
 #include <TObjString.h>
+#include <TGFileDialog.h>
 
 #include "PMusrCanvas.h"
 #include "PFourier.h"
+
+static const char *gFiletypes[] = { "Data files", "*.dat",
+                                    "All files",  "*",
+                                    0,            0 };
 
 ClassImp(PMusrCanvasPlotRange)
 
@@ -128,7 +133,6 @@ PMusrCanvas::PMusrCanvas()
   fImp   = 0;
   fBar   = 0;
   fPopupMain    = 0;
-  fPopupSave    = 0;
   fPopupFourier = 0;
 
   fStyle               = 0;
@@ -181,8 +185,8 @@ PMusrCanvas::PMusrCanvas()
  */
 PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
-                         const Bool_t batch) :
-                         fBatchMode(batch), fPlotNumber(number)
+                         const Bool_t batch, const Bool_t fourier) :
+                         fStartWithFourier(fourier), fBatchMode(batch), fPlotNumber(number)
 {
   fTimeout = 0;
   fTimeoutTimer = 0;
@@ -236,8 +240,8 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                          PMsrFourierStructure fourierDefault,
                          const PIntVector markerList, const PIntVector colorList,
-                         const Bool_t batch) :
-                         fBatchMode(batch),
+                         const Bool_t batch, const Bool_t fourier) :
+                         fStartWithFourier(fourier), fBatchMode(batch),
                          fPlotNumber(number), fFourier(fourierDefault),
                          fMarkerList(markerList), fColorList(colorList)
 {
@@ -703,7 +707,62 @@ void PMusrCanvas::UpdateDataTheoryPad()
   }
 
   // generate the histo plot
-  PlotData();
+  if (!fStartWithFourier || (fPlotType == MSR_PLOT_NON_MUSR)) {
+    PlotData();
+  } else { // show Fourier straight ahead.
+    // set the menu properly
+    if (!fBatchMode)
+      fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
+
+    // filter proper Fourier plot tag, and set the menu tags properly
+    switch (fFourier.fPlotTag) {
+      case FOURIER_PLOT_REAL:
+        fCurrentPlotView = PV_FOURIER_REAL;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        }
+        break;
+      case FOURIER_PLOT_IMAG:
+        fCurrentPlotView = PV_FOURIER_IMAG;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        }
+        break;
+      case FOURIER_PLOT_REAL_AND_IMAG:
+        fCurrentPlotView = PV_FOURIER_REAL_AND_IMAG;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        }
+        break;
+      case FOURIER_PLOT_POWER:
+        fCurrentPlotView = PV_FOURIER_PWR;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+        }
+        break;
+      case FOURIER_PLOT_PHASE:
+        fCurrentPlotView = PV_FOURIER_PHASE;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
+        }
+        break;
+      default:
+        fCurrentPlotView = PV_FOURIER_PWR;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+        }
+        break;
+    }
+
+    HandleFourier();
+    PlotFourier();
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -1282,8 +1341,16 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
       cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << endl;
       return;
     }
-  } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII) {
-    SaveDataAscii();
+  } else if (id == P_MENU_ID_EXPORT_DATA+P_MENU_PLOT_OFFSET*fPlotNumber) {
+    static TString dir(".");
+    TGFileInfo fi;
+    fi.fFileTypes = gFiletypes;
+    fi.fIniDir = StrDup(dir);
+    fi.fOverwrite = true;
+    new TGFileDialog(0, fImp, kFDSave, &fi);
+    if (fi.fFilename && strlen(fi.fFilename)) {
+      ExportData(fi.fFilename);
+    }
   }
 
   // check if phase increment/decrement needs to be ghost
@@ -1362,13 +1429,20 @@ void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
 }
 
 //--------------------------------------------------------------------------
-// SaveDataAscii 
+// ExportData
 //--------------------------------------------------------------------------
 /**
  * <p>Saves the currently seen data (data, difference, Fourier spectra, ...) in ascii column format.
+ *
+ * \param fileName file name to be used to save the data.
  */
-void PMusrCanvas::SaveDataAscii()
+void PMusrCanvas::ExportData(const Char_t *fileName)
 {
+  if (fileName == 0) { // path file name NOT provided, generate a default path file name
+    cerr << endl << ">> PMusrCanvas::ExportData **ERROR** NO path file name provided. Will do nothing." << endl;
+    return;
+  }
+
   // collect relevant data
   PMusrCanvasAsciiDump dump;
   PMusrCanvasAsciiDumpVector dumpVector;
@@ -2014,35 +2088,13 @@ void PMusrCanvas::SaveDataAscii()
       break;
   }
 
-  // generate output filename
-
-  // in order to handle names with "." correctly this slightly odd data-filename generation
-  TObjArray *tokens = fMsrHandler->GetFileName().Tokenize(".");
-  TObjString *ostr;
-  TString str;
-  TString fln = TString("");
-  for (Int_t i=0; i<tokens->GetEntries()-1; i++) {
-    ostr = dynamic_cast<TObjString*>(tokens->At(i));
-    fln += ostr->GetString() + TString(".");
-  }
-  if (!fDifferenceView) {
-    fln += "data.ascii";
-  } else {
-    fln += "diff.ascii";
-  }
-
-  if (tokens) {
-    delete tokens;
-    tokens = 0;
-  }
-
   // open file
   ofstream fout;
 
   // open output data-file
-  fout.open(fln.Data(), iostream::out);
+  fout.open(fileName, iostream::out);
   if (!fout.is_open()) {
-    cerr << endl << ">> PMusrCanvas::SaveDataAscii: **ERROR** couldn't open file " << fln.Data() << " for writing." << endl;
+    cerr << endl << ">> PMusrCanvas::ExportData: **ERROR** couldn't open file " << fileName << " for writing." << endl;
     return;
   }
 
@@ -2366,7 +2418,6 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   fImp   = 0;
   fBar   = 0;
   fPopupMain    = 0;
-  fPopupSave    = 0;
   fPopupFourier = 0;
 
   fMainCanvas          = 0;
@@ -2415,10 +2466,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
     fPopupMain->AddEntry("Average", P_MENU_ID_AVERAGE+P_MENU_PLOT_OFFSET*fPlotNumber);
     fPopupMain->AddSeparator();
 
-    fPopupSave = new TGPopupMenu();
-    fPopupSave->AddEntry("Save ascii", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII);
-
-    fPopupMain->AddPopup("&Save Data", fPopupSave);
+    fPopupMain->AddEntry("Export Data", P_MENU_ID_EXPORT_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
     fBar->MapSubwindows();
     fBar->Layout();
 
@@ -3358,10 +3406,14 @@ void PMusrCanvas::HandleFourier()
   // check if fourier needs to be calculated
   if (fData[0].dataFourierRe == 0) {
     Int_t bin;
-    bin = fHistoFrame->GetXaxis()->GetFirst();
-    double startTime = fHistoFrame->GetBinCenter(bin);
-    bin = fHistoFrame->GetXaxis()->GetLast();
-    double endTime   = fHistoFrame->GetBinCenter(bin);
+    double startTime = fXmin;
+    double endTime = fXmax;
+    if (!fStartWithFourier) { // fHistoFrame presen, hence get start/end from it
+      bin = fHistoFrame->GetXaxis()->GetFirst();
+      startTime = fHistoFrame->GetBinCenter(bin);
+      bin = fHistoFrame->GetXaxis()->GetLast();
+      endTime   = fHistoFrame->GetBinCenter(bin);
+    }
     for (UInt_t i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, fFourier.fFourierPower);
@@ -3800,7 +3852,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].data->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].data, fData[0].data->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].data, fData[0].data->GetBinCenter(i));
       }
       fDataAvg.data->SetBinContent(i, dval/fData.size());
     }
@@ -3814,7 +3866,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierRe, fData[0].dataFourierRe->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierRe, fData[0].dataFourierRe->GetBinCenter(i));
       }
       fDataAvg.dataFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3828,7 +3880,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierIm, fData[0].dataFourierIm->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierIm, fData[0].dataFourierIm->GetBinCenter(i));
       }
       fDataAvg.dataFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3842,7 +3894,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierPwr, fData[0].dataFourierPwr->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierPwr, fData[0].dataFourierPwr->GetBinCenter(i));
       }
       fDataAvg.dataFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3856,7 +3908,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierPhase, fData[0].dataFourierPhase->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierPhase, fData[0].dataFourierPhase->GetBinCenter(i));
       }
       fDataAvg.dataFourierPhase->SetBinContent(i, dval/fData.size());
     }
@@ -3870,7 +3922,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theory->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theory, fData[0].theory->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theory, fData[0].theory->GetBinCenter(i));
       }
       fDataAvg.theory->SetBinContent(i, dval/fData.size());
     }
@@ -3880,7 +3932,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierRe, fData[0].theoryFourierRe->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierRe, fData[0].theoryFourierRe->GetBinCenter(i));
       }
       fDataAvg.theoryFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3894,7 +3946,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierIm, fData[0].theoryFourierIm->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierIm, fData[0].theoryFourierIm->GetBinCenter(i));
       }
       fDataAvg.theoryFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3908,7 +3960,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierPwr, fData[0].theoryFourierPwr->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierPwr, fData[0].theoryFourierPwr->GetBinCenter(i));
       }
       fDataAvg.theoryFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3922,7 +3974,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierPhase, fData[0].theoryFourierPhase->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierPhase, fData[0].theoryFourierPhase->GetBinCenter(i));
       }
       fDataAvg.theoryFourierPhase->SetBinContent(i, dval/fData.size());
     }
@@ -3936,7 +3988,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diff->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diff, fData[0].diff->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diff, fData[0].diff->GetBinCenter(i));
       }
       fDataAvg.diff->SetBinContent(i, dval/fData.size());
     }
@@ -3950,7 +4002,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierRe, fData[0].diffFourierRe->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierRe, fData[0].diffFourierRe->GetBinCenter(i));
       }
       fDataAvg.diffFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3964,7 +4016,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierIm, fData[0].diffFourierIm->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierIm, fData[0].diffFourierIm->GetBinCenter(i));
       }
       fDataAvg.diffFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3978,7 +4030,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierPwr, fData[0].diffFourierPwr->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierPwr, fData[0].diffFourierPwr->GetBinCenter(i));
       }
       fDataAvg.diffFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3992,7 +4044,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierPhase, fData[0].diffFourierPhase->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierPhase, fData[0].diffFourierPhase->GetBinCenter(i));
       }
       fDataAvg.diffFourierPhase->SetBinContent(i, dval/fData.size());
     }

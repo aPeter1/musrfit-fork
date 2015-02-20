@@ -85,6 +85,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eDefaultSavePath;
   } else if (qName == "title_from_data_file") {
     fKeyWord = eTitleFromDataFile;
+  } else if (qName == "musrview_show_fourier") {
+    fKeyWord = eMusrviewShowFourier;
   } else if (qName == "enable_musrt0") {
     fKeyWord = eEnableMusrT0;
   } else if (qName == "keep_minuit2_output") {
@@ -130,7 +132,9 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
   } else if (qName == "musr_web_statistic") {
     fKeyWord = eHelpStatistic;
   } else if (qName == "musr_web_msr2data") {
-    fKeyWord = eHelpMsr2Data;    
+    fKeyWord = eHelpMsr2Data;
+  } else if (qName == "musr_web_musrFT") {
+    fKeyWord = eHelpMusrFT;
   } else if (qName == "chain_fit") {
     fKeyWord = eChainFit;
   } else if (qName == "write_data_header") {
@@ -240,6 +244,13 @@ bool PAdminXMLParser::characters(const QString& str)
         flag = false;
       fAdmin->setTitleFromDataFileFlag(flag);
       break;
+    case eMusrviewShowFourier:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setMusrviewShowFourierFlag(flag);
+      break;
     case eEnableMusrT0:
       if (str == "y")
         flag = true;
@@ -337,6 +348,9 @@ bool PAdminXMLParser::characters(const QString& str)
       break;
     case eHelpMsr2Data:
       fAdmin->setHelpUrl("msr2data", str);
+      break;
+    case eHelpMusrFT:
+      fAdmin->setHelpUrl("musrFT", str);
       break;
     case eChainFit:
       if (str == "y")
@@ -597,6 +611,8 @@ PAdmin::PAdmin() : QObject()
   fBeamline   = QString("");
   fInstitute  = QString("");
   fFileFormat = QString("");
+
+  fMusrviewShowFourier = false;
 
   fTitleFromDataFile  = false;
   fEnableMusrT0       = false;

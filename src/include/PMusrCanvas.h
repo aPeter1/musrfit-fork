@@ -67,7 +67,7 @@
 #define P_MENU_ID_FOURIER       10002
 #define P_MENU_ID_DIFFERENCE    10003
 #define P_MENU_ID_AVERAGE       10004
-#define P_MENU_ID_SAVE_DATA     10005
+#define P_MENU_ID_EXPORT_DATA   10005
 
 #define P_MENU_PLOT_OFFSET      1000
 
@@ -78,8 +78,6 @@
 #define P_MENU_ID_FOURIER_PHASE         104
 #define P_MENU_ID_FOURIER_PHASE_PLUS    105
 #define P_MENU_ID_FOURIER_PHASE_MINUS   106
-
-#define P_MENU_ID_SAVE_ASCII    200
 
 //------------------------------------------------------------------------
 /**
@@ -204,11 +202,13 @@ class PMusrCanvas : public TObject, public TQObject
   public:
     PMusrCanvas();
     PMusrCanvas(const Int_t number, const Char_t* title,
-                Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh, const Bool_t batch);
+                Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh, const Bool_t batch,
+                const Bool_t fourier=false);
     PMusrCanvas(const Int_t number, const Char_t* title,
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                 PMsrFourierStructure fourierDefault,
-                const PIntVector markerList, const PIntVector colorList, const Bool_t batch);
+                const PIntVector markerList, const PIntVector colorList, const Bool_t batch,
+                const Bool_t fourier=false);
     virtual ~PMusrCanvas();
 
     virtual Bool_t IsValid() { return fValid; }
@@ -229,9 +229,10 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void LastCanvasClosed(); // SLOT
 
     virtual void SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat);
-    virtual void SaveDataAscii();
+    virtual void ExportData(const Char_t *fileName);
 
   private:
+    Bool_t fStartWithFourier; ///< flag if true, the Fourier transform will be presented bypassing the time domain representation
     Int_t  fTimeout;          ///< timeout after which the Done signal should be emited. If timeout <= 0, no timeout is taking place
     Bool_t fScaleN0AndBkg;    ///< true=N0 and background is scaled to (1/ns), otherwise (1/bin) for the single histogram case
     Bool_t fBatchMode;        ///< musrview in ROOT batch mode
@@ -259,7 +260,6 @@ class PMusrCanvas : public TObject, public TQObject
     TRootCanvas *fImp;           ///< ROOT native GUI version of main window with menubar and drawing area
     TGMenuBar   *fBar;           ///< menu bar
     TGPopupMenu *fPopupMain;     ///< popup menu Musrfit in the main menu bar
-    TGPopupMenu *fPopupSave;     ///< popup menu of the Musrfit/Save Data sub menu
     TGPopupMenu *fPopupFourier;  ///< popup menu of the Musrfit/Fourier sub menu
 
     // canvas related variables

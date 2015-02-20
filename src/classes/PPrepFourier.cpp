@@ -27,6 +27,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <cmath>
+
 #include "PPrepFourier.h"
 
 //--------------------------------------------------------------------------
@@ -48,10 +50,11 @@ PPrepFourier::PPrepFourier()
 /**
  * <p>Constructor.
  */
-PPrepFourier::PPrepFourier(const Int_t *bkgRange, const Int_t packing) :
+PPrepFourier::PPrepFourier(const Int_t packing, const Int_t *bkgRange, PDoubleVector bkg) :
   fPacking(packing)
 {
   SetBkgRange(bkgRange);
+  SetBkg(bkg);
 }
 
 //--------------------------------------------------------------------------
@@ -113,6 +116,20 @@ void PPrepFourier::SetBkgRange(const Int_t *bkgRange)
 }
 
 //--------------------------------------------------------------------------
+// SetBkgRange
+//--------------------------------------------------------------------------
+/**
+ * <p>set the background values for all the histos.
+ *
+ * \param bkg vector
+ */
+void PPrepFourier::SetBkg(PDoubleVector bkg)
+{
+  for (unsigned int i=0; i<bkg.size(); i++)
+    fBkg.push_back(bkg[i]);
+}
+
+//--------------------------------------------------------------------------
 // SetPacking
 //--------------------------------------------------------------------------
 /**
@@ -157,29 +174,46 @@ void PPrepFourier::DoBkgCorrection()
   }
 
   // if no bkg-range is given, nothing needs to be done
-  if ((fBkgRange[0] == -1) && (fBkgRange[1] == -1)) {
+  if ((fBkgRange[0] == -1) && (fBkgRange[1] == -1) && (fBkg.size() == 0)) {
     return;
   }
 
-  // make sure that the bkg range is ok
-  for (unsigned int i=0; i<fRawData.size(); i++) {
-    if ((fBkgRange[0] >= fRawData[i].rawData.size()) || (fBkgRange[1] >= fRawData[i].rawData.size())) {
-      cerr << endl << "PPrepFourier::DoBkgCorrection() **ERROR** bkg-range out of data-range!";
+  if ((fBkgRange[0] != -1) && (fBkgRange[1] != -1)) { // background range is given
+    // make sure that the bkg range is ok
+    for (unsigned int i=0; i<fRawData.size(); i++) {
+      if ((fBkgRange[0] >= fRawData[i].rawData.size()) || (fBkgRange[1] >= fRawData[i].rawData.size())) {
+        cerr << endl << "PPrepFourier::DoBkgCorrection() **ERROR** bkg-range out of data-range!";
+        return;
+      }
+    }
+
+    Double_t bkg=0.0;
+    for (unsigned int i=0; i<fRawData.size(); i++) {
+      // calculate the bkg for the given range
+      for (int j=fBkgRange[0]; j<=fBkgRange[1]; j++) {
+        bkg += fRawData[i].rawData[j];
+      }
+      bkg /= (fBkgRange[1]-fBkgRange[0]+1);
+      cout << "debug> background " << i << ": " << bkg << endl;
+
+      // correct data
+      for (unsigned int j=0; j<fData[i].size(); j++)
+        fData[i][j] -= bkg;
+    }
+  } else { // there might be an explicit background list
+    // check if there is a background list
+    if (fBkg.size() == 0)
+      return;
+
+    // check if there are as many background values than data values
+    if (fBkg.size() != fData.size()) {
+      cerr << endl << "PPrepFourier::DoBkgCorrection() **ERROR** #bkg values != #histos. Will do nothing here." << endl;
       return;
     }
-  }
 
-  Double_t bkg=0.0;
-  for (unsigned int i=0; i<fRawData.size(); i++) {
-    // calculate the bkg for the given range
-    for (int j=fBkgRange[0]; j<=fBkgRange[1]; j++) {
-      bkg += fRawData[i].rawData[j];
-    }
-    bkg /= (fBkgRange[1]-fBkgRange[0]+1);
-
-    // correct data
-    for (unsigned int j=0; j<fData[i].size(); j++)
-      fData[i][j] -= bkg;
+    for (unsigned int i=0; i<fData.size(); i++)
+      for (unsigned int j=0; j<fData[i].size(); j++)
+        fData[i][j] -= fBkg[i];
   }
 }
 
@@ -215,20 +249,6 @@ void PPrepFourier::DoPacking()
     // change the original data set with the packed one
     fData[i].clear();
     fData[i] = tmpData;
-  }
-}
-
-//--------------------------------------------------------------------------
-// DoFiltering
-//--------------------------------------------------------------------------
-/**
- * <p>Not implemented yet.
- */
-void PPrepFourier::DoFiltering()
-{
-  // make sure fData are already present, and if not create the necessary data sets
-  if (fData.size() != fRawData.size()) {
-    InitData();
   }
 }
 
@@ -417,7 +437,7 @@ TH1F *PPrepFourier::GetData(const UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// InitData
+// InitData (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Copy raw-data to internal data from t0 to the size of raw-data.
