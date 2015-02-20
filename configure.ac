@@ -1167,6 +1167,8 @@ AC_CONFIG_FILES([Makefile \
                  src/external/libPhotoMeissner/Makefile \
                  src/external/libPhotoMeissner/classes/Makefile \
                  src/external/libBNMR/Makefile \
+                 src/musredit/Makefile \
+                 src/musrgui/Makefile \
                  src/musredit/musredit_startup.xml \
                  src/musrgui/musrgui_startup.xml])
 
