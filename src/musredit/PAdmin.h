@@ -69,7 +69,7 @@ class PAdminXMLParser : public QXmlDefaultHandler
 
   private:
     enum EAdminKeyWords {eEmpty, eTimeout, eKeepMinuit2Output, eDumpAscii, eDumpRoot,
-                         eTitleFromDataFile, eChisqPreRunBlock, eEstimateN0, eEnableMusrT0,
+                         eTitleFromDataFile, eChisqPreRunBlock, eEstimateN0, eMusrviewShowFourier, eEnableMusrT0,
                          eFontName, eFontSize, eExecPath, eDefaultSavePath,
                          eRecentFile, eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
                          eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
@@ -118,6 +118,7 @@ class PAdmin : public QObject
     QString getExecPath() { return fExecPath; }
     QString getDefaultSavePath() { return fDefaultSavePath; }
     bool    getTitleFromDataFileFlag() { return fTitleFromDataFile; }
+    bool    getMusrviewShowFourierFlag() { return fMusrviewShowFourier; }
     bool    getEnableMusrT0Flag() { return fEnableMusrT0; }
     bool    getKeepMinuit2OutputFlag() { return fKeepMinuit2Output; }
     bool    getDumpAsciiFlag() { return fDumpAscii; }
@@ -139,6 +140,7 @@ class PAdmin : public QObject
 
     void setTimeout(const int ival) { fTimeout = ival; }
     void setTitleFromDataFileFlag(const bool flag) { fTitleFromDataFile = flag; }
+    void setMusrviewShowFourierFlag(const bool flag) { fMusrviewShowFourier = flag; }
     void setEnableMusrT0Flag(const bool flag) { fEnableMusrT0 = flag; }
     void setKeepMinuit2OutputFlag(const bool flag) { fKeepMinuit2Output = flag; }
     void setDumpAsciiFlag(const bool flag) { fDumpAscii = flag; }
@@ -180,13 +182,14 @@ class PAdmin : public QObject
 
     QVector<QString> fRecentFile; ///< keep vector of recent path-file names
 
-    bool fKeepMinuit2Output; ///< flag indicating if the Minuit2 output shall be kept (default: no)
-    bool fDumpAscii;         ///< flag indicating if musrfit shall make an ascii-dump file (for debugging purposes, default: no).
-    bool fDumpRoot;          ///< flag indicating if musrfit shall make an root-dump file (for debugging purposes, default: no).
-    bool fTitleFromDataFile; ///< flag indicating if the title should be extracted from the data file (default: yes).
-    bool fChisqPreRunBlock;  ///< flag indicating if musrfit shall write 'per run block' chisq to the msr-file (default: no).
-    bool fEstimateN0;        ///< flag indicating if musrfit shall estimate N0 for single histogram fits (default: yes).
-    bool fEnableMusrT0;      ///< flag indicating if musrT0 shall be enabled at startup from within musredit (default: yes).
+    bool fMusrviewShowFourier; ///< flag indicating if musrview should show at startup data (=false) or Fourier of data (=true).
+    bool fKeepMinuit2Output;   ///< flag indicating if the Minuit2 output shall be kept (default: no)
+    bool fDumpAscii;           ///< flag indicating if musrfit shall make an ascii-dump file (for debugging purposes, default: no).
+    bool fDumpRoot;            ///< flag indicating if musrfit shall make an root-dump file (for debugging purposes, default: no).
+    bool fTitleFromDataFile;   ///< flag indicating if the title should be extracted from the data file (default: yes).
+    bool fChisqPreRunBlock;    ///< flag indicating if musrfit shall write 'per run block' chisq to the msr-file (default: no).
+    bool fEstimateN0;          ///< flag indicating if musrfit shall estimate N0 for single histogram fits (default: yes).
+    bool fEnableMusrT0;        ///< flag indicating if musrT0 shall be enabled at startup from within musredit (default: yes).
 
     QString fBeamline;   ///< name of the beamline. Used to generate default run header lines.
     QString fInstitute;  ///< name of the institute. Used to generate default run header lines.

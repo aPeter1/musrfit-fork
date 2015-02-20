@@ -185,8 +185,8 @@ PMusrCanvas::PMusrCanvas()
  */
 PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
-                         const Bool_t batch) :
-                         fBatchMode(batch), fPlotNumber(number)
+                         const Bool_t batch, const Bool_t fourier) :
+                         fStartWithFourier(fourier), fBatchMode(batch), fPlotNumber(number)
 {
   fTimeout = 0;
   fTimeoutTimer = 0;
@@ -240,8 +240,8 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                          PMsrFourierStructure fourierDefault,
                          const PIntVector markerList, const PIntVector colorList,
-                         const Bool_t batch) :
-                         fBatchMode(batch),
+                         const Bool_t batch, const Bool_t fourier) :
+                         fStartWithFourier(fourier), fBatchMode(batch),
                          fPlotNumber(number), fFourier(fourierDefault),
                          fMarkerList(markerList), fColorList(colorList)
 {
@@ -707,7 +707,49 @@ void PMusrCanvas::UpdateDataTheoryPad()
   }
 
   // generate the histo plot
-  PlotData();
+  if (!fStartWithFourier || (fPlotType == MSR_PLOT_NON_MUSR)) {
+    PlotData();
+  } else { // show Fourier straight ahead.
+    // set the menu properly
+    fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
+
+    // filter proper Fourier plot tag, and set the menu tags properly
+    switch (fFourier.fPlotTag) {
+      case FOURIER_PLOT_REAL:
+        fCurrentPlotView = PV_FOURIER_REAL;
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
+        fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+        fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        break;
+      case FOURIER_PLOT_IMAG:
+        fCurrentPlotView = PV_FOURIER_IMAG;
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
+        fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+        fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        break;
+      case FOURIER_PLOT_REAL_AND_IMAG:
+        fCurrentPlotView = PV_FOURIER_REAL_AND_IMAG;
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
+        fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+        fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        break;
+      case FOURIER_PLOT_POWER:
+        fCurrentPlotView = PV_FOURIER_PWR;
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+        break;
+      case FOURIER_PLOT_PHASE:
+        fCurrentPlotView = PV_FOURIER_PHASE;
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
+        break;
+      default:
+        fCurrentPlotView = PV_FOURIER_PWR;
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+        break;
+    }
+
+    HandleFourier();
+    PlotFourier();
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -3351,10 +3393,14 @@ void PMusrCanvas::HandleFourier()
   // check if fourier needs to be calculated
   if (fData[0].dataFourierRe == 0) {
     Int_t bin;
-    bin = fHistoFrame->GetXaxis()->GetFirst();
-    double startTime = fHistoFrame->GetBinCenter(bin);
-    bin = fHistoFrame->GetXaxis()->GetLast();
-    double endTime   = fHistoFrame->GetBinCenter(bin);
+    double startTime = fXmin;
+    double endTime = fXmax;
+    if (!fStartWithFourier) { // fHistoFrame presen, hence get start/end from it
+      bin = fHistoFrame->GetXaxis()->GetFirst();
+      startTime = fHistoFrame->GetBinCenter(bin);
+      bin = fHistoFrame->GetXaxis()->GetLast();
+      endTime   = fHistoFrame->GetBinCenter(bin);
+    }
     for (UInt_t i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, fFourier.fFourierPower);
