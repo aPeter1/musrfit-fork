@@ -141,3 +141,5 @@ FORMS = forms/PFindDialog.ui \
     forms/PMsr2DataDialog.ui
 
 RESOURCES = musredit.qrc
+
+macx:ICON = images/musredit.icns
