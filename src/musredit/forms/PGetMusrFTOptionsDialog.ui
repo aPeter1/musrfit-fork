@@ -34,11 +34,11 @@
    <property name="title">
     <string> Fourier </string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>30</y>
+      <x>21</x>
+      <y>31</y>
       <width>641</width>
       <height>156</height>
      </rect>
@@ -264,7 +264,14 @@ p, li { white-space: pre-wrap; }
        <item>
         <widget class="QCheckBox" name="fAveragedView_checkBox">
          <property name="text">
-          <string>Averaged View</string>
+          <string>Average All</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="fAveragePerDataSet_checkBox">
+         <property name="text">
+          <string>Average per Data Set</string>
          </property>
         </widget>
        </item>
@@ -275,7 +282,7 @@ p, li { white-space: pre-wrap; }
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>278</width>
+           <width>88</width>
            <height>20</height>
           </size>
          </property>
@@ -644,7 +651,14 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="fMsrFileSelector_lineEdit"/>
+        <widget class="QLineEdit" name="fMsrFileSelector_lineEdit">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>23</height>
+          </size>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="fMsrFileNameClear_pushButton">
@@ -668,7 +682,14 @@ p, li { white-space: pre-wrap; }
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="fDataFileSelector_lineEdit"/>
+        <widget class="QLineEdit" name="fDataFileSelector_lineEdit">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>23</height>
+          </size>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="fDataFileNameClear_pushButton">
@@ -685,7 +706,7 @@ p, li { white-space: pre-wrap; }
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>20</x>

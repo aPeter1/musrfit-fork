@@ -45,11 +45,12 @@ using namespace std;
  * necessary meta information.
  */
 typedef struct {
-  TString info;          ///< keeps all the meta information
-  double timeResolution; ///< time resolution in (usec)
-  int t0;                ///< keep the t0 bin
-  Double_t timeRange[2]; ///< time range to be used, given in (usec).
-  PDoubleVector rawData; ///< a single time domain data vector
+  Int_t dataSetTag;        ///< tag to label the data set. Needed for average-per-data-set
+  TString info;            ///< keeps all the meta information
+  Double_t timeResolution; ///< time resolution in (usec)
+  Int_t t0;                ///< keep the t0 bin
+  Double_t timeRange[2];   ///< time range to be used, given in (usec).
+  PDoubleVector rawData;   ///< a single time domain data vector
 } musrFT_data;
 
 //----------------------------------------------------------------------------
@@ -72,6 +73,7 @@ class PPrepFourier {
     virtual void DoLifeTimeCorrection(Double_t fudge);
 
     TString GetInfo(const UInt_t idx);
+    Int_t GetDataSetTag(const UInt_t idx);
     UInt_t GetNoOfData() { return fRawData.size(); }
     vector<TH1F*> GetData();
     TH1F *GetData(const UInt_t idx);

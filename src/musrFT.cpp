@@ -59,27 +59,28 @@ using namespace std;
  * <p>Structure keeping the command line options.
  */
 typedef struct {
-  vector<TString> msrFln;         ///< msr-file names to be used.
-  vector<TString> dataFln;        ///< raw-data-file names to be used.
-  vector<TString> dataFileFormat; ///< file format guess
+  PStringVector msrFln;           ///< msr-file names to be used.
+  PStringVector dataFln;          ///< raw-data-file names to be used.
+  PStringVector dataFileFormat;   ///< file format guess
   TString graphicFormat;          ///< format for the graphical output dump
   TString dumpFln;                ///< dump file name for Fourier data output
   TString msrFlnOut;              ///< dump file name for msr-file generation
-  int bkg_range[2];               ///< background range
-  vector<double> bkg;             ///< background value
+  Int_t bkg_range[2];             ///< background range
+  PDoubleVector bkg;              ///< background value
   TString fourierOpt;             ///< Fourier options, i.e. real, imag, power, phase
   TString apodization;            ///< apodization setting: none, weak, medium, strong
-  int fourierPower;               ///< Fourier power for zero padding, i.e. 2^fourierPower points
+  Int_t fourierPower;             ///< Fourier power for zero padding, i.e. 2^fourierPower points
   TString fourierUnits;           ///< wished Fourier units: Gauss, Tesla, MHz, Mc/s
-  double initialPhase;            ///< inital Fourier phase for Real/Imag
-  double fourierRange[2];         ///< Fourier range to be plotted. Given in the choosen units.
-  double timeRange[2];            ///< time range used for the Fourier
-  vector<int> histo;              ///< selection of the histos used from at data file for Fourier
-  bool showAverage;               ///< flag indicating if initially the Fourier average over the given histos shall be plotted.
-  vector<int> t0;                 ///< t0 vector for the histos. If not given t0's will be estimated.
-  int packing;                    ///< packing for rebinning the time histograms before Fourier transform.
+  Double_t initialPhase;          ///< inital Fourier phase for Real/Imag
+  Double_t fourierRange[2];       ///< Fourier range to be plotted. Given in the choosen units.
+  Double_t timeRange[2];          ///< time range used for the Fourier
+  PIntVector histo;               ///< selection of the histos used from at data file for Fourier
+  Bool_t showAverage;             ///< flag indicating if initially the Fourier average over the given histos shall be plotted, this over ALL data sets.
+  Bool_t showAveragePerDataSet;   ///< flag indicating if initially the Fourier average over the given histos shall be plotted, this per data set.
+  PIntVector t0;                  ///< t0 vector for the histos. If not given t0's will be estimated.
+  Int_t packing;                  ///< packing for rebinning the time histograms before Fourier transform.
   TString title;                  ///< title to be shown for the Fourier plot.
-  double lifetimecorrection;      ///< is == 0.0 for NO life time correction, otherwise it holds the fudge factor
+  Double_t lifetimecorrection;    ///< is == 0.0 for NO life time correction, otherwise it holds the fudge factor
   Int_t timeout;                  ///< timeout in (sec) after which musrFT will terminate. if <= 0, no automatic termination will take place.
 } musrFT_startup_param;
 
@@ -134,7 +135,8 @@ void musrFT_syntax()
   cout << endl << "                 the option --data-file. If multiple data file are given, <list> will apply";
   cout << endl << "                 to all data-files given. If --histo is not given, all histos of a data file will be used.";
   cout << endl << "                 <list> can be anything like: 2 3 6, or 2-17, or 1-6 9, etc.";
-  cout << endl << "    -a, --average : show the average of all Fourier transformed data.";
+  cout << endl << "    -a, --average : show the average of ALL Fourier transformed data.";
+  cout << endl << "    -ad, --average-per-data-set : show the average of the Fourier transformed data per data set.";
   cout << endl << "    --t0 <list> : A list of t0's can be provided. This in conjunction with --data-file and";
   cout << endl << "                 --fourier-option real allows to get the proper initial phase if t0's are known.";
   cout << endl << "                 If a single t0 for multiple histos is given, it is assume, that this t0 is common";
@@ -174,6 +176,7 @@ void musrFT_init(musrFT_startup_param &startupParam)
   startupParam.timeRange[0] = -1.0;
   startupParam.timeRange[1] = -1.0;
   startupParam.showAverage = false;
+  startupParam.showAveragePerDataSet = false;
   startupParam.packing = 1;
   startupParam.title = TString("");
   startupParam.lifetimecorrection = 0.0;
@@ -196,9 +199,9 @@ void musrFT_init(musrFT_startup_param &startupParam)
  * \param argv list of command line tokens
  * \param startupParam startup parameter structure
  */
-bool musrFT_filter_histo(int &i, int argc, char *argv[], musrFT_startup_param &startupParam)
+Bool_t musrFT_filter_histo(Int_t &i, Int_t argc, Char_t *argv[], musrFT_startup_param &startupParam)
 {
-  int start = i+1, end = 0;
+  Int_t start = i+1, end = 0;
 
   // find last element of histo option
   while (++i < argc) {
@@ -217,7 +220,7 @@ bool musrFT_filter_histo(int &i, int argc, char *argv[], musrFT_startup_param &s
 
   // handle histo arguments
   TString tstr("");
-  for (int j=start; j<end; j++) {
+  for (Int_t j=start; j<end; j++) {
     tstr = argv[j];
     if (!tstr.Contains("-")) { // likely to be a single number
       if (tstr.IsDigit()) {
@@ -236,7 +239,7 @@ bool musrFT_filter_histo(int &i, int argc, char *argv[], musrFT_startup_param &s
       }
       TObjString *ostr;
       TString sstr("");
-      int first=0, last=0;
+      Int_t first=0, last=0;
       ostr = dynamic_cast<TObjString*>(tok->At(0));
       sstr = ostr->GetString();
       if (sstr.IsDigit()) {
@@ -264,7 +267,7 @@ bool musrFT_filter_histo(int &i, int argc, char *argv[], musrFT_startup_param &s
         return false;
       }
 
-      for (int k=first; k<=last; k++) {
+      for (Int_t k=first; k<=last; k++) {
         startupParam.histo.push_back(k);
       }
 
@@ -287,11 +290,11 @@ bool musrFT_filter_histo(int &i, int argc, char *argv[], musrFT_startup_param &s
  * \param argv command line argument array
  * \param startupParam command line data structure
  */
-int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupParam)
+Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &startupParam)
 {
   TString tstr("");
 
-  for (int i=1; i<argc; i++) {
+  for (Int_t i=1; i<argc; i++) {
     tstr = argv[i];
     if (tstr.BeginsWith("--version")) {
 #ifdef HAVE_CONFIG_H
@@ -452,8 +455,10 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
       startupParam.timeRange[0] = timeRange[0].Atof();
       startupParam.timeRange[1] = timeRange[1].Atof();
       i += 2;
-    } else if (tstr.BeginsWith("-a") || tstr.BeginsWith("--average")) {
+    } else if (!tstr.CompareTo("-a") || !tstr.CompareTo("--average")) {
       startupParam.showAverage = true;
+    } else if (!tstr.CompareTo("-ad") || !tstr.CompareTo("--average-per-data-set")) {
+      startupParam.showAveragePerDataSet = true;
     } else if (tstr.BeginsWith("--histo")) {
       if (!musrFT_filter_histo(i, argc, argv, startupParam))
         return 2;
@@ -571,15 +576,19 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
   }
   if (startupParam.bkg_range[0] > startupParam.bkg_range[1]) {
     cerr << endl << ">> musrFT **WARNING** in --background-range, start=" << startupParam.bkg_range[0] << " > end=" << startupParam.bkg_range[1] << ", will swap them." << endl;
-    double swap = startupParam.bkg_range[0];
+    Double_t swap = startupParam.bkg_range[0];
     startupParam.bkg_range[0] = startupParam.bkg_range[1];
     startupParam.bkg_range[1] = swap;
   }
   if (startupParam.fourierRange[0] > startupParam.fourierRange[1]) {
     cerr << endl << ">> musrFT **WARNING** in --fourier-range, start=" << startupParam.fourierRange[0] << " > end=" << startupParam.fourierRange[1] << ", will swap them." << endl;
-    double swap = startupParam.fourierRange[0];
+    Double_t swap = startupParam.fourierRange[0];
     startupParam.fourierRange[0] = startupParam.fourierRange[1];
     startupParam.fourierRange[1] = swap;
+  }
+  if (startupParam.showAverage && startupParam.showAveragePerDataSet) {
+    cerr << endl << ">> musrFT **WARNING** Options: --average and --average-per-data-set exclude each other, will choose the latter." << endl;
+    startupParam.showAverage = false;
   }
 
   return 0;
@@ -595,7 +604,7 @@ int musrFT_parse_options(int argc, char *argv[], musrFT_startup_param &startupPa
  */
 void musrFT_getMetaInfo(const TString fln, PRawRunData *rawRunData, TString &metaInfo)
 {
-  double dval;
+  Double_t dval;
   TString str = fln;
   // file name
   // trunc it in case a path-name is given
@@ -644,12 +653,12 @@ void musrFT_estimateT0(musrFT_data &rd)
   cout << endl << "                      '" << rd.info << "'";
   cout << endl << "                      NO warranty this is sensible!" << endl;
 
-  unsigned int idx = 0;
-  double max = rd.rawData[0];
-  for (unsigned int i=1; i<rd.rawData.size(); i++) {
+  UInt_t idx = 0;
+  Double_t max = rd.rawData[0];
+  for (UInt_t i=1; i<rd.rawData.size(); i++) {
     if (rd.rawData[i] > max) {
       max = rd.rawData[i];
-      idx = (int)i;
+      idx = (Int_t)i;
     }
   }
   cout << endl << ">> musrFT_estimateT0: estimated t0=" << idx << endl;
@@ -679,7 +688,7 @@ void musrFT_cleanup(TH1F *h)
  * \param start starting point from where the data shall be written to file.
  * \param end ending point up to where the data shall be written to file.
  */
-int musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, double start, double end)
+Int_t musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, Double_t start, Double_t end)
 {
   vector<PDoubleVector> data;
   PDoubleVector freq;
@@ -697,19 +706,19 @@ int musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, double start, d
       end = hRe->GetBinCenter(hRe->GetNbinsX());
   }
 
-  unsigned int minSize = hRe->GetNbinsX()-1;
+  UInt_t minSize = hRe->GetNbinsX()-1;
   musrFT_cleanup(hRe);
-  for (unsigned int i=1; i<fourierData.size(); i++) {
+  for (UInt_t i=1; i<fourierData.size(); i++) {
     hRe = fourierData[i]->GetRealFourier();
     if (hRe->GetNbinsX()-1 < minSize)
       minSize = hRe->GetNbinsX()-1;
     musrFT_cleanup(hRe);
   }
 
-  for (unsigned int i=0; i<fourierData.size(); i++) {
+  for (UInt_t i=0; i<fourierData.size(); i++) {
     hRe = fourierData[i]->GetRealFourier();
     hIm = fourierData[i]->GetImaginaryFourier();
-    for (int j=1; j<minSize; j++) {
+    for (Int_t j=1; j<minSize; j++) {
       dval = hRe->GetBinCenter(j);
       if ((dval >= start) && (dval <= end)) {
         freq.push_back(dval);
@@ -735,13 +744,13 @@ int musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, double start, d
 
   // write header
   fout << "% ";
-  for (unsigned int i=0; i<fourierData.size()-1; i++)
+  for (UInt_t i=0; i<fourierData.size()-1; i++)
     fout << "freq" << i << ", Re[d" << i << "], Im[d" << i << "], Pwr[d" << i << "], ";
   fout << "freq" << fourierData.size()-1 << ", Re[d" << fourierData.size()-1 << "], Im[d" << fourierData.size()-1 << "], Pwr[d" << fourierData.size()-1 << "]" << endl;
 
   // write data
-  for (unsigned int j=0; j<data[0].size(); j++) {
-    for (unsigned int i=0; i<data.size()-1; i++) {
+  for (UInt_t j=0; j<data[0].size(); j++) {
+    for (UInt_t i=0; i<data.size()-1; i++) {
       fout << data[i][j] << ", ";
     }
     fout << data[data.size()-1][j] << endl;
@@ -761,7 +770,7 @@ int musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, double start, d
  * \param run reference to the relevant RUN block of the msr-file
  * \param rd data collection which will hold the grouped histograms.
  */
-int musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *global, PMsrRunBlock &run, musrFT_data &rd)
+Int_t musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *global, PMsrRunBlock &run, musrFT_data &rd)
 {
   // get proper raw run data set
   TString runName = *(run.GetRunName());
@@ -773,7 +782,7 @@ int musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *global,
 
   // keep histo list
   PIntVector histoList;
-  for (unsigned int i=0; i<run.GetForwardHistoNoSize(); i++) {
+  for (UInt_t i=0; i<run.GetForwardHistoNoSize(); i++) {
     histoList.push_back(run.GetForwardHistoNo(i));
   }
 
@@ -781,10 +790,10 @@ int musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *global,
   PDoubleVector t0;
   t0.resize(histoList.size());
   // init t0 vector
-  for (unsigned int i=0; i<t0.size(); i++)
+  for (UInt_t i=0; i<t0.size(); i++)
     t0[i] = -1.0;
   // 1st: check in the global block
-  for (unsigned int i=0; i<global->GetT0BinSize(); i++) {
+  for (UInt_t i=0; i<global->GetT0BinSize(); i++) {
     if (i >= t0.size()) { // something is VERY strange
       cerr << endl << ">> musrFT_groupHistos **WARNING** found #t0's in GLOBAL block > #histos!";
       cerr << endl << ">>                    This should NEVER happen. Will ignore these entries.";
@@ -794,7 +803,7 @@ int musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *global,
     }
   }
   // 2nd: check in the run block
-  for (unsigned int i=0; i<run.GetT0BinSize(); i++) {
+  for (UInt_t i=0; i<run.GetT0BinSize(); i++) {
     if (i >= t0.size()) { // something is VERY strange
       cerr << endl << ">> musrFT_groupHistos **WARNING** found #t0's in RUN block > #histos!";
       cerr << endl << ">>                    This should NEVER happen. Will ignore these entries.";
@@ -804,15 +813,15 @@ int musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *global,
     }
   }
   // if still some t0's are == -1, estimate t0
-  unsigned int idx;
-  double max;
-  for (unsigned int i=0; i<t0.size(); i++) {
+  UInt_t idx;
+  Double_t max;
+  for (UInt_t i=0; i<t0.size(); i++) {
     if (t0[i] == -1.0) {
       cout << endl << ">> musrFT_groupHistos **WARNING** try to estimate t0 from maximum in the data set";
       cout << endl << ">>   '" << runName << "', histo " << histoList[i] << ". NO warranty this is sensible!";
       idx = 0;
       max = rawRunData->GetDataBin(histoList[i])->at(0);
-      for (unsigned int j=1; j<rawRunData->GetDataBin(histoList[i])->size(); j++) {
+      for (UInt_t j=1; j<rawRunData->GetDataBin(histoList[i])->size(); j++) {
         if (rawRunData->GetDataBin(histoList[i])->at(j) > max) {
           max = rawRunData->GetDataBin(histoList[i])->at(j);
           idx = j;
@@ -825,8 +834,8 @@ int musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *global,
 
   // group histos
   PDoubleVector data = *(rawRunData->GetDataBin(histoList[0]));
-  for (unsigned int i=1; i<histoList.size(); i++) {
-    for (unsigned int j=0; j<data.size(); j++) {
+  for (UInt_t i=1; i<histoList.size(); i++) {
+    for (UInt_t j=0; j<data.size(); j++) {
       if ((j+t0[i]-t0[0] >= 0) && (j+t0[i]-t0[0] < rawRunData->GetDataBin(histoList[i])->size())) {
         data[j] += rawRunData->GetDataBin(histoList[i])->at(j);
       }
@@ -835,7 +844,7 @@ int musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *global,
 
   rd.rawData.clear();
   rd.rawData = data;
-  rd.t0 = (int)t0[0];
+  rd.t0 = (Int_t)t0[0];
 
   return 0;
 }
@@ -881,14 +890,14 @@ void musrFT_dumpMsrFile(musrFT_startup_param &param)
   // write RUN block
   // get extension of the data file
   TString fileFormat("MUSR-ROOT");
-  for (unsigned int i=0; i<param.dataFln.size(); i++) {
+  for (UInt_t i=0; i<param.dataFln.size(); i++) {
     if (param.dataFileFormat[i].BeginsWith("PsiBin"))
       fileFormat = TString("PSI-MDU");
     else if (param.dataFileFormat[i].BeginsWith("NeXus"))
       fileFormat = TString("NEXUS");
     else if (param.dataFileFormat[i].BeginsWith("Mud"))
       fileFormat = TString("MUD");
-    for (unsigned int j=0; j<param.histo.size(); j++) {
+    for (UInt_t j=0; j<param.histo.size(); j++) {
       fout << "RUN " << param.dataFln[i] << " BXXX IXX " << fileFormat << "   (name beamline institute data-file-format)" << endl;
       fout << "forward         " << param.histo[j] << endl;
       if ((param.t0.size() > 1) && (j < param.t0.size())) {
@@ -908,7 +917,7 @@ void musrFT_dumpMsrFile(musrFT_startup_param &param)
     fout << "runs     1" << endl;
   } else {
     fout << "runs     ";
-    for (unsigned int i=0; i<param.histo.size(); i++)
+    for (UInt_t i=0; i<param.histo.size(); i++)
       fout << i+1 << " ";
     fout << endl;
   }
@@ -949,12 +958,12 @@ void musrFT_dumpMsrFile(musrFT_startup_param &param)
  *
  * <b>return:</b> time stamp with msec resolution.
  */
-double millitime()
+Double_t millitime()
 {
   struct timeval now;
   gettimeofday(&now, 0);
 
-  return ((double)now.tv_sec * 1.0e6 + (double)now.tv_usec)/1.0e3;
+  return ((Double_t)now.tv_sec * 1.0e6 + (Double_t)now.tv_usec)/1.0e3;
 }
 
 //-------------------------------------------------------------------------
@@ -968,7 +977,7 @@ double millitime()
  * \param argc number of command line arguments
  * \param argv command line argument array
  */
-int main(int argc, char *argv[])
+Int_t main(Int_t argc, Char_t *argv[])
 {
   Int_t unitTag = FOURIER_UNIT_NOT_GIVEN;
   Int_t apodTag = F_APODIZATION_NONE;
@@ -985,9 +994,9 @@ int main(int argc, char *argv[])
   musrFT_init(startupParam);
 
   // parse command line options
-  int status = musrFT_parse_options(argc, argv, startupParam);
+  Int_t status = musrFT_parse_options(argc, argv, startupParam);
   if (status != 0) {
-    int retVal = PMUSR_SUCCESS;
+    Int_t retVal = PMUSR_SUCCESS;
     if (status == 2) {
       musrFT_syntax();
       retVal = PMUSR_WRONG_STARTUP_SYNTAX;
@@ -1002,7 +1011,7 @@ int main(int argc, char *argv[])
   }
 
   // read startup file
-  char startup_path_name[128];
+  Char_t startup_path_name[128];
   PStartupOptions startup_options;
   startup_options.writeExpectedChisq = false;
   startup_options.estimateN0 = true;
@@ -1051,7 +1060,7 @@ int main(int argc, char *argv[])
   // load msr-file(s)
   vector<PMsrHandler*> msrHandler;
   msrHandler.resize(startupParam.msrFln.size());
-  for (unsigned int i=0; i<startupParam.msrFln.size(); i++) {
+  for (UInt_t i=0; i<startupParam.msrFln.size(); i++) {
     msrHandler[i] = new PMsrHandler(startupParam.msrFln[i].Data(), startupHandler->GetStartupOptions(), true);
     status = msrHandler[i]->ReadMsrFile();
     if (status != PMUSR_SUCCESS) {
@@ -1073,7 +1082,7 @@ int main(int argc, char *argv[])
   vector<PRunDataHandler*> runDataHandler;
   runDataHandler.resize(startupParam.msrFln.size()+startupParam.dataFln.size()); // resize to the total number of run data provided
   // load data-file(s) related to msr-file
-  for (unsigned int i=0; i<msrHandler.size(); i++) {
+  for (UInt_t i=0; i<msrHandler.size(); i++) {
     // create run data handler
     if (startupHandler)
       runDataHandler[i] = new PRunDataHandler(msrHandler[i], startupHandler->GetDataPathList());
@@ -1082,7 +1091,7 @@ int main(int argc, char *argv[])
   }
 
   // load data-file(s) provided directly
-  for (unsigned int i=msrHandler.size(); i<msrHandler.size()+startupParam.dataFln.size(); i++) {
+  for (UInt_t i=msrHandler.size(); i<msrHandler.size()+startupParam.dataFln.size(); i++) {
     // create run data handler
     if (startupHandler)
       runDataHandler[i] = new PRunDataHandler(startupParam.dataFln[i-msrHandler.size()], startupParam.dataFileFormat[i-msrHandler.size()], startupHandler->GetDataPathList());
@@ -1091,7 +1100,14 @@ int main(int argc, char *argv[])
   }
 
   // read all the data files
-  for (unsigned int i=0; i<runDataHandler.size(); i++) {
+  musrFT_data rd;
+  rd.dataSetTag = -1;
+  Int_t dataSetTagCounter = 0;
+  TString prevDataSetPathName("");
+  TString str(""), fln("");
+  UInt_t idx=0;
+
+  for (UInt_t i=0; i<runDataHandler.size(); i++) {
     runDataHandler[i]->ReadData();
 
     if (!runDataHandler[i]->IsAllDataAvailable()) {
@@ -1116,8 +1132,8 @@ int main(int argc, char *argv[])
 
     // first check of histo list makes sense
     if (i >= msrHandler.size()) { // only check if originating from data-files (not msr-files)
-      for (unsigned int j=0; j<startupParam.histo.size(); j++) {
-        if ((unsigned int)startupParam.histo[j] > rawRunData->GetNoOfHistos()) {
+      for (UInt_t j=0; j<startupParam.histo.size(); j++) {
+        if ((UInt_t)startupParam.histo[j] > rawRunData->GetNoOfHistos()) {
           cerr << endl << ">> musrFT **ERROR** found histo no " << startupParam.histo[j] << " > # of histo in the file (";
           cerr << startupParam.dataFln[i] << " // # histo: " << rawRunData->GetNoOfHistos() << ")." << endl;
           return PMUSR_DATA_FILE_READ_ERROR;
@@ -1125,15 +1141,18 @@ int main(int argc, char *argv[])
       }
       if (startupParam.histo.size() == 0) { // no histo list given
         // set histo list to ALL available histos for the data file
-        for (unsigned int j=0; j<rawRunData->GetNoOfHistos(); j++)
+        for (UInt_t j=0; j<rawRunData->GetNoOfHistos(); j++)
           startupParam.histo.push_back(j+1);
       }
     }
 
-    musrFT_data rd;
-    TString str(""), fln("");
-    unsigned int idx=0;
     // get meta info, time resolution, time range, raw data sets
+    // check if the data set path-name has changed
+    if (prevDataSetPathName.CompareTo(runDataHandler[i]->GetRunPathName())) { // i.e. data set path-name changed
+      rd.dataSetTag = dataSetTagCounter++;
+      prevDataSetPathName = runDataHandler[i]->GetRunPathName();
+    }
+
     if (i < msrHandler.size()) { // obtain info from msr-files
       // keep title if not overwritten by the command line
       if (startupParam.title.Length() == 0)
@@ -1206,11 +1225,11 @@ int main(int argc, char *argv[])
       PIntVector runList = plot->at(0).fRuns;
 
       // loop over all runs listed in the msr-file PLOT block
-      for (unsigned int j=0; j<runList.size(); j++) {
+      for (UInt_t j=0; j<runList.size(); j++) {
 
         // keep forward histo list
         PIntVector histoList;
-        for (unsigned int k=0; k<runs->at(runList[j]-1).GetForwardHistoNoSize(); k++) {
+        for (UInt_t k=0; k<runs->at(runList[j]-1).GetForwardHistoNoSize(); k++) {
           histoList.push_back(runs->at(runList[j]-1).GetForwardHistoNo(k));
         }
 
@@ -1219,7 +1238,7 @@ int main(int argc, char *argv[])
         musrFT_getMetaInfo(fln, rawRunData, str);
         TString hh("");
         hh = TString::Format("h%d", histoList[0]);
-        for (unsigned int k=1; k<histoList.size(); k++)
+        for (UInt_t k=1; k<histoList.size(); k++)
           hh += TString::Format("/%d", histoList[k]);
         hh += ":";
         rd.info  = hh;
@@ -1262,7 +1281,7 @@ int main(int argc, char *argv[])
       }
     } else { // obtain info from command line options for direct data-file read
       musrFT_getMetaInfo(startupParam.dataFln[i-msrHandler.size()], rawRunData, str);
-      for (unsigned int j=0; j<startupParam.histo.size(); j++) {
+      for (UInt_t j=0; j<startupParam.histo.size(); j++) {
         idx = startupParam.histo[j];
 
         // handle meta information
@@ -1293,6 +1312,12 @@ int main(int argc, char *argv[])
         data.AddData(rd);
       }
     }
+  }
+
+  // generate data set label vector
+  PIntVector dataSetTag;
+  for (UInt_t i=0; i<data.GetNoOfData(); i++) {
+    dataSetTag.push_back(data.GetDataSetTag(i));
   }
 
   // make sure Fourier plot tag is set
@@ -1338,7 +1363,7 @@ int main(int argc, char *argv[])
 
   vector<PFourier*> fourier;
   fourier.resize(histo.size());
-  for (unsigned int i=0; i<fourier.size(); i++) {
+  for (UInt_t i=0; i<fourier.size(); i++) {
     fourier[i] = new PFourier(histo[i], unitTag, 0.0, 0.0, true, startupParam.fourierPower);
   }
 
@@ -1350,11 +1375,11 @@ int main(int argc, char *argv[])
   else if (startupParam.apodization.BeginsWith("strong", TString::kIgnoreCase))
     apodTag = F_APODIZATION_STRONG;
 
-  double start = millitime();
-  for (unsigned int i=0; i<fourier.size(); i++) {
+  Double_t start = millitime();
+  for (UInt_t i=0; i<fourier.size(); i++) {
     fourier[i]->Transform(apodTag);
   }
-  double end = millitime();
+  Double_t end = millitime();
   cout << endl << "info> after FFT. calculation time: " << (end-start)/1.0e3  << " (sec)." << endl;
 
   // make sure that a Fourier range is provided, if not calculate one
@@ -1374,7 +1399,7 @@ int main(int argc, char *argv[])
     Bool_t batch = false;
     if (startupParam.graphicFormat.Length() != 0) {
       batch = true;
-      argv[argc] = (char*)malloc(16*sizeof(char));
+      argv[argc] = (Char_t*)malloc(16*sizeof(Char_t));
       strcpy(argv[argc], "-b");
       argc++;
     }
@@ -1383,17 +1408,17 @@ int main(int argc, char *argv[])
     TApplication app("App", &argc, argv);
 
     if (startupHandler) {
-      fourierCanvas = new PFourierCanvas(fourier, startupParam.title.Data(),
-                                   startupParam.showAverage, fourierPlotTag,
-                                   startupParam.fourierRange, startupParam.initialPhase,
+      fourierCanvas = new PFourierCanvas(fourier, dataSetTag, startupParam.title.Data(),
+                                   startupParam.showAverage, startupParam.showAveragePerDataSet,
+                                   fourierPlotTag, startupParam.fourierRange, startupParam.initialPhase,
                                    10, 10, 800, 800,
                                    startupHandler->GetMarkerList(),
                                    startupHandler->GetColorList(),
                                    batch);
     } else {
-      fourierCanvas = new PFourierCanvas(fourier, startupParam.title.Data(),
-                                   startupParam.showAverage, fourierPlotTag,
-                                   startupParam.fourierRange, startupParam.initialPhase,
+      fourierCanvas = new PFourierCanvas(fourier, dataSetTag, startupParam.title.Data(),
+                                   startupParam.showAverage, startupParam.showAveragePerDataSet,
+                                   fourierPlotTag, startupParam.fourierRange, startupParam.initialPhase,
                                    10, 10, 800, 800,
                                    batch);
     }
@@ -1443,23 +1468,23 @@ int main(int argc, char *argv[])
   if (startupHandler)
     delete startupHandler;
 
-  for (unsigned int i=0; i<msrHandler.size(); i++)
+  for (UInt_t i=0; i<msrHandler.size(); i++)
     if (msrHandler[i])
       delete msrHandler[i];
   msrHandler.clear();
 
-  for (unsigned int i=0; i<runDataHandler.size(); i++)
+  for (UInt_t i=0; i<runDataHandler.size(); i++)
     if (runDataHandler[i])
       delete runDataHandler[i];
   runDataHandler.clear();
 
   if (histo.size() > 0) {
-    for (unsigned int i=0; i<histo.size(); i++)
+    for (UInt_t i=0; i<histo.size(); i++)
       delete histo[i];
     histo.clear();
   }
   if (fourier.size() > 0) {
-    for (unsigned int i=0; i<fourier.size(); i++)
+    for (UInt_t i=0; i<fourier.size(); i++)
       delete fourier[i];
     fourier.clear();
   }
