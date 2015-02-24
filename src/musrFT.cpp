@@ -1282,6 +1282,16 @@ Int_t main(Int_t argc, Char_t *argv[])
         if (startupParam.packing > 1)
           pack = startupParam.packing;
         data.SetPacking(pack);
+
+        // get background range
+        Int_t bkgStart=-1, bkgEnd=-1;
+        bkgStart = runs->at(runList[j]-1).GetBkgRange(0);
+        bkgEnd = runs->at(runList[j]-1).GetBkgRange(1);
+        if ((startupParam.bkg_range[0] == -1) && (bkgStart != -1))
+          startupParam.bkg_range[0] = bkgStart;
+        if ((startupParam.bkg_range[1] == -1) && (bkgEnd != -1))
+          startupParam.bkg_range[1] = bkgEnd;
+        data.SetBkgRange(startupParam.bkg_range);
       }
     } else { // obtain info from command line options for direct data-file read
       musrFT_getMetaInfo(startupParam.dataFln[i-msrHandler.size()], rawRunData, str);
