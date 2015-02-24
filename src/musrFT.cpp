@@ -542,8 +542,10 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
           TString fileFormat("??");
           if (fln.Contains(".root", TString::kIgnoreCase))
             fileFormat = "MusrRoot";
-          else if (fln.Contains(".bin", TString::kIgnoreCase) || fln.Contains(".mdu", TString::kIgnoreCase))
+          else if (fln.Contains(".bin", TString::kIgnoreCase))
             fileFormat = "PsiBin";
+          else if (fln.Contains(".mdu", TString::kIgnoreCase))
+            fileFormat = "PsiMdu";
           else if (fln.Contains(".nxs", TString::kIgnoreCase))
             fileFormat = "NeXus";
           else if (fln.Contains(".msr", TString::kIgnoreCase))
@@ -892,6 +894,8 @@ void musrFT_dumpMsrFile(musrFT_startup_param &param)
   TString fileFormat("MUSR-ROOT");
   for (UInt_t i=0; i<param.dataFln.size(); i++) {
     if (param.dataFileFormat[i].BeginsWith("PsiBin"))
+      fileFormat = TString("PSI-BIN");
+    else if (param.dataFileFormat[i].BeginsWith("PsiMdu"))
       fileFormat = TString("PSI-MDU");
     else if (param.dataFileFormat[i].BeginsWith("NeXus"))
       fileFormat = TString("NEXUS");
