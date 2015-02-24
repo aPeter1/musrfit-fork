@@ -2254,7 +2254,8 @@ void PTextEdit::musrFT()
     QProcess proc(this);
     proc.setStandardOutputFile("musrFT.log");
     proc.setStandardErrorFile("musrFT.log");
-    proc.startDetached("musrFT", fMusrFTPrevCmd);
+    QString cmd = fAdmin->getExecPath() + "/musrFT";
+    proc.startDetached(cmd, fMusrFTPrevCmd);
   }
 
   delete dlg;

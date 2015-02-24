@@ -4,6 +4,7 @@
 
 changes since 0.13.0
 ===================================
+NEW 2015-02-23 implemented an average-per-data-set option for musrFT.
 NEW 2015-02-20 add a switch to musrview that it plots initially the Fouier data rather
                than the time domain data.
 NEW 2015-02-19 added a first preliminary user interface for musrFT within musredit.

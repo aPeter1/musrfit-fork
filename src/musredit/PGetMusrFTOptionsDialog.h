@@ -55,6 +55,8 @@ class PGetMusrFTOptionsDialog : public QDialog, private Ui::PGetMusrFTOptionsDia
     void clearDataFileNames();
     void createMsrFileChanged(int state);
     void resetAll();
+    void averagedAll(int state);
+    void averagedPerDataSet(int state);
 
   private:
     QStringList fMsrFilePaths;   ///< list keeping all the paths from the msr-file path-name list
