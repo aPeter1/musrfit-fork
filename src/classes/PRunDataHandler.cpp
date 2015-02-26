@@ -280,7 +280,8 @@ void PRunDataHandler::ReadData()
       fAllDataAvailable = ReadRootFile();
     } else if ((fFileFormat == "NeXus") || (fFileFormat == "nexus")) {
       fAllDataAvailable = ReadNexusFile();
-    } else if ((fFileFormat == "PsiBin") || (fFileFormat == "psibin")) {
+    } else if ((fFileFormat == "PsiBin") || (fFileFormat == "psibin") ||
+               (fFileFormat == "PsiMdu") || (fFileFormat == "psimdu")) {
       fAllDataAvailable = ReadPsiBinFile();
     } else if ((fFileFormat == "Mud") || (fFileFormat == "mud")) {
       fAllDataAvailable = ReadMudFile();

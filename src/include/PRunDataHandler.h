@@ -61,7 +61,7 @@ class PRunDataHandler
     virtual Bool_t IsAllDataAvailable() const { return fAllDataAvailable; }
     virtual PRawRunData* GetRunData(const TString &runName);
     virtual PRawRunData* GetRunData(const UInt_t idx=0);
-    virtual TString GetRunPathName() {return fRunPathName; }
+    virtual Int_t GetNoOfRunData() {return fData.size(); }
 
   private:
     PMsrHandler   *fMsrInfo; ///< pointer to the msr-file handler

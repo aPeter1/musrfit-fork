@@ -1170,6 +1170,8 @@ void PFourierCanvas::HandleAverage()
           currentTag = fDataSetTag[j];
         }
       }
+      if (start == -1)
+        start = fDataSetTag.size()-1;
       if (end == -1)
         end = fDataSetTag.size()-1;
 
@@ -1197,7 +1199,7 @@ void PFourierCanvas::HandleAverage()
       // real average
       for (Int_t j=0; j<fFourierHistos[0].dataFourierRe->GetNbinsX(); j++) {
         dval = 0.0;
-        for (Int_t k=start; k<end; k++) {
+        for (Int_t k=start; k<=end; k++) {
           if (j < fFourierHistos[k].dataFourierRe->GetNbinsX())
             dval += GetInterpolatedValue(fFourierHistos[k].dataFourierRe, fFourierHistos[0].dataFourierRe->GetBinCenter(j));
         }
@@ -1212,7 +1214,7 @@ void PFourierCanvas::HandleAverage()
       // imaginary average
       for (Int_t j=0; j<fFourierHistos[0].dataFourierIm->GetNbinsX(); j++) {
         dval = 0.0;
-        for (Int_t k=start; k<end; k++) {
+        for (Int_t k=start; k<=end; k++) {
           if (j < fFourierHistos[k].dataFourierIm->GetNbinsX())
             dval += GetInterpolatedValue(fFourierHistos[k].dataFourierIm, fFourierHistos[0].dataFourierIm->GetBinCenter(j));
         }
@@ -1227,7 +1229,7 @@ void PFourierCanvas::HandleAverage()
       // power average
       for (Int_t j=0; j<fFourierHistos[0].dataFourierPwr->GetNbinsX(); j++) {
         dval = 0.0;
-        for (Int_t k=start; k<end; k++) {
+        for (Int_t k=start; k<=end; k++) {
           if (j < fFourierHistos[k].dataFourierPwr->GetNbinsX())
             dval += GetInterpolatedValue(fFourierHistos[k].dataFourierPwr, fFourierHistos[0].dataFourierPwr->GetBinCenter(j));
         }
@@ -1242,7 +1244,7 @@ void PFourierCanvas::HandleAverage()
       // phase average
       for (Int_t j=0; j<fFourierHistos[0].dataFourierPhase->GetNbinsX(); j++) {
         dval = 0.0;
-        for (Int_t k=start; k<end; k++) {
+        for (Int_t k=start; k<=end; k++) {
           if (j < fFourierHistos[k].dataFourierPhase->GetNbinsX())
             dval += GetInterpolatedValue(fFourierHistos[k].dataFourierPhase, fFourierHistos[0].dataFourierPhase->GetBinCenter(j));
         }
