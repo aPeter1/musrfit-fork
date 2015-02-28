@@ -3698,20 +3698,26 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.BeginsWith("par", TString::kIgnoreCase)) { // parameter value
-          Int_t no = 0;
-          if (FilterNumber(str, "par", 0, no)) {
-            // check that the parameter is in range
-            if ((Int_t)fParam.size() < no) {
+          if (fFourierOnly) {
+            cerr << endl << ">> PMsrHandler::HandleFourierEntry: **WARNING** Found phase parameter for Fourier only.";
+            cerr << endl << ">>      This is currently not supported. Will set the phase to 0." << endl;
+            fourier.fPhase = 0.0;
+          } else {
+            Int_t no = 0;
+            if (FilterNumber(str, "par", 0, no)) {
+              // check that the parameter is in range
+              if ((Int_t)fParam.size() < no) {
+                error = true;
+                continue;
+              }
+              // keep the parameter number
+              fourier.fPhaseParamNo = no;
+              // get parameter value
+              fourier.fPhase = fParam[no-1].fValue;
+            } else {
               error = true;
               continue;
             }
-            // keep the parameter number
-            fourier.fPhaseParamNo = no;
-            // get parameter value
-            fourier.fPhase = fParam[no-1].fValue;
-          } else {
-            error = true;
-            continue;
           }
         } else if (str.IsFloat()) { // phase value
           fourier.fPhase = str.Atof();
