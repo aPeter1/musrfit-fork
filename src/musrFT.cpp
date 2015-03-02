@@ -1151,12 +1151,6 @@ Int_t main(Int_t argc, Char_t *argv[])
     }
 
     // get meta info, time resolution, time range, raw data sets
-    // check if the data set path-name has changed
-    if (prevDataSetPathName.CompareTo(runDataHandler[i]->GetRunPathName())) { // i.e. data set path-name changed
-      rd.dataSetTag = dataSetTagCounter++;
-      prevDataSetPathName = runDataHandler[i]->GetRunPathName();
-    }
-
     if (i < msrHandler.size()) { // obtain info from msr-files
       // keep title if not overwritten by the command line
       if (startupParam.title.Length() == 0)
@@ -1212,7 +1206,20 @@ Int_t main(Int_t argc, Char_t *argv[])
               startupParam.fourierPower = fourierBlock->fFourierPower;
           }
           // get apodization tag
-          apodTag = fourierBlock->fApodization;
+          switch (fourierBlock->fApodization) {
+          case FOURIER_APOD_WEAK:
+            startupParam.apodization = "weak";
+            break;
+          case FOURIER_APOD_MEDIUM:
+            startupParam.apodization = "medium";
+            break;
+          case FOURIER_APOD_STRONG:
+            startupParam.apodization = "strong";
+            break;
+          default:
+            startupParam.apodization = "none";
+            break;
+          }
           // get range
           if ((startupParam.fourierRange[0] == -1) && (startupParam.fourierRange[1] == -1)) { // no Fourier range given from the command line
             startupParam.fourierRange[0] = fourierBlock->fPlotRange[0];
@@ -1231,6 +1238,13 @@ Int_t main(Int_t argc, Char_t *argv[])
       // loop over all runs listed in the msr-file PLOT block
       for (UInt_t j=0; j<runList.size(); j++) {
 
+        // check if the data set name has changed
+        str = *(runs->at(runList[j]-1).GetRunName()); // get the name from the msr-file RUN block
+        if (prevDataSetPathName.CompareTo(str)) { // i.e. data set name changed
+          rd.dataSetTag = dataSetTagCounter++;
+          prevDataSetPathName = str;
+        }
+
         // keep forward histo list
         PIntVector histoList;
         for (UInt_t k=0; k<runs->at(runList[j]-1).GetForwardHistoNoSize(); k++) {
@@ -1238,7 +1252,7 @@ Int_t main(Int_t argc, Char_t *argv[])
         }
 
         // handle meta information
-        fln  = runDataHandler[i]->GetRunPathName();
+        fln  = *(runs->at(runList[j]-1).GetRunName()); // get the name from the msr-file RUN block
         musrFT_getMetaInfo(fln, rawRunData, str);
         TString hh("");
         hh = TString::Format("h%d", histoList[0]);
@@ -1294,6 +1308,14 @@ Int_t main(Int_t argc, Char_t *argv[])
         data.SetBkgRange(startupParam.bkg_range);
       }
     } else { // obtain info from command line options for direct data-file read
+      // check if the data set name has changed
+      // since data-files are given, each PRunDataHandler object contains only a SINGLE data file.
+      str = *(runDataHandler[i]->GetRunData()->GetFileName()); // get the data set name
+      if (prevDataSetPathName.CompareTo(str)) { // i.e. data set name changed
+        rd.dataSetTag = dataSetTagCounter++;
+        prevDataSetPathName = str;
+      }
+
       musrFT_getMetaInfo(startupParam.dataFln[i-msrHandler.size()], rawRunData, str);
       for (UInt_t j=0; j<startupParam.histo.size(); j++) {
         idx = startupParam.histo[j];

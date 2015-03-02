@@ -552,6 +552,7 @@ void PGetMusrFTOptionsDialog::resetAll()
   fFourierRangeStart_lineEdit->setText("");
   fFourierRangeEnd_lineEdit->setText("");
   fAveragedView_checkBox->setCheckState(Qt::Unchecked);
+  fAveragePerDataSet_checkBox->setCheckState(Qt::Unchecked);
   fCreateMsrFile_checkBox->setCheckState(Qt::Unchecked);
   fFourierTitle_lineEdit->setText("");
 }
