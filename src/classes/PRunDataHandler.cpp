@@ -5437,7 +5437,7 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
     noOfEvents = 0;
     k = 0;
     for (UInt_t j=0; j<dataSet->GetData()->size(); j++) {
-      if ((j != 0) && (j % fAny2ManyInfo->rebin == 0)) {
+      if ((j > 0) && (j % fAny2ManyInfo->rebin == 0)) {
         data[k] = ival;
         noOfEvents += ival;
         k++;
@@ -5622,7 +5622,7 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
     }
 
     for (UInt_t i=0; i<length; i++) {
-      if ((i % fAny2ManyInfo->rebin) == 0) {
+      if ((i > 0) && ((i % fAny2ManyInfo->rebin) == 0)) {
         cout << endl;
         for (UInt_t j=0; j<dataRebin.size(); j++) {
           cout.width(8);
