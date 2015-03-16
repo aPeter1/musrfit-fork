@@ -99,7 +99,7 @@ AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
 CLEANFILES = *Dict.cpp *Dict.h *~ core
 
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h
-	@ROOTCINT@ -v -f $*Dict.cpp -c -p -I$(BOOST_INCLUDE) $(INCLUDES) $^
+	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^
 
 lib_LTLIBRARIES = libPUserFcnBase.la libPMusr.la
 

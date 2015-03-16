@@ -197,9 +197,13 @@ PGetMusrFTOptionsDialog::PGetMusrFTOptionsDialog(QString currentMsrFile, QString
       line.remove(line.length()-1, 1);
       fHistoList_lineEdit->setText(line);
     }
-    // average tag
+    // average ALL tag
     if (prevCmd[i] == "-a") {
       fAveragedView_checkBox->setCheckState(Qt::Checked);
+    }
+    // average per data set tag
+    if (prevCmd[i] == "-ad") {
+      fAveragePerDataSet_checkBox->setCheckState(Qt::Checked);
     }
     // t0 list
     if (prevCmd[i] == "--t0") {
@@ -239,6 +243,8 @@ PGetMusrFTOptionsDialog::PGetMusrFTOptionsDialog(QString currentMsrFile, QString
   connect(fMsrFileNameClear_pushButton, SIGNAL (clicked() ), this, SLOT( clearMsrFileNames() ) );
   connect(fDataFileNameClear_pushButton, SIGNAL (clicked() ), this, SLOT( clearDataFileNames() ) );
   connect(fResetAll_pushButton, SIGNAL( clicked() ), this, SLOT( resetAll() ) );
+  connect(fAveragedView_checkBox, SIGNAL ( stateChanged(int) ), this, SLOT( averagedAll(int) ) );
+  connect(fAveragePerDataSet_checkBox, SIGNAL ( stateChanged(int) ), this, SLOT( averagedPerDataSet(int) ) );
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -329,9 +335,13 @@ QStringList PGetMusrFTOptionsDialog::getMusrFTOptions()
       cmd << strList[i];
   }
 
-  // averaged view
+  // averaged view ALL
   if (fAveragedView_checkBox->checkState() == Qt::Checked)
     cmd << "-a";
+
+  // averaged view per data set
+  if (fAveragePerDataSet_checkBox->checkState() == Qt::Checked)
+    cmd << "-ad";
 
   // t0 list
   if (fT0_lineEdit->text().length() > 0) {
@@ -542,8 +552,29 @@ void PGetMusrFTOptionsDialog::resetAll()
   fFourierRangeStart_lineEdit->setText("");
   fFourierRangeEnd_lineEdit->setText("");
   fAveragedView_checkBox->setCheckState(Qt::Unchecked);
+  fAveragePerDataSet_checkBox->setCheckState(Qt::Unchecked);
   fCreateMsrFile_checkBox->setCheckState(Qt::Unchecked);
   fFourierTitle_lineEdit->setText("");
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>SLOT called when averaged view for ALL data is checked.
+ */
+void PGetMusrFTOptionsDialog::averagedAll(int state)
+{
+  if ((state == Qt::Checked) && fAveragePerDataSet_checkBox->isChecked())
+    fAveragePerDataSet_checkBox->setCheckState(Qt::Unchecked);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>SLOT called when averaged view per data set is checked.
+ */
+void PGetMusrFTOptionsDialog::averagedPerDataSet(int state)
+{
+  if ((state == Qt::Checked) && fAveragedView_checkBox->isChecked())
+    fAveragedView_checkBox->setCheckState(Qt::Unchecked);
 }
 
 //----------------------------------------------------------------------------------------------------
