@@ -4,10 +4,10 @@
 FITPARAMETER
 ###############################################################
 #     No     Name       Value    Err     Min  Max                  
-        1 Alphap      1.11662   0.00020     none        
-        2 Asyp        0   0.00038     none        
+        1 Alphap      1.11662   0.001     none        
+        2 Asyp        0.025   0.001     none        
         3 T           1e6         0           none        
-        4 Rlx         0.969e6     0.020       none        
+        4 Rlx         1e-6     0.020       none        
         5 Pos         1         0           none        
         6 Neg         -1        0           none        
 
@@ -15,7 +15,7 @@ FITPARAMETER
 THEORY
 ###############################################################
 asymmetry   fun1
-userFcn  libBNMR.so ExpRlx 3 4
+userFcn  /usr/local/lib/libBNMR.so ExpRlx 3 4
 
 ###############################################################
 FUNCTIONS
