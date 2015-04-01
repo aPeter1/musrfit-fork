@@ -3006,8 +3006,10 @@ Bool_t PRunDataHandler::ReadMudFile()
     setup += TString(str) + TString("/");
     if (TString(str) == "BNQR" || TString(str) == "BNMR") {
       cerr << "PRunDataHandler::ReadMudFile: **INFORMATION** this run was performed on " << str << endl;     
-      // identified BNMR/BNQR, correct time resolution.
-      timeResMultiplier = 1.0e15;
+      // identified BNMR/BNQR, do not change multiplier.
+      // Change x label in PMusrCanvas instead.
+      // I am keeping this here for now for possible future use.
+      // timeResMultiplier = 1.0e9;
     }
   }
   success = MUD_getApparatus( fh, str, sizeof(str) );

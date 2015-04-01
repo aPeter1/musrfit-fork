@@ -180,8 +180,8 @@ PMusrCanvas::PMusrCanvas()
  * \param wtopy top y coordinate (in pixels) to place the canvas.
  * \param ww width (in pixels) of the canvas.
  * \param wh height (in pixels) of the canvas.
- * \param batch flag: if set true, the canvas will not be displayed. This is used when just dumping of a
- *               graphical output file is wished.
+ * \param batch flag: if set true, the canvas will not be displayed. This is used when just dumping of a graphical output file is requested.
+ * \param fourier flag: if set true, the canvas will show the fourier transform of the data according to the msr file.
  */
 PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
@@ -233,8 +233,8 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
  * \param fourierDefault structure holding the pre-defined settings for a Fourier transform
  * \param markerList pre-defined list of markers
  * \param colorList pre-defined list of colors
- * \param batch flag: if set true, the canvas will not be displayed. This is used when just dumping of a
- *               graphical output file is wished.
+ * \param batch flag: if set true, the canvas will not be displayed. This is used when just dumping of a graphical output file is wished.
+ * \param fourier flag: if set true, the canvas will show the fourier transform of the data according to the msr file.
  */
 PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
@@ -3660,7 +3660,7 @@ void PMusrCanvas::HandleFourierDifference()
   if (fData[0].diffFourierRe == 0) {
     // calculate all the Fourier differences
     Double_t dval, dvalx;
-    TString name;
+    TString name,setup;
     Int_t theoBin;
     for (UInt_t i=0; i<fData.size(); i++) {
       // create difference histos
@@ -4648,7 +4648,14 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
         fDataTheoryPad->SetLogy(1);
 
       // set x-axis label
-      fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
+      PMsrRunList runs = *fMsrHandler->GetMsrRunList();
+      TString setup = fRunList->GetSetup(*runs[0].GetRunName());
+      if (strcmp(setup, "TRIUMF/BNQR") || strcmp(setup, "TRIUMF/BNMR")) {
+	fHistoFrame->GetXaxis()->SetTitle("time (s)");
+      } else {
+	fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
+      }
+
       // set y-axis label
       TString yAxisTitle;
       PMsrRunList *runList = fMsrHandler->GetMsrRunList();
@@ -4927,7 +4934,13 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
     fHistoFrame->SetBins(noOfPoints, dataXmin, dataXmax);
 
     // set x-axis label
-    fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
+    PMsrRunList runs = *fMsrHandler->GetMsrRunList();
+    TString setup = fRunList->GetSetup(*runs[0].GetRunName());
+    if (strcmp(setup, "TRIUMF/BNQR") || strcmp(setup, "TRIUMF/BNMR")) {
+      fHistoFrame->GetXaxis()->SetTitle("time (s)");
+    } else {
+      fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
+    }
     // set y-axis label
     fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
     fHistoFrame->GetYaxis()->SetTitle("data-theory");
@@ -5911,7 +5924,13 @@ void PMusrCanvas::PlotAverage(Bool_t unzoom)
   // define x-axis title
   TString xAxisTitle("");
   if (fCurrentPlotView == PV_DATA) {
-    xAxisTitle = TString("time (#mus)");
+    PMsrRunList runs = *fMsrHandler->GetMsrRunList();
+    TString setup = fRunList->GetSetup(*runs[0].GetRunName());
+    if (strcmp(setup, "TRIUMF/BNQR") || strcmp(setup, "TRIUMF/BNMR")) {
+      xAxisTitle = TString("time (s)");
+    } else {
+      xAxisTitle = TString("time (#mus)");
+    }
   } else { // all the Fourier
     if (fFourier.fUnits == FOURIER_UNIT_GAUSS) {
       xAxisTitle = TString("Field (G)");
