@@ -1734,8 +1734,34 @@ Bool_t PRunDataHandler::ReadRootFile()
 
     header->Get("RunInfo/RedGreen Offsets", ivec, ok);
     if (ok) {
-      redGreenOffsets = ivec;
-      runData.SetRedGreenOffset(ivec);
+      // check if any2many is used and a group histo list is defined, if NOT, only take the 0-offset data!
+      if (fAny2ManyInfo) { // i.e. any2many is called
+        if (fAny2ManyInfo->groupHistoList.size() == 0) { // NO group list defined -> use only the 0-offset data
+          redGreenOffsets.push_back(0);
+        } else { // group list defined
+          // make sure that the group list elements is a subset of present RedGreen offsets
+          Bool_t found = false;
+          Int_t ival;
+          for (UInt_t i=0; i<fAny2ManyInfo->groupHistoList.size(); i++) {
+            found = false;
+            for (UInt_t j=0; j<ivec.size(); j++) {
+              if (fAny2ManyInfo->groupHistoList[i] == ivec[i])
+                found = true;
+            }
+            if (!found) {
+              cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** requested histo group " << fAny2ManyInfo->groupHistoList[i];
+              cerr << endl << ">>     which is NOT present in the data file." << endl;
+              return false;
+            }
+          }
+          // found all requested histo groups, hence stuff it to the right places
+          redGreenOffsets = fAny2ManyInfo->groupHistoList;
+          runData.SetRedGreenOffset(fAny2ManyInfo->groupHistoList);
+        }
+      } else { // not any2many, i.e. musrfit, musrview, ...
+        redGreenOffsets = ivec;
+        runData.SetRedGreenOffset(ivec);
+      }
     }
 
     // check further for LEM specific stuff in RunInfo

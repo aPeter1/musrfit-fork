@@ -54,7 +54,7 @@ using namespace std;
 void any2many_syntax()
 {
   cout << endl << "usage: any2many [--help]   : will show this help.";
-  cout << endl << "       any2many --version  : will show the svn version.";
+  cout << endl << "       any2many --version  : will show the git version.";
   cout << endl << "       any2many -f <filenameList-input> | -r <runList-input>";
   cout << endl << "                -c <convert-options> [-p <output-path>] [-y <year>]";
   cout << endl << "                [-o <outputFileName> | -t <in-template> <out-template>] [-s]";
@@ -83,6 +83,10 @@ void any2many_syntax()
   cout << endl << "                NeXus2-HDF4, NeXus2-HDF5, NeXus2-XML, WKM, ASCII";
   cout << endl << "                Comment: ROOT is superseeded by MusrRoot. If there is not a very good";
   cout << endl << "                reason, avoid it!";
+  cout << endl << "          -h <histo-group-list> : This option is for MusrRoot input files only!";
+  cout << endl << "                Select the the histo groups to be exported. <histo-group-list> is a space";
+  cout << endl << "                separated list of the histo group, e.g. -h 0, 20 will try to export the histo";
+  cout << endl << "                0 (NPP) and 20 (PPC).";
   cout << endl << "          -p <output-path> : where <output-path> is the output path for the";
   cout << endl << "               converted files. If nothing is given, the current directory";
   cout << endl << "               will be used, unless the option '-s' is used.";
@@ -190,7 +194,7 @@ int main(int argc, char *argv[])
 
   // call any2many --help or any2many --version
   if (argc == 2) {
-    if (strstr(argv[1], "--h"))
+    if (!strncmp(argv[1], "--help", 128))
       any2many_syntax();
     else if (strstr(argv[1], "--v")) {
 #ifdef HAVE_CONFIG_H
@@ -344,6 +348,21 @@ int main(int argc, char *argv[])
         show_syntax = true;
         break;
       }
+    } else if (!strcmp(argv[i], "-h")) { // filter histo group list (for MusrRoot and ROOT (LEM) only!)
+      bool done = false;
+      int j = i+1;
+      do {
+        status = sscanf(argv[j], "%d", &ival);
+        if (status == 1) {
+          info.groupHistoList.push_back(ival);
+          j++;
+        } else {
+          done = true;
+        }
+      } while (!done && (j<argc));
+      i = j-1;
+      if (j >= argc) // make sure that counter is still in range
+        break;
     } else if (!strcmp(argv[i], "-p")) { // filter output path name flag
       if (i+1 < argc) {
         info.outPath = argv[i+1];
