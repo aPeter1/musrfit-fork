@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en_US" lang="en_US">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Mon, 23 Feb 2015 15:22:31 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 29 May 2015 18:01:42 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -8,7 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1424704911" type="application/x-wiki" title="edit MusrFit" />
+<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1432922465" type="application/x-wiki" title="edit MusrFit" />
 <meta name="TEXT_NUM_TOPICS" content="Number of topics:" />
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 <meta name="robots" content="noindex" /><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRsshtml.html" />
@@ -111,6 +111,8 @@ pre {
   
   
   
+<p></p>
+<p></p>
 <p></p>
 <p></p>
 <p></p>
@@ -387,6 +389,7 @@ Since the goal was to create a very flexible converter tool, it has ample of opt
 </dd> <dt> -r &lt;runList-input&gt; </dt><dd> where <code>&lt;runList-input&gt;</code> is a list of run numbers separated by spaces of the form: <code>&lt;run1&gt; &lt;run2&gt; &lt;run3&gt;</code> etc., or a sequence of runs <code>&lt;runStart&gt;-&lt;runEnd&gt;</code>, e.g. <code>111-123</code>. This option cannot be combined with <code>-f</code> and vice versa.
 </dd> <dt> -t &lt;in-template&gt; &lt;out-template&gt; </dt><dd> where <code>&lt;in-/out-template&gt;</code> are templates to generate real file names from run numbers. The following template tags can be used: <code>[yy]</code> for year, and <code>[rrrr]</code> for the run number. If the run number tag is used, the number of <code>'r'</code> will give the number of digits used with leading zeros, e.g. <code>[rrrrrr]</code> and run <code>123</code> will result in <code>000123</code>. Similarly <code>[yyyy]</code> will result in something like <code>1999</code>, whereas <code>[yy]</code> into something like <code>99</code>. For more details best check the examples below. 
 </dd> <dt> -c &lt;in-Format&gt; &lt;out-Format&gt; </dt><dd> this is used to tell <code>any2many</code> what is the input-file-format and into which output-file-format the data shall be converted. The possible input-/output-file-formats are listed above.
+</dd> <dt> -h &lt;histo-group-list&gt;  </dt><dd> This option is for <a href="MusrRoot.html">MusrRoot</a> input files only! Select the the histo groups to be exported. &lt;histo-group-list&gt; is a space separated list of the histo group, e.g. -h 0, 20 will try to export the histo 0 (NPP) and 20 (PPC). A histo-group is defined via the <code>RedGreen</code> offset in the <code>MusrRoot</code> file format. It is used e.g. in red/green mode measurements. If this option is omitted in a conversion from <code>MusrRoot</code> to something, the first group will exported only!
 </dd> <dt> -p &lt;output-path&gt; </dt><dd> where <code>&lt;output-path&gt;</code> is the output path for the converted files. If no <code>&lt;output-path&gt;</code> is given, the current directory will be used, unless the option <code>-s</code> is used. 
 </dd> <dt> -y &lt;year&gt; </dt><dd> here a <code>&lt;year&gt;</code> in the form <code>yy</code> or <code>yyyy</code> can be given. If this is the case, any automatic file name generation which needs a year will use this given one.
 </dd> <dt> -s </dt><dd> with this option the output data file will be sent to the stdout. It is intended to be used together with web applications.
@@ -827,6 +830,11 @@ The currently supported GLOBAL block entries are: <ul>
 </li></ul> 
 <p></p>
 For a detailed discussion of these entries see Sec <a href="#TheRunBlock" class="foswikiCurrentTopicLink">RUN block</a>.
+<p></p>
+There is one specific entry for the GLOBAL block which is <ul>
+<li> <code>time_base</code> &lt;tag&gt;
+</li></ul> 
+with the recognized tags: &lt;tag&gt; = <code>usec, msec, sec</code>. This will set the time base (<strong>not</strong> the time resolution) for fitting, plotting, and exporting data.
 <p></p>
 An example snippet with, and without GLOBAL section:
 With GLOBAL block:
@@ -1602,9 +1610,9 @@ For reporting bugs or requesting new features and improvements please use the <a
 <div class="foswikiFormSteps">
 <a name="topic-actions"></a>
   <div class="patternTopicActions foswikiFormStep">
-	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1424704911' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFit' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/php/pdf.php?url=MUSR/MusrFit?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r124&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=123;rev2=124">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=123">r123</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=122;rev2=123">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=122">r122</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=121;rev2=122">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=121">r121</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=more&amp;maxrev=124&amp;currrev=124' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
+	 <span class="patternActionButtons"><span><a href='https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFit?t=1432922465' rel='nofollow' title='Edit this topic text' accesskey='e'><span class='foswikiAccessKey'>E</span>dit</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/attach/MUSR/MusrFit' rel='nofollow' title='Attach an image or document to this topic' accesskey='a'><span class='foswikiAccessKey'>A</span>ttach</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='MusrFitc99a.html?cover=print;cover=print' rel='nofollow' title='Printable version of this topic' accesskey='p'><span class='foswikiAccessKey'>P</span>rint version</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/print/php/pdf.php?url=MUSR/MusrFit?cover=print' title='PDF version of this topic'>PDF</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><span class="foswikiRequiresChangePermission"><a href='https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit?template=oopshistory' rel='nofollow' title='View total topic history' accesskey='h'><span class='foswikiAccessKey'>H</span>istory</a></span>: r126&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=125;rev2=126">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=125">r125</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=124;rev2=125">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=124">r124</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/wiki/bin/compare/MUSR/MusrFit?rev1=123;rev2=124">&lt;</a>&nbsp;<a rel="nofollow" href="https://intranet.psi.ch/MUSR/MusrFit?rev=123">r123</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=backlinksweb' rel='nofollow' title='Search the MUSR Web for topics that link to here' accesskey='b'><span class='foswikiAccessKey'>B</span>acklinks</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?raw=on' rel='nofollow' title='View without formatting' accesskey='v'><span class='foswikiAccessKey'>V</span>iew wiki text</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?refresh=on' title='Refresh images and LaTeX charts'>Refresh</a></span><span class='foswikiSeparator'>&nbsp;|&nbsp;</span><span><a href='https://intranet.psi.ch/MUSR/MusrFit?template=more&amp;maxrev=126&amp;currrev=126' rel='nofollow' title='Delete or rename this topic; set parent topic; view and compare revisions' accesskey='m'><span class='foswikiAccessKey'>M</span>ore topic actions</a></span></span>
   </div>
-</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r124 - 23 Feb 2015, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
+</div></div><div class="patternInfo"><span class="patternRevInfo">Topic revision: r126 - 29 May 2015, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
 </div>
 </div><div id="patternSideBar"><div id="patternClearHeaderLeft"></div>
 <div id="patternSideBarContents">
@@ -1639,10 +1647,6 @@ For reporting bugs or requesting new features and improvements please use the <a
 <tr><td valign="middle"><span id="foswikiLogo" class="foswikiImage"><a href="WebHome.html"><img src="../pub/Main/WebPreferences/psi_logo_150.gif" border="0" alt="Paul Scherrer Institut" style="border:none; margin: -8px 0 0 15px;" /></a></span></td>
 <td align="right" valign="top" class="patternMetaMenu" id="psimetanav">
 <p></p> <ul>
-<li> <form name="quickSearchForm" id="solrSearchForm" action="https://intranet.psi.ch/search/">		<input type="text" class="foswikiInputField" id="quickSearchBox" name="q" value="" size="18" />		<input type="image" class="searchsubmit" alt="Search" value="Suche..." name="sa" src="../webbase/img/search.png">	</form>
-</li> <li> <form name="changeLanguage"    action="https://intranet.psi.ch/wiki/bin/oops/MUSR/MusrFit" method="get">    <input type="hidden" name="redirectto" value="/MUSR/MusrFit?cover=print" />    <select name="language" class="foswikiSelect"        onchange="document.changeLanguage.submit()">    <option  value="de">Deutsch</option> <option selected="selected" value="en">English</option></select>    <input type="hidden" name="template" value="oopslanguagechanged" />    <noscript>        <input class="foswikiButton" type="submit"            value="Change language" />    </noscript> </form>
-</li></ul> 
-<p></p>
 <p></p>
 </td></tr></table>
 </div><!--/patternTopBarContents-->
@@ -1652,7 +1656,7 @@ For reporting bugs or requesting new features and improvements please use the <a
 </div>
 </div>
 </div></body>
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Mon, 23 Feb 2015 15:22:54 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFit?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 29 May 2015 18:02:06 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=iso-8859-1"><!-- /Added by HTTrack -->
 </html>
 <p></p>

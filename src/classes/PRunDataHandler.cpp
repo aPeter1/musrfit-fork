@@ -1741,7 +1741,6 @@ Bool_t PRunDataHandler::ReadRootFile()
         } else { // group list defined
           // make sure that the group list elements is a subset of present RedGreen offsets
           Bool_t found = false;
-          Int_t ival;
           for (UInt_t i=0; i<fAny2ManyInfo->groupHistoList.size(); i++) {
             found = false;
             for (UInt_t j=0; j<ivec.size(); j++) {
