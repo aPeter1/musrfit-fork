@@ -459,10 +459,12 @@ TLambdaInvNonMonDWave2::~TLambdaInvNonMonDWave2() {
  */
 double TGapSWave::operator()(double t, const vector<double> &par) const {
 
-  assert((par.size() == 2) || (par.size() == 3)); // two or three parameters: Tc (K), Delta(0) (meV), [a (1)]
-                                                  // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
-                                                  // 3 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+  // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] c0 (1), [3] aG (1)]
+
+  assert((par.size() == 2) || (par.size() == 4)); // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 4 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
                                                   // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
+                                                  // c0 in the original context is c0 = (pi kB Tc) / Delta0
   if (t<=0.0)
     return 1.0;
   else if (t >= par[0])
@@ -509,7 +511,7 @@ double TGapSWave::operator()(double t, const vector<double> &par) const {
     if (par.size() == 2) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
-      intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(par[2]*(par[0]/t-1.0)))); // tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+      intPar.push_back(par[1]*tanh(par[2]*sqrt(par[3]*(par[0]/t-1.0)))); // Delta0*tanh(c0*sqrt(aG*(Tc/T-1)))
     }
 
     fGapIntegral->SetParameters(intPar);
@@ -536,10 +538,12 @@ double TGapSWave::operator()(double t, const vector<double> &par) const {
  */
 double TGapDWave::operator()(double t, const vector<double> &par) const {
 
-  assert((par.size() == 2) || (par.size() == 3)); // two or three parameters: Tc (K), Delta(0) (meV), [a (1)]
-                                                  // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
-                                                  // 3 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+  // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] c0 (1), [3] aG (1)]
+
+  assert((par.size() == 2) || (par.size() == 4)); // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 4 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
                                                   // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
+                                                  // c0 in the original context is c0 = (pi kB Tc) / Delta0
   if (t<=0.0)
     return 1.0;
   else if (t >= par[0])
@@ -585,7 +589,7 @@ double TGapDWave::operator()(double t, const vector<double> &par) const {
     if (par.size() == 2) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
-      intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(par[2]*(par[0]/t-1.0)))); // tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+      intPar.push_back(par[1]*tanh(par[2]*sqrt(par[3]*(par[0]/t-1.0)))); // Delta0*tanh(c0*sqrt(aG*(Tc/T-1)))
     }
     intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
     intPar.push_back(TMath::PiOver2()); // upper limit of phi-integration
@@ -618,9 +622,10 @@ double TGapDWave::operator()(double t, const vector<double> &par) const {
  */
 double TGapCosSqDWave::operator()(double t, const vector<double> &par) const {
 
-  assert((par.size() == 3) || (par.size() == 5)); // three or five parameters: Tc (K), DeltaD(0) (meV), DeltaS(0) (meV), [aD (1), aS (1)]
-                                                  // 3 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
-                                                  // 5 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+  // parameters: [0] Tc (K), [1] Delta0_D (meV), [2] Delta0_S (meV) [[3] c0_D (1), [4] aG_D (1), [5] c0_S (1), [6] aG_S (1)]
+
+  assert((par.size() == 3) || (par.size() == 7)); // 3 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 7 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
                                                   // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
   if (t<=0.0)
     return 1.0;
@@ -667,14 +672,14 @@ double TGapCosSqDWave::operator()(double t, const vector<double> &par) const {
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
-      intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(par[3]*(par[0]/t-1.0)))); // DeltaD(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+      intPar.push_back(par[1]*tanh(par[3]*sqrt(par[4]*(par[0]/t-1.0)))); // Delta0_D*tanh(c0_D*sqrt(aG_D*(Tc/T-1)))
     }
     intPar.push_back(1.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
     intPar.push_back(TMath::Pi()); // upper limit of phi-integration
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[2]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
-      intPar.push_back(par[2]*tanh(0.2707214816*par[0]/par[2]*sqrt(par[4]*(par[0]/t-1.0)))); // DeltaS(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+      intPar.push_back(par[2]*tanh(par[5]*sqrt(par[6]*(par[0]/t-1.0)))); // Delta0_S*tanh(c0_S*sqrt(aG_S*(Tc/T-1)))
     }
 
 //    double xl[] = {0.0, 0.0}; // lower bound E, phi
@@ -705,10 +710,12 @@ double TGapCosSqDWave::operator()(double t, const vector<double> &par) const {
  */
 double TGapSinSqDWave::operator()(double t, const vector<double> &par) const {
 
-  assert((par.size() == 3) || (par.size() == 5));  // three or five parameters: Tc (K), DeltaD(0) (meV), DeltaS(0) (meV), [aD (1), aS (1)]
-                                                   // 3 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
-                                                   // 5 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+  // parameters: [0] Tc (K), [1] Delta0_D (meV), [2] Delta0_S (meV) [[3] c0_D (1), [4] aG_D (1), [5] c0_S (1), [6] aG_S (1)]
+
+  assert((par.size() == 3) || (par.size() == 7));  // 3 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                   // 7 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
                                                    // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
+                                                   // c0 in the original context is c0 = (pi kB Tc) / Delta0
   if (t<=0.0)
     return 1.0;
   else if (t >= par[0])
@@ -754,14 +761,14 @@ double TGapSinSqDWave::operator()(double t, const vector<double> &par) const {
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
-      intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(par[3]*(par[0]/t-1.0)))); // DeltaD(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+      intPar.push_back(par[1]*tanh(par[3]*sqrt(par[4]*(par[0]/t-1.0)))); // Delta0_D*tanh(c0_D*sqrt(aG_D*(Tc/T-1)))
     }
     intPar.push_back(1.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
     intPar.push_back(TMath::Pi()); // upper limit of phi-integration
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[2]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
-      intPar.push_back(par[2]*tanh(0.2707214816*par[0]/par[2]*sqrt(par[4]*(par[0]/t-1.0)))); // DeltaS(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+      intPar.push_back(par[2]*tanh(par[5]*sqrt(par[6]*(par[0]/t-1.0)))); // Delta0_S*tanh(c0_S*sqrt(aG_S*(Tc/T-1)))
     }
 
 //    double xl[] = {0.0, 0.0}; // lower bound E, phi
@@ -792,10 +799,13 @@ double TGapSinSqDWave::operator()(double t, const vector<double> &par) const {
  */
 double TGapAnSWave::operator()(double t, const vector<double> &par) const {
 
-  assert((par.size() == 3) || (par.size() == 4)); // three or four parameters: Tc (K), Delta(0) (meV), a (1), [aS_Gap (1)]
-                                                  // 3 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
-                                                  // 4 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+  // parameters: [0] Tc (K), [1] Delta0 (meV), [2] a (1), [[3] c0 (1), [4] aG (1)]
+
+  assert((par.size() == 3) || (par.size() == 5)); // 3 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 5 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
                                                   // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
+                                                  // c0 in the original context is c0 = (pi kB Tc) / Delta0
+
   if (t<=0.0)
     return 1.0;
   else if (t >= par[0])
@@ -841,7 +851,7 @@ double TGapAnSWave::operator()(double t, const vector<double> &par) const {
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
-      intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(par[3]*(par[0]/t-1.0)))); // DeltaS(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+      intPar.push_back(par[1]*tanh(par[3]*sqrt(par[4]*(par[0]/t-1.0)))); // Delta0*tanh(c0*sqrt(aG*(Tc/T-1)))
     }
     intPar.push_back(par[2]);
     intPar.push_back(4.0*(t+(1.0+par[2])*intPar[1])); // upper limit of energy-integration: cutoff energy
@@ -875,10 +885,12 @@ double TGapAnSWave::operator()(double t, const vector<double> &par) const {
  */
 double TGapNonMonDWave1::operator()(double t, const vector<double> &par) const {
 
-  assert((par.size() == 3) || (par.size() == 4)); // three or four parameters: Tc (K), Delta(0) (meV), a (1), [aD_Gap (1)]
-                                                  // 3 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
-                                                  // 4 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+  // parameters: [0] Tc (K), [1] Delta0 (meV), [2] a (1), [[3] c0 (1), [4] aG (1)]
+
+  assert((par.size() == 3) || (par.size() == 5)); // 3 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 5 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
                                                   // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
+                                                  // c0 in the original context is c0 = (pi kB Tc) / Delta0
   if (t<=0.0)
     return 1.0;
   else if (t >= par[0])
@@ -924,7 +936,7 @@ double TGapNonMonDWave1::operator()(double t, const vector<double> &par) const {
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
-      intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(par[3]*(par[0]/t-1.0)))); // DeltaD(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+      intPar.push_back(par[1]*tanh(par[3]*sqrt(par[4]*(par[0]/t-1.0)))); // Delta0*tanh(c0*sqrt(aG*(Tc/T-1)))
     }
     intPar.push_back(par[2]);
     intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
@@ -955,10 +967,12 @@ double TGapNonMonDWave1::operator()(double t, const vector<double> &par) const {
  */
 double TGapNonMonDWave2::operator()(double t, const vector<double> &par) const {
 
-  assert((par.size() == 3) || (par.size() == 4)); // three parameters: Tc (K), Delta(0) (meV), a (1), [aD_Gap (1)]
-                                                  // 3 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
-                                                  // 4 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+  // parameters: [0] Tc (K), [1] Delta0 (meV), [2] a (1), [[3] c0 (1), [4] aG (1)]
+
+  assert((par.size() == 3) || (par.size() == 5)); // 3 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 5 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
                                                   // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
+                                                  // c0 in the original context is c0 = (pi kB Tc) / Delta0
   if (t<=0.0)
     return 1.0;
   else if (t >= par[0])
@@ -1004,7 +1018,7 @@ double TGapNonMonDWave2::operator()(double t, const vector<double> &par) const {
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
-      intPar.push_back(par[1]*tanh(0.2707214816*par[0]/par[1]*sqrt(par[3]*(par[0]/t-1.0)))); // DeltaD(T) : tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+      intPar.push_back(par[1]*tanh(par[3]*sqrt(par[4]*(par[0]/t-1.0)))); // Delta0*tanh(c0*sqrt(aG*(Tc/T-1)))
     }
     intPar.push_back(par[2]);
     intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
@@ -1056,9 +1070,10 @@ double TGapPowerLaw::operator()(double t, const vector<double> &par) const {
  */
 double TGapDirtySWave::operator()(double t, const vector<double> &par) const {
 
-  assert((par.size() == 2) || (par.size() == 3)); // two or three parameters: Tc (K), Delta(0) (meV) [a (1)]
-                                                  // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
-                                                  // 3 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+  // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] c0 (1), [3] aG (1)]
+
+  assert((par.size() == 2) || (par.size() == 4)); // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 4 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
                                                   // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
   if (t<=0.0)
     return 1.0;
@@ -1069,7 +1084,7 @@ double TGapDirtySWave::operator()(double t, const vector<double> &par) const {
   if (par.size() == 2) { // Carrington/Manzano
     deltaT = tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51));
   } else { // Prozorov/Giannetta
-    deltaT = tanh(0.2707214816*par[0]/par[1]*sqrt(par[2]*(par[0]/t-1.0))); // tanh(pi kB Tc / Delta(0) * sqrt()), pi kB = 0.2707214816 meV/K
+    deltaT = tanh(par[2]*sqrt(par[3]*(par[0]/t-1.0))); // tanh(c0*sqrt(aG*(Tc/T-1)))
   }
 
   return deltaT*tanh(par[1]*deltaT/(0.172346648*t)); // Delta(T)/Delta(0)*tanh(Delta(T)/2 kB T), kB in meV/K
