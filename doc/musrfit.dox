@@ -38,6 +38,7 @@ How to setup musrfit on different platforms: \texttt{http://lmu.web.psi.ch/musrf
 <p>The musrfit framework provies the following programs: 
 - \ref musrfit Carries out fits based on a msr-file.
 - \ref musrview Is used show the data in a graphical representation.
+- \ref musrFT Is used to show Fourier transforms of data without the need of a theory (raw data Fourier transform).
 - \ref musrt0 Is used to set graphically t0's, background and data ranges off raw histogram data.
 - \ref musrparam Can be used to generate ascii output files with extracted fit-parameters (from msr-files) and independent additional variables like temperature, field, ... The ascii output files can than be used to plot parameters, e.g. by gnuplot.
 - \ref msr2data A program (originally written by Bastian M. Wojek). Its purpose is to process/generate multiple musrfit msr-files with the same parameters and summarize the fitting results either in a TRIUMF DB or a column ASCII file.
@@ -88,6 +89,12 @@ This two points are somewhat contradictory, and currently it is not clear which 
 \section musrview musrview
 
 <p>Here will eventually follow a more technical description of musrview. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html} \endlatexonly
+
+//****************************************************************************************************
+\page musrFTPage
+\section musrFT musrFT
+
+<p>Here will eventually follow a more technical description of musrFT. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html} \endlatexonly
 
 //****************************************************************************************************
 \page musrt0Page

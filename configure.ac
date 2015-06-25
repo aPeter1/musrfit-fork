@@ -525,6 +525,9 @@ AC_ARG_ENABLE([NeXus], [AS_HELP_STRING([--enable-NeXus],[build optional NeXus su
          elif test -r /usr/local/hdf5/include/hdf5.h; then
            HDF5_PREFIX="/usr/local/hdf5"
            AC_MSG_RESULT([${HDF5_PREFIX}])
+         elif test -r /usr/include/hdf5/serial/hdf5.h; then
+           HDF5_PREFIX="/usr/include/hdf5/serial"
+           AC_MSG_RESULT([${HDF5_PREFIX}])
          elif test -r /usr/include/hdf5.h; then
            HDF5_PREFIX="/usr"
            AC_MSG_RESULT([${HDF5_PREFIX}])

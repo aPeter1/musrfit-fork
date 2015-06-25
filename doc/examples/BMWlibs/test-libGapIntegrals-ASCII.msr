@@ -2,18 +2,16 @@ Test superconductor data
 ###############################################################
 FITPARAMETER
 #      Nr. Name        Value     Step      Pos_Error  Boundaries
-        1 lambdaInvSq0 11.69     0.39        none        
-        2 Tc          0.558     0.018       none        0       2       
-        3 Delta0      0.0673    0.0035      none        
-        4 aG          1         0           none        
+        1 lambdaInvSq0 7.983     -0.042      0.042       
+        2 Tc          4.470     -0.015      0.016       0       5       
+        3 Delta0      1.547     -0.026      0.027       
+        4 c0          1.468     0           none        
+        5 aG          1.33333   0           none        
 
 ###############################################################
 THEORY
 asymmetry      1
-userFcn  libGapIntegrals TGapSWave 2 3 4
-
-###############################################################
-#FUNCTIONS
+userFcn  libGapIntegrals TGapDWave 2 3 4 5
 
 ###############################################################
 RUN data/libGapIntegrals-test PIM3 PSI ASCII   (name beamline institute data-file-format)
@@ -26,15 +24,15 @@ packing         1
 ###############################################################
 COMMANDS
 MINIMIZE
-HESSE
-#MINOS
+#HESSE
+MINOS
 SAVE
 
 ###############################################################
 PLOT 8   (non muSR plot)
 runs     1   
-range    0   1.5
+range    0   6
 
 ###############################################################
-STATISTIC --- 2014-10-28 10:40:31
-  chisq = 14.3, NDF = 8, chisq/NDF = 1.790471
+STATISTIC --- 2015-06-25 08:39:03
+  chisq = 58.3, NDF = 19, chisq/NDF = 3.066272
