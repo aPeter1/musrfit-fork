@@ -2444,7 +2444,7 @@ void PMsr2Data::WriteValue(fstream &outFile, const double &value, const unsigned
   if ((fabs(value) >= 1.0e6) || ((fabs(value) < 1.0e-4) && (fabs(value) > 0.0)))
     outFile << scientific << setprecision(width - 8);
   else
-    outFile.setf(ios::floatfield);
+    outFile.unsetf(ios::floatfield);
   outFile << setw(width) << left << value;
 }
 
@@ -2469,7 +2469,7 @@ void PMsr2Data::WriteValue(fstream &outFile, const double &value, const double &
   if ((fabs(value) >= 1.0e6) || ((fabs(value) < 1.0e-4) && (fabs(value) > 0)))
     outFile << scientific;
   else
-    outFile.setf(ios::floatfield);
+    outFile.unsetf(ios::floatfield);
 
   outFile.precision(prec);
   outFile << setw(width) << left << value;
