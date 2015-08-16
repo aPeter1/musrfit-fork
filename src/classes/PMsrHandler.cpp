@@ -3165,15 +3165,19 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
-        PIntVector group;
+        PUIntVector group;
         str = iter->fLine;
-        if (ParseDetectorGrouping(str, group)) {
+        PStringNumberList *rl = new PStringNumberList(str.Data());
+        string errorMsg("");
+        if (rl->Parse(errorMsg, true)) {
+          group = rl->GetList();
           for (UInt_t i=0; i<group.size(); i++) {
             param.SetForwardHistoNo(group[i]);
           }
         } else {
           error = true;
         }
+        delete rl;
         group.clear();
       }
     }
@@ -3186,15 +3190,19 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
-        PIntVector group;
+        PUIntVector group;
         str = iter->fLine;
-        if (ParseDetectorGrouping(str, group)) {
+        PStringNumberList *rl = new PStringNumberList(str.Data());
+        string errorMsg("");
+        if (rl->Parse(errorMsg, true)) {
+          group = rl->GetList();
           for (UInt_t i=0; i<group.size(); i++) {
             param.SetBackwardHistoNo(group[i]);
           }
         } else {
           error = true;
         }
+        delete rl;
         group.clear();
       }
     }
@@ -3892,6 +3900,9 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
         param.fLifeTimeCorrection = true;
       } else if (iter1->fLine.Contains("runs", TString::kIgnoreCase)) { // handle plot runs
         TComplex run;
+        PStringNumberList *rl;
+        string errorMsg;
+        PUIntVector runList;
         switch (param.fPlotType) {
           case -1:
             error = true;
@@ -3900,31 +3911,21 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           case MSR_PLOT_ASYM:
           case MSR_PLOT_NON_MUSR:
           case MSR_PLOT_MU_MINUS:
-            tokens = iter1->fLine.Tokenize(" \t");
-            if (!tokens) {
+            rl = new PStringNumberList(iter1->fLine.Data());
+            if (!rl->Parse(errorMsg, true)) {
               cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+              cerr << endl << ">>   Error Message: " << errorMsg;
               cerr << endl << endl;
               return false;
             }
-            if (tokens->GetEntries() < 2) { // runs missing
-              error = true;
-            } else {
-              for (Int_t i=1; i<tokens->GetEntries(); i++) {
-                ostr = dynamic_cast<TObjString*>(tokens->At(i));
-                str = ostr->GetString();
-                if (str.IsDigit()) {
-                  run = TComplex(str.Atoi(),-1.0);
-                  param.fRuns.push_back(run);
-                } else {
-                  error = true;
-                }
-              }
+            runList = rl->GetList();
+            for (UInt_t i=0; i<runList.size(); i++) {
+              run = TComplex(runList[i], -1.0);
+              param.fRuns.push_back(run);
             }
             // clean up
-            if (tokens) {
-              delete tokens;
-              tokens = 0;
-            }
+            runList.clear();
+            delete rl;
             break;
           default:
             error = true;
@@ -5642,86 +5643,6 @@ UInt_t PMsrHandler::LastSignificant(Double_t dval, UInt_t precLimit)
   }
 
   return lastSignificant;
-}
-
-//--------------------------------------------------------------------------
-// ParseDetectorGrouping (private)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param str forward/backward string to be decoded
- * \param group decoded detector grouping vector
- *
- * <b>return:</b> true if parsing was successful, false otherwise.
- */
-Bool_t PMsrHandler::ParseDetectorGrouping(TString str, PIntVector &group)
-{
-  TObjArray *tok=0, *tok1=0;
-  TObjString *ostr=0;
-  Int_t first=0, last=0;
-
-  // change cn - cm to cn-cm. Will *NOT* handle cn  - cm etc
-  str = str.ReplaceAll(" - ", "-");
-
-  group.clear();
-  tok = str.Tokenize(" \t");
-
-  // check that there are indeed enough tokens
-  if (tok->GetEntries() < 2) {
-    delete tok;
-    return false;
-  }
-
-  for (Int_t i=1; i<tok->GetEntries(); i++) {
-    ostr = dynamic_cast<TObjString*>(tok->At(i));
-    if (ostr->GetString().Contains("-")) { // hopefully a cn-cm token
-      tok1 = ostr->GetString().Tokenize("-");
-      if (tok1->GetEntries() == 2) {
-        ostr = dynamic_cast<TObjString*>(tok1->At(0));
-        if (ostr->GetString().IsDigit()) {
-          first = ostr->GetString().Atoi();
-        } else {
-          if (tok) delete tok;
-          if (tok1) delete tok1;
-          return false;
-        }
-        ostr = dynamic_cast<TObjString*>(tok1->At(1));
-        if (ostr->GetString().IsDigit()) {
-          last = ostr->GetString().Atoi();
-        } else {
-          if (tok) delete tok;
-          if (tok1) delete tok1;
-          return false;
-        }
-
-        if (last < first) {
-          if (tok) delete tok;
-          return false;
-        }
-
-        for (Int_t i=first; i<=last; i++)
-          group.push_back(i);
-      } else {
-        if (tok) delete tok;
-        if (tok1) delete tok1;
-        return false;
-      }
-    } else { // hopefully a number
-      if (ostr->GetString().IsDigit()) {
-        group.push_back(ostr->GetString().Atoi());
-      } else {
-        if (tok) delete tok;
-        return false;
-      }
-    }
-  }
-
-  // clean up
-  if (tok) delete tok;
-  if (tok1) delete tok1;
-
-  return true;
 }
 
 //--------------------------------------------------------------------------

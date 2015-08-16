@@ -28,9 +28,11 @@
  ***************************************************************************/
 
 #include <cassert>
-
 #include <iostream>
 using namespace std;
+
+#include <boost/algorithm/string.hpp>
+using namespace boost;
 
 #include "PMusr.h"
 
@@ -1740,4 +1742,168 @@ void PMsrRunBlock::SetMapGlobal(UInt_t idx, Int_t ival)
     fMapGlobal[idx] = ival;
   // else do nothing at the moment
   return;
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// implementation PStringNumberList
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//--------------------------------------------------------------------------
+// Parse (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Helper class which parses list of numbers of the following 3 forms and its combination.
+ * (i) list of integers separted by spaces, e.g. 1 3 7 14
+ * (ii) a range of integers of the form nS-nE, e.g. 13-27 which will generate 13, 14, 15, .., 26, 27
+ * (iii) a sequence of integers of the form nS:nE:nStep, e.g. 10:20:2  which will generate 10, 12, 14, .., 18, 20
+ *
+ * \param errorMsg error message
+ * \param ignoreFirstToken if true, the first parse token will be ignored
+ *
+ * @return true if parse has been successful, otherwise false
+ */
+bool PStringNumberList::Parse(string &errorMsg, bool ignoreFirstToken)
+{
+  bool result=true;
+  vector<string> splitVec;
+  int ival;
+
+  // before checking tokens, remove 'forbidden' " - " and " : "
+  StripSpaces();
+
+  // split string into space separated tokens
+  split(splitVec, fString, is_any_of(" "), token_compress_on);
+
+  unsigned int start=0;
+  if (ignoreFirstToken)
+    start=1;
+
+  for (unsigned int i=start; i<splitVec.size(); i++) {
+    if (splitVec[i].length() != 0) { // ignore empty tokens
+      if (splitVec[i].find("-") != string::npos) { // check for potential range
+        vector<string> subSplitVec;
+        // split potential nS-nE token
+        split(subSplitVec, splitVec[i], is_any_of("-"),  token_compress_on);
+
+        int start=-1, end=-1;
+        unsigned int count=0;
+        for (unsigned int j=0; j<subSplitVec.size(); j++) {
+          if (subSplitVec[j].length() != 0) { // ignore empty tokens
+            if (!IsNumber(subSplitVec[j])) {
+              result = false;
+            } else {
+              count++;
+              if (count == 1)
+                start = atoi(subSplitVec[j].c_str());
+              else if (count == 2)
+                end = atoi(subSplitVec[j].c_str());
+              else
+                result = false;
+            }
+          }
+        }
+        if ((start < 0) || (end < 0)) { // check that there is a vaild start and end
+          errorMsg = "**ERROR** start or end of a range is not valid";
+          result = false;
+        }
+        if (result) { // no error, hence check start and end
+          if (start > end) {
+            int swap = end;
+            cerr << "**WARNING** start=" << start << " > end=" << end << ", hence I will swap them" << endl;
+            end = start;
+            start = swap;
+          }
+          for (int j=start; j<=end; j++)
+            fList.push_back(j);
+        }
+      } else if (splitVec[i].find(":") != string::npos) { // check for potential sequence
+        vector<string> subSplitVec;
+        // split potential rStart:rEnd:rStep token
+        split(subSplitVec, splitVec[i], is_any_of(":"),  token_compress_on);
+
+        int start=-1, end=-1, step=-1;
+        unsigned int count=0;
+        for (unsigned int j=0; j<subSplitVec.size(); j++) {
+          if (subSplitVec[j].length() != 0) { // ignore empty tokens
+            if (!IsNumber(subSplitVec[j])) {
+              result = false;
+            } else {
+              count++;
+              if (count == 1)
+                start = atoi(subSplitVec[j].c_str());
+              else if (count == 2)
+                end = atoi(subSplitVec[j].c_str());
+              else if (count == 3)
+                step = atoi(subSplitVec[j].c_str());
+              else
+                result = false;
+            }
+          }
+        }
+        if ((start < 0) || (end < 0) || (step < 0)) { // check that there is a vaild start and end
+          errorMsg = "**ERROR** start, end, or step of a sequence is not valid";
+          result = false;
+        }
+        if (result) { // no error, hence check start and end
+          if (start > end) {
+            int swap = end;
+            cerr << "**WARNING** start=" << start << " > end=" << end << ", hence I will swap them" << endl;
+            end = start;
+            start = swap;
+          }
+          for (int j=start; j<=end; j+=step)
+            fList.push_back(j);
+        }
+      } else if (IsNumber(splitVec[i])) {
+        ival = atoi(splitVec[i].c_str());
+        fList.push_back(ival);
+      } else {
+        errorMsg = "**ERROR** invalid token: " + splitVec[i];
+        result = false;
+      }
+    }
+  }
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+// StripSpaces (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>This routine removes arbitray number of spaces between '-' and ':',
+ * e.g. 123    -    125  will be converted to 123-125, etc.
+ */
+void PStringNumberList::StripSpaces()
+{
+  string str=fString;
+  int pos=-1;
+
+  // backward scan
+  for (int i=str.size(); i>=0; --i) { // check if first space is found
+    if ((str[i] == ' ') && (pos == -1)) {
+      pos = i;
+    } else if ((str[i] == '-') || (str[i] == ':')) { // check for '-' or ':'
+      if (pos != -1) {
+        str.erase(i+1, pos-i);
+      }
+    } else if (str[i] != ' ') { // anything but different than a space leads to a reset of the pos counter
+      pos = -1;
+    }
+  }
+  // forward scan
+  for (unsigned int i=0; i<str.size(); i++) { // check if first space is found
+    if ((str[i] == ' ') && (pos == -1)) {
+      pos = i;
+    } else if ((str[i] == '-') || (str[i] == ':')) { // check for '-' or ':'
+      if (pos != -1) {
+        str.erase(pos, i-pos);
+        i = pos;
+      }
+    } else if (str[i] != ' ') { // anything but different than a space leads to a reset of the pos counter
+      pos = -1;
+    }
+  }
+
+  fString = str;
 }

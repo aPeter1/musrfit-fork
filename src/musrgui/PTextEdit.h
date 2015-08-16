@@ -64,7 +64,6 @@ private:
   void load( const QString &f, const int index=-1 );
   PSubTextEdit *currentEditor() const;
   void doConnections( PSubTextEdit *e );
-  bool validRunList(const QString runList);
 
 private slots:
   void fileNew();

@@ -152,7 +152,6 @@ class PMsrHandler
     virtual UInt_t NeededPrecision(Double_t dval, UInt_t precLimit=13);
     virtual UInt_t LastSignificant(Double_t dval, UInt_t precLimit=6);
 
-    virtual Bool_t ParseDetectorGrouping(TString str, PIntVector &group);
     virtual void MakeDetectorGroupingString(TString str, PIntVector &group, TString &result, Bool_t includeDetector = true);
 
     virtual void CheckLegacyLifetimecorrection();
