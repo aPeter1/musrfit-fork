@@ -2,6 +2,41 @@
 # ChangeLog
 #---------------------------------------------------------------------
 
+changes since 0.14.0
+===================================
+NEW 2015-02-23 implemented an average-per-data-set option for musrFT.
+NEW 2015-02-21 add proper Mac icon to musredit
+FIXED 2015-06-30 changed setf/unsetf bug (PMsr2Data.cpp)
+FIXED 2015-05-15 another path check for HDF5 with ubuntu 15.04
+FIXED 2015-03-16 some minor correction for ASCII export in any2many
+FIXED 2015-02-26 some more bug fixing for average per data set.
+FIXED 2015-02-20 for graphical export in the batch mode, menus mustn't be set.
+CHANGED 2015-08-17 updated ChangeLog which was orphaned since V0.13.0
+CHANGED 2015-08-16 updated the docu
+CHANGED 2015-08-16 added the class PStringNumberList which allow to parse a 
+                   generic encoded list of numbers. Used this class to improve 
+                   PMsrHandler, and improved the runList feature of msr2data. 
+                   For details see the documentation of msr2data.
+CHANGED 2015-06-25 adopted the temperature dependence of the gap function 
+                   (see Eq.(8) of the memo), which breaks the self-consistency. 
+                   Makes it more flexible but requires that the user is using 
+                   his brain.
+CHANGED 2015-06-25 small correction of the skewed Gaussian for extrem parameter 
+                   values.
+CHANGED 2015-05-29 updated docu and removed an unsed variable
+CHANGED 2015-05-29 added a group histo selector in any2many for MusrRoot when 
+                   exporting to a too limited file format as PSI-BIN.
+CHANGED 2015-04-01 update of the technical docu
+CHANGED 2015-02-28 check that FOURIER block phase parameter as parX is not leading 
+                   to an error message.
+CHANGED 2015-02-24 added missing background range from msr-file (musrFT)
+CHANGED 2015-02-24 separated PSI-BIN and PSI-MDU file format
+CHANGED 2015-02-21 make sure that musrFT is found
+CHANGED 2015-02-21 needed to adopted includes for dictionary generation due to 
+                   adding fftw.h in PMusr.h
+CHANGED 2015-02-21 have now README and README.md for automake and bitbucket, 
+                   respectively.
+
 changes since 0.13.0
 ===================================
 NEW 2015-02-23 implemented an average-per-data-set option for musrFT.

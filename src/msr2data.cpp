@@ -37,6 +37,7 @@
 #endif
 
 #include "git-revision.h"
+#include "PMusr.h"
 #include "PMsr2Data.h"
 
 #include <algorithm>
@@ -87,12 +88,17 @@ void msr2data_syntax()
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
   cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 3: msr2data \\[<run1> <run2> ... <runN>\\] <extension> [-o<outputfile> ] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
+  cout << endl << "usage 3: msr2data \\[<runList>\\] <extension> [-o<outputfile> ] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
   cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
   cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
   cout << endl;
-  cout << endl << "       <run>, <run1>, <run2>, ... <runN> : run numbers";
+  cout << endl << "       <runList> can be:";
+  cout << endl << "         (i)   <run0>, <run1>, <run2>, ... <runN> : run numbers, e.g. 123 124";
+  cout << endl << "         (ii)  <run0>-<runN> : a range, e.g. 123-125 -> 123 124 125";
+  cout << endl << "         (iii) <run0>:<runN>:<step> : a sequence, e.g. 123:127:2 -> 123 125 127";
+  cout << endl << "               <step> will give the step width and has to be a positive number!";
+  cout << endl << "         a <runList> can also combine (i)-(iii), e.g. 123 128-130 133, etc.";
   cout << endl << "       <extension> : msr-file extension, e.g. _tf_h13 for the file name 8472_tf_h13.msr";
   cout << endl << "       -o<outputfile> : specify the name of the DB or column-data output file; default: out.db/out.dat";
   cout << endl << "                        if the option '-o none' is used, no output file will be written.";
@@ -125,9 +131,27 @@ void msr2data_syntax()
   cout << endl << "              from this pre-analysis for each run---they are not just copied from the template.";
   cout << endl << "              The specification of '!' determines which fit mode (see above) is used for this pre-analysis.";
   cout << endl;
+  cout << endl << "    Typical examples:";
+  cout << endl;
+  cout << endl << "       msr2data 2047 2050 _tf_histo fit-2046";
+  cout << endl << "          will use 2046_tf_histo.msr as templete, and subsequently generating 2047_tf_histo.msr until";
+  cout << endl << "          2050_tf_histo.msr and fit them.";
+  cout << endl;
+  cout << endl << "       msr2data 2047 2050 _tf_histo msr-2046";
+  cout << endl << "          will use 2046_tf_histo.msr as templete, and subsequently generating 2047_tf_histo.msr until";
+  cout << endl << "          2050_tf_histo.msr, but NO fitting will be done.";
+  cout << endl;
+  cout << endl << "       msr2data 2046 2050 _tf_histo -o fitParam.db";
+  cout << endl << "          will collect the fit parameters from runs 2046-2050 (msr-files 2046_tf_histo.msr etc.) and";
+  cout << endl << "          write them to the file fitParam.db (DB-format).";
+  cout << endl;
+  cout << endl << "       msr2data [2047:2053:2 2056] _tf_histo fit-2045";
+  cout << endl << "          will use 2045_tf_histo.msr as templete, and subsequently generating msr-files from the run-list:";
+  cout << endl << "          2047 2049 2051 2053 2056 (2047_tf_histo.msr etc.) and fit them.";
+  cout << endl;
   cout << endl << "    For further information please refer to";
-  cout << endl << "    https://intranet.psi.ch/MUSR/Msr2Data";
-  cout << endl << "    http://lmu.web.psi.ch/facilities/software/musrfit/user/intranet.psi.ch/MUSR/Msr2Data.html";
+  cout << endl << "       http://lmu.web.psi.ch/musrfit/user/MUSR/Msr2Data.html";
+  cout << endl << "       https://intranet.psi.ch/MUSR/Msr2Data";
   cout << endl << endl;
 }
 
@@ -449,8 +473,26 @@ int main(int argc, char *argv[])
         return 0;
       }
 
-      for (unsigned int i(firstRunNumberInArg); i<=lastRunNumberInArg; ++i)
-        run_vec.push_back(boost::lexical_cast<unsigned int>(arg[i]));
+      // generate run_list string
+      for (unsigned int i(firstRunNumberInArg); i<=lastRunNumberInArg; ++i) {
+        run_list += arg[i] + " ";
+      }
+      // parse run_list string
+      PStringNumberList *nl = new PStringNumberList(run_list);
+      if (nl == 0) { // couldn't invoke object
+        cerr << endl;
+        cerr << ">> msr2data: **ERROR** Couldn't invoke run_list parser object! Quitting now." << endl;
+        return 0;
+      }
+      string errorMsg("");
+      if (!nl->Parse(errorMsg)) {
+        cerr << endl;
+        cerr << ">> msr2data: " << errorMsg << " - Quitting now." << endl;
+        return 0;
+      }
+      // get run list vector
+      run_vec = nl->GetList();
+      delete nl;
 
       msrExtension = arg[rightbracket + 1];
 

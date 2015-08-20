@@ -801,4 +801,29 @@ typedef struct {
   Double_t alphaEstimateN0;  ///< relates the Bkg to N0, i.e. Bkg = alpha*N0
 } PStartupOptions;
 
+//-------------------------------------------------------------
+/**
+ * <p>Helper class which parses list of numbers of the following 3 forms and its combination.
+ * (i) list of integers separted by spaces, e.g. 1 3 7 14
+ * (ii) a range of integers of the form nS-nE, e.g. 13-27 which will generate 13, 14, 15, .., 26, 27
+ * (iii) a sequence of integers of the form nS:nE:nStep, e.g. 10:20:2  which will generate 10, 12, 14, .., 18, 20
+ */
+class PStringNumberList {
+  public:
+    PStringNumberList(char *str) { fString = str; }
+    PStringNumberList(string str) { fString = str; }
+    virtual ~PStringNumberList() { fList.clear(); }
+
+    virtual bool Parse(string &errorMsg, bool ignoreFirstToken=false);
+    virtual PUIntVector GetList() { return fList; }
+
+  private:
+    string fString;
+    bool fIsValid;
+    PUIntVector fList;
+
+    virtual bool IsNumber(string &str) { return (str.find_first_not_of("0123456789") == string::npos); }
+    virtual void StripSpaces();
+};
+
 #endif // _PMUSR_H_

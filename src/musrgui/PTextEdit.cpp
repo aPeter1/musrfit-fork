@@ -497,40 +497,6 @@ void PTextEdit::doConnections( PSubTextEdit *e )
 /**
  * <p>
  */
-bool PTextEdit::validRunList(const QString runList)
-{
-  bool success = true;
-
-  int i = 0;
-  QString subStr;
-  bool done = false;
-  int val;
-  bool ok;
-  while (!done) {
-    subStr = runList.section(' ', i, i, QString::SectionSkipEmpty);
-    if (subStr.isEmpty()) {
-      done = true;
-      continue;
-    }
-    i++;
-    val = subStr.toInt(&ok);
-    if (!ok) {
-      done = true;
-      success = false;
-    }
-  }
-
-  if (i == 0) { // no token found
-    success = false;
-  }
-
-  return success;
-}
-
-//----------------------------------------------------------------------------------------------------
-/**
- * <p>
- */
 void PTextEdit::fileNew()
 {
   PSubTextEdit *edit = new PSubTextEdit( fAdmin );
@@ -1500,12 +1466,6 @@ void PTextEdit::musrMsr2Data()
         break;
       case 1:  // run list
         runList = fMsr2DataParam->runList;
-        if (!validRunList(runList)) {
-          QMessageBox::critical(this, "**ERROR**",
-            "Invalid Run List!\nThe run list needs to be a space separated list of run numbers.",
-            QMessageBox::Ok, QMessageBox::NoButton);
-          return;
-        }
         break;
       case 2:  // run list file name
         runListFileName = fMsr2DataParam->runListFileName;
