@@ -1089,6 +1089,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("range_for_phase_correction")) {
           fout << "range_for_phase_correction  " << fFourier.fRangeForPhaseCorrection[0] << "    " << fFourier.fRangeForPhaseCorrection[1] << endl;
         } else if (sstr.BeginsWith("range ")) {
+          fout.unsetf(ios::floatfield);
           fout << "range            " << fFourier.fPlotRange[0] << "    " << fFourier.fPlotRange[1] << endl;
         } else {
           fout << str.Data() << endl;
@@ -1971,6 +1972,7 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
 
     // range
     if ((fFourier.fPlotRange[0] != -1.0) || (fFourier.fPlotRange[1] != -1.0)) {
+      fout.unsetf(ios::floatfield);
       fout << "range            " << fFourier.fPlotRange[0] << "    " << fFourier.fPlotRange[1] << endl;
     }
 
