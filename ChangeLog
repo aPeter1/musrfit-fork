@@ -5,7 +5,9 @@
 changes since 0.14.0
 ===================================
 NEW 2015-02-23 implemented an average-per-data-set option for musrFT.
-NEW 2015-02-21 add proper Mac icon to musredit
+NEW 2015-02-21 add proper Mac icon to musredit 
+FIXED 2015-09-04 minor change in Fourier-block output (PMsrHandler::WriteMsrLogFile
+                 and PMsrHandler::WriteMsrLogFile) to avoid truncated range labels.
 FIXED 2015-06-30 changed setf/unsetf bug (PMsr2Data.cpp)
 FIXED 2015-05-15 another path check for HDF5 with ubuntu 15.04
 FIXED 2015-03-16 some minor correction for ASCII export in any2many
