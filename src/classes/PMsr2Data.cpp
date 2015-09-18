@@ -813,7 +813,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
                   tempVec[j].append(boost::lexical_cast<string>(l + 1));
                 }
               }
-//as              break;
+              break;
             }
           }
         }
@@ -902,7 +902,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
                   }
                   mapExists = false;
                 }
-//as                break;
+                break;
               }
             }
           }
@@ -1111,7 +1111,6 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
               lineChanged = true;
             }
           }
-//as          break;
         }
         catch(boost::bad_lexical_cast &) {
           // in case the cast does not work: do nothing - this means the entry is not a simple parameter
