@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009-2014 by Bastian M. Wojek / Andreas Suter           *
+ *   Copyright (C) 2009-2015 by Bastian M. Wojek / Andreas Suter           *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -170,7 +170,7 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
       string::size_type loc = firstOnLine.rfind(tempRunNumber.str());
       if ( loc != string::npos ) {
         while ( loc > 0 ) {
-          if(isdigit(firstOnLine.at(--loc))) {
+          if (isdigit(firstOnLine.at(--loc))) {
             ++fRunNumberDigits;
           } else {
             break;
@@ -731,7 +731,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
       msrParamList->at(i).fIsGlobal = true;
       ++fNumGlobalParam;
     }
-    //cout << msrParamList->at(i).fNo << " is global: " << msrParamList->at(i).fIsGlobal << endl;
+    // cout << "debug> " << msrParamList->at(i).fNo << ": " << msrParamList->at(i).fName.Data() << " is global: " << msrParamList->at(i).fIsGlobal << endl;
   }
 
   // check if parameters have been sorted correctly from the beginning
@@ -760,7 +760,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     bool mapExists(false);
     for (unsigned int i(0); i < tempLines->size(); ++i) {
       line = (*tempLines)[i].fLine.Data();
-      split( tempVec, line, is_any_of(" \t") ); // split the theory line at spaces
+      split( tempVec, line, is_any_of(" \t"), token_compress_on ); // split the theory line at spaces
       for (unsigned int j(1); j < tempVec.size(); ++j) {
         try {
           tempPar = boost::lexical_cast<unsigned int>(tempVec[j]);
@@ -1060,12 +1060,11 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     tempLines = fMsrHandler->GetMsrTheory();
     for (unsigned int i(0); i < tempLines->size(); ++i) {
       line = (*tempLines)[i].fLine.Data();
-      split( tempVec, line, is_any_of(" \t") ); // split the theory line at spaces
+      split( tempVec, line, is_any_of(" \t"), token_compress_on ); // split the theory line at spaces
 
       for (unsigned int j(1); j < tempVec.size(); ++j) {
         try {
           tempPar = boost::lexical_cast<unsigned int>(tempVec[j]);
-
           if (!msrParamList->at(tempPar - 1).fIsGlobal) {
             cerr << endl << ">> msr2data: **WARNING** The parameter " << msrParamList->at(tempPar - 1).fName.Data() \
                          << " is recognized as run specific!";
@@ -1112,7 +1111,6 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
               lineChanged = true;
             }
           }
-          break;
         }
         catch(boost::bad_lexical_cast &) {
           // in case the cast does not work: do nothing - this means the entry is not a simple parameter

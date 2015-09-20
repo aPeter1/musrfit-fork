@@ -1744,7 +1744,7 @@ Bool_t PRunDataHandler::ReadRootFile()
           for (UInt_t i=0; i<fAny2ManyInfo->groupHistoList.size(); i++) {
             found = false;
             for (UInt_t j=0; j<ivec.size(); j++) {
-              if (fAny2ManyInfo->groupHistoList[i] == ivec[i])
+              if (fAny2ManyInfo->groupHistoList[i] == ivec[j])
                 found = true;
             }
             if (!found) {
@@ -5084,7 +5084,11 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   if (lem_wkm_style)
     cout << endl << "TOF(M3S1):           nocut";
   cout << endl << "Groups:              " << fData[0].GetNoOfHistos();
-  cout << endl << "Channels:            " << static_cast<UInt_t>(fData[0].GetDataBin(1)->size()/fAny2ManyInfo->rebin);
+  UInt_t histo0 = 1;
+  if (fAny2ManyInfo->groupHistoList.size() != 0) { // red/green list found
+    histo0 = fAny2ManyInfo->groupHistoList[0]+1; // take the first available red/green entry
+  }
+  cout << endl << "Channels:            " << static_cast<UInt_t>(fData[0].GetDataBin(histo0)->size()/fAny2ManyInfo->rebin);
   cout.precision(10);
   cout << endl << "Resolution:          " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin/1.0e3; // ns->us
   cout.setf(ios::fixed,ios::floatfield);   // floatfield set to fixed
@@ -5173,7 +5177,11 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   // run number
   psibin.put_runNumber_int(fData[0].GetRunNumber());
   // length of histograms
-  psibin.put_histoLength_bin((int)(fData[0].GetDataBin(1)->size()/fAny2ManyInfo->rebin));
+  UInt_t histo0 = 1;
+  if (fAny2ManyInfo->groupHistoList.size() != 0) { // red/green list found
+    histo0 = fAny2ManyInfo->groupHistoList[0]+1; // take the first available red/green entry
+  }
+  psibin.put_histoLength_bin((int)(fData[0].GetDataBin(histo0)->size()/fAny2ManyInfo->rebin));
   // number of histograms
   psibin.put_numberHisto_int((int)fData[0].GetNoOfHistos());
   // run title = sample (10 char) / temp (10 char) / field (10 char) / orientation (10 char)
