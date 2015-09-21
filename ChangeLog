@@ -9,6 +9,8 @@ NEW 2015-02-21 add proper Mac icon to musredit
 FIXED 2015-09-17 in PMsr2Data::PrepareGlobalInputFile() there seem to be 'unmotivated'
                  break; commands in some loops. They prevent a proper map handling.
                  Since this is a real puzzle I contacted BMW for clarification. 
+                 2015-09-18: there is only one unmotivated break; cleaned up the code
+                 accordingly.
 FIXED 2015-09-14 any2many export of MusrRoot crashed when first histo group was != 0.
                  This happend when exporting to PSI-BIN or WKM. This is fixed now.
 FIXED 2015-09-08 fixed error in view_packing for single histo (wrong norm of the theory).

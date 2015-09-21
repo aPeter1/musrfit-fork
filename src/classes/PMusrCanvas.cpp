@@ -4787,18 +4787,22 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
 
       // add all data to fMultiGraphData
       for (UInt_t i=0; i<fNonMusrData.size(); i++) {
-        // the next two lines are ugly but needed for the following reasons:
+        // the next three lines are ugly but needed for the following reasons:
         // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
         // This is not resulting in a memory leak, since the TMultiGraph object will do the cleanup
         TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].data));
+        // Data points and model curves should be fixed on the graph and not dragged around using, e.g., the mouse.
+        ge->SetEditable(false);
         fMultiGraphData->Add(ge, "p");
       }
       // add all the theory to fMultiGraphData
       for (UInt_t i=0; i<fNonMusrData.size(); i++) {
-        // the next two lines are ugly but needed for the following reasons:
+        // the next three lines are ugly but needed for the following reasons:
         // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
         // This is not resulting in a memory leak, since the TMultiGraph object will do the cleanup
         TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].theory));
+        // Data points and model curves should be fixed on the graph and not dragged around using, e.g., the mouse.
+        ge->SetEditable(false);
         fMultiGraphData->Add(ge, "l");
       }
 
@@ -4842,6 +4846,11 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
 
       if (fMultiGraphLegend)
         fMultiGraphLegend->Draw();
+    }
+
+    // report canvas status events in non-musr plots
+    if (!fMainCanvas->GetShowEventStatus()) {
+      fMainCanvas->ToggleEventStatus();
     }
   }
 
@@ -5031,10 +5040,12 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
 
     // add all diff data to fMultiGraphDiff
     for (UInt_t i=0; i<fNonMusrData.size(); i++) {
-      // the next two lines are ugly but needed for the following reasons:
+      // the next three lines are ugly but needed for the following reasons:
       // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
       // This is not resulting in a memory leak, since the TMultiGraph object will do the cleaing
       TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].diff));
+      // Data points and model curves should be fixed on the graph and not dragged around using, e.g., the mouse.
+      ge->SetEditable(false);
       fMultiGraphDiff->Add(ge, "p");
     }
 
