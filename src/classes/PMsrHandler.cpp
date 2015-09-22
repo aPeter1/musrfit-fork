@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2015 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -242,7 +242,7 @@ Int_t PMsrHandler::ReadMsrFile()
   if (result == PMUSR_SUCCESS)
     if (!HandleFunctionsEntry(functions))
       result = PMUSR_MSR_SYNTAX_ERROR;
-  if (result == PMUSR_SUCCESS)
+  if ((result == PMUSR_SUCCESS) && (global.size()>0))
     if (!HandleGlobalEntry(global))
       result = PMUSR_MSR_SYNTAX_ERROR;
   if (result == PMUSR_SUCCESS)
@@ -1595,7 +1595,106 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
 
   // write GLOBAL block
   if (fGlobal.IsPresent()) {
-    // not sure that anything needs to be done here ...
+    fout << "GLOBAL" << endl;
+
+    // fittype
+    if (fGlobal.GetFitType() != -1) {
+      fout.width(16);
+      switch (fGlobal.GetFitType()) {
+      case MSR_FITTYPE_SINGLE_HISTO:
+        fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
+        break;
+      case MSR_FITTYPE_ASYM:
+        fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+        break;
+      case MSR_FITTYPE_MU_MINUS:
+        fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
+        break;
+      case MSR_FITTYPE_NON_MUSR:
+        fout << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << endl ;
+        break;
+      default:
+        break;
+      }
+    }
+
+    // data range
+    if ((fGlobal.GetDataRange(0) != -1) || (fGlobal.GetDataRange(1) != -1) || (fGlobal.GetDataRange(2) != -1) || (fGlobal.GetDataRange(3) != -1)) {
+      fout.width(16);
+      fout << left << "data";
+      for (UInt_t j=0; j<4; ++j) {
+        if (fGlobal.GetDataRange(j) > 0) {
+          fout.width(8);
+          fout << left << fGlobal.GetDataRange(j);
+        }
+      }
+      fout << endl;
+    }
+
+    // t0
+    if (fGlobal.GetT0BinSize() > 0) {
+      fout.width(16);
+      fout << left << "t0";
+      for (UInt_t j=0; j<fGlobal.GetT0BinSize(); ++j) {
+        fout.width(8);
+        fout.precision(1);
+        fout.setf(ios::fixed,ios::floatfield);
+        fout << left << fGlobal.GetT0Bin(j);
+      }
+      fout << endl;
+    }
+
+    // addt0
+    for (UInt_t j = 0; j < fGlobal.GetAddT0BinEntries(); ++j) {
+      if (fGlobal.GetAddT0BinSize(j) > 0) {
+        fout.width(16);
+        fout << left << "addt0";
+        for (Int_t k=0; k<fGlobal.GetAddT0BinSize(j); ++k) {
+          fout.width(8);
+          fout.precision(1);
+          fout.setf(ios::fixed,ios::floatfield);
+          fout << left << fGlobal.GetAddT0Bin(j, k);
+        }
+        fout << endl;
+      }
+    }
+
+    // fit range
+    if ( (fGlobal.IsFitRangeInBin() && fGlobal.GetFitRangeOffset(0) != -1) ||
+         (fGlobal.GetFitRange(0) != PMUSR_UNDEFINED) ) {
+      fout.width(16);
+      fout << left << "fit";
+      if (fGlobal.IsFitRangeInBin()) { // fit range given in bins
+        fout << "fgb";
+        if (fGlobal.GetFitRangeOffset(0) > 0)
+          fout << "+" << fGlobal.GetFitRangeOffset(0);
+        fout << "   lgb";
+        if (fGlobal.GetFitRangeOffset(1) > 0)
+          fout << "-" << fGlobal.GetFitRangeOffset(1);
+      } else { // fit range given in time
+        for (UInt_t j=0; j<2; j++) {
+          if (fGlobal.GetFitRange(j) == -1)
+            break;
+          UInt_t neededWidth = 7;
+          UInt_t neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
+          fout.width(neededWidth);
+          fout.precision(neededPrec);
+          fout << left << fixed << fGlobal.GetFitRange(j);
+          if (j==0)
+            fout << " ";
+        }
+      }
+      fout << endl;
+    }
+
+    // packing
+    if (fGlobal.GetPacking() != -1) {
+      fout.width(16);
+      fout << left << "packing";
+      fout << fGlobal.GetPacking() << endl;
+    }
+
+    fout << endl << hline.Data() << endl;
   }
 
   // write RUN blocks
@@ -1660,22 +1759,24 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     }
 
     // fittype
-    fout.width(16);
-    switch (fRuns[i].GetFitType()) {
-    case MSR_FITTYPE_SINGLE_HISTO:
-      fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
-      break;
-    case MSR_FITTYPE_ASYM:
-      fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
-      break;
-    case MSR_FITTYPE_MU_MINUS:
-      fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
-      break;
-    case MSR_FITTYPE_NON_MUSR:
-      fout << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << endl ;
-      break;
-    default:
-      break;
+    if (fRuns[i].GetFitType() != -1) {
+      fout.width(16);
+      switch (fRuns[i].GetFitType()) {
+      case MSR_FITTYPE_SINGLE_HISTO:
+        fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
+        break;
+      case MSR_FITTYPE_ASYM:
+        fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+        break;
+      case MSR_FITTYPE_MU_MINUS:
+        fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
+        break;
+      case MSR_FITTYPE_NON_MUSR:
+        fout << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << endl ;
+        break;
+      default:
+        break;
+      }
     }
 
     // alpha
@@ -1815,17 +1916,19 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     }
 
     // addt0
-    for (UInt_t j = 0; j < fRuns[i].GetRunNameSize() - 1; ++j) {
-      if (fRuns[i].GetAddT0BinSize(j) > 0) {
-        fout.width(16);
-        fout << left << "addt0";
-        for (Int_t k=0; k<fRuns[i].GetAddT0BinSize(j); ++k) {
-          fout.width(8);
-          fout.precision(1);
-          fout.setf(ios::fixed,ios::floatfield);
-          fout << left << fRuns[i].GetAddT0Bin(j, k);
+    if (fRuns[i].GetAddT0BinEntries() > 0) {
+      for (UInt_t j = 0; j < fRuns[i].GetRunNameSize() - 1; ++j) {
+        if (fRuns[i].GetAddT0BinSize(j) > 0) {
+          fout.width(16);
+          fout << left << "addt0";
+          for (Int_t k=0; k<fRuns[i].GetAddT0BinSize(j); ++k) {
+            fout.width(8);
+            fout.precision(1);
+            fout.setf(ios::fixed,ios::floatfield);
+            fout << left << fRuns[i].GetAddT0Bin(j, k);
+          }
+          fout << endl;
         }
-        fout << endl;
       }
     }
 
@@ -1852,34 +1955,40 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     }
 
     // fit
-    fout.width(16);
-    fout << left << "fit";
-    if (fRuns[i].IsFitRangeInBin()) { // fit range given in bins
-      fout << "fgb";
-      if (fRuns[i].GetFitRangeOffset(0) > 0)
-        fout << "+" << fRuns[i].GetFitRangeOffset(0);
-      fout << "   lgb";
-      if (fRuns[i].GetFitRangeOffset(1) > 0)
-        fout << "-" << fRuns[i].GetFitRangeOffset(1);
-    } else { // fit range given in time
-      for (UInt_t j=0; j<2; j++) {
-        if (fRuns[i].GetFitRange(j) == -1)
-          break;
-        UInt_t neededWidth = 7;
-        UInt_t neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
-        fout.width(neededWidth);
-        fout.precision(neededPrec);
-        fout << left << fixed << fRuns[i].GetFitRange(j);
-        if (j==0)
-          fout << " ";
+    if ( (fRuns[i].IsFitRangeInBin() && fRuns[i].GetFitRangeOffset(0) != -1) ||
+         (fRuns[i].GetFitRange(0) != PMUSR_UNDEFINED) ) {
+      fout.width(16);
+      fout << left << "fit";
+      if (fRuns[i].IsFitRangeInBin()) { // fit range given in bins
+        fout << "fgb";
+        if (fRuns[i].GetFitRangeOffset(0) > 0)
+          fout << "+" << fRuns[i].GetFitRangeOffset(0);
+        fout << "   lgb";
+        if (fRuns[i].GetFitRangeOffset(1) > 0)
+          fout << "-" << fRuns[i].GetFitRangeOffset(1);
+      } else { // fit range given in time
+        for (UInt_t j=0; j<2; j++) {
+          if (fRuns[i].GetFitRange(j) == -1)
+            break;
+          UInt_t neededWidth = 7;
+          UInt_t neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
+          fout.width(neededWidth);
+          fout.precision(neededPrec);
+          fout << left << fixed << fRuns[i].GetFitRange(j);
+          if (j==0)
+            fout << " ";
+        }
       }
+      fout << endl;
     }
-    fout << endl;
 
     // packing
-    fout.width(16);
-    fout << left << "packing";
-    fout << fRuns[i].GetPacking() << endl;
+    if (fRuns[i].GetPacking() != -1) {
+      fout.width(16);
+      fout << left << "packing";
+      fout << fRuns[i].GetPacking() << endl;
+    }
+
     fout << endl;
   }
 
