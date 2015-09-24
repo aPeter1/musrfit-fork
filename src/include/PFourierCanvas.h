@@ -43,23 +43,26 @@
 #define P_MENU_ID_AVERAGE_PER_DATA_SET 10003
 #define P_MENU_ID_EXPORT_DATA          10004
 
-#define P_MENU_ID_FOURIER_REAL          100
-#define P_MENU_ID_FOURIER_IMAG          101
-#define P_MENU_ID_FOURIER_REAL_AND_IMAG 102
-#define P_MENU_ID_FOURIER_PWR           103
-#define P_MENU_ID_FOURIER_PHASE         104
-#define P_MENU_ID_FOURIER_PHASE_PLUS    105
-#define P_MENU_ID_FOURIER_PHASE_MINUS   106
+#define P_MENU_ID_FOURIER_REAL           100
+#define P_MENU_ID_FOURIER_IMAG           101
+#define P_MENU_ID_FOURIER_REAL_AND_IMAG  102
+#define P_MENU_ID_FOURIER_PWR            103
+#define P_MENU_ID_FOURIER_PHASE          104
+#define P_MENU_ID_FOURIER_PHASE_OPT_REAL 105
+#define P_MENU_ID_FOURIER_PHASE_PLUS     106
+#define P_MENU_ID_FOURIER_PHASE_MINUS    107
 
 //------------------------------------------------------------------------
 /**
  * <p>Structure holding all necessary Fourier histograms.
  */
 typedef struct {
-  TH1F *dataFourierRe;       ///< real part of the Fourier transform of the data histogram
-  TH1F *dataFourierIm;       ///< imaginary part of the Fourier transform of the data histogram
-  TH1F *dataFourierPwr;      ///< power spectrum of the Fourier transform of the data histogram
-  TH1F *dataFourierPhase;    ///< phase spectrum of the Fourier transform of the data histogram
+  TH1F *dataFourierRe;           ///< real part of the Fourier transform of the data histogram
+  TH1F *dataFourierIm;           ///< imaginary part of the Fourier transform of the data histogram
+  TH1F *dataFourierPwr;          ///< power spectrum of the Fourier transform of the data histogram
+  TH1F *dataFourierPhase;        ///< phase spectrum of the Fourier transform of the data histogram
+  TH1F *dataFourierPhaseOptReal; ///< phase otpimized real Fourier transform of the data histogram
+  Double_t optPhase;             ///< optimal phase which maximizes the real Fourier
 } PFourierCanvasDataSet;
 
 //------------------------------------------------------------------------
