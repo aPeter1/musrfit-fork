@@ -4,8 +4,15 @@
 
 changes since 0.14.0
 ===================================
+NEW 2015-09-24 adding a phase optimized real Fourier to musrFT. This is still VERY
+               experimental, and hence only available from within musrFT. Eventually
+               it should make its way into musrview as well. Furthermore the 
+               documentation needs to be written yet. There is only a short not in
+               the command line present.
 NEW 2015-02-23 implemented an average-per-data-set option for musrFT.
 NEW 2015-02-21 add proper Mac icon to musredit
+FIXED 2015-09-22 generating global fit msr-files including a GLOBAL block is working
+                 now as expected.
 FIXED 2015-09-17 in PMsr2Data::PrepareGlobalInputFile() there seem to be 'unmotivated'
                  break; commands in some loops. They prevent a proper map handling.
                  Since this is a real puzzle I contacted BMW for clarification. 

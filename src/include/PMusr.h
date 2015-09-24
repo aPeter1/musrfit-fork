@@ -123,12 +123,13 @@ typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
 #define FOURIER_APOD_MEDIUM    3
 #define FOURIER_APOD_STRONG    4
 
-#define FOURIER_PLOT_NOT_GIVEN     0
-#define FOURIER_PLOT_REAL          1
-#define FOURIER_PLOT_IMAG          2
-#define FOURIER_PLOT_REAL_AND_IMAG 3
-#define FOURIER_PLOT_POWER         4
-#define FOURIER_PLOT_PHASE         5
+#define FOURIER_PLOT_NOT_GIVEN      0
+#define FOURIER_PLOT_REAL           1
+#define FOURIER_PLOT_IMAG           2
+#define FOURIER_PLOT_REAL_AND_IMAG  3
+#define FOURIER_PLOT_POWER          4
+#define FOURIER_PLOT_PHASE          5
+#define FOURIER_PLOT_PHASE_OPT_REAL 6
 
 //-------------------------------------------------------------
 // RRF related tags
