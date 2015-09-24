@@ -227,6 +227,7 @@ PFourierCanvas::~PFourierCanvas()
       delete fFourierHistos[i].dataFourierIm;
       delete fFourierHistos[i].dataFourierPwr;
       delete fFourierHistos[i].dataFourierPhase;
+      delete fFourierHistos[i].dataFourierPhaseOptReal;
     }
     fFourierHistos.clear();
   }
@@ -385,6 +386,11 @@ void PFourierCanvas::HandleMenuPopup(Int_t id)
     fPopupFourier->UnCheckEntries();
     fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PHASE);
     fCurrentPlotView = FOURIER_PLOT_PHASE;
+    PlotFourier();
+  } else if (id == P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PHASE_OPT_REAL) {
+    fPopupFourier->UnCheckEntries();
+    fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PHASE_OPT_REAL);
+    fCurrentPlotView = FOURIER_PLOT_PHASE_OPT_REAL;
     PlotFourier();
   } else if (id == P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PHASE_PLUS) {
     IncrementFourierPhase();
@@ -590,6 +596,12 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
         yAxis = TString("<Phase>");
         xMinBin = fFourierHistos[0].dataFourierPhase->GetXaxis()->GetFirst();
         xMaxBin = fFourierHistos[0].dataFourierPhase->GetXaxis()->GetLast();
+        break;        
+      case FOURIER_PLOT_PHASE_OPT_REAL:
+        xAxis = fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->GetTitle();
+        yAxis = TString("<Phase>");
+        xMinBin = fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->GetLast();
         break;
       default:
         xAxis = TString("??");
@@ -623,6 +635,12 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
         yAxis = TString("Phase");
         xMinBin = fFourierHistos[0].dataFourierPhase->GetXaxis()->GetFirst();
         xMaxBin = fFourierHistos[0].dataFourierPhase->GetXaxis()->GetLast();
+        break;
+      case FOURIER_PLOT_PHASE_OPT_REAL:
+        xAxis = fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->GetTitle();
+        yAxis = TString("Phase");
+        xMinBin = fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->GetLast();
         break;
       default:
         xAxis = TString("??");
@@ -659,6 +677,9 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
         case FOURIER_PLOT_PHASE:
           fout << fFourierAverage[0].dataFourierPhase->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierPhase->GetBinContent(i) << endl;
           break;
+        case FOURIER_PLOT_PHASE_OPT_REAL:
+          fout << fFourierAverage[0].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierPhaseOptReal->GetBinContent(i) << endl;
+          break;
         default:
           break;
       }
@@ -693,6 +714,9 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
           case FOURIER_PLOT_PHASE:
               fout << fFourierHistos[j].dataFourierPhase->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierPhase->GetBinContent(i) << ", ";
               break;
+          case FOURIER_PLOT_PHASE_OPT_REAL:
+              fout << fFourierHistos[j].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierPhaseOptReal->GetBinContent(i) << ", ";
+              break;
           default:
               break;
         }
@@ -709,6 +733,9 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
             break;
         case FOURIER_PLOT_PHASE:
             fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinContent(i) << endl;
+            break;
+        case FOURIER_PLOT_PHASE_OPT_REAL:
+            fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhaseOptReal->GetBinContent(i) << endl;
             break;
         default:
             break;
@@ -777,6 +804,8 @@ void PFourierCanvas::InitFourierDataSets()
     fFourierHistos[i].dataFourierIm = fFourier[i]->GetImaginaryFourier();
     fFourierHistos[i].dataFourierPwr = fFourier[i]->GetPowerFourier();
     fFourierHistos[i].dataFourierPhase = fFourier[i]->GetPhaseFourier();
+    fFourierHistos[i].dataFourierPhaseOptReal = fFourier[i]->GetPhaseOptRealFourier(fFourierHistos[i].optPhase, 1.0, fInitialXRange[0], fInitialXRange[1]);
+    cout << "debug> histo[" << i << "]: opt. phase = " << fFourierHistos[i].optPhase * 180.0 / TMath::Pi() << "°" << endl;
   }
 
   // rescale histo to abs(maximum) == 1
@@ -796,6 +825,7 @@ void PFourierCanvas::InitFourierDataSets()
       fFourierHistos[i].dataFourierRe->SetBinContent(j, fFourierHistos[i].dataFourierRe->GetBinContent(j)/fabs(max));
     }
   }
+
   // imaginary
   for (UInt_t i=0; i<fFourierHistos.size(); i++) {
     for (Int_t j=start; j<=end; j++) {
@@ -809,6 +839,7 @@ void PFourierCanvas::InitFourierDataSets()
       fFourierHistos[i].dataFourierIm->SetBinContent(j, fFourierHistos[i].dataFourierIm->GetBinContent(j)/fabs(max));
     }
   }
+
   // power
   max = 0.0;
   for (UInt_t i=0; i<fFourierHistos.size(); i++) {
@@ -823,6 +854,7 @@ void PFourierCanvas::InitFourierDataSets()
       fFourierHistos[i].dataFourierPwr->SetBinContent(j, fFourierHistos[i].dataFourierPwr->GetBinContent(j)/fabs(max));
     }
   }
+
   // phase
   max = 0.0;
   for (UInt_t i=0; i<fFourierHistos.size(); i++) {
@@ -838,6 +870,20 @@ void PFourierCanvas::InitFourierDataSets()
     }
   }
 
+  // phase opt real
+  for (UInt_t i=0; i<fFourierHistos.size(); i++) {
+    for (Int_t j=start; j<=end; j++) {
+      dval = fFourierHistos[i].dataFourierPhaseOptReal->GetBinContent(j);
+      if (fabs(dval) > max)
+        max = dval;
+    }
+  }
+  for (UInt_t i=0; i<fFourierHistos.size(); i++) {
+    for (Int_t j=1; j<fFourierHistos[i].dataFourierPhaseOptReal->GetNbinsX(); j++) {
+      fFourierHistos[i].dataFourierPhaseOptReal->SetBinContent(j, fFourierHistos[i].dataFourierPhaseOptReal->GetBinContent(j)/fabs(max));
+    }
+  }
+
   // set the marker and line color
   for (UInt_t i=0; i<fFourierHistos.size(); i++) {
     fFourierHistos[i].dataFourierRe->SetMarkerColor(fColorList[i]);
@@ -848,6 +894,8 @@ void PFourierCanvas::InitFourierDataSets()
     fFourierHistos[i].dataFourierPwr->SetLineColor(fColorList[i]);
     fFourierHistos[i].dataFourierPhase->SetMarkerColor(fColorList[i]);
     fFourierHistos[i].dataFourierPhase->SetLineColor(fColorList[i]);
+    fFourierHistos[i].dataFourierPhaseOptReal->SetMarkerColor(fColorList[i]);
+    fFourierHistos[i].dataFourierPhaseOptReal->SetLineColor(fColorList[i]);
   }
 
   // set the marker symbol and size
@@ -860,6 +908,8 @@ void PFourierCanvas::InitFourierDataSets()
     fFourierHistos[i].dataFourierPwr->SetMarkerSize(0.7);
     fFourierHistos[i].dataFourierPhase->SetMarkerStyle(fMarkerList[i]);
     fFourierHistos[i].dataFourierPhase->SetMarkerSize(0.7);
+    fFourierHistos[i].dataFourierPhaseOptReal->SetMarkerStyle(fMarkerList[i]);
+    fFourierHistos[i].dataFourierPhaseOptReal->SetMarkerSize(0.7);
   }
 
   // initialize average histos
@@ -913,6 +963,7 @@ void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t w
     fPopupFourier->AddEntry("Show Real+Imag", P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_REAL_AND_IMAG);
     fPopupFourier->AddEntry("Show Power", P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PWR);
     fPopupFourier->AddEntry("Show Phase", P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PHASE);
+    fPopupFourier->AddEntry("Show Phase Opt Fourier", P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PHASE_OPT_REAL);
     fPopupFourier->AddSeparator();
     fPopupFourier->AddEntry("Phase +", P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PHASE_PLUS);
     fPopupFourier->AddEntry("Phase -", P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PHASE_MINUS);
@@ -934,6 +985,9 @@ void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t w
         break;
       case FOURIER_PLOT_PHASE:
         fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PHASE);
+        break;
+      case FOURIER_PLOT_PHASE_OPT_REAL:
+        fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_ID_FOURIER_PHASE_OPT_REAL);
         break;
       default:
         break;
@@ -1029,6 +1083,10 @@ void PFourierCanvas::CleanupAverage()
       delete fFourierAverage[i].dataFourierPhase;
       fFourierAverage[i].dataFourierPhase = 0;
     }
+    if (fFourierAverage[i].dataFourierPhaseOptReal) {
+      delete fFourierAverage[i].dataFourierPhaseOptReal;
+      fFourierAverage[i].dataFourierPhaseOptReal = 0;
+    }
   }
   fFourierAverage.clear();
 }
@@ -1073,6 +1131,11 @@ void PFourierCanvas::HandleAverage()
     fFourierAverage[0].dataFourierPhase = new TH1F(name, name, fFourierHistos[0].dataFourierPhase->GetNbinsX(),
                                                    fFourierHistos[0].dataFourierPhase->GetXaxis()->GetXmin(),
                                                    fFourierHistos[0].dataFourierPhase->GetXaxis()->GetXmax());
+
+    name = TString(fFourierHistos[0].dataFourierPhaseOptReal->GetTitle()) + "_avg";
+    fFourierAverage[0].dataFourierPhaseOptReal = new TH1F(name, name, fFourierHistos[0].dataFourierPhaseOptReal->GetNbinsX(),
+                                                         fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->GetXmin(),
+                                                         fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->GetXmax());
 
     // real average
     for (Int_t j=0; j<fFourierHistos[0].dataFourierRe->GetNbinsX(); j++) {
@@ -1133,6 +1196,21 @@ void PFourierCanvas::HandleAverage()
     fFourierAverage[0].dataFourierPhase->SetLineColor(kBlack);
     fFourierAverage[0].dataFourierPhase->SetMarkerSize(0.8);
     fFourierAverage[0].dataFourierPhase->SetMarkerStyle(22);
+
+    // phase optimised real average
+    for (Int_t j=0; j<fFourierHistos[0].dataFourierPhaseOptReal->GetNbinsX(); j++) {
+      dval = 0.0;
+      for (UInt_t i=0; i<fFourierHistos.size(); i++) {
+        if (j < fFourierHistos[i].dataFourierPhaseOptReal->GetNbinsX())
+          dval += GetInterpolatedValue(fFourierHistos[i].dataFourierPhaseOptReal, fFourierHistos[0].dataFourierPhaseOptReal->GetBinCenter(j));
+      }
+      fFourierAverage[0].dataFourierPhaseOptReal->SetBinContent(j, dval/fFourierHistos.size());
+    }
+    // set marker color, line color, maker size, marker type
+    fFourierAverage[0].dataFourierPhaseOptReal->SetMarkerColor(kBlack);
+    fFourierAverage[0].dataFourierPhaseOptReal->SetLineColor(kBlack);
+    fFourierAverage[0].dataFourierPhaseOptReal->SetMarkerSize(0.8);
+    fFourierAverage[0].dataFourierPhaseOptReal->SetMarkerStyle(22);
   }
 
   // check if per data set shall be averaged
@@ -1196,6 +1274,11 @@ void PFourierCanvas::HandleAverage()
                                                      fFourierHistos[0].dataFourierPhase->GetXaxis()->GetXmin(),
                                                      fFourierHistos[0].dataFourierPhase->GetXaxis()->GetXmax());
 
+      name  = TString(fFourierHistos[start].dataFourierPhaseOptReal->GetTitle()) + "_avg";
+      fFourierAverage[i].dataFourierPhaseOptReal = new TH1F(name, name, fFourierHistos[0].dataFourierPhaseOptReal->GetNbinsX(),
+                                                            fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->GetXmin(),
+                                                            fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->GetXmax());
+
       // real average
       for (Int_t j=0; j<fFourierHistos[0].dataFourierRe->GetNbinsX(); j++) {
         dval = 0.0;
@@ -1255,6 +1338,21 @@ void PFourierCanvas::HandleAverage()
       fFourierAverage[i].dataFourierPhase->SetLineColor(fColorList[i]);
       fFourierAverage[i].dataFourierPhase->SetMarkerSize(0.8);
       fFourierAverage[i].dataFourierPhase->SetMarkerStyle(22); // closed up triangle
+
+      // phase optimised real average
+      for (Int_t j=0; j<fFourierHistos[0].dataFourierPhaseOptReal->GetNbinsX(); j++) {
+        dval = 0.0;
+        for (Int_t k=start; k<=end; k++) {
+          if (j < fFourierHistos[k].dataFourierPhaseOptReal->GetNbinsX())
+            dval += GetInterpolatedValue(fFourierHistos[k].dataFourierPhaseOptReal, fFourierHistos[0].dataFourierPhaseOptReal->GetBinCenter(j));
+        }
+        fFourierAverage[i].dataFourierPhaseOptReal->SetBinContent(j, dval/(end-start+1));
+      }
+      // set marker color, line color, maker size, marker type
+      fFourierAverage[i].dataFourierPhaseOptReal->SetMarkerColor(fColorList[i]);
+      fFourierAverage[i].dataFourierPhaseOptReal->SetLineColor(fColorList[i]);
+      fFourierAverage[i].dataFourierPhaseOptReal->SetMarkerSize(0.8);
+      fFourierAverage[i].dataFourierPhaseOptReal->SetMarkerStyle(22); // closed up triangle
     }
   }
 }
@@ -1379,6 +1477,26 @@ void PFourierCanvas::PlotFourier()
     fFourierHistos[0].dataFourierPhase->Draw("p");
     for (UInt_t i=1; i<fFourierHistos.size(); i++) {
       fFourierHistos[i].dataFourierPhase->Draw("psame");
+    }
+    break;
+  case FOURIER_PLOT_PHASE_OPT_REAL:
+    fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->SetRangeUser(xmin, xmax);
+    ymin = GetMinimum(fFourierHistos[0].dataFourierPhaseOptReal, xmin, xmax);
+    ymax = GetMaximum(fFourierHistos[0].dataFourierPhaseOptReal, xmin, xmax);
+    for (UInt_t i=1; i<fFourierHistos.size(); i++) {
+      if (GetMaximum(fFourierHistos[i].dataFourierPhaseOptReal, xmin, xmax) > ymax)
+        ymax = GetMaximum(fFourierHistos[i].dataFourierPhaseOptReal, xmin, xmax);
+      if (GetMinimum(fFourierHistos[i].dataFourierPhaseOptReal, xmin, xmax) < ymin)
+        ymin = GetMinimum(fFourierHistos[i].dataFourierPhaseOptReal, xmin, xmax);
+    }
+    fFourierHistos[0].dataFourierPhaseOptReal->GetYaxis()->SetRangeUser(ymin, 1.05*ymax);
+    fFourierHistos[0].dataFourierPhaseOptReal->GetYaxis()->SetTitleOffset(1.3);
+    fFourierHistos[0].dataFourierPhaseOptReal->GetYaxis()->SetDecimals(kTRUE);
+    fFourierHistos[0].dataFourierPhaseOptReal->GetYaxis()->SetTitle("Phase Opt. Real");
+    fFourierHistos[0].dataFourierPhaseOptReal->GetXaxis()->SetTitle(fXaxisTitle.Data());
+    fFourierHistos[0].dataFourierPhaseOptReal->Draw("p");
+    for (UInt_t i=1; i<fFourierHistos.size(); i++) {
+      fFourierHistos[i].dataFourierPhaseOptReal->Draw("psame");
     }
     break;
   default:
@@ -1541,6 +1659,24 @@ void PFourierCanvas::PlotAverage()
     fFourierAverage[0].dataFourierPhase->GetXaxis()->SetRangeUser(xmin, xmax);
     fFourierAverage[0].dataFourierPhase->Draw("p");
     break;
+  case FOURIER_PLOT_PHASE_OPT_REAL:
+    fFourierAverage[0].dataFourierPhaseOptReal->GetXaxis()->SetRangeUser(xmin, xmax);
+    ymin = GetMinimum(fFourierAverage[0].dataFourierPhaseOptReal, xmin, xmax);
+    ymax = GetMaximum(fFourierAverage[0].dataFourierPhaseOptReal, xmin, xmax);
+    for (UInt_t i=1; i<fFourierAverage.size(); i++) {
+      if (GetMaximum(fFourierAverage[i].dataFourierPhaseOptReal, xmin, xmax) > ymax)
+        ymax = GetMaximum(fFourierAverage[i].dataFourierPhaseOptReal, xmin, xmax);
+      if (GetMinimum(fFourierAverage[i].dataFourierPhaseOptReal, xmin, xmax) < ymin)
+        ymin = GetMinimum(fFourierAverage[i].dataFourierPhaseOptReal, xmin, xmax);
+    }
+    fFourierAverage[0].dataFourierPhaseOptReal->GetYaxis()->SetRangeUser(ymin, 1.03*ymax);
+    fFourierAverage[0].dataFourierPhaseOptReal->GetYaxis()->SetTitleOffset(1.3);
+    fFourierAverage[0].dataFourierPhaseOptReal->GetYaxis()->SetDecimals(kTRUE);
+    fFourierAverage[0].dataFourierPhaseOptReal->GetYaxis()->SetTitle("<Phase Opt. Real>");
+    fFourierAverage[0].dataFourierPhaseOptReal->GetXaxis()->SetTitle(fXaxisTitle.Data());
+    fFourierAverage[0].dataFourierPhaseOptReal->GetXaxis()->SetRangeUser(xmin, xmax);
+    fFourierAverage[0].dataFourierPhaseOptReal->Draw("p");
+    break;
   default:
     break;
   }
@@ -1567,6 +1703,9 @@ void PFourierCanvas::PlotAverage()
         break;
       case FOURIER_PLOT_PHASE:
         fFourierAverage[i].dataFourierPhase->Draw("psame");
+        break;
+      case FOURIER_PLOT_PHASE_OPT_REAL:
+        fFourierAverage[i].dataFourierPhaseOptReal->Draw("psame");
         break;
       default:
         break;

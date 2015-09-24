@@ -34,7 +34,7 @@
    <property name="title">
     <string> Fourier </string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>21</x>
@@ -89,6 +89,11 @@ p, li { white-space: pre-wrap; }
            <item>
             <property name="text">
              <string>phase</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>phaseOptReal</string>
             </property>
            </item>
           </widget>

@@ -67,7 +67,7 @@ typedef struct {
   TString msrFlnOut;              ///< dump file name for msr-file generation
   Int_t bkg_range[2];             ///< background range
   PDoubleVector bkg;              ///< background value
-  TString fourierOpt;             ///< Fourier options, i.e. real, imag, power, phase
+  TString fourierOpt;             ///< Fourier options, i.e. real, imag, power, phase, phaseOptReal
   TString apodization;            ///< apodization setting: none, weak, medium, strong
   Int_t fourierPower;             ///< Fourier power for zero padding, i.e. 2^fourierPower points
   TString fourierUnits;           ///< wished Fourier units: Gauss, Tesla, MHz, Mc/s
@@ -111,7 +111,7 @@ void musrFT_syntax()
   cout << endl << "    -br, --background-range <start> <end>: background interval used to estimate the background to be";
   cout << endl << "                subtracted before the Fourier transform. <start>, <end> to be given in bins.";
   cout << endl << "    -bg, --background <list> : gives the background explicit for each histogram.";
-  cout << endl << "    -fo, --fourier-option <fopt>: <fopt> can be 'real', 'imag', 'real+imag', 'power', or 'phase'.";
+  cout << endl << "    -fo, --fourier-option <fopt>: <fopt> can be 'real', 'imag', 'real+imag', 'power', 'phase', or 'phaseOptReal'.";
   cout << endl << "                If this is not defined (neither on the command line nor in the musrfit_startup.xml),";
   cout << endl << "                default will be 'power'.";
   cout << endl << "    -ap, --apodization <val> : <val> can be either 'none', 'weak', 'medium', 'strong'.";
@@ -370,7 +370,8 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
         return 2;
       }
       TString topt(argv[i+1]);
-      if (!topt.BeginsWith("real") && !topt.BeginsWith("imag") && !topt.BeginsWith("power") && !topt.BeginsWith("phase")) {
+      if (!topt.BeginsWith("real") && !topt.BeginsWith("imag") && !topt.BeginsWith("power") &&
+          !topt.BeginsWith("phase") && !topt.BeginsWith("phaseOptReal")) {
         cerr << endl << ">> musrFT **ERROR** found option --fourier-option with unrecognized argument '" << topt << "'." << endl;
         return 2;
       }
@@ -941,9 +942,9 @@ void musrFT_dumpMsrFile(musrFT_startup_param &param)
     fout << "units            " << param.fourierUnits << "   # units either 'Gauss', 'MHz', or 'Mc/s'" << endl;
   }
   if (param.fourierOpt.BeginsWith("??")) { // Fourier plot option not given, hence choose POWER
-    fout << "plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE" << endl;
+    fout << "plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL" << endl;
   } else {
-    fout << "plot             " << param.fourierOpt << "     # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE" << endl;
+    fout << "plot             " << param.fourierOpt << "     # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL" << endl;
   }
   if (param.fourierPower > 1) {
     fout << "fourier_power    " << param.fourierPower << endl;
@@ -1368,6 +1369,8 @@ Int_t main(Int_t argc, Char_t *argv[])
       fourierPlotTag = FOURIER_PLOT_POWER;
     else if (!startupParam.fourierOpt.CompareTo("phase", TString::kIgnoreCase))
       fourierPlotTag = FOURIER_PLOT_PHASE;
+    else if (!startupParam.fourierOpt.CompareTo("phaseoptreal", TString::kIgnoreCase))
+      fourierPlotTag = FOURIER_PLOT_PHASE_OPT_REAL;
     else
       fourierPlotTag = FOURIER_PLOT_POWER;
   }

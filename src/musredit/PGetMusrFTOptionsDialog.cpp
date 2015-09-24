@@ -36,12 +36,13 @@
 
 #include "PGetMusrFTOptionsDialog.h"
 
-#define MUSRFT_OPT_UNDEF         0
-#define MUSRFT_OPT_REAL          1
-#define MUSRFT_OPT_IMAG          2
-#define MUSRFT_OPT_REAL_AND_IMAG 3
-#define MUSRFT_OPT_POWER         4
-#define MUSRFT_OPT_PHASE         5
+#define MUSRFT_OPT_UNDEF          0
+#define MUSRFT_OPT_REAL           1
+#define MUSRFT_OPT_IMAG           2
+#define MUSRFT_OPT_REAL_AND_IMAG  3
+#define MUSRFT_OPT_POWER          4
+#define MUSRFT_OPT_PHASE          5
+#define MUSRFT_OPT_PHASE_OPT_REAL 6
 
 #define MUSRFT_APOD_UNDEF        0
 #define MUSRFT_APOD_WEAK         1
@@ -139,6 +140,8 @@ PGetMusrFTOptionsDialog::PGetMusrFTOptionsDialog(QString currentMsrFile, QString
         fFourierOption_comboBox->setCurrentIndex(MUSRFT_OPT_POWER);
       else if (prevCmd[i+1] == "phase")
         fFourierOption_comboBox->setCurrentIndex(MUSRFT_OPT_PHASE);
+      else if (prevCmd[i+1] == "phaseOptReal")
+        fFourierOption_comboBox->setCurrentIndex(MUSRFT_OPT_PHASE_OPT_REAL);
       else
         fFourierOption_comboBox->setCurrentIndex(MUSRFT_OPT_UNDEF);
       i++;
