@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PGetFunctionsBlockDialog</class>
+ <widget class="QDialog" name="PGetFunctionsBlockDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>636</width>
+    <height>604</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Get Functions</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../musredit.qrc">
+    <normaloff>:/images/musrfit.xpm</normaloff>:/images/musrfit.xpm</iconset>
+  </property>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>570</y>
+     <width>631</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="fHelp_pushButton">
+      <property name="text">
+       <string>&amp;Help</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>118</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="fOk_pushButton">
+      <property name="text">
+       <string>&amp;OK</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="fCancel_pushButton">
+      <property name="text">
+       <string>&amp;Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QTextEdit" name="fHelp_textEdit">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>10</y>
+     <width>631</width>
+     <height>201</height>
+    </rect>
+   </property>
+   <property name="readOnly">
+    <bool>true</bool>
+   </property>
+   <property name="html">
+    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;table style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:10pt;&quot;&gt;Supported basic arithmetics: &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:10pt;&quot;&gt;+, -, *, /, ()&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:10pt;&quot;&gt;Supported built-in functions; &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:10pt;&quot;&gt;cos(), sin(), tan(), acos(), asin(), atan(), cosh(), sinh(), tanh(), acosh(), asinh(), atanh(), exp(), log(), ln()&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:10pt;&quot;&gt;Supported pre-defined constants&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:10pt;&quot;&gt;gamma_mu = 0.0135538817 (MHz/G)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:10pt;&quot;&gt;pi = 3.1415926535897932846&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:10pt;&quot;&gt;Parameters and Maps are reached via parX, mapY, where X, Y are numbers, e.g. par1, map3&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:10pt;&quot;&gt;Examples:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:10pt;&quot;&gt;fun1 = gamma_mu * par3&lt;/span&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:10pt;&quot;&gt; valid&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:10pt;&quot;&gt;fun2 = par2/map4 * sin(par3*par5)&lt;/span&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:10pt;&quot;&gt; valid&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:10pt;&quot;&gt;fun3 = fun1 + par6&lt;/span&gt;&lt;span style=&quot; font-family:'Lucida Grande'; font-size:10pt;&quot;&gt; invalid, since functions cannot be used with the functions definition&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="fInput_groupBox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>210</y>
+     <width>631</width>
+     <height>101</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Input</string>
+   </property>
+   <widget class="QLineEdit" name="fFunctionInput_lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>30</y>
+      <width>521</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="fFunction_label">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>71</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Function:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="fAdd_pushButton">
+    <property name="geometry">
+     <rect>
+      <x>500</x>
+      <y>60</y>
+      <width>113</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Add</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QPlainTextEdit" name="fFunctionBlock_plainTextEdit">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>310</y>
+     <width>631</width>
+     <height>251</height>
+    </rect>
+   </property>
+   <property name="plainText">
+    <string>#####################################################
+FUNCTIONS</string>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>fOk_pushButton</tabstop>
+  <tabstop>fCancel_pushButton</tabstop>
+  <tabstop>fHelp_pushButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../musredit.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>fCancel_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetFunctionsBlockDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>629</x>
+     <y>584</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>368</x>
+     <y>565</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fOk_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetFunctionsBlockDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>538</x>
+     <y>577</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>265</x>
+     <y>583</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fHelp_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetFunctionsBlockDialog</receiver>
+   <slot>helpContent()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>41</x>
+     <y>585</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>111</x>
+     <y>582</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fAdd_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetFunctionsBlockDialog</receiver>
+   <slot>addFunction()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>555</x>
+     <y>289</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>410</x>
+     <y>591</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fFunctionInput_lineEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>PGetFunctionsBlockDialog</receiver>
+   <slot>addFunction()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>252</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>413</x>
+     <y>570</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>helpContent()</slot>
+  <slot>addFunction()</slot>
+ </slots>
+</ui>
