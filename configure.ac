@@ -1,7 +1,7 @@
 AC_REVISION([m4_esyscmd_s([git describe --always])])
 
 AC_PREREQ(2.63)
-AC_INIT([musrfit],[0.14.0],[andreas.suter@psi.ch])
+AC_INIT([musrfit],[0.15.0],[andreas.suter@psi.ch])
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_HOST
 #AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
@@ -35,7 +35,7 @@ dnl -----------------------------------------------
 
 #release versioning
 MUSR_MAJOR_VERSION=0
-MUSR_MINOR_VERSION=14
+MUSR_MINOR_VERSION=15
 MUSR_MICRO_VERSION=0
 
 #release versioning
@@ -858,6 +858,8 @@ if test "x$enable_editor" != "xno"; then
 
   echo "Additional checks for musredit/musrgui ..."
 
+  QT5MINVER=5.4
+
   case "$host" in
     *-*-cygwin)
       QT4MINVER=4.5
@@ -870,6 +872,7 @@ if test "x$enable_editor" != "xno"; then
   QT3_FOUND=no
   QT3MT_FOUND=no
   QT4_FOUND=no
+  QT5_FOUND=no
   QMAKEBIN=""
   QTEDITOR=none
 
@@ -943,14 +946,58 @@ if test "x$enable_editor" != "xno"; then
         fi]
   )
 
+  AC_ARG_WITH([qt5],
+        [AS_HELP_STRING([--with-qt5],[prefix of the Qt5 installation, e.g. /usr/lib64/qt5/])],
+        [QT5_PREFIX=$with_qt5
+        AC_MSG_CHECKING([whether qmake for Qt5 can be found at the specified location])
+        for QMAKE in qmake qmake-qt5
+        do
+          if test -x "${QT5_PREFIX}/bin/${QMAKE}"; then
+            QMAKEVERSIONSTRING="$(${QT5_PREFIX}/bin/${QMAKE} -v 2>&1)"
+            for a in $QMAKEVERSIONSTRING
+            do
+              if test "$(expr "$a" : '\(..\)')" = "5."; then
+                QMAKEBIN="${QT5_PREFIX}/bin/${QMAKE}"
+                QTEDITOR=musredit_qt5
+                AC_MSG_RESULT([${QMAKEBIN}])
+                break
+              fi
+            done
+            if test "x${QMAKEBIN}" != "x"; then
+              break
+            fi
+          fi
+        done
+
+        if test "x${QMAKEBIN}" = "x"; then
+          AC_MSG_RESULT([no])
+          AC_MSG_ERROR([qmake for Qt5 cannot be found in ${QT5_PREFIX}/bin!])
+        fi
+
+        if test "x${QT4PRESENT}" = "xyes"; then
+          AC_MSG_WARN([Qt4 and Qt5 directories have been given -- only the Qt5 information will be used and only musredit will be built!])
+        fi],
+        [if test "x${QMAKEBIN}" = "x"; then
+          PKG_CHECK_MODULES(QT5, Qt5WebKit >= $QT5MINVER Qt5Xml >= $QT5MINVER, [QT5_FOUND=yes],
+            [AC_MSG_NOTICE([Qt5 (including Qt5WebKit and Qt5Xml) not found!])
+             PKG_CHECK_MODULES(QT3, qt >= 3.3.0 qt < 4.0, [QT3_FOUND=yes],
+              [PKG_CHECK_MODULES(QT3MT, qt-mt >= 3.3.0 qt-mt < 4.0, [QT3MT_FOUND=yes], [QT3MT_FOUND=no])]
+            )]
+          )
+        fi]
+  )
+
   if test "x${QMAKEBIN}" = "x"; then
-    if test "x${QT3_FOUND}" = "xno" && test "x${QT3MT_FOUND}" = "xno" && test "x${QT4_FOUND}" = "xno"; then
-      AC_MSG_WARN([No suitable version of either Qt4 or Qt3 has been found! musredit/musrgui will not be built in this stage!])
+    if test "x${QT3_FOUND}" = "xno" && test "x${QT3MT_FOUND}" = "xno" && test "x${QT4_FOUND}" = "xno" && test "x${Qt5_FOUND}" = "xno"; then
+      AC_MSG_WARN([No suitable version of either Qt5, Qt4 or Qt3 has been found! musredit/musrgui will not be built in this stage!])
     else
       # Check for qmake on the basis of the pkg-config information
       QTPATH=none
 
-      if test "x$QT4_FOUND" = "xyes"; then
+      if test "x$QT5_FOUND" = "xyes"; then
+        QTPATH=$(pkg-config --variable=prefix Qt5WebKit)
+        QTEDITOR=musredit_qt5
+      elif test "x$QT4_FOUND" = "xyes"; then
         QTPATH=$(pkg-config --variable=prefix QtWebKit)
         QTEDITOR=musredit
       elif test "x$QT3_FOUND" = "xyes"; then
@@ -963,7 +1010,29 @@ if test "x$enable_editor" != "xno"; then
 
       AC_MSG_CHECKING([for qmake])
       if test "x${QTPATH}" != "xnone"; then
-        if test "x$QTEDITOR" = "xmusredit"; then
+        if test "x$QTEDITOR" = "xmusredit_qt5"; then
+          for QMAKE in qmake-qt5 qmake-qt54 qmake-qt55
+          do
+            if test -x "${QTPATH}/bin/${QMAKE}"; then
+              QMAKEBIN="${QTPATH}/bin/${QMAKE}"
+              AC_MSG_RESULT([${QMAKEBIN}])
+              break
+            fi
+          done
+          if test "x${QMAKEBIN}" = "x"; then
+            if test -x "${QTPATH}/bin/qmake"; then
+              QMAKEVERSIONSTRING="$(${QTPATH}/bin/qmake -v 2>&1)"
+              for a in $QMAKEVERSIONSTRING
+              do
+                if test "$(expr "$a" : '\(..\)')" = "5."; then
+                  QMAKEBIN="${QTPATH}/bin/qmake"
+                  AC_MSG_RESULT([${QMAKEBIN}])
+                  break
+                fi
+              done
+            fi
+          fi
+        elif test "x$QTEDITOR" = "xmusredit"; then
           for QMAKE in qmake-qt4 qmake-qt46 qmake-qt47 qmake-qt48
           do
             if test -x "${QTPATH}/bin/${QMAKE}"; then
@@ -1010,13 +1079,14 @@ if test "x$enable_editor" != "xno"; then
         fi
         if test "x${QMAKEBIN}" = "x"; then
           AC_MSG_RESULT([no])
-          AC_MSG_WARN([If Qt4 or Qt3 are present but have not been detected, try using the --with-qt4 or --with-qt3 options!])
+          AC_MSG_WARN([If Qt5, Qt4 or Qt3 are present but have not been detected, try using the --with-qt5, --with-qt4 or --with-qt3 options!])
         fi
       fi
     fi
   fi
 fi
 
+AM_CONDITIONAL([BUILD_MUSREDIT_QT5], [test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit_qt5"])
 AM_CONDITIONAL([BUILD_MUSREDIT], [test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit"])
 AM_CONDITIONAL([BUILD_MUSRGUI], [test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusrgui"])
 
@@ -1173,8 +1243,10 @@ AC_CONFIG_FILES([Makefile \
                  src/external/libPhotoMeissner/Makefile \
                  src/external/libPhotoMeissner/classes/Makefile \
                  src/external/libBNMR/Makefile \
+                 src/musredit_qt5/Makefile \
                  src/musredit/Makefile \
                  src/musrgui/Makefile \
+                 src/musredit_qt5/musredit_startup.xml \
                  src/musredit/musredit_startup.xml \
                  src/musrgui/musrgui_startup.xml])
 
@@ -1184,10 +1256,16 @@ if test "x$enable_editor" != "xno" && test "x$QMAKEBIN" != "x"; then
 
   echo "Configuring ${QTEDITOR} ..."
 
+  if test "x${QTEDITOR}" = "xmusredit_qt5"; then
+    QTEDITOR_PRO="musredit"
+  else
+    QTEDITOR_PRO=${QTEDITOR}
+  fi
+
   echo "Changing directory to src/${QTEDITOR} and calling"
-  echo "${QMAKEBIN} CC=${CC} CXX=${CXX} PREFIX=${INSTALLDIR} ${QTEDITOR}.pro"
+  echo "${QMAKEBIN} CC=${CC} CXX=${CXX} PREFIX=${INSTALLDIR} ${QTEDITOR_PRO}.pro"
   cd src/${QTEDITOR}
-  ${QMAKEBIN} CC=${CC} CXX=${CXX} PREFIX=${INSTALLDIR} ${QTEDITOR}.pro
+  ${QMAKEBIN} CC=${CC} CXX=${CXX} PREFIX=${INSTALLDIR} ${QTEDITOR_PRO}.pro
   cd ../..
 
 fi
@@ -1306,15 +1384,20 @@ else
 fi
 echo ""
 echo "   Qt musrfit editors:"
+if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit_qt5"; then
+  echo "     musredit (Qt5):                      yes"
+else
+  echo "     musredit (Qt5):                      no"
+fi
 if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit"; then
   echo "     musredit (Qt4):                      yes"
 else
   echo "     musredit (Qt4):                      no"
 fi
 if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusrgui"; then
-  echo "     musrgui (Qt3):                       yes"
+  echo "     musrgui  (Qt3):                      yes"
 else
-  echo "     musrgui (Qt3):                       no"
+  echo "     musrgui  (Qt3):                      no"
 fi
 echo ""
 echo ""
