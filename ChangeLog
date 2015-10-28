@@ -2,8 +2,13 @@
 # ChangeLog
 #---------------------------------------------------------------------
 
+changes since 0.15.0
+===================================
+
 changes since 0.14.0
 ===================================
+NEW 2015-10-26 added a first ported musredit version (Qt4 -> Qt5). At the same
+               the version has been incremented to 0.15.0.
 NEW 2015-09-24 adding a phase optimized real Fourier to musrFT. This is still VERY
                experimental, and hence only available from within musrFT. Eventually
                it should make its way into musrview as well. Furthermore the 
