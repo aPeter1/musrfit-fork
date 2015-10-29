@@ -4,6 +4,10 @@
 
 changes since 0.15.0
 ===================================
+FIXED 2015-10-29 TMusrRunHeader didn't map a double vector properly into a
+                 string. The last element was a copy of the 2nd last instead
+		 if the proper last. This is now fixed. Fixed also some
+		 comment typo.
 
 changes since 0.14.0
 ===================================
