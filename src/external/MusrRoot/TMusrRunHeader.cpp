@@ -1437,14 +1437,14 @@ bool TMusrRunHeader::UpdateFolder(TObject *treeObj, TString path)
 
   // remove the first path element
   if (!RemoveFirst(path, '/')) {
-    cerr << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** couldn't tokenize path!!" << endl;
+    cerr << endl << ">> TMusrRunHeader::UpdateFolder(): **ERROR** couldn't tokenize path!!" << endl;
     return false;
   }
 
   if (!obj) { // required object not present, create it
     TObjArray *oarray = new TObjArray();
     if (!oarray) {
-      cerr << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** couldn't create header structure!!" << endl;
+      cerr << endl << ">> TMusrRunHeader::UpdateFolder(): **ERROR** couldn't create header structure!!" << endl;
       return false;
     }
     // set the name of the new TObjArray
@@ -1636,7 +1636,7 @@ TObjString TMusrRunHeader::GetHeaderString(UInt_t idx)
         str += subStr;
         str += "; ";
       }
-      subStr.Form(fmt, dvec.size()-1);
+      subStr.Form(fmt, dvec[dvec.size()-1]);
       str += subStr;
       str += " -@";
       str += MRH_DOUBLE_VECTOR;
