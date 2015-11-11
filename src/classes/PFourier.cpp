@@ -299,6 +299,10 @@ TH1F* PFourier::GetPhaseOptRealFourier(Double_t &phase, const Double_t scale, co
   // check if maximum frequency is given. If yes, get the proper maxBin
   if (max != -1.0) {
     maxBin = (UInt_t)(max/fResolution);
+    if (maxBin >= noOfFourierBins) {
+      maxBin = noOfFourierBins;
+      cerr << "**WARNING** maximum frequency/field out of range. Will adopted it." << endl;
+    }
   }
 
   // copy the real/imag Fourier from min to max
