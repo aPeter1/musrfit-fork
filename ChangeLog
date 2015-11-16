@@ -10,6 +10,7 @@ FIXED 2015-10-29 TMusrRunHeader didn't map a double vector properly into a
 		 comment typo.
 FIXED 2015-11-11 Fixes the crash of Fourier if the maximal range given in the 
                  Fourier block is larger than the available.
+CHANGED 2015-11-15 removed unnecessary check form musredit_qt5 msr2data interface.
 
 changes since 0.14.0
 ===================================
