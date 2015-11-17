@@ -11,13 +11,14 @@ my %DATADIRS = (
 		"GPS",   "/afs/psi.ch/project/bulkmusr/data/gps",
 		"LTF",   "/afs/psi.ch/project/bulkmusr/data/ltf",
 		"Dolly", "/afs/psi.ch/project/bulkmusr/data/dolly",
-		"GPD", "/afs/psi.ch/project/bulkmusr/data/gpd"
+		"GPD", "/afs/psi.ch/project/bulkmusr/data/gpd",
+		"HAL",   "/afs/psi.ch/project/bulkmusr/data/hifi"
 		);
 
-my %BeamLines = ( "LEM", "MUE4", "LEM (PPC)", "MUE4", "GPS", "PIM3", "LTF", "PIM3", "Dolly", "PIE1", "GPD", "PIE1" );
+my %BeamLines = ( "LEM", "MUE4", "LEM (PPC)", "MUE4", "GPS", "PIM3", "LTF", "PIM3", "Dolly", "PIE1", "GPD", "PIE1" , "HAL", "PIE3");
 
 my %Def_Format =
-  ( "LEM", "MUSR-ROOT", "LEM (PPC)", "ROOT-PPC", "GPS", "PSI-BIN", "LTF", "PSI-BIN", "Dolly", "PSI-BIN" , "GPD", "PSI-BIN");
+  ( "LEM", "MUSR-ROOT", "LEM (PPC)", "ROOT-PPC", "GPS", "PSI-BIN", "LTF", "PSI-BIN", "Dolly", "PSI-BIN" , "GPD", "PSI-BIN", "HAL", "PSI-MDU");
 
 # Additional information to extract run properties from database
 # For LEM use summary files
@@ -28,6 +29,7 @@ $SUMM_DIR="/afs/psi.ch/project/nemu/data/summ/";
 	"Dolly","/afs/psi.ch/project/bulkmusr/olddata/list/",
 	"GPD","/afs/psi.ch/project/bulkmusr/olddata/list/",
 	"ALC","/afs/psi.ch/project/bulkmusr/olddata/list/",
+	"HAL","/afs/psi.ch/project/bulkmusr/olddata/list/",
 	"LTF","/afs/psi.ch/project/bulkmusr/olddata/list/");
 
 # Information available since
@@ -36,6 +38,7 @@ $SUMM_DIR="/afs/psi.ch/project/nemu/data/summ/";
 	   "Dolly","1998",
 	   "GPD","1993",
 	   "ALC","1993",
+	   "HAL","2012",
 	   "LTF","1995");
 
 # And to deal with old names of bulk muons
@@ -160,6 +163,9 @@ FUNCTIONS
     my $RUNSType = 0;
     my @RUNS=();
     if ($All{"RunNumbers"} ne $EMPTY) {
+	# Remove spaces and other illegal characters
+	$All{"RunNumbers"} =~ s/ //g;
+	$All{"RunNumbers"} =~ s/[a-zA-Z]//g;
 	@RUNS=split( /,/, $All{"RunNumbers"});
 	$RUNSType = 0;
     }
@@ -415,13 +421,11 @@ SAVE
     # Check if a plot range is defined (i.e. different from fit)
     $PRANGE_Line = "use_fit_ranges";
     if ( $All{"Xi"} != $All{"Xf"} ) {
-
-        #	if ($Yi != $Yf) {
-        $PRANGE_Line = "range  ".$All{"Xi"}."  ".$All{"Xf"}."  ".$All{"Yi"}."  ".$All{"Yf"};
-
-        #	} else {
-        #	    $PRANGE_Line = "range  $Xi  $Xf";
-        #	}
+	if ($All{"Yi"} != $All{"Yf"}) {
+	    $PRANGE_Line = "range  ".$All{"Xi"}."  ".$All{"Xf"}."  ".$All{"Yi"}."  ".$All{"Yf"};
+	} else {
+	    $PRANGE_Line = "range ".$All{"Xi"}." ".$All{"Xf"};
+	}
     }
 
     $VIEWBIN_Line ="";
@@ -441,7 +445,10 @@ $logxy";
     if ($All{"FAPODIZATION"} eq $EMPTY) {$All{"FAPODIZATION"}="STRONG";}
     if ($All{"FPLOT"} eq $EMPTY) {$All{"FPLOT"}="POWER";}
     if ($All{"FPHASE"} eq $EMPTY) {$All{"FPHASE"}="8.5";}
-
+    my $FrqRange = "#range ".$All{"FRQMIN"}."  ".$All{"FRQMAX"};
+    if ($All{"FRQMAX"} ne $EMPTY && $All{"FRQMIN"} ne $EMPTY) {
+	$FrqRange = "range ".$All{"FRQMIN"}."  ".$All{"FRQMAX"};
+    }
 
     $FOURIER_Block=
       "###############################################################
@@ -451,12 +458,13 @@ fourier_power    12
 apodization      FAPODIZATION  # NONE, WEAK, MEDIUM, STRONG
 plot             FPLOT   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
 phase            FPHASE
-#range            FRQMIN  FRQMAX";
+FRQRANGE";
 
     $FOURIER_Block=~ s/FUNITS/$All{"FUNITS"}/g;
     $FOURIER_Block=~ s/FAPODIZATION/$All{"FAPODIZATION"}/g;
     $FOURIER_Block=~ s/FPLOT/$All{"FPLOT"}/g;
     $FOURIER_Block=~ s/FPHASE/$All{"FPHASE"}/g;
+    $FOURIER_Block=~ s/FRQRANGE/$FrqRange/g;
 
     # Don't know why but it is needed initially
     $STAT_Block =
@@ -518,8 +526,6 @@ sub CreateMSRSingleHist {
     # First create the THEORY Block
     my ($Full_T_Block,$Paramcomp_ref)=MSR::CreateTheory(@FitTypes);
     my @Paramcomp = @$Paramcomp_ref;
-
-    print "Paramcomp= $Paramcomp[0]";
 
     # If we have a FUNCTIONS Block the Full_T_Block should be 
     # replaced by Func_T_Block
@@ -664,6 +670,7 @@ FUNCTIONS
 			    $NoBg_Line = $NoBg_Line . "backgr.fit      $PCount\n";
 			}
 		    }
+
 		    # End of No and NBg Lines
 		    # Now deal with physical parameters and phases
 		    elsif ( $Param_ORG ne "Phi" && $Param_ORG ne "No"  && $Param_ORG ne "NBg") {
@@ -817,13 +824,11 @@ SAVE
     # Check if a plot range is defined (i.e. different from fit)
     $PRANGE_Line = "use_fit_ranges";
     if ( $All{"Xi"} != $All{"Xf"} ) {
-
-        #	if ($Yi != $Yf) {
-        $PRANGE_Line = "range  ".$All{"Xi"}."  ".$All{"Xf"}."  ".$All{"Yi"}."  ".$All{"Yf"};
-
-        #	} else {
-        #	    $PRANGE_Line = "range  $Xi  $Xf";
-        #	}
+	if ($All{"Yi"} != $All{"Yf"}) {
+	    $PRANGE_Line = "range  ".$All{"Xi"}."  ".$All{"Xf"}."  ".$All{"Yi"}."  ".$All{"Yf"};
+	} else {
+	    $PRANGE_Line = "range ".$All{"Xi"}." ".$All{"Xf"};
+	}
     }
 
     my $RRFBlock=MSR::CreateRRFBlock(\%All);
@@ -1057,9 +1062,16 @@ sub CreateTheory {
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'dynGssKTLF'} );
 	}
 	
+	# Static Lorentzian or Gaussian KF ZF
 	elsif ( $FitType eq "LGKT" ) {
 	    $T_Block = $T_Block . "\n" . "combiLGKT " . $THEORY{'combiLGKT'};
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'combiLGKT'} );
+	} 
+
+	# Static Stretched KF ZF
+	elsif ( $FitType eq "STRKT" ) {
+	    $T_Block = $T_Block . "\n" . "strKT " . $THEORY{'strKT'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'strKT'} );
 	} 
 
 	# Now some more combined functions (multiplication).
@@ -1109,6 +1121,15 @@ sub CreateTheory {
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'combiLGKT'} );
 	}
 
+	# Stretched KT ZF multiplied by exponential
+	elsif ( $FitType eq "STRKTExp" ) {
+	    $T_Block = $T_Block . "\n" . "simplExpo " . $THEORY{'simplExpo'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'simplExpo'} );
+	    $T_Block =
+		$T_Block . "\n" . "strKT " . $THEORY{'strKT'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'strKT'} );
+	}
+
 	# Lorentzian or Gaussian KT ZF multiplied by stretched exponential
 	elsif ( $FitType eq "LGKTSExp" ) {
 	    $T_Block = $T_Block . "\n" . "generExpo " . $THEORY{'generExpo'};
@@ -1116,6 +1137,15 @@ sub CreateTheory {
 	    $T_Block =
 		$T_Block . "\n" . "combiLGKT " . $THEORY{'combiLGKT'};
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'combiLGKT'} );
+	}
+
+	# Stretched KT ZF multiplied by stretched exponential
+	elsif ( $FitType eq "STRKTSExp" ) {
+	    $T_Block = $T_Block . "\n" . "generExpo " . $THEORY{'generExpo'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'generExpo'} );
+	    $T_Block =
+		$T_Block . "\n" . "strKT " . $THEORY{'strKT'};
+	    $Parameters = join( $SPACE, $Parameters, $THEORY{'strKT'} );
 	}
 
 	# Lorentzian or Gaussian KT LF multiplied by stretched exponential
@@ -1765,6 +1795,11 @@ sub RUNFileNameAuto {
 	$RUN_File_Name = "deltat_tdc_gpd_" . $RUNtmp;
 	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
+    elsif ( $BeamLine eq "HAL" ) {
+	$RUNtmp=sprintf("%05d",$RUNtmp);
+	$RUN_File_Name = "tdc_hifi_" . $YEAR . "_" . $RUNtmp;
+	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+    }
 	$RUN_Line = join( $SPACE,
 			 "RUN", $RUNFILE, $BeamLines{$BeamLine}, "PSI",
 			 $Def_Format{$BeamLine} );
@@ -1792,6 +1827,52 @@ sub CreateRRFBlock {
 }
 
 
+########################
+# ExtractInfo
+########################
+# Used to extract information from data file header. The header (using
+# "dump_header" is sent to this function from musrfit.cgi or MuSRFit
+sub ExtractInfo {
+    my ($header,$Arg) = @_;
+
+    my @lines = split(/\n/,$header);
+
+    if ( $Arg eq "TITLE" ) {
+        $RTRN_Val = $lines[3];
+        $RTRN_Val =~ s/\n//g;
+    }
+    elsif ( $Arg eq "Temp" ) {
+        foreach my $line (@lines) {
+            if ( $line =~ /Mean Sample_CF1/ ) {
+                ( my $tmp, my $T )   = split( /=/,  $line );
+                ( $T,   $tmp ) = split( /\(/, $T );
+                $RTRN_Val = $T;
+            }
+        }
+
+    }
+    elsif ( $Arg eq "Field" ) {
+        foreach my $line (@lines) {
+            if ( $line =~ /Mean B field/ ) {
+                ( $tmp, my $B )   = split( /=/,  $line );
+                ( $B,   $tmp ) = split( /\(/, $B );
+                $RTRN_Val = $B;
+            }
+        }
+    }
+    elsif ( $Arg eq "Energy" ) {
+        foreach my $line (@lines) {
+            if ( $line =~ /implantation energy/ ) {
+                ( my $tmp1, my $tmp2, my $E ) = split( /=/, $line );
+                ( $E, $tmp ) = split( /keV/, $E );
+                $RTRN_Val = $E;
+            }
+        }
+
+    }
+    #	$RTRN_Val =~ s/[\.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]//g;
+    return $RTRN_Val;
+}
 
 
 ########################
@@ -2224,7 +2305,7 @@ FUNCTIONS
 FITPARAMETER
 ###############################################################
 #     No     Name       Value    Err     Min  Max                  ";
-    my %PTable=MSR::PrepParamTableSh(\%All);
+    my %PTable=MSR::PrepParamTable(\%All);
     my $NParam=scalar keys( %PTable );
 # Fill the table with labels and values of parametr 
     for (my $iP=0;$iP<$NParam;$iP++) {
@@ -2266,13 +2347,11 @@ SAVE
     # Check if a plot range is defined (i.e. different from fit)
     $PRANGE_Line = "use_fit_ranges";
     if ( $All{"Xi"} != $All{"Xf"} ) {
-
-        #	if ($Yi != $Yf) {
-        $PRANGE_Line = "range  ".$All{"Xi"}."  ".$All{"Xf"}."  ".$All{"Yi"}."  ".$All{"Yf"};
-
-        #	} else {
-        #	    $PRANGE_Line = "range  $Xi  $Xf";
-        #	}
+	if ($All{"Yi"} != $All{"Yf"}) {
+	    $PRANGE_Line = "range  ".$All{"Xi"}."  ".$All{"Xf"}."  ".$All{"Yi"}."  ".$All{"Yf"};
+	} else {
+	    $PRANGE_Line = "range ".$All{"Xi"}." ".$All{"Xf"};
+	}
     }
 
     $VIEWBIN_Line ="";
