@@ -34,7 +34,7 @@
     <musr_web_musrFT>file://@DOCDIR@/html/user/MUSR/MusrFit.html#A_2.3_musrFT</musr_web_musrFT>
   </help_section>
   <font_settings>
-    <font_name>Courier New</font_name>
+    <font_name>Monospace</font_name>
     <font_size>12</font_size>
   </font_settings>
   <msr_file_defaults>
