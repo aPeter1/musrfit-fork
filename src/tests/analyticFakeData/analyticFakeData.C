@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2012 by Andreas Suter                              *
+ *   Copyright (C) 2007-2015 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -27,6 +27,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
+#include <vector>
+using namespace std;
+
 void analyticFakeData(const TString type, UInt_t runNo)
 {
   // load library
@@ -40,6 +44,10 @@ void analyticFakeData(const TString type, UInt_t runNo)
   TFolder *runHeader;
   TFolder *runInfo;
   UInt_t offset = 0;
+  const UInt_t noOfHistos = 4;
+  const UInt_t noOfChannels = 426600;
+  const Double_t timeResolution = 0.025; // ns
+  TRandom3 rand;
 
   histosFolder = gROOT->GetRootFolder()->AddFolder("histos", "Histograms");
   gROOT->GetListOfBrowsables()->Add(histosFolder, "histos");
@@ -49,8 +57,12 @@ void analyticFakeData(const TString type, UInt_t runNo)
 
   fileName.Form("0%d.root", (Int_t)runNo);
 
-  Double_t t0[16] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  cout << ">> define t0" << endl;
+  vector<Double_t> t0;
+  for (UInt_t i=0; i<noOfHistos; i++)
+    t0.push_back(5000.0);
 
+  cout << ">> define header" << endl;
   if (!type.CompareTo("TLemRunHeader")) {
     // feed run info header
     runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "LEM RunInfo");
@@ -67,8 +79,8 @@ void analyticFakeData(const TString type, UInt_t runNo)
     header->SetImpEnergy(31.8);
     header->SetSampleTemperature(0.2, 0.001);
     header->SetSampleBField(-1.0, 0.1);
-    header->SetTimeResolution(0.025);
-    header->SetNChannels(66601);
+    header->SetTimeResolution(timeResolution);
+    header->SetNChannels(noOfChannels);
     header->SetNHist(8);
     header->SetCuts("none");
     header->SetModerator("none");
@@ -107,17 +119,16 @@ void analyticFakeData(const TString type, UInt_t runNo)
     prop.Set("Sample Magnetic Field", 40.0, "T");
     header->Set("RunInfo/Sample Magnetic Field", prop);
     prop.Set("Sample Temperature", 1.0, "mK");
-    header->Set("RunInfo/No of Histos", 8);
-    prop.Set("Time Resolution", 0.025, "ns");
+    header->Set("RunInfo/No of Histos", (Int_t)noOfHistos);
+    prop.Set("Time Resolution", timeResolution, "ns");
     header->Set("RunInfo/Time Resolution", prop);
     vector<Int_t> ivec;
     ivec.push_back(0);
-//    ivec.push_back(20);
     header->Set("RunInfo/RedGreen Offsets", ivec);
 
     offset = 1;
     // 2nd write all the required DetectorInfo entries
-    for (UInt_t i=0; i<16; i++) {
+    for (UInt_t i=0; i<4; i++) {
       tstr.Form("DetectorInfo/Detector%03d/", i+offset);
       label = tstr + TString("Name");
       tstr1.Form("Detector%03d", (Int_t)(i+offset));
@@ -125,32 +136,14 @@ void analyticFakeData(const TString type, UInt_t runNo)
       label = tstr + TString("Histo No");
       header->Set(label, (Int_t)(i+offset));
       label = tstr + TString("Histo Length");
-      header->Set(label, 426600);
+      header->Set(label, (Int_t)noOfChannels);
       label = tstr + TString("Time Zero Bin");
       header->Set(label, t0[i]);
       label = tstr + TString("First Good Bin");
       header->Set(label, (Int_t)t0[i]);
       label = tstr + TString("Last Good Bin");
-      header->Set(label, 426600);
+      header->Set(label, (Int_t)noOfChannels);
     }
-/*
-    for (UInt_t i=0; i<8; i++) {
-      tstr.Form("DetectorInfo/Detector%03d/", 20+i+offset);
-      label = tstr + TString("Name");
-      tstr1.Form("Detector%03d", (Int_t)(20+i+offset));
-      header->Set(label, tstr1);
-      label = tstr + TString("Histo No");
-      header->Set(label, (Int_t)(20+i+offset));
-      label = tstr + TString("Histo Length");
-      header->Set(label, 66601);
-      label = tstr + TString("Time Zero Bin");
-      header->Set(label, t0[i]);
-      label = tstr + TString("First Good Bin");
-      header->Set(label, (Int_t)t0[i]);
-      label = tstr + TString("Last Good Bin");
-      header->Set(label, 66600);
-    }
-*/
     // 3rd write required SampleEnvironmentInfo entries
     header->Set("SampleEnvironmentInfo/Cryo", "virtual");
 
@@ -162,41 +155,51 @@ void analyticFakeData(const TString type, UInt_t runNo)
   }
 
   // create histos
-  Double_t n0[16] = {25.0, 24.8, 25.1, 25.0, 24.8, 24.9, 25.3, 25.0, 25.0, 24.8, 25.1, 25.0, 24.8, 24.9, 25.3, 25.0};
-  Double_t bkg[16] = {0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05};
+  cout << ">> define n0" << endl;
+  vector<Double_t> n0;
+  for (UInt_t i=0; i<noOfHistos; i++)
+    n0.push_back(25.0 + 2.0*rand.Rndm());
+
+  cout << ">> define bkg" << endl;
+  vector<Double_t> bkg;
+  for (UInt_t i=0; i<noOfHistos; i++)
+    bkg.push_back(0.05 + 0.02*rand.Rndm());
+
   const Double_t tau = 2197.019; // ns
 
   // asymmetry related stuff
-  const Double_t timeResolution = 0.025; // ns
-  Double_t a0[16] = {0.25, 0.26, 0.25, 0.26, 0.25, 0.26, 0.25, 0.26, 0.25, 0.26, 0.25, 0.26, 0.25, 0.26, 0.25, 0.26};
-//  Double_t a1[8] = {0.06, 0.07, 0.06, 0.07, 0.06, 0.07, 0.06, 0.07};
-  Double_t phase[16] = {5.0*TMath::Pi()/180.0, 27.5*TMath::Pi()/180.0, 50.0*TMath::Pi()/180.0, 72.5*TMath::Pi()/180.0,
-                       95.0*TMath::Pi()/180.0, 117.5*TMath::Pi()/180.0, 140.0*TMath::Pi()/180.0, 162.5*TMath::Pi()/180.0,
-                       185.0*TMath::Pi()/180, 207.5*TMath::Pi()/180.0, 230.0*TMath::Pi()/180.0, 252.5*TMath::Pi()/180.0,
-                       275*TMath::Pi()/180.0, 297.5*TMath::Pi()/180.0, 320.0*TMath::Pi()/180.0, 342.5*TMath::Pi()/180.0};
+  cout << ">> define a0" << endl;
+  vector<Double_t> a0;
+  for (UInt_t i=0; i<noOfHistos; i++)
+    a0.push_back(0.25 + 0.01*rand.Rndm());
+
+  cout << ">> define phase" << endl;
+  vector<Double_t> phase;
+  for (UInt_t i=0; i<noOfHistos; i++)
+    phase.push_back((5.0 + 2.0*rand.Rndm())*TMath::Pi()/180.0 + TMath::TwoPi()/noOfHistos * (Double_t)i);
+
   const Double_t gamma = 0.0000135538817; // gamma/(2pi)
-  Double_t bb0 = 40000.0; // field in Gauss
-//  Double_t bb1 = 40015.0; // field in Gauss
-  Double_t rate0 = 0.25/1000.0; // in 1/ns
-//  Double_t rate1 = 0.15/1000.0; // in 1/ns
+  Double_t bb0 = 90000.0; // field in Gauss
+  Double_t rate0 = 1.0/1000.0; // in 1/ns
 
   // fake function parameters header info: only for test purposes
+  cout << ">> write fake header for TMusrRoot" << endl;
   if (type.CompareTo("TLemRunHeader")) {
     TDoubleVector dvec;
     header->Set("FakeFct/Def", "N0 exp(-t/tau_mu) [1 + A exp(-1/2 (t sigma)^2) cos(gamma_mu B t + phi)] + bkg");
-    for (UInt_t i=0; i<16; i++)
+    for (UInt_t i=0; i<noOfHistos; i++)
       dvec.push_back(n0[i]);
     header->Set("FakeFct/N0", dvec);
     dvec.clear();
-    for (UInt_t i=0; i<16; i++)
+    for (UInt_t i=0; i<noOfHistos; i++)
       dvec.push_back(bkg[i]);
     header->Set("FakeFct/bkg", dvec);
     dvec.clear();
-    for (UInt_t i=0; i<16; i++)
+    for (UInt_t i=0; i<noOfHistos; i++)
       dvec.push_back(a0[i]);
     header->Set("FakeFct/A", dvec);
     dvec.clear();
-    for (UInt_t i=0; i<16; i++)
+    for (UInt_t i=0; i<noOfHistos; i++)
       dvec.push_back(phase[i]);
     header->Set("FakeFct/phase", dvec);
     prop.Set("B", bb0, "G");
@@ -205,81 +208,66 @@ void analyticFakeData(const TString type, UInt_t runNo)
     header->Set("FakeFct/lambda", prop);
   }
 
-  TH1F *histo[16];
+  cout << ">> create histo objects" << endl;
+  vector<TH1F*> histo;
+  histo.resize(noOfHistos);
   char str[128];
-  for (UInt_t i=0; i<16; i++) {
+  for (UInt_t i=0; i<noOfHistos; i++) {
     if (!type.CompareTo("TLemRunHeader"))
       sprintf(str, "hDecay%02d", (Int_t)(i+offset));
     else
       sprintf(str, "hDecay%03d", (Int_t)(i+offset));
-    histo[i] = new TH1F(str, str, 426601, -0.5, 426600.5);
-/*
-    if (!type.CompareTo("TLemRunHeader"))
-      sprintf(str, "hDecay%02d", (Int_t)(20+i+offset));
-    else
-      sprintf(str, "hDecay%03d", (Int_t)(20+i+offset));
-    histo[i+8] = new TH1F(str, str, 426601, -0.5, 426600.5);
-*/
+    histo[i] = new TH1F(str, str, noOfChannels+1, -0.5, noOfChannels+0.5);
   }
   Double_t time;
-  Double_t dval, dval1;
-  for (UInt_t i=0; i<16; i++) {
-    for (UInt_t j=0; j<426600; j++) {
+  Double_t dval;
+  cout << ">> fill histos" << endl;
+  for (UInt_t i=0; i<noOfHistos; i++) {
+    for (UInt_t j=0; j<noOfChannels; j++) {
       if (j<t0[i]) {
         histo[i]->SetBinContent(j+1, bkg[i]);
       } else {
         time = (Double_t)(j-t0[i])*timeResolution;
-/*
-        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-time*rate0)*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i])+
-                                                          a1[i]*TMath::Exp(-time*rate1)*TMath::Cos(TMath::TwoPi()*gamma*bb1*time+phase[i]))+(Double_t)bkg[i];
-*/
         dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*rate0,2))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i]))+(Double_t)bkg[i];
         histo[i]->SetBinContent(j+1, dval);
       }
     }
   }
 
-/*
+  cout << ">> add prompt peak" << endl;
   // add a promp peak
-  Double_t ampl = 0.0;
+  Double_t ampl = 50.0;
   Double_t promptLambda = 500.0/1000.0; // Lorentzain in 1/ns
   if (ampl != 0.0) {
-    for (UInt_t i=0; i<8; i++) {
-      for (UInt_t j=1; j<426601; j++) {
+    for (UInt_t i=0; i<noOfHistos; i++) {
+      for (UInt_t j=1; j<noOfChannels+1; j++) {
         dval = histo[i]->GetBinContent(j);
-        dval1 = dval*0.9; // simulate a PPC
         time = (Double_t)(j-t0[i])*timeResolution;
         dval += ampl*TMath::Exp(-fabs(time)*promptLambda);
-        dval1 += ampl*TMath::Exp(-fabs(time)*promptLambda);
         histo[i]->SetBinContent(j, dval);
-        histo[i+8]->SetBinContent(j, dval1);
       }
     }
   }
-*/
 
   // add Poisson noise
+  cout << ">> add Poisson noise" << endl;
   PAddPoissonNoise *addNoise = new PAddPoissonNoise();
   if (!addNoise->IsValid()) {
     cerr << endl << "**ERROR** while invoking PAddPoissonNoise" << endl;
     return;
   }
-  for (UInt_t i=0; i<16; i++) {
+  for (UInt_t i=0; i<noOfHistos; i++) {
     addNoise->AddNoise(histo[i]);
   }
   delete addNoise;
   addNoise = 0;
-/*
-  for (UInt_t i=0; i<8; i++) {
-    for (UInt_t j=1; j<histo[i]->GetEntries(); j++) {
-      histo[i+8]->SetBinContent(j, histo[i]->GetBinContent(j));
-    }
-  }
-*/
-  for (UInt_t i=0; i<16; i++)
+
+  cout << ">> add histos to decayAnaModule" << endl;
+  for (UInt_t i=0; i<noOfHistos; i++)
     decayAnaModule->Add(histo[i]);
 
   // write file
+  cout << ">> write file" << endl;
   TFile *fout = new TFile(fileName.Data(), "RECREATE", "Midas Fake Histograms");
   if (fout == 0) {
     cout << endl << "**ERROR** Couldn't create ROOT file";
@@ -299,5 +287,10 @@ void analyticFakeData(const TString type, UInt_t runNo)
   fout->Close();
   delete fout;
 
-  delete [] histo;
+/*
+  cout << ">> cleanup" << endl;
+  for (UInt_t i=0; i<noOfHistos; i+1)
+    delete histo[i];
+*/
+  cout << ">> done!" << endl;
 }
