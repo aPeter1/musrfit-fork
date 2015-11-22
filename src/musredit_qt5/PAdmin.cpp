@@ -643,7 +643,7 @@ PAdmin::PAdmin() : QObject()
   // XML Parser part
   QString fln = "musredit_startup.xml";
   // check if it is a MacOSX
-#ifdef Q_WS_MAC
+#ifdef Q_OS_OSX
   fln = "./musredit_startup.xml";
   if (!QFile::exists(fln)) {
     fln = "/Applications/musredit.app/Contents/Resources/musredit_startup.xml";
@@ -773,7 +773,7 @@ int PAdmin::savePrefs(QString pref_fln)
   QString str;
   QString fln = "musredit_startup.xml";
   // check if it is a MacOSX
-#ifdef Q_WS_MAC
+#ifdef Q_OS_OSX
   fln = "./musredit_startup.xml";
   if (!QFile::exists(fln)) {
     fln = "/Applications/musredit.app/Contents/Resources/musredit_startup.xml";
@@ -898,7 +898,7 @@ void PAdmin::saveRecentFiles()
   QString str;
   QString fln = "musredit_startup.xml";
   // check if it is a MacOSX
-#ifdef Q_WS_MAC
+#ifdef Q_OS_OSX
   fln = "./musredit_startup.xml";
   if (!QFile::exists(fln)) {
     fln = "/Applications/musredit.app/Contents/Resources/musredit_startup.xml";
