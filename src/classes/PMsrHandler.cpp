@@ -612,6 +612,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             case MSR_FITTYPE_SINGLE_HISTO:
               fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
               break;
+            case MSR_FITTYPE_SINGLE_HISTO_RRF:
+              fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO_RRF << "         (single histogram RRF fit)" << endl;
+              break;
             case MSR_FITTYPE_ASYM:
               fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
               break;
@@ -624,6 +627,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             default:
               break;
           }
+        } else if (sstr.BeginsWith("rrf_freq", TString::kIgnoreCase) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+          fout.width(16);
+          fout << left << "rrf_freq";
         } else if (sstr.BeginsWith("data")) {
           fout.width(16);
           fout << left << "data";
@@ -2796,8 +2802,8 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
   TString str;
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
-  Int_t ival;
-  Double_t dval;
+  Int_t ival = 0;
+  Double_t dval = 0.0;
   UInt_t addT0Counter = 0;
 
   // since this routine is called, a GLOBAL block is present
@@ -2828,6 +2834,7 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
         if (str.IsDigit()) {
           Int_t fittype = str.Atoi();
           if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
+              (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
               (fittype == MSR_FITTYPE_ASYM) ||
               (fittype == MSR_FITTYPE_MU_MINUS) ||
               (fittype == MSR_FITTYPE_NON_MUSR)) {
@@ -2835,6 +2842,55 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
           } else {
             error = true;
           }
+        } else {
+          error = true;
+        }
+      }
+    } else if (iter->fLine.BeginsWith("rrf_freq", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 3) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsFloat()) {
+          dval = str.Atof();
+          if (dval <= 0.0)
+            error = true;
+        }
+        if (!error) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          global.SetRRFFreq(dval, str.Data());
+          if (global.GetRRFFreq(str.Data()) == 0.0)
+            error = true;
+        }
+      }
+    } else if (iter->fLine.BeginsWith("rrf_packing", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit()) {
+          ival = str.Atoi();
+          if (ival > 0) {
+            global.SetRRFPacking(ival);
+          } else {
+            error = true;
+          }
+        } else {
+          error = true;
+        }
+      }
+    } else if (iter->fLine.BeginsWith("rrf_phase", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsFloat()) {
+          dval = str.Atof();
+          global.SetRRFPhase(dval);
         } else {
           error = true;
         }

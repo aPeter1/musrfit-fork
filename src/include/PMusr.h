@@ -52,10 +52,11 @@ typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
 #define PMUSR_MSR_FILE_WRITE_ERROR     -7
 #define PMUSR_DATA_FILE_READ_ERROR     -8
 
-#define PRUN_SINGLE_HISTO 0
-#define PRUN_ASYMMETRY    2
-#define PRUN_MU_MINUS     4
-#define PRUN_NON_MUSR     8
+#define PRUN_SINGLE_HISTO     0
+#define PRUN_SINGLE_HISTO_RRF 1
+#define PRUN_ASYMMETRY        2
+#define PRUN_MU_MINUS         4
+#define PRUN_NON_MUSR         8
 
 // muon life time in (us), see PRL99, 032001 (2007)
 #define PMUON_LIFETIME 2.197019
@@ -92,10 +93,11 @@ typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
 
 //-------------------------------------------------------------
 // msr fit type tags
-#define MSR_FITTYPE_SINGLE_HISTO 0
-#define MSR_FITTYPE_ASYM         2
-#define MSR_FITTYPE_MU_MINUS     4
-#define MSR_FITTYPE_NON_MUSR     8
+#define MSR_FITTYPE_SINGLE_HISTO     0
+#define MSR_FITTYPE_SINGLE_HISTO_RRF 1
+#define MSR_FITTYPE_ASYM             2
+#define MSR_FITTYPE_MU_MINUS         4
+#define MSR_FITTYPE_NON_MUSR         8
 
 //-------------------------------------------------------------
 // msr plot type tags
@@ -133,11 +135,12 @@ typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
 
 //-------------------------------------------------------------
 // RRF related tags
-#define RRF_UNIT_kHz 0
-#define RRF_UNIT_MHz 1
-#define RRF_UNIT_Mcs 2
-#define RRF_UNIT_G   3
-#define RRF_UNIT_T   4
+#define RRF_UNIT_UNDEF -1
+#define RRF_UNIT_kHz    0
+#define RRF_UNIT_MHz    1
+#define RRF_UNIT_Mcs    2
+#define RRF_UNIT_G      3
+#define RRF_UNIT_T      4
 
 //-------------------------------------------------------------
 /**
@@ -542,6 +545,9 @@ class PMsrGlobalBlock {
     virtual ~PMsrGlobalBlock() {}
 
     virtual Bool_t IsPresent() { return fGlobalPresent; }
+    virtual Double_t GetRRFFreq(const char *unit);
+    virtual Double_t GetRRFPhase() { return fRRFPhase; }
+    virtual Int_t GetRRFPacking() { return fRRFPacking; }
     virtual Int_t GetFitType() { return fFitType; }
     virtual Int_t GetDataRange(UInt_t idx);
     virtual UInt_t GetT0BinSize() { return fT0.size(); }
@@ -555,6 +561,9 @@ class PMsrGlobalBlock {
     virtual Int_t GetPacking() { return fPacking; }
 
     virtual void SetGlobalPresent(Bool_t bval) { fGlobalPresent = bval; }
+    virtual void SetRRFFreq(Double_t freq, const char *unit);
+    virtual void SetRRFPhase(Double_t phase) { fRRFPhase = phase; }
+    virtual void SetRRFPacking(Int_t pack);
     virtual void SetFitType(Int_t ival) { fFitType = ival; }
     virtual void SetDataRange(Int_t ival, Int_t idx);
     virtual void SetT0Bin(Double_t dval, Int_t idx=-1);
@@ -566,10 +575,14 @@ class PMsrGlobalBlock {
 
   private:
     Bool_t fGlobalPresent;    ///< flag showing if a GLOBAL block is present at all.
-    Int_t fFitType;           ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
-    Int_t fDataRange[4];      ///< data bin range (fit type 0, 2, 4)
-    PDoubleVector fT0;        ///< t0 bins (fit type 0, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
-    vector<PDoubleVector> fAddT0; ///< addt0 bins (fit type 0, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+    Double_t fRRFFreq;        ///< RRF frequency given in units of (MHz, Mc, T)
+    Int_t fRRFUnitTag;        ///< RRF unit tag
+    Double_t fRRFPhase;       ///< RRF phase in (°)
+    Int_t fRRFPacking;        ///< RRF packing
+    Int_t fFitType;           ///< fit type: 0=single histo fit, 1=single histo RRF fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
+    Int_t fDataRange[4];      ///< data bin range (fit type 0, 1, 2, 4)
+    PDoubleVector fT0;        ///< t0 bins (fit type 0, 1, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+    vector<PDoubleVector> fAddT0; ///< addt0 bins (fit type 0, 1, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
     Bool_t fFitRangeInBins;   ///< flag telling if fit range is given in time or in bins
     Double_t fFitRange[2];    ///< fit range in (us)
     Int_t fFitRangeOffset[2]; ///< if fit range is given in bins it can have the form fit fgb+n0 lgb-n1. This variable holds the n0 and n1.
