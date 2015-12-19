@@ -311,6 +311,11 @@ Int_t PMsrHandler::ReadMsrFile()
     if (!CheckAddRunParameters())
       result = PMUSR_MSR_SYNTAX_ERROR;
 
+  // check that if RRF settings are present, the RUN block settings do correspond
+  if (result == PMUSR_SUCCESS)
+    if (!CheckRRFSettings())
+      result = PMUSR_MSR_SYNTAX_ERROR;
+
   if (result == PMUSR_SUCCESS) {
     CheckMaxLikelihood(); // check if the user wants to use max likelihood with asymmetry/non-muSR fit (which is not implemented)
     CheckLegacyLifetimecorrection(); // check if lifetimecorrection is found in RUN blocks, if yes transfer it to PLOT blocks
@@ -629,7 +634,23 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           }
         } else if (sstr.BeginsWith("rrf_freq", TString::kIgnoreCase) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
           fout.width(16);
-          fout << left << "rrf_freq";
+          fout << left << "rrf_freq ";
+          fout.width(8);
+          fout << left << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data());
+          fout << " " << fGlobal.GetRRFUnit();
+          fout << endl;
+        } else if (sstr.BeginsWith("rrf_phase", TString::kIgnoreCase) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+          fout.width(16);
+          fout << "rrf_phase ";
+          fout.width(8);
+          fout << left << fGlobal.GetRRFPhase();
+          fout << endl;
+        } else if (sstr.BeginsWith("rrf_packing", TString::kIgnoreCase) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+          fout.width(16);
+          fout << "rrf_packing ";
+          fout.width(8);
+          fout << left << fGlobal.GetRRFPacking();
+          fout << endl;
         } else if (sstr.BeginsWith("data")) {
           fout.width(16);
           fout << left << "data";
@@ -1622,6 +1643,30 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
       default:
         break;
       }
+    }
+
+    // RRF related stuff
+    if ((fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) > 0.0) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+      fout.width(16);
+      fout << left << "rrf_freq ";
+      fout.width(8);
+      fout << left << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data());
+      fout << " " << fGlobal.GetRRFUnit();
+      fout << endl;
+    }
+    if ((fGlobal.GetRRFPhase() != 0.0) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+      fout.width(16);
+      fout << "rrf_phase ";
+      fout.width(8);
+      fout << left << fGlobal.GetRRFPhase();
+      fout << endl;
+    }
+    if ((fGlobal.GetRRFPacking() != -1) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+      fout.width(16);
+      fout << "rrf_packing ";
+      fout.width(8);
+      fout << left << fGlobal.GetRRFPacking();
+      fout << endl;
     }
 
     // data range
@@ -3169,6 +3214,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         if (str.IsDigit()) {
           Int_t fittype = str.Atoi();
           if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
+              (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
               (fittype == MSR_FITTYPE_ASYM) ||
               (fittype == MSR_FITTYPE_MU_MINUS) ||
               (fittype == MSR_FITTYPE_NON_MUSR)) {
@@ -5249,6 +5295,9 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           fRuns[i].SetPacking(1);
         }
         break;
+      case PRUN_SINGLE_HISTO_RRF:
+        // STILL MISSING
+        break;
       case PRUN_ASYMMETRY:
         // check alpha
         if ((fRuns[i].GetAlphaParamNo() == -1) && !fFourierOnly) {
@@ -5685,6 +5734,93 @@ void PMsrHandler::CheckMaxLikelihood()
       }
     }
   }
+}
+
+//--------------------------------------------------------------------------
+// CheckRRFSettings (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Make sure that if RRF settings are found in the GLOBAL section, the fit types
+ * in the RUN blocks correspond.
+ */
+Bool_t PMsrHandler::CheckRRFSettings()
+{
+  Bool_t result = true;
+  Int_t fittype = fGlobal.GetFitType();
+
+  // first set of tests: if RRF parameters are set, check if RRF fit is chosen.
+  if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) != 0.0) {
+    if (fittype != -1) { // check if GLOBAL fittype is set
+      if (fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) {
+        cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** found GLOBAL fittype " << fittype << " and";
+        cerr << endl << ">>    RRF settings in the GLOBAL section. This is NOT compatible. Fix it first.";
+        result = false;
+      }
+    } else { // GLOBAL fittype is NOT set
+      for (UInt_t i=0; i<fRuns.size(); i++) {
+        fittype = fRuns[i].GetFitType();
+        if (fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) {
+          cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** found RUN with fittype " << fittype << " and";
+          cerr << endl << ">>    RRF settings in the GLOBAL section. This is NOT compatible. Fix it first.";
+          result = false;
+          break;
+        }
+      }
+    }
+  } else {
+    if (fGlobal.GetRRFPacking() != -1) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **WARNING** found in the GLOBAL section rrf_packing, without";
+      cerr << endl << ">>     rrf_freq. Doesn't make any sense. Will drop rrf_packing";
+      cerr << endl << endl;
+      fGlobal.SetRRFPacking(-1);
+    }
+    if (fGlobal.GetRRFPhase() != 0.0) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **WARNING** found in the GLOBAL section rrf_phase, without";
+      cerr << endl << ">>     rrf_freq. Doesn't make any sense. Will drop rrf_phase";
+      cerr << endl << endl;
+      fGlobal.SetRRFPhase(0.0);
+    }
+  }
+
+  // second set of tests: if RRF fit is chosen, do I find the necessary RRF parameters?
+  fittype = fGlobal.GetFitType();
+  if (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) { // make sure RRF freq and RRF packing are set
+    if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) == 0.0) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
+      cerr << endl << ">>    no RRF frequency found in the GLOBAL section! Fix it.";
+      return false;
+    }
+    if (fGlobal.GetRRFPacking() == -1) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
+      cerr << endl << ">>    no RRF packing found in the GLOBAL section! Fix it.";
+      return false;
+    }
+  } else {
+    UInt_t rrfFitCounter = 0;
+    for (UInt_t i=0; i<fRuns.size(); i++) {
+      fittype = fRuns[i].GetFitType();
+      if (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) { // make sure RRF freq and RRF packing are set
+        rrfFitCounter++;
+      }
+    }
+    if (rrfFitCounter != fRuns.size()) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** #Runs (" << fRuns.size() << ") != # RRF fits found (" << rrfFitCounter << ")";
+      cerr << endl << ">>    This is currently not supported.";
+      return false;
+    }
+    if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) == 0.0) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
+      cerr << endl << ">>    no RRF frequency found in the GLOBAL section! Fix it.";
+      return false;
+    }
+    if (fGlobal.GetRRFPacking() == -1) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
+      cerr << endl << ">>    no RRF packing found in the GLOBAL section! Fix it.";
+      return false;
+    }
+  }
+
+  return result;
 }
 
 //--------------------------------------------------------------------------

@@ -803,6 +803,43 @@ void PMsrGlobalBlock::SetRRFFreq(Double_t freq, const char *unit)
 }
 
 //--------------------------------------------------------------------------
+// GetRRFUnit (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> returns RRF frequency unit.
+ */
+TString PMsrGlobalBlock::GetRRFUnit()
+{
+  TString unit;
+
+  switch (fRRFUnitTag) {
+    case RRF_UNIT_UNDEF:
+      unit = TString("??");
+      break;
+    case RRF_UNIT_kHz:
+      unit = TString("kHz");
+      break;
+    case RRF_UNIT_MHz:
+      unit = TString("MHz");
+      break;
+    case RRF_UNIT_Mcs:
+      unit = TString("Mc");
+      break;
+    case RRF_UNIT_G:
+      unit = TString("G");
+      break;
+    case RRF_UNIT_T:
+      unit = TString("T");
+      break;
+    default:
+      unit = TString("??");
+      break;
+  }
+
+  return unit;
+}
+
+//--------------------------------------------------------------------------
 // SetRRFPacking (public)
 //--------------------------------------------------------------------------
 /**

@@ -546,6 +546,8 @@ class PMsrGlobalBlock {
 
     virtual Bool_t IsPresent() { return fGlobalPresent; }
     virtual Double_t GetRRFFreq(const char *unit);
+    virtual TString GetRRFUnit();
+    virtual Int_t GetRRFUnitTag() { return fRRFUnitTag; }
     virtual Double_t GetRRFPhase() { return fRRFPhase; }
     virtual Int_t GetRRFPacking() { return fRRFPacking; }
     virtual Int_t GetFitType() { return fFitType; }

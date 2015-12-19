@@ -102,6 +102,7 @@ class PMsrHandler
     virtual Bool_t CheckFuncs();
     virtual Bool_t CheckHistoGrouping();
     virtual Bool_t CheckAddRunParameters();
+    virtual Bool_t CheckRRFSettings();
     virtual void CheckMaxLikelihood();
 
     virtual void GetGroupingString(Int_t runNo, TString detector, TString &groupingStr);
