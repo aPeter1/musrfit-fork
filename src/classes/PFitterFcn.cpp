@@ -77,11 +77,13 @@ Double_t PFitterFcn::operator()(const std::vector<Double_t>& par) const
 
   if (fUseChi2) { // chi square
     value += fRunListCollection->GetSingleHistoChisq(par);
+    value += fRunListCollection->GetSingleHistoRRFChisq(par);
     value += fRunListCollection->GetAsymmetryChisq(par);
     value += fRunListCollection->GetMuMinusChisq(par);
     value += fRunListCollection->GetNonMusrChisq(par);
   } else { // max likelihood
     value += fRunListCollection->GetSingleHistoMaximumLikelihood(par);
+    value += fRunListCollection->GetSingleHistoRRFMaximumLikelihood(par);
     value += fRunListCollection->GetAsymmetryMaximumLikelihood(par);
     value += fRunListCollection->GetMuMinusMaximumLikelihood(par);
     value += fRunListCollection->GetNonMusrMaximumLikelihood(par);

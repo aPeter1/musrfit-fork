@@ -58,6 +58,12 @@ PRunListCollection::~PRunListCollection()
   }
   fRunSingleHistoList.clear();
 
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++) {
+    fRunSingleHistoRRFList[i]->CleanUp();
+    fRunSingleHistoRRFList[i]->~PRunSingleHistoRRF();
+  }
+  fRunSingleHistoRRFList.clear();
+
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++) {
     fRunAsymmetryList[i]->CleanUp();
     fRunAsymmetryList[i]->~PRunAsymmetry();
@@ -100,10 +106,18 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
     fitType = (*fMsrInfo->GetMsrGlobal()).GetFitType();
   }
 
+cout << "debug> PRunListCollection::Add(): (runNo: " << runNo << "), fitType = " << fitType << endl;
+
   switch (fitType) {
     case PRUN_SINGLE_HISTO:
       fRunSingleHistoList.push_back(new PRunSingleHisto(fMsrInfo, fData, runNo, tag));
       if (!fRunSingleHistoList[fRunSingleHistoList.size()-1]->IsValid())
+        success = false;
+      break;
+    case PRUN_SINGLE_HISTO_RRF:
+cout << "debug> PRunListCollection::Add(): add RRF single histo run to PRunListCollection (runNo: " << runNo << ")" << endl;
+      fRunSingleHistoRRFList.push_back(new PRunSingleHistoRRF(fMsrInfo, fData, runNo, tag));
+      if (!fRunSingleHistoRRFList[fRunSingleHistoRRFList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_ASYMMETRY:
@@ -147,6 +161,8 @@ void PRunListCollection::SetFitRange(const TString fitRange)
 {
   for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     fRunSingleHistoList[i]->SetFitRangeBin(fitRange);
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    fRunSingleHistoRRFList[i]->SetFitRangeBin(fitRange);
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     fRunAsymmetryList[i]->SetFitRangeBin(fitRange);
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
@@ -169,6 +185,8 @@ void PRunListCollection::SetFitRange(const PDoublePairVector fitRange)
 {
   for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     fRunSingleHistoList[i]->SetFitRange(fitRange);
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    fRunSingleHistoRRFList[i]->SetFitRange(fitRange);
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     fRunAsymmetryList[i]->SetFitRange(fitRange);
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
@@ -194,6 +212,27 @@ Double_t PRunListCollection::GetSingleHistoChisq(const std::vector<Double_t>& pa
 
   for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     chisq += fRunSingleHistoList[i]->CalcChiSquare(par);
+
+  return chisq;
+}
+
+//--------------------------------------------------------------------------
+// GetSingleHistoRRFChisq (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates chi-square of <em>all</em> single histogram RRF runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of all single histogram RRF runs of the msr-file
+ *
+ * \param par fit parameter vector
+ */
+Double_t PRunListCollection::GetSingleHistoRRFChisq(const std::vector<Double_t>& par) const
+{
+  Double_t chisq = 0.0;
+
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    chisq += fRunSingleHistoRRFList[i]->CalcChiSquare(par);
 
   return chisq;
 }
@@ -299,6 +338,9 @@ Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Doubl
   case PRUN_SINGLE_HISTO:
     expectedChisq = fRunSingleHistoList[subIdx]->CalcChiSquareExpected(par);
     break;
+  case PRUN_SINGLE_HISTO_RRF:
+    expectedChisq = fRunSingleHistoRRFList[subIdx]->CalcChiSquareExpected(par);
+    break;
   case PRUN_ASYMMETRY:
     expectedChisq = fRunAsymmetryList[subIdx]->CalcChiSquareExpected(par);
     break;
@@ -353,6 +395,9 @@ Double_t PRunListCollection::GetSingleRunChisq(const std::vector<Double_t>& par,
   case PRUN_SINGLE_HISTO:
     chisq = fRunSingleHistoList[subIdx]->CalcChiSquare(par);
     break;
+  case PRUN_SINGLE_HISTO_RRF:
+    chisq = fRunSingleHistoRRFList[subIdx]->CalcChiSquare(par);
+    break;
   case PRUN_ASYMMETRY:
     chisq = fRunAsymmetryList[subIdx]->CalcChiSquare(par);
     break;
@@ -376,7 +421,7 @@ Double_t PRunListCollection::GetSingleRunChisq(const std::vector<Double_t>& par,
  * <p>Calculates log max-likelihood of <em>all</em> single histogram runs of a msr-file.
  *
  * <b>return:</b>
- * - chi-square of all single histogram runs of the msr-file
+ * - log max-likelihood of all single histogram runs of the msr-file
  *
  * \param par fit parameter vector
  */
@@ -386,6 +431,27 @@ Double_t PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<D
 
   for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     mlh += fRunSingleHistoList[i]->CalcMaxLikelihood(par);
+
+  return mlh;
+}
+
+//--------------------------------------------------------------------------
+// GetSingleHistoRRFMaximumLikelihood (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates log max-likelihood of <em>all</em> single histogram RRF runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - log max-likelihood of all single histogram runs of the msr-file
+ *
+ * \param par fit parameter vector
+ */
+Double_t PRunListCollection::GetSingleHistoRRFMaximumLikelihood(const std::vector<Double_t>& par) const
+{
+  Double_t mlh = 0.0;
+
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    mlh += fRunSingleHistoRRFList[i]->CalcMaxLikelihood(par);
 
   return mlh;
 }
@@ -419,7 +485,7 @@ Double_t PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<Dou
  * <p>Calculates log max-likelihood of <em>all</em> mu minus runs of a msr-file.
  *
  * <b>return:</b>
- * - chi-square of all mu minus runs of the msr-file
+ * - log max-likelihood of all mu minus runs of the msr-file
  *
  * \param par fit parameter vector
  */
@@ -493,6 +559,9 @@ UInt_t PRunListCollection::GetNoOfBinsFitted(const UInt_t idx) const
   case PRUN_SINGLE_HISTO:
     result = fRunSingleHistoList[subIdx]->GetNoOfFitBins();
     break;
+  case PRUN_SINGLE_HISTO_RRF:
+    result = fRunSingleHistoRRFList[subIdx]->GetNoOfFitBins();
+    break;
   case PRUN_ASYMMETRY:
     result = fRunAsymmetryList[subIdx]->GetNoOfFitBins();
     break;
@@ -525,6 +594,9 @@ UInt_t PRunListCollection::GetTotalNoOfBinsFitted() const
 
   for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     counts += fRunSingleHistoList[i]->GetNoOfFitBins();
+
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    counts += fRunSingleHistoRRFList[i]->GetNoOfFitBins();
 
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     counts += fRunAsymmetryList[i]->GetNoOfFitBins();
@@ -570,6 +642,49 @@ PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
       for (UInt_t i=0; i<fRunSingleHistoList.size(); i++) {
         if (fRunSingleHistoList[i]->GetRunNo() == index) {
           data = fRunSingleHistoList[i]->GetData();
+          break;
+        }
+      }
+      break;
+    default: // error
+      break;
+  }
+
+  return data;
+}
+
+//--------------------------------------------------------------------------
+// GetSingleHistoRRF (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get a processed single histogram RRF data set.
+ *
+ * <b>return:</b>
+ * - pointer to the run data set (processed data) if data set is found
+ * - null pointer otherwise
+ *
+ * \param index msr-file run index
+ * \param tag kIndex -> data at index, kRunNo -> data of given run no
+ */
+PRunData* PRunListCollection::GetSingleHistoRRF(UInt_t index, EDataSwitch tag)
+{
+  PRunData *data = 0;
+
+  switch (tag) {
+    case kIndex:
+      if ((index < 0) || (index >= fRunSingleHistoRRFList.size())) {
+        cerr << endl << "PRunListCollection::GetSingleHistoRRF: **ERROR** index = " << index << " out of bounds";
+        cerr << endl;
+        return 0;
+      }
+
+      fRunSingleHistoRRFList[index]->CalcTheory();
+      data = fRunSingleHistoRRFList[index]->GetData();
+      break;
+    case kRunNo:
+      for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++) {
+        if (fRunSingleHistoRRFList[i]->GetRunNo() == index) {
+          data = fRunSingleHistoRRFList[i]->GetData();
           break;
         }
       }

@@ -636,7 +636,13 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout.width(16);
           fout << left << "rrf_freq ";
           fout.width(8);
-          fout << left << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data());
+
+cout << "debug> PMsrHandler::WriteMsrLogFile(): fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data())=" << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) << endl;
+neededPrec = LastSignificant(fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()),10);
+cout << "debug> PMsrHandler::WriteMsrLogFile(): neededPrec=" << neededPrec << endl;
+fout.precision(neededPrec);
+
+          fout << left << fixed << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data());
           fout << " " << fGlobal.GetRRFUnit();
           fout << endl;
         } else if (sstr.BeginsWith("rrf_phase", TString::kIgnoreCase) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
@@ -1650,6 +1656,7 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
       fout.width(16);
       fout << left << "rrf_freq ";
       fout.width(8);
+cout << "debug> PMsrHandler::WriteMsrFile(): fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data())=" << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) << endl;
       fout << left << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data());
       fout << " " << fGlobal.GetRRFUnit();
       fout << endl;

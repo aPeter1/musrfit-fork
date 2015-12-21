@@ -21,6 +21,7 @@ h_sources = \
   ../include/PRunNonMusr.h \
   ../include/PRunMuMinus.h \
   ../include/PRunSingleHisto.h \
+  ../include/PRunSingleHistoRRF.h \
   ../include/PStartupHandler.h \
   ../include/PTheory.h
 
@@ -65,6 +66,7 @@ cpp_sources = \
   PRunNonMusr.cpp \
   PRunMuMinus.cpp \
   PRunSingleHisto.cpp \
+  PRunSingleHistoRRF.cpp \
   PStartupHandler.cpp \
   PTheory.cpp
 
