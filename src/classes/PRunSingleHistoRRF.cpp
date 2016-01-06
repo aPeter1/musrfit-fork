@@ -563,10 +563,12 @@ Bool_t PRunSingleHistoRRF::PrepareData()
 Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
 {
   // keep the raw data for the RRF asymmetry error estimate for later
-  PDoubleVector sqrtNt;
+  PDoubleVector rawNt;
   for (UInt_t i=0; i<fForward.size(); i++) {
-    sqrtNt.push_back(sqrt(fForward[i]));  // sqrt(N(t))
+    rawNt.push_back(fForward[i]);  // N(t) without any corrections
   }
+
+  // initially fForward is the "raw data set" (i.e. grouped histo and raw runs already added) to be fitted. This means fForward = N(t) at this point.
 
   // 1) check how the background shall be handled
   if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg shall **NOT** be fitted
@@ -589,8 +591,10 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
       for (UInt_t i=0; i<fForward.size(); i++) {
         fForward[i] -= fRunInfo->GetBkgFix(0);
       }
+      fBackground = fRunInfo->GetBkgFix(0);
     }
   }
+  // here fForward = N(t) - Nbkg
 
   Int_t t0 = (Int_t)fT0s[0];
 
@@ -601,20 +605,40 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   cout << endl << "debug> PRunSingleHistoRRF::PrepareFitData(): endTime  =" << startTime+fTimeResolution*((Double_t)fGoodBins[1]-(Double_t)t0) << endl;
 
   Double_t time_tau=0.0;
+  Double_t exp_t_tau=0.0;
   for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
     time_tau = (startTime + fTimeResolution * (i - fGoodBins[0])) / PMUON_LIFETIME;
-    fForward[i] *= exp(time_tau);
+    exp_t_tau = exp(time_tau);
+    fForward[i] *= exp_t_tau;
+    fM.push_back(fForward[i]);   // needed to estimate N0 later on
+    fMerr.push_back(exp_t_tau*sqrt(rawNt[i]));
   }
+  // calculate weights
+  for (UInt_t i=0; i<fMerr.size(); i++) {
+    if (fMerr[i] > 0.0)
+      fW.push_back(1.0/(fMerr[i]*fMerr[i]));
+    else
+      fW.push_back(0.0);
+  }
+  // now fForward = exp(+t/tau) [N(t)-Nbkg] = M(t)
 
   // 3) estimate N0
-  Double_t n0 = EstimateN0();
+  Double_t errN0 = 0.0;
+  Double_t n0 = EstimateN0(errN0);
 
-  // 4) A(t) = exp(+t/tau) [N(t)-Nbkg] / N0 - 1.0
+  // 4a) A(t) = exp(+t/tau) [N(t)-Nbkg] / N0 - 1.0
   for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
     fForward[i] = fForward[i] / n0 - 1.0;
   }
 
-  // 5) rotate A(t): A(t) -> A(t) * cos(wRRF t + phiRRF)
+  // 4b) error estimate of A(t): errA(t) = exp(+t/tau)/N0 sqrt( N(t) + ([N(t)-N_bkg]/N0)^2 errN0^2 )
+  for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
+    time_tau = (startTime + fTimeResolution * (i - fGoodBins[0])) / PMUON_LIFETIME;
+    exp_t_tau = exp(time_tau);
+    fAerr.push_back(exp_t_tau/n0*sqrt(rawNt[i]+pow(((rawNt[i]-fBackground)/n0)*errN0,2.0)));
+  }
+
+  // 5) rotate A(t): A(t) -> 2* A(t) * cos(wRRF t + phiRRF), the factor 2.0 is needed since the high frequency part is suppressed.
   PMsrGlobalBlock *globalBlock = fMsrInfo->GetMsrGlobal();
   Double_t wRRF = globalBlock->GetRRFFreq("Mc");
   Double_t phaseRRF = globalBlock->GetRRFPhase()*TMath::TwoPi()/180.0;
@@ -623,7 +647,7 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   Double_t time = 0.0;
   for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
     time = startTime + fTimeResolution * ((Double_t)i - (Double_t)fGoodBins[0]);
-    fForward[i] *= cos(wRRF * time + phaseRRF);
+    fForward[i] *= 2.0*cos(wRRF * time + phaseRRF);
   }
 
   // 6) RRF packing
@@ -643,20 +667,16 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
     }
   }
 
-  // 7) estimate RRF errors (see log-book p.204)
-  //    the error estimate of the unpacked RRF asymmetry is: errA_RRF(t) \simeq exp(t/tau)/N0 sqrt(N(t))
-  for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
-    time_tau = (startTime + fTimeResolution * (i - fGoodBins[0])) / PMUON_LIFETIME;
-    sqrtNt[i] *= exp(time_tau)/n0; // unpacked RRF asymmetry error
-  }
+  // 7) estimate packed RRF errors (see log-book p.204)
+  //    the error estimate of the unpacked RRF asymmetry is: errA_RRF(t) \simeq exp(t/tau)/N0 sqrt( [N(t) + ((N(t)-N_bkg)/N0)^2 errN0^2] )
   dval = 0.0;
-  // the packed RRF asymmetry error is: sum_k(errA_RRF(t_k)) / N, N=packingRRF
+  // the packed RRF asymmetry error
   for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
     if (((i-fGoodBins[0]) % packingRRF == 0) && (i != fGoodBins[0])) { // fill data
-      fData.AppendErrorValue(sqrt(dval)/packingRRF);
+      fData.AppendErrorValue(sqrt(2.0*dval)/packingRRF); // the factor 2.0 is needed since the high frequency part is suppressed.
       dval = 0.0;
     }
-    dval += sqrtNt[i]*sqrtNt[i];
+    dval += fAerr[i-fGoodBins[0]]*fAerr[i-fGoodBins[0]];
   }
 
   // set start time and time step
@@ -1387,17 +1407,29 @@ void PRunSingleHistoRRF::GetProperFitRange(PMsrGlobalBlock *globalBlock)
 //--------------------------------------------------------------------------
 /**
  * <p>Estimate the N0 for the given run.
+ *
+ * \param sqrtNt
+ * \param errN0
  */
-Double_t PRunSingleHistoRRF::EstimateN0()
+Double_t PRunSingleHistoRRF::EstimateN0(Double_t &errN0)
 {
-  Int_t endBin = N0EstimateEndTime / fTimeResolution;
+  Int_t endBin = N0EstimateEndTime / fTimeResolution - fGoodBins[0];
   Double_t n0 = 0.0;
-  cout << "debug> PRunSingleHistoRRF::EstimateN0(): startBin=" << fGoodBins[0] << ", endBin=" << endBin << endl;
-  for (Int_t i=fGoodBins[0]; i<endBin; i++) {
-    n0 += fForward[i];
+  Double_t wN = 0.0;
+  cout << "debug> PRunSingleHistoRRF::EstimateN0(): endBin=" << endBin << endl;
+  for (Int_t i=0; i<endBin; i++) {
+    n0 += fW[i]*fM[i];
+    wN += fW[i];
   }
-  n0 /= (Double_t)(endBin-fGoodBins[0]);
-  cout << "debug> PRunSingleHistoRRF::EstimateN0(): N0=" << n0 << endl;
+  n0 /= wN;
+
+  errN0 = 0.0;
+  for (Int_t i=0; i<endBin; i++) {
+    errN0 += fW[i]*fW[i]*fMerr[i]*fMerr[i];
+  }
+  errN0 = sqrt(errN0)/wN;
+
+  cout << "debug> PRunSingleHistoRRF::EstimateN0(): N0=" << n0 << "(" << errN0 << ")" << endl;
 
   return n0;
 }
@@ -1475,7 +1507,9 @@ Bool_t PRunSingleHistoRRF::EstimateBkg(UInt_t histoNo)
     bkg += fForward[i];
   bkg /= static_cast<Double_t>(end - start + 1);
 
-  fBackground = bkg * fPacking;  // keep background (per bin)
+  fBackground = bkg;  // keep background (per bin)
+
+  cout << endl << "debug> fBackground=" << fBackground << endl;
 
   fRunInfo->SetBkgEstimated(fBackground, 0);
 

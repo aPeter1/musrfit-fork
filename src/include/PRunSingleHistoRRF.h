@@ -65,14 +65,18 @@ class PRunSingleHistoRRF : public PRunBase
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
     Int_t fPacking;         ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
 
-    Int_t fGoodBins[2];        ///< keep first/last good bins. 0=fgb, 1=lgb
+    Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
 
-    PDoubleVector fForward;    ///< forward histo data
+    PDoubleVector fForward; ///< forward histo data
+    PDoubleVector fM;       ///< vector holding M(t) = [N(t)-N_bkg] exp(+t/tau). Needed to estimate N0.
+    PDoubleVector fMerr;    ///< vector holding the error of M(t): M_err = exp(+t/tau) sqrt(N(t)).
+    PDoubleVector fW;       ///< vector holding the weight needed to estimate N0, and errN0.
+    PDoubleVector fAerr;    ///< vector holding the errors of estimated A(t)
 
     virtual Bool_t GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &histoNo);
     virtual Bool_t GetProperDataRange();
     virtual void GetProperFitRange(PMsrGlobalBlock *globalBlock);
-    virtual Double_t EstimateN0();
+    virtual Double_t EstimateN0(Double_t &errN0);
     virtual Bool_t EstimateBkg(UInt_t histoNo);
 };
 
