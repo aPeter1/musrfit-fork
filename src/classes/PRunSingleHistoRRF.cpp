@@ -630,12 +630,24 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   Double_t n0 = EstimateN0(errN0);
 
   // 4a) A(t) = exp(+t/tau) [N(t)-Nbkg] / N0 - 1.0
-  for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
     fForward[i] = fForward[i] / n0 - 1.0;
   }
 
+  // make a DC correction of A(t) --> this is introduced to reduce ghost lines.
+  // This is a dirty trick and should be put on a better quantitative base!
+  Double_t dc_offset=0.0;
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
+    dc_offset += fForward[i];
+  }
+  dc_offset /= (Double_t)(fGoodBins[1]-fGoodBins[0]+1);
+  cout << "info> dc_offset = " << dc_offset << endl;
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
+    fForward[i] -= dc_offset;
+  }
+
   // 4b) error estimate of A(t): errA(t) = exp(+t/tau)/N0 sqrt( N(t) + ([N(t)-N_bkg]/N0)^2 errN0^2 )
-  for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
     time_tau = (startTime + fTimeResolution * (i - fGoodBins[0])) / PMUON_LIFETIME;
     exp_t_tau = exp(time_tau);
     fAerr.push_back(exp_t_tau/n0*sqrt(rawNt[i]+pow(((rawNt[i]-fBackground)/n0)*errN0,2.0)));
@@ -646,14 +658,14 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   Double_t wRRF = globalBlock->GetRRFFreq("Mc");
   Double_t phaseRRF = globalBlock->GetRRFPhase()*TMath::TwoPi()/180.0;
   Double_t time = 0.0;
-  for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
     time = startTime + fTimeResolution * ((Double_t)i - (Double_t)fGoodBins[0]);
     fForward[i] *= 2.0*cos(wRRF * time + phaseRRF);
   }
 
   // 6) RRF packing
   Double_t dval=0.0;
-  for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
     if (fRRFPacking == 1) {
       fData.AppendValue(fForward[i]);
     } else { // RRF packing > 1
@@ -671,7 +683,7 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   //    the error estimate of the unpacked RRF asymmetry is: errA_RRF(t) \simeq exp(t/tau)/N0 sqrt( [N(t) + ((N(t)-N_bkg)/N0)^2 errN0^2] )
   dval = 0.0;
   // the packed RRF asymmetry error
-  for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
     if (((i-fGoodBins[0]) % fRRFPacking == 0) && (i != fGoodBins[0])) { // fill data
       fData.AppendErrorValue(sqrt(2.0*dval)/fRRFPacking); // the factor 2.0 is needed since the high frequency part is suppressed.
       dval = 0.0;
