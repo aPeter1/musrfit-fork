@@ -55,7 +55,6 @@ class PRunSingleHistoRRF : public PRunBase
     virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
     virtual Bool_t PrepareFitData(PRawRunData* runData, const UInt_t histoNo);
-    virtual Bool_t PrepareRawViewData(PRawRunData* runData, const UInt_t histoNo);
     virtual Bool_t PrepareViewData(PRawRunData* runData, const UInt_t histoNo);
 
   private:
@@ -63,7 +62,7 @@ class PRunSingleHistoRRF : public PRunBase
 
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
-    Int_t fPacking;         ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
+    Int_t fRRFPacking;      ///< RRF packing for this particular run. Given in the GLOBAL-block.
 
     Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
 

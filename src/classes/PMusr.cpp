@@ -752,8 +752,6 @@ Double_t PMsrGlobalBlock::GetRRFFreq(const char *unit)
     return freq;
   }
 
-cout << endl << "debug> PMsrGlobalBlock::GetRRFFreq(" << unit << "): unitTag=" << unitTag << ", fRRFFreq=" << fRRFFreq;
-
   // calc the conversion factor
   if (unitTag == fRRFUnitTag)
     freq = fRRFFreq;
@@ -769,8 +767,6 @@ cout << endl << "debug> PMsrGlobalBlock::GetRRFFreq(" << unit << "): unitTag=" <
     freq = fRRFFreq/GAMMA_BAR_MUON*1e-4; // 1e-4 need for G -> T since GAMMA_BAR_MUON is given in MHz/G
   else if ((unitTag == RRF_UNIT_T) && (fRRFUnitTag == RRF_UNIT_Mcs))
     freq = fRRFFreq/(TMath::TwoPi()*GAMMA_BAR_MUON)*1e-4; // 1e-4 need for G -> T since GAMMA_BAR_MUON is given in MHz/G
-
-cout << endl << "debug> PMsrGlobalBlock::GetRRFFreq(" << unit << "): freq=" << freq << endl;
 
   return freq;
 }

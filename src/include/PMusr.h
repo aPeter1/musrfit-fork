@@ -101,10 +101,11 @@ typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
 
 //-------------------------------------------------------------
 // msr plot type tags
-#define MSR_PLOT_SINGLE_HISTO 0
-#define MSR_PLOT_ASYM         2
-#define MSR_PLOT_MU_MINUS     4
-#define MSR_PLOT_NON_MUSR     8
+#define MSR_PLOT_SINGLE_HISTO     0
+#define MSR_PLOT_SINGLE_HISTO_RRF 1
+#define MSR_PLOT_ASYM             2
+#define MSR_PLOT_MU_MINUS         4
+#define MSR_PLOT_NON_MUSR         8
 
 //-------------------------------------------------------------
 // map and fun offsets for parameter parsing

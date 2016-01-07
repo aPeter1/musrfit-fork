@@ -636,12 +636,8 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           fout.width(16);
           fout << left << "rrf_freq ";
           fout.width(8);
-
-cout << "debug> PMsrHandler::WriteMsrLogFile(): fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data())=" << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) << endl;
-neededPrec = LastSignificant(fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()),10);
-cout << "debug> PMsrHandler::WriteMsrLogFile(): neededPrec=" << neededPrec << endl;
-fout.precision(neededPrec);
-
+          neededPrec = LastSignificant(fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()),10);
+          fout.precision(neededPrec);
           fout << left << fixed << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data());
           fout << " " << fGlobal.GetRRFUnit();
           fout << endl;
@@ -1139,6 +1135,9 @@ fout.precision(neededPrec);
           switch (fPlots[plotNo].fPlotType) {
           case MSR_PLOT_SINGLE_HISTO:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (single histo plot)" << endl;
+            break;
+          case MSR_PLOT_SINGLE_HISTO_RRF:
+            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (single histo RRF plot)" << endl;
             break;
           case MSR_PLOT_ASYM:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (asymmetry plot)" << endl;
@@ -1656,7 +1655,6 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
       fout.width(16);
       fout << left << "rrf_freq ";
       fout.width(8);
-cout << "debug> PMsrHandler::WriteMsrFile(): fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data())=" << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) << endl;
       fout << left << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data());
       fout << " " << fGlobal.GetRRFUnit();
       fout << endl;
@@ -2165,6 +2163,9 @@ cout << "debug> PMsrHandler::WriteMsrFile(): fGlobal.GetRRFFreq(fGlobal.GetRRFUn
     switch (fPlots[i].fPlotType) {
       case MSR_PLOT_SINGLE_HISTO:
         fout << "PLOT " << fPlots[i].fPlotType << "   (single histo plot)" << endl;
+        break;
+      case MSR_PLOT_SINGLE_HISTO_RRF:
+        fout << "PLOT " << fPlots[i].fPlotType << "   (single histo RRF plot)" << endl;
         break;
       case MSR_PLOT_ASYM:
         fout << "PLOT " << fPlots[i].fPlotType << "   (asymmetry plot)" << endl;
@@ -4136,6 +4137,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             error = true;
             break;
           case MSR_PLOT_SINGLE_HISTO: // like: runs 1 5 13
+          case MSR_PLOT_SINGLE_HISTO_RRF:
           case MSR_PLOT_ASYM:
           case MSR_PLOT_NON_MUSR:
           case MSR_PLOT_MU_MINUS:
@@ -5789,6 +5791,11 @@ Bool_t PMsrHandler::CheckRRFSettings()
     }
   }
 
+  // if not a RRF fit, done at this point
+  if (fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) {
+    return true;
+  }
+
   // second set of tests: if RRF fit is chosen, do I find the necessary RRF parameters?
   fittype = fGlobal.GetFitType();
   if (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) { // make sure RRF freq and RRF packing are set
@@ -5802,7 +5809,7 @@ Bool_t PMsrHandler::CheckRRFSettings()
       cerr << endl << ">>    no RRF packing found in the GLOBAL section! Fix it.";
       return false;
     }
-  } else {
+  } else { // check single runs for RRF
     UInt_t rrfFitCounter = 0;
     for (UInt_t i=0; i<fRuns.size(); i++) {
       fittype = fRuns[i].GetFitType();

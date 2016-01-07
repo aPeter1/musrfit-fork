@@ -106,8 +106,6 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
     fitType = (*fMsrInfo->GetMsrGlobal()).GetFitType();
   }
 
-cout << "debug> PRunListCollection::Add(): (runNo: " << runNo << "), fitType = " << fitType << endl;
-
   switch (fitType) {
     case PRUN_SINGLE_HISTO:
       fRunSingleHistoList.push_back(new PRunSingleHisto(fMsrInfo, fData, runNo, tag));
@@ -115,7 +113,6 @@ cout << "debug> PRunListCollection::Add(): (runNo: " << runNo << "), fitType = "
         success = false;
       break;
     case PRUN_SINGLE_HISTO_RRF:
-cout << "debug> PRunListCollection::Add(): add RRF single histo run to PRunListCollection (runNo: " << runNo << ")" << endl;
       fRunSingleHistoRRFList.push_back(new PRunSingleHistoRRF(fMsrInfo, fData, runNo, tag));
       if (!fRunSingleHistoRRFList[fRunSingleHistoRRFList.size()-1]->IsValid())
         success = false;
@@ -378,16 +375,17 @@ Double_t PRunListCollection::GetSingleRunChisq(const std::vector<Double_t>& par,
     return chisq;
   }
 
+  Int_t subIdx = 0;
   Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
-  if (type == -1) { // i.e. not forun in the RUN block, try the GLOBAL block
+  if (type == -1) { // i.e. not found in the RUN block, try the GLOBAL block
     type = fMsrInfo->GetMsrGlobal()->GetFitType();
-  }
-
-  // count how many entries of this fit-type are present up to idx
-  UInt_t subIdx = 0;
-  for (UInt_t i=0; i<idx; i++) {
-    if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
-      subIdx++;
+    subIdx = idx;
+  } else { // found in the RUN block
+    // count how many entries of this fit-type are present up to idx
+    for (UInt_t i=0; i<idx; i++) {
+      if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+        subIdx++;
+    }
   }
 
   // return the chisq of the single run
