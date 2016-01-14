@@ -110,8 +110,8 @@ void runMuSimulation()
   simulateMuTransition->SetMuPrecFreq23(Freq23);       // MHz
   simulateMuTransition->SetMuPrecFreq14(Freq14);       // MHz
   simulateMuTransition->SetMuFraction(MuFrac);         // initial Mu fraction
-  simulateMuTransition->SetMuFractionState1(MuFrac12); // Mu in states 12, 34
-  simulateMuTransition->SetMuFractionState2(MuFrac23); // Mu in states 23, 14
+  simulateMuTransition->SetMuFractionState12(MuFrac12); // Mu in states 12, 34
+  simulateMuTransition->SetMuFractionState23(MuFrac23); // Mu in states 23, 14
   simulateMuTransition->SetBfield(B/10000.);           // Tesla
   simulateMuTransition->SetCaptureRate(capRate);       // MHz
   simulateMuTransition->SetIonizationRate(ionRate);    // MHz
