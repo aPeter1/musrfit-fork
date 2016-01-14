@@ -580,6 +580,12 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   Double_t freqMax = GetMainFrequency(rawNt);
   cout << "info> freqMax=" << freqMax << " (MHz)" << endl;
 
+  // "optimal packing"
+  Double_t optNoPoints = 8;
+  if (freqMax < 271.0) // < 271 MHz, i.e ~ 2T
+    optNoPoints = 5;
+  cout << "info> optimal packing: " << (Int_t)(1.0 / (fTimeResolution*(freqMax - fMsrInfo->GetMsrGlobal()->GetRRFFreq("MHz"))) / optNoPoints);
+
   // initially fForward is the "raw data set" (i.e. grouped histo and raw runs already added) to be fitted. This means fForward = N(t) at this point.
 
   // 1) check how the background shall be handled
@@ -1108,8 +1114,8 @@ Double_t PRunSingleHistoRRF::GetMainFrequency(PDoubleVector &data)
 Double_t PRunSingleHistoRRF::EstimateN0(Double_t &errN0, Double_t freqMax)
 {
   // endBin is estimated such that the number of full cycles (according to the maximum frequency of the data)
-  // is approximately the time N0EstimateEndTime.
-  Int_t endBin = (Int_t)round(N0EstimateEndTime / fTimeResolution * ceil(freqMax)/freqMax);
+  // is approximately the time fN0EstimateEndTime.
+  Int_t endBin = (Int_t)round(fN0EstimateEndTime / fTimeResolution * ceil(freqMax)/freqMax);
 
   Double_t n0 = 0.0;
   Double_t wN = 0.0;

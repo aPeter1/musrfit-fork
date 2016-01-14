@@ -420,25 +420,27 @@ void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
       fRRFText = new TString("RRF: ");
       rrfUnitTag = fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit;
       rrfFreq = fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
+      TString rrfFreqStr("");
+      rrfFreqStr.Form("%.5g", rrfFreq);
       if (rrfUnitTag == RRF_UNIT_kHz) {
         *fRRFText += TString("#nu_{RRF} = ");
         *fRRFText += rrfFreq;
         *fRRFText += TString(" (kHz)");
       } else if (rrfUnitTag == RRF_UNIT_MHz) {
         *fRRFText += TString("#nu_{RRF} = ");
-        *fRRFText += rrfFreq;
+        *fRRFText += rrfFreqStr;
         *fRRFText += TString(" (MHz)");
       } else if (rrfUnitTag == RRF_UNIT_Mcs) {
         *fRRFText += TString("#omega_{RRF} = ");
-        *fRRFText += rrfFreq;
+        *fRRFText += rrfFreqStr;
         *fRRFText += TString(" (Mc/s)");
       } else if (rrfUnitTag == RRF_UNIT_G) {
         *fRRFText += TString("B_{RRF} = ");
-        *fRRFText += rrfFreq;
+        *fRRFText += rrfFreqStr;
         *fRRFText += TString(" (G)");
       } else if (rrfUnitTag == RRF_UNIT_T) {
         *fRRFText += TString("B_{RRF} = ");
-        *fRRFText += rrfFreq;
+        *fRRFText += rrfFreqStr;
         *fRRFText += TString(" (T)");
       }
       *fRRFText += TString(", RRF packing = ");
@@ -447,25 +449,27 @@ void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
       fRRFText = new TString("RRF: ");
       rrfUnitTag = fMsrHandler->GetMsrGlobal()->GetRRFUnitTag();
       rrfFreq = fMsrHandler->GetMsrGlobal()->GetRRFFreq(fMsrHandler->GetMsrGlobal()->GetRRFUnit().Data());
+      TString rrfFreqStr("");
+      rrfFreqStr.Form("%.5g", rrfFreq);
       if (rrfUnitTag == RRF_UNIT_kHz) {
         *fRRFText += TString("#nu_{RRF} = ");
-        *fRRFText += rrfFreq;
+        *fRRFText += rrfFreqStr;
         *fRRFText += TString(" (kHz)");
       } else if (rrfUnitTag == RRF_UNIT_MHz) {
         *fRRFText += TString("#nu_{RRF} = ");
-        *fRRFText += rrfFreq;
+        *fRRFText += rrfFreqStr;
         *fRRFText += TString(" (MHz)");
       } else if (rrfUnitTag == RRF_UNIT_Mcs) {
         *fRRFText += TString("#omega_{RRF} = ");
-        *fRRFText += rrfFreq;
+        *fRRFText += rrfFreqStr;
         *fRRFText += TString(" (Mc/s)");
       } else if (rrfUnitTag == RRF_UNIT_G) {
         *fRRFText += TString("B_{RRF} = ");
-        *fRRFText += rrfFreq;
+        *fRRFText += rrfFreqStr;
         *fRRFText += TString(" (G)");
       } else if (rrfUnitTag == RRF_UNIT_T) {
         *fRRFText += TString("B_{RRF} = ");
-        *fRRFText += rrfFreq;
+        *fRRFText += rrfFreqStr;
         *fRRFText += TString(" (T)");
       }
       *fRRFText += TString(", RRF packing = ");
@@ -6154,6 +6158,11 @@ void PMusrCanvas::PlotAverage(Bool_t unzoom)
       break;
     default:
       break;
+  }
+
+  // check if RRF and if yes show a label
+  if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+    fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
   }
 
   fDataTheoryPad->Update();
