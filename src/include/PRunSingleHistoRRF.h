@@ -75,7 +75,8 @@ class PRunSingleHistoRRF : public PRunBase
     virtual Bool_t GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &histoNo);
     virtual Bool_t GetProperDataRange();
     virtual void GetProperFitRange(PMsrGlobalBlock *globalBlock);
-    virtual Double_t EstimateN0(Double_t &errN0);
+    virtual Double_t GetMainFrequency(PDoubleVector &data);
+    virtual Double_t EstimateN0(Double_t &errN0, Double_t freqMax);
     virtual Bool_t EstimateBkg(UInt_t histoNo);
 };
 

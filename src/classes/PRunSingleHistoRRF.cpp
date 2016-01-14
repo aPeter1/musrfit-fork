@@ -43,8 +43,10 @@ using namespace std;
 #include <TString.h>
 #include <TObjArray.h>
 #include <TObjString.h>
+#include <TH1F.h>
 
 #include "PMusr.h"
+#include "PFourier.h"
 #include "PRunSingleHistoRRF.h"
 
 //--------------------------------------------------------------------------
@@ -575,6 +577,8 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   for (UInt_t i=0; i<fForward.size(); i++) {
     rawNt.push_back(fForward[i]);  // N(t) without any corrections
   }
+  Double_t freqMax = GetMainFrequency(rawNt);
+  cout << "info> freqMax=" << freqMax << " (MHz)" << endl;
 
   // initially fForward is the "raw data set" (i.e. grouped histo and raw runs already added) to be fitted. This means fForward = N(t) at this point.
 
@@ -613,9 +617,10 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
     time_tau = (startTime + fTimeResolution * (i - fGoodBins[0])) / PMUON_LIFETIME;
     exp_t_tau = exp(time_tau);
     fForward[i] *= exp_t_tau;
-    fM.push_back(fForward[i]);   // needed to estimate N0 later on
-    fMerr.push_back(exp_t_tau*sqrt(rawNt[i]));
+    fM.push_back(fForward[i]);   // i.e. M(t) = [N(t)-Nbkg] exp(+t/tau); needed to estimate N0 later on
+    fMerr.push_back(exp_t_tau*sqrt(rawNt[i]-fBackground));
   }
+
   // calculate weights
   for (UInt_t i=0; i<fMerr.size(); i++) {
     if (fMerr[i] > 0.0)
@@ -627,13 +632,14 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
 
   // 3) estimate N0
   Double_t errN0 = 0.0;
-  Double_t n0 = EstimateN0(errN0);
+  Double_t n0 = EstimateN0(errN0, freqMax);
 
   // 4a) A(t) = exp(+t/tau) [N(t)-Nbkg] / N0 - 1.0
   for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
     fForward[i] = fForward[i] / n0 - 1.0;
   }
 
+/*
   // make a DC correction of A(t) --> this is introduced to reduce ghost lines.
   // This is a dirty trick and should be put on a better quantitative base!
   Double_t dc_offset=0.0;
@@ -645,6 +651,7 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
     fForward[i] -= dc_offset;
   }
+*/
 
   // 4b) error estimate of A(t): errA(t) = exp(+t/tau)/N0 sqrt( N(t) + ([N(t)-N_bkg]/N0)^2 errN0^2 )
   for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
@@ -1040,17 +1047,70 @@ void PRunSingleHistoRRF::GetProperFitRange(PMsrGlobalBlock *globalBlock)
 }
 
 //--------------------------------------------------------------------------
+// GetMainFrequency (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>gets the maximum frequency of the given data.
+ *
+ * \param raw data set.
+ */
+Double_t PRunSingleHistoRRF::GetMainFrequency(PDoubleVector &data)
+{
+  Double_t freqMax = 0.0;
+
+  // create histo
+  Double_t startTime = (fGoodBins[0]-fT0s[0]) * fTimeResolution;
+  Int_t noOfBins = fGoodBins[1]-fGoodBins[0]+1;
+  TH1F *histo = new TH1F("data", "data", noOfBins, startTime-fTimeResolution/2.0, startTime+fTimeResolution/2.0+noOfBins*fTimeResolution);
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
+    histo->SetBinContent(i-fGoodBins[0]+1, data[i]);
+  }
+
+  // Fourier transform
+  PFourier *ft = new PFourier(histo, FOURIER_UNIT_FREQ);
+  ft->Transform(F_APODIZATION_STRONG);
+
+  // find frequency maximum
+  TH1F *power = ft->GetPowerFourier();
+  Double_t maxFreqVal = 0.0;
+  for (Int_t i=1; i<power->GetNbinsX(); i++) {
+    // ignore dc part at 0 frequency
+    if (i<power->GetNbinsX()-1) {
+      if (power->GetBinContent(i)>power->GetBinContent(i+1))
+        continue;
+    }
+    // check for maximum
+    if (power->GetBinContent(i) > maxFreqVal) {
+      maxFreqVal = power->GetBinContent(i);
+      freqMax = power->GetBinCenter(i);
+    }
+  }
+
+  // clean up
+  if (power)
+    delete power;
+  if (ft)
+    delete ft;
+  if (histo)
+    delete histo;
+
+  return freqMax;
+}
+
+//--------------------------------------------------------------------------
 // EstimateN0 (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Estimate the N0 for the given run.
  *
- * \param sqrtNt
  * \param errN0
  */
-Double_t PRunSingleHistoRRF::EstimateN0(Double_t &errN0)
+Double_t PRunSingleHistoRRF::EstimateN0(Double_t &errN0, Double_t freqMax)
 {
-  Int_t endBin = N0EstimateEndTime / fTimeResolution - fGoodBins[0];
+  // endBin is estimated such that the number of full cycles (according to the maximum frequency of the data)
+  // is approximately the time N0EstimateEndTime.
+  Int_t endBin = (Int_t)round(N0EstimateEndTime / fTimeResolution * ceil(freqMax)/freqMax);
+
   Double_t n0 = 0.0;
   Double_t wN = 0.0;
   for (Int_t i=0; i<endBin; i++) {
