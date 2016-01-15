@@ -216,6 +216,19 @@ void musrfit_dump_ascii(char *fileName, PRunListCollection *runList)
     }
   }
 
+  // asymmetry RRF
+  size = runList->GetNoOfAsymmetryRRF();
+  if (size > 0) {
+    for (unsigned int i=0; i<size; i++) {
+      data = runList->GetAsymmetryRRF(i);
+      if (data) {
+        // dump data
+        musrfit_write_ascii(fln, data, runCounter);
+        runCounter++;
+      }
+    }
+  }
+
   // muMinus
   size = runList->GetNoOfMuMinus();
   if (size > 0) {
@@ -354,6 +367,19 @@ void musrfit_dump_root(char *fileName, PRunListCollection *runList)
   if (size > 0) {
     for (unsigned int i=0; i<size; i++) {
       data = runList->GetAsymmetry(i);
+      if (data) {
+        // dump data
+        musrfit_write_root(f, fln, data, runCounter);
+        runCounter++;
+      }
+    }
+  }
+
+  // asymmetry RRF
+  size = runList->GetNoOfAsymmetryRRF();
+  if (size > 0) {
+    for (unsigned int i=0; i<size; i++) {
+      data = runList->GetAsymmetryRRF(i);
       if (data) {
         // dump data
         musrfit_write_root(f, fln, data, runCounter);

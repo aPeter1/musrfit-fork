@@ -832,11 +832,11 @@ PRunData* PRunListCollection::GetAsymmetryRRF(UInt_t index, EDataSwitch tag)
         return 0;
       }
 
-      fRunAsymmetryList[index]->CalcTheory();
-      data = fRunAsymmetryList[index]->GetData();
+      fRunAsymmetryRRFList[index]->CalcTheory();
+      data = fRunAsymmetryRRFList[index]->GetData();
       break;
     case kRunNo: // called from PMusrCanvas
-      for (UInt_t i=0; i<fRunAsymmetryList.size(); i++) {
+      for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++) {
         if (fRunAsymmetryRRFList[i]->GetRunNo() == index) {
           data = fRunAsymmetryRRFList[i]->GetData();
           break;

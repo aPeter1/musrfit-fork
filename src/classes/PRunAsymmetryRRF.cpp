@@ -386,6 +386,11 @@ void PRunAsymmetryRRF::SetFitRangeBin(const TString fitRange)
  */
 void PRunAsymmetryRRF::CalcNoOfFitBins()
 {
+  cout << "debug> fData.GetValue()->size()=" << fData.GetValue()->size() << endl;
+  cout << "debug> fFitStartTime=" << fFitStartTime << endl;
+  cout << "debug> fData.GetDataTimeStart()=" << fData.GetDataTimeStart() << ", fData.GetDataTimeStep()=" << fData.GetDataTimeStep() << endl;
+  cout << "debug> -----" << endl;
+
   // In order not having to loop over all bins and to stay consistent with the chisq method, calculate the start and end bins explicitly
   Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
   if (startTimeBin < 0)
@@ -867,9 +872,7 @@ Bool_t PRunAsymmetryRRF::PrepareFitData()
   Int_t lgb = fgb + lgb_offset;
   Int_t dt0 = (Int_t)fT0s[0]-(Int_t)fT0s[1];
 
-  cout << "debug> fGoodBins[0]=" << fGoodBins[0] << ", fGoodBins[2]=" << fGoodBins[2] << ", fT0s[0]=" << fT0s[0] << ", fT0s[1]=" << fT0s[1] << endl;
-  cout << "debug> fgbOffset=" << fgbOffset << endl;
-  cout << "debug> fgb=" << fgb << ", lgb=" << lgb << ", dt0=" << dt0 << endl;
+  cout << "debug> fgb=" << fgb << ", lgb=" << lgb << endl;
 
   PDoubleVector asym;
   PDoubleVector asymErr;
@@ -885,7 +888,7 @@ Bool_t PRunAsymmetryRRF::PrepareFitData()
     asym.push_back(asymVal);
     eff = fForwardErr[i];
     ebb = fBackwardErr[i-dt0];
-    if (asymVal != 0.0)
+    if ((asymVal != 0.0) && (ff+bb) > 0.0)
       asymValErr = sqrt(2)/(ff+bb)*sqrt(bb*eff+ff*ebb);
     else
       asymValErr = 1.0;
@@ -897,12 +900,14 @@ Bool_t PRunAsymmetryRRF::PrepareFitData()
   Double_t wRRF = globalBlock->GetRRFFreq("Mc");
   Double_t phaseRRF = globalBlock->GetRRFPhase()*TMath::TwoPi()/180.0;
 
-  Double_t startTime = fTimeResolution * (fT0s[0]+(Double_t)fgbOffset);
+  Double_t startTime = fTimeResolution * (Double_t)fgbOffset;
   Double_t time=0.0;
   for (UInt_t i=0; i<asym.size(); i++) {
     time = startTime + i*fTimeResolution;
     asym[i] *= 2.0*cos(wRRF*time+phaseRRF);
   }
+
+  cout << "debug> before packing: startTime=" << startTime << ", endTime=" << startTime+asym.size()*fTimeResolution << endl;
 
   // 3rd: rrf packing
   PDoubleVector asymRRF;
@@ -926,11 +931,19 @@ Bool_t PRunAsymmetryRRF::PrepareFitData()
     asymValErr += asymErr[i]*asymErr[i];
   }
 
+  cout << "debug> after packing: startTime=" << startTime + fTimeResolution*((Double_t)(fRRFPacking-1)/2.0) << ", endTime=" << startTime + fTimeResolution*((Double_t)(fRRFPacking-1)/2.0)+asymRRF.size()*fTimeResolution*(Double_t)(fRRFPacking) << endl;
 
-  fData.SetDataTimeStart(startTime+(Double_t)(fRRFPacking-1)/2.0);
+  ofstream fout("_data.dat", ofstream::out);
+  for (UInt_t i=0; i<asymRRF.size(); i++) {
+    fout << startTime + fTimeResolution*((Double_t)(fRRFPacking-1)/2.0) + i*fTimeResolution*(Double_t)fRRFPacking << ", " << asymRRF[i] << ", " << asymRRFErr[i] << endl;
+  }
+  fout.close();
+
+
+  fData.SetDataTimeStart(startTime+fTimeResolution*((Double_t)(fRRFPacking-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*(Double_t)fRRFPacking);
 
-  for (UInt_t i=0; i<asym.size(); i++) {
+  for (UInt_t i=0; i<asymRRF.size(); i++) {
     fData.AppendValue(asymRRF[i]);
     fData.AppendErrorValue(asymRRFErr[i]);
   }
