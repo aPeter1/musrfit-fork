@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2015 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -55,6 +55,7 @@ typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
 #define PRUN_SINGLE_HISTO     0
 #define PRUN_SINGLE_HISTO_RRF 1
 #define PRUN_ASYMMETRY        2
+#define PRUN_ASYMMETRY_RRF    3
 #define PRUN_MU_MINUS         4
 #define PRUN_NON_MUSR         8
 
@@ -96,6 +97,7 @@ typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
 #define MSR_FITTYPE_SINGLE_HISTO     0
 #define MSR_FITTYPE_SINGLE_HISTO_RRF 1
 #define MSR_FITTYPE_ASYM             2
+#define MSR_FITTYPE_ASYM_RRF         3
 #define MSR_FITTYPE_MU_MINUS         4
 #define MSR_FITTYPE_NON_MUSR         8
 
@@ -104,6 +106,7 @@ typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
 #define MSR_PLOT_SINGLE_HISTO     0
 #define MSR_PLOT_SINGLE_HISTO_RRF 1
 #define MSR_PLOT_ASYM             2
+#define MSR_PLOT_ASYM_RRF         3
 #define MSR_PLOT_MU_MINUS         4
 #define MSR_PLOT_NON_MUSR         8
 

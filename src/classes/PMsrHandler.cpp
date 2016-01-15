@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2015 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -623,6 +623,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             case MSR_FITTYPE_ASYM:
               fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
               break;
+            case MSR_FITTYPE_ASYM_RRF:
+              fout << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (asymmetry RRF fit)" << endl ;
+              break;
             case MSR_FITTYPE_MU_MINUS:
               fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
               break;
@@ -778,8 +781,14 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           case MSR_FITTYPE_SINGLE_HISTO:
             fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
             break;
+          case MSR_FITTYPE_SINGLE_HISTO_RRF:
+            fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO_RRF << "         (single histogram RRF fit)" << endl;
+            break;
           case MSR_FITTYPE_ASYM:
             fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+            break;
+          case MSR_FITTYPE_ASYM_RRF:
+            fout << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (asymmetry RRF fit)" << endl ;
             break;
           case MSR_FITTYPE_MU_MINUS:
             fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
@@ -1636,8 +1645,14 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
       case MSR_FITTYPE_SINGLE_HISTO:
         fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
         break;
+      case MSR_FITTYPE_SINGLE_HISTO_RRF:
+        fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO_RRF << "         (single histogram RRF fit)" << endl;
+        break;
       case MSR_FITTYPE_ASYM:
         fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+        break;
+      case MSR_FITTYPE_ASYM_RRF:
+        fout << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (asymmetry RRF fit)" << endl ;
         break;
       case MSR_FITTYPE_MU_MINUS:
         fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
@@ -1821,8 +1836,14 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
       case MSR_FITTYPE_SINGLE_HISTO:
         fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
         break;
+      case MSR_FITTYPE_SINGLE_HISTO_RRF:
+        fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO_RRF << "         (single histogram RRF fit)" << endl;
+        break;
       case MSR_FITTYPE_ASYM:
         fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+        break;
+      case MSR_FITTYPE_ASYM_RRF:
+        fout << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (asymmetry RRF fit)" << endl ;
         break;
       case MSR_FITTYPE_MU_MINUS:
         fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
@@ -2889,6 +2910,7 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
           if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
               (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
               (fittype == MSR_FITTYPE_ASYM) ||
+              (fittype == MSR_FITTYPE_ASYM_RRF) ||
               (fittype == MSR_FITTYPE_MU_MINUS) ||
               (fittype == MSR_FITTYPE_NON_MUSR)) {
             global.SetFitType(fittype);
@@ -3224,6 +3246,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
               (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
               (fittype == MSR_FITTYPE_ASYM) ||
+              (fittype == MSR_FITTYPE_ASYM_RRF) ||
               (fittype == MSR_FITTYPE_MU_MINUS) ||
               (fittype == MSR_FITTYPE_NON_MUSR)) {
             param.SetFitType(fittype);
@@ -4139,6 +4162,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           case MSR_PLOT_SINGLE_HISTO: // like: runs 1 5 13
           case MSR_PLOT_SINGLE_HISTO_RRF:
           case MSR_PLOT_ASYM:
+          case MSR_PLOT_ASYM_RRF:
           case MSR_PLOT_NON_MUSR:
           case MSR_PLOT_MU_MINUS:
             rl = new PStringNumberList(iter1->fLine.Data());
@@ -4550,8 +4574,10 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       cerr << endl << ">> [use_fit_ranges [ymin ymax]]";
       cerr << endl << ">> [view_packing n]";
       cerr << endl;
-      cerr << endl << ">> where <plot_type> is: 0=single histo asym,";
+      cerr << endl << ">> where <plot_type> is: 0=single histo,";
+      cerr << endl << ">>                       1=RRF single histo,";
       cerr << endl << ">>                       2=forward-backward asym,";
+      cerr << endl << ">>                       3=forward-backward RRF asym,";
       cerr << endl << ">>                       4=mu minus single histo,";
       cerr << endl << ">>                       8=non muSR.";
       cerr << endl << ">> <run_list> is the list of runs, e.g. runs 1 3";
@@ -5359,6 +5385,9 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           fRuns[i].SetPacking(1);
         }
         break;
+      case PRUN_ASYMMETRY_RRF:
+        // STILL MISSING
+        break;
       case PRUN_MU_MINUS:
         // needs eventually to be implemented
         break;
@@ -5760,7 +5789,8 @@ Bool_t PMsrHandler::CheckRRFSettings()
   // first set of tests: if RRF parameters are set, check if RRF fit is chosen.
   if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) != 0.0) {
     if (fittype != -1) { // check if GLOBAL fittype is set
-      if (fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) {
+      if ((fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) &&
+          (fittype != MSR_FITTYPE_ASYM_RRF)) {
         cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** found GLOBAL fittype " << fittype << " and";
         cerr << endl << ">>    RRF settings in the GLOBAL section. This is NOT compatible. Fix it first.";
         result = false;
@@ -5768,7 +5798,8 @@ Bool_t PMsrHandler::CheckRRFSettings()
     } else { // GLOBAL fittype is NOT set
       for (UInt_t i=0; i<fRuns.size(); i++) {
         fittype = fRuns[i].GetFitType();
-        if (fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) {
+        if ((fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) &&
+            (fittype != MSR_FITTYPE_ASYM_RRF)) {
           cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** found RUN with fittype " << fittype << " and";
           cerr << endl << ">>    RRF settings in the GLOBAL section. This is NOT compatible. Fix it first.";
           result = false;
@@ -5792,13 +5823,15 @@ Bool_t PMsrHandler::CheckRRFSettings()
   }
 
   // if not a RRF fit, done at this point
-  if (fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) {
+  if ((fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) &&
+      (fittype != MSR_FITTYPE_ASYM_RRF)) {
     return true;
   }
 
   // second set of tests: if RRF fit is chosen, do I find the necessary RRF parameters?
   fittype = fGlobal.GetFitType();
-  if (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) { // make sure RRF freq and RRF packing are set
+  if ((fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
+      (fittype == MSR_FITTYPE_ASYM_RRF)) { // make sure RRF freq and RRF packing are set
     if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) == 0.0) {
       cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
       cerr << endl << ">>    no RRF frequency found in the GLOBAL section! Fix it.";
@@ -5813,7 +5846,8 @@ Bool_t PMsrHandler::CheckRRFSettings()
     UInt_t rrfFitCounter = 0;
     for (UInt_t i=0; i<fRuns.size(); i++) {
       fittype = fRuns[i].GetFitType();
-      if (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) { // make sure RRF freq and RRF packing are set
+      if ((fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
+          (fittype == MSR_FITTYPE_ASYM_RRF)) { // make sure RRF freq and RRF packing are set
         rrfFitCounter++;
       }
     }

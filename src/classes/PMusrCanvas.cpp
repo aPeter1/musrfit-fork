@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -713,6 +713,18 @@ void PMusrCanvas::UpdateDataTheoryPad()
         // handle data
         HandleDataSet(i, runNo, data);
         break;
+      case MSR_FITTYPE_ASYM_RRF:
+        data = fRunList->GetAsymmetryRRF(runNo, PRunListCollection::kRunNo);
+        if (!data) { // something wrong
+          fValid = false;
+          // error message
+          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a asymmetry RRF plot";
+          cerr << endl;
+          return;
+        }
+        // handle data
+        HandleDataSet(i, runNo, data);
+        break;
       case MSR_FITTYPE_MU_MINUS:
         data = fRunList->GetMuMinus(runNo, PRunListCollection::kRunNo);
         if (!data) { // something wrong
@@ -873,13 +885,15 @@ void PMusrCanvas::UpdateInfoPad()
     else
       tstr  = *runs[runNo].GetRunName() + TString(","); // run_name
     // histo info (depending on the fittype
-    if (runs[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO) {
+    if ((runs[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO) ||
+        (runs[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
       tstr += TString("h:");
       TString grouping;
       fMsrHandler->GetGroupingString(runNo, "forward", grouping);
       tstr += grouping;
       tstr += TString(",");
-    } else if (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM) {
+    } else if ((runs[runNo].GetFitType() == MSR_FITTYPE_ASYM) ||
+               (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM_RRF)) {
       tstr += TString("h:");
       TString grouping;
       fMsrHandler->GetGroupingString(runNo, "forward", grouping);

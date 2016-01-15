@@ -179,7 +179,7 @@ void analyticFakeData(const TString type, UInt_t runNo)
     phase.push_back((5.0 + 2.0*rand.Rndm())*TMath::Pi()/180.0 + TMath::TwoPi()/noOfHistos * (Double_t)i);
 
   const Double_t gamma = 0.0000135538817; // gamma/(2pi)
-  Double_t bb0 = 90000.0; // field in Gauss
+  Double_t bb0 = 5000.0; // field in Gauss
   Double_t rate0 = 1.0/1000.0; // in 1/ns
 
   // fake function parameters header info: only for test purposes

@@ -645,20 +645,6 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
     fForward[i] = fForward[i] / n0 - 1.0;
   }
 
-/*
-  // make a DC correction of A(t) --> this is introduced to reduce ghost lines.
-  // This is a dirty trick and should be put on a better quantitative base!
-  Double_t dc_offset=0.0;
-  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
-    dc_offset += fForward[i];
-  }
-  dc_offset /= (Double_t)(fGoodBins[1]-fGoodBins[0]+1);
-  cout << "info> dc_offset = " << dc_offset << endl;
-  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
-    fForward[i] -= dc_offset;
-  }
-*/
-
   // 4b) error estimate of A(t): errA(t) = exp(+t/tau)/N0 sqrt( N(t) + ([N(t)-N_bkg]/N0)^2 errN0^2 )
   for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
     time_tau = (startTime + fTimeResolution * (i - fGoodBins[0])) / PMUON_LIFETIME;
