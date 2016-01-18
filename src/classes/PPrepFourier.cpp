@@ -181,7 +181,7 @@ void PPrepFourier::DoBkgCorrection()
   if ((fBkgRange[0] != -1) && (fBkgRange[1] != -1)) { // background range is given
     // make sure that the bkg range is ok
     for (UInt_t i=0; i<fRawData.size(); i++) {
-      if ((fBkgRange[0] >= fRawData[i].rawData.size()) || (fBkgRange[1] >= fRawData[i].rawData.size())) {
+      if ((fBkgRange[0] >= (Int_t)fRawData[i].rawData.size()) || (fBkgRange[1] >= (Int_t)fRawData[i].rawData.size())) {
         cerr << endl << "PPrepFourier::DoBkgCorrection() **ERROR** bkg-range out of data-range!";
         return;
       }
