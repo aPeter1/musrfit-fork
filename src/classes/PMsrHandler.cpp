@@ -353,7 +353,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 {
   const UInt_t prec = 6; // default output precision for float/doubles
   UInt_t neededPrec = 0;
-  UInt_t neededWidth = 9;
+  UInt_t neededWidth = 9;  
 
   Int_t tag, lineNo = 0, number;
   Int_t runNo = -1, addRunNo = 0;
@@ -2942,7 +2942,7 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
           ostr = dynamic_cast<TObjString*>(tokens->At(2));
           str = ostr->GetString();
           global.SetRRFFreq(dval, str.Data());
-          if (global.GetRRFFreq(str.Data()) == 0.0)
+          if (global.GetRRFFreq(str.Data()) == RRF_FREQ_UNDEF)
             error = true;
         }
       }
@@ -5890,7 +5890,7 @@ Bool_t PMsrHandler::CheckRRFSettings()
   Int_t fittype = fGlobal.GetFitType();
 
   // first set of tests: if RRF parameters are set, check if RRF fit is chosen.
-  if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) != 0.0) {
+  if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) != RRF_FREQ_UNDEF) {
     if (fittype != -1) { // check if GLOBAL fittype is set
       if ((fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) &&
           (fittype != MSR_FITTYPE_ASYM_RRF)) {
@@ -5935,7 +5935,7 @@ Bool_t PMsrHandler::CheckRRFSettings()
   fittype = fGlobal.GetFitType();
   if ((fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
       (fittype == MSR_FITTYPE_ASYM_RRF)) { // make sure RRF freq and RRF packing are set
-    if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) == 0.0) {
+    if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) == RRF_FREQ_UNDEF) {
       cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
       cerr << endl << ">>    no RRF frequency found in the GLOBAL section! Fix it.";
       return false;
@@ -5959,7 +5959,7 @@ Bool_t PMsrHandler::CheckRRFSettings()
       cerr << endl << ">>    This is currently not supported.";
       return false;
     }
-    if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) == 0.0) {
+    if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) == RRF_FREQ_UNDEF) {
       cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
       cerr << endl << ">>    no RRF frequency found in the GLOBAL section! Fix it.";
       return false;

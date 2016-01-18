@@ -146,6 +146,8 @@ typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
 #define RRF_UNIT_G      3
 #define RRF_UNIT_T      4
 
+#define RRF_FREQ_UNDEF  1.0e10
+
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of a bool vector.

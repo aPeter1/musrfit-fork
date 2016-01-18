@@ -710,7 +710,7 @@ void PRawRunData::SetTempError(const UInt_t idx, const Double_t errTemp)
 PMsrGlobalBlock::PMsrGlobalBlock()
 {
   fGlobalPresent = false;
-  fRRFFreq = 0.0; // rotating reference frequency in units given by fRRFUnitTag. Only needed for fittype 1
+  fRRFFreq = RRF_FREQ_UNDEF; // rotating reference frequency in units given by fRRFUnitTag. Only needed for fittype 1
   fRRFUnitTag = RRF_UNIT_UNDEF; // RRF unit tag. Default: undefined
   fRRFPhase = 0.0;
   fRRFPacking = -1; // undefined RRF packing/rebinning
@@ -730,7 +730,7 @@ PMsrGlobalBlock::PMsrGlobalBlock()
 // GetRRFFreq (public)
 //--------------------------------------------------------------------------
 /**
- * <p> get RRF frequency value in specific units. If units is unknown, 0.0 will be returned.
+ * <p> get RRF frequency value in specific units. If units is unknown, RRF_UNDEF_FREQ will be returned.
  *
  * \param unit unit string in which the units shall be given
  */
@@ -747,10 +747,8 @@ Double_t PMsrGlobalBlock::GetRRFFreq(const char *unit)
     unitTag = RRF_UNIT_Mcs;
   else if (!unitStr.CompareTo("T", TString::kIgnoreCase))
     unitTag = RRF_UNIT_T;
-  else {
-    cerr << endl << ">> PMsrGlobalBlock::GetRRFFreq: **ERROR** found undefined RRF unit '" << unit << "'!" << endl;
-    return freq;
-  }
+  else
+    return RRF_FREQ_UNDEF;
 
   // calc the conversion factor
   if (unitTag == fRRFUnitTag)
