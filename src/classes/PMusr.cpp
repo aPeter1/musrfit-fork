@@ -711,7 +711,7 @@ PMsrGlobalBlock::PMsrGlobalBlock()
 {
   fGlobalPresent = false;
   fRRFFreq = 0.0; // rotating reference frequency in units given by fRRFUnitTag. Only needed for fittype 1
-  fRRFUnitTag = RRF_UNIT_MHz; // RRF unit tag. Default: MHz
+  fRRFUnitTag = RRF_UNIT_UNDEF; // RRF unit tag. Default: undefined
   fRRFPhase = 0.0;
   fRRFPacking = -1; // undefined RRF packing/rebinning
   fFitType = -1; // undefined fit type

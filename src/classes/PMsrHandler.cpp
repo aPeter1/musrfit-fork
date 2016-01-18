@@ -1151,6 +1151,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           case MSR_PLOT_ASYM:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (asymmetry plot)" << endl;
             break;
+          case MSR_PLOT_ASYM_RRF:
+            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (asymmetry RRF plot)" << endl;
+            break;
           case MSR_PLOT_MU_MINUS:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (mu minus plot)" << endl;
             break;
@@ -2190,6 +2193,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
         break;
       case MSR_PLOT_ASYM:
         fout << "PLOT " << fPlots[i].fPlotType << "   (asymmetry plot)" << endl;
+        break;
+      case MSR_PLOT_ASYM_RRF:
+        fout << "PLOT " << fPlots[i].fPlotType << "   (asymmetry RRF plot)" << endl;
         break;
       case MSR_PLOT_MU_MINUS:
         fout << "PLOT " << fPlots[i].fPlotType << "   (mu minus plot)" << endl;
@@ -5331,7 +5337,51 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
         }
         break;
       case PRUN_SINGLE_HISTO_RRF:
-        // STILL MISSING
+        // check that there is a forward parameter number
+        if (fRuns[i].GetForwardHistoNo() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   forward parameter number not defined. Necessary for single histogram RRF fits." << endl;
+          return false;
+        }
+        if ((fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) && !fFourierOnly) {
+          // check if forward histogram number is a function
+          if (fRuns[i].GetNormParamNo() - MSR_PARAM_FUN_OFFSET > static_cast<Int_t>(fParam.size())) {
+            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << ">>   forward histogram number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
+            cerr << endl << ">>   Consider to check the manual ;-)" << endl;
+            return false;
+          }
+        }
+        // check fit range
+        if (!fRuns[i].IsFitRangeInBin() && !fFourierOnly) { // fit range given as times in usec (RUN block)
+          if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in RUN block
+            if (!fGlobal.IsFitRangeInBin()) { // fit range given as times in usec (GLOBAL block)
+              if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in GLOBAL block
+                cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+                cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+                return false;
+              }
+            }
+          }
+        }
+        // check number of T0's provided
+        if ((fRuns[i].GetT0BinSize() > fRuns[i].GetForwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > fRuns[i].GetForwardHistoNoSize())) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
+          return false;
+        }
+        // check that RRF frequency is given
+        if (fGlobal.GetRRFUnitTag() == RRF_UNIT_UNDEF) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** no RRF frequency found in the GLOBAL block." << endl;
+          return false;
+        }
+        // check that RRF packing is given
+        if (fGlobal.GetRRFPacking() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** no RRF packing found in the GLOBAL block." << endl;
+          return false;
+        }
         break;
       case PRUN_ASYMMETRY:
         // check alpha
@@ -5386,7 +5436,60 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
         }
         break;
       case PRUN_ASYMMETRY_RRF:
-        // STILL MISSING
+        // check alpha
+        if ((fRuns[i].GetAlphaParamNo() == -1) && !fFourierOnly) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   alpha parameter number missing which is needed for an asymmetry RRF fit.";
+          cerr << endl << ">>   Consider to check the manual ;-)" << endl;
+          return false;
+        }
+        // check that there is a forward parameter number
+        if (fRuns[i].GetForwardHistoNo() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   forward histogram number not defined. Necessary for asymmetry RRF fits." << endl;
+          return false;
+        }
+        // check that there is a backward parameter number
+        if (fRuns[i].GetBackwardHistoNo() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   backward histogram number not defined. Necessary for asymmetry RRF fits." << endl;
+          return false;
+        }
+        // check fit range
+        if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec
+          if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
+            if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) {
+              cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+              cerr << endl << ">>   Fit range is not defined, also NOT present in the GLOBAL block. Necessary for asymmetry RRF fits." << endl;
+              return false;
+            }
+          }
+        }
+        // check number of T0's provided
+        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize())) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << " in forward. Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
+          return false;
+        }
+        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize())) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << " in backward. Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << ". Needs to be fixed." << endl;
+          return false;
+        }
+        // check that RRF frequency is given
+        if (fGlobal.GetRRFUnitTag() == RRF_UNIT_UNDEF) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** no RRF frequency found in the GLOBAL block." << endl;
+          return false;
+        }
+        // check that RRF packing is given
+        if (fGlobal.GetRRFPacking() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** no RRF packing found in the GLOBAL block." << endl;
+          return false;
+        }
         break;
       case PRUN_MU_MINUS:
         // needs eventually to be implemented

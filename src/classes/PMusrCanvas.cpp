@@ -4729,6 +4729,7 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
           }
           break;
         case MSR_PLOT_SINGLE_HISTO_RRF:
+        case MSR_PLOT_ASYM_RRF:
           yAxisTitle = "RRF Asymmetry";
           break;
         case MSR_PLOT_ASYM:
