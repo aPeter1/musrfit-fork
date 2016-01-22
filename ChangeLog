@@ -4,6 +4,8 @@
 
 changes since 0.15.0
 ===================================
+NEW 2016-01-22 add RRF fit option. At the same time, the version has been
+               increased to 0.16.0. For details see the documentation.
 FIXED 2015-10-29 TMusrRunHeader didn't map a double vector properly into a
                  string. The last element was a copy of the 2nd last instead
 		 if the proper last. This is now fixed. Fixed also some
