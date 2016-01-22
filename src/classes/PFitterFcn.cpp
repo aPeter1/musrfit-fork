@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -77,12 +77,16 @@ Double_t PFitterFcn::operator()(const std::vector<Double_t>& par) const
 
   if (fUseChi2) { // chi square
     value += fRunListCollection->GetSingleHistoChisq(par);
+    value += fRunListCollection->GetSingleHistoRRFChisq(par);
     value += fRunListCollection->GetAsymmetryChisq(par);
+    value += fRunListCollection->GetAsymmetryRRFChisq(par);
     value += fRunListCollection->GetMuMinusChisq(par);
     value += fRunListCollection->GetNonMusrChisq(par);
   } else { // max likelihood
     value += fRunListCollection->GetSingleHistoMaximumLikelihood(par);
+    value += fRunListCollection->GetSingleHistoRRFMaximumLikelihood(par);
     value += fRunListCollection->GetAsymmetryMaximumLikelihood(par);
+    value += fRunListCollection->GetAsymmetryRRFMaximumLikelihood(par);
     value += fRunListCollection->GetMuMinusMaximumLikelihood(par);
     value += fRunListCollection->GetNonMusrMaximumLikelihood(par);
   }

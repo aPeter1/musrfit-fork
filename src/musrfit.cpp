@@ -175,13 +175,26 @@ void musrfit_dump_ascii(char *fileName, PRunListCollection *runList)
   // go through the run list, get the data and dump it in a file
 
   int runCounter = 0;
+  PRunData *data;
 
   // single histos
   unsigned int size = runList->GetNoOfSingleHisto();
-  PRunData *data;
   if (size > 0) {
     for (unsigned int i=0; i<size; i++) {
       data = runList->GetSingleHisto(i);
+      if (data) {
+        // dump data
+        musrfit_write_ascii(fln, data, runCounter);
+        runCounter++;
+      }
+    }
+  }
+
+  // single histos
+  size = runList->GetNoOfSingleHistoRRF();
+  if (size > 0) {
+    for (unsigned int i=0; i<size; i++) {
+      data = runList->GetSingleHistoRRF(i);
       if (data) {
         // dump data
         musrfit_write_ascii(fln, data, runCounter);
@@ -195,6 +208,19 @@ void musrfit_dump_ascii(char *fileName, PRunListCollection *runList)
   if (size > 0) {
     for (unsigned int i=0; i<size; i++) {
       data = runList->GetAsymmetry(i);
+      if (data) {
+        // dump data
+        musrfit_write_ascii(fln, data, runCounter);
+        runCounter++;
+      }
+    }
+  }
+
+  // asymmetry RRF
+  size = runList->GetNoOfAsymmetryRRF();
+  if (size > 0) {
+    for (unsigned int i=0; i<size; i++) {
+      data = runList->GetAsymmetryRRF(i);
       if (data) {
         // dump data
         musrfit_write_ascii(fln, data, runCounter);
@@ -308,13 +334,26 @@ void musrfit_dump_root(char *fileName, PRunListCollection *runList)
   // go through the run list, get the data and dump it in a file
 
   int runCounter = 0;
+  PRunData *data;
 
   // single histos
   unsigned int size = runList->GetNoOfSingleHisto();
-  PRunData *data;
   if (size > 0) {
     for (unsigned int i=0; i<size; i++) {
       data = runList->GetSingleHisto(i);
+      if (data) {
+        // dump data
+        musrfit_write_root(f, fln, data, runCounter);
+        runCounter++;
+      }
+    }
+  }
+
+  // single histo RRF
+  size = runList->GetNoOfSingleHistoRRF();
+  if (size > 0) {
+    for (unsigned int i=0; i<size; i++) {
+      data = runList->GetSingleHistoRRF(i);
       if (data) {
         // dump data
         musrfit_write_root(f, fln, data, runCounter);
@@ -328,6 +367,19 @@ void musrfit_dump_root(char *fileName, PRunListCollection *runList)
   if (size > 0) {
     for (unsigned int i=0; i<size; i++) {
       data = runList->GetAsymmetry(i);
+      if (data) {
+        // dump data
+        musrfit_write_root(f, fln, data, runCounter);
+        runCounter++;
+      }
+    }
+  }
+
+  // asymmetry RRF
+  size = runList->GetNoOfAsymmetryRRF();
+  if (size > 0) {
+    for (unsigned int i=0; i<size; i++) {
+      data = runList->GetAsymmetryRRF(i);
       if (data) {
         // dump data
         musrfit_write_root(f, fln, data, runCounter);

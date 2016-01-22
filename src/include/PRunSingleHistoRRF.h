@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PRunAsymmetry.h
+  PRunSingleHistoRRF.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -27,21 +27,20 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PRUNASYMMETRY_H_
-#define _PRUNASYMMETRY_H_
+#ifndef _PRUNSINGLEHISTORRF_H_
+#define _PRUNSINGLEHISTORRF_H_
 
 #include "PRunBase.h"
 
-//---------------------------------------------------------------------------
 /**
- * <p>Class handling the asymmetry fit.
+ * <p>Class handling single histogram fit type.
  */
-class PRunAsymmetry : public PRunBase
+class PRunSingleHistoRRF : public PRunBase
 {
   public:
-    PRunAsymmetry();
-    PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
-    virtual ~PRunAsymmetry();
+    PRunSingleHistoRRF();
+    PRunSingleHistoRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
+    virtual ~PRunSingleHistoRRF();
 
     virtual Double_t CalcChiSquare(const std::vector<Double_t>& par);
     virtual Double_t CalcChiSquareExpected(const std::vector<Double_t>& par);
@@ -55,28 +54,30 @@ class PRunAsymmetry : public PRunBase
   protected:
     virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
-    virtual Bool_t PrepareFitData();
-    virtual Bool_t PrepareViewData(PRawRunData* runData, UInt_t histoNo[2]);
-    virtual Bool_t PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]);
+    virtual Bool_t PrepareFitData(PRawRunData* runData, const UInt_t histoNo);
+    virtual Bool_t PrepareViewData(PRawRunData* runData, const UInt_t histoNo);
 
   private:
-    UInt_t fAlphaBetaTag; ///< \f$ 1 \to \alpha = \beta = 1\f$; \f$ 2 \to \alpha \neq 1, \beta = 1\f$; \f$ 3 \to \alpha = 1, \beta \neq 1\f$; \f$ 4 \to \alpha \neq 1, \beta \neq 1\f$.
-    UInt_t fNoOfFitBins;  ///< number of bins to be be fitted
-    Int_t fPacking;       ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
+    static const Double_t fN0EstimateEndTime = 1.0; ///< end time in (us) over which N0 is estimated. Should eventually be estimated automatically ...
 
-    PDoubleVector fForward;     ///< forward histo data
-    PDoubleVector fForwardErr;  ///< forward histo errors
-    PDoubleVector fBackward;    ///< backward histo data
-    PDoubleVector fBackwardErr; ///< backward histo errors
+    UInt_t fNoOfFitBins;    ///< number of bins to be fitted
+    Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
+    Int_t fRRFPacking;      ///< RRF packing for this particular run. Given in the GLOBAL-block.
 
-    Int_t fGoodBins[4];   ///< keep first/last good bins. 0=fgb, 1=lgb (forward); 2=fgb, 3=lgb (backward)
+    Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
 
-    Bool_t SubtractFixBkg();
-    Bool_t SubtractEstimatedBkg();
+    PDoubleVector fForward; ///< forward histo data
+    PDoubleVector fM;       ///< vector holding M(t) = [N(t)-N_bkg] exp(+t/tau). Needed to estimate N0.
+    PDoubleVector fMerr;    ///< vector holding the error of M(t): M_err = exp(+t/tau) sqrt(N(t)).
+    PDoubleVector fW;       ///< vector holding the weight needed to estimate N0, and errN0.
+    PDoubleVector fAerr;    ///< vector holding the errors of estimated A(t)
 
-    virtual Bool_t GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &forwardHisto, PUIntVector &backwardHistoNo);
-    virtual Bool_t GetProperDataRange(PRawRunData* runData, UInt_t histoNo[2]);
+    virtual Bool_t GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &histoNo);
+    virtual Bool_t GetProperDataRange();
     virtual void GetProperFitRange(PMsrGlobalBlock *globalBlock);
+    virtual Double_t GetMainFrequency(PDoubleVector &data);
+    virtual Double_t EstimateN0(Double_t &errN0, Double_t freqMax);
+    virtual Bool_t EstimateBkg(UInt_t histoNo);
 };
 
-#endif // _PRUNASYMMETRY_H_
+#endif // _PRUNSINGLEHISTORRF_H_

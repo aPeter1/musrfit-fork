@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -58,11 +58,23 @@ PRunListCollection::~PRunListCollection()
   }
   fRunSingleHistoList.clear();
 
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++) {
+    fRunSingleHistoRRFList[i]->CleanUp();
+    fRunSingleHistoRRFList[i]->~PRunSingleHistoRRF();
+  }
+  fRunSingleHistoRRFList.clear();
+
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++) {
     fRunAsymmetryList[i]->CleanUp();
     fRunAsymmetryList[i]->~PRunAsymmetry();
   }
   fRunAsymmetryList.clear();
+
+  for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++) {
+    fRunAsymmetryRRFList[i]->CleanUp();
+    fRunAsymmetryRRFList[i]->~PRunAsymmetryRRF();
+  }
+  fRunAsymmetryRRFList.clear();
 
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++) {
     fRunMuMinusList[i]->CleanUp();
@@ -106,9 +118,19 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
       if (!fRunSingleHistoList[fRunSingleHistoList.size()-1]->IsValid())
         success = false;
       break;
+    case PRUN_SINGLE_HISTO_RRF:
+      fRunSingleHistoRRFList.push_back(new PRunSingleHistoRRF(fMsrInfo, fData, runNo, tag));
+      if (!fRunSingleHistoRRFList[fRunSingleHistoRRFList.size()-1]->IsValid())
+        success = false;
+      break;
     case PRUN_ASYMMETRY:
       fRunAsymmetryList.push_back(new PRunAsymmetry(fMsrInfo, fData, runNo, tag));
       if (!fRunAsymmetryList[fRunAsymmetryList.size()-1]->IsValid())
+        success = false;
+      break;
+    case PRUN_ASYMMETRY_RRF:
+      fRunAsymmetryRRFList.push_back(new PRunAsymmetryRRF(fMsrInfo, fData, runNo, tag));
+      if (!fRunAsymmetryRRFList[fRunAsymmetryRRFList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_MU_MINUS:
@@ -147,8 +169,12 @@ void PRunListCollection::SetFitRange(const TString fitRange)
 {
   for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     fRunSingleHistoList[i]->SetFitRangeBin(fitRange);
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    fRunSingleHistoRRFList[i]->SetFitRangeBin(fitRange);
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     fRunAsymmetryList[i]->SetFitRangeBin(fitRange);
+  for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
+    fRunAsymmetryRRFList[i]->SetFitRangeBin(fitRange);
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
     fRunMuMinusList[i]->SetFitRangeBin(fitRange);
   for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
@@ -169,8 +195,12 @@ void PRunListCollection::SetFitRange(const PDoublePairVector fitRange)
 {
   for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     fRunSingleHistoList[i]->SetFitRange(fitRange);
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    fRunSingleHistoRRFList[i]->SetFitRange(fitRange);
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     fRunAsymmetryList[i]->SetFitRange(fitRange);
+  for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
+    fRunAsymmetryRRFList[i]->SetFitRange(fitRange);
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
     fRunMuMinusList[i]->SetFitRange(fitRange);
   for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
@@ -199,6 +229,27 @@ Double_t PRunListCollection::GetSingleHistoChisq(const std::vector<Double_t>& pa
 }
 
 //--------------------------------------------------------------------------
+// GetSingleHistoRRFChisq (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates chi-square of <em>all</em> single histogram RRF runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of all single histogram RRF runs of the msr-file
+ *
+ * \param par fit parameter vector
+ */
+Double_t PRunListCollection::GetSingleHistoRRFChisq(const std::vector<Double_t>& par) const
+{
+  Double_t chisq = 0.0;
+
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    chisq += fRunSingleHistoRRFList[i]->CalcChiSquare(par);
+
+  return chisq;
+}
+
+//--------------------------------------------------------------------------
 // GetAsymmetryChisq (public)
 //--------------------------------------------------------------------------
 /**
@@ -215,6 +266,27 @@ Double_t PRunListCollection::GetAsymmetryChisq(const std::vector<Double_t>& par)
 
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     chisq += fRunAsymmetryList[i]->CalcChiSquare(par);
+
+  return chisq;
+}
+
+//--------------------------------------------------------------------------
+// GetAsymmetryRRFChisq (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates chi-square of <em>all</em> asymmetry RRF runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of all asymmetry RRF runs of the msr-file
+ *
+ * \param par fit parameter vector
+ */
+Double_t PRunListCollection::GetAsymmetryRRFChisq(const std::vector<Double_t>& par) const
+{
+  Double_t chisq = 0.0;
+
+  for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
+    chisq += fRunAsymmetryRRFList[i]->CalcChiSquare(par);
 
   return chisq;
 }
@@ -299,8 +371,14 @@ Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Doubl
   case PRUN_SINGLE_HISTO:
     expectedChisq = fRunSingleHistoList[subIdx]->CalcChiSquareExpected(par);
     break;
+  case PRUN_SINGLE_HISTO_RRF:
+    expectedChisq = fRunSingleHistoRRFList[subIdx]->CalcChiSquareExpected(par);
+    break;
   case PRUN_ASYMMETRY:
     expectedChisq = fRunAsymmetryList[subIdx]->CalcChiSquareExpected(par);
+    break;
+  case PRUN_ASYMMETRY_RRF:
+    expectedChisq = fRunAsymmetryRRFList[subIdx]->CalcChiSquareExpected(par);
     break;
   case PRUN_MU_MINUS:
     expectedChisq = fRunMuMinusList[subIdx]->CalcChiSquareExpected(par);
@@ -336,16 +414,17 @@ Double_t PRunListCollection::GetSingleRunChisq(const std::vector<Double_t>& par,
     return chisq;
   }
 
+  Int_t subIdx = 0;
   Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
-  if (type == -1) { // i.e. not forun in the RUN block, try the GLOBAL block
+  if (type == -1) { // i.e. not found in the RUN block, try the GLOBAL block
     type = fMsrInfo->GetMsrGlobal()->GetFitType();
-  }
-
-  // count how many entries of this fit-type are present up to idx
-  UInt_t subIdx = 0;
-  for (UInt_t i=0; i<idx; i++) {
-    if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
-      subIdx++;
+    subIdx = idx;
+  } else { // found in the RUN block
+    // count how many entries of this fit-type are present up to idx
+    for (UInt_t i=0; i<idx; i++) {
+      if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+        subIdx++;
+    }
   }
 
   // return the chisq of the single run
@@ -353,8 +432,14 @@ Double_t PRunListCollection::GetSingleRunChisq(const std::vector<Double_t>& par,
   case PRUN_SINGLE_HISTO:
     chisq = fRunSingleHistoList[subIdx]->CalcChiSquare(par);
     break;
+  case PRUN_SINGLE_HISTO_RRF:
+    chisq = fRunSingleHistoRRFList[subIdx]->CalcChiSquare(par);
+    break;
   case PRUN_ASYMMETRY:
     chisq = fRunAsymmetryList[subIdx]->CalcChiSquare(par);
+    break;
+  case PRUN_ASYMMETRY_RRF:
+    chisq = fRunAsymmetryRRFList[subIdx]->CalcChiSquare(par);
     break;
   case PRUN_MU_MINUS:
     chisq = fRunMuMinusList[subIdx]->CalcChiSquare(par);
@@ -376,7 +461,7 @@ Double_t PRunListCollection::GetSingleRunChisq(const std::vector<Double_t>& par,
  * <p>Calculates log max-likelihood of <em>all</em> single histogram runs of a msr-file.
  *
  * <b>return:</b>
- * - chi-square of all single histogram runs of the msr-file
+ * - log max-likelihood of all single histogram runs of the msr-file
  *
  * \param par fit parameter vector
  */
@@ -386,6 +471,27 @@ Double_t PRunListCollection::GetSingleHistoMaximumLikelihood(const std::vector<D
 
   for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     mlh += fRunSingleHistoList[i]->CalcMaxLikelihood(par);
+
+  return mlh;
+}
+
+//--------------------------------------------------------------------------
+// GetSingleHistoRRFMaximumLikelihood (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates log max-likelihood of <em>all</em> single histogram RRF runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - log max-likelihood of all single histogram runs of the msr-file
+ *
+ * \param par fit parameter vector
+ */
+Double_t PRunListCollection::GetSingleHistoRRFMaximumLikelihood(const std::vector<Double_t>& par) const
+{
+  Double_t mlh = 0.0;
+
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    mlh += fRunSingleHistoRRFList[i]->CalcMaxLikelihood(par);
 
   return mlh;
 }
@@ -413,13 +519,35 @@ Double_t PRunListCollection::GetAsymmetryMaximumLikelihood(const std::vector<Dou
 }
 
 //--------------------------------------------------------------------------
+// GetAsymmetryRRFMaximumLikelihood (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> Since it is not clear yet how to handle asymmetry fits with max likelihood
+ * the chi square will be used!
+ *
+ * <b>return:</b>
+ * - chi-square of all asymmetry RRF runs of the msr-file
+ *
+ * \param par fit parameter vector
+ */
+Double_t PRunListCollection::GetAsymmetryRRFMaximumLikelihood(const std::vector<Double_t>& par) const
+{
+  Double_t mlh = 0.0;
+
+  for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
+    mlh += fRunAsymmetryRRFList[i]->CalcChiSquare(par);
+
+  return mlh;
+}
+
+//--------------------------------------------------------------------------
 // GetMuMinusMaximumLikelihood (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculates log max-likelihood of <em>all</em> mu minus runs of a msr-file.
  *
  * <b>return:</b>
- * - chi-square of all mu minus runs of the msr-file
+ * - log max-likelihood of all mu minus runs of the msr-file
  *
  * \param par fit parameter vector
  */
@@ -493,8 +621,14 @@ UInt_t PRunListCollection::GetNoOfBinsFitted(const UInt_t idx) const
   case PRUN_SINGLE_HISTO:
     result = fRunSingleHistoList[subIdx]->GetNoOfFitBins();
     break;
+  case PRUN_SINGLE_HISTO_RRF:
+    result = fRunSingleHistoRRFList[subIdx]->GetNoOfFitBins();
+    break;
   case PRUN_ASYMMETRY:
     result = fRunAsymmetryList[subIdx]->GetNoOfFitBins();
+    break;
+  case PRUN_ASYMMETRY_RRF:
+    result = fRunAsymmetryRRFList[subIdx]->GetNoOfFitBins();
     break;
   case PRUN_MU_MINUS:
     result = fRunMuMinusList[subIdx]->GetNoOfFitBins();
@@ -526,8 +660,14 @@ UInt_t PRunListCollection::GetTotalNoOfBinsFitted() const
   for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
     counts += fRunSingleHistoList[i]->GetNoOfFitBins();
 
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    counts += fRunSingleHistoRRFList[i]->GetNoOfFitBins();
+
   for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
     counts += fRunAsymmetryList[i]->GetNoOfFitBins();
+
+  for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
+    counts += fRunAsymmetryRRFList[i]->GetNoOfFitBins();
 
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
     counts += fRunMuMinusList[i]->GetNoOfFitBins();
@@ -558,7 +698,7 @@ PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
   switch (tag) {
     case kIndex:
       if ((index < 0) || (index >= fRunSingleHistoList.size())) {
-        cerr << endl << "PRunListCollection::GetSingleHisto: **ERROR** index = " << index << " out of bounds";
+        cerr << endl << ">> PRunListCollection::GetSingleHisto(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
       }
@@ -570,6 +710,49 @@ PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
       for (UInt_t i=0; i<fRunSingleHistoList.size(); i++) {
         if (fRunSingleHistoList[i]->GetRunNo() == index) {
           data = fRunSingleHistoList[i]->GetData();
+          break;
+        }
+      }
+      break;
+    default: // error
+      break;
+  }
+
+  return data;
+}
+
+//--------------------------------------------------------------------------
+// GetSingleHistoRRF (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get a processed single histogram RRF data set.
+ *
+ * <b>return:</b>
+ * - pointer to the run data set (processed data) if data set is found
+ * - null pointer otherwise
+ *
+ * \param index msr-file run index
+ * \param tag kIndex -> data at index, kRunNo -> data of given run no
+ */
+PRunData* PRunListCollection::GetSingleHistoRRF(UInt_t index, EDataSwitch tag)
+{
+  PRunData *data = 0;
+
+  switch (tag) {
+    case kIndex:
+      if ((index < 0) || (index >= fRunSingleHistoRRFList.size())) {
+        cerr << endl << ">> PRunListCollection::GetSingleHistoRRF(): **ERROR** index = " << index << " out of bounds";
+        cerr << endl;
+        return 0;
+      }
+
+      fRunSingleHistoRRFList[index]->CalcTheory();
+      data = fRunSingleHistoRRFList[index]->GetData();
+      break;
+    case kRunNo:
+      for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++) {
+        if (fRunSingleHistoRRFList[i]->GetRunNo() == index) {
+          data = fRunSingleHistoRRFList[i]->GetData();
           break;
         }
       }
@@ -601,7 +784,7 @@ PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
   switch (tag) {
     case kIndex: // called from musrfit when dumping the data
       if ((index < 0) || (index > fRunAsymmetryList.size())) {
-        cerr << endl << "PRunListCollection::GetAsymmetry: **ERROR** index = " << index << " out of bounds";
+        cerr << endl << ">> PRunListCollection::GetAsymmetry(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
       }
@@ -613,6 +796,49 @@ PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
       for (UInt_t i=0; i<fRunAsymmetryList.size(); i++) {
         if (fRunAsymmetryList[i]->GetRunNo() == index) {
           data = fRunAsymmetryList[i]->GetData();
+          break;
+        }
+      }
+      break;
+    default: // error
+      break;
+  }
+
+  return data;
+}
+
+//--------------------------------------------------------------------------
+// GetAsymmetryRRF (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get a processed asymmetry RRF data set.
+ *
+ * <b>return:</b>
+ * - pointer to the run data set (processed data) if data set is found
+ * - null pointer otherwise
+ *
+ * \param index msr-file run index
+ * \param tag kIndex -> data at index, kRunNo -> data of given run no
+ */
+PRunData* PRunListCollection::GetAsymmetryRRF(UInt_t index, EDataSwitch tag)
+{
+  PRunData *data = 0;
+
+  switch (tag) {
+    case kIndex: // called from musrfit when dumping the data
+      if ((index < 0) || (index > fRunAsymmetryRRFList.size())) {
+        cerr << endl << ">> PRunListCollection::GetAsymmetryRRF(): **ERROR** index = " << index << " out of bounds";
+        cerr << endl;
+        return 0;
+      }
+
+      fRunAsymmetryRRFList[index]->CalcTheory();
+      data = fRunAsymmetryRRFList[index]->GetData();
+      break;
+    case kRunNo: // called from PMusrCanvas
+      for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++) {
+        if (fRunAsymmetryRRFList[i]->GetRunNo() == index) {
+          data = fRunAsymmetryRRFList[i]->GetData();
           break;
         }
       }
@@ -644,7 +870,7 @@ PRunData* PRunListCollection::GetMuMinus(UInt_t index, EDataSwitch tag)
   switch (tag) {
     case kIndex:
       if ((index < 0) || (index > fRunMuMinusList.size())) {
-        cerr << endl << "PRunListCollection::GetMuMinus: **ERROR** index = " << index << " out of bounds";
+        cerr << endl << ">> PRunListCollection::GetMuMinus(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
       }
@@ -686,7 +912,7 @@ PRunData* PRunListCollection::GetNonMusr(UInt_t index, EDataSwitch tag)
   switch (tag) {
     case kIndex:
       if ((index < 0) || (index > fRunNonMusrList.size())) {
-        cerr << endl << "PRunListCollection::GetNonMusr: **ERROR** index = " << index << " out of bounds";
+        cerr << endl << ">> PRunListCollection::GetNonMusr(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
       }

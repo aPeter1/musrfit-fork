@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PRunMuMinus.cpp
+  PRunSingleHistoRRF.cpp
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -27,14 +27,27 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef HAVE_GOMP
+#include <omp.h>
+#endif
+
+#include <cmath>
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include <TString.h>
 #include <TObjArray.h>
 #include <TObjString.h>
+#include <TH1F.h>
 
-#include "PRunMuMinus.h"
+#include "PMusr.h"
+#include "PFourier.h"
+#include "PRunSingleHistoRRF.h"
 
 //--------------------------------------------------------------------------
 // Constructor
@@ -42,17 +55,16 @@ using namespace std;
 /**
  * <p>Constructor
  */
-PRunMuMinus::PRunMuMinus() : PRunBase()
+PRunSingleHistoRRF::PRunSingleHistoRRF() : PRunBase()
 {
   fNoOfFitBins  = 0;
-  fPacking = -1;
+  fBackground = 0;
+  fRRFPacking = -1;
 
   // the 2 following variables are need in case fit range is given in bins, and since
   // the fit range can be changed in the command block, these variables need to be accessible
   fGoodBins[0] = -1;
   fGoodBins[1] = -1;
-
-  fHandleTag = kEmpty;
 }
 
 //--------------------------------------------------------------------------
@@ -66,17 +78,30 @@ PRunMuMinus::PRunMuMinus() : PRunBase()
  * \param runNo number of the run within the msr-file
  * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
-PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
+PRunSingleHistoRRF::PRunSingleHistoRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
 {
   fNoOfFitBins  = 0;
 
-  fPacking = fRunInfo->GetPacking();
-  if (fPacking == -1) { // i.e. packing is NOT given in the RUN-block, it must be given in the GLOBAL-block
-    fPacking = fMsrInfo->GetMsrGlobal()->GetPacking();
+  PMsrGlobalBlock *global = msrInfo->GetMsrGlobal();
+
+  if (!global->IsPresent()) {
+    cerr << endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: no GLOBAL-block present!";
+    cerr << endl << ">> For Single Histo RRF the GLOBAL-block is mandatory! Please fix this first.";
+    cerr << endl;
+    fValid = false;
+    return;
   }
-  if (fPacking == -1) { // this should NOT happen, somethin is severely wrong
-    cerr << endl << ">> PRunMuMinus::PRunMuMinus: **SEVERE ERROR**: Couldn't find any packing information!";
-    cerr << endl << ">> This is very bad :-(, will quit ...";
+
+  if (!global->GetRRFUnit().CompareTo("??")) {
+    cerr << endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: no RRF-Frequency found!";
+    cerr << endl;
+    fValid = false;
+    return;
+  }
+
+  fRRFPacking = global->GetRRFPacking();
+  if (fRRFPacking == -1) {
+    cerr << endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: no RRF-Packing found!";
     cerr << endl;
     fValid = false;
     return;
@@ -88,7 +113,7 @@ PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t 
   fGoodBins[1] = -1;
 
   if (!PrepareData()) {
-    cerr << endl << ">> PRunMuMinus::PRunMuMinus: **SEVERE ERROR**: Couldn't prepare data for fitting!";
+    cerr << endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: Couldn't prepare data for fitting!";
     cerr << endl << ">> This is very bad :-(, will quit ...";
     cerr << endl;
     fValid = false;
@@ -101,13 +126,13 @@ PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t 
 /**
  * <p>Destructor
  */
-PRunMuMinus::~PRunMuMinus()
+PRunSingleHistoRRF::~PRunSingleHistoRRF()
 {
   fForward.clear();
 }
 
 //--------------------------------------------------------------------------
-// CalcChiSquare
+// CalcChiSquare (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculate chi-square.
@@ -117,10 +142,10 @@ PRunMuMinus::~PRunMuMinus()
  *
  * \param par parameter vector iterated by minuit2
  */
-Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
+Double_t PRunSingleHistoRRF::CalcChiSquare(const std::vector<Double_t>& par)
 {
-  Double_t chisq = 0.0;
-  Double_t diff = 0.0;
+  Double_t chisq     = 0.0;
+  Double_t diff      = 0.0;
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
@@ -152,7 +177,7 @@ Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
     chunk = 10;
   #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
-  for (i=startTimeBin; i < endTimeBin; ++i) {
+  for (i=startTimeBin; i<endTimeBin; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     diff = fData.GetValue()->at(i) - fTheory->Func(time, par, fFuncValues);
     chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
@@ -168,11 +193,11 @@ Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
  * <p>Calculate expected chi-square.
  *
  * <b>return:</b>
- * - chisq value == 0.0
+ * - chisq value
  *
  * \param par parameter vector iterated by minuit2
  */
-Double_t PRunMuMinus::CalcChiSquareExpected(const std::vector<Double_t>& par)
+Double_t PRunSingleHistoRRF::CalcChiSquareExpected(const std::vector<Double_t>& par)
 {
   Double_t chisq = 0.0;
   Double_t diff  = 0.0;
@@ -215,76 +240,58 @@ Double_t PRunMuMinus::CalcChiSquareExpected(const std::vector<Double_t>& par)
     chisq += diff*diff / theo;
   }
 
+  return chisq;
+}
+
+//--------------------------------------------------------------------------
+// CalcMaxLikelihood (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate log maximum-likelihood. See http://pdg.lbl.gov/index.html
+ *
+ * <b>return:</b>
+ * - log maximum-likelihood value
+ *
+ * \param par parameter vector iterated by minuit2
+ */
+Double_t PRunSingleHistoRRF::CalcMaxLikelihood(const std::vector<Double_t>& par)
+{
+  // not yet implemented
+
   return 0.0;
 }
 
 //--------------------------------------------------------------------------
-// CalcMaxLikelihood
+// CalcTheory (public)
 //--------------------------------------------------------------------------
 /**
- * <p>Calculate log max-likelihood. See http://pdg.lbl.gov/index.html
- *
- * <b>return:</b>
- * - log max-likelihood value
- *
- * \param par parameter vector iterated by minuit2
+ * <p>Calculate theory for a given set of fit-parameters.
  */
-Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
+void PRunSingleHistoRRF::CalcTheory()
 {
-  Double_t mllh = 0.0; // maximum log likelihood assuming poisson distribution for the single bin
+  // feed the parameter vector
+  std::vector<Double_t> par;
+  PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
+  for (UInt_t i=0; i<paramList->size(); i++)
+    par.push_back((*paramList)[i].fValue);
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    Int_t funcNo = fMsrInfo->GetFuncNo(i);
-    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
   }
 
-  // calculate maximum log likelihood
-  Double_t theo;
-  Double_t data;
-  Double_t time(1.0);
-  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
-
-  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
-  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
-  if (startTimeBin < 0)
-    startTimeBin = 0;
-  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin > N)
-    endTimeBin = N;
-
-  // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
-  // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
-  // for a given set of parameters---which should be done outside of the parallelized loop.
-  // For all other functions it means a tiny and acceptable overhead.
-  time = fTheory->Func(time, par, fFuncValues);
-
-  #ifdef HAVE_GOMP
-  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
-  if (chunk < 10)
-    chunk = 10;
-  #pragma omp parallel for default(shared) private(i,time,theo,data) schedule(dynamic,chunk) reduction(-:mllh)
-  #endif
-  for (i=startTimeBin; i < endTimeBin; ++i) {
-    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
-    // calculate theory for the given parameter set
-    theo = fTheory->Func(time, par, fFuncValues);
-
-    data = fData.GetValue()->at(i);
-
-    if (theo <= 0.0) {
-      cerr << ">> PRunMuMinus::CalcMaxLikelihood: **WARNING** NEGATIVE theory!!" << endl;
-      continue;
-    }
-
-    if (data > 1.0e-9) {
-      mllh += (theo-data) + data*log(data/theo);
-    } else {
-      mllh += (theo-data);
-    }
+  // calculate theory
+  UInt_t size = fData.GetValue()->size();
+  Double_t start = fData.GetDataTimeStart();
+  Double_t resolution = fData.GetDataTimeStep();
+  Double_t time;
+  for (UInt_t i=0; i<size; i++) {
+    time = start + (Double_t)i*resolution;
+    fData.AppendTheoryValue(fTheory->Func(time, par, fFuncValues));
   }
 
-  return 2.0*mllh;
+  // clean up
+  par.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -295,7 +302,7 @@ Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
  *
  * <b>return:</b> number of fitted bins.
  */
-UInt_t PRunMuMinus::GetNoOfFitBins()
+UInt_t PRunSingleHistoRRF::GetNoOfFitBins()
 {
   CalcNoOfFitBins();
 
@@ -316,7 +323,7 @@ UInt_t PRunMuMinus::GetNoOfFitBins()
  *
  * \param fitRange string containing the necessary information.
  */
-void PRunMuMinus::SetFitRangeBin(const TString fitRange)
+void PRunSingleHistoRRF::SetFitRangeBin(const TString fitRange)
 {
   TObjArray *tok = 0;
   TObjString *ostr = 0;
@@ -354,7 +361,7 @@ void PRunMuMinus::SetFitRangeBin(const TString fitRange)
     Int_t pos = 2*(fRunNo+1)-1;
 
     if (pos + 1 >= tok->GetEntries()) {
-      cerr << endl << ">> PRunMuMinus::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+      cerr << endl << ">> PRunSingleHistoRRF::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
       cerr << endl << ">> will ignore it. Sorry ..." << endl;
     } else {
       // handle fgb+n0 entry
@@ -382,7 +389,7 @@ void PRunMuMinus::SetFitRangeBin(const TString fitRange)
       fFitEndTime = (fGoodBins[1] - offset - fT0s[0]) * fTimeResolution;
     }
   } else { // error
-    cerr << endl << ">> PRunMuMinus::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+    cerr << endl << ">> PRunSingleHistoRRF::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
     cerr << endl << ">> will ignore it. Sorry ..." << endl;
   }
 
@@ -393,12 +400,12 @@ void PRunMuMinus::SetFitRangeBin(const TString fitRange)
 }
 
 //--------------------------------------------------------------------------
-// CalcNoOfFitBins (private)
+// CalcNoOfFitBins (protected)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculate the number of fitted bins for the current fit range.
  */
-void PRunMuMinus::CalcNoOfFitBins()
+void PRunSingleHistoRRF::CalcNoOfFitBins()
 {
   // In order not having to loop over all bins and to stay consistent with the chisq method, calculate the start and end bins explicitly
   Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
@@ -415,40 +422,7 @@ void PRunMuMinus::CalcNoOfFitBins()
 }
 
 //--------------------------------------------------------------------------
-// CalcTheory
-//--------------------------------------------------------------------------
-/**
- * <p>Calculate theory for a given set of fit-parameters.
- */
-void PRunMuMinus::CalcTheory()
-{
-  // feed the parameter vector
-  std::vector<Double_t> par;
-  PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
-  for (UInt_t i=0; i<paramList->size(); i++)
-    par.push_back((*paramList)[i].fValue);
-
-  // calculate functions
-  for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
-  }
-
-  // calculate theory
-  UInt_t size = fData.GetValue()->size();
-  Double_t start = fData.GetDataTimeStart();
-  Double_t resolution = fData.GetDataTimeStep();
-  Double_t time;
-  for (UInt_t i=0; i<size; i++) {
-    time = start + (Double_t)i*resolution;
-    fData.AppendTheoryValue(fTheory->Func(time, par, fFuncValues));
-  }
-
-  // clean up
-  par.clear();
-}
-
-//--------------------------------------------------------------------------
-// PrepareData
+// PrepareData (protected)
 //--------------------------------------------------------------------------
 /**
  * <p>Prepare data for fitting or viewing. What is already processed at this stage:
@@ -463,7 +437,7 @@ void PRunMuMinus::CalcTheory()
  * - true if everthing went smooth
  * - false, otherwise.
  */
-Bool_t PRunMuMinus::PrepareData()
+Bool_t PRunSingleHistoRRF::PrepareData()
 {
   Bool_t success = true;
 
@@ -473,7 +447,7 @@ Bool_t PRunMuMinus::PrepareData()
   // get the proper run
   PRawRunData* runData = fRawData->GetRunData(*fRunInfo->GetRunName());
   if (!runData) { // couldn't get run
-    cerr << endl << ">> PRunMuMinus::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->GetRunName()->Data() << "!";
+    cerr << endl << ">> PRunSingleHistoRRF::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->GetRunName()->Data() << "!";
     cerr << endl;
     return false;
   }
@@ -484,7 +458,7 @@ Bool_t PRunMuMinus::PrepareData()
     histoNo.push_back(fRunInfo->GetForwardHistoNo(i));
 
     if (!runData->IsPresent(histoNo[i])) {
-      cerr << endl << ">> PRunMuMinus::PrepareData(): **PANIC ERROR**:";
+      cerr << endl << ">> PRunSingleHistoRRF::PrepareData(): **PANIC ERROR**:";
       cerr << endl << ">> histoNo found = " << histoNo[i] << ", which is NOT present in the data file!?!?";
       cerr << endl << ">> Will quit :-(";
       cerr << endl;
@@ -496,7 +470,7 @@ Bool_t PRunMuMinus::PrepareData()
   // keep the time resolution in (us)
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
   cout.precision(10);
-  cout << endl << ">> PRunMuMinus::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
+  cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
 
   // get all the proper t0's and addt0's for the current RUN block
   if (!GetProperT0(runData, globalBlock, histoNo)) {
@@ -519,7 +493,7 @@ Bool_t PRunMuMinus::PrepareData()
       // get run to be added to the main one
       addRunData = fRawData->GetRunData(*fRunInfo->GetRunName(i));
       if (addRunData == 0) { // couldn't get run
-        cerr << endl << ">> PRunMuMinus::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
+        cerr << endl << ">> PRunSingleHistoRRF::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
         cerr << endl;
         return false;
       }
@@ -538,10 +512,10 @@ Bool_t PRunMuMinus::PrepareData()
     }
   }
 
-  // set forward/backward histo data of the first group
+  // set forward histo data of the first group
   fForward.resize(forward[0].size());
   for (UInt_t i=0; i<fForward.size(); i++) {
-    fForward[i]  = forward[0][i];
+    fForward[i] = forward[0][i];
   }
 
   // group histograms, add all the remaining forward histograms of the group
@@ -566,7 +540,7 @@ Bool_t PRunMuMinus::PrepareData()
   if (fHandleTag == kFit)
     success = PrepareFitData(runData, histoNo[0]);
   else if (fHandleTag == kView)
-    success = PrepareRawViewData(runData, histoNo[0]);
+    success = PrepareViewData(runData, histoNo[0]);
   else
     success = false;
 
@@ -577,13 +551,16 @@ Bool_t PRunMuMinus::PrepareData()
 }
 
 //--------------------------------------------------------------------------
-// PrepareFitData (private)
+// PrepareFitData (protected)
 //--------------------------------------------------------------------------
 /**
- * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for fitting.
+ * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the RRF histogram for fitting.
  * The following steps are preformed:
  * -# get fit start/stop time
  * -# check that 'first good data bin', 'last good data bin', and 't0' make any sense
+ * -# check how the background shall be handled, i.e. fitted, subtracted from background estimate data range, or subtacted from a given fixed background.
+ * -# estimate N0
+ * -# RRF transformation
  * -# packing (i.e rebinning)
  *
  * <b>return:</b>
@@ -593,39 +570,129 @@ Bool_t PRunMuMinus::PrepareData()
  * \param runData raw run data handler
  * \param histoNo forward histogram number
  */
-Bool_t PRunMuMinus::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
+Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
 {
-  // transform raw histo data. This is done the following way (for details see the manual):
-  // for the single histo fit, just the rebinned raw data are copied
+  // keep the raw data for the RRF asymmetry error estimate for later
+  PDoubleVector rawNt;
+  for (UInt_t i=0; i<fForward.size(); i++) {
+    rawNt.push_back(fForward[i]);  // N(t) without any corrections
+  }
+  Double_t freqMax = GetMainFrequency(rawNt);
+  cout << "info> freqMax=" << freqMax << " (MHz)" << endl;
 
-  // fill data set
+  // "optimal packing"
+  Double_t optNoPoints = 8;
+  if (freqMax < 271.0) // < 271 MHz, i.e ~ 2T
+    optNoPoints = 5;
+  cout << "info> optimal packing: " << (Int_t)(1.0 / (fTimeResolution*(freqMax - fMsrInfo->GetMsrGlobal()->GetRRFFreq("MHz"))) / optNoPoints);
+
+  // initially fForward is the "raw data set" (i.e. grouped histo and raw runs already added) to be fitted. This means fForward = N(t) at this point.
+
+  // 1) check how the background shall be handled
+  // subtract background from histogramms ------------------------------------------
+  if (fRunInfo->GetBkgFix(0) == PMUSR_UNDEFINED) { // no fixed background given
+    if (fRunInfo->GetBkgRange(0) >= 0) {
+      if (!EstimateBkg(histoNo))
+        return false;
+    } else { // no background given to do the job, try estimate
+      fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.1), 0);
+      fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.6), 1);
+      cerr << endl << ">> PRunSingleHistoRRF::PrepareFitData(): **WARNING** Neither fix background nor background bins are given!";
+      cerr << endl << ">> Will try the following: bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
+      cerr << endl << ">> NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
+      cerr << endl;
+      if (!EstimateBkg(histoNo))
+        return false;
+    }
+  } else { // fixed background given
+    for (UInt_t i=0; i<fForward.size(); i++) {
+      fForward[i] -= fRunInfo->GetBkgFix(0);
+    }
+    fBackground = fRunInfo->GetBkgFix(0);
+  }
+  // here fForward = N(t) - Nbkg
+
   Int_t t0 = (Int_t)fT0s[0];
-  Double_t value = 0.0;
-  // data start at data_start-t0
-  // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.SetDataTimeStart(fTimeResolution*((Double_t)fGoodBins[0]-(Double_t)t0+(Double_t)(fPacking-1)/2.0));
-  fData.SetDataTimeStep(fTimeResolution*fPacking);
+
+  // 2) N(t) - Nbkg -> exp(+t/tau) [N(t)-Nbkg]
+  Double_t startTime = fTimeResolution * ((Double_t)fGoodBins[0] - (Double_t)t0);
+
+  Double_t time_tau=0.0;
+  Double_t exp_t_tau=0.0;
   for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
-    if (fPacking == 1) {
-      value = fForward[i];
-      fData.AppendValue(value);
-      if (value == 0.0)
-        fData.AppendErrorValue(1.0);
-      else
-        fData.AppendErrorValue(TMath::Sqrt(value));
-    } else { // packed data, i.e. fPacking > 1
-      if (((i-fGoodBins[0]) % fPacking == 0) && (i != fGoodBins[0])) { // fill data
-        fData.AppendValue(value);
-        if (value == 0.0)
-          fData.AppendErrorValue(1.0);
-        else
-          fData.AppendErrorValue(TMath::Sqrt(value));
-        // reset values
-        value = 0.0;
+    time_tau = (startTime + fTimeResolution * (i - fGoodBins[0])) / PMUON_LIFETIME;
+    exp_t_tau = exp(time_tau);
+    fForward[i] *= exp_t_tau;
+    fM.push_back(fForward[i]);   // i.e. M(t) = [N(t)-Nbkg] exp(+t/tau); needed to estimate N0 later on
+    fMerr.push_back(exp_t_tau*sqrt(rawNt[i]-fBackground));
+  }
+
+  // calculate weights
+  for (UInt_t i=0; i<fMerr.size(); i++) {
+    if (fMerr[i] > 0.0)
+      fW.push_back(1.0/(fMerr[i]*fMerr[i]));
+    else
+      fW.push_back(0.0);
+  }
+  // now fForward = exp(+t/tau) [N(t)-Nbkg] = M(t)
+
+  // 3) estimate N0
+  Double_t errN0 = 0.0;
+  Double_t n0 = EstimateN0(errN0, freqMax);
+
+  // 4a) A(t) = exp(+t/tau) [N(t)-Nbkg] / N0 - 1.0
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
+    fForward[i] = fForward[i] / n0 - 1.0;
+  }
+
+  // 4b) error estimate of A(t): errA(t) = exp(+t/tau)/N0 sqrt( N(t) + ([N(t)-N_bkg]/N0)^2 errN0^2 )
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
+    time_tau = (startTime + fTimeResolution * (i - fGoodBins[0])) / PMUON_LIFETIME;
+    exp_t_tau = exp(time_tau);
+    fAerr.push_back(exp_t_tau/n0*sqrt(rawNt[i]+pow(((rawNt[i]-fBackground)/n0)*errN0,2.0)));
+  }
+
+  // 5) rotate A(t): A(t) -> 2* A(t) * cos(wRRF t + phiRRF), the factor 2.0 is needed since the high frequency part is suppressed.
+  PMsrGlobalBlock *globalBlock = fMsrInfo->GetMsrGlobal();
+  Double_t wRRF = globalBlock->GetRRFFreq("Mc");
+  Double_t phaseRRF = globalBlock->GetRRFPhase()*TMath::TwoPi()/180.0;
+  Double_t time = 0.0;
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
+    time = startTime + fTimeResolution * ((Double_t)i - (Double_t)fGoodBins[0]);
+    fForward[i] *= 2.0*cos(wRRF * time + phaseRRF);
+  }
+
+  // 6) RRF packing
+  Double_t dval=0.0;
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
+    if (fRRFPacking == 1) {
+      fData.AppendValue(fForward[i]);
+    } else { // RRF packing > 1
+      if (((i-fGoodBins[0]) % fRRFPacking == 0) && (i != fGoodBins[0])) { // fill data
+        dval /= fRRFPacking;
+        fData.AppendValue(dval);
+        // reset dval
+        dval = 0.0;
       }
-      value += fForward[i];
+      dval += fForward[i];
     }
   }
+
+  // 7) estimate packed RRF errors (see log-book p.204)
+  //    the error estimate of the unpacked RRF asymmetry is: errA_RRF(t) \simeq exp(t/tau)/N0 sqrt( [N(t) + ((N(t)-N_bkg)/N0)^2 errN0^2] )
+  dval = 0.0;
+  // the packed RRF asymmetry error
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
+    if (((i-fGoodBins[0]) % fRRFPacking == 0) && (i != fGoodBins[0])) { // fill data
+      fData.AppendErrorValue(sqrt(2.0*dval)/fRRFPacking); // the factor 2.0 is needed since the high frequency part is suppressed.
+      dval = 0.0;
+    }
+    dval += fAerr[i-fGoodBins[0]]*fAerr[i-fGoodBins[0]];
+  }
+
+  // set start time and time step
+  fData.SetDataTimeStart(fTimeResolution*((Double_t)fGoodBins[0]-(Double_t)t0+(Double_t)(fRRFPacking-1)/2.0));
+  fData.SetDataTimeStep(fTimeResolution*fRRFPacking);
 
   CalcNoOfFitBins();
 
@@ -633,102 +700,48 @@ Bool_t PRunMuMinus::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
 }
 
 //--------------------------------------------------------------------------
-// PrepareRawViewData (private)
+// PrepareViewData (protected)
 //--------------------------------------------------------------------------
 /**
  * <p>Take the pre-processed data (i.e. grouping and addrun are preformed) and form the histogram for viewing
- * without any life time correction.
+ * with life time correction, i.e. the exponential decay is removed.
  * <p>The following steps are preformed:
  * -# check if view packing is whished.
  * -# check that 'first good data bin', 'last good data bin', and 't0' makes any sense
- * -# packing (i.e. rebinnig)
+ * -# transform data sets (see below).
  * -# calculate theory
  *
  * <b>return:</b>
  * - true, if everything went smooth
- * - false, otherwise.
+ * - false, otherwise
  *
  * \param runData raw run data handler
  * \param histoNo forward histogram number
  */
-Bool_t PRunMuMinus::PrepareRawViewData(PRawRunData* runData, const UInt_t histoNo)
+Bool_t PRunSingleHistoRRF::PrepareViewData(PRawRunData* runData, const UInt_t histoNo)
 {
-  // check if view_packing is wished
-  Int_t packing = fPacking;
-  if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
-    packing = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
-  }
+  // --------------
+  // prepare data
+  // --------------
 
-  // calculate necessary norms
-  Double_t theoryNorm = 1.0;
-  if (fMsrInfo->GetMsrPlotList()->at(0).fViewPacking > 0) {
-    theoryNorm = (Double_t)fMsrInfo->GetMsrPlotList()->at(0).fViewPacking/(Double_t)fPacking;
-  }
+  // prepare RRF single histo
+  PrepareFitData(runData, histoNo);
 
-  // raw data, since PMusrCanvas is doing ranging etc.
-  // start = the first bin which is a multiple of packing backward from first good data bin
-  Int_t start = fGoodBins[0] - (fGoodBins[0]/packing)*packing;
-  // end = last bin starting from start which is a multipl of packing and still within the data
-  Int_t end   = start + ((fForward.size()-start)/packing)*packing;
-  // check if data range has been provided, and if not try to estimate them
-  if (start < 0) {
-    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
-    start = ((Int_t)fT0s[0]+offset) - (((Int_t)fT0s[0]+offset)/packing)*packing;
-    end = start + ((fForward.size()-start)/packing)*packing;
-    cerr << endl << ">> PRunMuMinus::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
-  }
-  // check if start, end, and t0 make any sense
-  // 1st check if start and end are in proper order
-  if (end < start) { // need to swap them
-    Int_t keep = end;
-    end = start;
-    start = keep;
-  }
-  // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunMuMinus::PrepareRawViewData(): **ERROR** start data bin doesn't make any sense!";
-    cerr << endl;
-    return false;
-  }
-  // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunMuMinus::PrepareRawViewData(): **ERROR** end data bin doesn't make any sense!";
-    cerr << endl;
-    return false;
-  }
-
-  // if fit range is given in bins (and not time), the fit start/end time can be calculated at this point now
-  if (fRunInfo->IsFitRangeInBin()) {
-    fFitStartTime = (fRunInfo->GetDataRange(0) + fRunInfo->GetFitRangeOffset(0) - fT0s[0]) * fTimeResolution; // (fgb+n0-t0)*dt
-    fFitEndTime = (fRunInfo->GetDataRange(1) - fRunInfo->GetFitRangeOffset(1) - fT0s[0]) * fTimeResolution;   // (lgb-n1-t0)*dt
-  }
-
-  // everything looks fine, hence fill data set
-  Int_t t0 = (Int_t)fT0s[0];
-  Double_t value = 0.0;
-  // data start at data_start-t0
-  // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.SetDataTimeStart(fTimeResolution*((Double_t)start-(Double_t)t0+(Double_t)(packing-1)/2.0));
-  fData.SetDataTimeStep(fTimeResolution*packing);
-
-  for (Int_t i=start; i<end; i++) {
-    if (((i-start) % packing == 0) && (i != start)) { // fill data
-      fData.AppendValue(value);
-      if (value == 0.0)
-        fData.AppendErrorValue(1.0);
-      else
-        fData.AppendErrorValue(TMath::Sqrt(value));
-      // reset values
-      value = 0.0;
+  // check for view packing
+  Int_t viewPacking = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
+  if (viewPacking > 0) {
+    if (viewPacking < fRRFPacking) {
+      cerr << ">> PRunSingleHistoRRF::PrepareViewData(): **WARNING** Found View Packing (" << viewPacking << ") < RRF Packing (" << fRRFPacking << ").";
+      cerr << ">> Will ignore View Packing." << endl;
+    } else {
+      // STILL MISSING
     }
-    value += fForward[i];
   }
 
-  CalcNoOfFitBins();
+  // --------------
+  // prepare theory
+  // --------------
 
-  // fill theory vector for kView
   // feed the parameter vector
   std::vector<Double_t> par;
   PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
@@ -740,28 +753,28 @@ Bool_t PRunMuMinus::PrepareRawViewData(PRawRunData* runData, const UInt_t histoN
     fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
   }
 
-  // calculate theory
+  // check if a finer binning for the theory is needed
   UInt_t size = fForward.size();
   Double_t factor = 1.0;
+  Double_t time = 0.0;
+  Double_t theoryValue = 0.0;
+
   if (fData.GetValue()->size() * 10 > fForward.size()) {
     size = fData.GetValue()->size() * 10;
     factor = (Double_t)fForward.size() / (Double_t)size;
   }
-  Double_t time;
-  Double_t theoryValue;
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
   fData.SetTheoryTimeStep(fTimeResolution*factor);
+
+  // calculate theory
   for (UInt_t i=0; i<size; i++) {
-    time = fData.GetTheoryTimeStart() + i*fData.GetTheoryTimeStep();
+    time = fData.GetTheoryTimeStart() + (Double_t)i*fData.GetTheoryTimeStep();
     theoryValue = fTheory->Func(time, par, fFuncValues);
-    if (fabs(theoryValue) > 1.0e10) {  // dirty hack needs to be fixed!!
+    if (fabs(theoryValue) > 10.0) { // dirty hack needs to be fixed!!
       theoryValue = 0.0;
     }
-    fData.AppendTheoryValue(theoryNorm*theoryValue);
+    fData.AppendTheoryValue(theoryValue);
   }
-
-  // clean up
-  par.clear();
 
   return true;
 }
@@ -778,13 +791,15 @@ Bool_t PRunMuMinus::PrepareRawViewData(PRawRunData* runData, const UInt_t histoN
  * -# if t0's are missing, try t0's from the data file
  * -# if t0's are missing, try to estimate them
  *
+ * \param runData pointer to the current RUN block entry from the msr-file
+ * \param globalBlock pointer to the GLOBLA block entry from the msr-file
  * \param histoNo histogram number vector of forward; histoNo = msr-file forward + redGreen_offset - 1
  *
  * <b>return:</b>
  * - true if everthing went smooth
  * - false, otherwise.
  */
-Bool_t PRunMuMinus::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &histoNo)
+Bool_t PRunSingleHistoRRF::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &histoNo)
 {
   // feed all T0's
   // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
@@ -822,7 +837,7 @@ Bool_t PRunMuMinus::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlo
       fT0s[i] = runData->GetT0BinEstimated(histoNo[i]);
       fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
 
-      cerr << endl << ">> PRunMuMinus::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+      cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
       cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
       cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
       cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
@@ -833,13 +848,13 @@ Bool_t PRunMuMinus::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlo
   // check if t0 is within proper bounds
   for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
     if ((fT0s[i] < 0) || (fT0s[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunMuMinus::GetProperT0(): **ERROR** t0 data bin (" << fT0s[i] << ") doesn't make any sense!";
+      cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **ERROR** t0 data bin (" << fT0s[i] << ") doesn't make any sense!";
       cerr << endl;
       return false;
     }
   }
 
-  // check if there are runs to be added to the current one
+  // check if there are runs to be added to the current one. If yes keep the needed t0's
   if (fRunInfo->GetRunNameSize() > 1) { // runs to be added present
     PRawRunData *addRunData;
     fAddT0s.resize(fRunInfo->GetRunNameSize()-1); // resize to the number of addruns
@@ -848,7 +863,7 @@ Bool_t PRunMuMinus::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlo
       // get run to be added to the main one
       addRunData = fRawData->GetRunData(*fRunInfo->GetRunName(i));
       if (addRunData == 0) { // couldn't get run
-        cerr << endl << ">> PRunMuMinus::GetProperT0(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
+        cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
         cerr << endl;
         return false;
       }
@@ -880,7 +895,7 @@ Bool_t PRunMuMinus::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlo
           fAddT0s[i-1][j] = addRunData->GetT0BinEstimated(histoNo[j]);
           fRunInfo->SetAddT0Bin(fAddT0s[i-1][j], i-1, j); // keep value for the msr-file
 
-          cerr << endl << ">> PRunMuMinus::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+          cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
           cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
           cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
           cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
@@ -891,7 +906,7 @@ Bool_t PRunMuMinus::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlo
       // check if t0 is within proper bounds
       for (UInt_t j=0; j<fRunInfo->GetForwardHistoNoSize(); j++) {
         if ((fAddT0s[i-1][j] < 0) || (fAddT0s[i-1][j] > (Int_t)addRunData->GetDataBin(histoNo[j])->size())) {
-          cerr << endl << ">> PRunMuMinus::GetProperT0(): **ERROR** addt0 data bin (" << fAddT0s[i-1][j] << ") doesn't make any sense!";
+          cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **ERROR** addt0 data bin (" << fAddT0s[i-1][j] << ") doesn't make any sense!";
           cerr << endl;
           return false;
         }
@@ -915,7 +930,7 @@ Bool_t PRunMuMinus::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlo
  * - true if everthing went smooth
  * - false, otherwise.
  */
-Bool_t PRunMuMinus::GetProperDataRange()
+Bool_t PRunSingleHistoRRF::GetProperDataRange()
 {
   // get start/end data
   Int_t start;
@@ -936,14 +951,14 @@ Bool_t PRunMuMinus::GetProperDataRange()
     Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
     start = (Int_t)fT0s[0]+offset;
     fRunInfo->SetDataRange(start, 0);
-    cerr << endl << ">> PRunMuMinus::GetProperDataRange(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
+    cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
   if (end < 0) {
     end = fForward.size();
     fRunInfo->SetDataRange(end, 1);
-    cerr << endl << ">> PRunMuMinus::GetProperDataRange(): **WARNING** data range was not provided, will try data range end = " << end << ".";
+    cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **WARNING** data range was not provided, will try data range end = " << end << ".";
     cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
@@ -957,13 +972,13 @@ Bool_t PRunMuMinus::GetProperDataRange()
   }
   // 2nd check if start is within proper bounds
   if ((start < 0) || (start > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunMuMinus::GetProperDataRange(): **ERROR** start data bin (" << start << ") doesn't make any sense!";
+    cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **ERROR** start data bin (" << start << ") doesn't make any sense!";
     cerr << endl;
     return false;
   }
   // 3rd check if end is within proper bounds
   if ((end < 0) || (end > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunMuMinus::GetProperDataRange(): **ERROR** end data bin (" << end << ") doesn't make any sense!";
+    cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **ERROR** end data bin (" << end << ") doesn't make any sense!";
     cerr << endl;
     return false;
   }
@@ -990,7 +1005,7 @@ Bool_t PRunMuMinus::GetProperDataRange()
  *
  * \param globalBlock pointer to the GLOBAL block information form the msr-file.
  */
-void PRunMuMinus::GetProperFitRange(PMsrGlobalBlock *globalBlock)
+void PRunSingleHistoRRF::GetProperFitRange(PMsrGlobalBlock *globalBlock)
 {
   // set fit start/end time; first check RUN Block
   fFitStartTime = fRunInfo->GetFitRange(0);
@@ -1018,7 +1033,173 @@ void PRunMuMinus::GetProperFitRange(PMsrGlobalBlock *globalBlock)
   if ((fFitStartTime == PMUSR_UNDEFINED) || (fFitEndTime == PMUSR_UNDEFINED)) {
     fFitStartTime = (fGoodBins[0] - fT0s[0]) * fTimeResolution; // (fgb-t0)*dt
     fFitEndTime = (fGoodBins[1] - fT0s[0]) * fTimeResolution;   // (lgb-t0)*dt
-    cerr << ">> PRunMuMinus::GetProperFitRange(): **WARNING** Couldn't get fit start/end time!" << endl;
+    cerr << ">> PRunSingleHistoRRF::GetProperFitRange(): **WARNING** Couldn't get fit start/end time!" << endl;
     cerr << ">>    Will set it to fgb/lgb which given in time is: " << fFitStartTime << "..." << fFitEndTime << " (usec)" << endl;
   }
+}
+
+//--------------------------------------------------------------------------
+// GetMainFrequency (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>gets the maximum frequency of the given data.
+ *
+ * \param raw data set.
+ */
+Double_t PRunSingleHistoRRF::GetMainFrequency(PDoubleVector &data)
+{
+  Double_t freqMax = 0.0;
+
+  // create histo
+  Double_t startTime = (fGoodBins[0]-fT0s[0]) * fTimeResolution;
+  Int_t noOfBins = fGoodBins[1]-fGoodBins[0]+1;
+  TH1F *histo = new TH1F("data", "data", noOfBins, startTime-fTimeResolution/2.0, startTime+fTimeResolution/2.0+noOfBins*fTimeResolution);
+  for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
+    histo->SetBinContent(i-fGoodBins[0]+1, data[i]);
+  }
+
+  // Fourier transform
+  PFourier *ft = new PFourier(histo, FOURIER_UNIT_FREQ);
+  ft->Transform(F_APODIZATION_STRONG);
+
+  // find frequency maximum
+  TH1F *power = ft->GetPowerFourier();
+  Double_t maxFreqVal = 0.0;
+  for (Int_t i=1; i<power->GetNbinsX(); i++) {
+    // ignore dc part at 0 frequency
+    if (i<power->GetNbinsX()-1) {
+      if (power->GetBinContent(i)>power->GetBinContent(i+1))
+        continue;
+    }
+    // check for maximum
+    if (power->GetBinContent(i) > maxFreqVal) {
+      maxFreqVal = power->GetBinContent(i);
+      freqMax = power->GetBinCenter(i);
+    }
+  }
+
+  // clean up
+  if (power)
+    delete power;
+  if (ft)
+    delete ft;
+  if (histo)
+    delete histo;
+
+  return freqMax;
+}
+
+//--------------------------------------------------------------------------
+// EstimateN0 (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Estimate the N0 for the given run.
+ *
+ * \param errN0
+ */
+Double_t PRunSingleHistoRRF::EstimateN0(Double_t &errN0, Double_t freqMax)
+{
+  // endBin is estimated such that the number of full cycles (according to the maximum frequency of the data)
+  // is approximately the time fN0EstimateEndTime.
+  Int_t endBin = (Int_t)round(fN0EstimateEndTime / fTimeResolution * ceil(freqMax)/freqMax);
+
+  Double_t n0 = 0.0;
+  Double_t wN = 0.0;
+  for (Int_t i=0; i<endBin; i++) {
+    n0 += fW[i]*fM[i];
+    wN += fW[i];
+  }
+  n0 /= wN;
+
+  errN0 = 0.0;
+  for (Int_t i=0; i<endBin; i++) {
+    errN0 += fW[i]*fW[i]*fMerr[i]*fMerr[i];
+  }
+  errN0 = sqrt(errN0)/wN;
+
+  cout << "info> PRunSingleHistoRRF::EstimateN0(): N0=" << n0 << "(" << errN0 << ")" << endl;
+
+  return n0;
+}
+
+//--------------------------------------------------------------------------
+// EstimatBkg (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Estimate the background for a given interval.
+ *
+ * <b>return:</b>
+ * - true, if everything went smooth
+ * - false, otherwise
+ *
+ * \param histoNo forward histogram number of the run
+ */
+Bool_t PRunSingleHistoRRF::EstimateBkg(UInt_t histoNo)
+{
+  Double_t beamPeriod = 0.0;
+
+  // check if data are from PSI, RAL, or TRIUMF
+  if (fRunInfo->GetInstitute()->Contains("psi"))
+    beamPeriod = ACCEL_PERIOD_PSI;
+  else if (fRunInfo->GetInstitute()->Contains("ral"))
+    beamPeriod = ACCEL_PERIOD_RAL;
+  else if (fRunInfo->GetInstitute()->Contains("triumf"))
+    beamPeriod = ACCEL_PERIOD_TRIUMF;
+  else
+    beamPeriod = 0.0;
+
+  // check if start and end are in proper order
+  UInt_t start = fRunInfo->GetBkgRange(0);
+  UInt_t end   = fRunInfo->GetBkgRange(1);
+  if (end < start) {
+    cout << endl << "PRunSingleHistoRRF::EstimatBkg(): end = " << end << " > start = " << start << "! Will swap them!";
+    UInt_t keep = end;
+    end = start;
+    start = keep;
+  }
+
+  // calculate proper background range
+  if (beamPeriod != 0.0) {
+    Double_t timeBkg = (Double_t)(end-start)*fTimeResolution; // length of the background intervall in time
+    UInt_t fullCycles = (UInt_t)(timeBkg/beamPeriod); // how many proton beam cylces can be placed within the proposed background intervall
+    // correct the end of the background intervall such that the background is as close as possible to a multiple of the proton cylce
+    end = start + (UInt_t) ((fullCycles*beamPeriod)/fTimeResolution);
+    cout << endl << "PRunSingleHistoRRF::EstimatBkg(): Background " << start << ", " << end;
+    if (end == start)
+      end = fRunInfo->GetBkgRange(1);
+  }
+
+  // check if start is within histogram bounds
+  if ((start < 0) || (start >= fForward.size())) {
+    cerr << endl << ">> PRunSingleHistoRRF::EstimatBkg(): **ERROR** background bin values out of bound!";
+    cerr << endl << ">> histo lengths    = " << fForward.size();
+    cerr << endl << ">> background start = " << start;
+    cerr << endl;
+    return false;
+  }
+
+  // check if end is within histogram bounds
+  if ((end < 0) || (end >= fForward.size())) {
+    cerr << endl << ">> PRunSingleHistoRRF::EstimatBkg(): **ERROR** background bin values out of bound!";
+    cerr << endl << ">> histo lengths  = " << fForward.size();
+    cerr << endl << ">> background end = " << end;
+    cerr << endl;
+    return false;
+  }
+
+  // calculate background
+  Double_t bkg    = 0.0;
+
+  // forward
+  for (UInt_t i=start; i<end; i++)
+    bkg += fForward[i];
+  bkg /= static_cast<Double_t>(end - start + 1);
+
+  fBackground = bkg;  // keep background (per bin)
+
+  cout << endl << "info> fBackground=" << fBackground << endl;
+
+  fRunInfo->SetBkgEstimated(fBackground, 0);
+
+  return true;
 }
