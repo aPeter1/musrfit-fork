@@ -180,13 +180,19 @@ void analyticFakeData(const TString type, UInt_t runNo)
 
   const Double_t gamma = 0.0000135538817; // gamma/(2pi)
   Double_t bb0 = 5000.0; // field in Gauss
-  Double_t rate0 = 1.0/1000.0; // in 1/ns
+  Double_t rate0 = 7.0/1000.0; // in 1/ns
+  Double_t frac0 = 0.5;
+  Double_t bb1 = bb0 + 200.0; // field in Gauss
+  Double_t rate1 = 0.75/1000.0; // in 1/ns
+  Double_t frac1 = 0.2;
+  Double_t bb2 = bb0 + 600.0; // field in Gauss
+  Double_t rate2 = 0.25/1000.0; // in 1/ns
 
   // fake function parameters header info: only for test purposes
   cout << ">> write fake header for TMusrRoot" << endl;
   if (type.CompareTo("TLemRunHeader")) {
     TDoubleVector dvec;
-    header->Set("FakeFct/Def", "N0 exp(-t/tau_mu) [1 + A exp(-1/2 (t sigma)^2) cos(gamma_mu B t + phi)] + bkg");
+    header->Set("FakeFct/Def", "N0 exp(-t/tau_mu) [1 + sum_{k=0}^2 frac_k A_0 exp(-1/2 (t sigma_k)^2) cos(gamma_mu B_k t + phi)] + bkg");
     for (UInt_t i=0; i<noOfHistos; i++)
       dvec.push_back(n0[i]);
     header->Set("FakeFct/N0", dvec);
@@ -202,10 +208,20 @@ void analyticFakeData(const TString type, UInt_t runNo)
     for (UInt_t i=0; i<noOfHistos; i++)
       dvec.push_back(phase[i]);
     header->Set("FakeFct/phase", dvec);
-    prop.Set("B", bb0, "G");
-    header->Set("FakeFct/B", prop);
-    prop.Set("lambda", rate0, "1/usec");
-    header->Set("FakeFct/lambda", prop);
+    prop.Set("B0", bb0, "G");
+    header->Set("FakeFct/B0", prop);
+    prop.Set("rate0", 1.0e3*rate0, "1/usec");
+    header->Set("FakeFct/rate0", prop);
+    header->Set("FakeFct/frac0", frac0);
+    prop.Set("B1", bb1, "G");
+    header->Set("FakeFct/B1", prop);
+    prop.Set("rate1", 1.0e3*rate1, "1/usec");
+    header->Set("FakeFct/rate1", prop);
+    header->Set("FakeFct/frac1", frac1);
+    prop.Set("B2", bb2, "G");
+    header->Set("FakeFct/B2", prop);
+    prop.Set("rate2", 1.0e3*rate2, "1/usec");
+    header->Set("FakeFct/rate2", prop);
   }
 
   cout << ">> create histo objects" << endl;
@@ -228,7 +244,10 @@ void analyticFakeData(const TString type, UInt_t runNo)
         histo[i]->SetBinContent(j+1, bkg[i]);
       } else {
         time = (Double_t)(j-t0[i])*timeResolution;
-        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+a0[i]*TMath::Exp(-0.5*TMath::Power(time*rate0,2))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i]))+(Double_t)bkg[i];
+        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+
+                   frac0*a0[i]*TMath::Exp(-0.5*TMath::Power(time*rate0,2))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i]) +
+                   frac1*a0[i]*TMath::Exp(-0.5*TMath::Power(time*rate1,2))*TMath::Cos(TMath::TwoPi()*gamma*bb1*time+phase[i]) +
+                   (1.0-frac0-frac1)*a0[i]*TMath::Exp(-0.5*TMath::Power(time*rate2,2))*TMath::Cos(TMath::TwoPi()*gamma*bb2*time+phase[i]))+(Double_t)bkg[i];
         histo[i]->SetBinContent(j+1, dval);
       }
     }
