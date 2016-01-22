@@ -57,8 +57,8 @@ class PSimulateMuTransition : public TObject
     virtual void SetIonizationRate(Double_t value){ fIonizationRate = value; } //!< sets Mu0 ionization rate (MHz)
     virtual void SetDecayAsymmetry(Double_t value){ fAsymmetry = value; }      //!< muon decay asymmetry
     virtual void SetMuFraction(Double_t value){ fMuFraction = value; }         //!< Muonium fraction
-    virtual void SetMuFractionState1(Double_t value){ fMuFractionState1 = value; }  
-    virtual void SetMuFractionState2(Double_t value){ fMuFractionState2 = value; }  
+    virtual void SetMuFractionState12(Double_t value){ fMuFractionState12 = value; }  
+    virtual void SetMuFractionState23(Double_t value){ fMuFractionState23 = value; }  
 
     virtual Bool_t IsValid() { return fValid; }
     virtual void   SetSeed(UInt_t seed);
@@ -77,6 +77,7 @@ class PSimulateMuTransition : public TObject
     Double_t  fMuPrecFreq34;    //!< Mu transition frequency 34 (MHz)
     Double_t  fMuPrecFreq23;    //!< Mu transition frequency 23 (MHz)
     Double_t  fMuPrecFreq14;    //!< Mu transition frequency 14 (MHz)
+    Double_t  fMuonPrecFreq;    //!< muon precession frequency (MHz)
     Double_t  fCaptureRate;     //!< Mu+ electron capture rate (MHz)
     Double_t  fIonizationRate;  //!< Mu0 ionization rate (MHz)
     Double_t  fInitialPhase;    //!< initial muon spin phase
@@ -84,13 +85,14 @@ class PSimulateMuTransition : public TObject
     Double_t  fMuonPhase;       //!< phase of muon spin
     Double_t  fAsymmetry;       //!< muon decay asymmetry
     Double_t  fMuFraction;      //!< total Mu fraction [0,1]
-    Double_t  fMuFractionState1; //!< fraction of Mu in state 1
-    Double_t  fMuFractionState2; //!< fraction of Mu in state 2
+    Double_t  fMuFractionState12; //!< fraction of Mu in state 12, 34
+    Double_t  fMuFractionState23; //!< fraction of Mu in state 23, 14
     Int_t     fNmuons;          //!< number of muons to simulate
     Bool_t    fDebugFlag;       //!< debug flag
 
     virtual Double_t NextEventTime(const Double_t &EventRate);
-    virtual Double_t PrecessionPhase(const Double_t &time, const Double_t &frequency);
+//     virtual Double_t PrecessionPhase(const Double_t &time, const Double_t &frequency);
+    virtual Double_t PrecessionPhase(const Double_t &time, const TString chargeState);
     virtual void     Event(const TString muonString);
  
   ClassDef(PSimulateMuTransition, 0)

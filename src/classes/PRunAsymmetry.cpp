@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -87,7 +87,7 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UIn
     fPacking = fMsrInfo->GetMsrGlobal()->GetPacking();
   }
   if (fPacking == -1) { // this should NOT happen, somethin is severely wrong
-    cerr << endl << ">> PRunAsymmetry::PRunAsymmetry: **SEVERE ERROR**: Couldn't find any packing information!";
+    cerr << endl << ">> PRunAsymmetry::PRunAsymmetry(): **SEVERE ERROR**: Couldn't find any packing information!";
     cerr << endl << ">> This is very bad :-(, will quit ...";
     cerr << endl;
     fValid = false;
@@ -342,7 +342,7 @@ void PRunAsymmetry::SetFitRangeBin(const TString fitRange)
     Int_t pos = 2*(fRunNo+1)-1;
 
     if (pos + 1 >= tok->GetEntries()) {
-      cerr << endl << ">> PRunSingleHisto::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+      cerr << endl << ">> PRunAsymmetry::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
       cerr << endl << ">> will ignore it. Sorry ..." << endl;
     } else {
       // handle fgb+n0 entry
@@ -370,7 +370,7 @@ void PRunAsymmetry::SetFitRangeBin(const TString fitRange)
       fFitEndTime = (fGoodBins[1] - offset - fT0s[0]) * fTimeResolution;
     }
   } else { // error
-    cerr << endl << ">> PRunSingleHisto::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+    cerr << endl << ">> PRunAsymmetry::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
     cerr << endl << ">> will ignore it. Sorry ..." << endl;
   }
 

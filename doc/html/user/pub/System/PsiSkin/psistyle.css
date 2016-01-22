@@ -99,7 +99,8 @@ blockquote.psi {
 
 /* DMS Icon */
 
-.patternContent a[href^="http:"] {
+.patternContent a[href^="http:"],
+.patternContent a[href^="https:"] {
    background-image: url(../DocumentGraphics/external.gif);
    background-position:  right center;
    background-repeat:  no-repeat;
@@ -107,11 +108,14 @@ blockquote.psi {
 }
 
 .patternContent a[href^="http:"]:hover, 
-.patternContent a[href^="http:"]:visited:hover {
+.patternContent a[href^="http:"]:visited:hover,
+.patternContent a[href^="https:"]:hover, 
+.patternContent a[href^="https:"]:visited:hover {
    background-image: url(../DocumentGraphics/external-hover.gif);
 }
 
-.patternContent a[href^="http:"]:visited {
+.patternContent a[href^="http:"]:visited,
+.patternContent a[href^="https:"]:visited {
    background-image: url(../DocumentGraphics/external-visited.gif);
 }
 
@@ -128,14 +132,17 @@ blockquote.psi {
         padding-right: 0px;
 }
 
-.patternContent a[href^="http://i.psi.ch"] {
+.patternContent a[href^="http://i.psi.ch"],
+.patternContent a[href^="https://intranet.psi.ch"] {
         background: transparent;
         padding-right: 0px;
         background-repeat: no-repeat;
         background-image: none;
 }
 .patternContent a[href^="http://i.psi.ch"]:hover,
-.patternContent a[href^="http://i.psi.ch"]:visited:hover {
+.patternContent a[href^="http://i.psi.ch"]:visited:hover,
+.patternContent a[href^="https://intranet.psi.ch"]:hover,
+.patternContent a[href^="https://intranet.psi.ch"]:visited:hover {
     background-image: none;
     background-color: #0055B5;
 }
@@ -175,7 +182,7 @@ caption {
 
 :lang(de)    { quotes:"\201E" "\201C" "\201A" "\2018"; }
 :lang(en)    { quotes:"\201C" "\201D" "\2018" "\2019"; }
-:lang(fr)    { quotes:"\00AB\A0" "\A0\00BB" "\2039\A0" "\A0\203A"; }
+:lang(fr)    { quotes:"\00AB" "\00BB" "\2039" "\203A"; }
 
 q:before { content:open-quote; color:#000000; }
 q:after { content:close-quote; color:#000000; }

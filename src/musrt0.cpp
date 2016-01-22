@@ -669,6 +669,7 @@ Int_t main(Int_t argc, Char_t *argv[])
         }
         switch (fitType) {
         case MSR_FITTYPE_SINGLE_HISTO:
+        case MSR_FITTYPE_SINGLE_HISTO_RRF:
         case MSR_FITTYPE_MU_MINUS:
           if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // no addruns / no grouping
             // feed necessary data
@@ -796,6 +797,7 @@ Int_t main(Int_t argc, Char_t *argv[])
           }
           break;
         case MSR_FITTYPE_ASYM:
+        case MSR_FITTYPE_ASYM_RRF:
           if ((runList->at(i).GetRunNameSize() == 1) && (runList->at(i).GetForwardHistoNoSize() == 1)) { // no addruns / no grouping
             // feed necessary data forward
             musrT0Data.InitData();
