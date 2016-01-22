@@ -2,6 +2,10 @@
 # ChangeLog
 #---------------------------------------------------------------------
 
+changes since 0.16.0
+===================================
+NEW 2016-01-22 update of the docu which now describes the RRF option.
+
 changes since 0.15.0
 ===================================
 NEW 2016-01-22 add RRF fit option. At the same time, the version has been
