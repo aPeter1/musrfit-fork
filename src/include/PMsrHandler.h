@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -102,6 +102,7 @@ class PMsrHandler
     virtual Bool_t CheckFuncs();
     virtual Bool_t CheckHistoGrouping();
     virtual Bool_t CheckAddRunParameters();
+    virtual Bool_t CheckRRFSettings();
     virtual void CheckMaxLikelihood();
 
     virtual void GetGroupingString(Int_t runNo, TString detector, TString &groupingStr);

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -33,6 +33,8 @@ using namespace std;
 
 #include <boost/algorithm/string.hpp>
 using namespace boost;
+
+#include "TMath.h"
 
 #include "PMusr.h"
 
@@ -708,6 +710,10 @@ void PRawRunData::SetTempError(const UInt_t idx, const Double_t errTemp)
 PMsrGlobalBlock::PMsrGlobalBlock()
 {
   fGlobalPresent = false;
+  fRRFFreq = RRF_FREQ_UNDEF; // rotating reference frequency in units given by fRRFUnitTag. Only needed for fittype 1
+  fRRFUnitTag = RRF_UNIT_UNDEF; // RRF unit tag. Default: undefined
+  fRRFPhase = 0.0;
+  fRRFPacking = -1; // undefined RRF packing/rebinning
   fFitType = -1; // undefined fit type
   for (UInt_t i=0; i<4; i++) {
     fDataRange[i] = -1; // undefined data bin range
@@ -718,6 +724,135 @@ PMsrGlobalBlock::PMsrGlobalBlock()
   fFitRangeOffset[0] = -1; // undefined start fit range offset
   fFitRangeOffset[1] = -1; // undefined end fit range offset
   fPacking = -1; // undefined packing/rebinning
+}
+
+//--------------------------------------------------------------------------
+// GetRRFFreq (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> get RRF frequency value in specific units. If units is unknown, RRF_UNDEF_FREQ will be returned.
+ *
+ * \param unit unit string in which the units shall be given
+ */
+Double_t PMsrGlobalBlock::GetRRFFreq(const char *unit)
+{
+  Double_t freq = 0.0;
+
+  // check that the units given make sense
+  TString unitStr = unit;
+  Int_t unitTag = RRF_UNIT_UNDEF;
+  if (!unitStr.CompareTo("MHz", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_MHz;
+  else if (!unitStr.CompareTo("Mc", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_Mcs;
+  else if (!unitStr.CompareTo("T", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_T;
+  else
+    return RRF_FREQ_UNDEF;
+
+  // calc the conversion factor
+  if (unitTag == fRRFUnitTag)
+    freq = fRRFFreq;
+  else if ((unitTag == RRF_UNIT_MHz) && (fRRFUnitTag == RRF_UNIT_Mcs))
+    freq = fRRFFreq/TMath::TwoPi();
+  else if ((unitTag == RRF_UNIT_MHz) && (fRRFUnitTag == RRF_UNIT_T))
+    freq = fRRFFreq*1e4*GAMMA_BAR_MUON; // 1e4 need for T -> G since GAMMA_BAR_MUON is given in MHz/G
+  else if ((unitTag == RRF_UNIT_Mcs) && (fRRFUnitTag == RRF_UNIT_MHz))
+    freq = fRRFFreq*TMath::TwoPi();
+  else if ((unitTag == RRF_UNIT_Mcs) && (fRRFUnitTag == RRF_UNIT_T))
+    freq = fRRFFreq*1e4*TMath::TwoPi()*GAMMA_BAR_MUON; // 1e4 need for T -> G since GAMMA_BAR_MUON is given in MHz/G
+  else if ((unitTag == RRF_UNIT_T) && (fRRFUnitTag == RRF_UNIT_MHz))
+    freq = fRRFFreq/GAMMA_BAR_MUON*1e-4; // 1e-4 need for G -> T since GAMMA_BAR_MUON is given in MHz/G
+  else if ((unitTag == RRF_UNIT_T) && (fRRFUnitTag == RRF_UNIT_Mcs))
+    freq = fRRFFreq/(TMath::TwoPi()*GAMMA_BAR_MUON)*1e-4; // 1e-4 need for G -> T since GAMMA_BAR_MUON is given in MHz/G
+
+  return freq;
+}
+
+//--------------------------------------------------------------------------
+// SetRRFFreq (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set RRF frequency value in specific units. If units is unknown, 0.0 will be set.
+ *
+ * \param RRF frequency value
+ * \param unit unit string in which the units shall be given
+ */
+void PMsrGlobalBlock::SetRRFFreq(Double_t freq, const char *unit)
+{
+  // check that the units given make sense
+  TString unitStr = unit;
+  Int_t unitTag = RRF_UNIT_UNDEF;
+  if (!unitStr.CompareTo("MHz", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_MHz;
+  else if (!unitStr.CompareTo("Mc", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_Mcs;
+  else if (!unitStr.CompareTo("T", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_T;
+  else {
+    cerr << endl << ">> PMsrGlobalBlock::SetRRFFreq: **ERROR** found undefined RRF unit '" << unit << "'!";
+    cerr << endl << ">>                              Will set RRF frequency to 0.0." << endl;
+    fRRFFreq = 0.0;
+    fRRFUnitTag = RRF_UNIT_UNDEF;
+  }
+
+  fRRFFreq = freq;
+  fRRFUnitTag = unitTag;
+}
+
+//--------------------------------------------------------------------------
+// GetRRFUnit (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> returns RRF frequency unit.
+ */
+TString PMsrGlobalBlock::GetRRFUnit()
+{
+  TString unit;
+
+  switch (fRRFUnitTag) {
+    case RRF_UNIT_UNDEF:
+      unit = TString("??");
+      break;
+    case RRF_UNIT_kHz:
+      unit = TString("kHz");
+      break;
+    case RRF_UNIT_MHz:
+      unit = TString("MHz");
+      break;
+    case RRF_UNIT_Mcs:
+      unit = TString("Mc");
+      break;
+    case RRF_UNIT_G:
+      unit = TString("G");
+      break;
+    case RRF_UNIT_T:
+      unit = TString("T");
+      break;
+    default:
+      unit = TString("??");
+      break;
+  }
+
+  return unit;
+}
+
+//--------------------------------------------------------------------------
+// SetRRFPacking (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set RRF packing.
+ *
+ * \param RRF packing
+ */
+void PMsrGlobalBlock::SetRRFPacking(Int_t pack)
+{
+  if (pack <= 0) {
+    cerr << endl << "PMsrGlobalBlock::SetRRFPacking: **WARNING** found RRF packing <= 0. Likely doesn't make any sense." << endl;
+    fRRFPacking = -1; // set to undefined
+  }
+
+  fRRFPacking = pack;
 }
 
 //--------------------------------------------------------------------------
