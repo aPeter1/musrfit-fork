@@ -4,23 +4,23 @@
 FITPARAMETER
 ###############################################################
 #     No     Name       Value    Err     Min  Max                  
-        1 Alphap      1.11662   0.00020     none        
-        2 Asyp        0   0.00038     none        
-        3 T           1e6         0           none        
-        4 Rlx         0.969e6     0.020       none        
-        5 Pos         1         0           none        
-        6 Neg         -1        0           none        
+        1 Alpha       1.11587   0.00038     none        
+        2 Asy         0.0570    0.0011      none        
+        3 T           1         0           none        
+        4 Rlx         1.015     0.023       none        
+        5 One         1         0           none        
+        6 Bet         -1.052    0.027       none        
 
 ###############################################################
 THEORY
 ###############################################################
 asymmetry   fun1
-userFcn  libBNMR.so ExpRlx 3 4
+userFcn  .libs/libBNMR.so ExpRlx 3 4
 
 ###############################################################
 FUNCTIONS
 ###############################################################
-fun1 = map1 * map2
+fun1 = 0.5 * map1 * map2
 
 ###############################################################
 RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
@@ -28,11 +28,12 @@ fittype         2         (asymmetry fit)
 alpha           1
 forward         3 
 backward        4 
-data            11      799     11      799     
-background      800     900     800     900        # estimated bkg: 416.9700 / 465.7600
-t0              0.0     0.0     
+data            11      800     11      800     
+#backgr.fix 0
+background      1       9       1       9          # estimated bkg: 8.0000 / 9.6250
+t0              10.0    10.0    
 map             2    5    0    0    0    0    0    0    0    0
-fit             5e5     8e6    
+fit             0.5     8      
 packing         5
 
 RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
@@ -40,11 +41,12 @@ fittype         2         (asymmetry fit)
 alpha           1
 forward         5 
 backward        6 
-data            11      799     11      799     
-background      800     900     800     900        # estimated bkg: 430.9200 / 479.4500
-t0              0.0     0.0     
+data            11      800     11      800     
+#backgr.fix 0
+background      1       9       1       9          # estimated bkg: 11.6250 / 15.6250
+t0              10.0    10.0    
 map             2    6    0    0    0    0    0    0    0    0
-fit             5e5     8e6    
+fit             0.5     8      
 packing         5
 
 
@@ -58,16 +60,17 @@ SAVE
 PLOT 2   (asymmetry plot)
 runs     1   2   
 use_fit_ranges
+view_packing 10
 
 
 ###############################################################
 FOURIER
-units            MHz    # units either 'Gauss', 'MHz', or 'Mc/s'
+units            MHz    # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
 fourier_power    12
 apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
 plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
 phase            8
 #range            FRQMIN  FRQMAX
 ###############################################################
-STATISTIC --- 2014-11-14 16:37:41
-  chisq = 372.2, NDF = 295, chisq/NDF = 1.261744
+STATISTIC --- 2015-04-14 11:00:19
+  chisq = 399.5, NDF = 290, chisq/NDF = 1.377736
