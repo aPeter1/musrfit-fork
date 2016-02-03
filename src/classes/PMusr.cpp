@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -28,9 +28,13 @@
  ***************************************************************************/
 
 #include <cassert>
-
 #include <iostream>
 using namespace std;
+
+#include <boost/algorithm/string.hpp>
+using namespace boost;
+
+#include "TMath.h"
 
 #include "PMusr.h"
 
@@ -706,6 +710,10 @@ void PRawRunData::SetTempError(const UInt_t idx, const Double_t errTemp)
 PMsrGlobalBlock::PMsrGlobalBlock()
 {
   fGlobalPresent = false;
+  fRRFFreq = RRF_FREQ_UNDEF; // rotating reference frequency in units given by fRRFUnitTag. Only needed for fittype 1
+  fRRFUnitTag = RRF_UNIT_UNDEF; // RRF unit tag. Default: undefined
+  fRRFPhase = 0.0;
+  fRRFPacking = -1; // undefined RRF packing/rebinning
   fFitType = -1; // undefined fit type
   for (UInt_t i=0; i<4; i++) {
     fDataRange[i] = -1; // undefined data bin range
@@ -716,6 +724,135 @@ PMsrGlobalBlock::PMsrGlobalBlock()
   fFitRangeOffset[0] = -1; // undefined start fit range offset
   fFitRangeOffset[1] = -1; // undefined end fit range offset
   fPacking = -1; // undefined packing/rebinning
+}
+
+//--------------------------------------------------------------------------
+// GetRRFFreq (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> get RRF frequency value in specific units. If units is unknown, RRF_UNDEF_FREQ will be returned.
+ *
+ * \param unit unit string in which the units shall be given
+ */
+Double_t PMsrGlobalBlock::GetRRFFreq(const char *unit)
+{
+  Double_t freq = 0.0;
+
+  // check that the units given make sense
+  TString unitStr = unit;
+  Int_t unitTag = RRF_UNIT_UNDEF;
+  if (!unitStr.CompareTo("MHz", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_MHz;
+  else if (!unitStr.CompareTo("Mc", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_Mcs;
+  else if (!unitStr.CompareTo("T", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_T;
+  else
+    return RRF_FREQ_UNDEF;
+
+  // calc the conversion factor
+  if (unitTag == fRRFUnitTag)
+    freq = fRRFFreq;
+  else if ((unitTag == RRF_UNIT_MHz) && (fRRFUnitTag == RRF_UNIT_Mcs))
+    freq = fRRFFreq/TMath::TwoPi();
+  else if ((unitTag == RRF_UNIT_MHz) && (fRRFUnitTag == RRF_UNIT_T))
+    freq = fRRFFreq*1e4*GAMMA_BAR_MUON; // 1e4 need for T -> G since GAMMA_BAR_MUON is given in MHz/G
+  else if ((unitTag == RRF_UNIT_Mcs) && (fRRFUnitTag == RRF_UNIT_MHz))
+    freq = fRRFFreq*TMath::TwoPi();
+  else if ((unitTag == RRF_UNIT_Mcs) && (fRRFUnitTag == RRF_UNIT_T))
+    freq = fRRFFreq*1e4*TMath::TwoPi()*GAMMA_BAR_MUON; // 1e4 need for T -> G since GAMMA_BAR_MUON is given in MHz/G
+  else if ((unitTag == RRF_UNIT_T) && (fRRFUnitTag == RRF_UNIT_MHz))
+    freq = fRRFFreq/GAMMA_BAR_MUON*1e-4; // 1e-4 need for G -> T since GAMMA_BAR_MUON is given in MHz/G
+  else if ((unitTag == RRF_UNIT_T) && (fRRFUnitTag == RRF_UNIT_Mcs))
+    freq = fRRFFreq/(TMath::TwoPi()*GAMMA_BAR_MUON)*1e-4; // 1e-4 need for G -> T since GAMMA_BAR_MUON is given in MHz/G
+
+  return freq;
+}
+
+//--------------------------------------------------------------------------
+// SetRRFFreq (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set RRF frequency value in specific units. If units is unknown, 0.0 will be set.
+ *
+ * \param RRF frequency value
+ * \param unit unit string in which the units shall be given
+ */
+void PMsrGlobalBlock::SetRRFFreq(Double_t freq, const char *unit)
+{
+  // check that the units given make sense
+  TString unitStr = unit;
+  Int_t unitTag = RRF_UNIT_UNDEF;
+  if (!unitStr.CompareTo("MHz", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_MHz;
+  else if (!unitStr.CompareTo("Mc", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_Mcs;
+  else if (!unitStr.CompareTo("T", TString::kIgnoreCase))
+    unitTag = RRF_UNIT_T;
+  else {
+    cerr << endl << ">> PMsrGlobalBlock::SetRRFFreq: **ERROR** found undefined RRF unit '" << unit << "'!";
+    cerr << endl << ">>                              Will set RRF frequency to 0.0." << endl;
+    fRRFFreq = 0.0;
+    fRRFUnitTag = RRF_UNIT_UNDEF;
+  }
+
+  fRRFFreq = freq;
+  fRRFUnitTag = unitTag;
+}
+
+//--------------------------------------------------------------------------
+// GetRRFUnit (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> returns RRF frequency unit.
+ */
+TString PMsrGlobalBlock::GetRRFUnit()
+{
+  TString unit;
+
+  switch (fRRFUnitTag) {
+    case RRF_UNIT_UNDEF:
+      unit = TString("??");
+      break;
+    case RRF_UNIT_kHz:
+      unit = TString("kHz");
+      break;
+    case RRF_UNIT_MHz:
+      unit = TString("MHz");
+      break;
+    case RRF_UNIT_Mcs:
+      unit = TString("Mc");
+      break;
+    case RRF_UNIT_G:
+      unit = TString("G");
+      break;
+    case RRF_UNIT_T:
+      unit = TString("T");
+      break;
+    default:
+      unit = TString("??");
+      break;
+  }
+
+  return unit;
+}
+
+//--------------------------------------------------------------------------
+// SetRRFPacking (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set RRF packing.
+ *
+ * \param RRF packing
+ */
+void PMsrGlobalBlock::SetRRFPacking(Int_t pack)
+{
+  if (pack <= 0) {
+    cerr << endl << "PMsrGlobalBlock::SetRRFPacking: **WARNING** found RRF packing <= 0. Likely doesn't make any sense." << endl;
+    fRRFPacking = -1; // set to undefined
+  }
+
+  fRRFPacking = pack;
 }
 
 //--------------------------------------------------------------------------
@@ -1740,4 +1877,168 @@ void PMsrRunBlock::SetMapGlobal(UInt_t idx, Int_t ival)
     fMapGlobal[idx] = ival;
   // else do nothing at the moment
   return;
+}
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// implementation PStringNumberList
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//--------------------------------------------------------------------------
+// Parse (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Helper class which parses list of numbers of the following 3 forms and its combination.
+ * (i) list of integers separted by spaces, e.g. 1 3 7 14
+ * (ii) a range of integers of the form nS-nE, e.g. 13-27 which will generate 13, 14, 15, .., 26, 27
+ * (iii) a sequence of integers of the form nS:nE:nStep, e.g. 10:20:2  which will generate 10, 12, 14, .., 18, 20
+ *
+ * \param errorMsg error message
+ * \param ignoreFirstToken if true, the first parse token will be ignored
+ *
+ * @return true if parse has been successful, otherwise false
+ */
+bool PStringNumberList::Parse(string &errorMsg, bool ignoreFirstToken)
+{
+  bool result=true;
+  vector<string> splitVec;
+  int ival;
+
+  // before checking tokens, remove 'forbidden' " - " and " : "
+  StripSpaces();
+
+  // split string into space separated tokens
+  split(splitVec, fString, is_any_of(" "), token_compress_on);
+
+  unsigned int start=0;
+  if (ignoreFirstToken)
+    start=1;
+
+  for (unsigned int i=start; i<splitVec.size(); i++) {
+    if (splitVec[i].length() != 0) { // ignore empty tokens
+      if (splitVec[i].find("-") != string::npos) { // check for potential range
+        vector<string> subSplitVec;
+        // split potential nS-nE token
+        split(subSplitVec, splitVec[i], is_any_of("-"),  token_compress_on);
+
+        int start=-1, end=-1;
+        unsigned int count=0;
+        for (unsigned int j=0; j<subSplitVec.size(); j++) {
+          if (subSplitVec[j].length() != 0) { // ignore empty tokens
+            if (!IsNumber(subSplitVec[j])) {
+              result = false;
+            } else {
+              count++;
+              if (count == 1)
+                start = atoi(subSplitVec[j].c_str());
+              else if (count == 2)
+                end = atoi(subSplitVec[j].c_str());
+              else
+                result = false;
+            }
+          }
+        }
+        if ((start < 0) || (end < 0)) { // check that there is a vaild start and end
+          errorMsg = "**ERROR** start or end of a range is not valid";
+          result = false;
+        }
+        if (result) { // no error, hence check start and end
+          if (start > end) {
+            int swap = end;
+            cerr << "**WARNING** start=" << start << " > end=" << end << ", hence I will swap them" << endl;
+            end = start;
+            start = swap;
+          }
+          for (int j=start; j<=end; j++)
+            fList.push_back(j);
+        }
+      } else if (splitVec[i].find(":") != string::npos) { // check for potential sequence
+        vector<string> subSplitVec;
+        // split potential rStart:rEnd:rStep token
+        split(subSplitVec, splitVec[i], is_any_of(":"),  token_compress_on);
+
+        int start=-1, end=-1, step=-1;
+        unsigned int count=0;
+        for (unsigned int j=0; j<subSplitVec.size(); j++) {
+          if (subSplitVec[j].length() != 0) { // ignore empty tokens
+            if (!IsNumber(subSplitVec[j])) {
+              result = false;
+            } else {
+              count++;
+              if (count == 1)
+                start = atoi(subSplitVec[j].c_str());
+              else if (count == 2)
+                end = atoi(subSplitVec[j].c_str());
+              else if (count == 3)
+                step = atoi(subSplitVec[j].c_str());
+              else
+                result = false;
+            }
+          }
+        }
+        if ((start < 0) || (end < 0) || (step < 0)) { // check that there is a vaild start and end
+          errorMsg = "**ERROR** start, end, or step of a sequence is not valid";
+          result = false;
+        }
+        if (result) { // no error, hence check start and end
+          if (start > end) {
+            int swap = end;
+            cerr << "**WARNING** start=" << start << " > end=" << end << ", hence I will swap them" << endl;
+            end = start;
+            start = swap;
+          }
+          for (int j=start; j<=end; j+=step)
+            fList.push_back(j);
+        }
+      } else if (IsNumber(splitVec[i])) {
+        ival = atoi(splitVec[i].c_str());
+        fList.push_back(ival);
+      } else {
+        errorMsg = "**ERROR** invalid token: " + splitVec[i];
+        result = false;
+      }
+    }
+  }
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+// StripSpaces (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>This routine removes arbitray number of spaces between '-' and ':',
+ * e.g. 123    -    125  will be converted to 123-125, etc.
+ */
+void PStringNumberList::StripSpaces()
+{
+  string str=fString;
+  int pos=-1;
+
+  // backward scan
+  for (int i=str.size(); i>=0; --i) { // check if first space is found
+    if ((str[i] == ' ') && (pos == -1)) {
+      pos = i;
+    } else if ((str[i] == '-') || (str[i] == ':')) { // check for '-' or ':'
+      if (pos != -1) {
+        str.erase(i+1, pos-i);
+      }
+    } else if (str[i] != ' ') { // anything but different than a space leads to a reset of the pos counter
+      pos = -1;
+    }
+  }
+  // forward scan
+  for (unsigned int i=0; i<str.size(); i++) { // check if first space is found
+    if ((str[i] == ' ') && (pos == -1)) {
+      pos = i;
+    } else if ((str[i] == '-') || (str[i] == ':')) { // check for '-' or ':'
+      if (pos != -1) {
+        str.erase(pos, i-pos);
+        i = pos;
+      }
+    } else if (str[i] != ' ') { // anything but different than a space leads to a reset of the pos counter
+      pos = -1;
+    }
+  }
+
+  fString = str;
 }

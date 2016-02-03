@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2015 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -55,7 +55,9 @@ class PFourier
     virtual const char* GetDataTitle() { return fData->GetTitle(); }
     virtual const Int_t GetUnitTag() { return fUnitTag; }
     virtual Double_t GetResolution() { return fResolution; }
+    virtual Double_t GetMaxFreq();
     virtual TH1F* GetRealFourier(const Double_t scale = 1.0);
+    virtual TH1F* GetPhaseOptRealFourier(Double_t &phase, const Double_t scale = 1.0, const Double_t min = -1.0, const Double_t max = -1.0);
     virtual TH1F* GetImaginaryFourier(const Double_t scale = 1.0);
     virtual TH1F* GetPowerFourier(const Double_t scale = 1.0);
     virtual TH1F* GetPhaseFourier(const Double_t scale = 1.0);

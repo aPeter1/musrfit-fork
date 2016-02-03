@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -102,6 +102,7 @@ class PMsrHandler
     virtual Bool_t CheckFuncs();
     virtual Bool_t CheckHistoGrouping();
     virtual Bool_t CheckAddRunParameters();
+    virtual Bool_t CheckRRFSettings();
     virtual void CheckMaxLikelihood();
 
     virtual void GetGroupingString(Int_t runNo, TString detector, TString &groupingStr);
@@ -152,7 +153,6 @@ class PMsrHandler
     virtual UInt_t NeededPrecision(Double_t dval, UInt_t precLimit=13);
     virtual UInt_t LastSignificant(Double_t dval, UInt_t precLimit=6);
 
-    virtual Bool_t ParseDetectorGrouping(TString str, PIntVector &group);
     virtual void MakeDetectorGroupingString(TString str, PIntVector &group, TString &result, Bool_t includeDetector = true);
 
     virtual void CheckLegacyLifetimecorrection();

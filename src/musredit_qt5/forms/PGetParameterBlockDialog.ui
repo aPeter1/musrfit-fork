@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PGetParameterBlockDialog</class>
+ <widget class="QDialog" name="PGetParameterBlockDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>656</width>
+    <height>476</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Get Parameter</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../musredit.qrc">
+    <normaloff>:/images/musrfit.xpm</normaloff>:/images/musrfit.xpm</iconset>
+  </property>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>430</y>
+     <width>631</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <widget class="QPushButton" name="fHelp_pushButton">
+      <property name="text">
+       <string>&amp;Help</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>118</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
+     <widget class="QPushButton" name="fOk_pushButton">
+      <property name="text">
+       <string>&amp;OK</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="fCancel_pushButton">
+      <property name="text">
+       <string>&amp;Cancel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QPlainTextEdit" name="fParam_plainTextEdit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>90</y>
+     <width>631</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <property name="plainText">
+    <string>###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="fAdd_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>50</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&amp;Add</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="fParamNo_label">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>31</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>No.</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="fName_label">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>30</y>
+     <width>46</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Name</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="fValue_label">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>30</y>
+     <width>46</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Value</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="fStep_label">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>30</y>
+     <width>46</width>
+     <height>13</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Step</string>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="fBoundaries_groupBox">
+   <property name="geometry">
+    <rect>
+     <x>370</x>
+     <y>10</y>
+     <width>171</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Boundaries</string>
+   </property>
+   <widget class="QLabel" name="fLower_label">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>46</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Lower</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="fUpper_label">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>20</y>
+      <width>46</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Upper</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="fLower_lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>none</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="fUpper_lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>40</y>
+      <width>71</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>none</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QSpinBox" name="fParamNo_spinBox">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>50</y>
+     <width>42</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>1</number>
+   </property>
+   <property name="maximum">
+    <number>999</number>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="fName_lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>50</y>
+     <width>113</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="fValue_lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>50</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="fStep_lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>50</y>
+     <width>81</width>
+     <height>20</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>fParamNo_spinBox</tabstop>
+  <tabstop>fName_lineEdit</tabstop>
+  <tabstop>fValue_lineEdit</tabstop>
+  <tabstop>fStep_lineEdit</tabstop>
+  <tabstop>fLower_lineEdit</tabstop>
+  <tabstop>fUpper_lineEdit</tabstop>
+  <tabstop>fAdd_pushButton</tabstop>
+  <tabstop>fOk_pushButton</tabstop>
+  <tabstop>fCancel_pushButton</tabstop>
+  <tabstop>fParam_plainTextEdit</tabstop>
+  <tabstop>fHelp_pushButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../musredit.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>fCancel_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetParameterBlockDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>639</x>
+     <y>434</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>338</x>
+     <y>429</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fOk_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetParameterBlockDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>548</x>
+     <y>436</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>448</x>
+     <y>438</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fAdd_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetParameterBlockDialog</receiver>
+   <slot>paramAdd()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>594</x>
+     <y>59</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>562</x>
+     <y>16</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>fHelp_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PGetParameterBlockDialog</receiver>
+   <slot>helpContent()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>62</x>
+     <y>447</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>148</x>
+     <y>443</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>helpContent()</slot>
+  <slot>paramAdd()</slot>
+ </slots>
+</ui>

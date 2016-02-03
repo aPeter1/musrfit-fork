@@ -1,5 +1,14 @@
 /***************************************************************************
- *   Copyright (C) 2007-2015 by Andreas Suter                              *
+
+  PFourierCanvas.h
+
+  Author: Andreas Suter
+  e-mail: andreas.suter@psi.ch
+
+***************************************************************************/
+
+/***************************************************************************
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -38,27 +47,31 @@
 #include "PFourier.h"
 
 // Canvas menu id's
-#define P_MENU_ID_FOURIER       10001
-#define P_MENU_ID_AVERAGE       10002
-#define P_MENU_ID_EXPORT_DATA   10003
+#define P_MENU_ID_FOURIER              10001
+#define P_MENU_ID_AVERAGE              10002
+#define P_MENU_ID_AVERAGE_PER_DATA_SET 10003
+#define P_MENU_ID_EXPORT_DATA          10004
 
-#define P_MENU_ID_FOURIER_REAL          100
-#define P_MENU_ID_FOURIER_IMAG          101
-#define P_MENU_ID_FOURIER_REAL_AND_IMAG 102
-#define P_MENU_ID_FOURIER_PWR           103
-#define P_MENU_ID_FOURIER_PHASE         104
-#define P_MENU_ID_FOURIER_PHASE_PLUS    105
-#define P_MENU_ID_FOURIER_PHASE_MINUS   106
+#define P_MENU_ID_FOURIER_REAL           100
+#define P_MENU_ID_FOURIER_IMAG           101
+#define P_MENU_ID_FOURIER_REAL_AND_IMAG  102
+#define P_MENU_ID_FOURIER_PWR            103
+#define P_MENU_ID_FOURIER_PHASE          104
+#define P_MENU_ID_FOURIER_PHASE_OPT_REAL 105
+#define P_MENU_ID_FOURIER_PHASE_PLUS     106
+#define P_MENU_ID_FOURIER_PHASE_MINUS    107
 
 //------------------------------------------------------------------------
 /**
  * <p>Structure holding all necessary Fourier histograms.
  */
 typedef struct {
-  TH1F *dataFourierRe;       ///< real part of the Fourier transform of the data histogram
-  TH1F *dataFourierIm;       ///< imaginary part of the Fourier transform of the data histogram
-  TH1F *dataFourierPwr;      ///< power spectrum of the Fourier transform of the data histogram
-  TH1F *dataFourierPhase;    ///< phase spectrum of the Fourier transform of the data histogram
+  TH1F *dataFourierRe;           ///< real part of the Fourier transform of the data histogram
+  TH1F *dataFourierIm;           ///< imaginary part of the Fourier transform of the data histogram
+  TH1F *dataFourierPwr;          ///< power spectrum of the Fourier transform of the data histogram
+  TH1F *dataFourierPhase;        ///< phase spectrum of the Fourier transform of the data histogram
+  TH1F *dataFourierPhaseOptReal; ///< phase otpimized real Fourier transform of the data histogram
+  Double_t optPhase;             ///< optimal phase which maximizes the real Fourier
 } PFourierCanvasDataSet;
 
 //------------------------------------------------------------------------
@@ -75,10 +88,12 @@ class PFourierCanvas : public TObject, public TQObject
 {
   public:
     PFourierCanvas();
-    PFourierCanvas(vector<PFourier*> &fourier, const Char_t* title, const Bool_t showAverage,
+    PFourierCanvas(vector<PFourier*> &fourier, PIntVector dataSetTag, const Char_t* title,
+                   const Bool_t showAverage, const Bool_t showAveragePerDataSet,
                    const Int_t fourierPlotOpt, Double_t fourierXrange[2], Double_t phase,
                    Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh, const Bool_t batch);
-    PFourierCanvas(vector<PFourier*> &fourier, const Char_t* title, const Bool_t showAverage,
+    PFourierCanvas(vector<PFourier*> &fourier, PIntVector dataSetTag, const Char_t* title,
+                   const Bool_t showAverage, const Bool_t showAveragePerDataSet,
                    const Int_t fourierPlotOpt, Double_t fourierXrange[2], Double_t phase,
                    Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                    const PIntVector markerList, const PIntVector colorList, const Bool_t batch);
@@ -103,7 +118,9 @@ class PFourierCanvas : public TObject, public TQObject
     Int_t  fTimeout;         ///< timeout after which the Done signal should be emited. If timeout <= 0, no timeout is taking place
     Bool_t fBatchMode;       ///< musrview in ROOT batch mode
     Bool_t fValid;           ///< if true, everything looks OK
-    Bool_t fAveragedView;    ///< tag showing that the averaged view or normal view should be presented.
+    Bool_t fAveragedView;    ///< tag showing that the averaged view for ALL data or normal view should be presented.
+    Bool_t fAveragedViewPerDataSet; ///< tag showing that the averaged view for individual data sets or normal view should be presented.
+    PIntVector fDataSetTag;  ///< vector holding the data set tags
     Int_t  fCurrentPlotView; ///< tag showing what the current plot view is: real, imag, power, phase, ...
     Double_t fInitialXRange[2]; ///< keeps the initial x-range
     Double_t fInitialYRange[2]; ///< keeps the initial y-range
@@ -112,7 +129,7 @@ class PFourierCanvas : public TObject, public TQObject
     TString fXaxisTitle;
     vector<PFourier*> fFourier; ///< keeps all the Fourier data, ownership is with the caller
     PFourierCanvasDataList fFourierHistos; ///< keeps all the Fourier histos
-    PFourierCanvasDataSet fFourierAverage; ///< keeps the average of the Fourier histos
+    PFourierCanvasDataList fFourierAverage; ///< keeps the average of the Fourier histos
     Double_t fCurrentFourierPhase; ///< keeps the current Fourier phase (real/imag)
     TLatex *fCurrentFourierPhaseText; ///< used in Re/Im Fourier to show the current phase in the pad
 
@@ -127,7 +144,6 @@ class PFourierCanvas : public TObject, public TQObject
     TRootCanvas *fImp;           ///< ROOT native GUI version of main window with menubar and drawing area
     TGMenuBar   *fBar;           ///< menu bar
     TGPopupMenu *fPopupMain;     ///< popup menu MusrFT in the main menu bar
-//    TGPopupMenu *fPopupSave;     ///< popup menu of the MusrFT/Save Data sub menu
     TGPopupMenu *fPopupFourier;  ///< popup menu of the MusrFT/Fourier sub menu
 
     // canvas related variables
@@ -135,6 +151,7 @@ class PFourierCanvas : public TObject, public TQObject
     TPaveText *fTitlePad;          ///< title pad used to display a title
     TPad      *fFourierPad;        ///< fourier pad used to display the fourier
     TLegend   *fInfoPad;           ///< info pad used to display a legend of the data plotted
+    TLegend   *fLegAvgPerDataSet;  ///< legend used for averaged per data set view
 
     virtual void CreateXaxisTitle();
     virtual void CreateStyle();
@@ -152,6 +169,7 @@ class PFourierCanvas : public TObject, public TQObject
     virtual Double_t GetMaximum(TH1F* histo, Double_t xmin=-1.0, Double_t xmax=-1.0);
     virtual Double_t GetMinimum(TH1F* histo, Double_t xmin=-1.0, Double_t xmax=-1.0);
     virtual Double_t GetInterpolatedValue(TH1F* histo, Double_t xVal);
+    virtual TString GetDataSetName(TString title);
 
     ClassDef(PFourierCanvas, 1)
 };

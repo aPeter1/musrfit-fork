@@ -1,0 +1,21 @@
+/*********************************************************************************************
+
+  name:       musredit.dox
+
+  created by: Andreas Suter, 2015/10/26
+
+  content:    Description of musredit.
+
+**********************************************************************************************/
+
+/**
+
+\mainpage musredit
+
+<p>musredit is a simple editor based interface to the musrfit programs. It is based on Qt 5.5
+of The Qt Company (<code>http://www.qt.io</code>).
+
+<p>musredit is free software liensenced under GPL 2 or later (for detail license informations see
+<code>http://www.gnu.org/licenses</code>).
+
+*/

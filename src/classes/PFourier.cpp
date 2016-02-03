@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -163,7 +163,7 @@ PFourier::~PFourier()
 }
 
 //--------------------------------------------------------------------------
-// Transform
+// Transform (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Carries out the Fourier transform. It is assumed that fStartTime is the time zero
@@ -201,7 +201,24 @@ void PFourier::Transform(UInt_t apodizationTag)
 }
 
 //--------------------------------------------------------------------------
-// GetRealFourier
+// GetMaxFreq (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>returns the maximal frequency in units choosen, i.e. Gauss, Tesla, MHz, Mc/s
+ */
+Double_t PFourier::GetMaxFreq()
+{
+  UInt_t noOfFourierBins = 0;
+  if (fNoOfBins % 2 == 0)
+    noOfFourierBins = fNoOfBins/2;
+  else
+    noOfFourierBins = (fNoOfBins+1)/2;
+
+  return fResolution*noOfFourierBins;
+}
+
+//--------------------------------------------------------------------------
+// GetRealFourier (public)
 //--------------------------------------------------------------------------
 /**
  * <p>returns the real part Fourier as a histogram.
@@ -242,7 +259,112 @@ TH1F* PFourier::GetRealFourier(const Double_t scale)
 }
 
 //--------------------------------------------------------------------------
-// GetImaginaryFourier
+// GetPhaseOptRealFourier (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>returns the phase corrected real Fourier transform. The correction angle is
+ * past back as well.
+ * <p>Currently it simply does the following thing: (i) rotate the complex Fourier
+ * transform through all angles in 1/2° steps, i.e.
+ * \f$ f_{\rm rot} = (f_{\rm real} + i f_{\rm imag}) \exp(- \alpha)\f$,
+ * hence \f$ f_{\rm rot} = f_{\rm real} \cos(\alpha) + f_{\rm imag} \sin(\alpha)\f$.
+ * (ii) search the maximum of \f$ sum_{\alpha} {\cal R}\{f_{\rm rot}\}\f$ for all
+ * \f$\alpha\f$. From this one gets \f$\alpha_{\rm opt}\f$. (iii) The 'optimal'
+ * real Fourier transform is \f$f_{\rm opt} = (f_{\rm real} + i f_{\rm imag})
+ * \exp(- \alpha_{\rm opt})\f$.
+ *
+ * \return the TH1F histo of the phase 'optimzed' real Fourier transform.
+ *
+ * \param phase return value of the optimal phase
+ * \param scale normalisation factor
+ * \param min minimal freq / field from which to optimise. Given in the choosen unit.
+ * \param max maximal freq / field up to which to optimise. Given in the choosen unit.
+ */
+TH1F* PFourier::GetPhaseOptRealFourier(Double_t &phase, const Double_t scale, const Double_t min, const Double_t max)
+{
+  UInt_t noOfFourierBins = 0;
+  if (fNoOfBins % 2 == 0)
+    noOfFourierBins = fNoOfBins/2;
+  else
+    noOfFourierBins = (fNoOfBins+1)/2;
+
+  UInt_t minBin = 0;
+  UInt_t maxBin = noOfFourierBins;
+
+  // check if minimum frequency is given. If yes, get the proper minBin
+  if (min != -1.0) {
+    minBin = (UInt_t)(min/fResolution);
+  }
+
+  // check if maximum frequency is given. If yes, get the proper maxBin
+  if (max != -1.0) {
+    maxBin = (UInt_t)(max/fResolution);
+    if (maxBin >= noOfFourierBins) {
+      maxBin = noOfFourierBins;
+      cerr << "**WARNING** maximum frequency/field out of range. Will adopted it." << endl;
+    }
+  }
+
+  // copy the real/imag Fourier from min to max
+  vector<Double_t> realF, imagF;
+  for (UInt_t i=minBin; i<=maxBin; i++) {
+    realF.push_back(fOut[i][0]);
+    imagF.push_back(fOut[i][1]);
+  }
+
+  // rotate trough real/imag Fourier through 360° with a 1/2° resolution and keep the integral
+  Double_t rotRealIntegral[720];
+  Double_t sum = 0.0;
+  Double_t da = 8.72664625997164774e-03; // pi / 360
+  for (UInt_t i=0; i<720; i++) {
+    sum = 0.0;
+    for (UInt_t j=0; j<realF.size(); j++) {
+      sum += realF[j]*cos(da*i) + imagF[j]*sin(da*i);
+    }
+    rotRealIntegral[i] = sum;
+  }
+
+  // find the maximum in rotRealIntegral
+  Double_t maxRot = 0.0;
+  UInt_t maxRotBin = 0;
+  for (UInt_t i=0; i<720; i++) {
+    if (maxRot < rotRealIntegral[i]) {
+      maxRot = rotRealIntegral[i];
+      maxRotBin = i;
+    }
+  }
+
+  // keep the optimal phase
+  phase = maxRotBin*da;
+
+  // clean up
+  realF.clear();
+  imagF.clear();
+
+  // invoke the real phase optimised histo to be filled. Caller is the owner!
+  Char_t name[256];
+  Char_t title[256];
+  snprintf(name, sizeof(name), "%s_Fourier_PhOptRe", fData->GetName());
+  snprintf(title, sizeof(title), "%s_Fourier_PhOptRe", fData->GetTitle());
+
+  TH1F *realPhaseOptFourier = new TH1F(name, title, noOfFourierBins, -fResolution/2.0, (Double_t)(noOfFourierBins-1)*fResolution+fResolution/2.0);
+  if (realPhaseOptFourier == 0) {
+    fValid = false;
+    cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the real part of the Fourier transform." << endl;
+    return 0;
+  }
+
+  // fill realFourier vector
+  for (UInt_t i=0; i<noOfFourierBins; i++) {
+    realPhaseOptFourier->SetBinContent(i+1, scale*(fOut[i][0]*cos(phase) + fOut[i][1]*sin(phase)));
+    realPhaseOptFourier->SetBinError(i+1, 0.0);
+  }
+
+  return realPhaseOptFourier;
+}
+
+//--------------------------------------------------------------------------
+// GetImaginaryFourier (public)
 //--------------------------------------------------------------------------
 /**
  * <p>returns the imaginary part Fourier as a histogram.
@@ -284,7 +406,7 @@ TH1F* PFourier::GetImaginaryFourier(const Double_t scale)
 }
 
 //--------------------------------------------------------------------------
-// GetPowerFourier
+// GetPowerFourier (public)
 //--------------------------------------------------------------------------
 /**
  * <p>returns the Fourier power spectrum as a histogram.
@@ -326,7 +448,7 @@ TH1F* PFourier::GetPowerFourier(const Double_t scale)
 }
 
 //--------------------------------------------------------------------------
-// GetPhaseFourier
+// GetPhaseFourier (public)
 //--------------------------------------------------------------------------
 /**
  * <p>returns the Fourier phase spectrum as a histogram.
@@ -385,7 +507,7 @@ TH1F* PFourier::GetPhaseFourier(const Double_t scale)
 }
 
 //--------------------------------------------------------------------------
-// PrepareFFTwInputData
+// PrepareFFTwInputData (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Feeds the Fourier data and apply the apodization.
@@ -434,7 +556,7 @@ void PFourier::PrepareFFTwInputData(UInt_t apodizationTag)
 }
 
 //--------------------------------------------------------------------------
-// ApodizeData
+// ApodizeData (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Carries out the appodization of the data.

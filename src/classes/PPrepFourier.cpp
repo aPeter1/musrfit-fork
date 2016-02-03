@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2015 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -26,6 +26,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
+#include <cmath>
 
 #include "PPrepFourier.h"
 
@@ -48,10 +50,11 @@ PPrepFourier::PPrepFourier()
 /**
  * <p>Constructor.
  */
-PPrepFourier::PPrepFourier(const Int_t *bkgRange, const Int_t packing) :
+PPrepFourier::PPrepFourier(const Int_t packing, const Int_t *bkgRange, PDoubleVector bkg) :
   fPacking(packing)
 {
   SetBkgRange(bkgRange);
+  SetBkg(bkg);
 }
 
 //--------------------------------------------------------------------------
@@ -76,7 +79,7 @@ PPrepFourier::~PPrepFourier()
  */
 void PPrepFourier::SetBkgRange(const Int_t *bkgRange)
 {
-  int err=0;
+  Int_t err=0;
   if (bkgRange[0] >= -1) {
     fBkgRange[0] = bkgRange[0];
   } else {
@@ -110,6 +113,20 @@ void PPrepFourier::SetBkgRange(const Int_t *bkgRange)
   if (err != 0) {
     cerr << endl << ">> PPrepFourier::SetBkgRange: **WARNING** " << errMsg << endl;
   }
+}
+
+//--------------------------------------------------------------------------
+// SetBkgRange
+//--------------------------------------------------------------------------
+/**
+ * <p>set the background values for all the histos.
+ *
+ * \param bkg vector
+ */
+void PPrepFourier::SetBkg(PDoubleVector bkg)
+{
+  for (UInt_t i=0; i<bkg.size(); i++)
+    fBkg.push_back(bkg[i]);
 }
 
 //--------------------------------------------------------------------------
@@ -157,29 +174,46 @@ void PPrepFourier::DoBkgCorrection()
   }
 
   // if no bkg-range is given, nothing needs to be done
-  if ((fBkgRange[0] == -1) && (fBkgRange[1] == -1)) {
+  if ((fBkgRange[0] == -1) && (fBkgRange[1] == -1) && (fBkg.size() == 0)) {
     return;
   }
 
-  // make sure that the bkg range is ok
-  for (unsigned int i=0; i<fRawData.size(); i++) {
-    if ((fBkgRange[0] >= fRawData[i].rawData.size()) || (fBkgRange[1] >= fRawData[i].rawData.size())) {
-      cerr << endl << "PPrepFourier::DoBkgCorrection() **ERROR** bkg-range out of data-range!";
+  if ((fBkgRange[0] != -1) && (fBkgRange[1] != -1)) { // background range is given
+    // make sure that the bkg range is ok
+    for (UInt_t i=0; i<fRawData.size(); i++) {
+      if ((fBkgRange[0] >= (Int_t)fRawData[i].rawData.size()) || (fBkgRange[1] >= (Int_t)fRawData[i].rawData.size())) {
+        cerr << endl << "PPrepFourier::DoBkgCorrection() **ERROR** bkg-range out of data-range!";
+        return;
+      }
+    }
+
+    Double_t bkg=0.0;
+    for (UInt_t i=0; i<fRawData.size(); i++) {
+      // calculate the bkg for the given range
+      for (Int_t j=fBkgRange[0]; j<=fBkgRange[1]; j++) {
+        bkg += fRawData[i].rawData[j];
+      }
+      bkg /= (fBkgRange[1]-fBkgRange[0]+1);
+      cout << "info> background " << i << ": " << bkg << endl;
+
+      // correct data
+      for (UInt_t j=0; j<fData[i].size(); j++)
+        fData[i][j] -= bkg;
+    }
+  } else { // there might be an explicit background list
+    // check if there is a background list
+    if (fBkg.size() == 0)
+      return;
+
+    // check if there are as many background values than data values
+    if (fBkg.size() != fData.size()) {
+      cerr << endl << "PPrepFourier::DoBkgCorrection() **ERROR** #bkg values != #histos. Will do nothing here." << endl;
       return;
     }
-  }
 
-  Double_t bkg=0.0;
-  for (unsigned int i=0; i<fRawData.size(); i++) {
-    // calculate the bkg for the given range
-    for (int j=fBkgRange[0]; j<=fBkgRange[1]; j++) {
-      bkg += fRawData[i].rawData[j];
-    }
-    bkg /= (fBkgRange[1]-fBkgRange[0]+1);
-
-    // correct data
-    for (unsigned int j=0; j<fData[i].size(); j++)
-      fData[i][j] -= bkg;
+    for (UInt_t i=0; i<fData.size(); i++)
+      for (UInt_t j=0; j<fData[i].size(); j++)
+        fData[i][j] -= fBkg[i];
   }
 }
 
@@ -201,10 +235,10 @@ void PPrepFourier::DoPacking()
 
   PDoubleVector tmpData;
   Double_t dval = 0.0;
-  for (unsigned int i=0; i<fData.size(); i++) {
+  for (UInt_t i=0; i<fData.size(); i++) {
     tmpData.clear();
     dval = 0.0;
-    for (unsigned int j=0; j<fData[i].size(); j++) {
+    for (UInt_t j=0; j<fData[i].size(); j++) {
       if ((j % fPacking == 0) && (j != 0)) {
         tmpData.push_back(dval);
         dval = 0.0;
@@ -215,20 +249,6 @@ void PPrepFourier::DoPacking()
     // change the original data set with the packed one
     fData[i].clear();
     fData[i] = tmpData;
-  }
-}
-
-//--------------------------------------------------------------------------
-// DoFiltering
-//--------------------------------------------------------------------------
-/**
- * <p>Not implemented yet.
- */
-void PPrepFourier::DoFiltering()
-{
-  // make sure fData are already present, and if not create the necessary data sets
-  if (fData.size() != fRawData.size()) {
-    InitData();
   }
 }
 
@@ -251,9 +271,9 @@ void PPrepFourier::DoLifeTimeCorrection(Double_t fudge)
 
   // calc exp(+t/tau)*N(t), where N(t) is already background corrected
   Double_t scale;
-  for (unsigned int i=0; i<fData.size(); i++) {
+  for (UInt_t i=0; i<fData.size(); i++) {
     scale = fRawData[i].timeResolution / PMUON_LIFETIME;
-    for (unsigned int j=0; j<fData[i].size(); j++) {
+    for (UInt_t j=0; j<fData[i].size(); j++) {
       fData[i][j] *= exp(j*scale);
     }
   }
@@ -261,14 +281,14 @@ void PPrepFourier::DoLifeTimeCorrection(Double_t fudge)
   // calc N0
   Double_t dval;
   Double_t N0;
-  for (unsigned int i=0; i<fData.size(); i++) {
+  for (UInt_t i=0; i<fData.size(); i++) {
     dval = 0.0;
-    for (unsigned int j=0; j<fData[i].size(); j++) {
+    for (UInt_t j=0; j<fData[i].size(); j++) {
       dval += fData[i][j];
     }
     N0 = dval/fData[i].size();
     N0 *= fudge;
-    for (unsigned int j=0; j<fData[i].size(); j++) {
+    for (UInt_t j=0; j<fData[i].size(); j++) {
       fData[i][j] -= N0;
       fData[i][j] /= N0;
     }
@@ -291,6 +311,24 @@ TString PPrepFourier::GetInfo(const UInt_t idx)
     info = fRawData[idx].info;
 
   return info;
+}
+
+//--------------------------------------------------------------------------
+// GetDataSetTag
+//--------------------------------------------------------------------------
+/**
+ * <p>Returns the data set tag of the object
+ *
+ * \param idx index of the object
+ */
+Int_t PPrepFourier::GetDataSetTag(const UInt_t idx)
+{
+  Int_t result = -1;
+
+  if (idx < fRawData.size())
+    result = fRawData[idx].dataSetTag;
+
+  return result;
 }
 
 //--------------------------------------------------------------------------
@@ -317,7 +355,7 @@ vector<TH1F*> PPrepFourier::GetData()
   UInt_t startIdx;
   UInt_t endIdx;
 
-  for (unsigned int i=0; i<fData.size(); i++) {
+  for (UInt_t i=0; i<fData.size(); i++) {
     name = TString::Format("histo%2d", i);
     dt = fRawData[i].timeResolution*fPacking;
     start = fRawData[i].timeRange[0];
@@ -353,7 +391,7 @@ vector<TH1F*> PPrepFourier::GetData()
     }
 
     data[i] = new TH1F(name.Data(), fRawData[i].info.Data(), size, start, end);
-    for (unsigned int j=startIdx; j<endIdx; j++)
+    for (UInt_t j=startIdx; j<endIdx; j++)
       data[i]->SetBinContent(j-startIdx+1, fData[i][j]);
   }
 
@@ -410,14 +448,14 @@ TH1F *PPrepFourier::GetData(const UInt_t idx)
   }
 
   TH1F *data = new TH1F(name.Data(), fRawData[idx].info.Data(), size, start, end);
-  for (unsigned int i=startIdx; i<endIdx; i++)
+  for (UInt_t i=startIdx; i<endIdx; i++)
     data->SetBinContent(i-startIdx+1, fData[idx][i]);
 
   return data;
 }
 
 //--------------------------------------------------------------------------
-// InitData
+// InitData (private)
 //--------------------------------------------------------------------------
 /**
  * <p>Copy raw-data to internal data from t0 to the size of raw-data.
@@ -425,13 +463,13 @@ TH1F *PPrepFourier::GetData(const UInt_t idx)
 void PPrepFourier::InitData()
 {
   fData.resize(fRawData.size());
-  unsigned int t0;
-  for (unsigned int i=0; i<fRawData.size(); i++) {
+  UInt_t t0;
+  for (UInt_t i=0; i<fRawData.size(); i++) {
     if (fRawData[i].t0 >= 0)
       t0 = fRawData[i].t0;
     else
       t0 = 0;
-    for (unsigned int j=t0; j<fRawData[i].rawData.size(); j++) {
+    for (UInt_t j=t0; j<fRawData[i].rawData.size(); j++) {
       fData[i].push_back(fRawData[i].rawData[j]);
     }
   }

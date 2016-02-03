@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -2307,7 +2307,7 @@ Double_t PTheory::SkewedGauss(register Double_t t, const PDoubleVector& paramVal
   Double_t freq  = TWO_PI*val[1];
 
   if ((zp >= 25.0) || (zm >= 25.0)) // needed to prevent crash of 1F1
-    skg = 2.0e300;
+    skg = 2.0e6;
   else if (fabs(val[2]) == fabs(val[3])) // sigma+ == sigma- -> Gaussian
     skg = TMath::Cos(phase+freq*tt) * gp;
   else

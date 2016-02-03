@@ -57,9 +57,12 @@ using namespace std;
  */
 void musrview_syntax()
 {
-  cout << endl << "usage: musrview <msr-file> [--<graphic-format-extension>] [--timeout <timeout>] | --version | --help";
+  cout << endl << "usage: musrview <msr-file> [Options]";
   cout << endl << "       <msr-file>: msr/mlog input file";
-  cout << endl << "       'musrview <msr-file>' will execute musrview";
+  cout << endl << "       Options:";
+  cout << endl << "       --help    : display this help and exit.";
+  cout << endl << "       --version : output version information and exit.";
+  cout << endl << "       -f, --fourier: will directly present the Fourier transform of the <msr-file>.";
   cout << endl << "       --<graphic-format-extension>: ";
   cout << endl << "           will produce a graphics-output-file without starting a root session.";
   cout << endl << "           the name is based on the <msr-file>, e.g. 3310.msr -> 3310_0.png";
@@ -71,9 +74,6 @@ void musrview_syntax()
   cout << endl << "           will produce an ascii dump of the data and fit as plotted.";
   cout << endl << "       --timeout <timeout>: <timeout> given in seconds after which musrview terminates.";
   cout << endl << "           If <timeout> <= 0, no timeout will take place. Default <timeout> is 0.";
-  cout << endl;
-  cout << endl << "       'musrview' or 'musrview --help' will show this help";
-  cout << endl << "       'musrview --version' will print the musrview version";
   cout << endl << endl;
 }
 
@@ -101,6 +101,7 @@ int main(int argc, char *argv[])
   int  status;
   bool success = true;
   char fileName[128];
+  bool fourier = false;
   bool graphicsOutput = false;
   bool asciiOutput = false;
   char graphicsExtension[128];
@@ -132,6 +133,8 @@ int main(int argc, char *argv[])
     } else if (!strcmp(argv[i], "--help")) {
       show_syntax = true;
       break;
+    } else if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "--fourier")) {
+      fourier = true;
     } else if (!strcmp(argv[i], "--eps") || !strcmp(argv[i], "--pdf") || !strcmp(argv[i], "--gif") ||
                !strcmp(argv[i], "--jpg") || !strcmp(argv[i], "--png") || !strcmp(argv[i], "--svg") ||
                !strcmp(argv[i], "--xpm") || !strcmp(argv[i], "--root")) {
@@ -304,10 +307,13 @@ int main(int argc, char *argv[])
                                      startupHandler->GetFourierDefaults(),
                                      startupHandler->GetMarkerList(),
                                      startupHandler->GetColorList(),
-                                     graphicsOutput||asciiOutput);
+                                     graphicsOutput||asciiOutput,
+                                     fourier);
       else
         musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
-                                     10+i*100, 10+i*100, 800, 600, graphicsOutput||asciiOutput);
+                                     10+i*100, 10+i*100, 800, 600,
+                                     graphicsOutput||asciiOutput,
+                                     fourier);
 
       if (!musrCanvas->IsValid()) {
         cerr << endl << ">> musrview **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
@@ -340,8 +346,12 @@ int main(int argc, char *argv[])
       }
 
       if (asciiOutput) {
+        // generate export data file name
+        TString str(fileName);
+        str.Remove(str.Last('.'));
+        str += ".dat";
         // save data in batch mode
-        musrCanvas->SaveDataAscii();
+        musrCanvas->ExportData(str.Data());
         musrCanvas->Done(0);
       }
 

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -242,7 +242,7 @@ Int_t PMsrHandler::ReadMsrFile()
   if (result == PMUSR_SUCCESS)
     if (!HandleFunctionsEntry(functions))
       result = PMUSR_MSR_SYNTAX_ERROR;
-  if (result == PMUSR_SUCCESS)
+  if ((result == PMUSR_SUCCESS) && (global.size()>0))
     if (!HandleGlobalEntry(global))
       result = PMUSR_MSR_SYNTAX_ERROR;
   if (result == PMUSR_SUCCESS)
@@ -311,6 +311,11 @@ Int_t PMsrHandler::ReadMsrFile()
     if (!CheckAddRunParameters())
       result = PMUSR_MSR_SYNTAX_ERROR;
 
+  // check that if RRF settings are present, the RUN block settings do correspond
+  if (result == PMUSR_SUCCESS)
+    if (!CheckRRFSettings())
+      result = PMUSR_MSR_SYNTAX_ERROR;
+
   if (result == PMUSR_SUCCESS) {
     CheckMaxLikelihood(); // check if the user wants to use max likelihood with asymmetry/non-muSR fit (which is not implemented)
     CheckLegacyLifetimecorrection(); // check if lifetimecorrection is found in RUN blocks, if yes transfer it to PLOT blocks
@@ -348,7 +353,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
 {
   const UInt_t prec = 6; // default output precision for float/doubles
   UInt_t neededPrec = 0;
-  UInt_t neededWidth = 9;
+  UInt_t neededWidth = 9;  
 
   Int_t tag, lineNo = 0, number;
   Int_t runNo = -1, addRunNo = 0;
@@ -612,8 +617,14 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             case MSR_FITTYPE_SINGLE_HISTO:
               fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
               break;
+            case MSR_FITTYPE_SINGLE_HISTO_RRF:
+              fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO_RRF << "         (single histogram RRF fit)" << endl;
+              break;
             case MSR_FITTYPE_ASYM:
               fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+              break;
+            case MSR_FITTYPE_ASYM_RRF:
+              fout << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (asymmetry RRF fit)" << endl ;
               break;
             case MSR_FITTYPE_MU_MINUS:
               fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
@@ -624,6 +635,27 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             default:
               break;
           }
+        } else if (sstr.BeginsWith("rrf_freq", TString::kIgnoreCase) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+          fout.width(16);
+          fout << left << "rrf_freq ";
+          fout.width(8);
+          neededPrec = LastSignificant(fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()),10);
+          fout.precision(neededPrec);
+          fout << left << fixed << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data());
+          fout << " " << fGlobal.GetRRFUnit();
+          fout << endl;
+        } else if (sstr.BeginsWith("rrf_phase", TString::kIgnoreCase) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+          fout.width(16);
+          fout << "rrf_phase ";
+          fout.width(8);
+          fout << left << fGlobal.GetRRFPhase();
+          fout << endl;
+        } else if (sstr.BeginsWith("rrf_packing", TString::kIgnoreCase) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+          fout.width(16);
+          fout << "rrf_packing ";
+          fout.width(8);
+          fout << left << fGlobal.GetRRFPacking();
+          fout << endl;
         } else if (sstr.BeginsWith("data")) {
           fout.width(16);
           fout << left << "data";
@@ -749,8 +781,14 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           case MSR_FITTYPE_SINGLE_HISTO:
             fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
             break;
+          case MSR_FITTYPE_SINGLE_HISTO_RRF:
+            fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO_RRF << "         (single histogram RRF fit)" << endl;
+            break;
           case MSR_FITTYPE_ASYM:
             fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+            break;
+          case MSR_FITTYPE_ASYM_RRF:
+            fout << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (asymmetry RRF fit)" << endl ;
             break;
           case MSR_FITTYPE_MU_MINUS:
             fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
@@ -1089,6 +1127,11 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("range_for_phase_correction")) {
           fout << "range_for_phase_correction  " << fFourier.fRangeForPhaseCorrection[0] << "    " << fFourier.fRangeForPhaseCorrection[1] << endl;
         } else if (sstr.BeginsWith("range ")) {
+          fout.setf(ios::fixed,ios::floatfield);
+          neededPrec = LastSignificant(fFourier.fPlotRange[0]);
+          if (LastSignificant(fFourier.fPlotRange[1]) > neededPrec)
+            neededPrec = LastSignificant(fFourier.fPlotRange[1]);
+          fout.precision(neededPrec);
           fout << "range            " << fFourier.fPlotRange[0] << "    " << fFourier.fPlotRange[1] << endl;
         } else {
           fout << str.Data() << endl;
@@ -1102,8 +1145,14 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           case MSR_PLOT_SINGLE_HISTO:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (single histo plot)" << endl;
             break;
+          case MSR_PLOT_SINGLE_HISTO_RRF:
+            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (single histo RRF plot)" << endl;
+            break;
           case MSR_PLOT_ASYM:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (asymmetry plot)" << endl;
+            break;
+          case MSR_PLOT_ASYM_RRF:
+            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (asymmetry RRF plot)" << endl;
             break;
           case MSR_PLOT_MU_MINUS:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (mu minus plot)" << endl;
@@ -1590,7 +1639,136 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
 
   // write GLOBAL block
   if (fGlobal.IsPresent()) {
-    // not sure that anything needs to be done here ...
+    fout << "GLOBAL" << endl;
+
+    // fittype
+    if (fGlobal.GetFitType() != -1) {
+      fout.width(16);
+      switch (fGlobal.GetFitType()) {
+      case MSR_FITTYPE_SINGLE_HISTO:
+        fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
+        break;
+      case MSR_FITTYPE_SINGLE_HISTO_RRF:
+        fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO_RRF << "         (single histogram RRF fit)" << endl;
+        break;
+      case MSR_FITTYPE_ASYM:
+        fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+        break;
+      case MSR_FITTYPE_ASYM_RRF:
+        fout << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (asymmetry RRF fit)" << endl ;
+        break;
+      case MSR_FITTYPE_MU_MINUS:
+        fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
+        break;
+      case MSR_FITTYPE_NON_MUSR:
+        fout << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << endl ;
+        break;
+      default:
+        break;
+      }
+    }
+
+    // RRF related stuff
+    if ((fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) > 0.0) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+      fout.width(16);
+      fout << left << "rrf_freq ";
+      fout.width(8);
+      fout << left << fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data());
+      fout << " " << fGlobal.GetRRFUnit();
+      fout << endl;
+    }
+    if ((fGlobal.GetRRFPhase() != 0.0) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+      fout.width(16);
+      fout << "rrf_phase ";
+      fout.width(8);
+      fout << left << fGlobal.GetRRFPhase();
+      fout << endl;
+    }
+    if ((fGlobal.GetRRFPacking() != -1) && (fGlobal.GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
+      fout.width(16);
+      fout << "rrf_packing ";
+      fout.width(8);
+      fout << left << fGlobal.GetRRFPacking();
+      fout << endl;
+    }
+
+    // data range
+    if ((fGlobal.GetDataRange(0) != -1) || (fGlobal.GetDataRange(1) != -1) || (fGlobal.GetDataRange(2) != -1) || (fGlobal.GetDataRange(3) != -1)) {
+      fout.width(16);
+      fout << left << "data";
+      for (UInt_t j=0; j<4; ++j) {
+        if (fGlobal.GetDataRange(j) > 0) {
+          fout.width(8);
+          fout << left << fGlobal.GetDataRange(j);
+        }
+      }
+      fout << endl;
+    }
+
+    // t0
+    if (fGlobal.GetT0BinSize() > 0) {
+      fout.width(16);
+      fout << left << "t0";
+      for (UInt_t j=0; j<fGlobal.GetT0BinSize(); ++j) {
+        fout.width(8);
+        fout.precision(1);
+        fout.setf(ios::fixed,ios::floatfield);
+        fout << left << fGlobal.GetT0Bin(j);
+      }
+      fout << endl;
+    }
+
+    // addt0
+    for (UInt_t j = 0; j < fGlobal.GetAddT0BinEntries(); ++j) {
+      if (fGlobal.GetAddT0BinSize(j) > 0) {
+        fout.width(16);
+        fout << left << "addt0";
+        for (Int_t k=0; k<fGlobal.GetAddT0BinSize(j); ++k) {
+          fout.width(8);
+          fout.precision(1);
+          fout.setf(ios::fixed,ios::floatfield);
+          fout << left << fGlobal.GetAddT0Bin(j, k);
+        }
+        fout << endl;
+      }
+    }
+
+    // fit range
+    if ( (fGlobal.IsFitRangeInBin() && fGlobal.GetFitRangeOffset(0) != -1) ||
+         (fGlobal.GetFitRange(0) != PMUSR_UNDEFINED) ) {
+      fout.width(16);
+      fout << left << "fit";
+      if (fGlobal.IsFitRangeInBin()) { // fit range given in bins
+        fout << "fgb";
+        if (fGlobal.GetFitRangeOffset(0) > 0)
+          fout << "+" << fGlobal.GetFitRangeOffset(0);
+        fout << "   lgb";
+        if (fGlobal.GetFitRangeOffset(1) > 0)
+          fout << "-" << fGlobal.GetFitRangeOffset(1);
+      } else { // fit range given in time
+        for (UInt_t j=0; j<2; j++) {
+          if (fGlobal.GetFitRange(j) == -1)
+            break;
+          UInt_t neededWidth = 7;
+          UInt_t neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
+          fout.width(neededWidth);
+          fout.precision(neededPrec);
+          fout << left << fixed << fGlobal.GetFitRange(j);
+          if (j==0)
+            fout << " ";
+        }
+      }
+      fout << endl;
+    }
+
+    // packing
+    if (fGlobal.GetPacking() != -1) {
+      fout.width(16);
+      fout << left << "packing";
+      fout << fGlobal.GetPacking() << endl;
+    }
+
+    fout << endl << hline.Data() << endl;
   }
 
   // write RUN blocks
@@ -1655,22 +1833,30 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     }
 
     // fittype
-    fout.width(16);
-    switch (fRuns[i].GetFitType()) {
-    case MSR_FITTYPE_SINGLE_HISTO:
-      fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
-      break;
-    case MSR_FITTYPE_ASYM:
-      fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
-      break;
-    case MSR_FITTYPE_MU_MINUS:
-      fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
-      break;
-    case MSR_FITTYPE_NON_MUSR:
-      fout << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << endl ;
-      break;
-    default:
-      break;
+    if (fRuns[i].GetFitType() != -1) {
+      fout.width(16);
+      switch (fRuns[i].GetFitType()) {
+      case MSR_FITTYPE_SINGLE_HISTO:
+        fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO << "         (single histogram fit)" << endl;
+        break;
+      case MSR_FITTYPE_SINGLE_HISTO_RRF:
+        fout << left << "fittype" << MSR_FITTYPE_SINGLE_HISTO_RRF << "         (single histogram RRF fit)" << endl;
+        break;
+      case MSR_FITTYPE_ASYM:
+        fout << left << "fittype" << MSR_FITTYPE_ASYM << "         (asymmetry fit)" << endl ;
+        break;
+      case MSR_FITTYPE_ASYM_RRF:
+        fout << left << "fittype" << MSR_FITTYPE_ASYM_RRF << "         (asymmetry RRF fit)" << endl ;
+        break;
+      case MSR_FITTYPE_MU_MINUS:
+        fout << left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << endl ;
+        break;
+      case MSR_FITTYPE_NON_MUSR:
+        fout << left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << endl ;
+        break;
+      default:
+        break;
+      }
     }
 
     // alpha
@@ -1810,17 +1996,19 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     }
 
     // addt0
-    for (UInt_t j = 0; j < fRuns[i].GetRunNameSize() - 1; ++j) {
-      if (fRuns[i].GetAddT0BinSize(j) > 0) {
-        fout.width(16);
-        fout << left << "addt0";
-        for (Int_t k=0; k<fRuns[i].GetAddT0BinSize(j); ++k) {
-          fout.width(8);
-          fout.precision(1);
-          fout.setf(ios::fixed,ios::floatfield);
-          fout << left << fRuns[i].GetAddT0Bin(j, k);
+    if (fRuns[i].GetAddT0BinEntries() > 0) {
+      for (UInt_t j = 0; j < fRuns[i].GetRunNameSize() - 1; ++j) {
+        if (fRuns[i].GetAddT0BinSize(j) > 0) {
+          fout.width(16);
+          fout << left << "addt0";
+          for (Int_t k=0; k<fRuns[i].GetAddT0BinSize(j); ++k) {
+            fout.width(8);
+            fout.precision(1);
+            fout.setf(ios::fixed,ios::floatfield);
+            fout << left << fRuns[i].GetAddT0Bin(j, k);
+          }
+          fout << endl;
         }
-        fout << endl;
       }
     }
 
@@ -1847,34 +2035,40 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
     }
 
     // fit
-    fout.width(16);
-    fout << left << "fit";
-    if (fRuns[i].IsFitRangeInBin()) { // fit range given in bins
-      fout << "fgb";
-      if (fRuns[i].GetFitRangeOffset(0) > 0)
-        fout << "+" << fRuns[i].GetFitRangeOffset(0);
-      fout << "   lgb";
-      if (fRuns[i].GetFitRangeOffset(1) > 0)
-        fout << "-" << fRuns[i].GetFitRangeOffset(1);
-    } else { // fit range given in time
-      for (UInt_t j=0; j<2; j++) {
-        if (fRuns[i].GetFitRange(j) == -1)
-          break;
-        UInt_t neededWidth = 7;
-        UInt_t neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
-        fout.width(neededWidth);
-        fout.precision(neededPrec);
-        fout << left << fixed << fRuns[i].GetFitRange(j);
-        if (j==0)
-          fout << " ";
+    if ( (fRuns[i].IsFitRangeInBin() && fRuns[i].GetFitRangeOffset(0) != -1) ||
+         (fRuns[i].GetFitRange(0) != PMUSR_UNDEFINED) ) {
+      fout.width(16);
+      fout << left << "fit";
+      if (fRuns[i].IsFitRangeInBin()) { // fit range given in bins
+        fout << "fgb";
+        if (fRuns[i].GetFitRangeOffset(0) > 0)
+          fout << "+" << fRuns[i].GetFitRangeOffset(0);
+        fout << "   lgb";
+        if (fRuns[i].GetFitRangeOffset(1) > 0)
+          fout << "-" << fRuns[i].GetFitRangeOffset(1);
+      } else { // fit range given in time
+        for (UInt_t j=0; j<2; j++) {
+          if (fRuns[i].GetFitRange(j) == -1)
+            break;
+          UInt_t neededWidth = 7;
+          UInt_t neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
+          fout.width(neededWidth);
+          fout.precision(neededPrec);
+          fout << left << fixed << fRuns[i].GetFitRange(j);
+          if (j==0)
+            fout << " ";
+        }
       }
+      fout << endl;
     }
-    fout << endl;
 
     // packing
-    fout.width(16);
-    fout << left << "packing";
-    fout << fRuns[i].GetPacking() << endl;
+    if (fRuns[i].GetPacking() != -1) {
+      fout.width(16);
+      fout << left << "packing";
+      fout << fRuns[i].GetPacking() << endl;
+    }
+
     fout << endl;
   }
 
@@ -1971,6 +2165,11 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
 
     // range
     if ((fFourier.fPlotRange[0] != -1.0) || (fFourier.fPlotRange[1] != -1.0)) {
+      fout.setf(ios::fixed,ios::floatfield);
+      UInt_t neededPrec = LastSignificant(fFourier.fPlotRange[0]);
+      if (LastSignificant(fFourier.fPlotRange[1]) > neededPrec)
+        neededPrec = LastSignificant(fFourier.fPlotRange[1]);
+      fout.precision(neededPrec);
       fout << "range            " << fFourier.fPlotRange[0] << "    " << fFourier.fPlotRange[1] << endl;
     }
 
@@ -1989,8 +2188,14 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
       case MSR_PLOT_SINGLE_HISTO:
         fout << "PLOT " << fPlots[i].fPlotType << "   (single histo plot)" << endl;
         break;
+      case MSR_PLOT_SINGLE_HISTO_RRF:
+        fout << "PLOT " << fPlots[i].fPlotType << "   (single histo RRF plot)" << endl;
+        break;
       case MSR_PLOT_ASYM:
         fout << "PLOT " << fPlots[i].fPlotType << "   (asymmetry plot)" << endl;
+        break;
+      case MSR_PLOT_ASYM_RRF:
+        fout << "PLOT " << fPlots[i].fPlotType << "   (asymmetry RRF plot)" << endl;
         break;
       case MSR_PLOT_MU_MINUS:
         fout << "PLOT " << fPlots[i].fPlotType << "   (mu minus plot)" << endl;
@@ -2677,8 +2882,8 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
   TString str;
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
-  Int_t ival;
-  Double_t dval;
+  Int_t ival = 0;
+  Double_t dval = 0.0;
   UInt_t addT0Counter = 0;
 
   // since this routine is called, a GLOBAL block is present
@@ -2709,13 +2914,64 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
         if (str.IsDigit()) {
           Int_t fittype = str.Atoi();
           if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
+              (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
               (fittype == MSR_FITTYPE_ASYM) ||
+              (fittype == MSR_FITTYPE_ASYM_RRF) ||
               (fittype == MSR_FITTYPE_MU_MINUS) ||
               (fittype == MSR_FITTYPE_NON_MUSR)) {
             global.SetFitType(fittype);
           } else {
             error = true;
           }
+        } else {
+          error = true;
+        }
+      }
+    } else if (iter->fLine.BeginsWith("rrf_freq", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 3) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsFloat()) {
+          dval = str.Atof();
+          if (dval <= 0.0)
+            error = true;
+        }
+        if (!error) {
+          ostr = dynamic_cast<TObjString*>(tokens->At(2));
+          str = ostr->GetString();
+          global.SetRRFFreq(dval, str.Data());
+          if (global.GetRRFFreq(str.Data()) == RRF_FREQ_UNDEF)
+            error = true;
+        }
+      }
+    } else if (iter->fLine.BeginsWith("rrf_packing", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsDigit()) {
+          ival = str.Atoi();
+          if (ival > 0) {
+            global.SetRRFPacking(ival);
+          } else {
+            error = true;
+          }
+        } else {
+          error = true;
+        }
+      }
+    } else if (iter->fLine.BeginsWith("rrf_phase", TString::kIgnoreCase)) {
+      if (tokens->GetEntries() < 2) {
+        error = true;
+      } else {
+        ostr = dynamic_cast<TObjString*>(tokens->At(1));
+        str = ostr->GetString();
+        if (str.IsFloat()) {
+          dval = str.Atof();
+          global.SetRRFPhase(dval);
         } else {
           error = true;
         }
@@ -2861,29 +3117,6 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
     fGlobal = global;
   }
 
-/*
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fittype   : " << fGlobal.GetFitType();
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: data bin range: ";
-  for (UInt_t i=0; i<4; i++) {
-    cout << fGlobal.GetDataRange(i) << ", ";
-  }
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: t0's      : ";
-  for (UInt_t i=0; i<fGlobal.GetT0BinSize(); i++)
-    cout << fGlobal.GetT0Bin(i) << ", ";
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: addt0's   : ";
-  for (UInt_t i=0; i<fGlobal.GetAddT0BinEntries(); i++) {
-    cout << endl << "  debug> --> " << i << ": ";
-    for (UInt_t j=0; j<(UInt_t)fGlobal.GetAddT0BinSize(i); j++) {
-      cout << fGlobal.GetAddT0Bin(i,j) << ", ";
-    }
-  }
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fit in bin: " << fGlobal.IsFitRangeInBin();
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fit offset: " << fGlobal.GetFitRangeOffset(0) << ", " << fGlobal.GetFitRangeOffset(1);
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: fit       : " << fGlobal.GetFitRange(0) << ", " << fGlobal.GetFitRange(1);
-  cout << endl << "debug> PMsrHandler::HandleGlobalEntry: Global: packing   : " << fGlobal.GetPacking();
-  cout << endl;
-*/
-
   return !error;
 }
 
@@ -3017,7 +3250,9 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
         if (str.IsDigit()) {
           Int_t fittype = str.Atoi();
           if ((fittype == MSR_FITTYPE_SINGLE_HISTO) ||
+              (fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
               (fittype == MSR_FITTYPE_ASYM) ||
+              (fittype == MSR_FITTYPE_ASYM_RRF) ||
               (fittype == MSR_FITTYPE_MU_MINUS) ||
               (fittype == MSR_FITTYPE_NON_MUSR)) {
             param.SetFitType(fittype);
@@ -3188,15 +3423,19 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
-        PIntVector group;
+        PUIntVector group;
         str = iter->fLine;
-        if (ParseDetectorGrouping(str, group)) {
+        PStringNumberList *rl = new PStringNumberList(str.Data());
+        string errorMsg("");
+        if (rl->Parse(errorMsg, true)) {
+          group = rl->GetList();
           for (UInt_t i=0; i<group.size(); i++) {
             param.SetForwardHistoNo(group[i]);
           }
         } else {
           error = true;
         }
+        delete rl;
         group.clear();
       }
     }
@@ -3209,15 +3448,19 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       if (tokens->GetEntries() < 2) {
         error = true;
       } else {
-        PIntVector group;
+        PUIntVector group;
         str = iter->fLine;
-        if (ParseDetectorGrouping(str, group)) {
+        PStringNumberList *rl = new PStringNumberList(str.Data());
+        string errorMsg("");
+        if (rl->Parse(errorMsg, true)) {
+          group = rl->GetList();
           for (UInt_t i=0; i<group.size(); i++) {
             param.SetBackwardHistoNo(group[i]);
           }
         } else {
           error = true;
         }
+        delete rl;
         group.clear();
       }
     }
@@ -3721,20 +3964,26 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
         if (str.BeginsWith("par", TString::kIgnoreCase)) { // parameter value
-          Int_t no = 0;
-          if (FilterNumber(str, "par", 0, no)) {
-            // check that the parameter is in range
-            if ((Int_t)fParam.size() < no) {
+          if (fFourierOnly) {
+            cerr << endl << ">> PMsrHandler::HandleFourierEntry: **WARNING** Found phase parameter for Fourier only.";
+            cerr << endl << ">>      This is currently not supported. Will set the phase to 0." << endl;
+            fourier.fPhase = 0.0;
+          } else {
+            Int_t no = 0;
+            if (FilterNumber(str, "par", 0, no)) {
+              // check that the parameter is in range
+              if ((Int_t)fParam.size() < no) {
+                error = true;
+                continue;
+              }
+              // keep the parameter number
+              fourier.fPhaseParamNo = no;
+              // get parameter value
+              fourier.fPhase = fParam[no-1].fValue;
+            } else {
               error = true;
               continue;
             }
-            // keep the parameter number
-            fourier.fPhaseParamNo = no;
-            // get parameter value
-            fourier.fPhase = fParam[no-1].fValue;
-          } else {
-            error = true;
-            continue;
           }
         } else if (str.IsFloat()) { // phase value
           fourier.fPhase = str.Atof();
@@ -3909,39 +4158,34 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
         param.fLifeTimeCorrection = true;
       } else if (iter1->fLine.Contains("runs", TString::kIgnoreCase)) { // handle plot runs
         TComplex run;
+        PStringNumberList *rl;
+        string errorMsg;
+        PUIntVector runList;
         switch (param.fPlotType) {
           case -1:
             error = true;
             break;
           case MSR_PLOT_SINGLE_HISTO: // like: runs 1 5 13
+          case MSR_PLOT_SINGLE_HISTO_RRF:
           case MSR_PLOT_ASYM:
+          case MSR_PLOT_ASYM_RRF:
           case MSR_PLOT_NON_MUSR:
           case MSR_PLOT_MU_MINUS:
-            tokens = iter1->fLine.Tokenize(" \t");
-            if (!tokens) {
+            rl = new PStringNumberList(iter1->fLine.Data());
+            if (!rl->Parse(errorMsg, true)) {
               cerr << endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
+              cerr << endl << ">>   Error Message: " << errorMsg;
               cerr << endl << endl;
               return false;
             }
-            if (tokens->GetEntries() < 2) { // runs missing
-              error = true;
-            } else {
-              for (Int_t i=1; i<tokens->GetEntries(); i++) {
-                ostr = dynamic_cast<TObjString*>(tokens->At(i));
-                str = ostr->GetString();
-                if (str.IsDigit()) {
-                  run = TComplex(str.Atoi(),-1.0);
-                  param.fRuns.push_back(run);
-                } else {
-                  error = true;
-                }
-              }
+            runList = rl->GetList();
+            for (UInt_t i=0; i<runList.size(); i++) {
+              run = TComplex(runList[i], -1.0);
+              param.fRuns.push_back(run);
             }
             // clean up
-            if (tokens) {
-              delete tokens;
-              tokens = 0;
-            }
+            runList.clear();
+            delete rl;
             break;
           default:
             error = true;
@@ -4336,8 +4580,10 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
       cerr << endl << ">> [use_fit_ranges [ymin ymax]]";
       cerr << endl << ">> [view_packing n]";
       cerr << endl;
-      cerr << endl << ">> where <plot_type> is: 0=single histo asym,";
+      cerr << endl << ">> where <plot_type> is: 0=single histo,";
+      cerr << endl << ">>                       1=RRF single histo,";
       cerr << endl << ">>                       2=forward-backward asym,";
+      cerr << endl << ">>                       3=forward-backward RRF asym,";
       cerr << endl << ">>                       4=mu minus single histo,";
       cerr << endl << ">>                       8=non muSR.";
       cerr << endl << ">> <run_list> is the list of runs, e.g. runs 1 3";
@@ -5054,7 +5300,7 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           cerr << endl << ">>   forward parameter number not defined. Necessary for single histogram fits." << endl;
           return false;
         }
-        if (fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) {
+        if ((fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) && !fFourierOnly) {
           // check if forward histogram number is a function
           if (fRuns[i].GetNormParamNo() - MSR_PARAM_FUN_OFFSET > static_cast<Int_t>(fParam.size())) {
             cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
@@ -5088,6 +5334,53 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
           cerr << endl << ">>   Packing is neither defined here, nor in the GLOBAL block, will set it to 1." << endl;
           fRuns[i].SetPacking(1);
+        }
+        break;
+      case PRUN_SINGLE_HISTO_RRF:
+        // check that there is a forward parameter number
+        if (fRuns[i].GetForwardHistoNo() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   forward parameter number not defined. Necessary for single histogram RRF fits." << endl;
+          return false;
+        }
+        if ((fRuns[i].GetNormParamNo() > static_cast<Int_t>(fParam.size())) && !fFourierOnly) {
+          // check if forward histogram number is a function
+          if (fRuns[i].GetNormParamNo() - MSR_PARAM_FUN_OFFSET > static_cast<Int_t>(fParam.size())) {
+            cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+            cerr << endl << ">>   forward histogram number " << fRuns[i].GetNormParamNo() << " is larger than the number of fit parameters (" << fParam.size() << ").";
+            cerr << endl << ">>   Consider to check the manual ;-)" << endl;
+            return false;
+          }
+        }
+        // check fit range
+        if (!fRuns[i].IsFitRangeInBin() && !fFourierOnly) { // fit range given as times in usec (RUN block)
+          if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in RUN block
+            if (!fGlobal.IsFitRangeInBin()) { // fit range given as times in usec (GLOBAL block)
+              if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) { // check fit range in GLOBAL block
+                cerr << endl << "PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+                cerr << endl << "  Fit range is not defined. Necessary for single histogram fits." << endl;
+                return false;
+              }
+            }
+          }
+        }
+        // check number of T0's provided
+        if ((fRuns[i].GetT0BinSize() > fRuns[i].GetForwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > fRuns[i].GetForwardHistoNoSize())) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
+          return false;
+        }
+        // check that RRF frequency is given
+        if (fGlobal.GetRRFUnitTag() == RRF_UNIT_UNDEF) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** no RRF frequency found in the GLOBAL block." << endl;
+          return false;
+        }
+        // check that RRF packing is given
+        if (fGlobal.GetRRFPacking() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** no RRF packing found in the GLOBAL block." << endl;
+          return false;
         }
         break;
       case PRUN_ASYMMETRY:
@@ -5140,6 +5433,62 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
           cerr << endl << ">>   Packing is neither defined here, nor in the GLOBAL block, will set it to 1." << endl;
           fRuns[i].SetPacking(1);
+        }
+        break;
+      case PRUN_ASYMMETRY_RRF:
+        // check alpha
+        if ((fRuns[i].GetAlphaParamNo() == -1) && !fFourierOnly) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   alpha parameter number missing which is needed for an asymmetry RRF fit.";
+          cerr << endl << ">>   Consider to check the manual ;-)" << endl;
+          return false;
+        }
+        // check that there is a forward parameter number
+        if (fRuns[i].GetForwardHistoNo() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   forward histogram number not defined. Necessary for asymmetry RRF fits." << endl;
+          return false;
+        }
+        // check that there is a backward parameter number
+        if (fRuns[i].GetBackwardHistoNo() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   backward histogram number not defined. Necessary for asymmetry RRF fits." << endl;
+          return false;
+        }
+        // check fit range
+        if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec
+          if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
+            if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) {
+              cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+              cerr << endl << ">>   Fit range is not defined, also NOT present in the GLOBAL block. Necessary for asymmetry RRF fits." << endl;
+              return false;
+            }
+          }
+        }
+        // check number of T0's provided
+        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize())) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << " in forward. Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
+          return false;
+        }
+        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize())) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << " in backward. Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << ". Needs to be fixed." << endl;
+          return false;
+        }
+        // check that RRF frequency is given
+        if (fGlobal.GetRRFUnitTag() == RRF_UNIT_UNDEF) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** no RRF frequency found in the GLOBAL block." << endl;
+          return false;
+        }
+        // check that RRF packing is given
+        if (fGlobal.GetRRFPacking() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** no RRF packing found in the GLOBAL block." << endl;
+          return false;
         }
         break;
       case PRUN_MU_MINUS:
@@ -5338,6 +5687,9 @@ Bool_t PMsrHandler::CheckFuncs()
 {
   Bool_t result = true;
 
+  if (fFourierOnly)
+    return result;
+
   PIntVector funVec;
   PIntVector funBlock;
   PIntVector funLineBlockNo;
@@ -5526,6 +5878,103 @@ void PMsrHandler::CheckMaxLikelihood()
 }
 
 //--------------------------------------------------------------------------
+// CheckRRFSettings (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Make sure that if RRF settings are found in the GLOBAL section, the fit types
+ * in the RUN blocks correspond.
+ */
+Bool_t PMsrHandler::CheckRRFSettings()
+{
+  Bool_t result = true;
+  Int_t fittype = fGlobal.GetFitType();
+
+  // first set of tests: if RRF parameters are set, check if RRF fit is chosen.
+  if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) != RRF_FREQ_UNDEF) {
+    if (fittype != -1) { // check if GLOBAL fittype is set
+      if ((fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) &&
+          (fittype != MSR_FITTYPE_ASYM_RRF)) {
+        cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** found GLOBAL fittype " << fittype << " and";
+        cerr << endl << ">>    RRF settings in the GLOBAL section. This is NOT compatible. Fix it first.";
+        result = false;
+      }
+    } else { // GLOBAL fittype is NOT set
+      for (UInt_t i=0; i<fRuns.size(); i++) {
+        fittype = fRuns[i].GetFitType();
+        if ((fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) &&
+            (fittype != MSR_FITTYPE_ASYM_RRF)) {
+          cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** found RUN with fittype " << fittype << " and";
+          cerr << endl << ">>    RRF settings in the GLOBAL section. This is NOT compatible. Fix it first.";
+          result = false;
+          break;
+        }
+      }
+    }
+  } else {
+    if (fGlobal.GetRRFPacking() != -1) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **WARNING** found in the GLOBAL section rrf_packing, without";
+      cerr << endl << ">>     rrf_freq. Doesn't make any sense. Will drop rrf_packing";
+      cerr << endl << endl;
+      fGlobal.SetRRFPacking(-1);
+    }
+    if (fGlobal.GetRRFPhase() != 0.0) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **WARNING** found in the GLOBAL section rrf_phase, without";
+      cerr << endl << ">>     rrf_freq. Doesn't make any sense. Will drop rrf_phase";
+      cerr << endl << endl;
+      fGlobal.SetRRFPhase(0.0);
+    }
+  }
+
+  // if not a RRF fit, done at this point
+  if ((fittype != MSR_FITTYPE_SINGLE_HISTO_RRF) &&
+      (fittype != MSR_FITTYPE_ASYM_RRF)) {
+    return true;
+  }
+
+  // second set of tests: if RRF fit is chosen, do I find the necessary RRF parameters?
+  fittype = fGlobal.GetFitType();
+  if ((fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
+      (fittype == MSR_FITTYPE_ASYM_RRF)) { // make sure RRF freq and RRF packing are set
+    if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) == RRF_FREQ_UNDEF) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
+      cerr << endl << ">>    no RRF frequency found in the GLOBAL section! Fix it.";
+      return false;
+    }
+    if (fGlobal.GetRRFPacking() == -1) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
+      cerr << endl << ">>    no RRF packing found in the GLOBAL section! Fix it.";
+      return false;
+    }
+  } else { // check single runs for RRF
+    UInt_t rrfFitCounter = 0;
+    for (UInt_t i=0; i<fRuns.size(); i++) {
+      fittype = fRuns[i].GetFitType();
+      if ((fittype == MSR_FITTYPE_SINGLE_HISTO_RRF) ||
+          (fittype == MSR_FITTYPE_ASYM_RRF)) { // make sure RRF freq and RRF packing are set
+        rrfFitCounter++;
+      }
+    }
+    if (rrfFitCounter != fRuns.size()) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** #Runs (" << fRuns.size() << ") != # RRF fits found (" << rrfFitCounter << ")";
+      cerr << endl << ">>    This is currently not supported.";
+      return false;
+    }
+    if (fGlobal.GetRRFFreq(fGlobal.GetRRFUnit().Data()) == RRF_FREQ_UNDEF) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
+      cerr << endl << ">>    no RRF frequency found in the GLOBAL section! Fix it.";
+      return false;
+    }
+    if (fGlobal.GetRRFPacking() == -1) {
+      cerr << endl << ">> PMsrHandler::CheckRRFSettings: **ERROR** RRF fit chosen, but";
+      cerr << endl << ">>    no RRF packing found in the GLOBAL section! Fix it.";
+      return false;
+    }
+  }
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
 // GetGroupingString (public)
 //--------------------------------------------------------------------------
 /**
@@ -5656,86 +6105,6 @@ UInt_t PMsrHandler::LastSignificant(Double_t dval, UInt_t precLimit)
   }
 
   return lastSignificant;
-}
-
-//--------------------------------------------------------------------------
-// ParseDetectorGrouping (private)
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- * \param str forward/backward string to be decoded
- * \param group decoded detector grouping vector
- *
- * <b>return:</b> true if parsing was successful, false otherwise.
- */
-Bool_t PMsrHandler::ParseDetectorGrouping(TString str, PIntVector &group)
-{
-  TObjArray *tok=0, *tok1=0;
-  TObjString *ostr=0;
-  Int_t first=0, last=0;
-
-  // change cn - cm to cn-cm. Will *NOT* handle cn  - cm etc
-  str = str.ReplaceAll(" - ", "-");
-
-  group.clear();
-  tok = str.Tokenize(" \t");
-
-  // check that there are indeed enough tokens
-  if (tok->GetEntries() < 2) {
-    delete tok;
-    return false;
-  }
-
-  for (Int_t i=1; i<tok->GetEntries(); i++) {
-    ostr = dynamic_cast<TObjString*>(tok->At(i));
-    if (ostr->GetString().Contains("-")) { // hopefully a cn-cm token
-      tok1 = ostr->GetString().Tokenize("-");
-      if (tok1->GetEntries() == 2) {
-        ostr = dynamic_cast<TObjString*>(tok1->At(0));
-        if (ostr->GetString().IsDigit()) {
-          first = ostr->GetString().Atoi();
-        } else {
-          if (tok) delete tok;
-          if (tok1) delete tok1;
-          return false;
-        }
-        ostr = dynamic_cast<TObjString*>(tok1->At(1));
-        if (ostr->GetString().IsDigit()) {
-          last = ostr->GetString().Atoi();
-        } else {
-          if (tok) delete tok;
-          if (tok1) delete tok1;
-          return false;
-        }
-
-        if (last < first) {
-          if (tok) delete tok;
-          return false;
-        }
-
-        for (Int_t i=first; i<=last; i++)
-          group.push_back(i);
-      } else {
-        if (tok) delete tok;
-        if (tok1) delete tok1;
-        return false;
-      }
-    } else { // hopefully a number
-      if (ostr->GetString().IsDigit()) {
-        group.push_back(ostr->GetString().Atoi());
-      } else {
-        if (tok) delete tok;
-        return false;
-      }
-    }
-  }
-
-  // clean up
-  if (tok) delete tok;
-  if (tok1) delete tok1;
-
-  return true;
 }
 
 //--------------------------------------------------------------------------

@@ -31,6 +31,7 @@
     <musr_web_plot>file://@DOCDIR@/html/user/MUSR/MusrFit.html#ThePlotBlock</musr_web_plot>
     <musr_web_statistic>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheStatisticBlock</musr_web_statistic>
     <musr_web_msr2data>file://@DOCDIR@/html/user/MUSR/Msr2Data.html</musr_web_msr2data>
+    <musr_web_musrFT>file://@DOCDIR@/html/user/MUSR/MusrFit.html#A_2.3_musrFT</musr_web_musrFT>
   </help_section>
   <font_settings>
     <font_name>Courier New</font_name>

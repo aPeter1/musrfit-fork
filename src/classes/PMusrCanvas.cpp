@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -35,9 +35,14 @@ using namespace std;
 #include <TRandom.h>
 #include <TROOT.h>
 #include <TObjString.h>
+#include <TGFileDialog.h>
 
 #include "PMusrCanvas.h"
 #include "PFourier.h"
+
+static const char *gFiletypes[] = { "Data files", "*.dat",
+                                    "All files",  "*",
+                                    0,            0 };
 
 ClassImp(PMusrCanvasPlotRange)
 
@@ -70,7 +75,7 @@ PMusrCanvasPlotRange::PMusrCanvasPlotRange()
 void PMusrCanvasPlotRange::SetXRange(Double_t xmin, Double_t xmax)
 {
   if (xmin > xmax) {
-    cerr << endl << "PMusrCanvasPlotRange::SetXRange: **WARNING** xmin > xmax, will swap them." << endl;
+    cerr << endl << ">> PMusrCanvasPlotRange::SetXRange(): **WARNING** xmin > xmax, will swap them." << endl;
     fXmin = xmax;
     fXmax = xmin;
   } else {
@@ -92,7 +97,7 @@ void PMusrCanvasPlotRange::SetXRange(Double_t xmin, Double_t xmax)
 void PMusrCanvasPlotRange::SetYRange(Double_t ymin, Double_t ymax)
 {
   if (ymin > ymax) {
-    cerr << endl << "PMusrCanvasPlotRange::SetYRange: **WARNING** ymin > ymax, will swap them." << endl;
+    cerr << endl << ">> PMusrCanvasPlotRange::SetYRange(): **WARNING** ymin > ymax, will swap them." << endl;
     fYmin = ymax;
     fYmax = ymin;
   } else {
@@ -128,7 +133,6 @@ PMusrCanvas::PMusrCanvas()
   fImp   = 0;
   fBar   = 0;
   fPopupMain    = 0;
-  fPopupSave    = 0;
   fPopupFourier = 0;
 
   fStyle               = 0;
@@ -181,8 +185,8 @@ PMusrCanvas::PMusrCanvas()
  */
 PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
-                         const Bool_t batch) :
-                         fBatchMode(batch), fPlotNumber(number)
+                         const Bool_t batch, const Bool_t fourier) :
+                         fStartWithFourier(fourier), fBatchMode(batch), fPlotNumber(number)
 {
   fTimeout = 0;
   fTimeoutTimer = 0;
@@ -236,8 +240,8 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                          PMsrFourierStructure fourierDefault,
                          const PIntVector markerList, const PIntVector colorList,
-                         const Bool_t batch) :
-                         fBatchMode(batch),
+                         const Bool_t batch, const Bool_t fourier) :
+                         fStartWithFourier(fourier), fBatchMode(batch),
                          fPlotNumber(number), fFourier(fourierDefault),
                          fMarkerList(markerList), fColorList(colorList)
 {
@@ -401,37 +405,76 @@ void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
   }
 
   // check if RRF data are present
-  if ((fMsrHandler->GetMsrPlotList()->at(0).fRRFPacking > 0) &&
-      (fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq != 0.0)) {
+  if (((fMsrHandler->GetMsrPlotList()->at(0).fRRFPacking > 0) &&
+      (fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq != 0.0)) ||
+      (fMsrHandler->GetMsrGlobal()->GetRRFPacking() > 0 &&
+       fMsrHandler->GetMsrGlobal()->GetRRFUnit().CompareTo("??"))) {
     fRRFLatexText = new TLatex();
     fRRFLatexText->SetNDC(kTRUE);
     fRRFLatexText->SetTextFont(62);
     fRRFLatexText->SetTextSize(0.03);
 
-    fRRFText = new TString("RRF: ");
-    if (fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit == RRF_UNIT_kHz) {
-      *fRRFText += TString("#nu_{RRF} = ");
-      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
-      *fRRFText += TString(" (kHz)");
-    } else if (fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit == RRF_UNIT_MHz) {
-      *fRRFText += TString("#nu_{RRF} = ");
-      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
-      *fRRFText += TString(" (MHz)");
-    } else if (fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit == RRF_UNIT_Mcs) {
-      *fRRFText += TString("#omega_{RRF} = ");
-      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
-      *fRRFText += TString(" (Mc/s)");
-    } else if (fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit == RRF_UNIT_G) {
-      *fRRFText += TString("B_{RRF} = ");
-      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
-      *fRRFText += TString(" (G)");
-    } else if (fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit == RRF_UNIT_T) {
-      *fRRFText += TString("B_{RRF} = ");
-      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
-      *fRRFText += TString(" (T)");
+    Int_t rrfUnitTag = -1;
+    Double_t rrfFreq = 0.0;
+    if (fMsrHandler->GetMsrPlotList()->at(0).fRRFPacking > 0) { // RRF single histo PLOT
+      fRRFText = new TString("RRF: ");
+      rrfUnitTag = fMsrHandler->GetMsrPlotList()->at(0).fRRFUnit;
+      rrfFreq = fMsrHandler->GetMsrPlotList()->at(0).fRRFFreq;
+      TString rrfFreqStr("");
+      rrfFreqStr.Form("%.5g", rrfFreq);
+      if (rrfUnitTag == RRF_UNIT_kHz) {
+        *fRRFText += TString("#nu_{RRF} = ");
+        *fRRFText += rrfFreq;
+        *fRRFText += TString(" (kHz)");
+      } else if (rrfUnitTag == RRF_UNIT_MHz) {
+        *fRRFText += TString("#nu_{RRF} = ");
+        *fRRFText += rrfFreqStr;
+        *fRRFText += TString(" (MHz)");
+      } else if (rrfUnitTag == RRF_UNIT_Mcs) {
+        *fRRFText += TString("#omega_{RRF} = ");
+        *fRRFText += rrfFreqStr;
+        *fRRFText += TString(" (Mc/s)");
+      } else if (rrfUnitTag == RRF_UNIT_G) {
+        *fRRFText += TString("B_{RRF} = ");
+        *fRRFText += rrfFreqStr;
+        *fRRFText += TString(" (G)");
+      } else if (rrfUnitTag == RRF_UNIT_T) {
+        *fRRFText += TString("B_{RRF} = ");
+        *fRRFText += rrfFreqStr;
+        *fRRFText += TString(" (T)");
+      }
+      *fRRFText += TString(", RRF packing = ");
+      *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFPacking;
+    } else { // RRF single histo FIT
+      fRRFText = new TString("RRF: ");
+      rrfUnitTag = fMsrHandler->GetMsrGlobal()->GetRRFUnitTag();
+      rrfFreq = fMsrHandler->GetMsrGlobal()->GetRRFFreq(fMsrHandler->GetMsrGlobal()->GetRRFUnit().Data());
+      TString rrfFreqStr("");
+      rrfFreqStr.Form("%.5g", rrfFreq);
+      if (rrfUnitTag == RRF_UNIT_kHz) {
+        *fRRFText += TString("#nu_{RRF} = ");
+        *fRRFText += rrfFreqStr;
+        *fRRFText += TString(" (kHz)");
+      } else if (rrfUnitTag == RRF_UNIT_MHz) {
+        *fRRFText += TString("#nu_{RRF} = ");
+        *fRRFText += rrfFreqStr;
+        *fRRFText += TString(" (MHz)");
+      } else if (rrfUnitTag == RRF_UNIT_Mcs) {
+        *fRRFText += TString("#omega_{RRF} = ");
+        *fRRFText += rrfFreqStr;
+        *fRRFText += TString(" (Mc/s)");
+      } else if (rrfUnitTag == RRF_UNIT_G) {
+        *fRRFText += TString("B_{RRF} = ");
+        *fRRFText += rrfFreqStr;
+        *fRRFText += TString(" (G)");
+      } else if (rrfUnitTag == RRF_UNIT_T) {
+        *fRRFText += TString("B_{RRF} = ");
+        *fRRFText += rrfFreqStr;
+        *fRRFText += TString(" (T)");
+      }
+      *fRRFText += TString(", RRF packing = ");
+      *fRRFText += fMsrHandler->GetMsrGlobal()->GetRRFPacking();
     }
-    *fRRFText += TString(", RRF packing = ");
-    *fRRFText += fMsrHandler->GetMsrPlotList()->at(0).fRRFPacking;
   }
 }
 
@@ -605,7 +648,7 @@ void PMusrCanvas::UpdateDataTheoryPad()
     // first check that plot number is smaller than the maximal number of runs
     if ((Int_t)plotInfo.fRuns[i] > (Int_t)runs.size()) {
       fValid = false;
-      cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** run plot number " << (Int_t)plotInfo.fRuns[i] << " is larger than the number of runs " << runs.size();
+      cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** run plot number " << (Int_t)plotInfo.fRuns[i] << " is larger than the number of runs " << runs.size();
       cerr << endl;
       return;
     }
@@ -616,7 +659,7 @@ void PMusrCanvas::UpdateDataTheoryPad()
     }
     if (fitType == -1) {
       fValid = false;
-      cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** plottype = " << fPlotType;
+      cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** plottype = " << fPlotType;
       cerr << ", fittype = " << runs[runNo].GetFitType() << "(RUN block)/";
       cerr << "fittype = " << globalBlock->GetFitType() << "(GLOBAL block). However, they have to correspond!";
       cerr << endl;
@@ -639,7 +682,19 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a single histogram plot";
+          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a single histogram plot";
+          cerr << endl;
+          return;
+        }
+        // handle data
+        HandleDataSet(i, runNo, data);
+        break;
+      case MSR_FITTYPE_SINGLE_HISTO_RRF:
+        data = fRunList->GetSingleHistoRRF(runNo, PRunListCollection::kRunNo);
+        if (!data) { // something wrong
+          fValid = false;
+          // error message
+          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a single histogram RRF plot";
           cerr << endl;
           return;
         }
@@ -651,7 +706,19 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a asymmetry plot";
+          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a asymmetry plot";
+          cerr << endl;
+          return;
+        }
+        // handle data
+        HandleDataSet(i, runNo, data);
+        break;
+      case MSR_FITTYPE_ASYM_RRF:
+        data = fRunList->GetAsymmetryRRF(runNo, PRunListCollection::kRunNo);
+        if (!data) { // something wrong
+          fValid = false;
+          // error message
+          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a asymmetry RRF plot";
           cerr << endl;
           return;
         }
@@ -663,7 +730,7 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a mu minus single histogram plot";
+          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a mu minus single histogram plot";
           cerr << endl;
           return;
         }
@@ -675,7 +742,7 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** couldn't obtain run no " << runNo << " for a none musr data plot";
+          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a none musr data plot";
           cerr << endl;
           return;
         }
@@ -695,7 +762,7 @@ void PMusrCanvas::UpdateDataTheoryPad()
       default:
         fValid = false;
         // error message
-        cerr << endl << "PMusrCanvas::UpdateDataTheoryPad: **ERROR** wrong plottype tag?!";
+        cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** wrong plottype tag?!";
         cerr << endl;
         return;
         break;
@@ -703,7 +770,62 @@ void PMusrCanvas::UpdateDataTheoryPad()
   }
 
   // generate the histo plot
-  PlotData();
+  if (!fStartWithFourier || (fPlotType == MSR_PLOT_NON_MUSR)) {
+    PlotData();
+  } else { // show Fourier straight ahead.
+    // set the menu properly
+    if (!fBatchMode)
+      fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
+
+    // filter proper Fourier plot tag, and set the menu tags properly
+    switch (fFourier.fPlotTag) {
+      case FOURIER_PLOT_REAL:
+        fCurrentPlotView = PV_FOURIER_REAL;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        }
+        break;
+      case FOURIER_PLOT_IMAG:
+        fCurrentPlotView = PV_FOURIER_IMAG;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_IMAG);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        }
+        break;
+      case FOURIER_PLOT_REAL_AND_IMAG:
+        fCurrentPlotView = PV_FOURIER_REAL_AND_IMAG;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_REAL_AND_IMAG);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_PLUS);
+          fPopupFourier->EnableEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE_MINUS);
+        }
+        break;
+      case FOURIER_PLOT_POWER:
+        fCurrentPlotView = PV_FOURIER_PWR;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+        }
+        break;
+      case FOURIER_PLOT_PHASE:
+        fCurrentPlotView = PV_FOURIER_PHASE;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PHASE);
+        }
+        break;
+      default:
+        fCurrentPlotView = PV_FOURIER_PWR;
+        if (!fBatchMode) {
+          fPopupFourier->CheckEntry(P_MENU_ID_FOURIER+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_FOURIER_PWR);
+        }
+        break;
+    }
+
+    HandleFourier();
+    PlotFourier();
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -763,13 +885,15 @@ void PMusrCanvas::UpdateInfoPad()
     else
       tstr  = *runs[runNo].GetRunName() + TString(","); // run_name
     // histo info (depending on the fittype
-    if (runs[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO) {
+    if ((runs[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO) ||
+        (runs[runNo].GetFitType() == MSR_FITTYPE_SINGLE_HISTO_RRF)) {
       tstr += TString("h:");
       TString grouping;
       fMsrHandler->GetGroupingString(runNo, "forward", grouping);
       tstr += grouping;
       tstr += TString(",");
-    } else if (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM) {
+    } else if ((runs[runNo].GetFitType() == MSR_FITTYPE_ASYM) ||
+               (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM_RRF)) {
       tstr += TString("h:");
       TString grouping;
       fMsrHandler->GetGroupingString(runNo, "forward", grouping);
@@ -1282,8 +1406,16 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
       cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << endl;
       return;
     }
-  } else if (id == P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII) {
-    SaveDataAscii();
+  } else if (id == P_MENU_ID_EXPORT_DATA+P_MENU_PLOT_OFFSET*fPlotNumber) {
+    static TString dir(".");
+    TGFileInfo fi;
+    fi.fFileTypes = gFiletypes;
+    fi.fIniDir = StrDup(dir);
+    fi.fOverwrite = true;
+    new TGFileDialog(0, fImp, kFDSave, &fi);
+    if (fi.fFilename && strlen(fi.fFilename)) {
+      ExportData(fi.fFilename);
+    }
   }
 
   // check if phase increment/decrement needs to be ghost
@@ -1342,7 +1474,7 @@ void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
   }
 
   if (idx == -1) {
-    cerr << endl << "PMusrCanvas::SaveGraphicsAndQuit **ERROR**: fileName (" << fileName << ") is invalid." << endl;
+    cerr << endl << ">> PMusrCanvas::SaveGraphicsAndQuit(): **ERROR** fileName (" << fileName << ") is invalid." << endl;
     return;
   }
 
@@ -1362,13 +1494,20 @@ void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
 }
 
 //--------------------------------------------------------------------------
-// SaveDataAscii 
+// ExportData
 //--------------------------------------------------------------------------
 /**
  * <p>Saves the currently seen data (data, difference, Fourier spectra, ...) in ascii column format.
+ *
+ * \param fileName file name to be used to save the data.
  */
-void PMusrCanvas::SaveDataAscii()
+void PMusrCanvas::ExportData(const Char_t *fileName)
 {
+  if (fileName == 0) { // path file name NOT provided, generate a default path file name
+    cerr << endl << ">> PMusrCanvas::ExportData(): **ERROR** NO path file name provided. Will do nothing." << endl;
+    return;
+  }
+
   // collect relevant data
   PMusrCanvasAsciiDump dump;
   PMusrCanvasAsciiDumpVector dumpVector;
@@ -2014,35 +2153,13 @@ void PMusrCanvas::SaveDataAscii()
       break;
   }
 
-  // generate output filename
-
-  // in order to handle names with "." correctly this slightly odd data-filename generation
-  TObjArray *tokens = fMsrHandler->GetFileName().Tokenize(".");
-  TObjString *ostr;
-  TString str;
-  TString fln = TString("");
-  for (Int_t i=0; i<tokens->GetEntries()-1; i++) {
-    ostr = dynamic_cast<TObjString*>(tokens->At(i));
-    fln += ostr->GetString() + TString(".");
-  }
-  if (!fDifferenceView) {
-    fln += "data.ascii";
-  } else {
-    fln += "diff.ascii";
-  }
-
-  if (tokens) {
-    delete tokens;
-    tokens = 0;
-  }
-
   // open file
   ofstream fout;
 
   // open output data-file
-  fout.open(fln.Data(), iostream::out);
+  fout.open(fileName, iostream::out);
   if (!fout.is_open()) {
-    cerr << endl << ">> PMusrCanvas::SaveDataAscii: **ERROR** couldn't open file " << fln.Data() << " for writing." << endl;
+    cerr << endl << ">> PMusrCanvas::ExportData(): **ERROR** couldn't open file " << fileName << " for writing." << endl;
     return;
   }
 
@@ -2366,7 +2483,6 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   fImp   = 0;
   fBar   = 0;
   fPopupMain    = 0;
-  fPopupSave    = 0;
   fPopupFourier = 0;
 
   fMainCanvas          = 0;
@@ -2382,7 +2498,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   canvasName += fPlotNumber;
   fMainCanvas = new TCanvas(canvasName.Data(), title, wtopx, wtopy, ww, wh);
   if (fMainCanvas == 0) {
-    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke " << canvasName.Data();
+    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke " << canvasName.Data();
     cerr << endl;
     return;
   }
@@ -2415,10 +2531,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
     fPopupMain->AddEntry("Average", P_MENU_ID_AVERAGE+P_MENU_PLOT_OFFSET*fPlotNumber);
     fPopupMain->AddSeparator();
 
-    fPopupSave = new TGPopupMenu();
-    fPopupSave->AddEntry("Save ascii", P_MENU_ID_SAVE_DATA+P_MENU_PLOT_OFFSET*fPlotNumber+P_MENU_ID_SAVE_ASCII);
-
-    fPopupMain->AddPopup("&Save Data", fPopupSave);
+    fPopupMain->AddEntry("Export Data", P_MENU_ID_EXPORT_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
     fBar->MapSubwindows();
     fBar->Layout();
 
@@ -2431,7 +2544,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   // title pad
   fTitlePad = new TPaveText(0.0, YTITLE, 1.0, 1.0, "NDC");
   if (fTitlePad == 0) {
-    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fTitlePad";
+    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fTitlePad";
     cerr << endl;
     return;
   }
@@ -2443,7 +2556,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   // data/theory pad
   fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
   if (fDataTheoryPad == 0) {
-    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fDataTheoryPad";
+    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fDataTheoryPad";
     cerr << endl;
     return;
   }
@@ -2453,7 +2566,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   // parameter pad
   fParameterPad = new TPaveText(XTHEO, 0.5, 1.0, YTITLE, "NDC");
   if (fParameterPad == 0) {
-    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fParameterPad";
+    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fParameterPad";
     cerr << endl;
     return;
   }
@@ -2464,7 +2577,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   // theory pad
   fTheoryPad = new TPaveText(XTHEO, 0.1, 1.0, 0.5, "NDC");
   if (fTheoryPad == 0) {
-    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fTheoryPad";
+    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fTheoryPad";
     cerr << endl;
     return;
   }
@@ -2476,7 +2589,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   // info pad
   fInfoPad = new TLegend(0.0, 0.0, 1.0, YINFO, "NDC");
   if (fInfoPad == 0) {
-    cerr << endl << "PMusrCanvas::PMusrCanvas: **PANIC ERROR**: Couldn't invoke fInfoPad";
+    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fInfoPad";
     cerr << endl;
     return;
   }
@@ -2881,9 +2994,9 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     Double_t dval = (startFitRange - data->GetDataTimeStart())/data->GetDataTimeStep();
     if (dval < 0.0) { // make sure that startBin >= 0
       startBin = 0;
-      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found startBin data < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data < 0 for 'use_fit_range', will set it to 0" << endl << endl;
     } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that startBin <= length of data vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found startBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'use_fit_range',";
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'use_fit_range',";
       cerr << endl << ">> will set it to data vector size" << endl << endl;
       startBin = data->GetValue()->size();
     } else {
@@ -2897,9 +3010,9 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     dval = (endFitRange - data->GetDataTimeStart())/data->GetDataTimeStep();
     if (dval < 0.0) { // make sure that endBin >= 0
       endBin = 0;
-      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found endBin data < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data < 0 for 'use_fit_range', will set it to 0" << endl << endl;
     } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that endBin <= length of data vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found endBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'use_fit_range',";
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'use_fit_range',";
       cerr << endl << ">> will set it to data vector size" << endl << endl;
       endBin = data->GetValue()->size();
     } else {
@@ -2912,9 +3025,9 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     Double_t dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep();
     if (dval < 0.0) { // make sure that startBin >= 0
       startBin = 0;
-      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found startBin data < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data < 0 for 'sub_ranges', will set it to 0" << endl << endl;
     } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that startBin <= length of data vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found startBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'sub_ranges',";
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'sub_ranges',";
       cerr << endl << ">> will set it to data vector size" << endl << endl;
       startBin = data->GetValue()->size();
     } else {
@@ -2924,9 +3037,9 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep();
     if (dval < 0.0) { // make sure that endBin >= 0
       endBin = 0;
-      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found endBin data < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data < 0 for 'sub_ranges', will set it to 0" << endl << endl;
     } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that endtBin <= length of data vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found endBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'sub_ranges',";
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'sub_ranges',";
       cerr << endl << ">> will set it to data vector size" << endl << endl;
       endBin = data->GetValue()->size();
     } else {
@@ -3013,9 +3126,9 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     Double_t dval = (startFitRange - data->GetDataTimeStart())/data->GetTheoryTimeStep();
     if (dval < 0.0) { // make sure that startBin >= 0
       startBin = 0;
-      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found startBin theory < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory < 0 for 'use_fit_range', will set it to 0" << endl << endl;
     } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that startBin <= length of theory vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found startBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'use_fit_range',";
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'use_fit_range',";
       cerr << endl << ">> will set it to theory vector size" << endl << endl;
       startBin = data->GetTheory()->size();
     } else {
@@ -3029,9 +3142,9 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     dval = (endFitRange - data->GetDataTimeStart())/data->GetTheoryTimeStep();
     if (dval < 0.0) { // make sure that endBin >= 0
       endBin = 0;
-      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found endBin theory < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory < 0 for 'use_fit_range', will set it to 0" << endl << endl;
     } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that endBin <= length of theory vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found endBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'use_fit_range',";
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'use_fit_range',";
       cerr << endl << ">> will set it to theory vector size" << endl << endl;
       endBin = data->GetTheory()->size();
     } else {
@@ -3047,9 +3160,9 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     Double_t dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] -data->GetDataTimeStart())/data->GetTheoryTimeStep();
     if (dval < 0.0) { // make sure that startBin >= 0
       startBin = 0;
-      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found startBin theory < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory < 0 for 'sub_ranges', will set it to 0" << endl << endl;
     } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that startBin <= length of theory vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found startBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'sub_ranges',";
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'sub_ranges',";
       cerr << endl << ">> will set it to theory vector size" << endl << endl;
       startBin = data->GetTheory()->size();
     } else {
@@ -3059,9 +3172,9 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] -data->GetDataTimeStart())/data->GetTheoryTimeStep();
     if (dval < 0.0) { // make sure that endBin >= 0
       endBin = 0;
-      cerr << endl << "PMusrCanvas::HandleDataSet() **WARNING** found endBin theory < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory < 0 for 'sub_ranges', will set it to 0" << endl << endl;
     } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that endtBin <= length of theory vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet() **WARNING** found endBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'sub_ranges',";
+      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'sub_ranges',";
       cerr << endl << ">> will set it to theory vector size" << endl << endl;
       endBin = data->GetTheory()->size();
     } else {
@@ -3358,15 +3471,19 @@ void PMusrCanvas::HandleFourier()
   // check if fourier needs to be calculated
   if (fData[0].dataFourierRe == 0) {
     Int_t bin;
-    bin = fHistoFrame->GetXaxis()->GetFirst();
-    double startTime = fHistoFrame->GetBinCenter(bin);
-    bin = fHistoFrame->GetXaxis()->GetLast();
-    double endTime   = fHistoFrame->GetBinCenter(bin);
+    double startTime = fXmin;
+    double endTime = fXmax;
+    if (!fStartWithFourier) { // fHistoFrame presen, hence get start/end from it
+      bin = fHistoFrame->GetXaxis()->GetFirst();
+      startTime = fHistoFrame->GetBinCenter(bin);
+      bin = fHistoFrame->GetXaxis()->GetLast();
+      endTime   = fHistoFrame->GetBinCenter(bin);
+    }
     for (UInt_t i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, fFourier.fFourierPower);
       if (!fourierData.IsValid()) {
-        cerr << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier data ..." << endl;
+        cerr << endl << ">> PMusrCanvas::HandleFourier(): **SEVERE ERROR** couldn't invoke PFourier to calculate the Fourier data ..." << endl;
         return;
       }
       fourierData.Transform(fFourier.fApodization);
@@ -3406,7 +3523,7 @@ void PMusrCanvas::HandleFourier()
       Int_t powerPad = (Int_t)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
       PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, powerPad);
       if (!fourierTheory.IsValid()) {
-        cerr << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
+        cerr << endl << ">> PMusrCanvas::HandleFourier(): **SEVERE ERROR** couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
         return;
       }
       fourierTheory.Transform(fFourier.fApodization);
@@ -3526,7 +3643,7 @@ void PMusrCanvas::HandleDifferenceFourier()
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, fFourier.fFourierPower);
       if (!fourierData.IsValid()) {
-        cerr << endl << "**SEVERE ERROR** PMusrCanvas::HandleFourier: couldn't invoke PFourier to calculate the Fourier diff ..." << endl;
+        cerr << endl << ">> PMusrCanvas::HandleFourier(): **SEVERE ERROR** couldn't invoke PFourier to calculate the Fourier diff ..." << endl;
         return;
       }
       fourierData.Transform(fFourier.fApodization);
@@ -3800,7 +3917,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].data->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].data, fData[0].data->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].data, fData[0].data->GetBinCenter(i));
       }
       fDataAvg.data->SetBinContent(i, dval/fData.size());
     }
@@ -3814,7 +3931,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierRe, fData[0].dataFourierRe->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierRe, fData[0].dataFourierRe->GetBinCenter(i));
       }
       fDataAvg.dataFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3828,7 +3945,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierIm, fData[0].dataFourierIm->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierIm, fData[0].dataFourierIm->GetBinCenter(i));
       }
       fDataAvg.dataFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3842,7 +3959,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierPwr, fData[0].dataFourierPwr->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierPwr, fData[0].dataFourierPwr->GetBinCenter(i));
       }
       fDataAvg.dataFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3856,7 +3973,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].dataFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].dataFourierPhase, fData[0].dataFourierPhase->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].dataFourierPhase, fData[0].dataFourierPhase->GetBinCenter(i));
       }
       fDataAvg.dataFourierPhase->SetBinContent(i, dval/fData.size());
     }
@@ -3870,7 +3987,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theory->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theory, fData[0].theory->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theory, fData[0].theory->GetBinCenter(i));
       }
       fDataAvg.theory->SetBinContent(i, dval/fData.size());
     }
@@ -3880,7 +3997,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierRe, fData[0].theoryFourierRe->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierRe, fData[0].theoryFourierRe->GetBinCenter(i));
       }
       fDataAvg.theoryFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3894,7 +4011,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierIm, fData[0].theoryFourierIm->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierIm, fData[0].theoryFourierIm->GetBinCenter(i));
       }
       fDataAvg.theoryFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3908,7 +4025,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierPwr, fData[0].theoryFourierPwr->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierPwr, fData[0].theoryFourierPwr->GetBinCenter(i));
       }
       fDataAvg.theoryFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3922,7 +4039,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].theoryFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].theoryFourierPhase, fData[0].theoryFourierPhase->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].theoryFourierPhase, fData[0].theoryFourierPhase->GetBinCenter(i));
       }
       fDataAvg.theoryFourierPhase->SetBinContent(i, dval/fData.size());
     }
@@ -3936,7 +4053,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diff->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diff, fData[0].diff->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diff, fData[0].diff->GetBinCenter(i));
       }
       fDataAvg.diff->SetBinContent(i, dval/fData.size());
     }
@@ -3950,7 +4067,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierRe, fData[0].diffFourierRe->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierRe, fData[0].diffFourierRe->GetBinCenter(i));
       }
       fDataAvg.diffFourierRe->SetBinContent(i, dval/fData.size());
     }
@@ -3964,7 +4081,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierIm, fData[0].diffFourierIm->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierIm, fData[0].diffFourierIm->GetBinCenter(i));
       }
       fDataAvg.diffFourierIm->SetBinContent(i, dval/fData.size());
     }
@@ -3978,7 +4095,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierPwr, fData[0].diffFourierPwr->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierPwr, fData[0].diffFourierPwr->GetBinCenter(i));
       }
       fDataAvg.diffFourierPwr->SetBinContent(i, dval/fData.size());
     }
@@ -3992,7 +4109,7 @@ void PMusrCanvas::HandleAverage()
     for (Int_t i=0; i<fData[0].diffFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
-        dval += GetInterpolatedValue(fData[j].diffFourierPhase, fData[0].diffFourierPhase->GetBinContent(i));
+        dval += GetInterpolatedValue(fData[j].diffFourierPhase, fData[0].diffFourierPhase->GetBinCenter(i));
       }
       fDataAvg.diffFourierPhase->SetBinContent(i, dval/fData.size());
     }
@@ -4596,14 +4713,14 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
         fDataTheoryPad->SetLogy(1);
 
       // set x-axis label
-      fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
+      fHistoFrame->GetXaxis()->SetTitle("Time (#mus)");
       // set y-axis label
       TString yAxisTitle;
       PMsrRunList *runList = fMsrHandler->GetMsrRunList();
       switch (fPlotType) {
         case MSR_PLOT_SINGLE_HISTO:
           if (runList->at(0).IsLifetimeCorrected()) { // lifetime correction
-            yAxisTitle = "asymmetry";
+            yAxisTitle = "Asymmetry";
           } else { // no liftime correction
             if (fScaleN0AndBkg)
               yAxisTitle = "N(t) per nsec";
@@ -4611,8 +4728,12 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
               yAxisTitle = "N(t) per bin";
           }
           break;
+        case MSR_PLOT_SINGLE_HISTO_RRF:
+        case MSR_PLOT_ASYM_RRF:
+          yAxisTitle = "RRF Asymmetry";
+          break;
         case MSR_PLOT_ASYM:
-          yAxisTitle = "asymmetry";
+          yAxisTitle = "Asymmetry";
           break;
         case MSR_PLOT_MU_MINUS:
           yAxisTitle = "N(t) per bin";
@@ -4728,18 +4849,22 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
 
       // add all data to fMultiGraphData
       for (UInt_t i=0; i<fNonMusrData.size(); i++) {
-        // the next two lines are ugly but needed for the following reasons:
+        // the next three lines are ugly but needed for the following reasons:
         // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
         // This is not resulting in a memory leak, since the TMultiGraph object will do the cleanup
         TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].data));
+        // Data points and model curves should be fixed on the graph and not dragged around using, e.g., the mouse.
+        ge->SetEditable(false);
         fMultiGraphData->Add(ge, "p");
       }
       // add all the theory to fMultiGraphData
       for (UInt_t i=0; i<fNonMusrData.size(); i++) {
-        // the next two lines are ugly but needed for the following reasons:
+        // the next three lines are ugly but needed for the following reasons:
         // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
         // This is not resulting in a memory leak, since the TMultiGraph object will do the cleanup
         TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].theory));
+        // Data points and model curves should be fixed on the graph and not dragged around using, e.g., the mouse.
+        ge->SetEditable(false);
         fMultiGraphData->Add(ge, "l");
       }
 
@@ -4783,6 +4908,11 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
 
       if (fMultiGraphLegend)
         fMultiGraphLegend->Draw();
+    }
+
+    // report canvas status events in non-musr plots
+    if (!fMainCanvas->GetShowEventStatus()) {
+      fMainCanvas->ToggleEventStatus();
     }
   }
 
@@ -4966,10 +5096,12 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
 
     // add all diff data to fMultiGraphDiff
     for (UInt_t i=0; i<fNonMusrData.size(); i++) {
-      // the next two lines are ugly but needed for the following reasons:
+      // the next three lines are ugly but needed for the following reasons:
       // TMultiGraph is taking ownership of the TGraphErrors, hence a deep copy is needed.
       // This is not resulting in a memory leak, since the TMultiGraph object will do the cleaing
       TGraphErrors *ge = new TGraphErrors(*(fNonMusrData[i].diff));
+      // Data points and model curves should be fixed on the graph and not dragged around using, e.g., the mouse.
+      ge->SetEditable(false);
       fMultiGraphDiff->Add(ge, "p");
     }
 
@@ -6041,6 +6173,11 @@ void PMusrCanvas::PlotAverage(Bool_t unzoom)
       break;
     default:
       break;
+  }
+
+  // check if RRF and if yes show a label
+  if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+    fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
   }
 
   fDataTheoryPad->Update();

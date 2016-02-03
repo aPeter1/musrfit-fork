@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2015 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -34,7 +34,8 @@
 #include <vector>
 using namespace std;
 
-#include "TH1F.h"
+#include <TH1F.h>
+#include <TMath.h>
 
 #include "PMusr.h"
 
@@ -44,11 +45,12 @@ using namespace std;
  * necessary meta information.
  */
 typedef struct {
-  TString info;          ///< keeps all the meta information
-  double timeResolution; ///< time resolution in (usec)
-  int t0;                ///< keep the t0 bin
-  Double_t timeRange[2]; ///< time range to be used, given in (usec).
-  PDoubleVector rawData; ///< a single time domain data vector
+  Int_t dataSetTag;        ///< tag to label the data set. Needed for average-per-data-set
+  TString info;            ///< keeps all the meta information
+  Double_t timeResolution; ///< time resolution in (usec)
+  Int_t t0;                ///< keep the t0 bin
+  Double_t timeRange[2];   ///< time range to be used, given in (usec).
+  PDoubleVector rawData;   ///< a single time domain data vector
 } musrFT_data;
 
 //----------------------------------------------------------------------------
@@ -59,18 +61,19 @@ typedef struct {
 class PPrepFourier {
   public:
     PPrepFourier();
-    PPrepFourier(const Int_t *bkgRange, const Int_t packing);
+    PPrepFourier(const Int_t packing, const Int_t *bkgRange, PDoubleVector bkg);
     virtual ~PPrepFourier();
 
-    void SetBkgRange(const Int_t *bkgRange);
-    void SetPacking(const Int_t packing);
-    void AddData(musrFT_data &data);
-    void DoBkgCorrection();
-    void DoPacking();
-    void DoFiltering();
-    void DoLifeTimeCorrection(Double_t fudge);
+    virtual void SetBkgRange(const Int_t *bkgRange);
+    virtual void SetBkg(PDoubleVector bkg);
+    virtual void SetPacking(const Int_t packing);
+    virtual void AddData(musrFT_data &data);
+    virtual void DoBkgCorrection();
+    virtual void DoPacking();
+    virtual void DoLifeTimeCorrection(Double_t fudge);
 
     TString GetInfo(const UInt_t idx);
+    Int_t GetDataSetTag(const UInt_t idx);
     UInt_t GetNoOfData() { return fRawData.size(); }
     vector<TH1F*> GetData();
     TH1F *GetData(const UInt_t idx);
@@ -79,9 +82,10 @@ class PPrepFourier {
     vector<musrFT_data> fRawData;
     vector<PDoubleVector>fData;
     Int_t fBkgRange[2];
+    PDoubleVector fBkg;
     Int_t fPacking;
 
-    void InitData();
+    virtual void InitData();
 };
 
 #endif // _PPREPFOURIER_H_

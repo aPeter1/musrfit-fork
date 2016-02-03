@@ -15,12 +15,14 @@ h_sources = \
   ../include/PMusrT0.h \
   ../include/PPrepFourier.h \
   ../include/PRunAsymmetry.h \
+  ../include/PRunAsymmetryRRF.h \
   ../include/PRunBase.h \
   ../include/PRunDataHandler.h \
   ../include/PRunListCollection.h \
   ../include/PRunNonMusr.h \
   ../include/PRunMuMinus.h \
   ../include/PRunSingleHisto.h \
+  ../include/PRunSingleHistoRRF.h \
   ../include/PStartupHandler.h \
   ../include/PTheory.h
 
@@ -59,12 +61,14 @@ cpp_sources = \
   PMusrT0.cpp \
   PPrepFourier.cpp \
   PRunAsymmetry.cpp \
+  PRunAsymmetryRRF.cpp \
   PRunBase.cpp \
   PRunDataHandler.cpp \
   PRunListCollection.cpp \
   PRunNonMusr.cpp \
   PRunMuMinus.cpp \
   PRunSingleHisto.cpp \
+  PRunSingleHistoRRF.cpp \
   PStartupHandler.cpp \
   PTheory.cpp
 
@@ -91,7 +95,7 @@ AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
 CLEANFILES = *Dict.cpp *Dict.h *~ core
 
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h
-	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(INCLUDES) $^
+	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^
 
 lib_LTLIBRARIES = libPUserFcnBase.la libPMusr.la
 

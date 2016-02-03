@@ -16,21 +16,32 @@ if BUILD_MUSREDIT
   EDITORDIR = musredit
 endif
 
+if BUILD_MUSREDIT_QT5
+  EDITORDIR = musredit_qt5
+endif
+
 SUBDIRS = external/MusrRoot \
           external/TLemRunHeader \
           external/MuSR_software \
           external/mud \
           $(PNEXUSDIRS) \
           classes \
-          external
+          external \
+          musredit_qt5 \
+          musredit \
+          musrgui 
 
 if BUILD_MUSRGUI
-SUBDIRS += $(EDITORDIR)
+#SUBDIRS += $(EDITORDIR)
 EXTRA_DIST = $(EDITORDIR)/Makefile
 endif
 
 if BUILD_MUSREDIT
-SUBDIRS += $(EDITORDIR)
+#SUBDIRS += $(EDITORDIR)
+EXTRA_DIST = $(EDITORDIR)/Makefile
+endif
+
+if BUILD_MUSREDIT_QT5
 EXTRA_DIST = $(EDITORDIR)/Makefile
 endif
 

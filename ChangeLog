@@ -2,12 +2,90 @@
 # ChangeLog
 #---------------------------------------------------------------------
 
+changes since 0.16.0
+===================================
+NEW 2016-01-22 update of the docu which now describes the RRF option.
+
+changes since 0.15.0
+===================================
+NEW 2016-01-22 add RRF fit option. At the same time, the version has been
+               increased to 0.16.0. For details see the documentation.
+FIXED 2015-10-29 TMusrRunHeader didn't map a double vector properly into a
+                 string. The last element was a copy of the 2nd last instead
+		 if the proper last. This is now fixed. Fixed also some
+		 comment typo.
+FIXED 2015-11-11 Fixes the crash of Fourier if the maximal range given in the 
+                 Fourier block is larger than the available.
+CHANGED 2015-11-15 removed unnecessary check form musredit_qt5 msr2data interface.
+
+changes since 0.14.0
+===================================
+NEW 2015-10-26 added a first ported musredit version (Qt4 -> Qt5). At the same
+               the version has been incremented to 0.15.0.
+NEW 2015-09-24 adding a phase optimized real Fourier to musrFT. This is still VERY
+               experimental, and hence only available from within musrFT. Eventually
+               it should make its way into musrview as well. Furthermore the 
+               documentation needs to be written yet. There is only a short not in
+               the command line present.
+NEW 2015-02-23 implemented an average-per-data-set option for musrFT.
+NEW 2015-02-21 add proper Mac icon to musredit
+FIXED 2015-09-22 generating global fit msr-files including a GLOBAL block is working
+                 now as expected.
+FIXED 2015-09-17 in PMsr2Data::PrepareGlobalInputFile() there seem to be 'unmotivated'
+                 break; commands in some loops. They prevent a proper map handling.
+                 Since this is a real puzzle I contacted BMW for clarification. 
+                 2015-09-18: there is only one unmotivated break; cleaned up the code
+                 accordingly.
+FIXED 2015-09-14 any2many export of MusrRoot crashed when first histo group was != 0.
+                 This happend when exporting to PSI-BIN or WKM. This is fixed now.
+FIXED 2015-09-08 fixed error in view_packing for single histo (wrong norm of the theory).
+FIXED 2015-09-04 minor change in Fourier-block output (PMsrHandler::WriteMsrLogFile
+                 and PMsrHandler::WriteMsrLogFile) to avoid truncated range labels.
+FIXED 2015-06-30 changed setf/unsetf bug (PMsr2Data.cpp)
+FIXED 2015-05-15 another path check for HDF5 with ubuntu 15.04
+FIXED 2015-03-16 some minor correction for ASCII export in any2many
+FIXED 2015-02-26 some more bug fixing for average per data set.
+FIXED 2015-02-20 for graphical export in the batch mode, menus mustn't be set.
+CHANGED 2015-08-17 updated ChangeLog which was orphaned since V0.13.0
+CHANGED 2015-08-16 updated the docu
+CHANGED 2015-08-16 added the class PStringNumberList which allow to parse a 
+                   generic encoded list of numbers. Used this class to improve 
+                   PMsrHandler, and improved the runList feature of msr2data. 
+                   For details see the documentation of msr2data.
+CHANGED 2015-06-25 adopted the temperature dependence of the gap function 
+                   (see Eq.(8) of the memo), which breaks the self-consistency. 
+                   Makes it more flexible but requires that the user is using 
+                   his brain.
+CHANGED 2015-06-25 small correction of the skewed Gaussian for extrem parameter 
+                   values.
+CHANGED 2015-05-29 updated docu and removed an unsed variable
+CHANGED 2015-05-29 added a group histo selector in any2many for MusrRoot when 
+                   exporting to a too limited file format as PSI-BIN.
+CHANGED 2015-04-01 update of the technical docu
+CHANGED 2015-02-28 check that FOURIER block phase parameter as parX is not leading 
+                   to an error message.
+CHANGED 2015-02-24 added missing background range from msr-file (musrFT)
+CHANGED 2015-02-24 separated PSI-BIN and PSI-MDU file format
+CHANGED 2015-02-21 make sure that musrFT is found
+CHANGED 2015-02-21 needed to adopted includes for dictionary generation due to 
+                   adding fftw.h in PMusr.h
+CHANGED 2015-02-21 have now README and README.md for automake and bitbucket, 
+                   respectively.
+
 changes since 0.13.0
 ===================================
+NEW 2015-02-23 implemented an average-per-data-set option for musrFT.
+NEW 2015-02-20 add a switch to musrview that it plots initially the Fouier data rather
+               than the time domain data.
+NEW 2015-02-19 added a first preliminary user interface for musrFT within musredit.
+NEW 2015-02-16 changed the data export handling from musrview. It is now more
+               main line and follows the implementation of musrFT.
 NEW 2015-02-13 first implementation of a standalone Fourier transform/plotter: 
                musrFT. Initially it is meant to be used for HAL-9500, 
                i.e. Fourier transform WITHOUT lifetime correction.
                A first simple minded lifetime correction is implemented as well.                
+NEW 2015-02-04 Integration of libBNMR for fitting beta-NMR relaxation data
+	       into automake of musrfit.
 NEW 2014-12-18 first implementation of a GLOBAL block which allows to shorten
                a typical msr-file. Duplicate entries from the RUN blocks can be
                added here. Furthermore, the 'lifetimecorrection' flag is 
@@ -16,9 +94,6 @@ NEW 2014-12-18 first implementation of a GLOBAL block which allows to shorten
                In order to make the code more readable a lot of setup collection
                parameters (t0, data, fit) has been encapsulated into its own 
                functions.
-
-NEW 2015-02-04 Integration of libBNMR for fitting beta-NMR relaxation data
-	       into automake of musrfit.
 
 changes since 0.12.0
 ===================================

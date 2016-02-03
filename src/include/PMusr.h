@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2015 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -36,6 +36,12 @@ using namespace std;
 
 #include <TString.h>
 
+// the following ifdef is needed for GCC 4.6 or higher, fftw 3.3 or higher and root 5.30.03 or lower
+#ifdef __CINT__
+typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
+#endif
+#include "fftw3.h"
+
 #define PMUSR_SUCCESS                   0
 #define PMUSR_WRONG_STARTUP_SYNTAX     -1
 #define PMUSR_MSR_FILE_NOT_FOUND       -2
@@ -46,10 +52,12 @@ using namespace std;
 #define PMUSR_MSR_FILE_WRITE_ERROR     -7
 #define PMUSR_DATA_FILE_READ_ERROR     -8
 
-#define PRUN_SINGLE_HISTO 0
-#define PRUN_ASYMMETRY    2
-#define PRUN_MU_MINUS     4
-#define PRUN_NON_MUSR     8
+#define PRUN_SINGLE_HISTO     0
+#define PRUN_SINGLE_HISTO_RRF 1
+#define PRUN_ASYMMETRY        2
+#define PRUN_ASYMMETRY_RRF    3
+#define PRUN_MU_MINUS         4
+#define PRUN_NON_MUSR         8
 
 // muon life time in (us), see PRL99, 032001 (2007)
 #define PMUON_LIFETIME 2.197019
@@ -86,17 +94,21 @@ using namespace std;
 
 //-------------------------------------------------------------
 // msr fit type tags
-#define MSR_FITTYPE_SINGLE_HISTO 0
-#define MSR_FITTYPE_ASYM         2
-#define MSR_FITTYPE_MU_MINUS     4
-#define MSR_FITTYPE_NON_MUSR     8
+#define MSR_FITTYPE_SINGLE_HISTO     0
+#define MSR_FITTYPE_SINGLE_HISTO_RRF 1
+#define MSR_FITTYPE_ASYM             2
+#define MSR_FITTYPE_ASYM_RRF         3
+#define MSR_FITTYPE_MU_MINUS         4
+#define MSR_FITTYPE_NON_MUSR         8
 
 //-------------------------------------------------------------
 // msr plot type tags
-#define MSR_PLOT_SINGLE_HISTO 0
-#define MSR_PLOT_ASYM         2
-#define MSR_PLOT_MU_MINUS     4
-#define MSR_PLOT_NON_MUSR     8
+#define MSR_PLOT_SINGLE_HISTO     0
+#define MSR_PLOT_SINGLE_HISTO_RRF 1
+#define MSR_PLOT_ASYM             2
+#define MSR_PLOT_ASYM_RRF         3
+#define MSR_PLOT_MU_MINUS         4
+#define MSR_PLOT_NON_MUSR         8
 
 //-------------------------------------------------------------
 // map and fun offsets for parameter parsing
@@ -117,20 +129,24 @@ using namespace std;
 #define FOURIER_APOD_MEDIUM    3
 #define FOURIER_APOD_STRONG    4
 
-#define FOURIER_PLOT_NOT_GIVEN     0
-#define FOURIER_PLOT_REAL          1
-#define FOURIER_PLOT_IMAG          2
-#define FOURIER_PLOT_REAL_AND_IMAG 3
-#define FOURIER_PLOT_POWER         4
-#define FOURIER_PLOT_PHASE         5
+#define FOURIER_PLOT_NOT_GIVEN      0
+#define FOURIER_PLOT_REAL           1
+#define FOURIER_PLOT_IMAG           2
+#define FOURIER_PLOT_REAL_AND_IMAG  3
+#define FOURIER_PLOT_POWER          4
+#define FOURIER_PLOT_PHASE          5
+#define FOURIER_PLOT_PHASE_OPT_REAL 6
 
 //-------------------------------------------------------------
 // RRF related tags
-#define RRF_UNIT_kHz 0
-#define RRF_UNIT_MHz 1
-#define RRF_UNIT_Mcs 2
-#define RRF_UNIT_G   3
-#define RRF_UNIT_T   4
+#define RRF_UNIT_UNDEF -1
+#define RRF_UNIT_kHz    0
+#define RRF_UNIT_MHz    1
+#define RRF_UNIT_Mcs    2
+#define RRF_UNIT_G      3
+#define RRF_UNIT_T      4
+
+#define RRF_FREQ_UNDEF  1.0e10
 
 //-------------------------------------------------------------
 /**
@@ -535,6 +551,11 @@ class PMsrGlobalBlock {
     virtual ~PMsrGlobalBlock() {}
 
     virtual Bool_t IsPresent() { return fGlobalPresent; }
+    virtual Double_t GetRRFFreq(const char *unit);
+    virtual TString GetRRFUnit();
+    virtual Int_t GetRRFUnitTag() { return fRRFUnitTag; }
+    virtual Double_t GetRRFPhase() { return fRRFPhase; }
+    virtual Int_t GetRRFPacking() { return fRRFPacking; }
     virtual Int_t GetFitType() { return fFitType; }
     virtual Int_t GetDataRange(UInt_t idx);
     virtual UInt_t GetT0BinSize() { return fT0.size(); }
@@ -548,6 +569,9 @@ class PMsrGlobalBlock {
     virtual Int_t GetPacking() { return fPacking; }
 
     virtual void SetGlobalPresent(Bool_t bval) { fGlobalPresent = bval; }
+    virtual void SetRRFFreq(Double_t freq, const char *unit);
+    virtual void SetRRFPhase(Double_t phase) { fRRFPhase = phase; }
+    virtual void SetRRFPacking(Int_t pack);
     virtual void SetFitType(Int_t ival) { fFitType = ival; }
     virtual void SetDataRange(Int_t ival, Int_t idx);
     virtual void SetT0Bin(Double_t dval, Int_t idx=-1);
@@ -559,10 +583,14 @@ class PMsrGlobalBlock {
 
   private:
     Bool_t fGlobalPresent;    ///< flag showing if a GLOBAL block is present at all.
-    Int_t fFitType;           ///< fit type: 0=single histo fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
-    Int_t fDataRange[4];      ///< data bin range (fit type 0, 2, 4)
-    PDoubleVector fT0;        ///< t0 bins (fit type 0, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
-    vector<PDoubleVector> fAddT0; ///< addt0 bins (fit type 0, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+    Double_t fRRFFreq;        ///< RRF frequency given in units of (MHz, Mc, T)
+    Int_t fRRFUnitTag;        ///< RRF unit tag
+    Double_t fRRFPhase;       ///< RRF phase in (°)
+    Int_t fRRFPacking;        ///< RRF packing
+    Int_t fFitType;           ///< fit type: 0=single histo fit, 1=single histo RRF fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
+    Int_t fDataRange[4];      ///< data bin range (fit type 0, 1, 2, 4)
+    PDoubleVector fT0;        ///< t0 bins (fit type 0, 1, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+    vector<PDoubleVector> fAddT0; ///< addt0 bins (fit type 0, 1, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
     Bool_t fFitRangeInBins;   ///< flag telling if fit range is given in time or in bins
     Double_t fFitRange[2];    ///< fit range in (us)
     Int_t fFitRangeOffset[2]; ///< if fit range is given in bins it can have the form fit fgb+n0 lgb-n1. This variable holds the n0 and n1.
@@ -774,6 +802,7 @@ typedef struct {
   TString outTemplate;       ///< holds the output file template
   TString year;              ///< holds the information about the year to be used
   PIntVector runList;        ///< holds the run number list to be converted
+  PIntVector groupHistoList; ///< holds the histo group list offset (used to define for MusrRoot files, what to be exported)
   PStringVector inFileName;  ///< holds the file name of the input data file
   TString outFileName;       ///< holds the output file name
   PStringVector outPathFileName; ///< holds the out path/file name
@@ -793,5 +822,30 @@ typedef struct {
   Bool_t estimateN0;         ///< if set to true, for single histogram fits N0 will be estimated
   Double_t alphaEstimateN0;  ///< relates the Bkg to N0, i.e. Bkg = alpha*N0
 } PStartupOptions;
+
+//-------------------------------------------------------------
+/**
+ * <p>Helper class which parses list of numbers of the following 3 forms and its combination.
+ * (i) list of integers separted by spaces, e.g. 1 3 7 14
+ * (ii) a range of integers of the form nS-nE, e.g. 13-27 which will generate 13, 14, 15, .., 26, 27
+ * (iii) a sequence of integers of the form nS:nE:nStep, e.g. 10:20:2  which will generate 10, 12, 14, .., 18, 20
+ */
+class PStringNumberList {
+  public:
+    PStringNumberList(char *str) { fString = str; }
+    PStringNumberList(string str) { fString = str; }
+    virtual ~PStringNumberList() { fList.clear(); }
+
+    virtual bool Parse(string &errorMsg, bool ignoreFirstToken=false);
+    virtual PUIntVector GetList() { return fList; }
+
+  private:
+    string fString;
+    bool fIsValid;
+    PUIntVector fList;
+
+    virtual bool IsNumber(string &str) { return (str.find_first_not_of("0123456789") == string::npos); }
+    virtual void StripSpaces();
+};
 
 #endif // _PMUSR_H_

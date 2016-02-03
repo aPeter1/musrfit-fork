@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -280,7 +280,8 @@ void PRunDataHandler::ReadData()
       fAllDataAvailable = ReadRootFile();
     } else if ((fFileFormat == "NeXus") || (fFileFormat == "nexus")) {
       fAllDataAvailable = ReadNexusFile();
-    } else if ((fFileFormat == "PsiBin") || (fFileFormat == "psibin")) {
+    } else if ((fFileFormat == "PsiBin") || (fFileFormat == "psibin") ||
+               (fFileFormat == "PsiMdu") || (fFileFormat == "psimdu")) {
       fAllDataAvailable = ReadPsiBinFile();
     } else if ((fFileFormat == "Mud") || (fFileFormat == "mud")) {
       fAllDataAvailable = ReadMudFile();
@@ -1733,8 +1734,33 @@ Bool_t PRunDataHandler::ReadRootFile()
 
     header->Get("RunInfo/RedGreen Offsets", ivec, ok);
     if (ok) {
-      redGreenOffsets = ivec;
-      runData.SetRedGreenOffset(ivec);
+      // check if any2many is used and a group histo list is defined, if NOT, only take the 0-offset data!
+      if (fAny2ManyInfo) { // i.e. any2many is called
+        if (fAny2ManyInfo->groupHistoList.size() == 0) { // NO group list defined -> use only the 0-offset data
+          redGreenOffsets.push_back(0);
+        } else { // group list defined
+          // make sure that the group list elements is a subset of present RedGreen offsets
+          Bool_t found = false;
+          for (UInt_t i=0; i<fAny2ManyInfo->groupHistoList.size(); i++) {
+            found = false;
+            for (UInt_t j=0; j<ivec.size(); j++) {
+              if (fAny2ManyInfo->groupHistoList[i] == ivec[j])
+                found = true;
+            }
+            if (!found) {
+              cerr << endl << ">> PRunDataHandler::ReadRootFile: **ERROR** requested histo group " << fAny2ManyInfo->groupHistoList[i];
+              cerr << endl << ">>     which is NOT present in the data file." << endl;
+              return false;
+            }
+          }
+          // found all requested histo groups, hence stuff it to the right places
+          redGreenOffsets = fAny2ManyInfo->groupHistoList;
+          runData.SetRedGreenOffset(fAny2ManyInfo->groupHistoList);
+        }
+      } else { // not any2many, i.e. musrfit, musrview, ...
+        redGreenOffsets = ivec;
+        runData.SetRedGreenOffset(ivec);
+      }
     }
 
     // check further for LEM specific stuff in RunInfo
@@ -5058,7 +5084,11 @@ Bool_t PRunDataHandler::WriteWkmFile(TString fln)
   if (lem_wkm_style)
     cout << endl << "TOF(M3S1):           nocut";
   cout << endl << "Groups:              " << fData[0].GetNoOfHistos();
-  cout << endl << "Channels:            " << static_cast<UInt_t>(fData[0].GetDataBin(1)->size()/fAny2ManyInfo->rebin);
+  UInt_t histo0 = 1;
+  if (fAny2ManyInfo->groupHistoList.size() != 0) { // red/green list found
+    histo0 = fAny2ManyInfo->groupHistoList[0]+1; // take the first available red/green entry
+  }
+  cout << endl << "Channels:            " << static_cast<UInt_t>(fData[0].GetDataBin(histo0)->size()/fAny2ManyInfo->rebin);
   cout.precision(10);
   cout << endl << "Resolution:          " << fData[0].GetTimeResolution()*fAny2ManyInfo->rebin/1.0e3; // ns->us
   cout.setf(ios::fixed,ios::floatfield);   // floatfield set to fixed
@@ -5147,7 +5177,11 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   // run number
   psibin.put_runNumber_int(fData[0].GetRunNumber());
   // length of histograms
-  psibin.put_histoLength_bin((int)(fData[0].GetDataBin(1)->size()/fAny2ManyInfo->rebin));
+  UInt_t histo0 = 1;
+  if (fAny2ManyInfo->groupHistoList.size() != 0) { // red/green list found
+    histo0 = fAny2ManyInfo->groupHistoList[0]+1; // take the first available red/green entry
+  }
+  psibin.put_histoLength_bin((int)(fData[0].GetDataBin(histo0)->size()/fAny2ManyInfo->rebin));
   // number of histograms
   psibin.put_numberHisto_int((int)fData[0].GetNoOfHistos());
   // run title = sample (10 char) / temp (10 char) / field (10 char) / orientation (10 char)
@@ -5436,7 +5470,7 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
     noOfEvents = 0;
     k = 0;
     for (UInt_t j=0; j<dataSet->GetData()->size(); j++) {
-      if ((j != 0) && (j % fAny2ManyInfo->rebin == 0)) {
+      if ((j > 0) && (j % fAny2ManyInfo->rebin == 0)) {
         data[k] = ival;
         noOfEvents += ival;
         k++;
@@ -5621,7 +5655,7 @@ Bool_t PRunDataHandler::WriteAsciiFile(TString fln)
     }
 
     for (UInt_t i=0; i<length; i++) {
-      if ((i % fAny2ManyInfo->rebin) == 0) {
+      if ((i > 0) && ((i % fAny2ManyInfo->rebin) == 0)) {
         cout << endl;
         for (UInt_t j=0; j<dataRebin.size(); j++) {
           cout.width(8);

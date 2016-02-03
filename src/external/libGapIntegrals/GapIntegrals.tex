@@ -12,6 +12,7 @@
 \usepackage{rotating}
 \usepackage{dcolumn}
 \usepackage{geometry}
+\usepackage{color}
 
 \geometry{a4paper,left=20mm,right=20mm,top=20mm,bottom=20mm}
 
@@ -72,7 +73,7 @@ E-Mail:  & \verb?andreas.suter@psi.ch? &&
 %
 \section*{\musrfithead plug-in for the calculation of the temperature dependence of $\bm{1/\lambda^2}$ for various gap symmetries}%
 
-This memo is intended to give a short summary of the background on which the \gapint plug-in for \musrfit \cite{musrfit} has been developped. The aim of this implementation is the efficient calculation of integrals of the form
+This memo is intended to give a short summary of the background on which the \gapint plug-in for \musrfit \cite{musrfit} has been developed. The aim of this implementation is the efficient calculation of integrals of the form
 \begin{equation}\label{int}
  I(T) = 1 + \frac{1}{\pi}\int_0^{2\pi}\int_{\Delta(\varphi,T)}^{\infty}\left(\frac{\partial f}{\partial E}\right) \frac{E}{\sqrt{E^2-\Delta^2(\varphi,T)}}\mathrm{d}E\mathrm{d}\varphi\,,
 \end{equation}
@@ -104,18 +105,27 @@ For the numerical integration we use algorithms of the \textsc{Cuba} library \ci
 \subsection*{Implemented gap functions and function calls from MUSRFIT}
 Currently the calculation of $\tilde{I}(T)$ is implemented for various gap functions.
 The temperature dependence of the gap functions is either given by Eq.(\ref{eq:gapT_Prozorov}) \cite{Prozorov}, or by Eq.(\ref{eq:gapT_Manzano}) \cite{Manzano}.
+
+\vspace{2mm}
+
+\noindent \color{red}\textbf{A few words of warning:~}\color{black} The temperature dependence of the gap function is typically derived from within the BCS framework, 
+and strongly links $T_c$ and $\Delta_0$ (e.g.\xspace $\Delta_0 = 1.76\, k_{\rm B} T_c$ for an s-wave superconductor). In a self-consistent 
+description this would mean that $\Delta_0$ of $\Delta(\varphi)$ is locked to $T_c$ as well. In the implementation provided, this limitation 
+is lifted, and therefore the \emph{user} should judge and question the result if the ratio $\Delta_0/(k_{\rm B}T_c)$ is strongly deviating from
+BCS values! 
+
 \begin{equation}\label{eq:gapT_Prozorov}
- \Delta(\varphi,T) \simeq \Delta(\varphi,0)\,\tanh\left[\frac{\pi k_{\rm B} T_{\rm c}}{\Delta_0}\sqrt{a_{\rm G} \left(\frac{T_{\rm c}}{T}-1\right)}\right]
+ \Delta(\varphi,T) \simeq \Delta(\varphi)\,\tanh\left[c_0\,\sqrt{a_{\rm G} \left(\frac{T_{\rm c}}{T}-1\right)}\right]
 \end{equation}
-\noindent with $\Delta_0$ as given below, and $a_{\rm G}$ depends on the pairing state:
+\noindent with $\Delta(\varphi)$ as given below, and $c_0$ and $a_{\rm G}$ depends on the pairing state:
 
 \begin{description}
- \item [\textit{s}-wave:] $a_{\rm G}=1$ \qquad with $\Delta_0 = 1.76\, k_{\rm B} T_c$
- \item [\textit{d}-wave:] $a_{\rm G}=4/3$ \quad with $\Delta_0 = 2.14\, k_{\rm B} T_c$
+ \item [\textit{s}-wave:] $a_{\rm G}=1$ \qquad with $c_0 =  \frac{\displaystyle\pi k_{\rm B} T_{\rm c}}{\displaystyle\Delta_0} = \pi/1.76 = 1.785$
+ \item [\textit{d}-wave:] $a_{\rm G}=4/3$ \quad with $c_0 = \frac{\displaystyle\pi k_{\rm B} T_{\rm c}}{\displaystyle\Delta_0} = \pi/2.14 = 1.468$
 \end{description}
 
 \begin{equation}\label{eq:gapT_Manzano}
-\Delta(\varphi,T) \simeq \Delta(\varphi)\tanh\left(1.82\left(1.018\left(\frac{T_{\mathrm c}}{T}-1\right)\right)^{0.51}\right)\,.
+\Delta(\varphi,T) \simeq \Delta(\varphi)\tanh\left[1.82\left(1.018\left(\frac{T_{\mathrm c}}{T}-1\right)\right)^{0.51}\right]\,.
 \end{equation}
 The \gapint plug-in calculates $\tilde{I}(T)$ for the following $\Delta(\varphi)$:
 
@@ -124,37 +134,39 @@ The \gapint plug-in calculates $\tilde{I}(T)$ for the following $\Delta(\varphi)
    \begin{equation}
      \Delta(\varphi) = \Delta_0
    \end{equation}
-   \musrfit theory line: \verb?userFcn libGapIntegrals TGapSWave 1 2 [3]?\\
-   (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
-    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
+   \musrfit theory line: \verb?userFcn libGapIntegrals TGapSWave 1 2 [3 4]?\\[1.5ex]
+    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[c_0~(1),~ a_{\rm G}~(1)]$. If $c_0$ and $a_{\rm G}$ are provided, 
+    the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
  \item[\textit{d}-wave gap \cite{Deutscher}:] 
    \begin{equation}
      \Delta(\varphi) = \Delta_0\cos\left(2\varphi\right)
    \end{equation}
-   \musrfit theory line: \verb?userFcn libGapIntegrals TGapDWave 1 2 [3]?\\
-   (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
-    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
+   \musrfit theory line: \verb?userFcn libGapIntegrals TGapDWave 1 2 [3 4]?\\[1.5ex]
+    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[c_0~(1),~a_{\rm G}~(1)]$. If $c_0$ and $a_{\rm G}$ are provided, 
+    the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
  \item[non-monotonic \textit{d}-wave gap \cite{Matsui}:] 
    \begin{equation}
      \Delta(\varphi) = \Delta_0\left[a \cos\left(2\varphi\right) + (1-a)\cos\left(6\varphi\right)\right]
    \end{equation}
-    \musrfit theory line: \verb?userFcn libGapIntegrals TGapNonMonDWave1 1 2 3 [4]?\\
-    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
-    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
+    \musrfit theory line: \verb?userFcn libGapIntegrals TGapNonMonDWave1 1 2 3 [4 5]?\\[1.5ex]
+    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $[c_0~(1),~a_{\rm G}~(1)]$. If $c_0$ and $a_{\rm G}$ are provided, 
+    the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
  \item[non-monotonic \textit{d}-wave gap \cite{Eremin}:]
     \begin{equation}
       \Delta(\varphi) = \Delta_0\left[\frac{2}{3} \sqrt{\frac{a}{3}}\cos\left(2\varphi\right) / \left( 1 + a\cos^2\left(2\varphi\right)\right)^{\frac{3}{2}}\right],\,a>1/2
     \end{equation}
-    \musrfit theory line: \verb?userFcn libGapIntegrals TGapNonMonDWave2 1 2 3 [4]?\\
-    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $a~(1)$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
-    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
+    \musrfit theory line: \verb?userFcn libGapIntegrals TGapNonMonDWave2 1 2 3 [4 5]?\\[1.5ex]
+    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $a~(1)$, $[c_0~(1),~a_{\rm G}~(1)]$. 
+    If $c_0$ and $a_{\rm G}$ are provided, the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, 
+    otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
  \item[anisotropic \textit{s}-wave gap \cite{AnisotropicSWave}:] 
     \begin{equation}
       \Delta(\varphi) = \Delta_0\left[1+a\cos\left(4\varphi\right)\right]\,,\,0\leqslant a\leqslant1
     \end{equation}
-    \musrfit theory line: \verb?userFcn libGapIntegrals TGapAnSWave 1 2 3 [4]?\\
-    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
-    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
+    \musrfit theory line: \verb?userFcn libGapIntegrals TGapAnSWave 1 2 3 [4 5]?\\[1.5ex]
+    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $[c_0~(1),~a_{\rm G}~(1)]$. 
+    If $c_0$ and $a_{\rm G}$ are provided, the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, 
+    otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
 \end{description}
 
 \noindent It is also possible to calculate a power law temperature dependence (in the two fluid approximation $n=4$) and the dirty \textit{s}-wave expression. 
@@ -164,16 +176,16 @@ Obviously for this no integration is needed.
    \begin{equation}
      \frac{\lambda(0)^2}{\lambda(T)^2} = 1-\left(\frac{T}{T_{\mathrm c}}\right)^n
    \end{equation}
-   \musrfit theory line: \verb?userFcn libGapIntegrals TGapPowerLaw 1 2?\\
-   (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $n~(1)$)
+   \musrfit theory line: \verb?userFcn libGapIntegrals TGapPowerLaw 1 2?\\[1.5ex]
+   Parameters: $T_{\mathrm c}~(\mathrm{K})$, $n~(1)$
  \item[dirty \textit{s}-wave \cite{Tinkham}:]
     \begin{equation}
       \frac{\lambda(0)^2}{\lambda(T)^2} = \frac{\Delta(T)}{\Delta_0}\,\tanh\left[\frac{\Delta(T)}{2 k_{\rm B} T}\right]
     \end{equation}
-    with $\Delta(T)$ given by Eq.(\ref{eq:gapT}).\\ 
-    \musrfit theory line: \verb?userFcn libGapIntegrals TGapDirtySWave 1 2 [3]?\\
-    (Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[a_{\rm G}~(1)]$. If $a_{\rm G}$ is given, the temperature dependence 
-    according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.)
+    \musrfit theory line: \verb?userFcn libGapIntegrals TGapDirtySWave 1 2 [3 4]?\\[1.5ex]
+    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[c_0~(1),~a_{\rm G}~(1)]$. 
+    If $c_0$ and $a_{\rm G}$ are provided, the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, 
+    otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
 \end{description}
 
 \noindent Currently there are two gap functions to be found in the code which are \emph{not} documented here: 
@@ -187,7 +199,8 @@ The \gapint library is free software; you can redistribute it and/or modify it u
 \bibliographystyle{plain}
 \begin{thebibliography}{1}
 
-\bibitem{musrfit} A.~Suter, \textit{\musrfit User Manual}, https://wiki.intranet.psi.ch/MUSR/MusrFit
+\bibitem{musrfit} A. Suter, and B.M. Wojek, Physics Procedia \textbf{30}, 69 (2012). 
+                  A.~Suter, \textit{\musrfit User Manual}, http://lmu.web.psi.ch/musrfit/user/MUSR/WebHome.html
 \bibitem{cuba} T.~Hahn, \textit{Cuba -- a library for multidimensional numerical integration}, Comput.~Phys.~Commun.~\textbf{168}~(2005)~78-95, http://www.feynarts.de/cuba/
 \bibitem{Prozorov} R.~Prozorov and R.W.~Giannetta, \textit{Magnetic penetration depth in unconventional superconductors}, Supercond.\ Sci.\ Technol.\ \textbf{19}~(2006)~R41-R67, and Erratum in Supercond.\ Sci.\ Technol.\ \textbf{21}~(2008)~082003.
 \bibitem{Manzano} A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205

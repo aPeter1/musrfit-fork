@@ -14,9 +14,15 @@
 
   Description:
   Root class to simulate muon spin phase under successive Mu+/Mu0 charge-exchange
-  processes by a Monte-Carlo method. Up to 3 Mu0 states are considered at the moment 
-  (analogous to MuBC in Si, B||(100)), a non-precessing signal, and two precessing 
-  states ("nu_12" and "nu_34").
+  processes by a Monte-Carlo method. Consider transverse field geometry, and assume
+  initial muon spin direction in x, and field applied along z. For PxMu(t) in 
+  muonium use the equation 8.22 of the muSR book of Yaounc and Dalmas de Réotier, in
+  slightly modified form (see Senba, J. Phys. B 23, 1545 (1990)); note that PxMu(t) 
+  is given by a superposition of the four frequencies "nu_12", "nu_34", "nu_23", "nu_14".
+  These frequencies and the corresponding probabilities ("SetMuFractionState12" for
+  transitions 12 and 34, "SetMuFractionState23" for states 23 and 14) can be calculated
+  for a given field with the root macro AnisotropicMu.C
+ 
   Parameters:
   1) Precession frequencies of "nu_12", "nu_34", "nu_23", "nu_14"
   2) fractions of nu_12, nu_34; and nu_23 and nu_14
@@ -33,15 +39,14 @@
 
   The muon event simulation with a sequence of charge-changing processes is
   done in Event():
-  simulate muon spin phase under charge-exchange with "3 Mu states" 
-  (as MuBC in Si, B || (100), for example): a non-precessing,
-  and two precessing signals (nu_12, nu_34). 
+  simulate muon spin phase under charge-exchange with "4 Mu transitions" 
   1) according to Mu+/Mu0 fraction begin either with a Mu+ state or Mu state
   2) Mu+: determine next electron-capture time t_c. If t_c is larger than decay time t_d
      calculate muon spin precession for t_d; else calculate spin precession for t_c.
-  3) Determine next ionization time t_i, also determine which Mu0 state has been formed
-     at the capture event. Calculate muon spin precession.
-   4) get the next electron capture time, continue until t_d is reached.
+  3) Determine next ionization time t_i; calculate Px(t_i) in Muonium; calculate the 
+     muon spin phase by acos(Px(t_i)).
+  4) get the next electron capture time, continue until t_d is reached; accumulate muon spin
+     phase.
 
 ***************************************************************************/
 
@@ -95,6 +100,7 @@ PSimulateMuTransition::PSimulateMuTransition(UInt_t seed)
   fMuPrecFreq12     = 0.;    // Mu precession frequency of a 12 transition
   fMuPrecFreq23     = 0.;    // Mu precession frequency of a 23 transition
   fMuPrecFreq14     = 0.;    // Mu precession frequency of a 14 transition
+  fMuonPrecFreq     = 0.;    // muon precession frequency
   fBfield           = 0.01;  // magnetic field (T)
   fCaptureRate      = 0.01;  // Mu+ capture rate (MHz)
   fIonizationRate   = 10.;   // Mu0 ionization rate (MHz)
@@ -103,8 +109,8 @@ PSimulateMuTransition::PSimulateMuTransition(UInt_t seed)
   fMuonDecayTime    = 0.;
   fAsymmetry        = 0.27;
   fMuFraction       = 0.;
-  fMuFractionState1 = 0.;
-  fMuFractionState2 = 0.;
+  fMuFractionState12 = 0.;
+  fMuFractionState23 = 0.;
   fDebugFlag        = kFALSE;
 }
 
@@ -139,8 +145,8 @@ void PSimulateMuTransition::PrintSettings() const
   cout << endl << "Mu ionizatioan rate (MHz)             = " << fIonizationRate;
   cout << endl << "Decay asymmetry                       = " << fAsymmetry;
   cout << endl << "Muonium fraction                      = " << fMuFraction;
-  cout << endl << "Muonium fraction state1               = " << fMuFractionState1;
-  cout << endl << "Muonium fraction state2               = " << fMuFractionState2;
+  cout << endl << "Muonium fraction state12              = " << fMuFractionState12;
+  cout << endl << "Muonium fraction state23              = " << fMuFractionState23;
   cout << endl << "Number of particles to simulate       = " << fNmuons;
   cout << endl << "Initial muon spin phase (degree)      = " << fInitialPhase;
   cout << endl << "Debug flag                            = " << fDebugFlag;
@@ -224,38 +230,53 @@ Double_t PSimulateMuTransition::NextEventTime(const Double_t &EventRate)
  * \param time duration of precession (us);
  * \param frequency muon spin precession frequency (MHz);
  */
-Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const Double_t &frequency)
+Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const TString chargeState)
 {
-  return TMath::TwoPi()*frequency*time;
+  Double_t muonPhaseX;
+  Double_t muoniumPolX = 0;
+  
+  if (chargeState == "Mu+")
+    muonPhaseX = TMath::TwoPi()*fMuonPrecFreq*time;
+  else if (chargeState == "Mu0"){
+    muoniumPolX = 0.5 * 
+    (fMuFractionState12 * (TMath::Cos(TMath::TwoPi()*fMuPrecFreq12*time) + TMath::Cos(TMath::TwoPi()*fMuPrecFreq34*time)) + 
+     fMuFractionState23 * (TMath::Cos(TMath::TwoPi()*fMuPrecFreq23*time) + TMath::Cos(TMath::TwoPi()*fMuPrecFreq14*time)));
+    muonPhaseX = TMath::ACos(muoniumPolX);
+  }
+  else
+    muonPhaseX = 0.;
+  
+  return muonPhaseX;
 }
 
 //--------------------------------------------------------------------------
 // Event (private)
 //--------------------------------------------------------------------------
 /**
- * <p> Generates "muon event": simulate muon spin phase under charge-exchange
- *     with "3 Mu states" (as MuBC in Si, B || (100), for example): a non-precessing,
- *     and two precessing signals (nu_12, nu_34). 
+ * <p> Generates "muon event": simulate muon spin phase under charge-exchange with
+ *     a neutral muonium state in transverse field, where the polarization evolution
+ *     PxMu(t) of the muon spin in muonium is determined by a superposition of the 
+ *     four "Mu transitions" nu_12, nu_34, nu_23, and nu_14.
  *     1) according to Mu+/Mu0 fraction begin either with a Mu+ state or Mu state
  *     2) Mu+: determine next electron-capture time t_c. If t_c is larger than decay time t_d
  *        calculate muon spin precession for t_d; else calculate spin precession for t_c.
- *     3) Determine next ionization time t_i, also determine which Mu0 state has been formed
- *        at the capture event. Calculate muon spin precession.
+ *     3) Determine next ionization time t_i; calculate Px(t_i) in Muonium; calculate the 
+ *        muon spin phase by acos(Px(t_i)).
  *     4) get the next electron capture time, continue until t_d is reached.
  *
  * <p> For isotropic muonium, TF:
- *     nu_12 and nu_34 with equal probabilities, probability for both states fMuFractionState1
- *     ni_23 and nu_14 with equal probabilities, probability for both states fMuFractionState2
+ *     nu_12 and nu_34 with equal probabilities, probability for both states fMuFractionState12
+ *     ni_23 and nu_14 with equal probabilities, probability for both states fMuFractionState23
  *
  * \param muonString if eq. "Mu+" begin with Mu+ precession
  */
 void PSimulateMuTransition::Event(const TString muonString)
 {
   Double_t eventTime, eventDiffTime, captureTime, ionizationTime;
-  Double_t muonPrecessionFreq, muoniumPrecessionFreq; // MHz
-  Double_t rndm, frac1, frac2;
+//   Double_t muonPrecessionFreq, muoniumPrecessionFreq; // MHz
+//   Double_t rndm, frac1, frac2;
 
-  muonPrecessionFreq = fMuonGyroRatio * fBfield; 
+  fMuonPrecFreq = fMuonGyroRatio * fBfield; 
 
   // charge-exchange loop until muon decay
   eventTime     = 0.;
@@ -270,10 +291,10 @@ void PSimulateMuTransition::Event(const TString muonString)
      eventTime += captureTime;
      if (fDebugFlag) cout << "Capture time = " << captureTime << " Phase = " << fMuonPhase << endl;
      if (eventTime < fMuonDecayTime)
-       fMuonPhase += PrecessionPhase(captureTime, muonPrecessionFreq);
+       fMuonPhase += PrecessionPhase(captureTime, "Mu+");
      else{ //muon decays; handle precession prior to muon decay
        eventDiffTime = fMuonDecayTime - (eventTime - captureTime);
-       fMuonPhase += PrecessionPhase(eventDiffTime, muonPrecessionFreq);
+       fMuonPhase += PrecessionPhase(eventDiffTime, "Mu+");
        break;
      }
 
@@ -281,31 +302,30 @@ void PSimulateMuTransition::Event(const TString muonString)
      ionizationTime = NextEventTime(fIonizationRate);
      eventTime += ionizationTime;
      // determine Mu state
-     rndm = fRandom->Rndm();
-     frac1 = 1. - fMuFractionState1 - fMuFractionState2; // non-precessing Mu states
-     frac2 = 1. - fMuFractionState2;
-     if ( rndm < frac1 )
-       muoniumPrecessionFreq = 0.;
-     else if (rndm >= frac1 && rndm <= frac2){
-       if (fRandom->Rndm() <= 0.5) 
-	muoniumPrecessionFreq = fMuPrecFreq12;
-       else
-        muoniumPrecessionFreq = fMuPrecFreq34;
-     }
-     else{
-       if (fRandom->Rndm() <= 0.5)
-        muoniumPrecessionFreq = fMuPrecFreq23;
-       else
-        muoniumPrecessionFreq = fMuPrecFreq14;
-     }
+//      rndm = fRandom->Rndm();
+//      frac1 = 1. - fMuFractionState1 - fMuFractionState2; // non-precessing Mu states
+//      frac2 = 1. - fMuFractionState2;
+//      if ( rndm < frac1 )
+//        muoniumPrecessionFreq = 0.;
+//      else if (rndm >= frac1 && rndm <= frac2){
+//        if (fRandom->Rndm() <= 0.5) 
+// 	muoniumPrecessionFreq = fMuPrecFreq12;
+//        else
+//         muoniumPrecessionFreq = fMuPrecFreq34;
+//      }
+//      else{
+//        if (fRandom->Rndm() <= 0.5)
+//         muoniumPrecessionFreq = fMuPrecFreq23;
+//        else
+//         muoniumPrecessionFreq = fMuPrecFreq14;
+//      }
 
-     if (fDebugFlag) cout << "Ioniza. time = " << ionizationTime << " Freq = " << muoniumPrecessionFreq 
-                          << " Phase = " << fMuonPhase << endl;
+     if (fDebugFlag) cout << "Ioniza. time = " << ionizationTime << " Phase = " << fMuonPhase << endl;
      if (eventTime < fMuonDecayTime)
-       fMuonPhase += PrecessionPhase(ionizationTime, muoniumPrecessionFreq);
+       fMuonPhase += PrecessionPhase(ionizationTime, "Mu0");
      else{ //muon decays; handle precession prior to muon decay
        eventDiffTime = fMuonDecayTime - (eventTime - ionizationTime);
-       fMuonPhase += PrecessionPhase(eventDiffTime, muoniumPrecessionFreq);
+       fMuonPhase += PrecessionPhase(eventDiffTime, "Mu0");
        break;
      }
    }
@@ -314,32 +334,31 @@ void PSimulateMuTransition::Event(const TString muonString)
      ionizationTime = NextEventTime(fIonizationRate);
      eventTime += ionizationTime;
      // determine Mu state
-     rndm = fRandom->Rndm();
-     frac1 = 1. - fMuFractionState1 - fMuFractionState2; // non-precessing Mu states
-     frac2 = 1. - fMuFractionState2;
-     if ( rndm < frac1 )
-       muoniumPrecessionFreq = 0.;
-     else if (rndm >= frac1 && rndm <= frac2){
-       if (fRandom->Rndm() <= 0.5) 
-	muoniumPrecessionFreq = fMuPrecFreq12;
-       else
-        muoniumPrecessionFreq = fMuPrecFreq34;
-     }
-     else{
-       if (fRandom->Rndm() <= 0.5)
-        muoniumPrecessionFreq = fMuPrecFreq23;
-       else
-        muoniumPrecessionFreq = fMuPrecFreq14;
-     }
+//      rndm = fRandom->Rndm();
+//      frac1 = 1. - fMuFractionState1 - fMuFractionState2; // non-precessing Mu states
+//      frac2 = 1. - fMuFractionState2;
+//      if ( rndm < frac1 )
+//        muoniumPrecessionFreq = 0.;
+//      else if (rndm >= frac1 && rndm <= frac2){
+//        if (fRandom->Rndm() <= 0.5) 
+// 	muoniumPrecessionFreq = fMuPrecFreq12;
+//        else
+//         muoniumPrecessionFreq = fMuPrecFreq34;
+//      }
+//      else{
+//        if (fRandom->Rndm() <= 0.5)
+//         muoniumPrecessionFreq = fMuPrecFreq23;
+//        else
+//         muoniumPrecessionFreq = fMuPrecFreq14;
+//      }
 
      if (fDebugFlag) 
-      cout << "Mu Ioniza. time = " << ionizationTime << " Freq = " << muoniumPrecessionFreq 
-         << " Phase = " << fMuonPhase << endl;
+      cout << "Mu Ioniza. time = " << ionizationTime << " Phase = " << fMuonPhase << endl;
      if (eventTime < fMuonDecayTime)
-       fMuonPhase += PrecessionPhase(ionizationTime, muoniumPrecessionFreq);
+       fMuonPhase += PrecessionPhase(ionizationTime, "Mu0");
      else{ //muon decays; handle precession prior to muon decay
        eventDiffTime = fMuonDecayTime - (eventTime - ionizationTime);
-       fMuonPhase += PrecessionPhase(eventDiffTime, muoniumPrecessionFreq);
+       fMuonPhase += PrecessionPhase(eventDiffTime, "Mu0");
        break;
      }
 
@@ -348,10 +367,10 @@ void PSimulateMuTransition::Event(const TString muonString)
      eventTime += captureTime;
      if (fDebugFlag) cout << "Capture time = " << captureTime << " Phase = " << fMuonPhase << endl;
      if (eventTime < fMuonDecayTime)
-       fMuonPhase += PrecessionPhase(captureTime, muonPrecessionFreq);
+       fMuonPhase += PrecessionPhase(captureTime, "Mu+");
      else{ //muon decays; handle precession prior to muon decay
        eventDiffTime = fMuonDecayTime - (eventTime - captureTime);
-       fMuonPhase += PrecessionPhase(eventDiffTime, muonPrecessionFreq);
+       fMuonPhase += PrecessionPhase(eventDiffTime, "Mu+");
        break;
      }
    }

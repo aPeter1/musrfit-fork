@@ -1,0 +1,178 @@
+MnSi, FLC68.2, 50 K                                           
+###############################################################
+FITPARAMETER
+#      Nr. Name       Value     Step      Pos_Error Boundaries   
+        1 rate_1      1.680     0.019       none        
+        2 field_1     1589.71   0.20        none        
+        3 rate_2      1.863     0.065       none        
+        4 field_2     788.86    0.49        none        
+
+        5 alpha_f15   1.0029    0.0015      none        
+        6 frac_f15    0.7350    0.0090      none        
+        7 asym_f15    0.2713    0.0043      none        0       none    
+        8 phase_f15   79.37     0.80        none        
+
+        9 alpha_f26   0.9996    0.0015      none        
+       10 frac_f26    0.7408    0.0085      none        
+       11 asym_f26    0.3029    0.0046      none        0       none    
+       12 phase_f26   30.22     0.73        none        
+
+       13 alpha_f37   1.0003    0.0015      none        
+       14 frac_f37    0.88      0.23        none        
+       15 asym_f37    0.0126    0.0045      none        0       none    
+       16 phase_f37   58.0      15.0        none        
+
+       17 alpha_f48   0.9999    0.0015      none        
+       18 frac_f48    0.7344    0.0084      none        
+       19 asym_f48    0.2929    0.0043      none        0       none    
+       20 phase_f48   -33.13    0.76        none        
+
+       21 alpha_b15   0.9991    0.0013      none        
+       22 frac_b15    0.7439    0.0077      none        
+       23 asym_b15    0.2807    0.0038      none        0       none    
+       24 phase_b15   164.98    0.68        none        
+
+       25 alpha_b26   1.0003    0.0013      none        
+       26 frac_b26    0.7331    0.0078      none        
+       27 asym_b26    0.2810    0.0038      none        0       none    
+       28 phase_b26   119.49    0.70        none        
+
+       29 alpha_b37   0.9989    0.0012      none        
+       30 frac_b37    0.7504    0.0078      none        
+       31 asym_b37    0.2755    0.0037      none        0       none    
+       32 phase_b37   102.07    0.69        none        
+
+       33 alpha_b48   0.9990    0.0012      none        
+       34 frac_b48    0.7391    0.0080      none        
+       35 asym_b48    0.2763    0.0039      none        0       none    
+       36 phase_b48   37.66     0.67        none        
+
+###############################################################
+THEORY
+asymmetry   fun1
+simplExpo      1          (rate)
+TFieldCos   map3  fun3       (phase frequency)
++
+asymmetry   fun2
+simplExpo      3          (rate)
+TFieldCos   map3  fun4       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = map1 * map2
+fun2 = (1 - map1) * map2
+fun3 = gamma_mu * par2
+fun4 = gamma_mu * par4
+
+###############################################################
+GLOBAL
+fittype         3         (asymmetry RRF fit)
+fit             0.0005  6      
+rrf_freq        7.15     T
+rrf_packing     300     
+rrf_phase       0.00    
+
+###############################################################
+# Fw1-Fw5 +++++++
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+alpha           5
+map             6    7    8    0    0    0    0    0    0    0    0
+forward         2 
+backward        6 
+background      500     15000   500     15000      # estimated bkg: 0.0492 / 0.0501
+data            20158   409500  20130   409500  
+t0              20108.0 20080.0 
+
+# Fw2-Fw6 +++++++
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+alpha           9
+map            10   11   12    0    0    0    0    0    0    0    0
+forward         3 
+backward        7 
+background      500     15000   500     15000      # estimated bkg: 0.0501 / 0.0451
+data            20138   409500  20121   409500  
+t0              20088.0 20071.0 
+
+# Fw3-Fw7 +++++++
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+alpha           13
+map            14   15   16    0    0    0    0    0    0    0    0
+forward         3 
+backward        8 
+background      500     15000   500     15000      # estimated bkg: 0.0501 / 0.0449
+data            20111   409500  20116   409500  
+t0              20061.0 20066.0 
+
+# Fw4-Fw8 +++++++
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+alpha           17
+map            18   19   20    0    0    0    0    0    0    0    0
+forward         5 
+backward        9 
+background      500     15000   500     15000      # estimated bkg: 0.0560 / 0.0462
+data            20121   409500  20082   409500  
+t0              20071.0 20032.0 
+
+# Bw1-Bw5 +++++++
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+alpha           21
+map            22   23   24    0    0    0    0    0    0    0    0
+forward         10 
+backward        14 
+background      500     15000   500     15000      # estimated bkg: 0.0641 / 0.0806
+data            20072   409500  20067   409500  
+t0              20022.0 20017.0 
+
+# Bw2-Bw6 +++++++
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+alpha           25
+map            26   27   28    0    0    0    0    0    0    0    0
+forward         11 
+backward        15 
+background      500     15000   500     15000      # estimated bkg: 0.0689 / 0.0768
+data            20076   409500  20069   409500  
+t0              20026.0 20019.0 
+
+# Bw3-Bw7 +++++++
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+alpha           29
+map            30   31   32    0    0    0    0    0    0    0    0
+forward         12 
+backward        16 
+background      500     15000   500     15000      # estimated bkg: 0.0769 / 0.0795
+data            20060   409500  20069   409500  
+t0              20010.0 20019.0 
+
+# Bw4-Bw8 +++++++
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+alpha           33
+map            34   35   36    0    0    0    0    0    0    0    0
+forward         13 
+backward        17 
+background      500     15000   500     15000      # estimated bkg: 0.0761 / 0.0702
+data            20063   409500  20089   409500  
+t0              20013.0 20039.0 
+
+###############################################################
+COMMANDS
+#MAX_LIKELIHOOD
+PRINT_LEVEL 2
+MINIMIZE
+#MINOS
+SAVE
+
+###############################################################
+PLOT 3   (asymmetry RRF plot)
+runs     1   2   3   4   5   6   7   8   
+range    0   9.07   -0.5   0.5
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
+fourier_power    11
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+
+###############################################################
+STATISTIC --- 2016-01-18 16:23:00
+  chisq = 7402.2, NDF = 6516, chisq/NDF = 1.135997
