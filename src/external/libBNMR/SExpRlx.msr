@@ -10,7 +10,7 @@ FITPARAMETER
 ###############################################################
 THEORY
 asymmetry      1
-userFcn  /home/l_salman/LEM/musrfit/src/external/libBNMR/libBNMR.so SExpRlx 2 3 4
+userFcn  /usr/local/lib/libBNMR.so SExpRlx 2 3 4
 
 ###############################################################
 RUN 45377 MUE4 PSI ASCII   (name beamline institute data-file-format)
