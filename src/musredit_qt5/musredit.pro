@@ -73,6 +73,7 @@ QT += xml
 QT += webkitwidgets
 QT += network
 QT += printsupport
+QT += svg
 
 HEADERS = musredit.h \
     PHelp.h \
@@ -144,5 +145,5 @@ FORMS = forms/PFindDialog.ui \
 
 RESOURCES = musredit.qrc
 
-macx:ICON = images/musredit.icns
+macx:ICON = icons/musredit.icns
 
