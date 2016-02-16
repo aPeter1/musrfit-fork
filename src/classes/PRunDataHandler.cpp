@@ -365,6 +365,10 @@ Bool_t PRunDataHandler::ReadFilesMsr()
     return false;
   }
 
+  char str[1024], *p_str=0;
+  UInt_t year=0;
+  TString musrRoot("musr-root");
+
   for (UInt_t i=0; i<runList->size(); i++) {
     for (UInt_t j=0; j<runList->at(i).GetRunNameSize(); j++) {
       fRunName = *(runList->at(i).GetRunName(j));
@@ -372,8 +376,17 @@ Bool_t PRunDataHandler::ReadFilesMsr()
       if (!FileExistsCheck(runList->at(i), j))
         return false;
 
+      // get year from string if LEM data file
+      strcpy(str, fRunName.Data());
+      p_str = strstr(str, "lem");
+      if (p_str != 0)
+        sscanf(p_str, "lem%d_his", &year);
+
       // check special case for ROOT-NPP/ROOT-PPC (LEM)
       if (!runList->at(i).GetFileFormat(j)->CompareTo("root-npp")) { // not post pile up corrected histos
+        // if LEM file header is already TMusrRoot, change the data-file-format
+        if (year >= 12)
+          runList->at(i).SetFileFormat(musrRoot, j);
         // check if forward/backward histoNo are within proper bounds, i.e. < PRH_PPC_OFFSET
         for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) {
           if (runList->at(i).GetForwardHistoNo(k) > PRH_PPC_OFFSET)
@@ -384,6 +397,9 @@ Bool_t PRunDataHandler::ReadFilesMsr()
             runList->at(i).SetBackwardHistoNo(runList->at(i).GetBackwardHistoNo(k)-PRH_PPC_OFFSET, k);
         }
       } else if (!runList->at(i).GetFileFormat(j)->CompareTo("root-ppc")) { // post pile up corrected histos
+        // if LEM file header is already TMusrRoot, change the data-file-format
+        if (year >= 12)
+          runList->at(i).SetFileFormat(musrRoot, j);
         // check if forward/backward histoNo are within proper bounds, i.e. > PRH_PPC_OFFSET
         for (UInt_t k=0; k<runList->at(i).GetForwardHistoNoSize(); k++) {
           if (runList->at(i).GetForwardHistoNo(k) < PRH_PPC_OFFSET)
