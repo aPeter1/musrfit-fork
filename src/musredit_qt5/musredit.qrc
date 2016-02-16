@@ -1,29 +1,29 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/editcopy.xpm</file>
-        <file>images/editcut.xpm</file>
-        <file>images/editfind.xpm</file>
-        <file>images/editnext.xpm</file>
-        <file>images/editpaste.xpm</file>
-        <file>images/editprevious.xpm</file>
-        <file>images/editredo.xpm</file>
-        <file>images/editundo.xpm</file>
-        <file>images/filenew.xpm</file>
-        <file>images/fileopen.xpm</file>
-        <file>images/fileprint.xpm</file>
-        <file>images/filereload.xpm</file>
-        <file>images/filesave.xpm</file>
-        <file>images/musrasym.xpm</file>
-        <file>images/musrcalcchisq.xpm</file>
-        <file>images/musrfit.xpm</file>
-        <file>images/musrmsr2data.xpm</file>
-        <file>images/musrprefs.xpm</file>
-        <file>images/musrsinglehisto.xpm</file>
-        <file>images/musrswap.xpm</file>
-        <file>images/musrt0.xpm</file>
-        <file>images/musrview.xpm</file>
-        <file>images/musrFT.xpm</file>
-        <file>images/musrdump.xpm</file>
+        <file>icons/edit-copy-plain.svg</file>
+        <file>icons/edit-cut-plain.svg</file>
+        <file>icons/edit-find-plain.svg</file>
+        <file>icons/go-next-use-plain.svg</file>
+        <file>icons/edit-paste-plain.svg</file>
+        <file>icons/go-previous-use-plain.svg</file>
+        <file>icons/edit-redo-plain.svg</file>
+        <file>icons/edit-undo-plain.svg</file>
+        <file>icons/document-new-plain.svg</file>
+        <file>icons/document-open-plain.svg</file>
+        <file>icons/document-print-plain.svg</file>
+        <file>icons/view-refresh-plain.svg</file>
+        <file>icons/document-save-plain.svg</file>
+        <file>icons/musrasym.xpm</file>
+        <file>icons/musrchisq-plain.svg</file>
+        <file>icons/musrfit-plain.svg</file>
+        <file>icons/msr2data-plain.svg</file>
+        <file>icons/musrprefs.xpm</file>
+        <file>icons/musrsinglehisto.xpm</file>
+        <file>icons/musrswap-plain.svg</file>
+        <file>icons/musrt0.xpm</file>
+        <file>icons/musrview-plain.svg</file>
+        <file>icons/musrFT.xpm</file>
+        <file>icons/musrdump.xpm</file>
         <file>latex_images/abragam.png</file>
         <file>latex_images/asymmetry.png</file>
         <file>latex_images/bessel.png</file>

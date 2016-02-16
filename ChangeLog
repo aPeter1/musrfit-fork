@@ -5,6 +5,10 @@
 changes since 0.16.0
 ===================================
 NEW 2016-01-22 update of the docu which now describes the RRF option.
+CHANGED 2016-02-16 start migrating the icons of musredit_qt5 to the breeze
+               icons (https://github.com/NitruxSA/breeze-icon-theme).
+               At the same time I start to redesign the musrfit specific
+               icons accordingly (not yet happy with it, but ...).
 
 changes since 0.15.0
 ===================================
