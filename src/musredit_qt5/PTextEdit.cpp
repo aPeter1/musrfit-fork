@@ -489,14 +489,14 @@ void PTextEdit::setupMusrActions()
   menuBar()->addMenu( menu );
 
   QAction *a;
-  a = new QAction( QIcon( QPixmap( ":/icons/musrasym.xpm" ) ), tr( "&Asymmetry Default" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrAsym-plain.svg" ) ), tr( "&Asymmetry Default" ), this );
   a->setShortcut( tr("Alt+A") );
   a->setStatusTip( tr("Get Default Asymmetry msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrGetAsymmetryDefault() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/musrsinglehisto.xpm" ) ), tr( "Single &Histogram Default" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrSingleHisto-plain.svg" ) ), tr( "Single &Histogram Default" ), this );
   a->setShortcut( tr("Alt+H") );
   a->setStatusTip( tr("Get Default Single Histogram msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrGetSingleHistoDefault() ) );
@@ -544,20 +544,20 @@ void PTextEdit::setupMusrActions()
   tb->addAction(a);
   menu->addAction(a);
 
-  fMusrT0Action = new QAction( QIcon( QPixmap( ":/icons/musrt0.xpm" ) ), tr( "&T0" ), this );
+  fMusrT0Action = new QAction( QIcon( QPixmap( ":/icons/musrt0-plain.svg" ) ), tr( "&T0" ), this );
   fMusrT0Action->setStatusTip( tr("Start musrt0") );
   connect( fMusrT0Action, SIGNAL( triggered() ), this, SLOT( musrT0() ) );
   tb->addAction(fMusrT0Action);
   menu->addAction(fMusrT0Action);
   fMusrT0Action->setEnabled(fAdmin->getEnableMusrT0Flag());
 
-  a = new QAction( QIcon( QPixmap (":/icons/musrFT.xpm") ), tr( "Raw Fourier" ), this );
+  a = new QAction( QIcon( QPixmap (":/icons/musrFT-plain.svg") ), tr( "Raw Fourier" ), this );
   a->setStatusTip( tr("Start musrFT") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrFT() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/musrprefs.xpm" ) ), tr( "&Preferences" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrprefs-plain.svg" ) ), tr( "&Preferences" ), this );
   a->setStatusTip( tr("Show Preferences") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrPrefs() ) );
   tb->addAction(a);
@@ -566,7 +566,7 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap(":/icons/musrdump.xpm")), tr( "&Dump Header"), this);
+  a = new QAction( QIcon( QPixmap(":/icons/musrdump-plain.svg")), tr( "&Dump Header"), this);
   a->setStatusTip( tr("Dumps muSR File Header Information") );
   connect( a, SIGNAL(triggered()), this, SLOT(musrDump()));
   tb->addAction(a);
