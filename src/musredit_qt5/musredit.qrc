@@ -13,17 +13,17 @@
         <file>icons/document-print-plain.svg</file>
         <file>icons/view-refresh-plain.svg</file>
         <file>icons/document-save-plain.svg</file>
-        <file>icons/musrasym.xpm</file>
+        <file>icons/musrAsym-plain.svg</file>
         <file>icons/musrchisq-plain.svg</file>
         <file>icons/musrfit-plain.svg</file>
         <file>icons/msr2data-plain.svg</file>
-        <file>icons/musrprefs.xpm</file>
-        <file>icons/musrsinglehisto.xpm</file>
+        <file>icons/musrprefs-plain.svg</file>
+        <file>icons/musrSingleHisto-plain.svg</file>
         <file>icons/musrswap-plain.svg</file>
-        <file>icons/musrt0.xpm</file>
+        <file>icons/musrt0-plain.svg</file>
         <file>icons/musrview-plain.svg</file>
-        <file>icons/musrFT.xpm</file>
-        <file>icons/musrdump.xpm</file>
+        <file>icons/musrFT-plain.svg</file>
+        <file>icons/musrdump-plain.svg</file>
         <file>latex_images/abragam.png</file>
         <file>latex_images/asymmetry.png</file>
         <file>latex_images/bessel.png</file>
