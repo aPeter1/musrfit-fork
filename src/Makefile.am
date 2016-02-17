@@ -60,7 +60,7 @@ write_musrRoot_runHeader_SOURCES = write_musrRoot_runHeader.cpp
 musrRootValidation_SOURCES = musrRootValidation.cpp
 dump_header_SOURCES = dump_header.cpp
 
-xmldir = $(bindir)
+xmldir = $(HOME)/.musrfit
 xml_DATA = musrfit_startup.xml
 
 LIBADD = $(PMUSR_LIBS) $(MUSR_ROOT_LIBS) $(LEM_LIBS) $(PSIBIN_LIBS) $(MUD_LIBS) $(PNEXUS_LIBS)
@@ -82,7 +82,7 @@ install-xmlDATA: $(xml_DATA)
 	  DIFF="$$(diff "$(DESTDIR)$(xmldir)/$(xml_DATA)" "$(xml_DATA)" 2>&1)"; \
 	  if test "x$$DIFF" != "x"; then \
 	    echo "   " && \
-	    echo "   musrfit_startup.xml in $(bindir)" && \
+	    echo "   musrfit_startup.xml in $(xmldir)" && \
 	    echo "   is different from the distribution's version." && \
 	    echo "   Do you want to overwrite it? [y/N]" && \
 	    read OVERWRITE && \
@@ -101,7 +101,7 @@ uninstall-xmlDATA:
 	  DIFF="$$(diff "$(DESTDIR)$(xmldir)/$(xml_DATA)" "$(xml_DATA)" 2>&1)"; \
 	  if test "x$$DIFF" != "x"; then \
 	    echo "   " && \
-	    echo "   musrfit_startup.xml in $(bindir)" && \
+	    echo "   musrfit_startup.xml in $(xmldir)" && \
 	    echo "   is different from the distribution's version." && \
 	    echo "   Do you want to remove it? [y/N]" && \
 	    read REMOVE && \

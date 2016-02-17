@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<musredit_startup xmlns="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrGui.html">
+<musredit_startup xmlns="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrGui.html">
   <comment>
     This is handling default setting parameters for the musredit.
   </comment>
@@ -14,6 +14,7 @@
     <title_from_data_file>y</title_from_data_file>
     <chisq_per_run_block>n</chisq_per_run_block>
     <estimate_n0>y</estimate_n0>
+    <musrview_show_fourier>n</musrview_show_fourier>
     <enable_musrt0>y</enable_musrt0>
   </general>
   <recent_files>
