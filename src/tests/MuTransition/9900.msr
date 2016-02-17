@@ -1,0 +1,67 @@
+09900- Mu-frac 1.00, Mu12 134.86 MHz(0.27), Mu23 143.71 MHz(0.23), ionRate 608086.30 MHz, capRate   1.00 MHz, SF rate   0.00,   100 G
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+        1 alpha       1.0008    -0.0021     0.0021      0       none    
+        2 asy         0.2717    -0.0014     0.0014      0       0.33    
+        3 phase       1.78      -0.46       0.46        
+        4 field       100.418   -0.035      0.035       0       none    
+        5 rate        0.0000000072  -0.0000000072 0.0013386264 0       100     
+        6 asyMu       0         0           none        
+        7 phaseMu     0         0           none        
+        8 freqMu      35        0           none        
+        9 rateMu      0         0           none        
+
+###############################################################
+THEORY
+asymmetry      2
+TFieldCos      3  fun1       (phase frequency)
+simplExpo      5          (rate)
++
+asymmetry      6
+TFieldCos      7     8       (phase frequency)
+simplExpo      9          (rate)
+
+###############################################################
+FUNCTIONS
+fun1 = par4 * gamma_mu
+
+###############################################################
+RUN 09900 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+fittype         2         (asymmetry fit)
+alpha           1
+map             0    0    0    0    0    0    0    0    0    0
+forward         1 
+backward        2 
+backgr.fix      0           0           
+data            1       12000   1       12000   
+t0              0.0     0.0     
+fit             0       8      
+packing         5
+
+###############################################################
+COMMANDS
+SET BATCH
+MINIMIZE
+MINOS
+SAVE
+END RETURN
+
+###############################################################
+FOURIER
+units            MHz    # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8
+#range_for_phase_correction 50.0 70.0
+range            0    200
+
+###############################################################
+PLOT 2   (asymmetry plot)
+runs     1   
+range    0   8   -0.35   0.35
+
+###############################################################
+STATISTIC --- 2016-02-17 20:38:53
+  chisq = 1457.5, NDF = 1595, chisq/NDF = 0.913780
