@@ -104,6 +104,7 @@ PSimulateMuTransition::PSimulateMuTransition(UInt_t seed)
   fBfield           = 0.01;  // magnetic field (T)
   fCaptureRate      = 0.01;  // Mu+ capture rate (MHz)
   fIonizationRate   = 10.;   // Mu0 ionization rate (MHz)
+  fSpinFlipRate     = 0.001; // Mu0 spin flip rate (MHz)
   fInitialPhase     = 0.;
   fMuonPhase        = fInitialPhase;
   fMuonDecayTime    = 0.;
@@ -142,7 +143,9 @@ void PSimulateMuTransition::PrintSettings() const
   cout << endl << "Mu precession frequency 14 (MHz)  = " << fMuPrecFreq14;
   cout << endl << "B field (T)                           = " << fBfield;
   cout << endl << "Mu+ electron capture rate (MHz)       = " << fCaptureRate;
-  cout << endl << "Mu ionizatioan rate (MHz)             = " << fIonizationRate;
+  cout << endl << "Mu0 ionizatioan rate (MHz)            = " << fIonizationRate;
+  cout << endl << "Mu0 spin-flip rate (MHz)              = " << fSpinFlipRate;
+  cout << endl << "!!! Note: if spin-flip rate > 0.001 only spin-flip process is considered!!!";
   cout << endl << "Decay asymmetry                       = " << fAsymmetry;
   cout << endl << "Muonium fraction                      = " << fMuFraction;
   cout << endl << "Muonium fraction state12              = " << fMuFractionState12;
@@ -184,12 +187,17 @@ void PSimulateMuTransition::Run(TH1F *histoForward, TH1F *histoBackward)
   for (i = 0; i<fNmuons; i++){
     fMuonPhase         = TMath::TwoPi() * fInitialPhase/360.; // transform to radians
     fMuonDecayTime     = NextEventTime(fMuonDecayRate);
-    // initial muon state Mu+ or Mu0?
-    if (fRandom->Rndm() <= 1.-fMuFraction) 
-     Event("Mu+");
-    else
-     Event("");
-
+    
+    if (fSpinFlipRate > 0.001){// consider only Mu0 spin-flip in this case
+      fMuonPhase = TMath::ACos(GTSpinFlip(fMuonDecayTime));
+    }
+    else{
+      // initial muon state Mu+ or Mu0?
+      if (fRandom->Rndm() <= 1.-fMuFraction) 
+        Event("Mu+");
+      else
+        Event("");
+    }
     // fill 50% in "forward", and 50% in "backward" detector to get independent
     // events in "forward" and "backward" histograms. This allows "normal" uSR
     // analysis of the data
@@ -228,7 +236,7 @@ Double_t PSimulateMuTransition::NextEventTime(const Double_t &EventRate)
  * <p>Determines phase of the muon spin
  *
  * \param time duration of precession (us);
- * \param frequency muon spin precession frequency (MHz);
+ * \param chargeState charge state of Mu ("Mu+" or  "Mu0")
  */
 Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const TString chargeState)
 {
@@ -238,15 +246,67 @@ Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const TStr
   if (chargeState == "Mu+")
     muonPhaseX = TMath::TwoPi()*fMuonPrecFreq*time;
   else if (chargeState == "Mu0"){
-    muoniumPolX = 0.5 * 
-    (fMuFractionState12 * (TMath::Cos(TMath::TwoPi()*fMuPrecFreq12*time) + TMath::Cos(TMath::TwoPi()*fMuPrecFreq34*time)) + 
-     fMuFractionState23 * (TMath::Cos(TMath::TwoPi()*fMuPrecFreq23*time) + TMath::Cos(TMath::TwoPi()*fMuPrecFreq14*time)));
+    muoniumPolX = GTFunction(time);
     muonPhaseX = TMath::ACos(muoniumPolX);
   }
   else
     muonPhaseX = 0.;
   
   return muonPhaseX;
+}
+
+//--------------------------------------------------------------------------
+// Mu0 transverse field polarization function (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates Mu0 polarization in x direction by superposition of four Mu0 frequencies
+ *
+ * \param time  (us);
+ */
+Double_t PSimulateMuTransition::GTFunction(const Double_t &time)
+{
+  Double_t muoniumPolX = 0;
+
+  muoniumPolX = 0.5 * 
+   (fMuFractionState12 * (TMath::Cos(TMath::TwoPi()*fMuPrecFreq12*time) + TMath::Cos(TMath::TwoPi()*fMuPrecFreq34*time)) + 
+    fMuFractionState23 * (TMath::Cos(TMath::TwoPi()*fMuPrecFreq23*time) + TMath::Cos(TMath::TwoPi()*fMuPrecFreq14*time)));
+  
+  return muoniumPolX;
+}
+
+//--------------------------------------------------------------------------
+// Mu0 transverse field polarization function after n spin-flip collisions (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates Mu0 polarization in x direction after n spin flip collisions.
+ * See M. Senba, J.Phys. B24, 3531 (1991), equation (17)
+ *
+ * \param time  (us);
+ */
+Double_t PSimulateMuTransition::GTSpinFlip(const Double_t &time)
+{
+  Double_t muoniumPolX = 1.0; //initial polarization in x direction
+  Double_t eventTime =  0;
+  Double_t eventDiffTime = 0;
+  Double_t lastEventTime = 0;
+  
+  eventTime += NextEventTime(fSpinFlipRate);
+  if (eventTime >= time){
+   muoniumPolX = GTFunction(time); 
+  }
+  else{
+   while (eventTime < time){
+     eventDiffTime = eventTime - lastEventTime;
+     muoniumPolX = muoniumPolX * GTFunction(eventDiffTime);
+     lastEventTime = eventTime;
+     eventTime += NextEventTime(fSpinFlipRate);
+   }
+   // calculate for the last collision
+   eventDiffTime = time - lastEventTime;
+   muoniumPolX = muoniumPolX * GTFunction(eventDiffTime);
+  }
+ 
+  return muoniumPolX;
 }
 
 //--------------------------------------------------------------------------
