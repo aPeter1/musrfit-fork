@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<musredit_startup xmlns="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrGui.html">
+<musredit_startup xmlns="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrGui.html">
   <comment>
     This is handling default setting parameters for the musredit.
   </comment>
