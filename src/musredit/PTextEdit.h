@@ -147,7 +147,7 @@ private slots:
   void replaceAndClose();
   void replaceAll();
 
-  void applyFontSettings(QWidget*);
+  void applyFontSettings(int);
   void fileChanged(const QString &fileName);
   void setFileSystemWatcherActive();
 

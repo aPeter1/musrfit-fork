@@ -14,6 +14,7 @@
     <title_from_data_file>y</title_from_data_file>
     <chisq_per_run_block>n</chisq_per_run_block>
     <estimate_n0>y</estimate_n0>
+    <musrview_show_fourier>n</musrview_show_fourier>
     <enable_musrt0>y</enable_musrt0>
   </general>
   <recent_files>
