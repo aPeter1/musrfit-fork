@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /***************************************************************************
 
   runMuSimulation.C
@@ -298,4 +297,3 @@ void runMuSimulation()
 
   delete [] histo;
 }
->>>>>>> 4fec25e423493c58fa21cedec161430f90ffc10d
