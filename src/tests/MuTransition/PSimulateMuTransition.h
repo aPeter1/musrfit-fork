@@ -34,6 +34,7 @@
 #include <TObject.h>
 #include <TH1F.h>
 #include <TRandom2.h>
+#include <TComplex.h>
 
 // global constants
 const Double_t fMuonGyroRatio = 135.54; //!< muon gyromagnetic ratio (MHz/T)
@@ -95,7 +96,7 @@ class PSimulateMuTransition : public TObject
     virtual Double_t NextEventTime(const Double_t &EventRate);
 //     virtual Double_t PrecessionPhase(const Double_t &time, const Double_t &frequency);
     virtual Double_t PrecessionPhase(const Double_t &time, const TString chargeState);
-    virtual Double_t GTFunction(const Double_t &time); //!< transverse field polarization function of Mu0
+    virtual TComplex GTFunction(const Double_t &time); //!< transverse field polarization function of Mu0
     virtual Double_t GTSpinFlip(const Double_t &time); //!< transverse field polarization function after spin-flip collisions
     virtual void     Event(const TString muonString);
  

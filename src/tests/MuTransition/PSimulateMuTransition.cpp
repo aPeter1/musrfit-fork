@@ -73,6 +73,7 @@
 using namespace std;
 
 #include <TMath.h>
+#include <TComplex.h>
 
 #include "PSimulateMuTransition.h"
 
@@ -246,7 +247,7 @@ Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const TStr
   if (chargeState == "Mu+")
     muonPhaseX = TMath::TwoPi()*fMuonPrecFreq*time;
   else if (chargeState == "Mu0"){
-    muoniumPolX = GTFunction(time);
+    muoniumPolX = GTFunction(time).Re();
     muonPhaseX = TMath::ACos(muoniumPolX);
   }
   else
@@ -263,15 +264,29 @@ Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const TStr
  *
  * \param time  (us);
  */
-Double_t PSimulateMuTransition::GTFunction(const Double_t &time)
+TComplex PSimulateMuTransition::GTFunction(const Double_t &time)
 {
-  Double_t muoniumPolX = 0;
+  Double_t twoPi = TMath::TwoPi();
 
-  muoniumPolX = 0.5 * 
-   (fMuFractionState12 * (TMath::Cos(TMath::TwoPi()*fMuPrecFreq12*time) + TMath::Cos(TMath::TwoPi()*fMuPrecFreq34*time)) + 
-    fMuFractionState23 * (TMath::Cos(TMath::TwoPi()*fMuPrecFreq23*time) + TMath::Cos(TMath::TwoPi()*fMuPrecFreq14*time)));
-  
-  return muoniumPolX;
+  TComplex complexPol = 0; 
+  complexPol = 
+    0.5 * fMuFractionState12 * 
+   (TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq12*time) +
+    TComplex::Exp(-TComplex::I()*twoPi*fMuPrecFreq34*time))
+    +
+    0.5 * fMuFractionState23 * 
+   (TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq23*time) +
+    TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq14*time));
+    
+  return complexPol;
+
+//   Double_t muoniumPolX = 0;
+//   muoniumPolX = 0.5 * 
+//    (fMuFractionState12 * (TMath::Cos(twoPi*fMuPrecFreq12*time) + TMath::Cos(twoPi*fMuPrecFreq34*time)) + 
+//     fMuFractionState23 * (TMath::Cos(twoPi*fMuPrecFreq23*time) + TMath::Cos(twoPi*fMuPrecFreq14*time)));
+//   
+//   return muoniumPolX;
+
 }
 
 //--------------------------------------------------------------------------
@@ -285,6 +300,7 @@ Double_t PSimulateMuTransition::GTFunction(const Double_t &time)
  */
 Double_t PSimulateMuTransition::GTSpinFlip(const Double_t &time)
 {
+  TComplex complexPolX = 1.0;
   Double_t muoniumPolX = 1.0; //initial polarization in x direction
   Double_t eventTime =  0;
   Double_t eventDiffTime = 0;
@@ -292,18 +308,19 @@ Double_t PSimulateMuTransition::GTSpinFlip(const Double_t &time)
   
   eventTime += NextEventTime(fSpinFlipRate);
   if (eventTime >= time){
-   muoniumPolX = GTFunction(time); 
+   muoniumPolX = GTFunction(time).Re(); 
   }
   else{
    while (eventTime < time){
      eventDiffTime = eventTime - lastEventTime;
-     muoniumPolX = muoniumPolX * GTFunction(eventDiffTime);
+     complexPolX = complexPolX * GTFunction(eventDiffTime);
      lastEventTime = eventTime;
      eventTime += NextEventTime(fSpinFlipRate);
    }
    // calculate for the last collision
    eventDiffTime = time - lastEventTime;
-   muoniumPolX = muoniumPolX * GTFunction(eventDiffTime);
+   complexPolX = complexPolX * GTFunction(eventDiffTime);
+   muoniumPolX = complexPolX.Re();
   }
  
   return muoniumPolX;
