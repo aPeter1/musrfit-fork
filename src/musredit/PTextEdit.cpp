@@ -129,7 +129,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
     fileNew();
   }
 
-  connect( fTabWidget, SIGNAL( currentChanged(QWidget*) ), this, SLOT( applyFontSettings(QWidget*) ));
+  connect( fTabWidget, SIGNAL( currentChanged(int) ), this, SLOT( applyFontSettings(int) ));
 
   fLastDirInUse = fAdmin->getDefaultSavePath();
 }
@@ -903,12 +903,31 @@ void PTextEdit::fileReload()
  */
 void PTextEdit::fileOpenPrefs()
 {
-  QString fln = QFileDialog::getOpenFileName( this, tr("Open Prefs"),
+  QString fln("");
+  QString msg("");
+  QMessageBox msgBox;
+  msgBox.setText("Which Preferences do you want to open?");
+  msgBox.addButton("Default", QMessageBox::AcceptRole);
+  msgBox.addButton("Custom", QMessageBox::AcceptRole);
+  msgBox.setStandardButtons(QMessageBox::Cancel);
+  int result = msgBox.exec();
+  if (result == QMessageBox::Cancel) {
+    return;
+  } else if (result == 0) { // default dir
+    fln = fAdmin->getDefaultPrefPathName();
+    msg = QString("Current Default Preferences Path-Name:\n") + fln;
+    if (QMessageBox::information(this, "Info", msg, QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel)
+      return;
+  } else if (result == 1) { // custom dir
+    fln = QFileDialog::getOpenFileName( this, tr("Open Prefs"),
                         fLastDirInUse,
                         tr( "xml-Files (*.xml);; All Files (*)" ));
+  }
 
-  if (fAdmin->loadPrefs(fln))
-    QMessageBox::information(0, "Prefs", "<b>Prefs Loaded.</b>");
+  if (fAdmin->loadPrefs(fln)) {
+    msg = QString("Prefs from '") + fln + QString("' loaded.");
+    QMessageBox::information(0, "Info", msg);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -970,12 +989,31 @@ void PTextEdit::fileSaveAs()
  */
 void PTextEdit::fileSavePrefs()
 {
-  QString fn = QFileDialog::getSaveFileName( this,
+  QString fln("");
+  QString msg("");
+  QMessageBox msgBox;
+  msgBox.setText("Which Preferences do you want to open?");
+  msgBox.addButton("Default", QMessageBox::AcceptRole);
+  msgBox.addButton("Custom", QMessageBox::AcceptRole);
+  msgBox.setStandardButtons(QMessageBox::Cancel);
+  int result = msgBox.exec();
+  if (result == QMessageBox::Cancel) {
+    return;
+  } else if (result == 0) { // default dir
+    fln = fAdmin->getDefaultPrefPathName();
+    msg = QString("Current Default Preferences Path-Name:\n") + fln;
+    if (QMessageBox::information(this, "Info", msg, QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel)
+      return;
+  } else if (result == 1) { // custom dir
+    fln = QFileDialog::getSaveFileName( this,
                     tr( "Save Prefs As" ), "musredit_startup.xml",
                     tr( "xml-Files (*.xml);;All Files (*)" ) );
+  }
 
-  if ( !fn.isEmpty() ) {
-    fAdmin->savePrefs(fn);
+  if ( !fln.isEmpty() ) {
+    fAdmin->savePrefs(fln);
+    msg = QString("Prefs to '") + fln + QString("' saved.");
+    QMessageBox::information(0, "Info", msg);
   }
 }
 
@@ -2508,7 +2546,7 @@ void PTextEdit::replaceAll()
 /**
  * <p>SLOT: updates the fonts if the textedit tab has changed.
  */
-void PTextEdit::applyFontSettings(QWidget*)
+void PTextEdit::applyFontSettings(int)
 {
   QFont font(fAdmin->getFontName(), fAdmin->getFontSize());
   fontChanged(font);

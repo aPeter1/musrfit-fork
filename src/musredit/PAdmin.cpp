@@ -603,6 +603,7 @@ PAdmin::PAdmin() : QObject()
   fFontName = QString("Courier"); // default font
   fFontSize = 11; // default font size
 
+  fPrefPathName = QString("");
   fExecPath = QString("");
   fDefaultSavePath = QString("");
   fMsrDefaultFilePath = QString("");
@@ -641,25 +642,28 @@ PAdmin::PAdmin() : QObject()
   fMsr2DataParam.globalPlus = false;
 
   // XML Parser part
-  QString fln = "musredit_startup.xml";
-  // check if it is a MacOSX
-#ifdef Q_WS_MAC
-  fln = "./musredit_startup.xml";
-  if (!QFile::exists(fln)) {
-    fln = "/Applications/musredit.app/Contents/Resources/musredit_startup.xml";
+  // 1st: check local directory
+  QString path = QString("./");
+  QString fln = QString("musredit_startup.xml");
+  QString pathFln = path + fln;
+  if (!QFile::exists(pathFln)) {
+    // 2nd: check $HOME/.musrfit/musredit/musredit_startup.xml
+    path = std::getenv("HOME");
+    pathFln = path + "/.musrfit/musredit/" + fln;
+    if (!QFile::exists(pathFln)) {
+      // 3rd: check $MUSRFITPATH/musredit_startup.xml
+      path = std::getenv("MUSRFITPATH");
+      pathFln = path + "/" + fln;
+      if (!QFile::exists(pathFln)) {
+        // 4th: check $ROOTSYS/bin/musredit_startup.xml
+        path = std::getenv("ROOTSYS");
+        pathFln = path + "/bin/" + fln;
+      }
+    }
   }
-#else
-  fln = "./musredit_startup.xml";
-  if (!QFile::exists(fln)) {
-    QString path = std::getenv("MUSRFITPATH");
-    QString rootsys = std::getenv("ROOTSYS");
-    if (path.isEmpty())
-      path = rootsys + "/bin";
-    fln = path + "/musredit_startup.xml";
-  }
-#endif
+  fPrefPathName = pathFln;
 
-  loadPrefs(fln);
+  loadPrefs(fPrefPathName);
 }
 
 //--------------------------------------------------------------------------
@@ -769,25 +773,10 @@ int PAdmin::savePrefs(QString pref_fln)
 {
   // check if musredit_startup.xml is present in the current directory, and if yes, use this file to
   // save the recent file names otherwise use the "master" musredit_startup.xml
+  QString fln = QString("./musredit_startup.xml");
+  if (!QFile::exists(fln))
+    fln = fPrefPathName;
 
-  QString str;
-  QString fln = "musredit_startup.xml";
-  // check if it is a MacOSX
-#ifdef Q_WS_MAC
-  fln = "./musredit_startup.xml";
-  if (!QFile::exists(fln)) {
-    fln = "/Applications/musredit.app/Contents/Resources/musredit_startup.xml";
-  }
-#else
-  fln = "./musredit_startup.xml";
-  if (!QFile::exists(fln)) {
-    QString path = std::getenv("MUSRFITPATH");
-    QString rootsys = std::getenv("ROOTSYS");
-    if (path.isEmpty())
-      path = rootsys + "/bin";
-    fln = path + "/musredit_startup.xml";
-  }
-#endif
   if (QFile::exists(fln)) { // administration file present
     QVector<QString> data;
     QFile file(fln);
@@ -842,6 +831,12 @@ int PAdmin::savePrefs(QString pref_fln)
         else
           data[i] = "    <estimate_n0>n</estimate_n0>";
       }
+      if (data[i].contains("<musrview_show_fourier>") && data[i].contains("</musrview_show_fourier>")) {
+        if (fMusrviewShowFourier)
+          data[i] = "    <musrview_show_fourier>y</musrview_show_fourier>";
+        else
+          data[i] = "    <musrview_show_fourier>n</musrview_show_fourier>";
+      }
       if (data[i].contains("<enable_musrt0>") && data[i].contains("</enable_musrt0>")) {
         if (fEnableMusrT0)
           data[i] = "    <enable_musrt0>y</enable_musrt0>";
@@ -853,13 +848,16 @@ int PAdmin::savePrefs(QString pref_fln)
     // write prefs
     file.setFileName(pref_fln);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      cerr << endl << ">> PAdmin::savePrefs: **ERROR** Cannot open " << fln.toLatin1().data() << " for writing." << endl;
+      cerr << endl << ">> PAdmin::savePrefs: **ERROR** Cannot open " << pref_fln.toLatin1().data() << " for writing." << endl;
       return 0;
     }
     fin.setDevice(&file);
     for (int i=0; i<data.size(); i++)
       fin << data[i] << endl;
     file.close();
+  } else {
+    QString msg("Failed to write musredit_startup.xml. Neither a local nor a global copy found.");
+    QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
   }
 
   return 1;
@@ -894,25 +892,11 @@ void PAdmin::saveRecentFiles()
 {
   // check if musredit_startup.xml is present in the current directory, and if yes, use this file to
   // save the recent file names otherwise use the "master" musredit_startup.xml
+  QString str("");
+  QString fln = QString("./musredit_startup.xml");
+  if (!QFile::exists(fln))
+    fln = fPrefPathName;
 
-  QString str;
-  QString fln = "musredit_startup.xml";
-  // check if it is a MacOSX
-#ifdef Q_WS_MAC
-  fln = "./musredit_startup.xml";
-  if (!QFile::exists(fln)) {
-    fln = "/Applications/musredit.app/Contents/Resources/musredit_startup.xml";
-  }
-#else
-  fln = "./musredit_startup.xml";
-  if (!QFile::exists(fln)) {
-    QString path = std::getenv("MUSRFITPATH");
-    QString rootsys = std::getenv("ROOTSYS");
-    if (path.isEmpty())
-      path = rootsys + "/bin";
-    fln = path + "/musredit_startup.xml";
-  }
-#endif
   if (QFile::exists(fln)) { // administration file present
     QVector<QString> data;
     QFile file(fln);
@@ -959,6 +943,9 @@ void PAdmin::saveRecentFiles()
     for (int i=0; i<data.size(); i++)
       fin << data[i] << endl;
     file.close();
+  } else {
+    QString msg("Failed to write musredit_startup.xml. Neither a local nor a global copy found.");
+    QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
   }
 }
 

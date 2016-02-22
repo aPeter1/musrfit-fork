@@ -136,6 +136,7 @@ class PAdmin : public QObject
     PTheory* getTheoryItem(const unsigned int idx);
     PMsr2DataParam getMsr2DataParam() { return fMsr2DataParam; }
     int     getNumRecentFiles() { return fRecentFile.size(); }
+    QString getDefaultPrefPathName() { return fPrefPathName; }
     QString getRecentFile(int idx);
 
     void setTimeout(const int ival) { fTimeout = ival; }
@@ -153,7 +154,7 @@ class PAdmin : public QObject
     void addRecentFile(const QString str);
 
     int loadPrefs(QString fln);
-    int  savePrefs(QString pref_fln);
+    int savePrefs(QString pref_fln);
 
   protected:
     void setExecPath(const QString str) { fExecPath = str; }
@@ -175,6 +176,7 @@ class PAdmin : public QObject
     QString fFontName;  ///< default font name
     int fFontSize;      ///< default font size
 
+    QString fPrefPathName;       ///< path-name of the musredit_startup.xml
     QString fExecPath;           ///< system path to the musrfit executables
     QString fDefaultSavePath;    ///< default path where the msr-file should be saved
     QString fMsrDefaultFilePath; ///< path where to find musredit source

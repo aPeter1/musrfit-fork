@@ -58,8 +58,8 @@ QMAKE_CXX = $${CXX}
 QMAKE_LINK = $${CXX}
 
 # install path for the XML configuration file
-unix:xml.path = $${MUSREDIT_INSTALL_PATH}
-macx:xml.path = /Applications/musredit.app/Contents/Resources
+unix:xml.path = $$(HOME)/.musrfit/musredit
+macx:xml.path = $$(HOME)/.musrfit/musredit
 win32:xml.path = c:/musrfit/bin
 xml.files = musredit_startup.xml
 INSTALLS += xml

@@ -117,8 +117,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   textSize(QString("%1").arg(fAdmin->getFontSize()));
   fFontChanging = false;
 
-  QPixmap image0(":/images/musrfit.xpm");
-  setWindowIcon( image0 );
+  setWindowIcon( QIcon( QPixmap( ":/icons/musrfit-plain.svg" ) ) );
 
   // if arguments are give, try to load those files, otherwise create an empty new file
   if ( qApp->arguments().size() != 1 ) {
@@ -128,7 +127,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
     fileNew();
   }
 
-  connect( fTabWidget, SIGNAL( currentChanged(QWidget*) ), this, SLOT( applyFontSettings(QWidget*) ));
+  connect( fTabWidget, SIGNAL( currentChanged(int) ), this, SLOT( applyFontSettings(int) ));
 
   fLastDirInUse = fAdmin->getDefaultSavePath();
 }
@@ -173,14 +172,14 @@ void PTextEdit::setupFileActions()
 
   QAction *a;
 
-  a = new QAction( QIcon( QPixmap(":/images/filenew.xpm") ), tr( "&New..." ), this );
+  a = new QAction( QIcon( QPixmap(":/icons/document-new-plain.svg") ), tr( "&New..." ), this );
   a->setShortcut( tr("Ctrl+N") );
   a->setStatusTip( tr("Create a new msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileNew() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap(":/images/fileopen.xpm" ) ), tr( "&Open..." ), this );
+  a = new QAction( QIcon( QPixmap(":/icons/document-open-plain.svg" ) ), tr( "&Open..." ), this );
   a->setShortcut( tr("Ctrl+O") );
   a->setStatusTip( tr("Opens a msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileOpen() ) );
@@ -196,7 +195,7 @@ void PTextEdit::setupFileActions()
   }
   fillRecentFiles();
 
-  a = new QAction( QIcon( QPixmap(":/images/filereload.xpm") ), tr( "Reload..." ), this );
+  a = new QAction( QIcon( QPixmap(":/icons/view-refresh-plain.svg") ), tr( "Reload..." ), this );
   a->setShortcut( tr("F5") );
   a->setStatusTip( tr("Reload msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileReload() ) );
@@ -209,7 +208,7 @@ void PTextEdit::setupFileActions()
 
   menu->addSeparator();
 
-  a = new QAction( QIcon( QPixmap(":/images/filesave.xpm") ), tr( "&Save..." ), this );
+  a = new QAction( QIcon( QPixmap(":/icons/document-save-plain.svg") ), tr( "&Save..." ), this );
   a->setShortcut( tr("Ctrl+S") );
   a->setStatusTip( tr("Save msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileSave() ) );
@@ -227,7 +226,7 @@ void PTextEdit::setupFileActions()
 
   menu->addSeparator();
 
-  a = new QAction( QIcon( QPixmap(":/images/fileprint.xpm") ), tr( "&Print..." ), this );
+  a = new QAction( QIcon( QPixmap(":/icons/document-print-plain.svg") ), tr( "&Print..." ), this );
   a->setShortcut( tr("Ctrl+P") );
   a->setStatusTip( tr("Print msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( filePrint() ) );
@@ -276,14 +275,14 @@ void PTextEdit::setupEditActions()
 
   QAction *a;
 
-  a = new QAction( QIcon( QPixmap( ":/images/editundo.xpm" ) ), tr( "&Undo" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/edit-undo-plain.svg" ) ), tr( "&Undo" ), this );
   a->setShortcut( tr("Ctrl+Z") );
   a->setStatusTip( tr("Edit Undo") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editUndo() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/images/editredo.xpm" ) ), tr( "&Redo" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/edit-redo-plain.svg" ) ), tr( "&Redo" ), this );
   a->setShortcut( tr("Ctrl+Y") );
   a->setStatusTip( tr("Edit Redo") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editRedo() ) );
@@ -300,21 +299,21 @@ void PTextEdit::setupEditActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap( ":/images/editcopy.xpm" ) ), tr( "&Copy" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/edit-copy-plain.svg" ) ), tr( "&Copy" ), this );
   a->setShortcut( tr("Ctrl+C") );
   a->setStatusTip( tr("Edit Copy") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editCopy() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/images/editcut.xpm" ) ), tr( "Cu&t" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/edit-cut-plain.svg" ) ), tr( "Cu&t" ), this );
   a->setShortcut( tr("Ctrl+X") );
   a->setStatusTip( tr("Edit Cut") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editCut() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/images/editpaste.xpm" ) ), tr( "&Paste" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/edit-paste-plain.svg" ) ), tr( "&Paste" ), this );
   a->setShortcut( tr("Ctrl+V") );
   a->setStatusTip( tr("Edit Paste") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editPaste() ) );
@@ -324,21 +323,21 @@ void PTextEdit::setupEditActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap( ":/images/editfind.xpm" ) ), tr( "&Find" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/edit-find-plain.svg" ) ), tr( "&Find" ), this );
   a->setShortcut( tr("Ctrl+F") );
   a->setStatusTip( tr("Edit Find") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editFind() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/images/editnext.xpm" ) ), tr( "Find &Next" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/go-next-use-plain.svg" ) ), tr( "Find &Next" ), this );
   a->setShortcut( tr("F3") );
   a->setStatusTip( tr("Edit Find Next") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editFindNext() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/images/editprevious.xpm" ) ) , tr( "Find Pre&vious" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/go-previous-use-plain.svg" ) ) , tr( "Find Pre&vious" ), this );
   a->setShortcut( tr("Shift+F4") );
   a->setStatusTip( tr("Edit Find Previous") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editFindPrevious() ) );
@@ -490,14 +489,14 @@ void PTextEdit::setupMusrActions()
   menuBar()->addMenu( menu );
 
   QAction *a;
-  a = new QAction( QIcon( QPixmap( ":/images/musrasym.xpm" ) ), tr( "&Asymmetry Default" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrAsym-plain.svg" ) ), tr( "&Asymmetry Default" ), this );
   a->setShortcut( tr("Alt+A") );
   a->setStatusTip( tr("Get Default Asymmetry msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrGetAsymmetryDefault() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/images/musrsinglehisto.xpm" ) ), tr( "Single &Histogram Default" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrSingleHisto-plain.svg" ) ), tr( "Single &Histogram Default" ), this );
   a->setShortcut( tr("Alt+H") );
   a->setStatusTip( tr("Get Default Single Histogram msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrGetSingleHistoDefault() ) );
@@ -507,28 +506,28 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap( ":/images/musrcalcchisq.xpm" ) ), tr( "Calculate Chisq" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrchisq-plain.svg" ) ), tr( "Calculate Chisq" ), this );
   a->setShortcut( tr("Alt+C") );
   a->setStatusTip( tr("Calculate Chi Square (Log Max Likelihood)") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrCalcChisq() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/images/musrfit.xpm" ) ), tr( "&Fit" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrfit-plain.svg" ) ), tr( "&Fit" ), this );
   a->setShortcut( tr("Alt+F") );
   a->setStatusTip( tr("Fit") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrFit() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/images/musrswap.xpm" ) ), tr( "&Swap Msr <-> Mlog" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrswap-plain.svg" ) ), tr( "&Swap Msr <-> Mlog" ), this );
   a->setShortcut( tr("Alt+S") );
   a->setStatusTip( tr("Swap msr-file <-> mlog-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrSwapMsrMlog() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/images/musrmsr2data.xpm" ) ), tr( "&Msr2Data" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/msr2data-plain.svg" ) ), tr( "&Msr2Data" ), this );
   a->setShortcut( tr("Alt+M") );
   a->setStatusTip( tr("Start msr2data interface") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrMsr2Data() ) );
@@ -538,27 +537,27 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap( ":/images/musrview.xpm" ) ), tr( "&View" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrview-plain.svg" ) ), tr( "&View" ), this );
   a->setShortcut( tr("Alt+V") );
   a->setStatusTip( tr("Start musrview") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrView() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  fMusrT0Action = new QAction( QIcon( QPixmap( ":/images/musrt0.xpm" ) ), tr( "&T0" ), this );
+  fMusrT0Action = new QAction( QIcon( QPixmap( ":/icons/musrt0-plain.svg" ) ), tr( "&T0" ), this );
   fMusrT0Action->setStatusTip( tr("Start musrt0") );
   connect( fMusrT0Action, SIGNAL( triggered() ), this, SLOT( musrT0() ) );
   tb->addAction(fMusrT0Action);
   menu->addAction(fMusrT0Action);
   fMusrT0Action->setEnabled(fAdmin->getEnableMusrT0Flag());
 
-  a = new QAction( QIcon( QPixmap (":/images/musrFT.xpm") ), tr( "Raw Fourier" ), this );
+  a = new QAction( QIcon( QPixmap (":/icons/musrFT-plain.svg") ), tr( "Raw Fourier" ), this );
   a->setStatusTip( tr("Start musrFT") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrFT() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/images/musrprefs.xpm" ) ), tr( "&Preferences" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrprefs-plain.svg" ) ), tr( "&Preferences" ), this );
   a->setStatusTip( tr("Show Preferences") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrPrefs() ) );
   tb->addAction(a);
@@ -567,7 +566,7 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap(":/images/musrdump.xpm")), tr( "&Dump Header"), this);
+  a = new QAction( QIcon( QPixmap(":/icons/musrdump-plain.svg")), tr( "&Dump Header"), this);
   a->setStatusTip( tr("Dumps muSR File Header Information") );
   connect( a, SIGNAL(triggered()), this, SLOT(musrDump()));
   tb->addAction(a);
@@ -902,12 +901,31 @@ void PTextEdit::fileReload()
  */
 void PTextEdit::fileOpenPrefs()
 {
-  QString fln = QFileDialog::getOpenFileName( this, tr("Open Prefs"),
+  QString fln("");
+  QString msg("");
+  QMessageBox msgBox;
+  msgBox.setText("Which Preferences do you want to open?");
+  msgBox.addButton("Default", QMessageBox::AcceptRole);
+  msgBox.addButton("Custom", QMessageBox::AcceptRole);
+  msgBox.setStandardButtons(QMessageBox::Cancel);
+  int result = msgBox.exec();
+  if (result == QMessageBox::Cancel) {
+    return;
+  } else if (result == 0) { // default dir
+    fln = fAdmin->getDefaultPrefPathName();
+    msg = QString("Current Default Preferences Path-Name:\n") + fln;
+    if (QMessageBox::information(this, "Info", msg, QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel)
+      return;
+  } else if (result == 1) { // custom dir
+    fln = QFileDialog::getOpenFileName( this, tr("Open Prefs"),
                         fLastDirInUse,
                         tr( "xml-Files (*.xml);; All Files (*)" ));
+  }
 
-  if (fAdmin->loadPrefs(fln))
-    QMessageBox::information(0, "Prefs", "<b>Prefs Loaded.</b>");
+  if (fAdmin->loadPrefs(fln)) {
+    msg = QString("Prefs from '") + fln + QString("' loaded.");
+    QMessageBox::information(0, "Info", msg);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -969,12 +987,31 @@ void PTextEdit::fileSaveAs()
  */
 void PTextEdit::fileSavePrefs()
 {
-  QString fn = QFileDialog::getSaveFileName( this,
+  QString fln("");
+  QString msg("");
+  QMessageBox msgBox;
+  msgBox.setText("Which Preferences do you want to open?");
+  msgBox.addButton("Default", QMessageBox::AcceptRole);
+  msgBox.addButton("Custom", QMessageBox::AcceptRole);
+  msgBox.setStandardButtons(QMessageBox::Cancel);
+  int result = msgBox.exec();
+  if (result == QMessageBox::Cancel) {
+    return;
+  } else if (result == 0) { // default dir
+    fln = fAdmin->getDefaultPrefPathName();
+    msg = QString("Current Default Preferences Path-Name:\n") + fln;
+    if (QMessageBox::information(this, "Info", msg, QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel)
+      return;
+  } else if (result == 1) { // custom dir
+    fln = QFileDialog::getSaveFileName( this,
                     tr( "Save Prefs As" ), "musredit_startup.xml",
                     tr( "xml-Files (*.xml);;All Files (*)" ) );
+  }
 
-  if ( !fn.isEmpty() ) {
-    fAdmin->savePrefs(fn);
+  if ( !fln.isEmpty() ) {
+    fAdmin->savePrefs(fln);
+    msg = QString("Prefs to '") + fln + QString("' saved.");
+    QMessageBox::information(0, "Info", msg);
   }
 }
 
@@ -2507,7 +2544,7 @@ void PTextEdit::replaceAll()
 /**
  * <p>SLOT: updates the fonts if the textedit tab has changed.
  */
-void PTextEdit::applyFontSettings(QWidget*)
+void PTextEdit::applyFontSettings(int)
 {
   QFont font(fAdmin->getFontName(), fAdmin->getFontSize());
   fontChanged(font);

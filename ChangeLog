@@ -2,9 +2,24 @@
 # ChangeLog
 #---------------------------------------------------------------------
 
+changes since 0.17.0
+===================================
+
+
 changes since 0.16.0
 ===================================
 NEW 2016-01-22 update of the docu which now describes the RRF option.
+CHANGED 2016-02-17 move the startup XML-files to $HOME/.musrfit
+               rather than having it within $prefix/bin. Increase
+               therefore the version number to 0.17.0
+CHANGED 2016-02-16 if the LEM file is created 2012 or later and the
+               data-file-format tag is still ROOT-NPP or ROOT-PPC, it
+               will automatically switched to MUSR-ROOT. This way red/green
+               issues should be prevented. (see MUSR-314).
+CHANGED 2016-02-16 start migrating the icons of musredit_qt5 to the breeze
+               icons (https://github.com/NitruxSA/breeze-icon-theme).
+               At the same time I start to redesign the musrfit specific
+               icons accordingly (not yet happy with it, but ...).
 
 changes since 0.15.0
 ===================================

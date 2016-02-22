@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<musrfit xmlns="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">
+<musrfit xmlns="http://lmu.web.psi.ch/musrfit/user/MUSR/WebHome.html">
     <comment>
         Defines default settings for the musrfit package
     </comment>
