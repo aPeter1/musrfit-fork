@@ -34,6 +34,7 @@
 #include <TObject.h>
 #include <TH1F.h>
 #include <TRandom2.h>
+#include <TComplex.h>
 
 // global constants
 const Double_t fMuonGyroRatio = 135.54; //!< muon gyromagnetic ratio (MHz/T)
@@ -55,6 +56,7 @@ class PSimulateMuTransition : public TObject
     virtual void SetMuPrecFreq14(Double_t value) { fMuPrecFreq14 = value; } //!< sets Mu transition frequency (MHz)
     virtual void SetCaptureRate(Double_t value){ fCaptureRate = value; }  //!< sets Mu+ electron capture rate (MHz)
     virtual void SetIonizationRate(Double_t value){ fIonizationRate = value; } //!< sets Mu0 ionization rate (MHz)
+    virtual void SetSpinFlipRate(Double_t value){ fSpinFlipRate = value; }     //!< sets Mu0 spin flip rate (MHz)
     virtual void SetDecayAsymmetry(Double_t value){ fAsymmetry = value; }      //!< muon decay asymmetry
     virtual void SetMuFraction(Double_t value){ fMuFraction = value; }         //!< Muonium fraction
     virtual void SetMuFractionState12(Double_t value){ fMuFractionState12 = value; }  
@@ -80,6 +82,7 @@ class PSimulateMuTransition : public TObject
     Double_t  fMuonPrecFreq;    //!< muon precession frequency (MHz)
     Double_t  fCaptureRate;     //!< Mu+ electron capture rate (MHz)
     Double_t  fIonizationRate;  //!< Mu0 ionization rate (MHz)
+    Double_t  fSpinFlipRate;    //!< Mu0 spin-flip rate (MHz)  
     Double_t  fInitialPhase;    //!< initial muon spin phase
     Double_t  fMuonDecayTime;   //!< muon decay time (us)
     Double_t  fMuonPhase;       //!< phase of muon spin
@@ -93,6 +96,8 @@ class PSimulateMuTransition : public TObject
     virtual Double_t NextEventTime(const Double_t &EventRate);
 //     virtual Double_t PrecessionPhase(const Double_t &time, const Double_t &frequency);
     virtual Double_t PrecessionPhase(const Double_t &time, const TString chargeState);
+    virtual TComplex GTFunction(const Double_t &time); //!< transverse field polarization function of Mu0
+    virtual Double_t GTSpinFlip(const Double_t &time); //!< transverse field polarization function after spin-flip collisions
     virtual void     Event(const TString muonString);
  
   ClassDef(PSimulateMuTransition, 0)
