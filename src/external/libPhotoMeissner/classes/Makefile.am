@@ -59,3 +59,14 @@ install-exec-hook:
 uninstall-hook:
 	rm -f $(libdir)/libPPhotoMeissner.so
 endif
+
+# define default xml install
+xmldir = $(HOME)/.musrfit/external
+xml_DATA = ../test/photoMeissner_startup.xml
+
+instal-xml_DATA: $(xml_DATA)
+	$(INSTALL_DATA) '$(xml_DATA)' '$(xmldir)' 
+
+uninstal-xml_DATA: $(xml_DATA)
+	$(RM) '$(xml_DATA)' '$(xmldir)' 
+
