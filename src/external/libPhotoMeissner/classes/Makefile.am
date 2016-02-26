@@ -28,7 +28,7 @@ AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
-CLEANFILES = ../include/*Dict.cpp ../include/*Dict.h *~ core
+CLEANFILES = ../classes/*Dict* ../include/*Dict.* *~ core
 
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h
 	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^
