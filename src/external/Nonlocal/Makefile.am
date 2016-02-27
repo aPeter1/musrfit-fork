@@ -67,3 +67,13 @@ install-exec-hook:
 uninstall-hook:
 	rm -f $(libdir)/libPNL_PippardFitter.so
 endif
+
+xmldir = $(HOME)/.musrfit/external
+xml_DATA = nonlocal_startup.xml
+
+install-xml_DATA: $(xml_DATA)
+	$(INSTALL_DATA) '$(xml_DATA)' '$xmldir'
+
+uninstall-xml_DATA: $(xml_DATA)
+	$(RM) '$(xml_DATA)' '$xmldir'
+
