@@ -52,6 +52,7 @@ PStartupHandler_SV::PStartupHandler_SV()
 
   // get default path (for the moment only linux like)
   char startup_path_name[128];
+  char *home_path=0;
 
   // check if the startup file is found in the current directory
   strcpy(startup_path_name, "./spinValve_startup.xml");
@@ -59,8 +60,9 @@ PStartupHandler_SV::PStartupHandler_SV()
     fStartupFileFound = true;
     fStartupFilePath = TString(startup_path_name);
   } else { // startup file is not found in the current directory
-    cout << endl << ">> PStartupHandler_SV(): **WARNING** Couldn't find skewedLorentzian_startup.xml in the current directory, will try default one." << endl;
-    strncpy(startup_path_name, "/home/nemu/analysis/musrfit/src/external/libSpinValve/test/spinValve_startup.xml", sizeof(startup_path_name));
+    cout << endl << ">> PStartupHandler_SV(): **WARNING** Couldn't find spinValve_startup.xml in the current directory, will try default one." << endl;
+    home_path = getenv("HOME");
+    snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/external/spinValve_startup.xml", home_path);
     if (StartupFileExists(startup_path_name)) {
       fStartupFileFound = true;
       fStartupFilePath = TString(startup_path_name);

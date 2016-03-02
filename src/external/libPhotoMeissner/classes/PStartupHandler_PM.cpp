@@ -231,7 +231,8 @@ PStartupHandler_PM::PStartupHandler_PM()
   fStartupFilePath = "";
 
   // get default path (for the moment only linux like)
-  char startup_path_name[128];
+  char startup_path_name[512];
+  char *home_path=0;
 
   // check if the startup file is found in the current directory
   strcpy(startup_path_name, "./photoMeissner_startup.xml");
@@ -240,7 +241,8 @@ PStartupHandler_PM::PStartupHandler_PM()
     fStartupFilePath = TString(startup_path_name);
   } else { // startup file is not found in the current directory
     cout << endl << ">> PStartupHandler_PM(): **WARNING** Couldn't find photoMeissner_startup.xml in the current directory, will try default one." << endl;
-    strncpy(startup_path_name, "/home/nemu/analysis/musrfit/src/external/libPhotoMeissner/test/photoMeissner_startup.xml", sizeof(startup_path_name));
+    home_path = getenv("HOME");
+    snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/external/photoMeissner_startup.xml", home_path);
     if (StartupFileExists(startup_path_name)) {
       fStartupFileFound = true;
       fStartupFilePath = TString(startup_path_name);

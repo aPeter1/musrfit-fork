@@ -5,8 +5,6 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
@@ -56,7 +54,8 @@ PNL_StartupHandler::PNL_StartupHandler()
   fTrimSpDataPath = TString("");
 
   // get default path (for the moment only linux like)
-  char startup_path_name[128];
+  char startup_path_name[512];
+  char *home_str=0;
 
   // check if the startup file is found in the current directory
   strcpy(startup_path_name, "./nonlocal_startup.xml");
@@ -65,7 +64,8 @@ PNL_StartupHandler::PNL_StartupHandler()
     fStartupFilePath = TString(startup_path_name);
   } else { // startup file is not found in the current directory
     cout << endl << "PNL_StartupHandler(): **WARNING** Couldn't find nonlocal_startup.xml in the current directory, will try default one." << endl;
-    strncpy(startup_path_name, "/home/nemu/analysis/musrfit/src/external/Nonlocal/nonlocal_startup.xml", sizeof(startup_path_name));
+    home_str = getenv("HOME");
+    snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/nonlocal_startup.xml", home_str);
     if (StartupFileExists(startup_path_name)) {
       fStartupFileFound = true;
       fStartupFilePath = TString(startup_path_name);
