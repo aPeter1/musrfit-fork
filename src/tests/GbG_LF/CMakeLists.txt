@@ -7,5 +7,5 @@ set(DependOnLibs gslcblas)
 
 add_executable(GbG_LF GbG_LF.cpp)
 
-target_link_libraries(GbG_LF gslcblas gsl)
+target_link_libraries(GbG_LF gsl gslcblas)
 

@@ -3,7 +3,8 @@ if BUILD_ASLIBS
   ASDIRS = Nonlocal \
            MagProximity \
 	   libSpinValve \
-	   libPhotoMeissner
+	   libPhotoMeissner \
+           libGbGLF
 endif
 
 if BUILD_CUBALIB
