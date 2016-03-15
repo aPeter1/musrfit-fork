@@ -1,0 +1,78 @@
+07700- complexMuPol, A0 100MHz, Mu-frac 1.00, Mu12  40.43 MHz(0.49), Mu23 256.25 MHz(0.01), ionRate    0.000 MHz, capRate  0.000 MHz, SF rate  0.010 MHz, 106.5 G
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+        1 alpha       0.99961   -0.00091    0.00091     0       none    
+        2 asy         0         0           none        0       0.33    
+        3 phase       0         0           none        
+        4 field       106.5     0           none        0       none    
+        5 rate        0         0           none        0       150     
+        6 asyMu12     0.135     0           none        
+        7 phaseMu12   0.68      -0.42       0.42        
+        8 freqMu12    40.43248  -0.00045    0.00045     
+        9 rateMu12    0.0104    -0.0019     0.0019      0       100     
+       10 asyMu34     0.135     0           none        
+       11 phaseMu34   -0.01     -0.43       0.43        
+       12 freqMu34    59.56737  -0.00046    0.00046     
+       13 rateMu34    0.0164    -0.0019     0.0019      0       100     
+
+###############################################################
+THEORY
+asymmetry      2
+TFieldCos      3  fun1       (phase frequency)
+simplExpo      5          (rate)
++
+asymmetry      6
+TFieldCos      7     8       (phase frequency)
+simplExpo      9          (rate)
++
+asymmetry     10
+TFieldCos     11    12       (phase frequency)
+simplExpo     13          (rate)
+
+###############################################################
+FUNCTIONS
+fun1 = par4 * gamma_mu
+fun2 = par8 * gamma_mu
+
+###############################################################
+GLOBAL
+fittype         2         (asymmetry fit)
+data            1       18000   1       18000   
+fit             0.005   8      
+packing         1
+
+###############################################################
+RUN 07700 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+#ADDRUN 07701 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+alpha           1
+map             0    0    0    0    0    0    0    0    0    0
+forward         1 
+backward        2 
+backgr.fix      0.000000    0.000000    
+
+###############################################################
+COMMANDS
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+FOURIER
+units            MHz    # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8.000000
+#range_for_phase_correction 50.0 70.0
+#range            0    200
+
+###############################################################
+PLOT 2   (asymmetry plot)
+runs     1   
+range    0   8
+view_packing 2
+
+###############################################################
+STATISTIC --- 2016-03-03 17:25:40
+  chisq = 8091.8, NDF = 7988, chisq/NDF = 1.012996

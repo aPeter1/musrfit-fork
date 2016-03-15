@@ -1242,6 +1242,7 @@ AC_CONFIG_FILES([Makefile \
 		 src/external/libSpinValve/classes/Makefile \
                  src/external/libPhotoMeissner/Makefile \
                  src/external/libPhotoMeissner/classes/Makefile \
+                 src/external/libGbGLF/Makefile \
                  src/external/libBNMR/Makefile \
                  src/musredit_qt5/Makefile \
                  src/musredit/Makefile \
