@@ -63,7 +63,7 @@ class PGbGLF : public PUserFcnBase
     virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
 
   private:
-    static const Double_t fTmax = 12.0;
+    static constexpr Double_t fTmax = 12.0;
     mutable Double_t fPrevParam[3];
     mutable gslFunParam fGslFunParam;
     gsl_integration_workspace *fWs;
