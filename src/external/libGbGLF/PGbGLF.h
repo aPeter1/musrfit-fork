@@ -33,18 +33,7 @@
 #include <vector>
 using namespace std;
 
-#include <gsl/gsl_integration.h>
-
 #include "PUserFcnBase.h"
-
-typedef struct {
-  double wExt;
-  double s0;
-  double s1;
-} gslFunParam;
-
-
-double pz_GbG_2(double x, void *param);
 
 //--------------------------------------------------------------------------------------------
 /**
@@ -53,8 +42,8 @@ double pz_GbG_2(double x, void *param);
 class PGbGLF : public PUserFcnBase
 {
   public:
-    PGbGLF();
-    virtual ~PGbGLF();
+    PGbGLF() {}
+    virtual ~PGbGLF() {}
 
     virtual Bool_t NeedGlobalPart() const { return false; }
     virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) {}
@@ -63,14 +52,9 @@ class PGbGLF : public PUserFcnBase
     virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
 
   private:
-    static const Double_t fTmax = 12.0;
-    mutable Double_t fPrevParam[3];
-    mutable gslFunParam fGslFunParam;
-    gsl_integration_workspace *fWs;
-    mutable gsl_function fFun;
-    mutable gsl_integration_qawo_table *fIntTab;
+    Double_t pz_GbG_2(Double_t t, const std::vector<Double_t> &par) const;
 
-  ClassDef(PGbGLF, 1)
+    ClassDef(PGbGLF, 1)
 };
 
 #endif // _PGBGLF_H_
