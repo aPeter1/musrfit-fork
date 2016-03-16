@@ -301,6 +301,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
       cerr << endl << ">> PTheory::PTheory: **ERROR** user function object could not be invoked. See line no " << line->fLineNo;
       cerr << endl;
       fValid = false;
+      return;
     } else { // user function valid, hence expand the fUserParam vector to the proper size
       fUserParam.resize(fParamNo.size());
     }
