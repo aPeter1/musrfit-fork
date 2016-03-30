@@ -1,0 +1,184 @@
+\documentclass[twoside]{article}
+
+\usepackage[english]{babel}
+%\usepackage{a4}
+\usepackage{amssymb,amsmath,bm}
+\usepackage{graphicx,tabularx}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{xspace}
+\usepackage{rotating}
+\usepackage{dcolumn}
+\usepackage{geometry}
+\usepackage{color}
+
+\geometry{a4paper,left=20mm,right=20mm,top=20mm,bottom=20mm}
+
+% \setlength{\topmargin}{10mm}
+% \setlength{\topmargin}{-13mm}
+% % \setlength{\oddsidemargin}{0.5cm}
+% % \setlength{\evensidemargin}{0cm}
+% \setlength{\oddsidemargin}{1cm}
+% \setlength{\evensidemargin}{1cm}
+% \setlength{\textwidth}{15cm}
+\setlength{\textheight}{23.8cm}
+
+\pagestyle{fancyplain}
+\addtolength{\headwidth}{0.6cm}
+\fancyhead{}%
+\fancyhead[RE,LO]{\bf \textsc{GapIntegrals}}%
+\fancyhead[LE,RO]{\thepage}
+\cfoot{--- A.~Suter -- \today~ ---}
+\rfoot{\includegraphics[width=2cm]{PSI-Logo_narrow.jpg}}
+
+\DeclareMathAlphabet{\bi}{OML}{cmm}{b}{it}
+
+\newcommand{\mean}[1]{\langle #1 \rangle}
+\newcommand{\ie}{\emph{i.e.}\xspace}
+\newcommand{\musrfithead}{MUSRFIT\xspace}
+\newcommand{\musrfit}{\textsc{musrfit}\xspace}
+
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\begin{document}
+% Header info --------------------------------------------------
+\thispagestyle{empty}
+\noindent
+\begin{tabular}{@{\hspace{-0.2cm}}l@{\hspace{6cm}}r}
+\noindent\includegraphics[width=3.4cm]{PSI-Logo_narrow.jpg} &
+  {\Huge\sf Memorandum}
+\end{tabular}
+%
+\vskip 1cm
+%
+\begin{tabular}{@{\hspace{-0.5cm}}ll@{\hspace{4cm}}ll}
+Date:    & \today       &     & \\[3ex]
+From:    & A. Suter     &     & \\
+E-Mail:  & \verb?andreas.suter@psi.ch? &&
+\end{tabular}
+%
+\vskip 0.3cm
+\noindent\hrulefill
+\vskip 1cm
+%
+\section*{Homogenous Disorder Model: GbG in Longitudinal Fields}%
+
+Noakes and Kalvius \cite{noakes1997} derived a phenomenological model for
+homogenous disorder: Gaussian-broadened Gaussian disorder (see also
+Ref.\,\cite{yaouanc2011}). In both mentioned references only the zero field
+case and the weak transverse field case are discussed. Here I briefly summarize
+the longitudinal field (LF) case under the assumption that the applied field doesn't 
+polarize the impurties, \ie the applied field is ``innocent''.
+
+The Gauss-Kubo-Toyabe LF polarization function is
+
+\begin{eqnarray}\label{eq:GKT_LF}
+  P_{Z,{\rm GKT}}^{\rm LF} &=& 1 - 2 \frac{\sigma^2}{\omega_{\rm ext}^2}\left[ 1 - \cos(\omega_{\rm ext} t)\,\exp\left(-1/2 (\sigma t)^2\right) \right] + \label{eq:GKT_LF_1}\\
+   & & + 2 \frac{\sigma^2}{\omega_{\rm ext}^3} \int_0^t \sin(\omega_{\rm ext} \tau)\,\exp\left(-1/2 (\omega_{\rm ext} \tau)^2\right) d\tau. \label{eq:GKT_LF_2}
+\end{eqnarray}
+
+\noindent The Gaussian disorder is assumed to have the funtional form 
+
+\begin{equation}\label{eq:GaussianDisorder}
+ \varrho = \frac{1}{\sqrt{2\pi}}\,\frac{1}{\sigma_1} \exp\left( -\frac{1}{2} \, \left[ \frac{\sigma - \sigma_0}{\sigma_1} \right]^2 \right).
+\end{equation}
+
+\noindent In Ref.\cite{yaouanc2011} a slightly different notation is used: $\sigma \to \Delta_{\rm G}$,  $\sigma_0 \to \Delta_{0}$, and 
+$\sigma_1 \to \Delta_{\rm GbG}$.
+
+\noindent The GbG LF polarizatio function is given by
+
+\begin{equation}
+ P_{Z,{\rm GbG}}^{\rm LF} = \int_0^\infty d\sigma \left\{ \varrho \cdot P_{Z,{\rm GKT}}^{\rm LF} \right\}.
+\end{equation}
+
+\noindent Assuming that $\sigma_0 \gg \sigma_1$ this can be approximated by
+
+\begin{equation}
+ P_{Z,{\rm GbG}}^{\rm LF} \simeq \int_{-\infty}^\infty d\sigma \left\{ \varrho \cdot P_{Z,{\rm GKT}}^{\rm LF} \right\}.
+\end{equation}
+
+\noindent Integrating 
+
+\begin{equation*}
+ P_{Z,{\rm GbG}}^{\rm LF, (1)} = \int_{-\infty}^\infty d\sigma \left\{ \varrho \cdot P_{Z,{\rm GKT}}^{\rm LF, (1)} \right\},  
+\end{equation*}
+
+\noindent where $P_{Z,{\rm GKT}}^{\rm LF, (1)}$ is given by Eq.(\ref{eq:GKT_LF_1}), leads to 
+
+\begin{equation}\label{eq:GbG_LF_1}
+ P_{Z,{\rm GbG}}^{\rm LF, (1)} = 1 - 2 \frac{\sigma_0^2+\sigma_1^2}{\omega_{\rm ext}^2} + 
+      2 \frac{\sigma_0^2 + \sigma_1^2 (1 + \sigma_1^2 t^2)}{\omega_{\rm ext}^2 (1 + \sigma_1^2 t^2)^{5/2}}\, \cos(\omega_{\rm ext} t)\,
+      \exp\left[-\frac{1}{2} \frac{\sigma_0^2 t^2}{1+\sigma_1^2 t^2}\right],
+\end{equation}
+
+\noindent and Eq.(\ref{eq:GKT_LF_2}) leads to the non-analytic integral
+
+\begin{eqnarray}
+  P_{Z,{\rm GbG}}^{\rm LF, (2)} &=& \int_{-\infty}^\infty d\sigma \left\{ \varrho \cdot P_{Z,{\rm GKT}}^{\rm LF, (2)} \right\} \nonumber \\
+    &=& \int_0^t d\tau \left\{ \frac{\sigma_0^4 + 3 \sigma_1^4 (1 + \sigma_1^2 \tau^2)^2 + 6 \sigma_0^2 \sigma_1^2 (1+\sigma_1^2 \tau^2)}{\omega_{\rm ext}^3 (1+\sigma_1^2 \tau^2)^{9/2}} 
+   \sin(\omega_{\rm ext} \tau)\, \exp\left[-\frac{1}{2} \frac{\sigma_0^2 t^2}{1+\sigma_1^2 t^2}\right] \right\}. \label{eq:GbG_LF_2}
+\end{eqnarray}
+
+\noindent The full GbG LF polarization function is hence
+
+\begin{equation}
+   P_{Z,{\rm GbG}}^{\rm LF} = P_{Z,{\rm GbG}}^{\rm LF, (1)} + P_{Z,{\rm GbG}}^{\rm LF, (2)}
+\end{equation}
+
+
+\subsection*{The GbG LF Polarization Function as a User Function in \musrfithead}
+
+Eqs.(\ref{eq:GbG_LF_1})\&(\ref{eq:GbG_LF_2}) are implemented in \musrfit as user function. The current implementation is far from being efficient but stable.
+The typical call from within the msr-file would be
+
+\begin{verbatim}
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+        1 PlusOne     1         0           none
+        2 MinusOne    -1        0           none
+        3 Alpha       0.78699   -0.00036    0.00036     0       none
+        4 Asy         0.06682   0.00027     none        0       0.33
+        5 Sig0        0.3046    -0.0087     0.0093      0       100
+        6 Rb          1.0000    0.0027      none        0       1
+        7 Field0      0         0           none
+        8 Field1      20.03     0           none
+        9 Field2      99.32     0           none
+
+###############################################################
+THEORY
+asymmetry   fun1
+userFcn  libGbGLF PGbGLF map2 5 fun2   (field sigma0 Rb)
+
+###############################################################
+FUNCTIONS
+fun1 = map1 * par4
+fun2 = par5 * par6
+\end{verbatim}
+
+\noindent where \texttt{PGbGLF} takes 3 arguments: 
+
+\begin{enumerate}
+ \item field in Gauss
+ \item $\sigma_0$ in ($1/\mu s$)
+ \item $R_b = \sigma_1 / \sigma_0$
+\end{enumerate}
+
+\noindent \textbf{Be aware that we explicitly assumed $\sigma_1 \ll \sigma_0$, \ie $R_b < 1$.}
+
+\bibliographystyle{plain}
+\begin{thebibliography}{1}
+
+\bibitem{noakes1997} D.~R.~Noakes, G.~M.~Kalvius, Phys.~Rev.~B, \textbf{56}, 2352
+(1997).
+\bibitem{yaouanc2011} A.~Yaouanc, P.~Dalmas~de~R\'{e}otier, ``Muon Spin
+Rotation, Relaxation, and Resonance'', Oxford University Press (2011). 
+
+\end{thebibliography}
+
+
+\end{document}
