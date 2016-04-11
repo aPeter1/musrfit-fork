@@ -1555,7 +1555,7 @@ void PRunSingleHisto::EstimateN0()
   if (paramNo > 10000) // i.e. fun or map
     return;
 
-  // still missing: set this value in the parameters
+  // get the parameters
   PMsrParamList *param = fMsrInfo->GetMsrParamList();
   assert(param);
 
@@ -1563,6 +1563,11 @@ void PRunSingleHisto::EstimateN0()
     cerr << endl << ">> PRunSingleHisto::EstimateN0: **ERROR** found parameter number " << paramNo << ", which is larger than the number of parameters = " << param->size() << endl;
     return;
   }
+
+  // check if N0 is fixed. If this is the case, do NOT estimate N0
+  if (param->at(paramNo-1).fStep == 0.0) // N0 parameter fixed
+    return;
+
 
   // check that 'backgr.fit' in the msr-file run block is indeed a parameter number.
   // in case it is a function, nothing will be done.
