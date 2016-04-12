@@ -2186,6 +2186,9 @@ void PTextEdit::musrView()
   cmd = str + " \"";
 
   str = *fFilenames.find( currentEditor() );
+  int pos = str.lastIndexOf("/");
+  if (pos != -1)
+    str.remove(0, pos+1);
   QString numStr;
   numStr.setNum(fAdmin->getTimeout());
   cmd += str + "\" --timeout " + numStr;
@@ -2194,6 +2197,10 @@ void PTextEdit::musrView()
   cmd += " &";
 
   int status=system(cmd.toLatin1());
+
+  if (status != 0) {
+    cerr << "**WARNING** musrView: something went wrong ..." << endl;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
