@@ -3,9 +3,7 @@
   PSimulateMuTransition.cpp
 
   Author: Thomas Prokscha
-  Date: 25-Feb-2010
-
-  $Id$
+  Date: 25-Feb-2010, 14-Apr-2016
 
   Use root macros runMuSimulation.C and testAnalysis.C to run the simulation
   and to get a quick look on the data. Data are saved to a root histogram file
@@ -13,26 +11,28 @@
   analyze the simulated data.
 
   Description:
-  Root class to simulate muon spin phase under successive Mu+/Mu0 charge-exchange
-  processes by a Monte-Carlo method. Consider transverse field geometry, and assume
-  initial muon spin direction in x, and field applied along z. For PxMu(t) in 
-  muonium use the equation 8.22 of the muSR book of Yaounc and Dalmas de Réotier, in
-  slightly modified form (see Senba, J. Phys. B 23, 1545 (1990)); note that PxMu(t) 
-  is given by a superposition of the four frequencies "nu_12", "nu_34", "nu_23", "nu_14".
-  These frequencies and the corresponding probabilities ("SetMuFractionState12" for
-  transitions 12 and 34, "SetMuFractionState23" for states 23 and 14) can be calculated
+  Root class to simulate muon spin polarization under successive Mu+/Mu0 charge-exchange
+  or Mu0 spin-flip processes by a Monte-Carlo method. Consider transverse field geometry, 
+  and assume initial muon spin direction in x, and field applied along z. For PxMu(t) in 
+  muonium use the complex expression of 
+  equation (4) in the paper of M. Senba, J. Phys. B 23, 1545 (1990), or
+  equation (7) in the paper of M. Senba, J. Phys. B 24, 3531 (1991);
+  note that PxMu(t) is given by a superposition of the four frequencies "nu_12", "nu_34", 
+  "nu_23", "nu_14". These frequencies and the corresponding probabilities ("SetMuFractionState12" 
+  for transitions 12 and 34, "SetMuFractionState23" for states 23 and 14) can be calculated
   for a given field with the root macro AnisotropicMu.C
  
   Parameters:
   1) Precession frequencies of "nu_12", "nu_34", "nu_23", "nu_14"
   2) fractions of nu_12, nu_34; and nu_23 and nu_14
   3) total Mu0 fraction
-  4) electron-capture rate
-  5) Mu ionization rate
-  6) initial muon spin phase
-  7) total muon decay asymmetry
-  8) number of muon decays to be generated.
-  9) debug flag: if TRUE print capture/ionization events on screen
+  4) Mu+ electron-capture rate
+  5) Mu0 ionization rate
+  6) Mu0 spin-flip rate
+  7) initial muon spin phase
+  9) total muon decay asymmetry
+  9) number of muon decays to be generated.
+ 10) debug flag: if TRUE print capture/ionization events on screen
 
   Output:
   Two histograms ("forward" and "backward") are written to a root file.
@@ -43,10 +43,13 @@
   1) according to Mu+/Mu0 fraction begin either with a Mu+ state or Mu state
   2) Mu+: determine next electron-capture time t_c. If t_c is larger than decay time t_d
      calculate muon spin precession for t_d; else calculate spin precession for t_c.
-  3) Determine next ionization time t_i; calculate Px(t_i) in Muonium; calculate the 
-     muon spin phase by acos(Px(t_i)).
-  4) get the next electron capture time, continue until t_d is reached; accumulate muon spin
-     phase.
+  3) Determine next ionization time t_i; calculate Px(t_i) in Muonium; calculate the total
+     muon spin polarization Px(t_i)*Px(t_c).
+  4) get the next electron capture time, continue until t_d is reached, and calculate
+     the resulting polarization.
+     
+  The Mu0 spin-flip processes are calculated in GTSpinFlip(), using eq. (17) of
+  M. Senba, J. Phys. B 24, 3531 (1991).
 
 ***************************************************************************/
 
@@ -138,15 +141,21 @@ PSimulateMuTransition::~PSimulateMuTransition()
  */
 void PSimulateMuTransition::PrintSettings() const
 {
-  cout << endl << "Mu precession frequency 12 (MHz)  = " << fMuPrecFreq12;
-  cout << endl << "Mu precession frequency 34 (MHz)  = " << fMuPrecFreq34;
-  cout << endl << "Mu precession frequency 23 (MHz)  = " << fMuPrecFreq23;
-  cout << endl << "Mu precession frequency 14 (MHz)  = " << fMuPrecFreq14;
+  cout << endl << "Mu0 precession frequency 12 (MHz)  = " << fMuPrecFreq12;
+  cout << endl << "Mu0 precession frequency 34 (MHz)  = " << fMuPrecFreq34;
+  cout << endl << "Mu0 precession frequency 23 (MHz)  = " << fMuPrecFreq23;
+  cout << endl << "Mu0 precession frequency 14 (MHz)  = " << fMuPrecFreq14;
+  cout << endl << "Mu+ precession frequency    (MHz)  = " << fMuonGyroRatio * fBfield;
   cout << endl << "B field (T)                           = " << fBfield;
   cout << endl << "Mu+ electron capture rate (MHz)       = " << fCaptureRate;
   cout << endl << "Mu0 ionizatioan rate (MHz)            = " << fIonizationRate;
   cout << endl << "Mu0 spin-flip rate (MHz)              = " << fSpinFlipRate;
-  cout << endl << "!!! Note: if spin-flip rate > 0.001 only spin-flip process is considered!!!";
+  if (fSpinFlipRate > 0.001)
+   cout << endl << "!!! Note: spin-flip rate > 0.001 only spin-flip processes are considered!!!";
+  else{
+   cout << endl << "!!!   spin-flip rate <= 0.001: only charge-exchange cycles are considered!!!";
+   cout << endl << "!!! if spin-flip rate > 0.001, only spin-flip processes are considered!!!";
+  }
   cout << endl << "Decay asymmetry                       = " << fAsymmetry;
   cout << endl << "Muonium fraction                      = " << fMuFraction;
   cout << endl << "Muonium fraction state12              = " << fMuFractionState12;
@@ -181,23 +190,26 @@ void PSimulateMuTransition::SetSeed(UInt_t seed)
  */
 void PSimulateMuTransition::Run(TH1F *histoForward, TH1F *histoBackward)
 {
+//   Double_t muoniumPolX = 1.0; //polarization in x direction
   Int_t i;
   if (histoForward == 0 || histoBackward == 0)
     return;
 
+  fMuonPrecFreq = fMuonGyroRatio * fBfield; 
+  
   for (i = 0; i<fNmuons; i++){
     fMuonPhase         = TMath::TwoPi() * fInitialPhase/360.; // transform to radians
     fMuonDecayTime     = NextEventTime(fMuonDecayRate);
     
     if (fSpinFlipRate > 0.001){// consider only Mu0 spin-flip in this case
-      fMuonPhase = TMath::ACos(GTSpinFlip(fMuonDecayTime));
+      fMuonPhase += TMath::ACos(GTSpinFlip(fMuonDecayTime));
     }
     else{
       // initial muon state Mu+ or Mu0?
       if (fRandom->Rndm() <= 1.-fMuFraction) 
-        Event("Mu+");
+        fMuonPhase += TMath::ACos(Event("Mu+"));
       else
-        Event("");
+        fMuonPhase += TMath::ACos(Event("Mu0"));
     }
     // fill 50% in "forward", and 50% in "backward" detector to get independent
     // events in "forward" and "backward" histograms. This allows "normal" uSR
@@ -233,28 +245,29 @@ Double_t PSimulateMuTransition::NextEventTime(const Double_t &EventRate)
 //--------------------------------------------------------------------------
 // Phase (private)
 //--------------------------------------------------------------------------
-/**
- * <p>Determines phase of the muon spin
+// /**
+/* * <p>Determines phase of the muon spin
  *
  * \param time duration of precession (us);
  * \param chargeState charge state of Mu ("Mu+" or  "Mu0")
  */
-Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const TString chargeState)
-{
-  Double_t muonPhaseX;
-  Double_t muoniumPolX = 0;
-  
-  if (chargeState == "Mu+")
-    muonPhaseX = TMath::TwoPi()*fMuonPrecFreq*time;
-  else if (chargeState == "Mu0"){
-    muoniumPolX = GTFunction(time).Re();
-    muonPhaseX = TMath::ACos(muoniumPolX);
-  }
-  else
-    muonPhaseX = 0.;
-  
-  return muonPhaseX;
-}
+// Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const TString chargeState)
+// {
+//   Double_t muonPhaseX;
+//   Double_t muoniumPolX = 0;
+//   
+//   if (chargeState == "Mu+")
+//     muonPhaseX = TMath::TwoPi()*fMuonPrecFreq*time;
+//   else if (chargeState == "Mu0"){
+//     muoniumPolX = GTFunction(time).Re();
+//     if (fDebugFlag) cout << "muoniumPolX = " << muoniumPolX << endl;
+//     muonPhaseX = TMath::ACos(muoniumPolX);
+//   }
+//   else
+//     muonPhaseX = 0.;
+//   
+//   return muonPhaseX;
+// }
 
 //--------------------------------------------------------------------------
 // Mu0 transverse field polarization function (private)
@@ -264,29 +277,26 @@ Double_t PSimulateMuTransition::PrecessionPhase(const Double_t &time, const TStr
  *
  * \param time  (us);
  */
-TComplex PSimulateMuTransition::GTFunction(const Double_t &time)
+TComplex PSimulateMuTransition::GTFunction(const Double_t &time, const TString chargeState)
 {
   Double_t twoPi = TMath::TwoPi();
 
   TComplex complexPol = 0; 
-  complexPol = 
-    0.5 * fMuFractionState12 * 
-   (TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq12*time) +
-    TComplex::Exp(-TComplex::I()*twoPi*fMuPrecFreq34*time))
-    +
-    0.5 * fMuFractionState23 * 
-   (TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq23*time) +
-    TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq14*time));
+  
+  if (chargeState == "Mu+")
+    complexPol = TComplex::Exp(-TComplex::I()*twoPi*fMuonPrecFreq*time);
+  else{
+    complexPol = 
+      0.5 * fMuFractionState12 * 
+     (TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq12*time) +
+      TComplex::Exp(-TComplex::I()*twoPi*fMuPrecFreq34*time))
+      +
+      0.5 * fMuFractionState23 * 
+     (TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq23*time) +
+      TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq14*time));  
+  } 
     
   return complexPol;
-
-//   Double_t muoniumPolX = 0;
-//   muoniumPolX = 0.5 * 
-//    (fMuFractionState12 * (TMath::Cos(twoPi*fMuPrecFreq12*time) + TMath::Cos(twoPi*fMuPrecFreq34*time)) + 
-//     fMuFractionState23 * (TMath::Cos(twoPi*fMuPrecFreq23*time) + TMath::Cos(twoPi*fMuPrecFreq14*time)));
-//   
-//   return muoniumPolX;
-
 }
 
 //--------------------------------------------------------------------------
@@ -308,18 +318,18 @@ Double_t PSimulateMuTransition::GTSpinFlip(const Double_t &time)
   
   eventTime += NextEventTime(fSpinFlipRate);
   if (eventTime >= time){
-   muoniumPolX = GTFunction(time).Re(); 
+   muoniumPolX = GTFunction(time, "Mu0").Re(); 
   }
   else{
    while (eventTime < time){
      eventDiffTime = eventTime - lastEventTime;
-     complexPolX = complexPolX * GTFunction(eventDiffTime);
+     complexPolX = complexPolX * GTFunction(eventDiffTime, "Mu0");
      lastEventTime = eventTime;
      eventTime += NextEventTime(fSpinFlipRate);
    }
    // calculate for the last collision
    eventDiffTime = time - lastEventTime;
-   complexPolX = complexPolX * GTFunction(eventDiffTime);
+   complexPolX = complexPolX * GTFunction(eventDiffTime, "Mu0");
    muoniumPolX = complexPolX.Re();
   }
  
@@ -330,130 +340,100 @@ Double_t PSimulateMuTransition::GTSpinFlip(const Double_t &time)
 // Event (private)
 //--------------------------------------------------------------------------
 /**
- * <p> Generates "muon event": simulate muon spin phase under charge-exchange with
+ * <p> Generates "muon event": simulate muon spin polarization under charge-exchange with
  *     a neutral muonium state in transverse field, where the polarization evolution
  *     PxMu(t) of the muon spin in muonium is determined by a superposition of the 
- *     four "Mu transitions" nu_12, nu_34, nu_23, and nu_14.
+ *     four "Mu transitions" nu_12, nu_34, nu_23, and nu_14. Use complex polarization
+ *     functions.
  *     1) according to Mu+/Mu0 fraction begin either with a Mu+ state or Mu state
  *     2) Mu+: determine next electron-capture time t_c. If t_c is larger than decay time t_d
- *        calculate muon spin precession for t_d; else calculate spin precession for t_c.
- *     3) Determine next ionization time t_i; calculate Px(t_i) in Muonium; calculate the 
- *        muon spin phase by acos(Px(t_i)).
+ *        calculate muon spin precession for t_d, Px(t_i); else calculate spin precession for t_c.
+ *     3) Determine next ionization time t_i+1; calculate Px(t_i+1) in Muonium. Polarization
+ *        after ionization process is given by Px(t_i+1)*Px(t_i).
  *     4) get the next electron capture time, continue until t_d is reached.
  *
  * <p> For isotropic muonium, TF:
  *     nu_12 and nu_34 with equal probabilities, probability for both states fMuFractionState12
  *     ni_23 and nu_14 with equal probabilities, probability for both states fMuFractionState23
  *
+ * <p>Calculates Mu0 polarization in x direction during cyclic charge exchange.
+ * See M. Senba, J.Phys. B23, 1545 (1990), equations (9), (11)
+
  * \param muonString if eq. "Mu+" begin with Mu+ precession
  */
-void PSimulateMuTransition::Event(const TString muonString)
+Double_t PSimulateMuTransition::Event(const TString muonString)
 {
+  TComplex complexPolX = 1.0;
+  Double_t muoniumPolX = 1.0; //initial polarization in x direction
   Double_t eventTime, eventDiffTime, captureTime, ionizationTime;
-//   Double_t muonPrecessionFreq, muoniumPrecessionFreq; // MHz
-//   Double_t rndm, frac1, frac2;
 
-  fMuonPrecFreq = fMuonGyroRatio * fBfield; 
-
-  // charge-exchange loop until muon decay
   eventTime     = 0.;
   eventDiffTime = 0.;
 
   if (fDebugFlag) cout << "Decay time = " << fMuonDecayTime << endl;
-  //cout << muonString << endl;
+  
+  // charge-exchange loop until muon decays
   while (1) {
-   if (muonString == "Mu+"){
-     // Mu+ initial state; get next electron capture time
+   if (muonString == "Mu+"){// Mu+ initial state; get next electron capture time
      captureTime = NextEventTime(fCaptureRate);
      eventTime += captureTime;
-     if (fDebugFlag) cout << "Capture time = " << captureTime << " Phase = " << fMuonPhase << endl;
+     
+     if (fDebugFlag) cout << "Capture time = " << captureTime << " PolX = " << complexPolX.Re() << endl;
+
      if (eventTime < fMuonDecayTime)
-       fMuonPhase += PrecessionPhase(captureTime, "Mu+");
+       complexPolX *= GTFunction(captureTime, "Mu+");
      else{ //muon decays; handle precession prior to muon decay
        eventDiffTime = fMuonDecayTime - (eventTime - captureTime);
-       fMuonPhase += PrecessionPhase(eventDiffTime, "Mu+");
+       complexPolX *= GTFunction(eventDiffTime, "Mu+");
        break;
      }
-
      // now, we have Mu0; get next ionization time
      ionizationTime = NextEventTime(fIonizationRate);
      eventTime += ionizationTime;
-     // determine Mu state
-//      rndm = fRandom->Rndm();
-//      frac1 = 1. - fMuFractionState1 - fMuFractionState2; // non-precessing Mu states
-//      frac2 = 1. - fMuFractionState2;
-//      if ( rndm < frac1 )
-//        muoniumPrecessionFreq = 0.;
-//      else if (rndm >= frac1 && rndm <= frac2){
-//        if (fRandom->Rndm() <= 0.5) 
-// 	muoniumPrecessionFreq = fMuPrecFreq12;
-//        else
-//         muoniumPrecessionFreq = fMuPrecFreq34;
-//      }
-//      else{
-//        if (fRandom->Rndm() <= 0.5)
-//         muoniumPrecessionFreq = fMuPrecFreq23;
-//        else
-//         muoniumPrecessionFreq = fMuPrecFreq14;
-//      }
 
-     if (fDebugFlag) cout << "Ioniza. time = " << ionizationTime << " Phase = " << fMuonPhase << endl;
+     if (fDebugFlag) cout << "Ioniza. time = " << ionizationTime << " PolX = " << complexPolX.Re() << endl;
+
      if (eventTime < fMuonDecayTime)
-       fMuonPhase += PrecessionPhase(ionizationTime, "Mu0");
+       complexPolX *= GTFunction(ionizationTime, "Mu0");
      else{ //muon decays; handle precession prior to muon decay
        eventDiffTime = fMuonDecayTime - (eventTime - ionizationTime);
-       fMuonPhase += PrecessionPhase(eventDiffTime, "Mu0");
+       complexPolX *= GTFunction(eventDiffTime, "Mu0");
        break;
      }
    }
-   else{
-     // Mu0 as initial state; get next ionization time
+   else{// Mu0 as initial state; get next ionization time
      ionizationTime = NextEventTime(fIonizationRate);
      eventTime += ionizationTime;
-     // determine Mu state
-//      rndm = fRandom->Rndm();
-//      frac1 = 1. - fMuFractionState1 - fMuFractionState2; // non-precessing Mu states
-//      frac2 = 1. - fMuFractionState2;
-//      if ( rndm < frac1 )
-//        muoniumPrecessionFreq = 0.;
-//      else if (rndm >= frac1 && rndm <= frac2){
-//        if (fRandom->Rndm() <= 0.5) 
-// 	muoniumPrecessionFreq = fMuPrecFreq12;
-//        else
-//         muoniumPrecessionFreq = fMuPrecFreq34;
-//      }
-//      else{
-//        if (fRandom->Rndm() <= 0.5)
-//         muoniumPrecessionFreq = fMuPrecFreq23;
-//        else
-//         muoniumPrecessionFreq = fMuPrecFreq14;
-//      }
 
      if (fDebugFlag) 
-      cout << "Mu Ioniza. time = " << ionizationTime << " Phase = " << fMuonPhase << endl;
+      cout << "Mu Ioniza. time = " << ionizationTime << " PolX = " << complexPolX.Re() << endl;
+     
      if (eventTime < fMuonDecayTime)
-       fMuonPhase += PrecessionPhase(ionizationTime, "Mu0");
+       complexPolX *= GTFunction(ionizationTime, "Mu0");
      else{ //muon decays; handle precession prior to muon decay
        eventDiffTime = fMuonDecayTime - (eventTime - ionizationTime);
-       fMuonPhase += PrecessionPhase(eventDiffTime, "Mu0");
+       complexPolX *= GTFunction(eventDiffTime, "Mu0");
        break;
      }
 
      // Mu+ state; get next electron capture time
      captureTime = NextEventTime(fCaptureRate);
      eventTime += captureTime;
-     if (fDebugFlag) cout << "Capture time = " << captureTime << " Phase = " << fMuonPhase << endl;
+     
+     if (fDebugFlag) cout << "Capture time = " << captureTime << " PolX = " << complexPolX.Re() << endl;
+     
      if (eventTime < fMuonDecayTime)
-       fMuonPhase += PrecessionPhase(captureTime, "Mu+");
+       complexPolX *= GTFunction(captureTime, "Mu+");
      else{ //muon decays; handle precession prior to muon decay
        eventDiffTime = fMuonDecayTime - (eventTime - captureTime);
-       fMuonPhase += PrecessionPhase(eventDiffTime, "Mu+");
+       complexPolX *= GTFunction(eventDiffTime, "Mu+");
        break;
      }
    }
   }
+  
+  muoniumPolX = complexPolX.Re();
+  if (fDebugFlag) cout << " Final PolX = " <<  muoniumPolX << endl;
 
-  if (fDebugFlag) cout << " Final Phase = " << fMuonPhase << endl;
-  //fMuonPhase = TMath::ACos(TMath::Cos(fMuonPhase))*360./TMath::TwoPi(); //transform back to [0, 180] degree interval
-  return;
+  return muoniumPolX;
 }

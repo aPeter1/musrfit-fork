@@ -69,6 +69,7 @@ void runMuSimulation()
   Double_t MuFrac23 = 2*0.013;  //Mu in states 23 and 14
   Int_t    Nmuons   = 5e6;  //number of muons
   Double_t Asym     = 0.27; //muon decay asymmetry
+  Int_t    debugFlag = 0; //print debug information on screen
   
   histogramFileName  = TString("0");
   histogramFileName += runNo;
@@ -97,7 +98,7 @@ void runMuSimulation()
   simulateMuTransition->SetSpinFlipRate(spinFlipRate); // MHz
   simulateMuTransition->SetNmuons(Nmuons);
   simulateMuTransition->SetDecayAsymmetry(Asym);
-  simulateMuTransition->SetDebugFlag(kFALSE); // to print time and phase during charge-changing cycle
+  simulateMuTransition->SetDebugFlag(debugFlag); // to print time and phase during charge-changing cycle
    
   // feed run info header
   gRunHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "MuTransition Simulation Header Info");  

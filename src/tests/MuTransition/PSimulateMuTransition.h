@@ -94,11 +94,10 @@ class PSimulateMuTransition : public TObject
     Bool_t    fDebugFlag;       //!< debug flag
 
     virtual Double_t NextEventTime(const Double_t &EventRate);
-//     virtual Double_t PrecessionPhase(const Double_t &time, const Double_t &frequency);
-    virtual Double_t PrecessionPhase(const Double_t &time, const TString chargeState);
-    virtual TComplex GTFunction(const Double_t &time); //!< transverse field polarization function of Mu0
+//     virtual Double_t PrecessionPhase(const Double_t &time, const TString chargeState);
+    virtual TComplex GTFunction(const Double_t &time, const TString chargeState); //!< transverse field polarization function of Mu0 or Mu+
     virtual Double_t GTSpinFlip(const Double_t &time); //!< transverse field polarization function after spin-flip collisions
-    virtual void     Event(const TString muonString);
+    virtual Double_t Event(const TString muonString);
  
   ClassDef(PSimulateMuTransition, 0)
 };
