@@ -65,8 +65,10 @@ void runMuSimulation()
   Double_t Freq23   = 256.245;  //Mu freq of the 23 transition
   Double_t Freq14   = 356.245; //Mu freq of the 14 transition
   Double_t MuFrac   = 1.0;  //total Mu fraction
-  Double_t MuFrac12 = 2*0.487;  //Mu in states 12 and 34
-  Double_t MuFrac23 = 2*0.013;  //Mu in states 23 and 14
+  Double_t MuFrac12 = 0.487;  //weight of transition 12
+  Double_t MuFrac34 = 0.487;  //weight of transition 34
+  Double_t MuFrac23 = 0.013;  //weight of transition 23
+  Double_t MuFrac14 = 0.013;  //weight of transition 14
   Int_t    Nmuons   = 5e6;  //number of muons
   Double_t Asym     = 0.27; //muon decay asymmetry
   Int_t    debugFlag = 0; //print debug information on screen
@@ -90,8 +92,10 @@ void runMuSimulation()
   simulateMuTransition->SetMuPrecFreq23(Freq23);       // MHz
   simulateMuTransition->SetMuPrecFreq14(Freq14);       // MHz
   simulateMuTransition->SetMuFraction(MuFrac);         // initial Mu fraction
-  simulateMuTransition->SetMuFractionState12(MuFrac12); // Mu in states 12, 34
-  simulateMuTransition->SetMuFractionState23(MuFrac23); // Mu in states 23, 14
+  simulateMuTransition->SetMuFractionState12(MuFrac12); 
+  simulateMuTransition->SetMuFractionState34(MuFrac34); 
+  simulateMuTransition->SetMuFractionState23(MuFrac23); 
+  simulateMuTransition->SetMuFractionState14(MuFrac14); 
   simulateMuTransition->SetBfield(B/10000.);           // Tesla
   simulateMuTransition->SetCaptureRate(capRate);       // MHz
   simulateMuTransition->SetIonizationRate(ionRate);    // MHz
@@ -169,7 +173,9 @@ void runMuSimulation()
   header->Set("Simulation/Mu0 Precession frequency 14", Freq14);
   header->Set("Simulation/Mu0 Fraction", MuFrac);
   header->Set("Simulation/Mu0 Fraction 12", MuFrac12);
+  header->Set("Simulation/Mu0 Fraction 34", MuFrac34);
   header->Set("Simulation/Mu0 Fraction 23", MuFrac23);
+  header->Set("Simulation/Mu0 Fraction 14", MuFrac14);
   header->Set("Simulation/muon Capture Rate", capRate);
   header->Set("Simulation/Mu0 Ionization Rate", ionRate);
   header->Set("Simulation/Mu0 Spin Flip Rate", spinFlipRate);

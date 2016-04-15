@@ -114,8 +114,10 @@ PSimulateMuTransition::PSimulateMuTransition(UInt_t seed)
   fMuonDecayTime    = 0.;
   fAsymmetry        = 0.27;
   fMuFraction       = 0.;
-  fMuFractionState12 = 0.;
-  fMuFractionState23 = 0.;
+  fMuFractionState12 = 0.25;
+  fMuFractionState34 = 0.25;
+  fMuFractionState23 = 0.25;
+  fMuFractionState14 = 0.25;
   fDebugFlag        = kFALSE;
 }
 
@@ -159,7 +161,9 @@ void PSimulateMuTransition::PrintSettings() const
   cout << endl << "Decay asymmetry                       = " << fAsymmetry;
   cout << endl << "Muonium fraction                      = " << fMuFraction;
   cout << endl << "Muonium fraction state12              = " << fMuFractionState12;
+  cout << endl << "Muonium fraction state34              = " << fMuFractionState34;
   cout << endl << "Muonium fraction state23              = " << fMuFractionState23;
+  cout << endl << "Muonium fraction state14              = " << fMuFractionState14;
   cout << endl << "Number of particles to simulate       = " << fNmuons;
   cout << endl << "Initial muon spin phase (degree)      = " << fInitialPhase;
   cout << endl << "Debug flag                            = " << fDebugFlag;
@@ -287,13 +291,11 @@ TComplex PSimulateMuTransition::GTFunction(const Double_t &time, const TString c
     complexPol = TComplex::Exp(-TComplex::I()*twoPi*fMuonPrecFreq*time);
   else{
     complexPol = 
-      0.5 * fMuFractionState12 * 
-     (TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq12*time) +
-      TComplex::Exp(-TComplex::I()*twoPi*fMuPrecFreq34*time))
+     (fMuFractionState12 * TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq12*time) +
+      fMuFractionState34 * TComplex::Exp(-TComplex::I()*twoPi*fMuPrecFreq34*time))
       +
-      0.5 * fMuFractionState23 * 
-     (TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq23*time) +
-      TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq14*time));  
+     (fMuFractionState23 * TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq23*time) +
+      fMuFractionState14 * TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq14*time));  
   } 
     
   return complexPol;
