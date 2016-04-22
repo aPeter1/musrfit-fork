@@ -5866,9 +5866,10 @@ void PMsrHandler::CheckMaxLikelihood()
 {
   if (!fStatistic.fChisq) {
     for (UInt_t i=0; i<fRuns.size(); i++) {
-      if ((fRuns[i].GetFitType() != MSR_FITTYPE_SINGLE_HISTO) && (fGlobal.GetFitType() != MSR_FITTYPE_SINGLE_HISTO)) {
+      if ((fRuns[i].GetFitType() != MSR_FITTYPE_SINGLE_HISTO) && (fGlobal.GetFitType() != MSR_FITTYPE_SINGLE_HISTO) &&
+          (fRuns[i].GetFitType() != MSR_FITTYPE_MU_MINUS) && (fGlobal.GetFitType() != MSR_FITTYPE_MU_MINUS)) {
         cerr << endl << ">> PMsrHandler::CheckMaxLikelihood: **WARNING**: Maximum Log Likelihood Fit is only implemented";
-        cerr << endl << ">>    for Single Histogram Fit. Will fall back to Chi Square Fit.";
+        cerr << endl << ">>    for Single Histogram and Mu Minus Fits. Will fall back to Chi Square Fit.";
         cerr << endl << endl;
         fStatistic.fChisq = true;
         break;
