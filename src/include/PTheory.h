@@ -70,8 +70,9 @@
 #define THEORY_STATIC_TF_NK                 24
 #define THEORY_DYNAMIC_ZF_NK                25
 #define THEORY_DYNAMIC_TF_NK                26
-#define THEORY_POLYNOM                      27
-#define THEORY_USER_FCN                     28
+#define THEORY_MU_MINUS_EXP                 27
+#define THEORY_POLYNOM                      28
+#define THEORY_USER_FCN                     29
 
 // function parameter tags, i.e. how many parameters has a specific function
 // if there is a comment with a (tshift), the number of parameters is increased by one
@@ -102,9 +103,10 @@
 #define THEORY_PARAM_STATIC_TF_NK                 4 // phase, frequency, damping D0, R_b=DGbG/D0 (tshift)
 #define THEORY_PARAM_DYNAMIC_ZF_NK                3 // damping D0, R_b=DGbG/D0, nu_c (tshift)
 #define THEORY_PARAM_DYNAMIC_TF_NK                5 // phase, frequency, damping D0, R_b=DGbG/D0, nu_c (tshift)
+#define THEORY_PARAM_MU_MINUS_EXP                 6 // N0, tau, A, damping, phase, frequency (tshift)
 
 // number of available user functions
-#define THEORY_MAX 29
+#define THEORY_MAX 30
 
 // maximal number of parameters. Needed in the contents of LF
 #define THEORY_MAX_PARAM 10
@@ -217,6 +219,9 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
   {THEORY_DYNAMIC_TF_NK, THEORY_PARAM_DYNAMIC_TF_NK, false,
    "dynamicNKTF", "dnktf", "(phase frequency damping_D0 R_b nu_c)", "(phase frequency damping_D0 R_b nu_c tshift)"},
 
+  {THEORY_MU_MINUS_EXP, THEORY_PARAM_MU_MINUS_EXP, false,
+   "muMinusExpTF", "mmsetf", "(N0 tau A lambda phase nu)", "(N0 tau A lambda phase nu tshift)"},
+
   {THEORY_POLYNOM, 0, false,
    "polynom", "p", "(tshift p0 p1 ... pn)", "(tshift p0 p1 ... pn)"},
 
@@ -272,6 +277,7 @@ class PTheory
     virtual Double_t StaticNKTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t DynamicNKZF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t DynamicNKTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
+    virtual Double_t MuMinusExpTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t Polynom(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
     virtual Double_t UserFcn(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const;
 

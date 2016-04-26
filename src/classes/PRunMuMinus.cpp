@@ -52,6 +52,9 @@ PRunMuMinus::PRunMuMinus() : PRunBase()
   fGoodBins[0] = -1;
   fGoodBins[1] = -1;
 
+  fStartTimeBin = -1;
+  fEndTimeBin   = -1;
+
   fHandleTag = kEmpty;
 }
 
@@ -86,6 +89,9 @@ PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t 
   // the fit range can be changed in the command block, these variables need to be accessible
   fGoodBins[0] = -1;
   fGoodBins[1] = -1;
+
+  fStartTimeBin = -1;
+  fEndTimeBin   = -1;
 
   if (!PrepareData()) {
     cerr << endl << ">> PRunMuMinus::PRunMuMinus: **SEVERE ERROR**: Couldn't prepare data for fitting!";
@@ -130,15 +136,7 @@ Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
 
   // calculate chi square
   Double_t time(1.0);
-  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
-
-  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
-  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
-  if (startTimeBin < 0)
-    startTimeBin = 0;
-  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin > N)
-    endTimeBin = N;
+  Int_t i;
 
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
   // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
@@ -147,12 +145,12 @@ Double_t PRunMuMinus::CalcChiSquare(const std::vector<Double_t>& par)
   time = fTheory->Func(time, par, fFuncValues);
 
   #ifdef HAVE_GOMP
-  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  Int_t chunk = (fEndTimeBin - fStartTimeBin)/omp_get_num_procs();
   if (chunk < 10)
     chunk = 10;
   #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
-  for (i=startTimeBin; i < endTimeBin; ++i) {
+  for (i=fStartTimeBin; i < fEndTimeBin; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     diff = fData.GetValue()->at(i) - fTheory->Func(time, par, fFuncValues);
     chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
@@ -186,15 +184,7 @@ Double_t PRunMuMinus::CalcChiSquareExpected(const std::vector<Double_t>& par)
 
   // calculate chi square
   Double_t time(1.0);
-  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
-
-  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
-  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
-  if (startTimeBin < 0)
-    startTimeBin = 0;
-  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin > N)
-    endTimeBin = N;
+  Int_t i;
 
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
   // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
@@ -203,12 +193,12 @@ Double_t PRunMuMinus::CalcChiSquareExpected(const std::vector<Double_t>& par)
   time = fTheory->Func(time, par, fFuncValues);
 
   #ifdef HAVE_GOMP
-  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  Int_t chunk = (fEndTimeBin - fStartTimeBin)/omp_get_num_procs();
   if (chunk < 10)
     chunk = 10;
   #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
-  for (i=startTimeBin; i < endTimeBin; ++i) {
+  for (i=fStartTimeBin; i < fEndTimeBin; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     theo = fTheory->Func(time, par, fFuncValues);
     diff = fData.GetValue()->at(i) - theo;
@@ -243,15 +233,7 @@ Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
   Double_t theo;
   Double_t data;
   Double_t time(1.0);
-  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
-
-  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
-  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
-  if (startTimeBin < 0)
-    startTimeBin = 0;
-  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin > N)
-    endTimeBin = N;
+  Int_t i;
 
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
   // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
@@ -260,12 +242,12 @@ Double_t PRunMuMinus::CalcMaxLikelihood(const std::vector<Double_t>& par)
   time = fTheory->Func(time, par, fFuncValues);
 
   #ifdef HAVE_GOMP
-  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  Int_t chunk = (fEndTimeBin - fStartTimeBin)/omp_get_num_procs();
   if (chunk < 10)
     chunk = 10;
   #pragma omp parallel for default(shared) private(i,time,theo,data) schedule(dynamic,chunk) reduction(-:mllh)
   #endif
-  for (i=startTimeBin; i < endTimeBin; ++i) {
+  for (i=fStartTimeBin; i < fEndTimeBin; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     // calculate theory for the given parameter set
     theo = fTheory->Func(time, par, fFuncValues);
@@ -401,15 +383,15 @@ void PRunMuMinus::SetFitRangeBin(const TString fitRange)
 void PRunMuMinus::CalcNoOfFitBins()
 {
   // In order not having to loop over all bins and to stay consistent with the chisq method, calculate the start and end bins explicitly
-  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
-  if (startTimeBin < 0)
-    startTimeBin = 0;
-  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin > static_cast<Int_t>(fData.GetValue()->size()))
-    endTimeBin = fData.GetValue()->size();
+  fStartTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (fStartTimeBin < 0)
+    fStartTimeBin = 0;
+  fEndTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (fEndTimeBin > static_cast<Int_t>(fData.GetValue()->size()))
+    fEndTimeBin = fData.GetValue()->size();
 
-  if (endTimeBin > startTimeBin)
-    fNoOfFitBins = endTimeBin - startTimeBin;
+  if (fEndTimeBin > fStartTimeBin)
+    fNoOfFitBins = fEndTimeBin - fStartTimeBin;
   else
     fNoOfFitBins = 0;
 }
