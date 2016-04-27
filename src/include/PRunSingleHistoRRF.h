@@ -58,7 +58,7 @@ class PRunSingleHistoRRF : public PRunBase
     virtual Bool_t PrepareViewData(PRawRunData* runData, const UInt_t histoNo);
 
   private:
-    static const Double_t fN0EstimateEndTime = 1.0; ///< end time in (us) over which N0 is estimated. Should eventually be estimated automatically ...
+    Double_t fN0EstimateEndTime; ///< end time in (us) over which N0 is estimated.
 
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
