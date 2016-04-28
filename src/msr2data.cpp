@@ -438,7 +438,6 @@ int msr2data_paramList(vector<string> &arg, vector<unsigned int> &paramList)
   unsigned int idx_end=0;
   size_t pos=string::npos;
   for (unsigned int i=idx; i<arg.size(); i++) {
-    cout << i << ": " << arg[i] << endl;
     pos = arg[i].find("-");
     if (pos == 0) { // likely something like -o, -k, etc.
       idx_end = i;
