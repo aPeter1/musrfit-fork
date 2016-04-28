@@ -65,6 +65,8 @@ PRunSingleHistoRRF::PRunSingleHistoRRF() : PRunBase()
   // the fit range can be changed in the command block, these variables need to be accessible
   fGoodBins[0] = -1;
   fGoodBins[1] = -1;
+  
+  fN0EstimateEndTime = 1.0; // end time in (us) over which N0 is estimated.
 }
 
 //--------------------------------------------------------------------------
@@ -112,6 +114,8 @@ PRunSingleHistoRRF::PRunSingleHistoRRF(PMsrHandler *msrInfo, PRunDataHandler *ra
   fGoodBins[0] = -1;
   fGoodBins[1] = -1;
 
+  fN0EstimateEndTime = 1.0; // end time in (us) over which N0 is estimated.
+ 
   if (!PrepareData()) {
     cerr << endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: Couldn't prepare data for fitting!";
     cerr << endl << ">> This is very bad :-(, will quit ...";
