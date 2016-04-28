@@ -71,7 +71,7 @@ class PMsr2Data
     bool PrepareNewInputFile(unsigned int, bool) const; // template
     bool PrepareGlobalInputFile(unsigned int, const string&, unsigned int) const; // generate msr-input file for a global fit
 
-    int WriteOutput(const string&, bool, unsigned int, bool global = false, unsigned int counter = 0) const;
+    int WriteOutput(const string&, const vector<unsigned int>&, bool, unsigned int, bool global = false, unsigned int counter = 0) const;
 
   private:
     bool PrepareNewSortedInputFile(unsigned int) const; // template
@@ -80,6 +80,7 @@ class PMsr2Data
     void WriteValue(fstream &outFile, const double &value, const unsigned int &width) const;
     void WriteValue(fstream &outFile, const double &value, const double &errValue, const unsigned int &width, const bool &db) const;
     int GetFirstSignificantDigit(const double &value) const;
+    bool InParameterList(const unsigned int &paramValue, const vector<unsigned int>&) const;
 
     string fFileExtension;
     vector<unsigned int> fRunVector;
