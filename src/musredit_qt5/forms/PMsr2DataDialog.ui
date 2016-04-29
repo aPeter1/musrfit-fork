@@ -10,14 +10,14 @@
     <x>0</x>
     <y>0</y>
     <width>552</width>
-    <height>551</height>
+    <height>594</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>msr2data input</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../musredit.qrc">
+   <iconset>
     <normaloff>:/images/musrmsr2data.xpm</normaloff>:/images/musrmsr2data.xpm</iconset>
   </property>
   <widget class="QGroupBox" name="fRunListInput_groupBox">
@@ -64,7 +64,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="fFirst_lineEdit"/>
+        <widget class="QLineEdit" name="fFirst_lineEdit">
+         <property name="toolTip">
+          <string>start run number</string>
+         </property>
+         <property name="whatsThis">
+          <string>start run number</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_2">
@@ -90,7 +97,14 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="fLast_lineEdit"/>
+        <widget class="QLineEdit" name="fLast_lineEdit">
+         <property name="toolTip">
+          <string>end run number</string>
+         </property>
+         <property name="statusTip">
+          <string>end run number</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_3">
@@ -130,7 +144,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="fRunList_lineEdit"/>
+        <widget class="QLineEdit" name="fRunList_lineEdit">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The run list consists of a collection of run number. Accepted input formats are:&lt;/p&gt;&lt;p&gt;(i) &amp;lt;run0&amp;gt; &amp;lt;run1&amp;gt; ... &amp;lt;runN&amp;gt;, e.g. 124 126 129&lt;/p&gt;&lt;p&gt;(ii) &amp;lt;run0&amp;gt;-&amp;lt;runN&amp;gt;, e.g. 124-126, i.e. 124 125 126&lt;/p&gt;&lt;p&gt;(iii) &amp;lt;run0&amp;gt;:&amp;lt;runN&amp;gt;:&amp;lt;step&amp;gt;, e.g 124:128:2, i.e. 124 126 128&lt;/p&gt;&lt;p&gt;or combination of those three.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_4">
@@ -170,7 +188,11 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="fRunListFileName_lineEdit"/>
+        <widget class="QLineEdit" name="fRunListFileName_lineEdit">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;an ASCII file containing a list of run numbers and optional external parameters is passed to msr2data. &lt;/p&gt;&lt;p&gt;For details see the online documentation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
        </item>
        <item>
         <spacer name="horizontalSpacer_5">
@@ -236,7 +258,11 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLineEdit" name="fMsrFileExtension_lineEdit"/>
+      <widget class="QLineEdit" name="fMsrFileExtension_lineEdit">
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;the extension will be used together with the run number to generate the msr-file name. For example: the run number being 123 and the extension _tf_h13, an msr-file name 123_tf_h13.msr will result.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer_7">
@@ -284,10 +310,17 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="fTemplateRunNumber_lineEdit"/>
+      <widget class="QLineEdit" name="fTemplateRunNumber_lineEdit">
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;the run number given here will be used as a msr-file template number to generate/fit the run's given in the 'Run List Input'.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QCheckBox" name="fChainFit_checkBox">
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;unselected means: all msr-files generated and fitted will start from the given template.&lt;/p&gt;&lt;p&gt;selected means: the msr-files generated and fitted will use the previously fitted msr-file as an input. This makes sense if the run list given has continously changing parameters, e.g. as function of the temperature.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>Chain Fit</string>
        </property>
@@ -319,7 +352,7 @@
     </rect>
    </property>
    <property name="title">
-    <string>Data Output File Name</string>
+    <string>Parameter Output File Name</string>
    </property>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
@@ -334,12 +367,16 @@
      <item>
       <widget class="QLabel" name="fDataOutputFileName_label">
        <property name="text">
-        <string>Data Output File Name</string>
+        <string>Parameters Output File Name</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="fDataOutputFileName_lineEdit"/>
+      <widget class="QLineEdit" name="fDataOutputFileName_lineEdit">
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;db- or dat-output file name for the parameter files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer_9">
@@ -366,7 +403,7 @@
      <x>0</x>
      <y>360</y>
      <width>551</width>
-     <height>141</height>
+     <height>171</height>
     </rect>
    </property>
    <property name="title">
@@ -386,6 +423,9 @@
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QCheckBox" name="fWriteDataHeader_checkBox">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;For db-files, a Data Header will be written.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Write Data Header</string>
          </property>
@@ -393,6 +433,9 @@
        </item>
        <item>
         <widget class="QCheckBox" name="fIgnoreDataHeaderInfo_checkBox">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This tag is used in conjunction with LEM. If &lt;span style=&quot; font-weight:600;&quot;&gt;not&lt;/span&gt; selected, it will try to extract experiment specific parameters from the data file like implantation energy, transport HV settings, etc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Ignore Data Header Info</string>
          </property>
@@ -400,6 +443,9 @@
        </item>
        <item>
         <widget class="QCheckBox" name="fKeepMinuit2Output_checkBox">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;selected: for each run fitted, two additional files will be written, namely a &amp;lt;msr-filename&amp;gt;-mn2.output and &amp;lt;msr-filename&amp;gt;-mn2.root, which contain a richer set of information about fit, i.e. the covariance matrix, the correlation coefficients, etc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Keep Minuit2 Output</string>
          </property>
@@ -411,6 +457,9 @@
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
         <widget class="QCheckBox" name="fWriteColumnData_checkBox">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;unselected: the output parameter file is written in so called db-format.&lt;/p&gt;&lt;p&gt;selected: the output parameter file is written in column like ascii-format.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Write Column Data</string>
          </property>
@@ -418,6 +467,9 @@
        </item>
        <item>
         <widget class="QCheckBox" name="fRecreateDataFile_checkBox">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;unselected: if the parameter output file already exists, the parameters will be appended.&lt;/p&gt;&lt;p&gt;selected: if the parameter output file already exists: it will be deleted and a new one will be written.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Recreate Data File</string>
          </property>
@@ -425,6 +477,9 @@
        </item>
        <item>
         <widget class="QCheckBox" name="fOpenFilesAfterFitting_checkBox">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;selected: the newly generated msr-files will be opened in musredit after the fit took place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Open Files after Fitting</string>
          </property>
@@ -436,6 +491,9 @@
       <layout class="QVBoxLayout" name="verticalLayout_5">
        <item>
         <widget class="QCheckBox" name="fTitleFromData_checkBox">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;if selected: the run title of the generated msr-file will be the one given in the muSR data file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Take Data File Title</string>
          </property>
@@ -443,6 +501,9 @@
        </item>
        <item>
         <widget class="QCheckBox" name="fCreateMsrFileOnly_checkBox">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;if selected: the msr-files will be created, but &lt;span style=&quot; font-weight:600;&quot;&gt;no &lt;/span&gt;fitting will take place.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Create msr-File only</string>
          </property>
@@ -450,6 +511,9 @@
        </item>
        <item>
         <widget class="QCheckBox" name="fFitOnly_checkBox">
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;selected: it is assumed that the msr-files already exist, and only musrfit is called.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>Fit Only</string>
          </property>
@@ -459,6 +523,9 @@
         <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
           <widget class="QCheckBox" name="fGlobal_checkBox">
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;selected: will generate a msr-file for a global fit. Please check the online documentation for further details.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Global</string>
            </property>
@@ -466,6 +533,9 @@
          </item>
          <item>
           <widget class="QCheckBox" name="fGlobalPlus_checkBox">
+           <property name="whatsThis">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;selected: will generate a msr-file for a global fit. The difference between Global and Global+ is that for Global+ the input parameters of the msr-file are originating from the single run fits. Please check the online documentation for further details.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>Global+</string>
            </property>
@@ -477,12 +547,41 @@
      </item>
     </layout>
    </widget>
+   <widget class="QLabel" name="fParamList_label">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>143</y>
+      <width>141</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="whatsThis">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;parameter numbers to be exported, e.g. 1-16, or 1 3-7, etc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="text">
+     <string>Parameter Export List</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="fParamList_lineEdit">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>140</y>
+      <width>395</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="whatsThis">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;parameter numbers to be exported, e.g. 1-16, or 1 3-7, etc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>5</x>
-     <y>500</y>
+     <y>540</y>
      <width>541</width>
      <height>51</height>
     </rect>
@@ -556,9 +655,10 @@
   <tabstop>fFitOnly_checkBox</tabstop>
   <tabstop>fGlobal_checkBox</tabstop>
   <tabstop>fGlobalPlus_checkBox</tabstop>
-  <tabstop>fOk_pushButton</tabstop>
+  <tabstop>fParamList_lineEdit</tabstop>
   <tabstop>fCancel_pushButton</tabstop>
   <tabstop>fHelp_pushButton</tabstop>
+  <tabstop>fOk_pushButton</tabstop>
  </tabstops>
  <resources>
   <include location="../musredit.qrc"/>

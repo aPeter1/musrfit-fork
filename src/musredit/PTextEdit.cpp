@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010-2014 by Andreas Suter                              *
+ *   Copyright (C) 2010-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -1962,6 +1962,14 @@ void PTextEdit::musrMsr2Data()
       cmd.append(str);
 
     // options
+
+    // parameter export list
+    if (!fMsr2DataParam->paramList.isEmpty()) {
+      cmd.append("paramList");
+      QStringList list = fMsr2DataParam->paramList.split(' ');
+      for (int i=0; i<list.size(); i++)
+        cmd.append(list[i]);
+    }
 
     // no header flag?
     if (!fMsr2DataParam->writeDbHeader)

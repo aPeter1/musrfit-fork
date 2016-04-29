@@ -49,6 +49,7 @@
 using namespace std;
 
 
+#include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower() in std::string
 using namespace boost::algorithm;
 
@@ -84,14 +85,10 @@ bool isNumber(const string &s)
 void msr2data_syntax()
 {
   cout << endl << "usage 0: msr2data [--version] | [--help]";
-  cout << endl << "usage 1: msr2data <run> <extension> [-o<outputfile>] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
-  cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 2: msr2data <run1> <run2> <extension> [-o<outputfile>] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
-  cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 3: msr2data \\[<runList>\\] <extension> [-o<outputfile> ] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
-  cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
-  cout << endl << "usage 4: msr2data <runlist> <extension> [-o<outputfile>] [new] [data] [[no]header] [nosummary] [global[+[!]]]";
-  cout << endl << "                  [fit [-k] [-t] | fit-<template>[!] [-k] [-t] | msr-<template>]";
+  cout << endl << "usage 1: msr2data <run> <extension> options";
+  cout << endl << "usage 2: msr2data <run1> <run2> <extension> options";
+  cout << endl << "usage 3: msr2data \\[<runList>\\] <extension> options";
+  cout << endl << "usage 4: msr2data <runListFileName> <extension> options";
   cout << endl;
   cout << endl << "       <runList> can be:";
   cout << endl << "         (i)   <run0>, <run1>, <run2>, ... <runN> : run numbers, e.g. 123 124";
@@ -99,7 +96,12 @@ void msr2data_syntax()
   cout << endl << "         (iii) <run0>:<runN>:<step> : a sequence, e.g. 123:127:2 -> 123 125 127";
   cout << endl << "               <step> will give the step width and has to be a positive number!";
   cout << endl << "         a <runList> can also combine (i)-(iii), e.g. 123 128-130 133, etc.";
+  cout << endl << "       <runListFileName> : an ASCII file containing a list of run numbers and optional";
+  cout << endl << "                           external parameters is passed to msr2data. For details see";
+  cout << endl << "                           the online documentation: http://lmu.web.psi.ch/musrfit/user/MUSR/Msr2Data.html";
   cout << endl << "       <extension> : msr-file extension, e.g. _tf_h13 for the file name 8472_tf_h13.msr";
+  cout << endl;
+  cout << endl << "options:";
   cout << endl << "       -o<outputfile> : specify the name of the DB or column-data output file; default: out.db/out.dat";
   cout << endl << "                        if the option '-o none' is used, no output file will be written.";
   cout << endl << "       new : before writing a new output file, delete the contents of any existing file with the same name";
@@ -109,6 +111,10 @@ void msr2data_syntax()
   cout << endl << "              If either none or both of the header options are given, the file header will be written";
   cout << endl << "              if a new file is created, but not if the output file exists already!";
   cout << endl << "       nosummary : no additional data from the run data file is written to the output file";
+  cout << endl << "       paramList <param> : option used to select the parameters which shall be exported.";
+  cout << endl << "               <param> is a list of parameter numbers to be exported. Allowed lists are:";
+  cout << endl << "               1-16 will export parameters 1 to 16. 1 3 5 will export parameters 1 3 5.";
+  cout << endl << "               A combination of both is possible, e.g. 1-16 19 31 62, and so on.";
   cout << endl << "       fit : invoke musrfit to fit the specified runs";
   cout << endl << "              All msr input files are assumed to be present, none is newly generated!";
   cout << endl << "       fit-<template>! : generate msr files for the runs to be processed from the <template> run";
@@ -148,6 +154,10 @@ void msr2data_syntax()
   cout << endl << "       msr2data [2047:2053:2 2056] _tf_histo fit-2045";
   cout << endl << "          will use 2045_tf_histo.msr as templete, and subsequently generating msr-files from the run-list:";
   cout << endl << "          2047 2049 2051 2053 2056 (2047_tf_histo.msr etc.) and fit them.";
+  cout << endl;
+  cout << endl << "       msr2data 2046 2058 _tf_histo paramList 1-12 data -o fitParam.dat";
+  cout << endl << "          will export the parameters number 1 trough 12 in a column like fashion of the runs 2046 to 2058,";
+  cout << endl << "          collected form the msr-files 2046_tf_histo.msr and so on.";
   cout << endl;
   cout << endl << "    For further information please refer to";
   cout << endl << "       http://lmu.web.psi.ch/musrfit/user/MUSR/Msr2Data.html";
@@ -208,7 +218,8 @@ string msr2data_validArguments(const vector<string> &arg)
     if ( (!iter->compare("header")) || (!iter->compare("noheader")) || (!iter->compare("nosummary")) \
       || (!iter->substr(0,3).compare("fit")) || (!iter->compare("-k")) || (!iter->compare("-t")) \
       || (!iter->compare("data")) || (!iter->substr(0,4).compare("msr-")) || (!iter->compare("global")) \
-      || (!iter->compare("global+")) || (!iter->compare("global+!")) || (!iter->compare("new")) )
+      || (!iter->compare("global+")) || (!iter->compare("global+!")) || (!iter->compare("new")) \
+      || !iter->compare("paramList") )
       word.clear();
     else if (!iter->substr(0,2).compare("-o")) {
       word.clear();
@@ -395,6 +406,91 @@ int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
 
 //--------------------------------------------------------------------------
 /**
+ * <p>
+ *
+ */
+int msr2data_paramList(vector<string> &arg, vector<unsigned int> &paramList)
+{
+  paramList.clear(); // make sure paramList is empty
+
+  unsigned int idx=0;
+  // check if paramList tag is present
+  for (unsigned int i=0; i<arg.size(); i++) {
+    if (!arg[i].compare("paramList")) {
+      idx = i+1;
+      break;
+    }
+  }
+
+  if (idx == 0) { // paramList tag NOT present
+    return 0;
+  }
+
+  // make sure there are parameter list elements to follow
+  if (idx == arg.size()) {
+    cerr << endl << "**ERROR** found paramList without any arguments!" << endl;
+    msr2data_syntax();
+    return -1;
+  }
+
+  // paramList tag present and further elements present: collect them
+  vector<string> str;
+  unsigned int idx_end=0;
+  size_t pos=string::npos;
+  for (unsigned int i=idx; i<arg.size(); i++) {
+    pos = arg[i].find("-");
+    if (pos == 0) { // likely something like -o, -k, etc.
+      idx_end = i;
+      break;
+    } else if (pos != string::npos) { // looks like a parameter list like n0-n1
+      boost::split(str, arg[i], boost::is_any_of("-"));
+      if (str.size() != 2) { // something is wrong, since the structure n0-n1 is expected
+        cerr << endl << "**ERROR** found token " << arg[i] << " in paramList command which cannot be handled." << endl;
+        msr2data_syntax();
+        return -1;
+      }
+      if (!str[0].compare("fit") || !str[0].compare("msr")) {
+        idx_end = i;
+        break;
+      }
+      if (!isNumber(str[0]) || !isNumber(str[1])) {
+        cerr << endl << "**ERROR** found token " << arg[i] << " in paramList command which cannot be handled." << endl;
+        msr2data_syntax();
+        return -1;
+      }
+      unsigned int start=boost::lexical_cast<unsigned int>(str[0]);
+      unsigned int end=boost::lexical_cast<unsigned int>(str[1]);
+      for (unsigned int j=start; j<=end; j++)
+        paramList.push_back(j);
+    } else if (isNumber(arg[i])) { // a single number
+      paramList.push_back(boost::lexical_cast<unsigned int>(arg[i]));
+    } else { // likely the next argument not related to paramList
+      idx_end = i;
+      break;
+    }
+  }
+  if (idx_end == 0)
+    idx_end = arg.size();
+
+  // remove all the paramList arguments for arg
+  arg.erase(arg.begin()+idx-1, arg.begin()+idx_end);
+
+  // go through the parameter list and make sure the values are unique
+  for (unsigned int i=0; i<paramList.size(); i++) {
+    for (unsigned int j=i+1; j<paramList.size(); j++) {
+      if (paramList[i] == paramList[j]) {
+        cerr << endl << "**ERROR** the parameter list numbers have to be unique. Found " << paramList[i] << " at least 2 times." << endl;
+        msr2data_syntax();
+        return -1;
+      }
+    }
+  }
+
+  return paramList.size();
+}
+
+//--------------------------------------------------------------------------
+/**
  * <p>msr2data is used to generate msr-files based on template msr-files, automatically fit these new msr-files,
  * collect fitting parameters, etc. For a detailed description see
  * \htmlonly <a href="https://intranet.psi.ch/MUSR/Msr2Data">musr2data online help</a>
@@ -441,6 +537,7 @@ int main(int argc, char *argv[])
   vector<unsigned int> run_vec;
   string run_list;
   string msrExtension;
+  vector<unsigned int> param_vec;
 
   try {
     if (arg[0].at(0) == '[') { // In case a list of runs is given by [...]
@@ -557,7 +654,14 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-// check the validity of the command line given command line arguments
+  // check if parameter list is given
+  int noParamList(msr2data_paramList(arg, param_vec));
+  if (noParamList == -1) {
+    arg.clear();
+    return -1;
+  }
+
+  // check the validity of the command line given command line arguments
   string wrongArgument(msr2data_validArguments(arg));
   if (!wrongArgument.empty()) {
     cerr << endl;
@@ -567,18 +671,18 @@ int main(int argc, char *argv[])
     return -1;
   }
 
-// check if the output format is DB or data
+  // check if the output format is DB or data
   bool db(msr2data_useOption(arg, "data"));
 
-// check the arguments for the "-o" option and set the output filename
+  // check the arguments for the "-o" option and set the output filename
   string outputFile(msr2data_outputfile(arg, db));
 
-// introduce check, if no output should be generated - in that case we do not need msrfile and rundata handlers later
+  // introduce check, if no output should be generated - in that case we do not need msrfile and rundata handlers later
   bool realOutput(true);
   if (!to_lower_copy(outputFile).compare("none"))
     realOutput = false;
 
-// create the msr2data-object and set the run numbers according to the runTAG above
+  // create the msr2data-object and set the run numbers according to the runTAG above
   PMsr2Data *msr2dataHandler = new PMsr2Data(msrExtension);
 
   int status;
@@ -615,7 +719,7 @@ int main(int argc, char *argv[])
 
   run_vec.clear();
 
-// check if fitting should be done and in case, which template run number to use
+  // check if fitting should be done and in case, which template run number to use
   int temp(0);
   bool chainfit(true), onlyInputCreation(false);
   string musrfitOptions;
@@ -635,7 +739,7 @@ int main(int argc, char *argv[])
   }
 
 
-// check if any options should be passed to musrfit
+  // check if any options should be passed to musrfit
   if (temp) {
     if (!msr2data_useOption(arg, "-k"))
       musrfitOptions.append("-k ");
@@ -643,9 +747,8 @@ int main(int argc, char *argv[])
       musrfitOptions.append("-t ");
   }
 
-// if no fitting should be done, check if only the input files should be created
-
-  if(!temp) {
+  // if no fitting should be done, check if only the input files should be created
+  if (!temp) {
     temp = msr2data_doInputCreation(arg, onlyInputCreation);
     if (onlyInputCreation) {
       // if only input files should be created, do not write data to an output file (no matter, what has been determined earlier)
@@ -672,8 +775,8 @@ int main(int argc, char *argv[])
     globalMode = 2;
   }
 
-// At this point it should be clear if any template for input-file generation is given or not.
-// Therefore, the number of digits in the run number format is determined only here.
+  // At this point it should be clear if any template for input-file generation is given or not.
+  // Therefore, the number of digits in the run number format is determined only here.
   if(temp > 0) {
     status = msr2dataHandler->DetermineRunNumberDigits(temp, setNormalMode);
   } else {
@@ -685,7 +788,7 @@ int main(int argc, char *argv[])
     return status;
   }
 
-// Check if all given run numbers are covered by the formatting of the data file name
+  // Check if all given run numbers are covered by the formatting of the data file name
   status = msr2dataHandler->CheckRunNumbersInRange();
   if(status) {
     cerr << endl;
@@ -736,7 +839,7 @@ int main(int argc, char *argv[])
     }
   }
 
-// GLOBAL MODE
+  // GLOBAL MODE
   if (!setNormalMode) {
     ostringstream strInfile;
     strInfile << msr2dataHandler->GetPresentRun() << "+global" << msrExtension << ".msr";
@@ -798,7 +901,7 @@ int main(int argc, char *argv[])
 
       while (msr2dataHandler->GetPresentRun()) {
         // write DB or dat file
-        status = msr2dataHandler->WriteOutput(outputFile, db, writeHeader, !setNormalMode, counter);
+        status = msr2dataHandler->WriteOutput(outputFile, param_vec, db, writeHeader, !setNormalMode, counter);
         if (status == -1) {
           msr2data_cleanup(msr2dataHandler, arg);
           return status;
@@ -842,7 +945,7 @@ int main(int argc, char *argv[])
           }
         }
 
-      // and do the fitting
+        // and do the fitting
         if (!onlyInputCreation) {
           // check if MUSRFITPATH is set, if not issue a warning
           string path("");
@@ -866,12 +969,12 @@ int main(int argc, char *argv[])
         }
       }
 
-    // read msr-file
+      // read msr-file
       if (realOutput) {
         status = msr2dataHandler->ReadMsrFile(strInfile.str());
         if (status != PMUSR_SUCCESS) {
           // if the msr-file cannot be read, write no output but proceed to the next run
-          status = msr2dataHandler->WriteOutput("none", db, writeHeader);
+          status = msr2dataHandler->WriteOutput("none", param_vec, db, writeHeader);
           if (status == -1) {
             msr2data_cleanup(msr2dataHandler, arg);
             return status;
@@ -881,12 +984,12 @@ int main(int argc, char *argv[])
         }
       }
 
-    // read data files
+      // read data files
       if (writeSummary)
         status = msr2dataHandler->ReadRunDataFile();
 
-    // write DB or dat file
-      status = msr2dataHandler->WriteOutput(outputFile, db, writeHeader);
+      // write DB or dat file
+      status = msr2dataHandler->WriteOutput(outputFile, param_vec, db, writeHeader);
       if (status == -1) {
         msr2data_cleanup(msr2dataHandler, arg);
         return status;
@@ -899,7 +1002,7 @@ int main(int argc, char *argv[])
   // Unfortunately, this can be done in a coherent way only on that level
   // Unfortunately, there are also problems with boost::filesystem::exists(outputFile)
   // Therefore, first try to open the file for reading and if this works, write to it - not clean but it works
-  if(realOutput) {
+  if (realOutput) {
     fileOutput = new fstream;
     fileOutput->open(outputFile.c_str(), ios::in);
     if (fileOutput->is_open()) {
