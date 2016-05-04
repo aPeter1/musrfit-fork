@@ -1059,6 +1059,9 @@ Double_t PRunSingleHistoRRF::GetMainFrequency(PDoubleVector &data)
       if (power->GetBinContent(i)>power->GetBinContent(i+1))
         continue;
     }
+    // ignore everything below 10 MHz
+    if (power->GetBinCenter(i) < 10.0)
+      continue;
     // check for maximum
     if (power->GetBinContent(i) > maxFreqVal) {
       maxFreqVal = power->GetBinContent(i);
