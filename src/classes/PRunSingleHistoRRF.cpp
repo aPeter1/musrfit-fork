@@ -58,7 +58,8 @@ using namespace std;
 PRunSingleHistoRRF::PRunSingleHistoRRF() : PRunBase()
 {
   fNoOfFitBins  = 0;
-  fBackground = 0;
+  fBackground = 0.0;
+  fBkgErr = 1.0;
   fRRFPacking = -1;
 
   // the 2 following variables are need in case fit range is given in bins, and since
@@ -612,7 +613,7 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
     exp_t_tau = exp(time_tau);
     fForward[i] *= exp_t_tau;
     fM.push_back(fForward[i]);   // i.e. M(t) = [N(t)-Nbkg] exp(+t/tau); needed to estimate N0 later on
-    fMerr.push_back(exp_t_tau*sqrt(rawNt[i]-fBackground));
+    fMerr.push_back(exp_t_tau*sqrt(rawNt[i]+fBkgErr*fBkgErr));
   }
 
   // calculate weights
@@ -620,7 +621,7 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
     if (fMerr[i] > 0.0)
       fW.push_back(1.0/(fMerr[i]*fMerr[i]));
     else
-      fW.push_back(0.0);
+      fW.push_back(1.0);
   }
   // now fForward = exp(+t/tau) [N(t)-Nbkg] = M(t)
 
@@ -1188,7 +1189,12 @@ Bool_t PRunSingleHistoRRF::EstimateBkg(UInt_t histoNo)
 
   fBackground = bkg;  // keep background (per bin)
 
-  cout << endl << "info> fBackground=" << fBackground << endl;
+  bkg = 0.0;
+  for (UInt_t i=start; i<end; i++)
+    bkg += pow(fForward[i]-fBackground, 2.0);
+  fBkgErr = sqrt(bkg/(static_cast<Double_t>(end - start)));
+
+  cout << endl << "info> fBackground=" << fBackground << "(" << fBkgErr << ")" << endl;
 
   fRunInfo->SetBkgEstimated(fBackground, 0);
 
