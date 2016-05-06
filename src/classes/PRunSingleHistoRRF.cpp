@@ -593,6 +593,9 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
       if (!EstimateBkg(histoNo))
         return false;
     }
+    // subtract background from fForward
+    for (UInt_t i=0; i<fForward.size(); i++)
+      fForward[i] -= fBackground;
   } else { // fixed background given
     for (UInt_t i=0; i<fForward.size(); i++) {
       fForward[i] -= fRunInfo->GetBkgFix(0);
@@ -1093,15 +1096,17 @@ Double_t PRunSingleHistoRRF::EstimateN0(Double_t &errN0, Double_t freqMax)
 {
   // endBin is estimated such that the number of full cycles (according to the maximum frequency of the data)
   // is approximately the time fN0EstimateEndTime.
-  Int_t endBin = (Int_t)round(fN0EstimateEndTime / fTimeResolution * ceil(freqMax)/freqMax);
+  Int_t endBin = (Int_t)round(ceil(fN0EstimateEndTime*freqMax/TMath::TwoPi()) * (TMath::TwoPi()/freqMax) / fTimeResolution);
 
   Double_t n0 = 0.0;
   Double_t wN = 0.0;
   for (Int_t i=0; i<endBin; i++) {
-    n0 += fW[i]*fM[i];
+//    n0 += fW[i]*fM[i];
+    n0 += fM[i];
     wN += fW[i];
   }
-  n0 /= wN;
+//  n0 /= wN;
+  n0 /= endBin;
 
   errN0 = 0.0;
   for (Int_t i=0; i<endBin; i++) {
