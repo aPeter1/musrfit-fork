@@ -65,6 +65,7 @@ class PRunSingleHistoRRF : public PRunBase
 
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
+    Double_t fBkgErr;       ///< estimate error on the estimated background
     Int_t fRRFPacking;      ///< RRF packing for this particular run. Given in the GLOBAL-block.
 
     Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
