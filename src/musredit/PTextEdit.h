@@ -31,6 +31,8 @@
 #define _PTEXTEDIT_H_
 
 #include <QMainWindow>
+#include <QString>
+#include <QStringList>
 #include <QMap>
 #include <QTimer>
 #include <QString>
@@ -175,6 +177,7 @@ private:
   QAction *fRecentFilesAction[MAX_RECENT_FILES]; ///< array of the recent file actions
 
   void fillRecentFiles();
+  QStringList getRunList(QString runListStr, bool &ok);
 };
 
 

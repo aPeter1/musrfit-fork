@@ -1870,6 +1870,8 @@ void PTextEdit::musrMsr2Data()
     QFileInfo fi;
     QString str;
     int i, end;
+    QStringList list;
+    bool ok;
 
     fMsr2DataParam = dlg->getMsr2DataParam();
     fAdmin->setKeepMinuit2OutputFlag(fMsr2DataParam->keepMinuit2Output);
@@ -2069,12 +2071,11 @@ void PTextEdit::musrMsr2Data()
             }
             break;
           case 1: // run list
-            end = 0;
-            while (!runList.section(' ', end, end, QString::SectionSkipEmpty).isEmpty()) {
-              end++;
-            }
-            for (int i=0; i<end; i++) {
-              fln = runList.section(' ', i, i, QString::SectionSkipEmpty);
+            list = getRunList(runList, ok);
+            if (!ok)
+             return;
+            for (int i=0; i<list.size(); i++) {
+              fln = list[i];
               if (fMsr2DataParam->msrFileExtension.isEmpty())
                 fln += ".msr";
               else
@@ -2642,6 +2643,58 @@ void PTextEdit::fillRecentFiles()
     fRecentFilesAction[i]->setText(fAdmin->getRecentFile(i));
     fRecentFilesAction[i]->setVisible(true);
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p> run list is split (space separated) and expanded (start-end -> start, start+1, ..., end) to a list
+ *
+ * \param runListStr list to be split and expanded
+ * \param ok true if everything is fine; false if an error has been encountered
+ *
+ * \return fully expanded run list
+ */
+QStringList PTextEdit::getRunList(QString runListStr, bool &ok)
+{
+  QStringList result;
+  bool isInt;
+  QString str;
+
+  ok = true;
+
+  // first split space separated parts
+  QStringList tok = runListStr.split(' ', QString::SkipEmptyParts);
+  for (int i=0; i<tok.size(); i++) {
+    if (tok[i].contains('-')) { // list given, hence need to expand
+      QStringList runListTok = tok[i].split('-', QString::SkipEmptyParts);
+      if (runListTok.size() != 2) { // error
+        ok = false;
+        result.clear();
+        return result;
+      }
+      int start=0, end=0;
+      start = runListTok[0].toInt(&isInt);
+      if (!isInt) {
+        ok = false;
+        result.clear();
+        return result;
+      }
+      end = runListTok[1].toInt(&isInt);
+      if (!isInt) {
+        ok = false;
+        result.clear();
+        return result;
+      }
+      for (int i=start; i<=end; i++) {
+        str = QString("%1").arg(i);
+        result << str;
+      }
+    } else { // keep it
+      result << tok[i];
+    }
+  }
+
+  return result;
 }
 
 //----------------------------------------------------------------------------------------------------
