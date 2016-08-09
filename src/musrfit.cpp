@@ -614,10 +614,15 @@ int main(int argc, char *argv[])
       }
     }
   }
-  startupHandler->SetStartupOptions(startup_options);
+  if (startupHandler)
+    startupHandler->SetStartupOptions(startup_options);
 
   // read msr-file
-  PMsrHandler *msrHandler = new PMsrHandler(filename, startupHandler->GetStartupOptions());
+  PMsrHandler *msrHandler = 0;
+  if (startupHandler)
+    msrHandler = new PMsrHandler(filename, startupHandler->GetStartupOptions());
+  else
+    msrHandler = new PMsrHandler(filename);
   status = msrHandler->ReadMsrFile();
   if (status != PMUSR_SUCCESS) {
     switch (status) {
