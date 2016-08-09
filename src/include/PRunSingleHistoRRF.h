@@ -51,6 +51,9 @@ class PRunSingleHistoRRF : public PRunBase
 
     virtual void SetFitRangeBin(const TString fitRange);
 
+    virtual Int_t GetStartTimeBin() { return fStartTimeBin; }
+    virtual Int_t GetEndTimeBin() { return fEndTimeBin; }
+
   protected:
     virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
@@ -58,13 +61,17 @@ class PRunSingleHistoRRF : public PRunBase
     virtual Bool_t PrepareViewData(PRawRunData* runData, const UInt_t histoNo);
 
   private:
-    static constexpr Double_t fN0EstimateEndTime = 1.0; ///< end time in (us) over which N0 is estimated. Should eventually be estimated automatically ...
+    Double_t fN0EstimateEndTime; ///< end time in (us) over which N0 is estimated.
 
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
+    Double_t fBkgErr;       ///< estimate error on the estimated background
     Int_t fRRFPacking;      ///< RRF packing for this particular run. Given in the GLOBAL-block.
 
     Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
+
+    Int_t fStartTimeBin;    ///< bin at which the fit starts
+    Int_t fEndTimeBin;      ///< bin at which the fit ends
 
     PDoubleVector fForward; ///< forward histo data
     PDoubleVector fM;       ///< vector holding M(t) = [N(t)-N_bkg] exp(+t/tau). Needed to estimate N0.

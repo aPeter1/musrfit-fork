@@ -58,13 +58,16 @@ using namespace std;
 PRunSingleHistoRRF::PRunSingleHistoRRF() : PRunBase()
 {
   fNoOfFitBins  = 0;
-  fBackground = 0;
+  fBackground = 0.0;
+  fBkgErr = 1.0;
   fRRFPacking = -1;
 
   // the 2 following variables are need in case fit range is given in bins, and since
   // the fit range can be changed in the command block, these variables need to be accessible
   fGoodBins[0] = -1;
   fGoodBins[1] = -1;
+  
+  fN0EstimateEndTime = 1.0; // end time in (us) over which N0 is estimated.
 }
 
 //--------------------------------------------------------------------------
@@ -112,6 +115,8 @@ PRunSingleHistoRRF::PRunSingleHistoRRF(PMsrHandler *msrInfo, PRunDataHandler *ra
   fGoodBins[0] = -1;
   fGoodBins[1] = -1;
 
+  fN0EstimateEndTime = 1.0; // end time in (us) over which N0 is estimated.
+ 
   if (!PrepareData()) {
     cerr << endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: Couldn't prepare data for fitting!";
     cerr << endl << ">> This is very bad :-(, will quit ...";
@@ -155,15 +160,7 @@ Double_t PRunSingleHistoRRF::CalcChiSquare(const std::vector<Double_t>& par)
 
   // calculate chi square
   Double_t time(1.0);
-  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
-
-  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
-  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
-  if (startTimeBin < 0)
-    startTimeBin = 0;
-  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin > N)
-    endTimeBin = N;
+  Int_t i;
 
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
   // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
@@ -172,12 +169,12 @@ Double_t PRunSingleHistoRRF::CalcChiSquare(const std::vector<Double_t>& par)
   time = fTheory->Func(time, par, fFuncValues);
 
   #ifdef HAVE_GOMP
-  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  Int_t chunk = (fEndTimeBin - fStartTimeBin)/omp_get_num_procs();
   if (chunk < 10)
     chunk = 10;
   #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
-  for (i=startTimeBin; i<endTimeBin; ++i) {
+  for (i=fStartTimeBin; i<fEndTimeBin; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     diff = fData.GetValue()->at(i) - fTheory->Func(time, par, fFuncValues);
     chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
@@ -211,15 +208,7 @@ Double_t PRunSingleHistoRRF::CalcChiSquareExpected(const std::vector<Double_t>& 
 
   // calculate chi square
   Double_t time(1.0);
-  Int_t i, N(static_cast<Int_t>(fData.GetValue()->size()));
-
-  // In order not to have an IF in the next loop, determine the start and end bins for the fit range now
-  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
-  if (startTimeBin < 0)
-    startTimeBin = 0;
-  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin > N)
-    endTimeBin = N;
+  Int_t i;
 
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
   // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
@@ -228,12 +217,12 @@ Double_t PRunSingleHistoRRF::CalcChiSquareExpected(const std::vector<Double_t>& 
   time = fTheory->Func(time, par, fFuncValues);
 
   #ifdef HAVE_GOMP
-  Int_t chunk = (endTimeBin - startTimeBin)/omp_get_num_procs();
+  Int_t chunk = (fEndTimeBin - fStartTimeBin)/omp_get_num_procs();
   if (chunk < 10)
     chunk = 10;
   #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
-  for (i=startTimeBin; i < endTimeBin; ++i) {
+  for (i=fStartTimeBin; i < fEndTimeBin; ++i) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     theo = fTheory->Func(time, par, fFuncValues);
     diff = fData.GetValue()->at(i) - theo;
@@ -408,15 +397,15 @@ void PRunSingleHistoRRF::SetFitRangeBin(const TString fitRange)
 void PRunSingleHistoRRF::CalcNoOfFitBins()
 {
   // In order not having to loop over all bins and to stay consistent with the chisq method, calculate the start and end bins explicitly
-  Int_t startTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
-  if (startTimeBin < 0)
-    startTimeBin = 0;
-  Int_t endTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
-  if (endTimeBin > static_cast<Int_t>(fData.GetValue()->size()))
-    endTimeBin = fData.GetValue()->size();
+  fStartTimeBin = static_cast<Int_t>(ceil((fFitStartTime - fData.GetDataTimeStart())/fData.GetDataTimeStep()));
+  if (fStartTimeBin < 0)
+    fStartTimeBin = 0;
+  fEndTimeBin = static_cast<Int_t>(floor((fFitEndTime - fData.GetDataTimeStart())/fData.GetDataTimeStep())) + 1;
+  if (fEndTimeBin > static_cast<Int_t>(fData.GetValue()->size()))
+    fEndTimeBin = fData.GetValue()->size();
 
-  if (endTimeBin > startTimeBin)
-    fNoOfFitBins = endTimeBin - startTimeBin;
+  if (fEndTimeBin > fStartTimeBin)
+    fNoOfFitBins = fEndTimeBin - fStartTimeBin;
   else
     fNoOfFitBins = 0;
 }
@@ -604,6 +593,9 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
       if (!EstimateBkg(histoNo))
         return false;
     }
+    // subtract background from fForward
+    for (UInt_t i=0; i<fForward.size(); i++)
+      fForward[i] -= fBackground;
   } else { // fixed background given
     for (UInt_t i=0; i<fForward.size(); i++) {
       fForward[i] -= fRunInfo->GetBkgFix(0);
@@ -624,7 +616,7 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
     exp_t_tau = exp(time_tau);
     fForward[i] *= exp_t_tau;
     fM.push_back(fForward[i]);   // i.e. M(t) = [N(t)-Nbkg] exp(+t/tau); needed to estimate N0 later on
-    fMerr.push_back(exp_t_tau*sqrt(rawNt[i]-fBackground));
+    fMerr.push_back(exp_t_tau*sqrt(rawNt[i]+fBkgErr*fBkgErr));
   }
 
   // calculate weights
@@ -632,7 +624,7 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
     if (fMerr[i] > 0.0)
       fW.push_back(1.0/(fMerr[i]*fMerr[i]));
     else
-      fW.push_back(0.0);
+      fW.push_back(1.0);
   }
   // now fForward = exp(+t/tau) [N(t)-Nbkg] = M(t)
 
@@ -1071,6 +1063,9 @@ Double_t PRunSingleHistoRRF::GetMainFrequency(PDoubleVector &data)
       if (power->GetBinContent(i)>power->GetBinContent(i+1))
         continue;
     }
+    // ignore everything below 10 MHz
+    if (power->GetBinCenter(i) < 10.0)
+      continue;
     // check for maximum
     if (power->GetBinContent(i) > maxFreqVal) {
       maxFreqVal = power->GetBinContent(i);
@@ -1101,15 +1096,17 @@ Double_t PRunSingleHistoRRF::EstimateN0(Double_t &errN0, Double_t freqMax)
 {
   // endBin is estimated such that the number of full cycles (according to the maximum frequency of the data)
   // is approximately the time fN0EstimateEndTime.
-  Int_t endBin = (Int_t)round(fN0EstimateEndTime / fTimeResolution * ceil(freqMax)/freqMax);
+  Int_t endBin = (Int_t)round(ceil(fN0EstimateEndTime*freqMax/TMath::TwoPi()) * (TMath::TwoPi()/freqMax) / fTimeResolution);
 
   Double_t n0 = 0.0;
   Double_t wN = 0.0;
   for (Int_t i=0; i<endBin; i++) {
-    n0 += fW[i]*fM[i];
+//    n0 += fW[i]*fM[i];
+    n0 += fM[i];
     wN += fW[i];
   }
-  n0 /= wN;
+//  n0 /= wN;
+  n0 /= endBin;
 
   errN0 = 0.0;
   for (Int_t i=0; i<endBin; i++) {
@@ -1197,7 +1194,12 @@ Bool_t PRunSingleHistoRRF::EstimateBkg(UInt_t histoNo)
 
   fBackground = bkg;  // keep background (per bin)
 
-  cout << endl << "info> fBackground=" << fBackground << endl;
+  bkg = 0.0;
+  for (UInt_t i=start; i<end; i++)
+    bkg += pow(fForward[i]-fBackground, 2.0);
+  fBkgErr = sqrt(bkg/(static_cast<Double_t>(end - start)));
+
+  cout << endl << "info> fBackground=" << fBackground << "(" << fBkgErr << ")" << endl;
 
   fRunInfo->SetBkgEstimated(fBackground, 0);
 
