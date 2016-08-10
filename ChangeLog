@@ -11,6 +11,7 @@ NEW 2016-04-28 msr2data gets a new option: paramList which allows to
                of msr-files.
 NEW 2016-04-22 Added the theory function muMinusExpTF for mu minus fits
 NEW 2016-02-23 It is now possible to export the averaged data/Fourier
+CHANGED 2016-08-10 drop NeXus support for Version < 4.4
 CHANGED 2016-04-26 start-/endTimeBin are now class members. This reduces 
                the number of recalculations.
 FIXED 2016-08-02 run lists are now properly loaded if containing nS-nE elements.
