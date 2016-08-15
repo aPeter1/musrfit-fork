@@ -586,7 +586,17 @@ AC_ARG_ENABLE([NeXus], [AS_HELP_STRING([--enable-NeXus],[build optional NeXus su
     )
     AC_SUBST(NEXUS_PREFIX)
     if test "${NEXUS_FOUND}" != "1"; then
-      NEXUS_LIBS="-L${NEXUS_PREFIX}/lib64 -lNeXus"
+      if test -r ${NEXUS_PREFIX}/lib/libNeXus.so; then
+        NEXUS_LIB_DIR="lib"
+      elif test -r ${NEXUS_PREFIX}/lib64/libNeXus.so; then
+        NEXUS_LIB_DIR="lib64"
+      else
+        AC_MSG_ERROR(
+         [Couldn't find the NeXus library.]
+        )
+      fi
+
+      NEXUS_LIBS="-L${NEXUS_PREFIX}/${NEXUS_LIB_DIR} -lNeXus"
       NEXUS_CFLAGS="-I${NEXUS_PREFIX}/include/nexus"
     fi
     AC_SUBST(NEXUS_LIBS)
