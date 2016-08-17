@@ -586,9 +586,18 @@ AC_ARG_ENABLE([NeXus], [AS_HELP_STRING([--enable-NeXus],[build optional NeXus su
     )
     AC_SUBST(NEXUS_PREFIX)
     if test "${NEXUS_FOUND}" != "1"; then
-      if test -r ${NEXUS_PREFIX}/lib/libNeXus.so; then
+      dnl get suffix for the NeXus library depending on the OS
+      AC_REQUIRE([AC_CANONICAL_HOST])
+      AS_CASE([$host_os],
+       [linux*], [NEXUS_SUFFIX="so"],
+       [darwin*], [NEXUS_SUFFIX="dylib"],
+       [*cygwin*], [NEXUS_SUFFIX="dll"],
+       [AC_MSG_ERROR([NeXus check: Your platform is not currently supported])]
+      )
+      AC_MSG_NOTICE([NeXus Suffix Result: "${NEXUS_SUFFIX}"])
+      if test -r ${NEXUS_PREFIX}/lib/libNeXus.${NEXUS_SUFFIX}; then
         NEXUS_LIB_DIR="lib"
-      elif test -r ${NEXUS_PREFIX}/lib64/libNeXus.so; then
+      elif test -r ${NEXUS_PREFIX}/lib64/libNeXus.${NEXUS_SUFFIX}; then
         NEXUS_LIB_DIR="lib64"
       else
         AC_MSG_ERROR(
