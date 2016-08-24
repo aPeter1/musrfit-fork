@@ -1140,6 +1140,13 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
       cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << endl;
       return;
     }
+  } else if (x == 'c') {
+    Int_t state = fDataTheoryPad->GetCrosshair();
+    if (state == 0)
+      fDataTheoryPad->SetCrosshair(2);
+    else
+      fDataTheoryPad->SetCrosshair(0);
+    fMainCanvas->Update();
   } else {
     fMainCanvas->Update();
   }
