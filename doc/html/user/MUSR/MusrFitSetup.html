@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 28 Apr 2016 07:39:42 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 25 Aug 2016 05:41:53 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8"><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
@@ -14,12 +14,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1461829165" type="application/x-wiki" title="edit MusrFitSetup" />
+<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1472103696" type="application/x-wiki" title="edit MusrFitSetup" />
 <meta name="TEXT_NUM_TOPICS" content="Number of topics:" />
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
 <meta name="robots" content="noindex" /><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRsshtml.html" />
-<base  /><!--[if IE]></base><![endif]--><link class='head FOOTNOTEPLUGIN_LINKCSS' rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
-<link class='head JQUERYPLUGIN::COMMENT' rel='stylesheet' href='../pub/System/CommentPlugin/commentf5b6.css?version=3.0' type='text/css' media='all' /><!--JQUERYPLUGIN::COMMENT-->
+<base  /><!--[if IE]></base><![endif]--><link class='head JQUERYPLUGIN::COMMENT' rel='stylesheet' href='../pub/System/CommentPlugin/commentf5b6.css?version=3.0' type='text/css' media='all' /><!--JQUERYPLUGIN::COMMENT-->
+<link class='head FOOTNOTEPLUGIN_LINKCSS' rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
 <link class='head SMILIESPLUGIN' rel='stylesheet' href='../pub/System/SmiliesPlugin/smilies.css' type='text/css' media='all' /><!--SMILIESPLUGIN-->
 <link class='head CLASSIFICATIONPLUGIN::CSS' rel="stylesheet" href="../pub/System/ClassificationPlugin/styles.css" media="all" /><!--CLASSIFICATIONPLUGIN::CSS--><link rel='stylesheet' href='../pub/System/SkinTemplates/base.css' media='all' type='text/css' />
 <style type="text/css" media="all">
@@ -102,17 +102,17 @@
 <!--<![endif]-->
 <!--JQUERYPLUGIN-->
 <!--JQUERYPLUGIN::MIGRATE-->
-<!--JQUERYPLUGIN::LIVEQUERY-->
 <!--JQUERYPLUGIN::FOSWIKI-->
-<!--JavascriptFiles/foswikiString-->
-<!--JQUERYPLUGIN::FOSWIKI::PREFERENCES-->
-<!--JQUERYPLUGIN::METADATA-->
-<!--JavascriptFiles/foswikiForm-->
+<!--JQUERYPLUGIN::LIVEQUERY-->
 <!--JQUERYPLUGIN::COMMENT-->
+<!--JQUERYPLUGIN::FOSWIKI::PREFERENCES-->
+<!--JavascriptFiles/foswikiString-->
+<!--JavascriptFiles/foswikiForm-->
 <!--JavascriptFiles/foswikiPref-->
+<!--JQUERYPLUGIN::METADATA-->
+<!--PatternSkin/pattern-->
 
-<!--JQUERYPLUGIN::CHILI-->
-<!--PatternSkin/pattern--><link class='head FOOTNOTEPLUGIN_LINKCSS' rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
+<!--JQUERYPLUGIN::CHILI--><link class='head FOOTNOTEPLUGIN_LINKCSS' rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
 </head> 
 <body class="foswikiNoJs patternViewPage patternPrintPage">
 <span id="PageTop"></span><div class="foswikiPage"><div id="patternScreen">
@@ -227,8 +227,27 @@ For any further information on the standard installation of software, please ref
 <h3 id="A_3.1.2_Installation_of_61_61NeXus_61_61_requirements_40optional_41"> 3.1.2  Installation of <code><b>NeXus</b></code> requirements (optional) </h3>
 <span class='foswikiRedFG'>Only if</span> <code>musrfit</code> should support reading/writing data files in the <code>NeXus</code> format the further <a class="foswikiCurrentTopicLink" href="#ReqSwNeXus">required</a> software has to be set up. The required libraries and header files could either be available through the user's GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. E.g. on Red Hat-like systems binary packages for <code>MXML</code>, <code>HDF4</code>, and <code>HDF5</code> might be called <code><b>mxml, mxml-devel, hdf, hdf-devel, hdf5, hdf5-devel</b></code>, on Debian-like systems <code><b>libmxml1, libmxml-dev, libhdf4-dev, libhdf5-dev</b></code>.
 <p></p>
-Even though there might exist binary packages for the <code>NeXus</code> library, it is best to build and install it directly from the source code which can be found <a href="http://download.nexusformat.org/kits/">here</a>.
+<strong>Only <code><b>NeXus</b></code> Version &gt;= 4.4 is support!</strong>
 <p></p>
+Even though there might exist binary packages for the <code>NeXus</code> library, it is best to build and install it directly from the source code which can be found <a href="https://github.com/nexusformat/code">here</a>.
+<p></p>
+A brief instruction how to get <code>NeXus</code> compiled from source: 
+<p></p>
+<pre class="bash">
+&#36; cd Downloads
+&#36; # create a directory for the NeXus source code
+&#36; mkdir nexus
+&#36; cd nexus
+&#36; # get the source code from the master repository
+&#36; git clone https://github.com/nexusformat/code.git
+&#36; # next we will build NeXus out-of-source
+&#36; mkdir build
+&#36; cd build
+&#36; cmake -DENABLE&#95;HDF5&#61;1 -DENABLE&#95;HDF4&#61;1 -DENABLE&#95;MXML&#61;1 ../code
+&#36; make
+&#36; # make install needs either to be carried out as root or sudo depending on your linux flavour.
+&#36; sudo make install
+</pre>
 <h3 id="A_3.1.3_61_61ROOT_61_61"> 3.1.3  <code><b>ROOT</b></code> </h3>
 <strong>Currently only ROOT 5.34/xx is support! Do NOT try to use ROOT 6.xx/yy yet!</strong>
 <p></p>
@@ -383,6 +402,8 @@ Notes
 <hr />
 <p></p>
 <h1 id="A_4_MS_Windows"> 4  MS Windows </h1>
+<span class='foswikiRedFG'> The description here is only for the very brave ones. It hasn't been tested for quite a while and therefore gives you rather a flavour of what needs to be done rather than a real instruction how to setup <code>musrfit</code>. If you just need <code>musrfit</code> to work on a MS Windows platform, it is recommended to install it via a linux virtual machine!</span>
+<p></p>
 Under Windows a native installation is not supported but there is the possibility to run <code>musrfit</code> through <a href="http://www.cygwin.com/">Cygwin</a> which has the great advantage that one gains additionally various nice <code>UNIX</code> tools also for other purposes <img class='smily' src='../pub/Main/SmiliesPluginPSI_/wink.gif' alt='wink' title='wink' /> <br>
 <span class='foswikiRedFG'>Please also be aware of the fact that the X server which is going to be installed with Cygwin has to be started (e.g. by selecting it from the "Programs" folder) before any graphical application (<code>musrview</code>, <code>musrgui</code>, etc.) is run</span>.
 <p></p>
@@ -408,6 +429,9 @@ where <strong>x_yy_z</strong> has to be substituted by the correct version numbe
 <span class='foswikiRedFG'>Only if</span> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a class="foswikiCurrentTopicLink" href="#ReqSwNeXus">required</a> software has to be set up. Under Cygwin of all the required libraries only <code>HDF5</code> is available. The packages <code><b>hdf5</b></code> and <code><b>libhdf5-devel</b></code> can be installed through the Cygwin setup. One should also make sure that <code><b>bison</b></code>, <code><b>flex</b></code> and a package containing <nobr><b>/usr/lib/librpc.a</b></nobr> (e.g. <code><b>sunrpc</b></code> = <strong>4.0-3</strong>, <span class='foswikiRedFG'>but not</span> <code><b>sunrpc</b></code> = <strong>4.0-4</strong>) are installed.
 <p></p>
 All other libraries have to be built from the sources. The following lines will track the installation of <code>JPEG</code> <strong>6b</strong>, <code>MXML</code> <strong>2.9</strong>, <code>HDF</code> <strong>4.2.7-patch1</strong>, and <code>NeXus</code> <strong>4.3.2</strong>. The version numbers and source-code locations might of course change with time but should be easily adjustable.
+<p></p>
+<strong>Only <code><b>NeXus</b></code> Version &gt;= 4.4 is support!</strong>
+<p></p>
 <pre class="bash">
 &#36; cd
 &#36; mkdir nexus
@@ -430,9 +454,15 @@ All other libraries have to be built from the sources. The following lines will 
 &#36; make
 &#36; make install
 &#36; cd ..
-&#36; curl http://download.nexusformat.org/kits/nexus-4.3.2-20140413svn1919.tar.gz -G &#124; tar xz
-&#36; cd nexus-4.3.2-20140413svn1919
-&#36; ./configure --prefix&#61;/usr/local --with-hdf4&#61;/usr/local --with-hdf5&#61;/usr --with-xml&#61;/usr/local
+&#36; # create a directory for the NeXus source code
+&#36; mkdir nexus
+&#36; cd nexus
+&#36; # get the source code from the master repository
+&#36; git clone https://github.com/nexusformat/code.git
+&#36; # next we will build NeXus out-of-source
+&#36; mkdir build
+&#36; cd build
+&#36; cmake -DENABLE&#95;HDF5&#61;1 -DENABLE&#95;HDF4&#61;1 -DENABLE&#95;MXML&#61;1 ../code
 &#36; make
 &#36; make install
 </pre>
@@ -608,7 +638,7 @@ With <code><b>qt4-mac</b></code>, <code>musredit</code> will be installed. If it
 <pre class="bash">
 &#36; sudo port -v install jpeg6b hdf4 hdf5
 </pre>
-Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to be compiled and installed directly from the source code. Given the respective version numbers of <strong>2.9</strong> and <strong>4.3.2</strong> (which are subject to change with time) this can be achieved for example by:
+Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to be compiled and installed directly from the source code. Given the respective version numbers of <strong>2.9</strong> and <strong>4.4.2</strong> (which are subject to change with time, <strong>Only <code><b>NeXus</b></code> Version &gt;= 4.4 is support!</strong>) this can be achieved for example by:
 <pre class="bash">
 &#36; cd
 &#36; curl www.msweet.org/files/project3/mxml-2.9.tar.gz -G &#124; tar xz
@@ -616,14 +646,19 @@ Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to
 &#36; ./configure --prefix&#61;/usr/local
 &#36; make
 &#36; sudo make install
-&#36; cd ..
-&#36; curl http://download.nexusformat.org/kits/nexus-4.3.2-20140413svn1919.tar.gz -G &#124; tar xz
-&#36; cd nexus-4.3.2-20140413svn1919
-&#36; ./configure --prefix&#61;/usr/local
+&#36; cd &#36;HOME/Downloads
+&#36; # create a directory for the NeXus source code
+&#36; mkdir nexus
+&#36; cd nexus
+&#36; # get the source code from the master repository
+&#36; git clone https://github.com/nexusformat/code.git
+&#36; # next we will build NeXus out-of-source
+&#36; mkdir build
+&#36; cd build
+&#36; cmake -DENABLE&#95;HDF5&#61;1 -DENABLE&#95;HDF4&#61;1 -DENABLE&#95;MXML&#61;1 ../code
 &#36; make
 &#36; sudo make install
 </pre>
-<p></p>
 <h3 id="A_5.1.3_61_61ROOT_61_61"> 5.1.3  <code><b>ROOT</b></code> </h3>
 The best way to get <code>ROOT</code> exactly the way needed for <code>musrfit</code> is to install it from source. Before describing it, please make sure that you have installed all required packages listed under <a class="foswikiCurrentTopicLink" href="#ReqSw">Requested Software</a> (e.g. fftw, gsl, etc).
 <p></p>
@@ -905,7 +940,7 @@ If <code>musrgui</code> has been installed, just open one of the <strong>test-&#
 <p></p>
 </div>
 <div class="patternInfo">This topic: MUSR<span class='foswikiSeparator'>&nbsp;&gt;&nbsp;</span><a class="foswikiCurrentWebHomeLink" href="WebHome.html">WebHome</a> &gt; <a href="MusrFit.html">MusrFit</a><span class='foswikiSeparator'>&nbsp;&gt;&nbsp;</span>MusrFitSetup <br />
-Topic revision:  <span class='patternRevInfo'>23 Nov 2015, suter_a</span></div>
+Topic revision:  <span class='patternRevInfo'>10 Aug 2016, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
 </div>
 </div>
 </div>
@@ -923,6 +958,6 @@ Topic revision:  <span class='patternRevInfo'>23 Nov 2015, suter_a</span></div>
 
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 28 Apr 2016 07:39:42 GMT -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Thu, 25 Aug 2016 05:41:53 GMT -->
 <!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8"><!-- /Added by HTTrack -->
 </html>
