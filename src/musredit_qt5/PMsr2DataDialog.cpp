@@ -105,6 +105,8 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString he
   fGlobal_checkBox->setChecked(fMsr2DataParam->global);
   fGlobalPlus_checkBox->setChecked(fMsr2DataParam->globalPlus);
 
+  fOk_pushButton->setDefault(true);
+
   connect(fGlobal_checkBox, SIGNAL(clicked(bool)), this, SLOT(globalOptionSet(bool)));
   connect(fGlobalPlus_checkBox, SIGNAL(clicked(bool)), this, SLOT(globalPlusOptionSet(bool)));
 }
