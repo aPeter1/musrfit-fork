@@ -2185,29 +2185,29 @@ void PTextEdit::musrView()
     fileSave();
   }
 
-  QString cmd;
+  QString cmd = fAdmin->getExecPath() + "/musrview";
+  QString workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
+  QStringList arg;
   QString str;
 
-  str = "cd \"" + QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "\"; ";
-
-  str += fAdmin->getExecPath() + "/musrview";
-  cmd = str + " \"";
-
+  // file name
   str = *fFilenames.find( currentEditor() );
   int pos = str.lastIndexOf("/");
   if (pos != -1)
     str.remove(0, pos+1);
-  QString numStr;
-  numStr.setNum(fAdmin->getTimeout());
-  cmd += str + "\" --timeout " + numStr;
+  arg << str;
+
+  // timeout
+  str.setNum(fAdmin->getTimeout());
+  arg << "--timeout" << str;
+
+  // start with Fourier?
   if (fAdmin->getMusrviewShowFourierFlag())
-    cmd += " -f ";
-  cmd += " &";
+    arg << "-f";
 
-  int status=system(cmd.toLatin1());
-
-  if (status != 0) {
-    cerr << "**WARNING** musrView: something went wrong ..." << endl;
+  QProcess proc(this);
+  if (!proc.startDetached(cmd, arg, workDir)) {
+    QMessageBox::critical(this, "ERROR", "**ERROR** musrview process couldn't be launched properly, sorry.");
   }
 }
 
@@ -2230,20 +2230,26 @@ void PTextEdit::musrT0()
     fileSave();
   }
 
-  QString cmd;
+  QString cmd = fAdmin->getExecPath() + "/musrt0";
+  QString workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
+  QStringList arg;
   QString str;
 
-  str = fAdmin->getExecPath() + "/musrt0";
-  cmd = str + " \"";
-
+  // file name
   str = *fFilenames.find( currentEditor() );
-  QString numStr;
-  numStr.setNum(fAdmin->getTimeout());
-  cmd += str + "\" --timeout " + numStr + " &";
+  int pos = str.lastIndexOf("/");
+  if (pos != -1)
+    str.remove(0, pos+1);
+  arg << str;
 
-  int status=system(cmd.toLatin1());
+  // timeout
+  str.setNum(fAdmin->getTimeout());
+  arg << "--timeout" << str;
 
-  QString fln = *fFilenames.find( currentEditor() );
+  QProcess proc(this);
+  if (!proc.startDetached(cmd, arg, workDir)) {
+    QMessageBox::critical(this, "ERROR", "**ERROR** musrt0 process couldn't be launched properly, sorry.");
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2355,16 +2361,44 @@ void PTextEdit::musrSwapMsrMlog()
     fileSave();
   }
 
+  QMessageBox::information(0, "INFO", QString("Will now swap files: %1 <-> %2").arg(currentFileName).arg(swapFileName));
+
   // swap files
-  QString cmd;
-  cmd = QString("cp \"") + currentFileName + QString("\" \"") + tempFileName + QString("\"");
-  int status=system(cmd.toLatin1());
-  cmd = QString("cp \"") + swapFileName + QString("\" \"") + currentFileName + QString("\"");
-  status=system(cmd.toLatin1());
-  cmd = QString("cp \"") + tempFileName + QString("\" \"") + swapFileName + QString("\"");
-  status=system(cmd.toLatin1());
-  cmd = QString("rm \"") + tempFileName + QString("\"");
-  status=system(cmd.toLatin1());
+
+  // copy currentFile -> tempFile
+  if (QFile::exists(tempFileName)) {
+    if (!QFile::remove(tempFileName)) {
+      QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(tempFileName));
+      return;
+    }
+  }
+  if (!QFile::copy(currentFileName, tempFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to copy %1 -> %2").arg(currentFileName).arg(tempFileName));
+    return;
+  }
+  // copy swapFile -> currentFile
+  if (!QFile::remove(currentFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(currentFileName));
+    return;
+  }
+  if (!QFile::copy(swapFileName, currentFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to copy %1 -> %2").arg(swapFileName).arg(currentFileName));
+    return;
+  }
+  // copy tempFile -> swapFile
+  if (!QFile::remove(swapFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(swapFileName));
+    return;
+  }
+  if (!QFile::copy(tempFileName, swapFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to copy %1 -> %2").arg(tempFileName).arg(swapFileName));
+    return;
+  }
+  // clean up
+  if (!QFile::remove(tempFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(tempFileName));
+    return;
+  }
 
   int currentIdx = fTabWidget->currentIndex();
 
