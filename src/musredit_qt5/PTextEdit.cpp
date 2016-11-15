@@ -2205,11 +2205,24 @@ void PTextEdit::musrView()
   if (fAdmin->getMusrviewShowFourierFlag())
     arg << "-f";
 
-  QProcess proc(this);
-  if (!proc.startDetached(cmd, arg, workDir)) {
-    QMessageBox::critical(this, "ERROR", "**ERROR** musrview process couldn't be launched properly, sorry.");
+  QProcess *proc = new QProcess(this);
+  
+  // make sure that the system environment variables are properly set
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+  proc->setProcessEnvironment(env);
+  proc->setWorkingDirectory(workDir);
+  proc->start(cmd, arg);
+  if (!proc->waitForStarted()) {
+    // error handling
+    QString msg(tr("Could not execute the output command: ")+cmd[0]);
+    QMessageBox::critical( 0,
+                          tr("Fatal error"),
+                          msg,
+                          tr("Quit") );
+    return;
   }
-}
+ }
 
 //----------------------------------------------------------------------------------------------------
 /**
