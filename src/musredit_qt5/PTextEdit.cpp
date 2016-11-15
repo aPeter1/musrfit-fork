@@ -2259,9 +2259,22 @@ void PTextEdit::musrT0()
   str.setNum(fAdmin->getTimeout());
   arg << "--timeout" << str;
 
-  QProcess proc(this);
-  if (!proc.startDetached(cmd, arg, workDir)) {
-    QMessageBox::critical(this, "ERROR", "**ERROR** musrt0 process couldn't be launched properly, sorry.");
+  QProcess *proc = new QProcess(this);
+
+  // make sure that the system environment variables are properly set
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+  proc->setProcessEnvironment(env);
+  proc->setWorkingDirectory(workDir);
+  proc->start(cmd, arg);
+  if (!proc->waitForStarted()) {
+    // error handling
+    QString msg(tr("Could not execute the output command: ")+cmd[0]);
+    QMessageBox::critical( 0,
+                          tr("Fatal error"),
+                          msg,
+                          tr("Quit") );
+    return;
   }
 }
 
@@ -2282,11 +2295,23 @@ void PTextEdit::musrFT()
 
   if (dlg->exec() == QDialog::Accepted) {
     fMusrFTPrevCmd = dlg->getMusrFTOptions();
-    QProcess proc(this);
-    proc.setStandardOutputFile("musrFT.log");
-    proc.setStandardErrorFile("musrFT.log");
+    QProcess *proc = new QProcess(this);
+    proc->setStandardOutputFile("musrFT.log");
+    proc->setStandardErrorFile("musrFT.log");
     QString cmd = fAdmin->getExecPath() + "/musrFT";
-    proc.startDetached(cmd, fMusrFTPrevCmd);
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+    proc->setProcessEnvironment(env);
+    proc->start(cmd, fMusrFTPrevCmd);
+    if (!proc->waitForStarted()) {
+      // error handling
+      QString msg(tr("Could not execute the output command: ")+cmd[0]);
+      QMessageBox::critical( 0,
+                            tr("Fatal error"),
+                            msg,
+                            tr("Quit") );
+      return;
+    }
   }
 
   delete dlg;
