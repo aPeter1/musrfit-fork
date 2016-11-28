@@ -3844,7 +3844,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
 
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
-  TString str;
+  TString str, pcStr=TString("");
 
   Int_t ival;
 
@@ -3993,21 +3993,10 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
         }
       }
     } else if (iter->fLine.BeginsWith("range_for_phase_correction", TString::kIgnoreCase)) {
-      if (tokens->GetEntries() < 3) { // range values are missing
-        error = true;
-        continue;
-      } else {
-        for (UInt_t i=0; i<2; i++) {
-          ostr = dynamic_cast<TObjString*>(tokens->At(i+1));
-          str = ostr->GetString();
-          if (str.IsFloat()) {
-            fourier.fRangeForPhaseCorrection[i] = str.Atof();
-          } else {
-            error = true;
-            continue;
-          }
-        }
-      }
+      // keep the string. It can only be handled at the very end of the FOURIER block evaluation
+      // since it needs potentially the range input and there is no guaranty this is already
+      // available at this point.
+      pcStr = iter->fLine;
     } else if (iter->fLine.BeginsWith("range", TString::kIgnoreCase)) { // fourier plot range
       if (tokens->GetEntries() < 3) { // plot range values are missing
         error = true;
@@ -4045,6 +4034,45 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
     tokens = 0;
   }
 
+  // handle range_for_phase_correction if present
+  if ((pcStr.Length() != 0) && !error) {
+    // tokenize line
+    tokens = pcStr.Tokenize(" \t");
+
+    switch (tokens->GetEntries()) {
+    case 2:
+      ostr = dynamic_cast<TObjString*>(tokens->At(1));
+      str = ostr->GetString();
+      if (!str.CompareTo("all", TString::kIgnoreCase)) {
+        fourier.fRangeForPhaseCorrection[0] = fourier.fPlotRange[0];
+        fourier.fRangeForPhaseCorrection[1] = fourier.fPlotRange[1];
+      } else {
+        error = true;
+      }
+      break;
+    case 3:
+      for (UInt_t i=0; i<2; i++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(i+1));
+        str = ostr->GetString();
+        if (str.IsFloat()) {
+          fourier.fRangeForPhaseCorrection[i] = str.Atof();
+        } else {
+          error = true;
+        }
+      }
+      break;
+    default:
+      error = true;
+      break;
+    }
+
+    // clean up
+    if (tokens) {
+      delete tokens;
+      tokens = 0;
+    }
+  }
+
   if (error) {
     cerr << endl << ">> PMsrHandler::HandleFourierEntry: **ERROR** in line " << iter->fLineNo << ":";
     cerr << endl;
@@ -4061,7 +4089,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
     cerr << endl << ">> [apodization none | weak | medium | strong]";
     cerr << endl << ">> [plot real | imag | real_and_imag | power | phase]";
     cerr << endl << ">> [phase value]";
-    cerr << endl << ">> [range_for_phase_correction min max]";
+    cerr << endl << ">> [range_for_phase_correction min max | all]";
     cerr << endl << ">> [range min max]";
     cerr << endl;
   } else { // save last run found
