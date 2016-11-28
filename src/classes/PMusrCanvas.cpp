@@ -1142,10 +1142,13 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     }
   } else if (x == 'c') {
     Int_t state = fDataTheoryPad->GetCrosshair();
-    if (state == 0)
+    if (state == 0) {
+      fMainCanvas->ToggleEventStatus();
       fDataTheoryPad->SetCrosshair(2);
-    else
+    } else {
+      fMainCanvas->ToggleEventStatus();
       fDataTheoryPad->SetCrosshair(0);
+    }
     fMainCanvas->Update();
   } else {
     fMainCanvas->Update();
