@@ -624,6 +624,12 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
         xMinBin = fFourierHistos[0].dataFourierIm->GetXaxis()->GetFirst();
         xMaxBin = fFourierHistos[0].dataFourierIm->GetXaxis()->GetLast();
         break;
+      case FOURIER_PLOT_REAL_AND_IMAG:
+        xAxis = fFourierHistos[0].dataFourierRe->GetXaxis()->GetTitle();
+        yAxis = TString("Real+Imag");
+        xMinBin = fFourierHistos[0].dataFourierRe->GetXaxis()->GetFirst();
+        xMaxBin = fFourierHistos[0].dataFourierRe->GetXaxis()->GetLast();
+        break;
       case FOURIER_PLOT_POWER:
         xAxis = fFourierHistos[0].dataFourierPwr->GetXaxis()->GetTitle();
         yAxis = TString("Power");
@@ -703,42 +709,46 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
       for (UInt_t j=0; j<fFourierHistos.size()-1; j++) {
         switch (fCurrentPlotView) {
           case FOURIER_PLOT_REAL:
-              fout << fFourierHistos[j].dataFourierRe->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierRe->GetBinContent(i) << ", ";
-              break;
+            fout << fFourierHistos[j].dataFourierRe->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierRe->GetBinContent(i) << ", ";
+            break;
           case FOURIER_PLOT_IMAG:
-              fout << fFourierHistos[j].dataFourierIm->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierIm->GetBinContent(i) << ", ";
-              break;
+            fout << fFourierHistos[j].dataFourierIm->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierIm->GetBinContent(i) << ", ";
+            break;
+          case FOURIER_PLOT_REAL_AND_IMAG:
+            break;
           case FOURIER_PLOT_POWER:
-              fout << fFourierHistos[j].dataFourierPwr->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierPwr->GetBinContent(i) << ", ";
-              break;
+            fout << fFourierHistos[j].dataFourierPwr->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierPwr->GetBinContent(i) << ", ";
+            break;
           case FOURIER_PLOT_PHASE:
-              fout << fFourierHistos[j].dataFourierPhase->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierPhase->GetBinContent(i) << ", ";
-              break;
+            fout << fFourierHistos[j].dataFourierPhase->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierPhase->GetBinContent(i) << ", ";
+            break;
           case FOURIER_PLOT_PHASE_OPT_REAL:
-              fout << fFourierHistos[j].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierPhaseOptReal->GetBinContent(i) << ", ";
-              break;
+            fout << fFourierHistos[j].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierHistos[j].dataFourierPhaseOptReal->GetBinContent(i) << ", ";
+            break;
           default:
-              break;
+            break;
         }
       }
       switch (fCurrentPlotView) {
         case FOURIER_PLOT_REAL:
-            fout << fFourierHistos[fFourierHistos.size()-1].dataFourierRe->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierRe->GetBinContent(i) << endl;
-            break;
+          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierRe->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierRe->GetBinContent(i) << endl;
+          break;
         case FOURIER_PLOT_IMAG:
-            fout << fFourierHistos[fFourierHistos.size()-1].dataFourierIm->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierIm->GetBinContent(i) << endl;
-            break;
+          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierIm->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierIm->GetBinContent(i) << endl;
+          break;
+        case FOURIER_PLOT_REAL_AND_IMAG:
+          break;
         case FOURIER_PLOT_POWER:
-            fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPwr->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPwr->GetBinContent(i) << endl;
-            break;
+          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPwr->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPwr->GetBinContent(i) << endl;
+          break;
         case FOURIER_PLOT_PHASE:
-            fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinContent(i) << endl;
-            break;
+          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinContent(i) << endl;
+          break;
         case FOURIER_PLOT_PHASE_OPT_REAL:
-            fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhaseOptReal->GetBinContent(i) << endl;
-            break;
+          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhaseOptReal->GetBinContent(i) << endl;
+          break;
         default:
-            break;
+          break;
       }
     }
   }
@@ -805,7 +815,6 @@ void PFourierCanvas::InitFourierDataSets()
     fFourierHistos[i].dataFourierPwr = fFourier[i]->GetPowerFourier();
     fFourierHistos[i].dataFourierPhase = fFourier[i]->GetPhaseFourier();
     fFourierHistos[i].dataFourierPhaseOptReal = fFourier[i]->GetPhaseOptRealFourier(fFourierHistos[i].optPhase, 1.0, fInitialXRange[0], fInitialXRange[1]);
-    cout << "debug> histo[" << i << "]: opt. phase = " << fFourierHistos[i].optPhase * 180.0 / TMath::Pi() << "°" << endl;
   }
 
   // rescale histo to abs(maximum) == 1
