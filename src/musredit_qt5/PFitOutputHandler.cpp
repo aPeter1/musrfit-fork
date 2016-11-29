@@ -62,6 +62,10 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QVector<QString> 
   // QProcess related code
   fProc = new QProcess( this );
 
+  // make sure that the system environment variables are properly set
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+  fProc->setProcessEnvironment(env);
   fProc->setWorkingDirectory(workingDirectory);
 
   // Set up the command and arguments.
