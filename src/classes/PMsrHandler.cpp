@@ -1113,8 +1113,10 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             fout << "POWER";
           } else if (fFourier.fPlotTag == FOURIER_PLOT_PHASE) {
             fout << "PHASE";
+          } else if (fFourier.fPlotTag == FOURIER_PLOT_PHASE_OPT_REAL) {
+            fout << "PHASE_OPT_REAL";
           }
-          fout << "   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE";
+          fout << "   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL";
           fout << endl;
         } else if (sstr.BeginsWith("phase")) {
           if (fFourier.fPhaseParamNo > 0) {
@@ -2146,8 +2148,10 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *co
         fout << "POWER";
       } else if (fFourier.fPlotTag == FOURIER_PLOT_PHASE) {
         fout << "PHASE";
+      } else if (fFourier.fPlotTag == FOURIER_PLOT_PHASE_OPT_REAL) {
+        fout << "PHASE_OPT_REAL";
       }
-      fout << "   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE";
+      fout << "   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL";
       fout << endl;
     }
 
@@ -3951,6 +3955,8 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
           fourier.fPlotTag = FOURIER_PLOT_POWER;
         } else if (!str.CompareTo("phase", TString::kIgnoreCase)) {
           fourier.fPlotTag = FOURIER_PLOT_PHASE;
+        } else if (!str.CompareTo("phase_opt_real", TString::kIgnoreCase)) {
+          fourier.fPlotTag = FOURIER_PLOT_PHASE_OPT_REAL;
         } else { // unrecognized plot tag
           error = true;
           continue;
@@ -4087,7 +4093,7 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
     cerr << endl << ">>    0 <= n <= 20 are allowed values";
     cerr << endl << ">> [dc-corrected true | false]";
     cerr << endl << ">> [apodization none | weak | medium | strong]";
-    cerr << endl << ">> [plot real | imag | real_and_imag | power | phase]";
+    cerr << endl << ">> [plot real | imag | real_and_imag | power | phase | phase_opt_real]";
     cerr << endl << ">> [phase value]";
     cerr << endl << ">> [range_for_phase_correction min max | all]";
     cerr << endl << ">> [range min max]";

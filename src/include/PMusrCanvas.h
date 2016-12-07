@@ -55,12 +55,13 @@
 #define XTHEO  0.75
 
 // Current Plot Views
-#define PV_DATA                  1
-#define PV_FOURIER_REAL          2
-#define PV_FOURIER_IMAG          3
-#define PV_FOURIER_REAL_AND_IMAG 4
-#define PV_FOURIER_PWR           5
-#define PV_FOURIER_PHASE         6
+#define PV_DATA                   1
+#define PV_FOURIER_REAL           2
+#define PV_FOURIER_IMAG           3
+#define PV_FOURIER_REAL_AND_IMAG  4
+#define PV_FOURIER_PWR            5
+#define PV_FOURIER_PHASE          6
+#define PV_FOURIER_PHASE_OPT_REAL 7
 
 // Canvas menu id's
 #define P_MENU_ID_DATA          10001
@@ -71,13 +72,14 @@
 
 #define P_MENU_PLOT_OFFSET      1000
 
-#define P_MENU_ID_FOURIER_REAL          100
-#define P_MENU_ID_FOURIER_IMAG          101
-#define P_MENU_ID_FOURIER_REAL_AND_IMAG 102
-#define P_MENU_ID_FOURIER_PWR           103
-#define P_MENU_ID_FOURIER_PHASE         104
-#define P_MENU_ID_FOURIER_PHASE_PLUS    105
-#define P_MENU_ID_FOURIER_PHASE_MINUS   106
+#define P_MENU_ID_FOURIER_REAL           100
+#define P_MENU_ID_FOURIER_IMAG           101
+#define P_MENU_ID_FOURIER_REAL_AND_IMAG  102
+#define P_MENU_ID_FOURIER_PWR            103
+#define P_MENU_ID_FOURIER_PHASE          104
+#define P_MENU_ID_FOURIER_PHASE_OPT_REAL 105
+#define P_MENU_ID_FOURIER_PHASE_PLUS     106
+#define P_MENU_ID_FOURIER_PHASE_MINUS    107
 
 //------------------------------------------------------------------------
 /**
@@ -122,16 +124,19 @@ typedef struct {
   TH1F *dataFourierIm;       ///< imaginary part of the Fourier transform of the data histogram
   TH1F *dataFourierPwr;      ///< power spectrum of the Fourier transform of the data histogram
   TH1F *dataFourierPhase;    ///< phase spectrum of the Fourier transform of the data histogram
+  TH1F *dataFourierPhaseOptReal; ///< phase optimized real part spectrum Fourier transform of the data histogram
   TH1F *theory;              ///< theory histogram belonging to the data histogram
   TH1F *theoryFourierRe;     ///< real part of the Fourier transform of the theory histogram
   TH1F *theoryFourierIm;     ///< imaginary part of the Fourier transform of the theory histogram
   TH1F *theoryFourierPwr;    ///< power spectrum of the Fourier transform of the theory histogram
   TH1F *theoryFourierPhase;  ///< phase spectrum of the Fourier transform of the theory histogram
+  TH1F *theoryFourierPhaseOptReal; ///< phase optimized real part spectrum Fourier transform of the theory histogram
   TH1F *diff;                ///< difference histogram, i.e. data-theory
   TH1F *diffFourierRe;       ///< real part of the Fourier transform of the diff histogram
   TH1F *diffFourierIm;       ///< imaginary part of the Fourier transform of the diff histogram
   TH1F *diffFourierPwr;      ///< power spectrum of the Fourier transform of the diff histogram
   TH1F *diffFourierPhase;    ///< phase spectrum of the Fourier transform of the diff histogram
+  TH1F *diffFourierPhaseOptReal; ///< phase optimized real part spectrum Fourier transform of the diff histogram
   PMusrCanvasPlotRange *dataRange;    ///< keep the msr-file plot data range
   UInt_t diffFourierTag; ///< 0=not relevant, 1=d-f (Fourier of difference time spectra), 2=f-d (difference of Fourier spectra)
 } PMusrCanvasDataSet;
@@ -302,7 +307,6 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleDifferenceFourier();
     virtual void HandleFourierDifference();
     virtual void HandleAverage();
-    virtual Double_t FindOptimalFourierPhase();
     virtual void CleanupDifference();
     virtual void CleanupFourier();
     virtual void CleanupFourierDifference();
