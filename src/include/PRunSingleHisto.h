@@ -51,6 +51,13 @@ class PRunSingleHisto : public PRunBase
 
     virtual void SetFitRangeBin(const TString fitRange);
 
+    virtual Double_t GetBackground() { return fBackground; }
+
+    virtual Int_t GetStartTimeBin() { return fStartTimeBin; }
+    virtual Int_t GetEndTimeBin() { return fEndTimeBin; }
+    virtual Int_t GetPacking() { return fPacking; }
+    virtual Bool_t GetScaleN0AndBkg() { return fScaleN0AndBkg; }
+
   protected:
     virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
@@ -64,9 +71,12 @@ class PRunSingleHisto : public PRunBase
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
     Int_t fPacking;         ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
 
-    Int_t fGoodBins[2];        ///< keep first/last good bins. 0=fgb, 1=lgb
+    Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
 
-    PDoubleVector fForward;    ///< forward histo data
+    PDoubleVector fForward; ///< forward histo data
+
+    Int_t fStartTimeBin;    ///< bin at which the fit starts
+    Int_t fEndTimeBin;      ///< bin at which the fit ends
 
     virtual Bool_t GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &histoNo);
     virtual Bool_t GetProperDataRange();

@@ -554,34 +554,31 @@ AC_ARG_ENABLE([NeXus], [AS_HELP_STRING([--enable-NeXus],[build optional NeXus su
         [AS_HELP_STRING([--with-nexus],[prefix of the NeXus installation, e.g. /usr/local])],
         [NEXUS_PREFIX=$with_nexus
          AC_MSG_CHECKING([whether NeXus can be found at the specified location])
-         if !(test -r ${NEXUS_PREFIX}/include/napi.h); then
+         if !(test -r ${NEXUS_PREFIX}/include/nexus/napi.h); then
            AC_MSG_RESULT([no])
            AC_MSG_ERROR([NeXus cannot be found at the specified path!])
          fi
          AC_MSG_RESULT([${NEXUS_PREFIX}])],
-        [PKG_CHECK_MODULES(NEXUS, nexus >= 4.1, [NEXUS_FOUND=1],
+        [PKG_CHECK_MODULES(NEXUS, nexus >= 4.4, [NEXUS_FOUND=1],
          [AC_MSG_CHECKING([whether NeXus is installed in a standard location])
-          if test -r /usr/local/include/napi.h; then
-            NEXUS_PREFIX="/usr/local"
-            AC_MSG_RESULT([${NEXUS_PREFIX}])
-         elif test -r /usr/local/nexus/include/napi.h; then
-           NEXUS_PREFIX="/usr/local/nexus"
+          if test -r /usr/local/include/nexus/napi.h; then
+           NEXUS_PREFIX="/usr/local"
            AC_MSG_RESULT([${NEXUS_PREFIX}])
-         elif test -r /usr/include/napi.h; then
-           NEXUS_PREFIX="/usr"
-           AC_MSG_RESULT([${NEXUS_PREFIX}])
-         elif test -r /sw/include/napi.h; then
+          elif test -r /sw/include/nexus/napi.h; then
            NEXUS_PREFIX="/sw"
            AC_MSG_RESULT([${NEXUS_PREFIX}])
-         elif test -r /opt/local/include/napi.h; then
+          elif test -r /opt/local/include/nexus/napi.h; then
            NEXUS_PREFIX="/opt/local"
            AC_MSG_RESULT([${NEXUS_PREFIX}])
-         else
+          elif test -r /opt/nexus/include/nexus/napi.h; then
+           NEXUS_PREFIX="/opt/nexus"
+           AC_MSG_RESULT([${NEXUS_PREFIX}])
+          else
            AC_MSG_RESULT([no])
            AC_MSG_ERROR(
-           [NeXus not found. Please call configure with the --with-nexus option.
+           [NeXus Version >= 4.4 not found. Please call configure with the --with-nexus option.
            This tells configure where to find the NeXus headers,
-           e.g. --with-nexus=/usr/local/nexus]
+           e.g. --with-nexus=/opt/nexus]
            )
          fi
         ]
@@ -589,8 +586,27 @@ AC_ARG_ENABLE([NeXus], [AS_HELP_STRING([--enable-NeXus],[build optional NeXus su
     )
     AC_SUBST(NEXUS_PREFIX)
     if test "${NEXUS_FOUND}" != "1"; then
-      NEXUS_LIBS="-L${NEXUS_PREFIX}/lib -lNeXus"
-      NEXUS_CFLAGS="-I${NEXUS_PREFIX}/include"
+      dnl get suffix for the NeXus library depending on the OS
+      AC_REQUIRE([AC_CANONICAL_HOST])
+      AS_CASE([$host_os],
+       [linux*], [NEXUS_SUFFIX="so"],
+       [darwin*], [NEXUS_SUFFIX="dylib"],
+       [*cygwin*], [NEXUS_SUFFIX="dll"],
+       [AC_MSG_ERROR([NeXus check: Your platform is not currently supported])]
+      )
+      AC_MSG_NOTICE([NeXus Suffix Result: "${NEXUS_SUFFIX}"])
+      if test -r ${NEXUS_PREFIX}/lib/libNeXus.${NEXUS_SUFFIX}; then
+        NEXUS_LIB_DIR="lib"
+      elif test -r ${NEXUS_PREFIX}/lib64/libNeXus.${NEXUS_SUFFIX}; then
+        NEXUS_LIB_DIR="lib64"
+      else
+        AC_MSG_ERROR(
+         [Couldn't find the NeXus library.]
+        )
+      fi
+
+      NEXUS_LIBS="-L${NEXUS_PREFIX}/${NEXUS_LIB_DIR} -lNeXus"
+      NEXUS_CFLAGS="-I${NEXUS_PREFIX}/include/nexus"
     fi
     AC_SUBST(NEXUS_LIBS)
     AC_SUBST(NEXUS_CFLAGS)
@@ -1239,6 +1255,7 @@ AC_CONFIG_FILES([Makefile \
 		 src/external/libSpinValve/classes/Makefile \
                  src/external/libPhotoMeissner/Makefile \
                  src/external/libPhotoMeissner/classes/Makefile \
+                 src/external/libGbGLF/Makefile \
                  src/external/libBNMR/Makefile \
                  src/musredit_qt5/Makefile \
                  src/musredit/Makefile \

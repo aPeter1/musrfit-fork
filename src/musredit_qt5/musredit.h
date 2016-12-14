@@ -5,12 +5,10 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010 by Andreas Suter                                   *
+ *   Copyright (C) 2010-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -49,6 +47,7 @@ typedef struct {
   QString runListFileName;     ///< run list filename (usage 4 of msr2data)
   QString msrFileExtension;    ///< msr filename extension, e.g. '0100_h13.msr' -> '_h13'
   int templateRunNo;           ///< fit template run number
+  QString paramList;           ///< parameter list to be exported.
   QString dbOutputFileName;    ///< output file name for the generated (trumf-like) db-file.
   bool writeDbHeader;          ///< flag indicating if a db header shall be generated (== !noheader in msr2data)
   bool ignoreDataHeaderInfo;   ///< flag indicating if data header info (like temp.) shall be ignored (== nosummary in msr2data)

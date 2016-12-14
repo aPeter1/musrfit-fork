@@ -1,0 +1,89 @@
+/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+Simple Example for a User Function without Global Part
+
+/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+Goal: define a user function which implements a polynom
+      of 3rd order.
+
+For details see: http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html#A_6_User_Functions
+
+Implementation:
+      3 Files are needed:
+
+      1) A header file which defines your user function
+         interface.
+ 
+         In the example here it is called PUserFcn.h
+
+         Please rename it in your case to something more
+         sensible, e.g. PMyPoly.h. At the same time also 
+         rename correspondingly the class name in your 
+         header file, i.e. PUserFcn -> PMyPoly. This will
+         be at 4 places in the header file of this example.
+
+      2) The source file which defines your user function.
+
+         In the example here it is called PUserFcn.cpp
+
+         Please rename it accordingly to the header file.
+         In case the header file is called PMyPoly.h, the
+         source file will need to be called PMyPoly.cpp.
+         As for the header file, the class names need to 
+         be adopted: PUserFcn -> PMyPoly.
+
+         In the source file change the operator implementation
+         (Double_t PUserFcn::operator()(Double_t t, 
+                   const std::vector<Double_t> &param) const)
+         to whatever you need.
+
+      3) There is another header file needed to generate
+         the necessary ROOT dictionary.
+
+         In this example it is called PUserFcnLinkDef.h
+
+         Here you only will need to find PUserFcn+ and 
+         replace it with your class name, e.g. PMyPoly+
+
+Generate Code:
+      You will find the Makefil.PUserFcn which generates
+      the needed shared library for your user function.
+
+      Again, if your user function is called PMyPoly, you
+      will need to replace things accordingly in the 
+      Makefile, i.e.
+
+      Makefile.PUserFcn -> Makefile.PMyPoly
+
+      In the Makefile:
+
+      PUserFcn.o      ->  PMyPoly.o
+      PUserFcnDict.o  ->  PMyPolyDict.o
+      libPUserFcn.so  ->  libPMyPoly.so
+
+      To create the shared library do:
+
+      make -f Makefile.PUserFcn
+
+      on the command line. This should create a file      
+      libPUserFcn.so.
+
+      Next call on the command line:
+
+      make -f Makefile.PUserFcn install
+
+      This will copy the shared library to the correct
+      place. 
+
+      You also will need to make sure that the system is
+      finding the shared library, either by setting
+      LD_LIBRARY_PATH or by calling /sbin/ldconfig as 
+      superuser/root assuming you are using linux.
+
+Example msr-file:
+      You will find an example msr-file test-asy-MUS.msr
+      which is using PUserFcn. The example is UN-PHYSICALLY
+      it is just to show how to use a user function. 
+      
+ 

@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009-2014 by Andreas Suter                              *
+ *   Copyright (C) 2009-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -88,6 +88,10 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString he
     fDataOutputFileName_lineEdit->setText(fMsr2DataParam->dbOutputFileName);
   }
 
+  if (!fMsr2DataParam->paramList.isEmpty()) {
+    fParamList_lineEdit->setText(fMsr2DataParam->paramList);
+  }
+
   fWriteDataHeader_checkBox->setChecked(fMsr2DataParam->writeDbHeader);
   fIgnoreDataHeaderInfo_checkBox->setChecked(fMsr2DataParam->ignoreDataHeaderInfo);
   fKeepMinuit2Output_checkBox->setChecked(fMsr2DataParam->keepMinuit2Output);
@@ -100,6 +104,8 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString he
   fFitOnly_checkBox->setChecked(fMsr2DataParam->fitOnly);
   fGlobal_checkBox->setChecked(fMsr2DataParam->global);
   fGlobalPlus_checkBox->setChecked(fMsr2DataParam->globalPlus);
+
+  fOk_pushButton->setDefault(true);
 
   connect(fGlobal_checkBox, SIGNAL(clicked(bool)), this, SLOT(globalOptionSet(bool)));
   connect(fGlobalPlus_checkBox, SIGNAL(clicked(bool)), this, SLOT(globalPlusOptionSet(bool)));
@@ -129,6 +135,7 @@ PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
   } else {
     fMsr2DataParam->templateRunNo = fTemplateRunNumber_lineEdit->text().toInt();
   }
+  fMsr2DataParam->paramList = fParamList_lineEdit->text();
   fMsr2DataParam->dbOutputFileName = fDataOutputFileName_lineEdit->text();
   fMsr2DataParam->writeDbHeader = fWriteDataHeader_checkBox->isChecked();
   fMsr2DataParam->ignoreDataHeaderInfo = fIgnoreDataHeaderInfo_checkBox->isChecked();

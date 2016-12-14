@@ -34,6 +34,7 @@
 #include <TObject.h>
 #include <TH1F.h>
 #include <TRandom2.h>
+#include <TComplex.h>
 
 // global constants
 const Double_t fMuonGyroRatio = 135.54; //!< muon gyromagnetic ratio (MHz/T)
@@ -55,10 +56,13 @@ class PSimulateMuTransition : public TObject
     virtual void SetMuPrecFreq14(Double_t value) { fMuPrecFreq14 = value; } //!< sets Mu transition frequency (MHz)
     virtual void SetCaptureRate(Double_t value){ fCaptureRate = value; }  //!< sets Mu+ electron capture rate (MHz)
     virtual void SetIonizationRate(Double_t value){ fIonizationRate = value; } //!< sets Mu0 ionization rate (MHz)
+    virtual void SetSpinFlipRate(Double_t value){ fSpinFlipRate = value; }     //!< sets Mu0 spin flip rate (MHz)
     virtual void SetDecayAsymmetry(Double_t value){ fAsymmetry = value; }      //!< muon decay asymmetry
     virtual void SetMuFraction(Double_t value){ fMuFraction = value; }         //!< Muonium fraction
     virtual void SetMuFractionState12(Double_t value){ fMuFractionState12 = value; }  
+    virtual void SetMuFractionState34(Double_t value){ fMuFractionState34 = value; }  
     virtual void SetMuFractionState23(Double_t value){ fMuFractionState23 = value; }  
+    virtual void SetMuFractionState14(Double_t value){ fMuFractionState14 = value; }  
 
     virtual Bool_t IsValid() { return fValid; }
     virtual void   SetSeed(UInt_t seed);
@@ -80,20 +84,24 @@ class PSimulateMuTransition : public TObject
     Double_t  fMuonPrecFreq;    //!< muon precession frequency (MHz)
     Double_t  fCaptureRate;     //!< Mu+ electron capture rate (MHz)
     Double_t  fIonizationRate;  //!< Mu0 ionization rate (MHz)
+    Double_t  fSpinFlipRate;    //!< Mu0 spin-flip rate (MHz)  
     Double_t  fInitialPhase;    //!< initial muon spin phase
     Double_t  fMuonDecayTime;   //!< muon decay time (us)
     Double_t  fMuonPhase;       //!< phase of muon spin
     Double_t  fAsymmetry;       //!< muon decay asymmetry
     Double_t  fMuFraction;      //!< total Mu fraction [0,1]
-    Double_t  fMuFractionState12; //!< fraction of Mu in state 12, 34
-    Double_t  fMuFractionState23; //!< fraction of Mu in state 23, 14
+    Double_t  fMuFractionState12; //!< fraction of Mu in state 12
+    Double_t  fMuFractionState34; //!< fraction of Mu in state 34
+    Double_t  fMuFractionState23; //!< fraction of Mu in state 23
+    Double_t  fMuFractionState14; //!< fraction of Mu in state 14
     Int_t     fNmuons;          //!< number of muons to simulate
     Bool_t    fDebugFlag;       //!< debug flag
 
     virtual Double_t NextEventTime(const Double_t &EventRate);
-//     virtual Double_t PrecessionPhase(const Double_t &time, const Double_t &frequency);
-    virtual Double_t PrecessionPhase(const Double_t &time, const TString chargeState);
-    virtual void     Event(const TString muonString);
+//     virtual Double_t PrecessionPhase(const Double_t &time, const TString chargeState);
+    virtual TComplex GTFunction(const Double_t &time, const TString chargeState); //!< transverse field polarization function of Mu0 or Mu+
+    virtual Double_t GTSpinFlip(const Double_t &time); //!< transverse field polarization function after spin-flip collisions
+    virtual Double_t Event(const TString muonString);
  
   ClassDef(PSimulateMuTransition, 0)
 };

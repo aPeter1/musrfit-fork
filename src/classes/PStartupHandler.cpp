@@ -97,7 +97,6 @@ PStartupHandler::PStartupHandler()
   Char_t *home=0;
   Char_t musrpath[128];
   Char_t startup_path_name[128];
-  Bool_t found = false;
 
   strncpy(musrpath, "", sizeof(musrpath));
 
@@ -106,32 +105,39 @@ PStartupHandler::PStartupHandler()
   if (StartupFileExists(startup_path_name)) {
     fStartupFileFound = true;
     fStartupFilePath = TString(startup_path_name);
-  } else { // startup file is not found in the current directory
+  }
+  if (!fStartupFileFound) { // startup file not found in the current directory
     // check if the startup file is found under $HOME/.musrfit
     home = getenv("HOME");
     if (home != 0) {
-      sprintf(musrpath, "%s/.musrfit", home);
-      found = true;
-    }
-    pmusrpath = getenv("MUSRFITPATH");
-    if (!found) {
-      // check if the MUSRFITPATH system variable is set
-      if (pmusrpath != 0) {
-        if (strcmp(pmusrpath, "")) { // MUSRFITPATH variable set but empty
-          found = true;
-        }
+      sprintf(startup_path_name, "%s/.musrfit/musrfit_startup.xml", home);
+      if (StartupFileExists(startup_path_name)) {
+        fStartupFilePath = TString(startup_path_name);
+        fStartupFileFound = true;
       }
     }
-    if (!found) { // MUSRFITPATH not set or empty, will try default one
-      home = getenv("ROOTSYS");
+  }
+  if (!fStartupFileFound) { // startup file not found in $HOME/.musrfit
+    // check if the MUSRFITPATH system variable is set
+    pmusrpath = getenv("MUSRFITPATH");
+    if (pmusrpath != 0) {
+      sprintf(startup_path_name, "%s/musrfit_startup.xml", pmusrpath);
+      if (StartupFileExists(startup_path_name)) {
+        fStartupFilePath = TString(startup_path_name);
+        fStartupFileFound = true;
+      }
+    }
+  }
+  if (!fStartupFileFound) { // MUSRFITPATH not set or empty, will try $ROOTSYS/bin
+    home = getenv("ROOTSYS");
+    if (home != 0) {
       sprintf(musrpath, "%s/bin", home);
       cerr << endl << "**WARNING** MUSRFITPATH environment variable not set will try " << musrpath << endl;
-    }
-
-    sprintf(startup_path_name, "%s/musrfit_startup.xml", musrpath);
-    fStartupFilePath = TString(startup_path_name);
-    if (StartupFileExists(startup_path_name)) {
-      fStartupFileFound = true;
+      sprintf(startup_path_name, "%s/musrfit_startup.xml", musrpath);
+      if (StartupFileExists(startup_path_name)) {
+        fStartupFilePath = TString(startup_path_name);
+        fStartupFileFound = true;
+      }
     }
   }
 }

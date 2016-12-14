@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010-2014 by Andreas Suter                              *
+ *   Copyright (C) 2010-2016 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -30,6 +30,8 @@
 #include <iostream>
 using namespace std;
 
+#include <QString>
+#include <QStringList>
 #include <QTextEdit>
 #include <QStatusBar>
 #include <QAction>
@@ -1867,7 +1869,9 @@ void PTextEdit::musrMsr2Data()
     QString runListFileName;
     QFileInfo fi;
     QString str;
-    int i, end;
+    int i, end;   
+    QStringList list;
+    bool ok;
 
     fMsr2DataParam = dlg->getMsr2DataParam();
     fAdmin->setKeepMinuit2OutputFlag(fMsr2DataParam->keepMinuit2Output);
@@ -1961,6 +1965,14 @@ void PTextEdit::musrMsr2Data()
 
     // options
 
+    // parameter export list
+    if (!fMsr2DataParam->paramList.isEmpty()) {
+      cmd.append("paramList");
+      QStringList list = fMsr2DataParam->paramList.split(' ');
+      for (int i=0; i<list.size(); i++)
+        cmd.append(list[i]);
+    }
+
     // no header flag?
     if (!fMsr2DataParam->writeDbHeader)
       cmd.append("noheader");
@@ -2044,7 +2056,6 @@ void PTextEdit::musrMsr2Data()
       QTextStream *stream;
 
       if (!fMsr2DataParam->global) { // standard fits
-
         switch(dlg->getRunTag()) {
           case 0: // first run / last run list
             if (fMsr2DataParam->firstRun != -1) {
@@ -2059,12 +2070,11 @@ void PTextEdit::musrMsr2Data()
             }
             break;
           case 1: // run list
-            end = 0;
-            while (!runList.section(' ', end, end, QString::SectionSkipEmpty).isEmpty()) {
-              end++;
-            }
-            for (int i=0; i<end; i++) {
-              fln = runList.section(' ', i, i, QString::SectionSkipEmpty);
+            list = getRunList(runList, ok);
+            if (!ok)
+              return;
+            for (int i=0; i<list.size(); i++) {
+              fln = list[i];
               if (fMsr2DataParam->msrFileExtension.isEmpty())
                 fln += ".msr";
               else
@@ -2175,23 +2185,43 @@ void PTextEdit::musrView()
     fileSave();
   }
 
-  QString cmd;
+  QString cmd = fAdmin->getExecPath() + "/musrview";
+  QString workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
+  QStringList arg;
   QString str;
 
-  str = "cd \"" + QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "\"; ";
-
-  str += fAdmin->getExecPath() + "/musrview";
-  cmd = str + " \"";
-
+  // file name
   str = *fFilenames.find( currentEditor() );
-  QString numStr;
-  numStr.setNum(fAdmin->getTimeout());
-  cmd += str + "\" --timeout " + numStr;
-  if (fAdmin->getMusrviewShowFourierFlag())
-    cmd += " -f ";
-  cmd += " &";
+  int pos = str.lastIndexOf("/");
+  if (pos != -1)
+    str.remove(0, pos+1);
+  arg << str;
 
-  int status=system(cmd.toLatin1());
+  // timeout
+  str.setNum(fAdmin->getTimeout());
+  arg << "--timeout" << str;
+
+  // start with Fourier?
+  if (fAdmin->getMusrviewShowFourierFlag())
+    arg << "-f";
+
+  QProcess *proc = new QProcess(this);
+
+  // make sure that the system environment variables are properly set
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+  proc->setProcessEnvironment(env);
+  proc->setWorkingDirectory(workDir);
+  proc->start(cmd, arg);
+  if (!proc->waitForStarted()) {
+    // error handling
+    QString msg(tr("Could not execute the output command: ")+cmd[0]);
+    QMessageBox::critical( 0,
+                          tr("Fatal error"),
+                          msg,
+                          tr("Quit") );
+    return;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2213,20 +2243,39 @@ void PTextEdit::musrT0()
     fileSave();
   }
 
-  QString cmd;
+  QString cmd = fAdmin->getExecPath() + "/musrt0";
+  QString workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
+  QStringList arg;
   QString str;
 
-  str = fAdmin->getExecPath() + "/musrt0";
-  cmd = str + " \"";
-
+  // file name
   str = *fFilenames.find( currentEditor() );
-  QString numStr;
-  numStr.setNum(fAdmin->getTimeout());
-  cmd += str + "\" --timeout " + numStr + " &";
+  int pos = str.lastIndexOf("/");
+  if (pos != -1)
+    str.remove(0, pos+1);
+  arg << str;
 
-  int status=system(cmd.toLatin1());
+  // timeout
+  str.setNum(fAdmin->getTimeout());
+  arg << "--timeout" << str;
 
-  QString fln = *fFilenames.find( currentEditor() );
+  QProcess *proc = new QProcess(this);
+
+  // make sure that the system environment variables are properly set
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+  proc->setProcessEnvironment(env);
+  proc->setWorkingDirectory(workDir);
+  proc->start(cmd, arg);
+  if (!proc->waitForStarted()) {
+    // error handling
+    QString msg(tr("Could not execute the output command: ")+cmd[0]);
+    QMessageBox::critical( 0,
+                          tr("Fatal error"),
+                          msg,
+                          tr("Quit") );
+    return;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2246,11 +2295,23 @@ void PTextEdit::musrFT()
 
   if (dlg->exec() == QDialog::Accepted) {
     fMusrFTPrevCmd = dlg->getMusrFTOptions();
-    QProcess proc(this);
-    proc.setStandardOutputFile("musrFT.log");
-    proc.setStandardErrorFile("musrFT.log");
+    QProcess *proc = new QProcess(this);
+    proc->setStandardOutputFile("musrFT.log");
+    proc->setStandardErrorFile("musrFT.log");
     QString cmd = fAdmin->getExecPath() + "/musrFT";
-    proc.startDetached(cmd, fMusrFTPrevCmd);
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+    proc->setProcessEnvironment(env);
+    proc->start(cmd, fMusrFTPrevCmd);
+    if (!proc->waitForStarted()) {
+      // error handling
+      QString msg(tr("Could not execute the output command: ")+cmd[0]);
+      QMessageBox::critical( 0,
+                            tr("Fatal error"),
+                            msg,
+                            tr("Quit") );
+      return;
+    }
   }
 
   delete dlg;
@@ -2338,16 +2399,44 @@ void PTextEdit::musrSwapMsrMlog()
     fileSave();
   }
 
+  QMessageBox::information(0, "INFO", QString("Will now swap files: %1 <-> %2").arg(currentFileName).arg(swapFileName));
+
   // swap files
-  QString cmd;
-  cmd = QString("cp \"") + currentFileName + QString("\" \"") + tempFileName + QString("\"");
-  int status=system(cmd.toLatin1());
-  cmd = QString("cp \"") + swapFileName + QString("\" \"") + currentFileName + QString("\"");
-  status=system(cmd.toLatin1());
-  cmd = QString("cp \"") + tempFileName + QString("\" \"") + swapFileName + QString("\"");
-  status=system(cmd.toLatin1());
-  cmd = QString("rm \"") + tempFileName + QString("\"");
-  status=system(cmd.toLatin1());
+
+  // copy currentFile -> tempFile
+  if (QFile::exists(tempFileName)) {
+    if (!QFile::remove(tempFileName)) {
+      QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(tempFileName));
+      return;
+    }
+  }
+  if (!QFile::copy(currentFileName, tempFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to copy %1 -> %2").arg(currentFileName).arg(tempFileName));
+    return;
+  }
+  // copy swapFile -> currentFile
+  if (!QFile::remove(currentFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(currentFileName));
+    return;
+  }
+  if (!QFile::copy(swapFileName, currentFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to copy %1 -> %2").arg(swapFileName).arg(currentFileName));
+    return;
+  }
+  // copy tempFile -> swapFile
+  if (!QFile::remove(swapFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(swapFileName));
+    return;
+  }
+  if (!QFile::copy(tempFileName, swapFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to copy %1 -> %2").arg(tempFileName).arg(swapFileName));
+    return;
+  }
+  // clean up
+  if (!QFile::remove(tempFileName)) {
+    QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(tempFileName));
+    return;
+  }
 
   int currentIdx = fTabWidget->currentIndex();
 
@@ -2625,6 +2714,58 @@ void PTextEdit::fillRecentFiles()
     fRecentFilesAction[i]->setText(fAdmin->getRecentFile(i));
     fRecentFilesAction[i]->setVisible(true);
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p> run list is split (space separated) and expanded (start-end -> start, start+1, ..., end) to a list
+ *
+ * \param runListStr list to be split and expanded
+ * \param ok true if everything is fine; false if an error has been encountered
+ *
+ * \return fully expanded run list
+ */
+QStringList PTextEdit::getRunList(QString runListStr, bool &ok)
+{
+  QStringList result;
+  bool isInt;
+  QString str;
+
+  ok = true;
+
+  // first split space separated parts
+  QStringList tok = runListStr.split(' ', QString::SkipEmptyParts);
+  for (int i=0; i<tok.size(); i++) {
+    if (tok[i].contains('-')) { // list given, hence need to expand
+      QStringList runListTok = tok[i].split('-', QString::SkipEmptyParts);
+      if (runListTok.size() != 2) { // error
+        ok = false;
+        result.clear();
+        return result;
+      }
+      int start=0, end=0;
+      start = runListTok[0].toInt(&isInt);
+      if (!isInt) {
+        ok = false;
+        result.clear();
+        return result;
+      }
+      end = runListTok[1].toInt(&isInt);
+      if (!isInt) {
+        ok = false;
+        result.clear();
+        return result;
+      }
+      for (int i=start; i<=end; i++) {
+        str = QString("%1").arg(i);
+        result << str;
+      }
+    } else { // keep it
+      result << tok[i];
+    }
+  }
+
+  return result;
 }
 
 //----------------------------------------------------------------------------------------------------

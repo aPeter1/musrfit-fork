@@ -51,6 +51,10 @@ class PRunMuMinus : public PRunBase
 
     virtual void SetFitRangeBin(const TString fitRange);
 
+    virtual Int_t GetStartTimeBin() { return fStartTimeBin; }
+    virtual Int_t GetEndTimeBin() { return fEndTimeBin; }
+    virtual Int_t GetPacking() { return fPacking; }
+
   protected:
     virtual void CalcNoOfFitBins();
     virtual Bool_t PrepareData();
@@ -64,6 +68,9 @@ class PRunMuMinus : public PRunBase
     Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
 
     PDoubleVector fForward; ///< forward histo data
+
+    Int_t fStartTimeBin;    ///< bin at which the fit starts
+    Int_t fEndTimeBin;      ///< bin at which the fit ends
 
     virtual Bool_t GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &histoNo);
     virtual Bool_t GetProperDataRange();

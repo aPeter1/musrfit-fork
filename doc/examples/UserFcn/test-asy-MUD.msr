@@ -1,0 +1,55 @@
+MgB12H12 No2 ZF T=150
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+        1 alpha       1         0           none        0       2       
+        2 asy         0.1650    0.0027      none        0       0.33    
+        3 c0          1.047     0.016       none        
+        4 c1          -0.1957   0.0038      none        
+        5 c2          0.0216    0.0011      none        
+        6 c3          -0.00119  0.00011     none        
+
+###############################################################
+THEORY
+asymmetry      2
+userFcn  libPUserFcn PUserFcn 3 4 5 6
+
+###############################################################
+RUN data/000100 XXXX TRIUMF MUD   (name beamline institute data-file-format)
+fittype         2         (asymmetry fit)
+alpha           1
+map             0    0    0    0    0    0    0    0    0    0    0
+forward         1 
+backward        2 
+background      79      391     80      409        # estimated bkg: 21.0833 / 17.2249
+data            438     12785   436     12787   
+t0              432.0   431.0   
+fit             0       8      
+packing         100
+
+###############################################################
+COMMANDS
+MINIMIZE
+MINOS
+#HESSE
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      NONE    # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8
+#range_for_phase_correction 50.0 70.0
+range            0    2000
+dc-corrected     true
+
+###############################################################
+PLOT 2   (asymmetry plot)
+runs     1   
+range    0   9   0   0.22
+
+###############################################################
+STATISTIC --- 2016-06-22 09:34:01
+  chisq = 152.4, NDF = 97, chisq/NDF = 1.571461

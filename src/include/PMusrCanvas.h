@@ -181,8 +181,6 @@ typedef struct {
   PDoubleVector dataX;   ///< x-axis data set
   PDoubleVector data;    ///< y-axis data set
   PDoubleVector dataErr; ///< error of the y-axis data set
-  PDoubleVector theoryX; ///< x-axis theory set
-  PDoubleVector theory;  ///< y-axis theory set
 } PMusrCanvasAsciiDump;
 
 //------------------------------------------------------------------------
@@ -332,6 +330,9 @@ class PMusrCanvas : public TObject, public TQObject
     virtual UInt_t GetNeededAccuracy(PMsrParamStructure param);
 
     virtual Double_t GetInterpolatedValue(TH1F* histo, Double_t xVal);
+
+    virtual void GetExportDataSet(const TH1F *data, const Double_t xmin, const Double_t xmax,
+                                  PMusrCanvasAsciiDumpVector &dumpData, const Bool_t hasError=true);
 
   ClassDef(PMusrCanvas, 1)
 };

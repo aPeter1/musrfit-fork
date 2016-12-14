@@ -1643,13 +1643,23 @@ bool PMsr2Data::PrepareNewSortedInputFile(unsigned int tempRun) const
  * - -2 if a fit has not converged (and the data is not appended to the output file)
  *
  * \param outfile name of the DB/ASCII output file
+ * \param paramList parameter list which shall be written to the output file
  * \param db DB or plain ASCII output
  * \param withHeader write output file header or not
  * \param global global mode or not
  * \param counter counter used within the global mode to determine how many runs have been processed already
  */
-int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHeader, bool global, unsigned int counter) const
+int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& paramList, bool db,
+                           unsigned int withHeader, bool global, unsigned int counter) const
 {
+  // make sure that the parameter number of the parameter list stays within proper bounds
+  for (unsigned int i=0; i<paramList.size(); i++) {
+    if (paramList[i] > fMsrHandler->GetMsrParamList()->size()) {
+      cerr << "msr2data: **ERROR** found parameter " << paramList[i] << " which is out of bound (>" << fMsrHandler->GetMsrParamList()->size() << ")." << endl;
+      return -1;
+    }
+  }
+
   if (!to_lower_copy(outfile).compare("none")) {
     fRunVectorIter++;
     return PMUSR_SUCCESS;
@@ -2008,7 +2018,7 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
 
       if (fDataHandler) {
         for (unsigned int i(0); i < dataParamLabels.size(); ++i) {
-         outFile << dataParamLabels[i] << endl;
+          outFile << dataParamLabels[i] << endl;
         }
       }
 
@@ -2022,22 +2032,26 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
       if (global) {
         string tempName;
         for (unsigned int i(0); i < fNumGlobalParam; ++i) {
-          outFile << (*msrParamList)[i].fName.Data() << endl;
+          if (InParameterList(i, paramList))
+            outFile << (*msrParamList)[i].fName.Data() << endl;
         }
         for (unsigned int i(0); i < fNumSpecParam; ++i) {
-          tempName = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
-          string::size_type loc = tempName.rfind(curRunNumber.str());
-          if (loc == tempName.length() - fRunNumberDigits) {
-            outFile << tempName.substr(0, loc) << endl;
-          } else {
-            cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
-            cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
-            cerr << endl;
+          if (InParameterList(fNumGlobalParam + fNumSpecParam*counter + i, paramList)) {
+            tempName = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
+            string::size_type loc = tempName.rfind(curRunNumber.str());
+            if (loc == tempName.length() - fRunNumberDigits) {
+              outFile << tempName.substr(0, loc) << endl;
+            } else {
+              cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
+              cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
+              cerr << endl;
+            }
           }
         }
       } else {
         for (unsigned int i(0); i < msrNoOfParams; ++i) {
-          outFile << (*msrParamList)[i].fName.Data() << endl;
+          if (InParameterList(i, paramList))
+            outFile << (*msrParamList)[i].fName.Data() << endl;
         }
       }
 
@@ -2073,22 +2087,26 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
       if (global) {
         string tempName;
         for (unsigned int i(0); i < fNumGlobalParam; ++i) {
-          outFile << " " << (*msrParamList)[i].fName.Data();
+          if (InParameterList(i, paramList))
+            outFile << " " << (*msrParamList)[i].fName.Data();
         }
         for (unsigned int i(0); i < fNumSpecParam; ++i) {
-          tempName = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
-          string::size_type loc = tempName.rfind(curRunNumber.str());
-          if (loc == tempName.length() - fRunNumberDigits) {
-            outFile << " " << tempName.substr(0, loc);
-          } else {
-            cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
-            cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
-            cerr << endl;
+          if (InParameterList(i, paramList)) {
+            tempName = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
+            string::size_type loc = tempName.rfind(curRunNumber.str());
+            if (loc == tempName.length() - fRunNumberDigits) {
+              outFile << " " << tempName.substr(0, loc);
+            } else {
+              cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
+              cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
+              cerr << endl;
+            }
           }
         }
       } else {
         for (unsigned int i(0); i < msrNoOfParams; ++i) {
-          outFile << " " << (*msrParamList)[i].fName.Data();
+          if (InParameterList(i, paramList))
+            outFile << " " << (*msrParamList)[i].fName.Data();
         }
       }
 
@@ -2132,61 +2150,67 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
       string tempName;
       unsigned int idx;
       for (unsigned int i(0); i < fNumGlobalParam; ++i) {
-        outFile << (*msrParamList)[i].fName.Data() << " = ";
-        if ((*msrParamList)[i].fPosErrorPresent) {
-          WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, outFile.width(), db);
-          outFile << ", ";
-        } else {
-          outFile << (*msrParamList)[i].fValue << ", ";
-        }
+        if (InParameterList(i, paramList)) {
+          outFile << (*msrParamList)[i].fName.Data() << " = ";
+          if ((*msrParamList)[i].fPosErrorPresent) {
+            WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, outFile.width(), db);
+            outFile << ", ";
+          } else {
+            outFile << (*msrParamList)[i].fValue << ", ";
+          }
 
-        if ((*msrParamList)[i].fPosErrorPresent)
-          outFile << (*msrParamList)[i].fPosError << ", ";
-        else
-          outFile << fabs((*msrParamList)[i].fStep) << ", ";
-        outFile << fabs((*msrParamList)[i].fStep) << ",\\" << endl;
+          if ((*msrParamList)[i].fPosErrorPresent)
+            outFile << (*msrParamList)[i].fPosError << ", ";
+          else
+            outFile << fabs((*msrParamList)[i].fStep) << ", ";
+          outFile << fabs((*msrParamList)[i].fStep) << ",\\" << endl;
+        }
       }
       for (unsigned int i(0); i < fNumSpecParam; ++i) {
         idx = fNumGlobalParam + fNumSpecParam*counter + i;
-        tempName = (*msrParamList)[idx].fName.Data();
-        string::size_type loc = tempName.rfind(curRunNumber.str());
-        if (loc == tempName.length() - fRunNumberDigits) {
-          outFile << tempName.substr(0, loc) << " = ";
-          if ((*msrParamList)[idx].fPosErrorPresent) {
-            WriteValue(outFile, (*msrParamList)[idx].fValue, (*msrParamList)[idx].fPosError, outFile.width(), db);
-            outFile << ", ";
-          } else {
-            outFile << (*msrParamList)[idx].fValue << ", ";
-          }
-          if ((*msrParamList)[idx].fPosErrorPresent) {
-            WriteValue(outFile, (*msrParamList)[idx].fPosError, (*msrParamList)[idx].fPosError, outFile.width(), db);
-            outFile << ", ";
-          } else {
+        if (InParameterList(idx, paramList)) {
+          tempName = (*msrParamList)[idx].fName.Data();
+          string::size_type loc = tempName.rfind(curRunNumber.str());
+          if (loc == tempName.length() - fRunNumberDigits) {
+            outFile << tempName.substr(0, loc) << " = ";
+            if ((*msrParamList)[idx].fPosErrorPresent) {
+              WriteValue(outFile, (*msrParamList)[idx].fValue, (*msrParamList)[idx].fPosError, outFile.width(), db);
+              outFile << ", ";
+            } else {
+              outFile << (*msrParamList)[idx].fValue << ", ";
+            }
+            if ((*msrParamList)[idx].fPosErrorPresent) {
+              WriteValue(outFile, (*msrParamList)[idx].fPosError, (*msrParamList)[idx].fPosError, outFile.width(), db);
+              outFile << ", ";
+            } else {
+              WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, outFile.width(), db);
+              outFile << ", ";
+            }
             WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, outFile.width(), db);
-            outFile << ", ";
+            outFile << ",\\" << endl;
           }
-          WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, outFile.width(), db);
-          outFile << ",\\" << endl;
         }
       }
     } else {
       for (unsigned int i(0); i < msrNoOfParams; ++i) {
-        outFile << (*msrParamList)[i].fName.Data() << " = ";
-        if ((*msrParamList)[i].fPosErrorPresent) {
-          WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, outFile.width(), db);
-          outFile << ", ";
-        } else {
-          outFile << (*msrParamList)[i].fValue << ", ";
-        }
-        if ((*msrParamList)[i].fPosErrorPresent) {
-          WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, outFile.width(), db);
-          outFile << ", ";
-        } else {
+        if (InParameterList(i, paramList)) {
+          outFile << (*msrParamList)[i].fName.Data() << " = ";
+          if ((*msrParamList)[i].fPosErrorPresent) {
+            WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, outFile.width(), db);
+            outFile << ", ";
+          } else {
+            outFile << (*msrParamList)[i].fValue << ", ";
+          }
+          if ((*msrParamList)[i].fPosErrorPresent) {
+            WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, outFile.width(), db);
+            outFile << ", ";
+          } else {
+            WriteValue(outFile, (*msrParamList)[i].fStep, (*msrParamList)[i].fStep, outFile.width(), db);
+            outFile << ", ";
+          }
           WriteValue(outFile, (*msrParamList)[i].fStep, (*msrParamList)[i].fStep, outFile.width(), db);
-          outFile << ", ";
+          outFile << ",\\" << endl;
         }
-        WriteValue(outFile, (*msrParamList)[i].fStep, (*msrParamList)[i].fStep, outFile.width(), db);
-        outFile << ",\\" << endl;
       }
     }
 
@@ -2221,30 +2245,38 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
     string s;
     if (global) {
       for (unsigned int i(0); i < fNumGlobalParam; ++i) {
-        s = (*msrParamList)[i].fName.Data();
-        length = s.length();
-        if (length > maxlength)
-          maxlength = length;
-      }
-      for (unsigned int i(0); i < fNumSpecParam; ++i) {
-        s = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
-        string::size_type loc = s.rfind(curRunNumber.str());
-        if (loc == s.length() - fRunNumberDigits) {
-          length = s.length() - fRunNumberDigits;
+        if (InParameterList(i, paramList)) {
+          s = (*msrParamList)[i].fName.Data();
+          length = s.length();
           if (length > maxlength)
             maxlength = length;
-        } else {
-          cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
-          cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
-          cerr << endl;
+        }
+      }
+      unsigned int idx;
+      for (unsigned int i(0); i < fNumSpecParam; ++i) {
+        idx = fNumGlobalParam + fNumSpecParam*counter + i;
+        if (InParameterList(idx, paramList)) {
+          s = (*msrParamList)[idx].fName.Data();
+          string::size_type loc = s.rfind(curRunNumber.str());
+          if (loc == s.length() - fRunNumberDigits) {
+            length = s.length() - fRunNumberDigits;
+            if (length > maxlength)
+              maxlength = length;
+          } else {
+            cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
+            cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
+            cerr << endl;
+          }
         }
       }
     } else {
       for (unsigned int i(0); i < msrNoOfParams; ++i) {
-        s = (*msrParamList)[i].fName.Data();
-        length = s.length();
-        if (length > maxlength)
-          maxlength = length;
+        if (InParameterList(i, paramList)) {
+          s = (*msrParamList)[i].fName.Data();
+          length = s.length();
+          if (length > maxlength)
+            maxlength = length;
+        }
       }
     }
     if (maxlength < 13)
@@ -2274,31 +2306,39 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
       // in the GLOBAL mode write only global parameters and those which belong to the actual run - in the NORMAL mode write all parameters
       if (global) {
         for (unsigned int i(0); i < fNumGlobalParam; ++i) {
-          s = (*msrParamList)[i].fName.Data();
-          outFile << setw(maxlength) << left << s \
-                << setw(maxlength + 6) << left << s + "PosErr" \
-                << setw(maxlength + 6) << left << s + "NegErr";
-        }
-        for (unsigned int i(0); i < fNumSpecParam; ++i) {
-          s = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
-          string::size_type loc = s.rfind(curRunNumber.str());
-          if (loc == s.length() - fRunNumberDigits) {
-            s = s.substr(0, loc);
+          if (InParameterList(i, paramList)) {
+            s = (*msrParamList)[i].fName.Data();
             outFile << setw(maxlength) << left << s \
                     << setw(maxlength + 6) << left << s + "PosErr" \
                     << setw(maxlength + 6) << left << s + "NegErr";
-          } else {
-            cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
-            cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
-            cerr << endl;
+          }
+        }
+        unsigned int idx;
+        for (unsigned int i(0); i < fNumSpecParam; ++i) {
+          idx = fNumGlobalParam + fNumSpecParam*counter + i;
+          if (InParameterList(idx, paramList)) {
+            s = (*msrParamList)[idx].fName.Data();
+            string::size_type loc = s.rfind(curRunNumber.str());
+            if (loc == s.length() - fRunNumberDigits) {
+              s = s.substr(0, loc);
+              outFile << setw(maxlength) << left << s \
+                      << setw(maxlength + 6) << left << s + "PosErr" \
+                      << setw(maxlength + 6) << left << s + "NegErr";
+            } else {
+              cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
+              cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
+              cerr << endl;
+            }
           }
         }
       } else {
         for (unsigned int i(0); i < msrNoOfParams; ++i) {
-          s = (*msrParamList)[i].fName.Data();
-          outFile << setw(maxlength) << left << s \
-                  << setw(maxlength + 6) << left << s + "PosErr" \
-                  << setw(maxlength + 6) << left << s + "NegErr";
+          if (InParameterList(i, paramList)) {
+            s = (*msrParamList)[i].fName.Data();
+            outFile << setw(maxlength) << left << s \
+                    << setw(maxlength + 6) << left << s + "PosErr" \
+                    << setw(maxlength + 6) << left << s + "NegErr";
+          }
         }
       }
       s.clear();
@@ -2340,46 +2380,52 @@ int PMsr2Data::WriteOutput(const string &outfile, bool db, unsigned int withHead
     // in the GLOBAL mode write only global parameters and those which belong to the actual run - in the NORMAL mode write all parameters
     if (global) {
       for (unsigned int i(0); i < fNumGlobalParam; ++i) {
-        if ((*msrParamList)[i].fPosErrorPresent)
-          WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, maxlength, db);
-        else
-          WriteValue(outFile, (*msrParamList)[i].fValue, maxlength);
+        if (InParameterList(i, paramList)) {
+          if ((*msrParamList)[i].fPosErrorPresent)
+            WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, maxlength, db);
+          else
+            WriteValue(outFile, (*msrParamList)[i].fValue, maxlength);
 
-        if ((*msrParamList)[i].fPosErrorPresent)
-          WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, maxlength, db);
-        else
+          if ((*msrParamList)[i].fPosErrorPresent)
+            WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, maxlength, db);
+          else
+            WriteValue(outFile, fabs((*msrParamList)[i].fStep), (*msrParamList)[i].fStep, maxlength, db);
+
           WriteValue(outFile, fabs((*msrParamList)[i].fStep), (*msrParamList)[i].fStep, maxlength, db);
-
-        WriteValue(outFile, fabs((*msrParamList)[i].fStep), (*msrParamList)[i].fStep, maxlength, db);
+        }
       }
       unsigned int idx;
       for (unsigned int i(0); i < fNumSpecParam; ++i) {
         idx = fNumGlobalParam + fNumSpecParam*counter + i;
-        if ((*msrParamList)[idx].fPosErrorPresent)
-          WriteValue(outFile, (*msrParamList)[idx].fValue, (*msrParamList)[idx].fPosError, maxlength, db);
-        else
-          WriteValue(outFile, (*msrParamList)[idx].fValue, maxlength);
+        if (InParameterList(idx, paramList)) {
+          if ((*msrParamList)[idx].fPosErrorPresent)
+            WriteValue(outFile, (*msrParamList)[idx].fValue, (*msrParamList)[idx].fPosError, maxlength, db);
+          else
+            WriteValue(outFile, (*msrParamList)[idx].fValue, maxlength);
 
-        if ((*msrParamList)[idx].fPosErrorPresent)
-          WriteValue(outFile, (*msrParamList)[idx].fPosError, (*msrParamList)[idx].fPosError, maxlength, db);
-        else
+          if ((*msrParamList)[idx].fPosErrorPresent)
+            WriteValue(outFile, (*msrParamList)[idx].fPosError, (*msrParamList)[idx].fPosError, maxlength, db);
+          else
+            WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, maxlength, db);
+
           WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, maxlength, db);
-
-        WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, maxlength, db);
+        }
       }
     } else {
       for (unsigned int i(0); i < msrNoOfParams; ++i) {
-        if ((*msrParamList)[i].fPosErrorPresent)
-          WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, maxlength, db);
-        else
-          WriteValue(outFile, (*msrParamList)[i].fValue, maxlength);
+        if (InParameterList(i, paramList)) {
+          if ((*msrParamList)[i].fPosErrorPresent)
+            WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, maxlength, db);
+          else
+            WriteValue(outFile, (*msrParamList)[i].fValue, maxlength);
 
-        if ((*msrParamList)[i].fPosErrorPresent)
-          WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, maxlength, db);
-        else
+          if ((*msrParamList)[i].fPosErrorPresent)
+            WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, maxlength, db);
+          else
+            WriteValue(outFile, fabs((*msrParamList)[i].fStep), fabs((*msrParamList)[i].fStep), maxlength, db);
+
           WriteValue(outFile, fabs((*msrParamList)[i].fStep), fabs((*msrParamList)[i].fStep), maxlength, db);
-
-        WriteValue(outFile, fabs((*msrParamList)[i].fStep), fabs((*msrParamList)[i].fStep), maxlength, db);
+        }
       }
     }
 
@@ -2503,6 +2549,24 @@ int PMsr2Data::GetFirstSignificantDigit(const double &value) const
     prec = i;
 
   return prec+1;
+}
+
+//-------------------------------------------------------------
+/**
+ *
+ */
+bool PMsr2Data::InParameterList(const unsigned int &paramValue, const vector<unsigned int> &paramList) const
+{
+  // if paramList.size() == 0, i.e. use ALL parameters
+  if (paramList.size() == 0)
+    return true;
+
+  for (unsigned int i=0; i<paramList.size(); i++) {
+    if (paramValue+1 == paramList[i])
+      return true;
+  }
+
+  return false;
 }
 
 //-------------------------------------------------------------------------------------------------------

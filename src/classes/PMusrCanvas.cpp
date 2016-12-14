@@ -1140,6 +1140,13 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
       cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << endl;
       return;
     }
+  } else if (x == 'c') {
+    Int_t state = fDataTheoryPad->GetCrosshair();
+    if (state == 0)
+      fDataTheoryPad->SetCrosshair(2);
+    else
+      fDataTheoryPad->SetCrosshair(0);
+    fMainCanvas->Update();
   } else {
     fMainCanvas->Update();
   }
@@ -1516,7 +1523,6 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
   Int_t xmaxBin;
   Double_t xmin;
   Double_t xmax;
-  Double_t time, freq;
   Double_t xval, yval;
 
   switch (fPlotType) {
@@ -1533,29 +1539,12 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fHistoFrame->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all difference data bins
-              for (Int_t j=1; j<fData[i].diff->GetNbinsX(); j++) {
-                // get time
-                time = fData[i].diff->GetBinCenter(j);
-                // check if time is in the current range
-                if ((time >= xmin) && (time <= xmax)) {
-                  dump.dataX.push_back(time);
-                  dump.data.push_back(fData[i].diff->GetBinContent(j));
-                  dump.dataErr.push_back(fData[i].diff->GetBinError(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.diff, xmin, xmax, dumpVector);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+                GetExportDataSet(fData[i].diff, xmin, xmax, dumpVector);
               }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
             break;
           case PV_FOURIER_REAL:
@@ -1566,28 +1555,12 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fData[0].diffFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].diffFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierRe->GetBinContent(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.diffFourierRe, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+                GetExportDataSet(fData[i].diffFourierRe, xmin, xmax, dumpVector, false);
               }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
             break;
           case PV_FOURIER_IMAG:
@@ -1598,28 +1571,12 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fData[0].diffFourierIm->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].diffFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierIm->GetBinContent(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.diffFourierIm, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+                GetExportDataSet(fData[i].diffFourierIm, xmin, xmax, dumpVector, false);
               }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
             break;
           case PV_FOURIER_REAL_AND_IMAG:
@@ -1630,37 +1587,14 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fData[0].diffFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].diffFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierRe->GetBinContent(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.diffFourierRe, xmin, xmax, dumpVector, false);
+              GetExportDataSet(fDataAvg.diffFourierIm, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
+                GetExportDataSet(fData[i].diffFourierRe, xmin, xmax, dumpVector, false);
+                GetExportDataSet(fData[i].diffFourierIm, xmin, xmax, dumpVector, false);
               }
-              for (Int_t j=1; j<fData[i].diffFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierIm->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
             break;
           case PV_FOURIER_PWR:
@@ -1671,28 +1605,12 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fData[0].diffFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].diffFourierPwr->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierPwr->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierPwr->GetBinContent(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.diffFourierPwr, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) {
+                GetExportDataSet(fData[i].diffFourierPwr, xmin, xmax, dumpVector, false);
               }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
             break;
           case PV_FOURIER_PHASE:
@@ -1703,28 +1621,12 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fData[0].diffFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].diffFourierPhase->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].diffFourierPhase->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].diffFourierPhase->GetBinContent(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.diffFourierPhase, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) {
+                GetExportDataSet(fData[i].diffFourierPhase, xmin, xmax, dumpVector, false);
               }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
             break;
           default:
@@ -1740,40 +1642,14 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fHistoFrame->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].data->GetNbinsX(); j++) {
-                // get time
-                time = fData[i].data->GetBinCenter(j);
-                // check if time is in the current range
-                if ((time >= xmin) && (time <= xmax)) {
-                  dump.dataX.push_back(time);
-                  dump.data.push_back(fData[i].data->GetBinContent(j));
-                  dump.dataErr.push_back(fData[i].data->GetBinError(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.data, xmin, xmax, dumpVector);
+              GetExportDataSet(fDataAvg.theory, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) {
+                GetExportDataSet(fData[i].data, xmin, xmax, dumpVector);
+                GetExportDataSet(fData[i].theory, xmin, xmax, dumpVector, false);
               }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theory->GetNbinsX(); j++) {
-                // get time
-                time = fData[i].theory->GetBinCenter(j);
-                // check if time is in the current range
-                if ((time >= xmin) && (time <= xmax)) {
-                  dump.theoryX.push_back(time);
-                  dump.theory.push_back(fData[i].theory->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
 
             break;
@@ -1785,39 +1661,14 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierRe->GetBinContent(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.dataFourierRe, xmin, xmax, dumpVector, false);
+              GetExportDataSet(fDataAvg.theoryFourierRe, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) {
+                GetExportDataSet(fData[i].dataFourierRe, xmin, xmax, dumpVector, false);
+                GetExportDataSet(fData[i].theoryFourierRe, xmin, xmax, dumpVector, false);
               }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierRe->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
             break;
           case PV_FOURIER_IMAG:
@@ -1828,39 +1679,14 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fData[0].dataFourierIm->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierIm->GetBinContent(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.dataFourierIm, xmin, xmax, dumpVector, false);
+              GetExportDataSet(fDataAvg.theoryFourierIm, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) {
+                GetExportDataSet(fData[i].dataFourierIm, xmin, xmax, dumpVector, false);
+                GetExportDataSet(fData[i].theoryFourierIm, xmin, xmax, dumpVector, false);
               }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierIm->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
             break;
           case PV_FOURIER_REAL_AND_IMAG:
@@ -1870,80 +1696,18 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmin = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xminBin);
             xmax = fData[0].dataFourierRe->GetXaxis()->GetBinCenter(xmaxBin);
 
-            // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              //-----------------------------
-              // Re
-              //-----------------------------
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierRe->GetBinContent(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.dataFourierRe, xmin, xmax, dumpVector, false);
+              GetExportDataSet(fDataAvg.theoryFourierRe, xmin, xmax, dumpVector, false);
+              GetExportDataSet(fDataAvg.dataFourierIm, xmin, xmax, dumpVector, false);
+              GetExportDataSet(fDataAvg.theoryFourierIm, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) {
+                GetExportDataSet(fData[i].dataFourierRe, xmin, xmax, dumpVector, false);
+                GetExportDataSet(fData[i].theoryFourierRe, xmin, xmax, dumpVector, false);
+                GetExportDataSet(fData[i].dataFourierIm, xmin, xmax, dumpVector, false);
+                GetExportDataSet(fData[i].theoryFourierIm, xmin, xmax, dumpVector, false);
               }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierRe->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierRe->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierRe->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-
-              //-----------------------------
-              // Im
-              //-----------------------------
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierIm->GetBinContent(j));
-                }
-              }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierIm->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierIm->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierIm->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
-
             }
             break;
           case PV_FOURIER_PWR:
@@ -1954,39 +1718,14 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fData[0].dataFourierPwr->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierPwr->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierPwr->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierPwr->GetBinContent(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.dataFourierPwr, xmin, xmax, dumpVector, false);
+              GetExportDataSet(fDataAvg.theoryFourierPwr, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) {
+                GetExportDataSet(fData[i].dataFourierPwr, xmin, xmax, dumpVector, false);
+                GetExportDataSet(fData[i].theoryFourierPwr, xmin, xmax, dumpVector, false);
               }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierPwr->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierPwr->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierPwr->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
             break;
           case PV_FOURIER_PHASE:
@@ -1997,39 +1736,14 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fData[0].dataFourierPhase->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fData.size(); i++) { // go through all the histogramms
-              // clean up dump
-              dump.dataX.clear();
-              dump.data.clear();
-              dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
-
-              // go through all data bins
-              for (Int_t j=1; j<fData[i].dataFourierPhase->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].dataFourierPhase->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.dataX.push_back(freq);
-                  dump.data.push_back(fData[i].dataFourierPhase->GetBinContent(j));
-                }
+            if (fAveragedView) {
+              GetExportDataSet(fDataAvg.dataFourierPhase, xmin, xmax, dumpVector, false);
+              GetExportDataSet(fDataAvg.theoryFourierPhase, xmin, xmax, dumpVector, false);
+            } else { // go through all the histogramms
+              for (UInt_t i=0; i<fData.size(); i++) {
+                GetExportDataSet(fData[i].dataFourierPhase, xmin, xmax, dumpVector, false);
+                GetExportDataSet(fData[i].theoryFourierPhase, xmin, xmax, dumpVector, false);
               }
-
-              // go through all theory bins
-              for (Int_t j=1; j<fData[i].theoryFourierPhase->GetNbinsX(); j++) {
-                // get frequency
-                freq = fData[i].theoryFourierPhase->GetBinCenter(j);
-                // check if time is in the current range
-                if ((freq >= xmin) && (freq <= xmax)) {
-                  dump.theoryX.push_back(freq);
-                  dump.theory.push_back(fData[i].theoryFourierPhase->GetBinContent(j));
-                }
-              }
-
-              // if anything found keep it
-              if (dump.dataX.size() > 0)
-                dumpVector.push_back(dump);
             }
             break;
           default:
@@ -2053,8 +1767,6 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
               dump.dataX.clear();
               dump.data.clear();
               dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
 
               // go through all data bins
               for (Int_t j=0; j<fNonMusrData[i].diff->GetN(); j++) {
@@ -2102,8 +1814,6 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
               dump.dataX.clear();
               dump.data.clear();
               dump.dataErr.clear();
-              dump.theoryX.clear();
-              dump.theory.clear();
 
               // go through all data bins
               for (Int_t j=0; j<fNonMusrData[i].data->GetN(); j++) {
@@ -2123,8 +1833,8 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
                 fNonMusrData[i].theory->GetPoint(j,xval,yval);
                 // check if time is in the current range
                 if ((xval >= xmin) && (xval <= xmax)) {
-                  dump.theoryX.push_back(xval);
-                  dump.theory.push_back(yval);
+                  dump.dataX.push_back(xval);
+                  dump.data.push_back(yval);
                 }
               }
 
@@ -2164,71 +1874,94 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
   }
 
   // find out what is the longest data/theory vector
-  UInt_t maxDataLength = 0;
-  UInt_t maxTheoryLength = 0;
+  UInt_t maxLength = 0;
   for (UInt_t i=0; i<dumpVector.size(); i++) {
-    if (maxDataLength < dumpVector[i].dataX.size())
-      maxDataLength = dumpVector[i].dataX.size();
-    if (maxTheoryLength < dumpVector[i].theoryX.size())
-      maxTheoryLength = dumpVector[i].theoryX.size();
+    if (maxLength < dumpVector[i].dataX.size())
+      maxLength = dumpVector[i].dataX.size();
   }
 
   // write data to file
-  UInt_t maxLength = 0;
-
   if (fDifferenceView) { // difference view
     // write header
     switch (fCurrentPlotView) {
       case PV_DATA:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
-          fout << "x" << i << " , diff" << i << ", errDiff" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% x, diff, errDiff" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size()-1; i++) {
+            fout << "x" << i << " , diff" << i << ", errDiff" << i << ", ";
+          }
+          fout << "x" << dumpVector.size()-1 << " , diff" << dumpVector.size()-1 << ", errDiff" << dumpVector.size()-1 << endl;
         }
-        fout << "x" << dumpVector.size()-1 << " , diff" << dumpVector.size()-1 << ", errDiff" << dumpVector.size()-1 << endl;
         break;
       case PV_FOURIER_REAL:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
-          fout << "freq" << i << ", F_diffRe" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% x, F_diffRe" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size()-1; i++) {
+            fout << "freq" << i << ", F_diffRe" << i << ", ";
+          }
+          fout << "freq" << dumpVector.size()-1 << ", F_diffRe" << dumpVector.size()-1 << endl;
         }
-        fout << "freq" << dumpVector.size()-1 << ", F_diffRe" << dumpVector.size()-1 << endl;
         break;
       case PV_FOURIER_IMAG:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
-          fout << "freq" << i << ", F_diffIm" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% x, F_diffIm" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size()-1; i++) {
+            fout << "freq" << i << ", F_diffIm" << i << ", ";
+          }
+          fout << "freq" << dumpVector.size()-1 << ", F_diffIm" << dumpVector.size()-1 << endl;
         }
-        fout << "freq" << dumpVector.size()-1 << ", F_diffIm" << dumpVector.size()-1 << endl;
         break;
       case PV_FOURIER_REAL_AND_IMAG:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size()/2; i++) {
-          fout << "freq" << i << ", F_diffRe" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% x, F_diffRe, F_diffIm" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size()/2; i++) {
+            fout << "freq" << i << ", F_diffRe" << i << ", ";
+          }
+          for (UInt_t i=0; i<dumpVector.size()/2-1; i++) {
+            fout << "freq" << i << ", F_diffIm" << i << ", ";
+          }
+          fout << "freq" << dumpVector.size()/2-1 << ", F_diffIm" << dumpVector.size()/2-1 << endl;
         }
-        for (UInt_t i=0; i<dumpVector.size()/2-1; i++) {
-          fout << "freq" << i << ", F_diffIm" << i << ", ";
-        }
-        fout << "freq" << dumpVector.size()/2-1 << ", F_diffIm" << dumpVector.size()/2-1 << endl;
         break;
       case PV_FOURIER_PWR:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
-          fout << "freq" << i << ", F_diffPwr" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% x, F_diffPwr" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size()-1; i++) {
+            fout << "freq" << i << ", F_diffPwr" << i << ", ";
+          }
+          fout << "freq" << dumpVector.size()-1 << ", F_diffPwr" << dumpVector.size()-1 << endl;
         }
-        fout << "freq" << dumpVector.size()-1 << ", F_diffPwr" << dumpVector.size()-1 << endl;
         break;
       case PV_FOURIER_PHASE:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
-          fout << "freq" << i << ", F_diffPhase" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% x, F_diffPhase" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size()-1; i++) {
+            fout << "freq" << i << ", F_diffPhase" << i << ", ";
+          }
+          fout << "freq" << dumpVector.size()-1 << ", F_diffPhase" << dumpVector.size()-1 << endl;
         }
-        fout << "freq" << dumpVector.size()-1 << ", F_diffPhase" << dumpVector.size()-1 << endl;
         break;
       default:
         break;
     }
-
-    maxLength = maxDataLength;
 
     // write difference data
     for (UInt_t i=0; i<maxLength; i++) {
@@ -2264,84 +1997,119 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
     // write header
     switch (fCurrentPlotView) {
       case PV_DATA:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size(); i++) {
-          fout << "xData" << i << " , data" << i << ", errData" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% xData, data, errData, xTheory, theory" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size(); i++) {
+            if (i % 2 == 0)
+              fout << "xData" << i/2 << " , data" << i/2 << ", errData" << i/2 << ", ";
+            else
+              if (i == dumpVector.size()-1)
+                fout << "xTheory" << (i-1)/2 << " , theory" << (i-1)/2 << endl;
+              else
+                fout << "xTheory" << (i-1)/2 << " , theory" << (i-1)/2 << ", ";
+          }
         }
-        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
-          fout << "xTheory" << i << " , theory" << i << ", ";
-        }
-        fout << "xTheory" << dumpVector.size()-1 << " , theory" << dumpVector.size()-1 << endl;
         break;
       case PV_FOURIER_REAL:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size(); i++) {
-          fout << "freq" << i << ", F_Re" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% freq, F_Re, freqTheo, F_theoRe" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size(); i++) {
+            if (i % 2 == 0)
+              fout << "freq" << i/2 << ", F_Re" << i/2 << ", ";
+            else
+              if (i == dumpVector.size()-1)
+                fout << "freqTheo" << (i-1)/2 << ", F_theoRe" << (i-1)/2 << endl;
+              else
+                fout << "freqTheo" << (i-1)/2 << ", F_theoRe" << (i-1)/2 << ", ";
+          }
         }
-        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
-          fout << "freqTheo" << i << ", F_theo" << i << ", ";
-        }
-        fout << "freqTheo" << dumpVector.size()-1 << ", F_theo" << dumpVector.size()-1 << endl;
         break;
       case PV_FOURIER_IMAG:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size(); i++) {
-          fout << "freq" << i << ", F_Im" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% freq, F_Im, freqTheo, F_theoIm" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size(); i++) {
+            if (i % 2 == 0)
+              fout << "freq" << i/2 << ", F_Im" << i/2 << ", ";
+            else
+              if (i == dumpVector.size()-1)
+                fout << "freqTheo" << (i-1)/2 << ", F_theoIm" << (i-1)/2 << endl;
+              else
+                fout << "freqTheo" << (i-1)/2 << ", F_theoIm" << (i-1)/2 << ", ";
+          }
         }
-        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
-          fout << "freqTheo" << i << ", F_theo" << i << ", ";
-        }
-        fout << "freqTheo" << dumpVector.size()-1 << ", F_theo" << dumpVector.size()-1 << endl;
         break;
       case PV_FOURIER_REAL_AND_IMAG:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size()/2; i++) {
-          fout << "freq" << i << ", F_Re" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% freq, F_Re, freqTheo, F_theoRe, freq, F_Im, freqTheo, F_theoIm" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size(); i++) {
+            if (i % 4 == 0)
+              fout << "freq" << i/4 << ", F_Re" << i/4 << ", ";
+            else if (i % 4 == 1)
+              fout << "freqTheo" << (i-1)/4 << ", F_theoRe" << (i-1)/4 << ", ";
+            else if (i % 4 == 2)
+              fout << "freq" << (i-2)/4 << ", F_Im" << (i-2)/4 << ", ";
+            else
+              if (i == dumpVector.size()-1)
+                fout << "freqTheo" << (i-3)/4 << ", F_theoIm" << (i-3)/4 << endl;
+              else
+                fout << "freqTheo" << (i-3)/4 << ", F_theoIm" << (i-3)/4 << ", ";
+          }
         }
-        for (UInt_t i=0; i<dumpVector.size()/2; i++) {
-          fout << "freq" << i << ", F_Im" << i << ", ";
-        }
-        for (UInt_t i=0; i<dumpVector.size()/2; i++) {
-          fout << "freqTheo" << i << ", F_theoRe" << i << ", ";
-        }
-        for (UInt_t i=0; i<(dumpVector.size()-1)/2; i++) {
-          fout << "freqTheo" << i << ", F_theoIm" << i << ", ";
-        }
-        fout << "freqTheo" << (dumpVector.size()-1)/2 << ", F_theoIm" << (dumpVector.size()-1)/2 << endl;
         break;
       case PV_FOURIER_PWR:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size(); i++) {
-          fout << "freq" << i << ", F_Pwr" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% freq, F_Pwr, freqTheo, F_theoPwr" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size(); i++) {
+            if (i % 2 == 0)
+              fout << "freq" << i/2 << ", F_Pwr" << i/2 << ", ";
+            else
+              if (i == dumpVector.size()-1)
+                fout << "freqTheo" << (i-1)/2 << ", F_theoPwr" << (i-1)/2 << endl;
+              else
+                fout << "freqTheo" << (i-1)/2 << ", F_theoPwr" << (i-1)/2 << ", ";
+          }
         }
-        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
-          fout << "freqTheo" << i << ", F_theo" << i << ", ";
-        }
-        fout << "freqTheo" << dumpVector.size()-1 << ", F_theo" << dumpVector.size()-1 << endl;
         break;
       case PV_FOURIER_PHASE:
-        fout << "% ";
-        for (UInt_t i=0; i<dumpVector.size(); i++) {
-          fout << "freq" << i << ", F_Phase" << i << ", ";
+        if (fAveragedView) {
+          fout << "% from averaged view" << endl;
+          fout << "% freq, F_Phase, freqTheo, F_theoPhase" << endl;
+        } else {
+          fout << "% ";
+          for (UInt_t i=0; i<dumpVector.size(); i++) {
+            if (i % 2 == 0)
+              fout << "freq" << i/2 << ", F_Phase" << i/2 << ", ";
+            else
+              if (i == dumpVector.size()-1)
+                fout << "freqTheo" << (i-1)/2 << ", F_theoPhase" << (i-1)/2 << endl;
+              else
+                fout << "freqTheo" << (i-1)/2 << ", F_theoPhase" << (i-1)/2 << ", ";
+          }
         }
-        for (UInt_t i=0; i<dumpVector.size()-1; i++) {
-          fout << "freqTheo" << i << ", F_theo" << i << ", ";
-        }
-        fout << "freqTheo" << dumpVector.size()-1 << ", F_theo" << dumpVector.size()-1 << endl;
         break;
       default:
         break;
     }
 
-    if (maxDataLength > maxTheoryLength)
-      maxLength = maxDataLength;
-    else
-      maxLength = maxTheoryLength;
-
     // write data and theory
     for (UInt_t i=0; i<maxLength; i++) {
-      // write data
-      for (UInt_t j=0; j<dumpVector.size(); j++) {
+      // write data/theory
+      for (UInt_t j=0; j<dumpVector.size()-1; j++) {
         if (i<dumpVector[j].dataX.size()) {
           fout << dumpVector[j].dataX[i] << ", ";
           fout << dumpVector[j].data[i] << ", ";
@@ -2354,19 +2122,10 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             fout << " , , ";
         }
       }
-      // write theory
-      for (UInt_t j=0; j<dumpVector.size()-1; j++) {
-        if (i<dumpVector[j].theoryX.size()) {
-          fout << dumpVector[j].theoryX[i] << ", ";
-          fout << dumpVector[j].theory[i] << ", ";
-        } else {
-          fout << " , , ";
-        }
-      }
-      // write last theory entry
-      if (i<dumpVector[dumpVector.size()-1].theoryX.size()) {
-        fout << dumpVector[dumpVector.size()-1].theoryX[i] << ", ";
-        fout << dumpVector[dumpVector.size()-1].theory[i];
+      // write last data/theory entry
+      if (i<dumpVector[dumpVector.size()-1].dataX.size()) {
+        fout << dumpVector[dumpVector.size()-1].dataX[i] << ", ";
+        fout << dumpVector[dumpVector.size()-1].data[i];
       } else {
         fout << " , ";
       }
@@ -2382,8 +2141,6 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
     dumpVector[i].dataX.clear();
     dumpVector[i].data.clear();
     dumpVector[i].dataErr.clear();
-    dumpVector[i].theoryX.clear();
-    dumpVector[i].theory.clear();
   }
   dumpVector.clear();
 
@@ -2392,6 +2149,42 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
   //    if (fPlotNumber == static_cast<Int_t>(fMsrHandler->GetMsrPlotList()->size()) - 1)
   //      Done(0);
   //  }
+}
+
+//--------------------------------------------------------------------------
+// GetExportDataSet (private)
+//--------------------------------------------------------------------------
+/**
+ * <p> extract data for export.
+ *
+ * \param data
+ * \param xmin
+ * \param xmax
+ * \param dumpData
+ * \param hasError
+ */
+void PMusrCanvas::GetExportDataSet(const TH1F *data, const Double_t xmin, const Double_t xmax,
+                                   PMusrCanvasAsciiDumpVector &dumpData, const Bool_t hasError)
+{
+  PMusrCanvasAsciiDump dump;
+  Double_t x=0.0;
+
+  // go through all difference data bins
+  for (Int_t j=1; j<data->GetNbinsX(); j++) {
+    // get time/freq
+    x = data->GetBinCenter(j);
+    // check if x is in the current range
+    if ((x >= xmin) && (x <= xmax)) {
+      dump.dataX.push_back(x);
+      dump.data.push_back(data->GetBinContent(j));
+      if (hasError)
+        dump.dataErr.push_back(data->GetBinError(j));
+    }
+  }
+
+  // if anything found keep it
+  if (dump.dataX.size() > 0)
+    dumpData.push_back(dump);
 }
 
 //--------------------------------------------------------------------------

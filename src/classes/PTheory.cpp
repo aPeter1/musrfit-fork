@@ -301,6 +301,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
       cerr << endl << ">> PTheory::PTheory: **ERROR** user function object could not be invoked. See line no " << line->fLineNo;
       cerr << endl;
       fValid = false;
+      return;
     } else { // user function valid, hence expand the fUserParam vector to the proper size
       fUserParam.resize(fParamNo.size());
     }
@@ -506,6 +507,10 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
           return Polynom(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_MU_MINUS_EXP:
+          return MuMinusExpTF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
+                 fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_USER_FCN:
           return UserFcn(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
@@ -597,6 +602,9 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
           break;
         case THEORY_DYNAMIC_TF_NK:
           return DynamicNKTF (t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
+          break;
+        case THEORY_MU_MINUS_EXP:
+          return MuMinusExpTF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
           break;
         case THEORY_POLYNOM:
           return Polynom(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
@@ -694,6 +702,9 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
         case THEORY_DYNAMIC_TF_NK:
           return DynamicNKTF (t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
+        case THEORY_MU_MINUS_EXP:
+          return MuMinusExpTF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
+          break;
         case THEORY_POLYNOM:
           return Polynom(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
           break;
@@ -787,6 +798,9 @@ Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, co
           break;
         case THEORY_DYNAMIC_TF_NK:
           return DynamicNKTF(t, paramValues, funcValues);
+          break;
+        case THEORY_MU_MINUS_EXP:
+          return MuMinusExpTF(t, paramValues, funcValues);
           break;
         case THEORY_POLYNOM:
           return Polynom(t, paramValues, funcValues);
@@ -2939,6 +2953,46 @@ Double_t PTheory::GetDynKTLFValue(const Double_t t) const
   Double_t df = (fDynLFFuncValue[idx+1]-fDynLFFuncValue[idx])*(t/fDynLFdt-static_cast<Double_t>(idx));
 
   return fDynLFFuncValue[idx]+df;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p> theory function: MuMinusExpTF
+ *
+ * \f[ = N_0 \exp(-t/tau) [1 + A \exp(-\lambda t) \cos(2\pi\nu t + \phi)] \f]
+ *
+ * <b>meaning of paramValues:</b> \f$t_{\rm shift}\f$, \f$N_0\f$, \f$\tau\f$, \f$A\f$, \f$\lambda\f$, \f$\phi\f$, \f$\nu\f$
+ *
+ * <b>return:</b> function value
+ *
+ * \param t time in \f$(\mu\mathrm{s})\f$, or x-axis value for non-muSR fit
+ * \param paramValues parameter values
+ * \param funcValues vector with the functions (i.e. functions of the parameters)
+ */
+Double_t PTheory::MuMinusExpTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+{
+  // expected parameters: N0 tau A lambda phase frequency [tshift]
+
+  Double_t val[7];
+
+  assert(fParamNo.size() <= 7);
+
+  // check if FUNCTIONS are used
+  for (UInt_t i=0; i<fParamNo.size(); i++) {
+    if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
+      val[i] = paramValues[fParamNo[i]];
+    } else { // function
+      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+    }
+  }
+
+  Double_t tt;
+  if (fParamNo.size() == 6) // no tshift
+    tt = t;
+  else // tshift present
+    tt = t-val[6];
+
+  return val[0]*exp(-tt/val[1])*(1.0+val[2]*exp(-val[3]*tt)*cos(TWO_PI*val[5]*tt+DEG_TO_RAD*val[4]));
 }
 
 //--------------------------------------------------------------------------
