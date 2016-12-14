@@ -446,7 +446,7 @@ $logxy";
     if ($All{"FPLOT"} eq $EMPTY) {$All{"FPLOT"}="POWER";}
     if ($All{"FPHASE"} eq $EMPTY) {$All{"FPHASE"}="8.5";}
     my $FrqRange = "#range ".$All{"FRQMIN"}."  ".$All{"FRQMAX"};
-    if ($All{"FRQMAX"} ne $EMPTY && $All{"FRQMIN"} ne $EMPTY) {
+    if ($All{"FRQMAX"} ne $EMPTY && $All{"FRQMIN"} ne $EMPTY && $All{"FRQMAX"} ne $All{"FRQMIN"}) {
 	$FrqRange = "range ".$All{"FRQMIN"}."  ".$All{"FRQMAX"};
     }
 
@@ -1780,20 +1780,40 @@ sub RUNFileNameAuto {
 	$RUNFILE       = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
     }
     elsif ( $BeamLine eq "GPS" ) {
-	$RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
-	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	if ($YEAR >= 2008) {
+	    $RUN_File_Name = "deltat_tdc_gps_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	} else {
+	    $RUN_File_Name = "deltat_pta_gps_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/$RUN_File_Name";
+	}
     }
     elsif ( $BeamLine eq "LTF" ) {
-	$RUN_File_Name = "deltat_tdc_ltf_" . $RUNtmp;
-	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	if ($YEAR >= 2009) {
+	    $RUN_File_Name = "deltat_tdc_ltf_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	} else {
+	    $RUN_File_Name = "deltat_pta_ltf_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/$RUN_File_Name";
+	}
     }
     elsif ( $BeamLine eq "Dolly" ) {
-	$RUN_File_Name = "deltat_tdc_dolly_" . $RUNtmp;
-	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	if ($YEAR >= 2008) {
+	    $RUN_File_Name = "deltat_tdc_dolly_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	} else {
+	    $RUN_File_Name = "deltat_pta_dolly_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/$RUN_File_Name";
+	}	    
     }
     elsif ( $BeamLine eq "GPD" ) {
-	$RUN_File_Name = "deltat_tdc_gpd_" . $RUNtmp;
-	$RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	if ($YEAR >= 2008) {
+	    $RUN_File_Name = "deltat_tdc_gpd_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/tdc/$RUN_File_Name";
+	} else {
+	    $RUN_File_Name = "deltat_pta_gpd_" . $RUNtmp;
+	    $RUNFILE = "$DATADIR/d$YEAR/$RUN_File_Name";
+	}  
     }
     elsif ( $BeamLine eq "HAL" ) {
 	$RUNtmp=sprintf("%05d",$RUNtmp);
