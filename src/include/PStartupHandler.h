@@ -73,17 +73,15 @@ class PStartupHandler : public TObject, public TQObject
 
     virtual void CheckLists();
 
-    virtual PStartupOptions* GetStartupOptions() { return &fStartupOptions; } ///< returns the startup options
     virtual PMsrFourierStructure  GetFourierDefaults() { return fFourierDefaults; } ///< returns the Fourier defaults
     virtual const PStringVector   GetDataPathList() const { return fDataPathList; } ///< returns the search data path list
     virtual const PIntVector      GetMarkerList() const { return fMarkerList; }     ///< returns the marker list
     virtual const PIntVector      GetColorList() const { return fColorList; }       ///< returns the color list
 
-    virtual void SetStartupOptions(const PStartupOptions opt) { fStartupOptions = opt; }
-
   private:
-    enum EKeyWords {eEmpty, eComment, eDataPath, eOptions, eWritePerRunBlockChisq, eEstimateN0, eAlphaEstimateN0,
-                    eFourierSettings, eUnits, eFourierPower, eApodization, ePlot, ePhase, ePhaseIncrement,
+    enum EKeyWords {eEmpty, eComment, eDataPath, eOptions,
+                    eFourierSettings, eUnits, eFourierPower,
+                    eApodization, ePlot, ePhase, ePhaseIncrement,
                     eRootSettings, eMarkerList, eMarker, 
                     eColorList, eColor};
     EKeyWords       fKey; ///< xml filter key
@@ -94,7 +92,6 @@ class PStartupHandler : public TObject, public TQObject
     PStringVector        fDataPathList;     ///< search data path list
     PIntVector           fMarkerList;       ///< marker list
     PIntVector           fColorList;        ///< color list
-    PStartupOptions      fStartupOptions;   ///< collects all startup options which will be requested by PMsrFileHandler
 
     Bool_t StartupFileExists(Char_t *fln);
 

@@ -104,9 +104,8 @@ void musrfit_syntax()
   cout << endl << "       -t, --title-from-data-file: will replace the <msr-file> run title by the";
   cout << endl << "              run title of the FIRST run of the <msr-file> run block, if a run title";
   cout << endl << "              is present in the data file.";
-  cout << endl << "       -e, --estimateN0: estimate N0 for single histogram fits flag. <flag> can have the values 'yes' or 'no'.";
+  cout << endl << "       -e, --estimateN0: estimate N0 for single histogram fits.";
   cout << endl << "       -p, --per-run-block-chisq: will write per run block chisq to the msr-file.";
-  cout << endl << "              <flag> can have the values 'yes' or 'no'.";
   cout << endl << "       --dump <type> is writing a data file with the fit data and the theory";
   cout << endl << "              <type> can be 'ascii', 'root'";
   cout << endl << "       --timeout <timeout_tag>: overwrites to predefined timeout of " << timeout << " (sec).";
@@ -444,8 +443,7 @@ int main(int argc, char *argv[])
   bool timeout_enabled = true;
   PStartupOptions startup_options;
   startup_options.writeExpectedChisq = false;
-  startup_options.estimateN0 = true;
-  startup_options.alphaEstimateN0 = 0.0;
+  startup_options.estimateN0 = false;
 
   TString dump("");
   char filename[1024];
@@ -496,39 +494,9 @@ int main(int argc, char *argv[])
         break;
       }
     } else if (!strcmp(argv[i], "-e") || !strcmp(argv[i], "--estimateN0")) {
-      if (i<argc-1) {
-        if (!strcmp(argv[i+1], "yes")) {
-          startup_options.estimateN0 = true;
-        } else if (!strcmp(argv[i+1], "no")) {
-          startup_options.estimateN0 = false;
-        } else {
-          cerr << endl << "musrfit: **ERROR** option --estimateN0 <flag> with unsupported <flag> = " << argv[i+1] << endl;
-          show_syntax = true;
-          break;
-        }
-        i++;
-      } else {
-        cerr << endl << "musrfit: **ERROR** found option --estimateN0 without <flag>" << endl;
-        show_syntax = true;
-        break;
-      }
+      startup_options.estimateN0 = true;
     } else if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--per-run-block-chisq")) {
-      if (i<argc-1) {
-        if (!strcmp(argv[i+1], "yes")) {
-          startup_options.writeExpectedChisq = true;
-        } else if (!strcmp(argv[i+1], "no")) {
-          startup_options.writeExpectedChisq = false;
-        } else {
-          cerr << endl << "musrfit: **ERROR** option --per-run-block-chisq <flag> with unsupported <flag> = " << argv[i+1] << endl;
-          show_syntax = true;
-          break;
-        }
-        i++;
-      } else {
-        cerr << endl << "musrfit: **ERROR** found option --per-run-block-chisq without <flag>" << endl;
-        show_syntax = true;
-        break;
-      }
+      startup_options.writeExpectedChisq = true;
     } else if (!strcmp(argv[i], "--timeout")) {
       if (i<argc-1) {
         TString str(argv[i+1]);
@@ -614,13 +582,11 @@ int main(int argc, char *argv[])
       }
     }
   }
-  if (startupHandler)
-    startupHandler->SetStartupOptions(startup_options);
 
   // read msr-file
   PMsrHandler *msrHandler = 0;
   if (startupHandler)
-    msrHandler = new PMsrHandler(filename, startupHandler->GetStartupOptions());
+    msrHandler = new PMsrHandler(filename, &startup_options);
   else
     msrHandler = new PMsrHandler(filename);
   status = msrHandler->ReadMsrFile();
