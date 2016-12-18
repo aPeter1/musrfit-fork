@@ -33,7 +33,7 @@
     <item>
      <widget class="QTabWidget" name="fTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="fGeneral_tab">
        <attribute name="title">
@@ -173,6 +173,19 @@
         </property>
         <property name="text">
          <string>start with Fourier</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="fAvg_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>40</y>
+          <width>261</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>start with averaged data/Fourier</string>
         </property>
        </widget>
       </widget>

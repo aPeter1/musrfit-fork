@@ -47,6 +47,7 @@ class PPrefsDialog : public QDialog, private Ui::PPrefsDialog
     PPrefsDialog(PAdmin *admin);
 
     bool getMusrviewShowFourierFlag() { return fFourier_checkBox->isChecked(); }
+    bool getMusrviewShowAvgFlag()   { return fAvg_checkBox->isChecked(); }
     bool getKeepMinuit2OutputFlag() { return fKeepMn2Output_checkBox->isChecked(); }
     bool getTitleFromDataFileFlag() { return fTitleFromData_checkBox->isChecked(); }
     bool getEnableMusrT0Flag()      { return fEnableMusrT0_checkBox->isChecked(); }

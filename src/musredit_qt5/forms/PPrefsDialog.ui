@@ -17,7 +17,7 @@
    <string>Preferences</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../musredit.qrc">
+   <iconset>
     <normaloff>:/images/musrfit.xpm</normaloff>:/images/musrfit.xpm</iconset>
   </property>
   <widget class="QWidget" name="layoutWidget">
@@ -173,6 +173,19 @@
         </property>
         <property name="text">
          <string>start with Fourier</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="fAvg_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>40</y>
+          <width>231</width>
+          <height>21</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>start with averaged data/Fourier</string>
         </property>
        </widget>
       </widget>

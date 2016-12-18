@@ -37,6 +37,8 @@ using namespace std;
 #include <QTextStream>
 #include <QVector>
 
+#include <QProcessEnvironment>
+
 #include "PAdmin.h"
 
 //--------------------------------------------------------------------------
@@ -87,6 +89,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eTitleFromDataFile;
   } else if (qName == "musrview_show_fourier") {
     fKeyWord = eMusrviewShowFourier;
+  } else if (qName == "musrview_show_avg") {
+    fKeyWord = eMusrviewShowAvg;
   } else if (qName == "enable_musrt0") {
     fKeyWord = eEnableMusrT0;
   } else if (qName == "keep_minuit2_output") {
@@ -234,7 +238,7 @@ bool PAdminXMLParser::characters(const QString& str)
     case eExecPath:
       fAdmin->setExecPath(QString(str.toLatin1()).trimmed());
       break;
-    case eDefaultSavePath:
+    case eDefaultSavePath:      
       fAdmin->setDefaultSavePath(QString(str.toLatin1()).trimmed());
       break;
     case eTitleFromDataFile:
@@ -250,6 +254,13 @@ bool PAdminXMLParser::characters(const QString& str)
       else
         flag = false;
       fAdmin->setMusrviewShowFourierFlag(flag);
+      break;
+    case eMusrviewShowAvg:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setMusrviewShowAvgFlag(flag);
       break;
     case eEnableMusrT0:
       if (str == "y")
@@ -477,7 +488,7 @@ bool PAdminXMLParser::endDocument()
     str = expandPath(fAdmin->getDefaultSavePath());
     if (!str.isEmpty())
       fAdmin->setDefaultSavePath(str);
-  }
+ }
 
   if (fAdmin->getMsrDefaultFilePath().indexOf('$') >= 0) {
     str = expandPath(fAdmin->getMsrDefaultFilePath());
@@ -567,13 +578,21 @@ QString PAdminXMLParser::expandPath(const QString &str)
   QString msg;
   QString newStr="";
 
+  QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
+
   QStringList list = str.split("/");
 
   for ( QStringList::Iterator it = list.begin(); it != list.end(); ++it ) {
     token = *it;
     if (token.contains("$")) {
       token.remove('$');
-      path = std::getenv(token.toLatin1());
+      if (!procEnv.contains(token)) {
+        msg = QString("Couldn't find '%1'. Some things might not work properly").arg(token);
+        QMessageBox::warning(0, "**WARNING**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+        newStr = "";
+        break;
+      }
+      path = procEnv.value(token, "");
       if (path.isEmpty()) {
         msg = QString("Couldn't expand '%1'. Some things might not work properly").arg(token);
         QMessageBox::warning(0, "**WARNING**", msg, QMessageBox::Ok, QMessageBox::NoButton);
@@ -614,6 +633,7 @@ PAdmin::PAdmin() : QObject()
   fFileFormat = QString("");
 
   fMusrviewShowFourier = false;
+  fMusrviewShowAvg = false;
 
   fTitleFromDataFile  = false;
   fEnableMusrT0       = false;
@@ -646,17 +666,18 @@ PAdmin::PAdmin() : QObject()
   QString path = QString("./");
   QString fln = QString("musredit_startup.xml");
   QString pathFln = path + fln;
+  QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
   if (!QFile::exists(pathFln)) {
     // 2nd: check $HOME/.musrfit/musredit/musredit_startup.xml
-    path = std::getenv("HOME");
+    path = procEnv.value("HOME", "");
     pathFln = path + "/.musrfit/musredit/" + fln;
     if (!QFile::exists(pathFln)) {
       // 3rd: check $MUSRFITPATH/musredit_startup.xml
-      path = std::getenv("MUSRFITPATH");
+      path = procEnv.value("MUSRFITPATH", "");
       pathFln = path + "/" + fln;
       if (!QFile::exists(pathFln)) {
         // 4th: check $ROOTSYS/bin/musredit_startup.xml
-        path = std::getenv("ROOTSYS");
+        path = procEnv.value("ROOTSYS", "");
         pathFln = path + "/bin/" + fln;
       }
     }
@@ -837,11 +858,23 @@ int PAdmin::savePrefs(QString pref_fln)
         else
           data[i] = "    <musrview_show_fourier>n</musrview_show_fourier>";
       }
+      if (data[i].contains("<musrview_show_avg>") && data[i].contains("</musrview_show_avg>")) {
+        if (fMusrviewShowAvg)
+          data[i] = "    <musrview_show_avg>y</musrview_show_avg>";
+        else
+          data[i] = "    <musrview_show_avg>n</musrview_show_avg>";
+      }
       if (data[i].contains("<enable_musrt0>") && data[i].contains("</enable_musrt0>")) {
         if (fEnableMusrT0)
           data[i] = "    <enable_musrt0>y</enable_musrt0>";
         else
           data[i] = "    <enable_musrt0>n</enable_musrt0>";
+      }
+      if (data[i].contains("<font_name>") && data[i].contains("</font_name>")) {
+        data[i] = QString("    <font_name>%1</font_name>").arg(fFontName);
+      }
+      if (data[i].contains("<font_size>") && data[i].contains("</font_size>")) {
+        data[i] = QString("    <font_size>%1</font_size>").arg(fFontSize);
       }
     }
 
