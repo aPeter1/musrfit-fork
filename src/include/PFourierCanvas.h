@@ -159,6 +159,7 @@ class PFourierCanvas : public TObject, public TQObject
     virtual void InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     virtual void CleanupAverage();
     virtual void HandleAverage();
+    virtual void CalcPhaseOptReal();
 
     virtual void PlotFourier();
     virtual void PlotFourierPhaseValue();

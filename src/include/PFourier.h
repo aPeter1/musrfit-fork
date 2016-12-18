@@ -108,10 +108,13 @@ class PFourier
     virtual Double_t GetResolution() { return fResolution; }
     virtual Double_t GetMaxFreq();
     virtual TH1F* GetRealFourier(const Double_t scale = 1.0);
-    virtual TH1F* GetPhaseOptRealFourier(vector<Double_t> &phase, const Double_t scale = 1.0, const Double_t min = -1.0, const Double_t max = -1.0);
+//as    virtual TH1F* GetPhaseOptRealFourier(vector<Double_t> &phase, const Double_t scale = 1.0, const Double_t min = -1.0, const Double_t max = -1.0);
     virtual TH1F* GetImaginaryFourier(const Double_t scale = 1.0);
     virtual TH1F* GetPowerFourier(const Double_t scale = 1.0);
     virtual TH1F* GetPhaseFourier(const Double_t scale = 1.0);
+
+    static TH1F* GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, vector<Double_t> &phase,
+                                        const Double_t scale = 1.0, const Double_t min = -1.0, const Double_t max = -1.0);
 
     virtual Bool_t IsValid() { return fValid; }
 
@@ -136,7 +139,7 @@ class PFourier
     fftw_complex *fIn; ///< real part of the Fourier transform
     fftw_complex *fOut; ///< imaginary part of the Fourier transform
 
-    PFTPhaseCorrection *fPhCorrectedReFT;
+//as    PFTPhaseCorrection *fPhCorrectedReFT;
 
     virtual void PrepareFFTwInputData(UInt_t apodizationTag);
     virtual void ApodizeData(Int_t apodizationTag);

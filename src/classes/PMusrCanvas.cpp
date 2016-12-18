@@ -182,11 +182,14 @@ PMusrCanvas::PMusrCanvas()
  * \param wh height (in pixels) of the canvas.
  * \param batch flag: if set true, the canvas will not be displayed. This is used when just dumping of a
  *               graphical output file is wished.
+ * \param fourier flag: if set true, the canvas will present the Fourier view.
+ * \param avg flag: if set true, the canvas will present the averages data/Fourier view.
  */
 PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
-                         const Bool_t batch, const Bool_t fourier) :
-                         fStartWithFourier(fourier), fBatchMode(batch), fPlotNumber(number)
+                         const Bool_t batch, const Bool_t fourier, const Bool_t avg) :
+    fStartWithFourier(fourier), fStartWithAvg(avg),
+    fBatchMode(batch), fPlotNumber(number)
 {
   fTimeout = 0;
   fTimeoutTimer = 0;
@@ -235,15 +238,17 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
  * \param colorList pre-defined list of colors
  * \param batch flag: if set true, the canvas will not be displayed. This is used when just dumping of a
  *               graphical output file is wished.
+ * \param fourier flag: if set true, the canvas will present the Fourier view.
+ * \param avg flag: if set true, the canvas will present the averages data/Fourier view.
  */
 PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                          PMsrFourierStructure fourierDefault,
                          const PIntVector markerList, const PIntVector colorList,
-                         const Bool_t batch, const Bool_t fourier) :
-                         fStartWithFourier(fourier), fBatchMode(batch),
-                         fPlotNumber(number), fFourier(fourierDefault),
-                         fMarkerList(markerList), fColorList(colorList)
+                         const Bool_t batch, const Bool_t fourier, const Bool_t avg) :
+     fStartWithFourier(fourier), fStartWithAvg(avg), fBatchMode(batch),
+     fPlotNumber(number), fFourier(fourierDefault),
+     fMarkerList(markerList), fColorList(colorList)
 {
   fTimeout = 0;
   fTimeoutTimer = 0;
@@ -832,6 +837,12 @@ void PMusrCanvas::UpdateDataTheoryPad()
     HandleFourier();
     PlotFourier();
   }
+
+  // if fStartWithAvg=true, start with averaged data/Fourier representation
+  // fStartWithAvg is given at the command line level
+  if (fStartWithAvg) {
+    HandleCmdKey(kKeyPress, (Int_t)'a', 0, 0);
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -1357,6 +1368,13 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     // set appropriate plot view
     fPreviousPlotView = fCurrentPlotView;
     fCurrentPlotView = PV_FOURIER_PHASE_OPT_REAL;
+    // make sure that phase opt. real indeed exists
+    if (fData[0].dataFourierPhaseOptReal == 0) {
+      if (fData[0].dataFourierRe == 0)
+        HandleFourier();
+      else
+        CalcPhaseOptReFT();
+    }
     // uncheck data
     fPopupMain->UnCheckEntry(P_MENU_ID_DATA+P_MENU_PLOT_OFFSET*fPlotNumber);
     // check appropriate fourier popup item
@@ -3331,10 +3349,7 @@ void PMusrCanvas::HandleDifference()
  */
 void PMusrCanvas::HandleFourier()
 {
-  PDoubleVector phaseParam;
-  Double_t min=-1.0, max=-1.0;
-  Double_t re, im, ph;
-  char hName[1024];
+  Double_t re, im;
 
   // check if plot type is appropriate for fourier
   if (fPlotType == MSR_PLOT_NON_MUSR)
@@ -3347,9 +3362,9 @@ void PMusrCanvas::HandleFourier()
     double endTime = fXmax;
     if (!fStartWithFourier) { // fHistoFrame present, hence get start/end from it
       bin = fHistoFrame->GetXaxis()->GetFirst();
-      startTime = fHistoFrame->GetBinCenter(bin);
+      startTime = fHistoFrame->GetBinLowEdge(bin);
       bin = fHistoFrame->GetXaxis()->GetLast();
-      endTime   = fHistoFrame->GetBinCenter(bin);
+      endTime   = fHistoFrame->GetBinLowEdge(bin)+fHistoFrame->GetBinWidth(bin);
     }
     for (UInt_t i=0; i<fData.size(); i++) {
       // calculate fourier transform of the data
@@ -3370,12 +3385,6 @@ void PMusrCanvas::HandleFourier()
       // get phase part of the data
       fData[i].dataFourierPhase = fourierData.GetPhaseFourier();
 
-      // get phase optimized real fourier from data
-      min = fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[0];
-      max = fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[1];
-      // eventually min/max needs to be extracted from the 'range_for_phase_correction' parameter of the msr-file
-      fData[i].dataFourierPhaseOptReal = fourierData.GetPhaseOptRealFourier(phaseParam, scale, min, max);
-
       // set marker and line color
       fData[i].dataFourierRe->SetMarkerColor(fData[i].data->GetMarkerColor());
       fData[i].dataFourierRe->SetLineColor(fData[i].data->GetLineColor());
@@ -3385,22 +3394,18 @@ void PMusrCanvas::HandleFourier()
       fData[i].dataFourierPwr->SetLineColor(fData[i].data->GetLineColor());
       fData[i].dataFourierPhase->SetMarkerColor(fData[i].data->GetMarkerColor());
       fData[i].dataFourierPhase->SetLineColor(fData[i].data->GetLineColor());
-      fData[i].dataFourierPhaseOptReal->SetMarkerColor(fData[i].data->GetMarkerColor());
-      fData[i].dataFourierPhaseOptReal->SetLineColor(fData[i].data->GetLineColor());
 
       // set marker size
       fData[i].dataFourierRe->SetMarkerSize(1);
       fData[i].dataFourierIm->SetMarkerSize(1);
       fData[i].dataFourierPwr->SetMarkerSize(1);
       fData[i].dataFourierPhase->SetMarkerSize(1);
-      fData[i].dataFourierPhaseOptReal->SetMarkerSize(1);
 
       // set marker type
       fData[i].dataFourierRe->SetMarkerStyle(fData[i].data->GetMarkerStyle());
       fData[i].dataFourierIm->SetMarkerStyle(fData[i].data->GetMarkerStyle());
       fData[i].dataFourierPwr->SetMarkerStyle(fData[i].data->GetMarkerStyle());
       fData[i].dataFourierPhase->SetMarkerStyle(fData[i].data->GetMarkerStyle());
-      fData[i].dataFourierPhaseOptReal->SetMarkerStyle(fData[i].data->GetMarkerStyle());
 
       // calculate fourier transform of the theory
       Int_t powerPad = (Int_t)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
@@ -3418,31 +3423,18 @@ void PMusrCanvas::HandleFourier()
       // get power part of the data
       fData[i].theoryFourierPwr = fourierTheory.GetPowerFourier(scale);
       // get phase part of the data
-      fData[i].theoryFourierPhase = fourierTheory.GetPhaseFourier();
-
-      // get phase optimized real fourier from data
-
-      // clone theory Re FT
-      strcpy(hName, fData[i].theoryFourierPhase->GetName());
-      strcat(hName, "_Opt_Real");
-      fData[i].theoryFourierPhaseOptReal = (TH1F*) fData[i].theoryFourierRe->Clone(hName);
-
-      // rotate the theory according to the optimized phase parameters
-      // first find minBin for min of the phase correction
-      Int_t minBin = fData[i].theoryFourierPhaseOptReal->GetXaxis()->FindBin(min);
-      Int_t maxBin = fData[i].theoryFourierPhaseOptReal->GetXaxis()->FindBin(max);
-      for (Int_t j=1; j<fData[i].theoryFourierPhaseOptReal->GetNbinsX(); j++) {
-        ph = phaseParam[0] + phaseParam[1] * (Double_t)(j-minBin+1) / (Double_t)(maxBin-minBin);
-        re = fData[i].theoryFourierRe->GetBinContent(j) * cos(ph) - fData[i].theoryFourierIm->GetBinContent(j) * sin(ph);
-        fData[i].theoryFourierPhaseOptReal->SetBinContent(j, re);
-      }
+      fData[i].theoryFourierPhase = fourierTheory.GetPhaseFourier();      
 
       // set line colors for the theory
       fData[i].theoryFourierRe->SetLineColor(fData[i].theory->GetLineColor());
       fData[i].theoryFourierIm->SetLineColor(fData[i].theory->GetLineColor());
       fData[i].theoryFourierPwr->SetLineColor(fData[i].theory->GetLineColor());
       fData[i].theoryFourierPhase->SetLineColor(fData[i].theory->GetLineColor());
-      fData[i].theoryFourierPhaseOptReal->SetLineColor(fData[i].theory->GetLineColor());
+    }
+
+    // phase opt. real FT requested initially in the msr-file, hence calculate it here
+    if (fCurrentPlotView == PV_FOURIER_PHASE_OPT_REAL) {
+      CalcPhaseOptReFT();
     }
 
     // apply global phase if present
@@ -3475,42 +3467,6 @@ void PMusrCanvas::HandleFourier()
         }
       }
     }
-
-/* as: will be obsolate ...
-    // find optimal Fourier phase if range is given
-    if ((fFourier.fRangeForPhaseCorrection[0] != -1.0) && (fFourier.fRangeForPhaseCorrection[1] != -1.0)) {
-
-      fCurrentFourierPhase = FindOptimalFourierPhase();
-
-      // apply optimal Fourier phase
-      double re, im;
-      const double cp = TMath::Cos(fCurrentFourierPhase/180.0*TMath::Pi());
-      const double sp = TMath::Sin(fCurrentFourierPhase/180.0*TMath::Pi());
-
-      for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
-        if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
-          for (Int_t j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-            // calculate new fourier data set value
-            re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
-            im = fData[i].dataFourierIm->GetBinContent(j) * cp - fData[i].dataFourierRe->GetBinContent(j) * sp;
-            // overwrite fourier data set value
-            fData[i].dataFourierRe->SetBinContent(j, re);
-            fData[i].dataFourierIm->SetBinContent(j, im);
-          }
-        }
-        if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
-          for (Int_t j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
-            // calculate new fourier data set value
-            re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
-            im = fData[i].theoryFourierIm->GetBinContent(j) * cp - fData[i].theoryFourierRe->GetBinContent(j) * sp;
-            // overwrite fourier data set value
-            fData[i].theoryFourierRe->SetBinContent(j, re);
-            fData[i].theoryFourierIm->SetBinContent(j, im);
-          }
-        }
-      }
-    }
-*/
   }
 }
 
@@ -4190,6 +4146,10 @@ void PMusrCanvas::CleanupFourierDifference()
       delete fData[i].diffFourierPhase;
       fData[i].diffFourierPhase = 0;
     }
+    if (fData[i].diffFourierPhaseOptReal != 0) {
+      delete fData[i].diffFourierPhaseOptReal;
+      fData[i].diffFourierPhaseOptReal = 0;
+    }
   }
 }
 
@@ -4272,6 +4232,64 @@ void PMusrCanvas::CleanupAverage()
   if (fDataAvg.diffFourierPhaseOptReal != 0) {
     delete fDataAvg.diffFourierPhaseOptReal;
     fDataAvg.diffFourierPhaseOptReal = 0;
+  }
+}
+
+//--------------------------------------------------------------------------
+// CalculateDiff (private)
+//--------------------------------------------------------------------------
+/**
+ * @brief PMusrCanvas::CalcPhaseOptReFT
+ */
+void PMusrCanvas::CalcPhaseOptReFT()
+{
+  Double_t min = fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[0];
+  Double_t max = fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[1];
+
+  if ((min == -1.0) && (max == -1.0)) {
+    if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+      min = fFourier.fPlotRange[0];
+      max = fFourier.fPlotRange[1];
+    } else {
+      min = fData[0].dataFourierRe->GetBinLowEdge(1);
+      max = fData[0].dataFourierRe->GetBinLowEdge(fData[0].dataFourierRe->GetNbinsX())+fData[0].dataFourierRe->GetBinWidth(1);
+    }
+  }
+
+  PDoubleVector phaseParam;
+  Char_t hName[1024];
+  Double_t ph, re;
+
+  for (UInt_t i=0; i<fData.size(); i++) {
+    // handle Fourier data part
+    fData[i].dataFourierPhaseOptReal = PFourier::GetPhaseOptRealFourier(fData[i].dataFourierRe, fData[i].dataFourierIm,
+                                                                        phaseParam, 1.0, min, max);
+    // set marker and line color
+    fData[i].dataFourierPhaseOptReal->SetMarkerColor(fData[i].data->GetMarkerColor());
+    fData[i].dataFourierPhaseOptReal->SetLineColor(fData[i].data->GetLineColor());
+    // set marker size
+    fData[i].dataFourierPhaseOptReal->SetMarkerSize(1);
+    // set marker type
+    fData[i].dataFourierPhaseOptReal->SetMarkerStyle(fData[i].data->GetMarkerStyle());
+
+    // handle Fourier theory part
+    // clone theory Re FT
+    strcpy(hName, fData[i].theoryFourierPhase->GetName());
+    strcat(hName, "_Opt_Real");
+    fData[i].theoryFourierPhaseOptReal = (TH1F*) fData[i].theoryFourierRe->Clone(hName);
+
+    // rotate the theory according to the optimized phase parameters
+    // first find minBin for min of the phase correction
+    Int_t minBin = fData[i].theoryFourierPhaseOptReal->GetXaxis()->FindFixBin(min);
+    Int_t maxBin = fData[i].theoryFourierPhaseOptReal->GetXaxis()->FindFixBin(max);
+
+    for (Int_t j=1; j<fData[i].theoryFourierPhaseOptReal->GetNbinsX(); j++) {
+      ph = phaseParam[0] + phaseParam[1] * (Double_t)(j-minBin+1) / (Double_t)(maxBin-minBin);
+      re = fData[i].theoryFourierRe->GetBinContent(j) * cos(ph) - fData[i].theoryFourierIm->GetBinContent(j) * sin(ph);
+      fData[i].theoryFourierPhaseOptReal->SetBinContent(j, re);
+    }
+    // set line colors for the theory
+    fData[i].theoryFourierPhaseOptReal->SetLineColor(fData[i].theory->GetLineColor());
   }
 }
 
@@ -5924,6 +5942,58 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
 
       PlotFourierPhaseValue();
 
+      break;
+    case PV_FOURIER_PHASE_OPT_REAL:
+      // set x-range
+      if ((fFourier.fPlotRange[0] != -1) && (fFourier.fPlotRange[1] != -1)) {
+        xmin = fFourier.fPlotRange[0];
+        xmax = fFourier.fPlotRange[1];
+      } else {
+        xmin = fData[0].diffFourierPhaseOptReal->GetBinLowEdge(1);
+        xmax = fData[0].diffFourierPhaseOptReal->GetBinLowEdge(fData[0].diffFourierPhaseOptReal->GetNbinsX())+fData[0].diffFourierPhaseOptReal->GetBinWidth(1);
+      }
+
+      // set y-range
+      // first find minimum/maximum of all histos
+      ymin = GetMinimum(fData[0].diffFourierPhaseOptReal);
+      ymax = GetMaximum(fData[0].diffFourierPhaseOptReal);
+      for (UInt_t i=1; i<fData.size(); i++) {
+        binContent = GetMinimum(fData[i].diffFourierPhaseOptReal);
+        if (binContent < ymin)
+          ymin = binContent;
+        binContent = GetMaximum(fData[i].diffFourierPhaseOptReal);
+        if (binContent > ymax)
+          ymax = binContent;
+      }
+
+      // delete old fHistoFrame if present
+      if (fHistoFrame) {
+        delete fHistoFrame;
+        fHistoFrame = 0;
+      }
+
+      fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
+
+      // set ranges for phase opt. real Fourier difference
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].diffFourierPhaseOptReal->GetXaxis()->SetRangeUser(xmin, xmax);
+        fData[i].diffFourierPhaseOptReal->GetYaxis()->SetRangeUser(1.05*ymin, 1.05*ymax);
+      }
+
+      // set x-axis title
+      fHistoFrame->GetXaxis()->SetTitle(xAxisTitle.Data());
+
+      // set y-axis title
+      fHistoFrame->GetYaxis()->SetTitleOffset(1.3);
+      if (fData[0].diffFourierTag == 1)
+        fHistoFrame->GetYaxis()->SetTitle("Real Fourier (d-f: data-theory)");
+      else
+        fHistoFrame->GetYaxis()->SetTitle("Real Fourier (f-d: [(F data)-(F theory)]");
+
+      // plot data
+      for (UInt_t i=0; i<fData.size(); i++) {
+        fData[i].diffFourierPhaseOptReal->Draw("plsame");
+      }
       break;
     default:
       break;

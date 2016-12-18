@@ -713,7 +713,7 @@ Int_t musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, Double_t star
   musrFT_cleanup(hRe);
   for (UInt_t i=1; i<fourierData.size(); i++) {
     hRe = fourierData[i]->GetRealFourier();
-    if (hRe->GetNbinsX()-1 < minSize)
+    if (hRe->GetNbinsX()-1 < (Int_t)minSize)
       minSize = hRe->GetNbinsX()-1;
     musrFT_cleanup(hRe);
   }
@@ -721,7 +721,7 @@ Int_t musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, Double_t star
   for (UInt_t i=0; i<fourierData.size(); i++) {
     hRe = fourierData[i]->GetRealFourier();
     hIm = fourierData[i]->GetImaginaryFourier();
-    for (Int_t j=1; j<minSize; j++) {
+    for (Int_t j=1; j<(Int_t)minSize; j++) {
       dval = hRe->GetBinCenter(j);
       if ((dval >= start) && (dval <= end)) {
         freq.push_back(dval);
@@ -1020,7 +1020,6 @@ Int_t main(Int_t argc, Char_t *argv[])
   PStartupOptions startup_options;
   startup_options.writeExpectedChisq = false;
   startup_options.estimateN0 = true;
-  startup_options.alphaEstimateN0 = 0.0;
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
@@ -1057,7 +1056,6 @@ Int_t main(Int_t argc, Char_t *argv[])
       }
     }
   }
-  startupHandler->SetStartupOptions(startup_options);
 
   // defines the raw time-domain data vector
   PPrepFourier data(startupParam.packing, startupParam.bkg_range, startupParam.bkg);
@@ -1066,7 +1064,7 @@ Int_t main(Int_t argc, Char_t *argv[])
   vector<PMsrHandler*> msrHandler;
   msrHandler.resize(startupParam.msrFln.size());
   for (UInt_t i=0; i<startupParam.msrFln.size(); i++) {
-    msrHandler[i] = new PMsrHandler(startupParam.msrFln[i].Data(), startupHandler->GetStartupOptions(), true);
+    msrHandler[i] = new PMsrHandler(startupParam.msrFln[i].Data(), &startup_options, true);
     status = msrHandler[i]->ReadMsrFile();
     if (status != PMUSR_SUCCESS) {
       switch (status) {
