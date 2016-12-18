@@ -1564,63 +1564,65 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
   }
 
   // handle expected chisq if applicable
-  if (fUseChi2) {
-    fParams = *(fRunInfo->GetMsrParamList()); // get the update parameters back
+  fParams = *(fRunInfo->GetMsrParamList()); // get the update parameters back
 
-    // calculate expected chisq
-    std::vector<Double_t> param;
-    Double_t totalExpectedChisq = 0.0;
-    std::vector<Double_t> expectedChisqPerHisto;
-    std::vector<UInt_t> ndfPerHisto;
+  // calculate expected chisq
+  std::vector<Double_t> param;
+  Double_t totalExpectedChisq = 0.0;
+  std::vector<Double_t> expectedChisqPerHisto;
+  std::vector<UInt_t> ndfPerHisto;
 
-    for (UInt_t i=0; i<fParams.size(); i++)
-      param.push_back(fParams[i].fValue);
+  for (UInt_t i=0; i<fParams.size(); i++)
+    param.push_back(fParams[i].fValue);
 
-    fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerHisto);
+  // CalcExpectedChiSquare handles both, chisq and mlh
+  fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerHisto);
 
-    // calculate chisq per run
-    std::vector<Double_t> chisqPerHisto;
-    for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
+  // calculate chisq per run
+  std::vector<Double_t> chisqPerHisto;
+  for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
+    if (fUseChi2)
       chisqPerHisto.push_back(fRunListCollection->GetSingleRunChisq(param, i));
-    }
-
-    if (totalExpectedChisq != 0.0) { // i.e. applicable for single histogram fits only
-      // get the ndf's of the histos
-      UInt_t ndf_histo;
-      for (UInt_t i=0; i<expectedChisqPerHisto.size(); i++) {
-        ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
-        ndfPerHisto.push_back(ndf_histo);
-      }
-
-      // feed the msr-file handler
-      PMsrStatisticStructure *statistics = fRunInfo->GetMsrStatistic();
-      if (statistics) {
-        statistics->fMinPerHisto = chisqPerHisto;
-        statistics->fMinExpected = totalExpectedChisq;
-        statistics->fMinExpectedPerHisto = expectedChisqPerHisto;
-        statistics->fNdfPerHisto = ndfPerHisto;
-      }
-    } else if (chisqPerHisto.size() > 1) { // in case expected chisq is not applicable like for asymmetry fits
-      UInt_t ndf_histo = 0;
-      for (UInt_t i=0; i<chisqPerHisto.size(); i++) {
-        ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
-        ndfPerHisto.push_back(ndf_histo);
-      }
-
-      // feed the msr-file handler
-      PMsrStatisticStructure *statistics = fRunInfo->GetMsrStatistic();
-      if (statistics) {
-        statistics->fMinPerHisto = chisqPerHisto;
-        statistics->fNdfPerHisto = ndfPerHisto;
-      }
-    }
-
-    // clean up
-    param.clear();
-    expectedChisqPerHisto.clear();
-    ndfPerHisto.clear();
-    chisqPerHisto.clear();
+    else
+      chisqPerHisto.push_back(fRunListCollection->GetSingleRunMaximumLikelihood(param, i));
   }
+
+  if (totalExpectedChisq != 0.0) { // i.e. applicable for single histogram fits only
+    // get the ndf's of the histos
+    UInt_t ndf_histo;
+    for (UInt_t i=0; i<expectedChisqPerHisto.size(); i++) {
+      ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+      ndfPerHisto.push_back(ndf_histo);
+    }
+
+    // feed the msr-file handler
+    PMsrStatisticStructure *statistics = fRunInfo->GetMsrStatistic();
+    if (statistics) {
+      statistics->fMinPerHisto = chisqPerHisto;
+      statistics->fMinExpected = totalExpectedChisq;
+      statistics->fMinExpectedPerHisto = expectedChisqPerHisto;
+      statistics->fNdfPerHisto = ndfPerHisto;
+    }
+  } else if (chisqPerHisto.size() > 1) { // in case expected chisq is not applicable like for asymmetry fits
+    UInt_t ndf_histo = 0;
+    for (UInt_t i=0; i<chisqPerHisto.size(); i++) {
+      ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+      ndfPerHisto.push_back(ndf_histo);
+    }
+
+    // feed the msr-file handler
+    PMsrStatisticStructure *statistics = fRunInfo->GetMsrStatistic();
+    if (statistics) {
+      statistics->fMinPerHisto = chisqPerHisto;
+      statistics->fNdfPerHisto = ndfPerHisto;
+    }
+  }
+
+  // clean up
+  param.clear();
+  expectedChisqPerHisto.clear();
+  ndfPerHisto.clear();
+  chisqPerHisto.clear();
 
   cout << ">> PFitter::ExecuteSave(): will write minuit2 output file ..." << endl;
 

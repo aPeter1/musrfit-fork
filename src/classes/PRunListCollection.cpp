@@ -355,7 +355,7 @@ Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Doubl
   }
 
   Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
-  if (type == -1) { // i.e. not forun in the RUN block, try the GLOBAL block
+  if (type == -1) { // i.e. not found in the RUN block, try the GLOBAL block
     type = fMsrInfo->GetMsrGlobal()->GetFitType();
   }
 
@@ -579,6 +579,97 @@ Double_t PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<Doubl
 
   for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
     mlh += fRunNonMusrList[i]->CalcChiSquare(par);
+
+  return mlh;
+}
+
+//--------------------------------------------------------------------------
+// GetSingleHistoMaximumLikelihoodExpected (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates expected mlh of the single histogram with run block index idx of a msr-file.
+ *
+ * <b>return:</b>
+ * - expected mlh of for a single histogram
+ *
+ * \param par fit parameter vector
+ * \param idx run block index
+ */
+Double_t PRunListCollection::GetSingleHistoMaximumLikelihoodExpected(const std::vector<Double_t>& par, const UInt_t idx) const
+{
+  Double_t expected_mlh = 0.0;
+
+  if (idx > fMsrInfo->GetMsrRunList()->size()) {
+    cerr << ">> PRunListCollection::GetSingleHistoMaximumLikelihoodExpected() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << endl << endl;
+    return expected_mlh;
+  }
+
+  Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
+  if (type == -1) { // i.e. not found in the RUN block, try the GLOBAL block
+    type = fMsrInfo->GetMsrGlobal()->GetFitType();
+  }
+
+  // count how many entries of this fit-type are present up to idx
+  UInt_t subIdx = 0;
+  for (UInt_t i=0; i<idx; i++) {
+    if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+      subIdx++;
+  }
+
+  // return the mlh of the single run
+  switch (type) {
+  case PRUN_SINGLE_HISTO:
+    expected_mlh = fRunSingleHistoList[subIdx]->CalcMaxLikelihoodExpected(par);
+    break;
+  default:
+    break;
+  }
+
+  return expected_mlh;
+}
+
+//--------------------------------------------------------------------------
+// GetSingleRunMaximumLikelihood (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates mlh of a single run-block entry of the msr-file.
+ *
+ * <b>return:</b>
+ * - mlh of single run-block entry with index idx
+ *
+ * \param par fit parameter vector
+ * \param idx run block index
+ */
+Double_t PRunListCollection::GetSingleRunMaximumLikelihood(const std::vector<Double_t>& par, const UInt_t idx) const
+{
+  Double_t mlh = 0.0;
+
+  if (idx > fMsrInfo->GetMsrRunList()->size()) {
+    cerr << ">> PRunListCollection::GetSingleRunMaximumLikelihood() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << endl << endl;
+    return mlh;
+  }
+
+  Int_t subIdx = 0;
+  Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
+  if (type == -1) { // i.e. not found in the RUN block, try the GLOBAL block
+    type = fMsrInfo->GetMsrGlobal()->GetFitType();
+    subIdx = idx;
+  } else { // found in the RUN block
+    // count how many entries of this fit-type are present up to idx
+    for (UInt_t i=0; i<idx; i++) {
+      if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+        subIdx++;
+    }
+  }
+
+  // return the mlh of the single run
+  switch (type) {
+  case PRUN_SINGLE_HISTO:
+    mlh = fRunSingleHistoList[subIdx]->CalcMaxLikelihood(par);
+    break;
+  default:
+    break;
+  }
 
   return mlh;
 }

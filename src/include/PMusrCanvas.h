@@ -206,12 +206,12 @@ class PMusrCanvas : public TObject, public TQObject
     PMusrCanvas();
     PMusrCanvas(const Int_t number, const Char_t* title,
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh, const Bool_t batch,
-                const Bool_t fourier=false);
+                const Bool_t fourier=false, const Bool_t avg=false);
     PMusrCanvas(const Int_t number, const Char_t* title,
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                 PMsrFourierStructure fourierDefault,
                 const PIntVector markerList, const PIntVector colorList, const Bool_t batch,
-                const Bool_t fourier=false);
+                const Bool_t fourier=false, const Bool_t avg=false);
     virtual ~PMusrCanvas();
 
     virtual Bool_t IsValid() { return fValid; }
@@ -236,6 +236,7 @@ class PMusrCanvas : public TObject, public TQObject
 
   private:
     Bool_t fStartWithFourier; ///< flag if true, the Fourier transform will be presented bypassing the time domain representation
+    Bool_t fStartWithAvg;     ///< flag if true, the averaged data/Fourier will be presented
     Int_t  fTimeout;          ///< timeout after which the Done signal should be emited. If timeout <= 0, no timeout is taking place
     Bool_t fScaleN0AndBkg;    ///< true=N0 and background is scaled to (1/ns), otherwise (1/bin) for the single histogram case
     Bool_t fBatchMode;        ///< musrview in ROOT batch mode
@@ -312,6 +313,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void CleanupFourierDifference();
     virtual void CleanupAverage();
 
+    virtual void CalcPhaseOptReFT();
     virtual Double_t CalculateDiff(const Double_t x, const Double_t y, TH1F *theo);
     virtual Double_t CalculateDiff(const Double_t x, const Double_t y, TGraphErrors *theo);
     virtual Int_t  FindBin(const Double_t x, TGraphErrors *graph);
