@@ -507,7 +507,7 @@ TH1F* PFourier::GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, vector<Do
 
   phase.resize(2); // c0, c1
 
-  TAxis *axis = re->GetXaxis();
+  const TAxis *axis = re->GetXaxis();
 
   Int_t minBin = 1;
   Int_t maxBin = axis->GetNbins();
