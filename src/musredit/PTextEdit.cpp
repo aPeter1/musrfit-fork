@@ -1699,6 +1699,12 @@ void PTextEdit::musrCalcChisq()
   if ( !currentEditor() )
     return;
 
+  int result = 0;
+  if (fAdmin->getEstimateN0Flag())
+    result = QMessageBox::question(this, "Estimate N0 active",
+                           "Do you wish a chisq/mlh evaluation with an automatic N0 estimate?",
+                           QMessageBox::Yes, QMessageBox::No);
+
   QString tabLabel = fTabWidget->tabText(fTabWidget->currentIndex());
   if (tabLabel == "noname") {
     QMessageBox::critical(this, "**ERROR**", "For a fit a real msr-file is needed.");
@@ -1716,8 +1722,8 @@ void PTextEdit::musrCalcChisq()
   cmd.append(str);
   cmd.append(QFileInfo(*fFilenames.find( currentEditor())).fileName() );
   cmd.append("--chisq-only");
-  cmd.append("--estimateN0");
-  cmd.append("no");
+  if (fAdmin->getEstimateN0Flag() && (result == QMessageBox::Yes))
+    cmd.append("--estimateN0");
   PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
@@ -1770,19 +1776,11 @@ void PTextEdit::musrFit()
   // check estimate N0 flag
   if (fAdmin->getEstimateN0Flag()) {
     cmd.append("--estimateN0");
-    cmd.append("yes");
-  } else {
-    cmd.append("--estimateN0");
-    cmd.append("no");
   }
 
   // check per-run-block-chisq flag
   if (fAdmin->getChisqPerRunBlockFlag()) {
     cmd.append("--per-run-block-chisq");
-    cmd.append("yes");
-  } else {
-    cmd.append("--per-run-block-chisq");
-    cmd.append("no");
   }
 
   // add timeout
@@ -2203,6 +2201,8 @@ void PTextEdit::musrView()
   cmd += str + "\" --timeout " + numStr;
   if (fAdmin->getMusrviewShowFourierFlag())
     cmd += " -f ";
+  if (fAdmin->getMusrviewShowAvgFlag())
+    cmd += " -a ";
   cmd += " &";
 
   int status=system(cmd.toLatin1());

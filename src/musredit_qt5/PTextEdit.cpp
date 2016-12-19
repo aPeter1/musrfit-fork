@@ -848,6 +848,13 @@ void PTextEdit::fileOpen()
 
     ++it;
   }
+
+  // in case there is a 1st empty tab "noname", remove it
+  if (fTabWidget->tabText(0) == "noname") { // has to be the first, otherwise do nothing
+    fFileSystemWatcher->removePath("noname");
+
+    delete fTabWidget->widget(0);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -878,6 +885,13 @@ void PTextEdit::fileOpenRecent()
       load(action->text());
     else
       fileReload();
+  }
+
+  // in case there is a 1st empty tab "noname", remove it
+  if (fTabWidget->tabText(0) == "noname") { // has to be the first, otherwise do nothing
+    fFileSystemWatcher->removePath("noname");
+
+    delete fTabWidget->widget(0);
   }
 }
 
@@ -1699,6 +1713,11 @@ void PTextEdit::musrCalcChisq()
   if ( !currentEditor() )
     return;
 
+  int result = 0;
+  if (fAdmin->getEstimateN0Flag())
+    result = QMessageBox::question(this, "Estimate N0 active",
+                           "Do you wish a chisq/mlh evaluation with an automatic N0 estimate?");
+
   QString tabLabel = fTabWidget->tabText(fTabWidget->currentIndex());
   if (tabLabel == "noname") {
     QMessageBox::critical(this, "**ERROR**", "For a fit a real msr-file is needed.");
@@ -1716,8 +1735,8 @@ void PTextEdit::musrCalcChisq()
   cmd.append(str);
   cmd.append(QFileInfo(*fFilenames.find( currentEditor())).fileName() );
   cmd.append("--chisq-only");
-  cmd.append("--estimateN0");
-  cmd.append("no");
+  if (fAdmin->getEstimateN0Flag() && (result == QMessageBox::Yes))
+    cmd.append("--estimateN0");
   PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
   fitOutputHandler.setModal(true);
   fitOutputHandler.exec();
@@ -1770,19 +1789,11 @@ void PTextEdit::musrFit()
   // check estimate N0 flag
   if (fAdmin->getEstimateN0Flag()) {
     cmd.append("--estimateN0");
-    cmd.append("yes");
-  } else {
-    cmd.append("--estimateN0");
-    cmd.append("no");
   }
 
   // check per-run-block-chisq flag
   if (fAdmin->getChisqPerRunBlockFlag()) {
     cmd.append("--per-run-block-chisq");
-    cmd.append("yes");
-  } else {
-    cmd.append("--per-run-block-chisq");
-    cmd.append("no");
   }
 
   // add timeout
@@ -2205,6 +2216,10 @@ void PTextEdit::musrView()
   if (fAdmin->getMusrviewShowFourierFlag())
     arg << "-f";
 
+  // start with averaged data/Fourier?
+  if (fAdmin->getMusrviewShowAvgFlag())
+    arg << "-a";
+
   QProcess *proc = new QProcess(this);
 
   // make sure that the system environment variables are properly set
@@ -2333,6 +2348,7 @@ void PTextEdit::musrPrefs()
 
   if (dlg->exec() == QDialog::Accepted) {
     fAdmin->setMusrviewShowFourierFlag(dlg->getMusrviewShowFourierFlag());
+    fAdmin->setMusrviewShowAvgFlag(dlg->getMusrviewShowAvgFlag());
     fAdmin->setKeepMinuit2OutputFlag(dlg->getKeepMinuit2OutputFlag());
     fAdmin->setTitleFromDataFileFlag(dlg->getTitleFromDataFileFlag());
     fAdmin->setEnableMusrT0Flag(dlg->getEnableMusrT0Flag());

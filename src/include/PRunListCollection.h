@@ -76,6 +76,9 @@ class PRunListCollection
     virtual Double_t GetMuMinusMaximumLikelihood(const std::vector<Double_t>& par) const;
     virtual Double_t GetNonMusrMaximumLikelihood(const std::vector<Double_t>& par) const;
 
+    virtual Double_t GetSingleHistoMaximumLikelihoodExpected(const std::vector<Double_t>& par, const UInt_t idx) const;
+    virtual Double_t GetSingleRunMaximumLikelihood(const std::vector<Double_t>& par, const UInt_t idx) const;
+
     virtual UInt_t GetNoOfBinsFitted(const UInt_t idx) const;
     virtual UInt_t GetTotalNoOfBinsFitted() const;
 

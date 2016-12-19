@@ -62,6 +62,7 @@ PPrefsDialog::PPrefsDialog(PAdmin *admin) : fAdmin(admin)
   fPerRunBlockChisq_checkBox->setChecked(fAdmin->getChisqPerRunBlockFlag());
   fEstimateN0_checkBox->setChecked(fAdmin->getEstimateN0Flag());
   fFourier_checkBox->setChecked(fAdmin->getMusrviewShowFourierFlag());
+  fAvg_checkBox->setChecked(fAdmin->getMusrviewShowAvgFlag());
 
   fTimeout_lineEdit->setText(QString("%1").arg(fAdmin->getTimeout()));
   fTimeout_lineEdit->setValidator(new QIntValidator(fTimeout_lineEdit));

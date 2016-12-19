@@ -63,6 +63,7 @@ void musrview_syntax()
   cout << endl << "       --help    : display this help and exit.";
   cout << endl << "       --version : output version information and exit.";
   cout << endl << "       -f, --fourier: will directly present the Fourier transform of the <msr-file>.";
+  cout << endl << "       -a, --avg: will directly present the averaged data/Fourier of the <msr-file>.";
   cout << endl << "       --<graphic-format-extension>: ";
   cout << endl << "           will produce a graphics-output-file without starting a root session.";
   cout << endl << "           the name is based on the <msr-file>, e.g. 3310.msr -> 3310_0.png";
@@ -102,6 +103,7 @@ int main(int argc, char *argv[])
   bool success = true;
   char fileName[128];
   bool fourier = false;
+  bool avg = false;
   bool graphicsOutput = false;
   bool asciiOutput = false;
   char graphicsExtension[128];
@@ -135,6 +137,8 @@ int main(int argc, char *argv[])
       break;
     } else if (!strcmp(argv[i], "-f") || !strcmp(argv[i], "--fourier")) {
       fourier = true;
+    } else if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--avg")) {
+      avg = true;
     } else if (!strcmp(argv[i], "--eps") || !strcmp(argv[i], "--pdf") || !strcmp(argv[i], "--gif") ||
                !strcmp(argv[i], "--jpg") || !strcmp(argv[i], "--png") || !strcmp(argv[i], "--svg") ||
                !strcmp(argv[i], "--xpm") || !strcmp(argv[i], "--root")) {
@@ -308,12 +312,12 @@ int main(int argc, char *argv[])
                                      startupHandler->GetMarkerList(),
                                      startupHandler->GetColorList(),
                                      graphicsOutput||asciiOutput,
-                                     fourier);
+                                     fourier, avg);
       else
         musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
                                      10+i*100, 10+i*100, 800, 600,
                                      graphicsOutput||asciiOutput,
-                                     fourier);
+                                     fourier, avg);
 
       if (!musrCanvas->IsValid()) {
         cerr << endl << ">> musrview **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
