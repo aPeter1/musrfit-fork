@@ -2,8 +2,23 @@
 # ChangeLog
 #---------------------------------------------------------------------
 
+changes since 0.18.0
+===================================
+
 changes since 0.17.0
 ===================================
+NEW 2016-12-18 for maxLH it is now possible to get the per-run-block maxLH,
+               and the expected maxLH.
+NEW 2016-12-18 musrview allows no to show directly the Fourier transform,
+               and the averaged data/Fourier transform.
+NEW 2016-12-18 added a first full version of an automatic phase correction 
+               for the real part of the Fourier transform. It is based on
+               the algorithm published in JMR 158, 164 (2002).
+NEW 2016-12-18 a couple of improvements in dump_header: (i) it is not
+               only searching in the current directory, but also in all
+               default paths defined in musrfit_startup.xml. (ii) it is
+               now possible also to give only run numbers instead of the
+               full file name.
 NEW 2016-08-24 in musrview it is now possible to enable/disable a
                crosshair cursor by pressing 'c'.
 NEW 2016-04-28 updated licence info in musredit and added paramList 
@@ -13,6 +28,8 @@ NEW 2016-04-28 msr2data gets a new option: paramList which allows to
                of msr-files.
 NEW 2016-04-22 Added the theory function muMinusExpTF for mu minus fits
 NEW 2016-02-23 It is now possible to export the averaged data/Fourier
+CHANGED 2016-12-18 updated the docu.
+CHANGED 2016-12-18 a couple of little improvements in musredit.
 CHANGED 2016-08-10 drop NeXus support for Version < 4.4
 CHANGED 2016-04-26 start-/endTimeBin are now class members. This reduces 
                the number of recalculations.

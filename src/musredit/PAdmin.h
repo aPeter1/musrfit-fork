@@ -69,7 +69,8 @@ class PAdminXMLParser : public QXmlDefaultHandler
 
   private:
     enum EAdminKeyWords {eEmpty, eTimeout, eKeepMinuit2Output, eDumpAscii, eDumpRoot,
-                         eTitleFromDataFile, eChisqPreRunBlock, eEstimateN0, eMusrviewShowFourier, eEnableMusrT0,
+                         eTitleFromDataFile, eChisqPreRunBlock, eEstimateN0,
+                         eMusrviewShowFourier, eMusrviewShowAvg, eEnableMusrT0,
                          eFontName, eFontSize, eExecPath, eDefaultSavePath,
                          eRecentFile, eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
                          eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
@@ -119,6 +120,7 @@ class PAdmin : public QObject
     QString getDefaultSavePath() { return fDefaultSavePath; }
     bool    getTitleFromDataFileFlag() { return fTitleFromDataFile; }
     bool    getMusrviewShowFourierFlag() { return fMusrviewShowFourier; }
+    bool    getMusrviewShowAvgFlag() { return fMusrviewShowAvg; }
     bool    getEnableMusrT0Flag() { return fEnableMusrT0; }
     bool    getKeepMinuit2OutputFlag() { return fKeepMinuit2Output; }
     bool    getDumpAsciiFlag() { return fDumpAscii; }
@@ -142,6 +144,7 @@ class PAdmin : public QObject
     void setTimeout(const int ival) { fTimeout = ival; }
     void setTitleFromDataFileFlag(const bool flag) { fTitleFromDataFile = flag; }
     void setMusrviewShowFourierFlag(const bool flag) { fMusrviewShowFourier = flag; }
+    void setMusrviewShowAvgFlag(const bool flag) { fMusrviewShowAvg = flag; }
     void setEnableMusrT0Flag(const bool flag) { fEnableMusrT0 = flag; }
     void setKeepMinuit2OutputFlag(const bool flag) { fKeepMinuit2Output = flag; }
     void setDumpAsciiFlag(const bool flag) { fDumpAscii = flag; }
@@ -185,6 +188,7 @@ class PAdmin : public QObject
     QVector<QString> fRecentFile; ///< keep vector of recent path-file names
 
     bool fMusrviewShowFourier; ///< flag indicating if musrview should show at startup data (=false) or Fourier of data (=true).
+    bool fMusrviewShowAvg;     ///< flag indicating if musrview should show at startup averaged (=true) or original (=false) data/Fourier.
     bool fKeepMinuit2Output;   ///< flag indicating if the Minuit2 output shall be kept (default: no)
     bool fDumpAscii;           ///< flag indicating if musrfit shall make an ascii-dump file (for debugging purposes, default: no).
     bool fDumpRoot;            ///< flag indicating if musrfit shall make an root-dump file (for debugging purposes, default: no).

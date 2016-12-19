@@ -394,6 +394,103 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
 }
 
 //--------------------------------------------------------------------------
+// CalcMaxLikelihoodExpected (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculate expected log maximum-likelihood.
+ *
+ * <b>return:</b>
+ * - log maximum-likelihood value
+ *
+ * \param par parameter vector iterated by minuit2
+ */
+Double_t PRunSingleHisto::CalcMaxLikelihoodExpected(const std::vector<Double_t>& par)
+{
+  Double_t mllh = 0.0; // maximum log likelihood assuming poisson distribution for the single bin
+
+  Double_t N0;
+
+  // check if norm is a parameter or a function
+  if (fRunInfo->GetNormParamNo() < MSR_PARAM_FUN_OFFSET) { // norm is a parameter
+    N0 = par[fRunInfo->GetNormParamNo()-1];
+  } else { // norm is a function
+    // get function number
+    UInt_t funNo = fRunInfo->GetNormParamNo()-MSR_PARAM_FUN_OFFSET;
+    // evaluate function
+    N0 = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+  }
+
+  // get tau
+  Double_t tau;
+  if (fRunInfo->GetLifetimeParamNo() != -1)
+    tau = par[fRunInfo->GetLifetimeParamNo()-1];
+  else
+    tau = PMUON_LIFETIME;
+
+  // get background
+  Double_t bkg;
+  if (fRunInfo->GetBkgFitParamNo() == -1) { // bkg not fitted
+    if (fRunInfo->GetBkgFix(0) == PMUSR_UNDEFINED) { // no fixed background given (background interval)
+      bkg = fBackground;
+    } else { // fixed bkg given
+      bkg = fRunInfo->GetBkgFix(0);
+    }
+  } else { // bkg fitted
+    bkg = par[fRunInfo->GetBkgFitParamNo()-1];
+  }
+
+  // calculate functions
+  for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
+    Int_t funcNo = fMsrInfo->GetFuncNo(i);
+    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
+  }
+
+  // calculate maximum log likelihood
+  Double_t theo;
+  Double_t data;
+  Double_t time(1.0);
+  Int_t i;
+
+  // norm is needed since there is no simple scaling like in chisq case to get the correct Max.Log.Likelihood value when normlizing N(t) to 1/ns
+  Double_t normalizer = 1.0;
+
+  if (fScaleN0AndBkg)
+    normalizer = fPacking * (fTimeResolution * 1.0e3);
+
+  // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
+  // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
+  // for a given set of parameters---which should be done outside of the parallelized loop.
+  // For all other functions it means a tiny and acceptable overhead.
+  time = fTheory->Func(time, par, fFuncValues);
+
+  #ifdef HAVE_GOMP
+  Int_t chunk = (fEndTimeBin - fStartTimeBin)/omp_get_num_procs();
+  if (chunk < 10)
+    chunk = 10;
+  #pragma omp parallel for default(shared) private(i,time,theo,data) schedule(dynamic,chunk) reduction(-:mllh)
+  #endif
+  for (i=fStartTimeBin; i<fEndTimeBin; ++i) {
+    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+    // calculate theory for the given parameter set
+    theo = N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg;
+    theo *= normalizer;
+
+    data = normalizer*fData.GetValue()->at(i);
+
+    if (theo <= 0.0) {
+      cerr << ">> PRunSingleHisto::CalcMaxLikelihood: **WARNING** NEGATIVE theory!!" << endl;
+      continue;
+    }
+
+    if (data > 1.0e-9) { // is this correct?? needs to be checked. See G-test
+      mllh += data*log(data/theo);
+    }
+  }
+
+  return 2.0*mllh;
+}
+
+//--------------------------------------------------------------------------
 // CalcTheory (public)
 //--------------------------------------------------------------------------
 /**
@@ -1571,7 +1668,6 @@ void PRunSingleHisto::EstimateN0()
   Double_t tau = PMUON_LIFETIME;
 
   UInt_t t0 = (UInt_t)round(fT0s[0]);
-  Double_t alpha = fMsrInfo->GetAlphaEstimateN0();
   Double_t dval = 0.0;
   Double_t nom = 0.0;
   Double_t denom = 0.0;
@@ -1580,14 +1676,12 @@ void PRunSingleHisto::EstimateN0()
   // calc nominator
   for (UInt_t i=t0; i<fForward.size(); i++) {
     xx = exp(-dt*(Double_t)(i-t0)/tau);
-    xx += alpha;
     nom += xx;
   }
 
   // calc denominator
   for (UInt_t i=t0; i<fForward.size(); i++) {
     xx = exp(-dt*(Double_t)(i-t0)/tau);
-    xx += alpha;
     dval = fForward[i];
     if (dval > 0)
       denom += xx*xx/dval;

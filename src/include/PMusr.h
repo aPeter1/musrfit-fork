@@ -815,12 +815,11 @@ typedef struct {
 
 //-------------------------------------------------------------
 /**
- * <p>Holds the informations for the any2many converter program
+ * <p>Holds the informations
  */
 typedef struct {
   Bool_t writeExpectedChisq; ///< if set to true, expected chisq per block will be written
   Bool_t estimateN0;         ///< if set to true, for single histogram fits N0 will be estimated
-  Double_t alphaEstimateN0;  ///< relates the Bkg to N0, i.e. Bkg = alpha*N0
 } PStartupOptions;
 
 //-------------------------------------------------------------

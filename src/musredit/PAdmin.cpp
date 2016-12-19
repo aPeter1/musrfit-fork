@@ -87,6 +87,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eTitleFromDataFile;
   } else if (qName == "musrview_show_fourier") {
     fKeyWord = eMusrviewShowFourier;
+  } else if (qName == "musrview_show_avg") {
+    fKeyWord = eMusrviewShowAvg;
   } else if (qName == "enable_musrt0") {
     fKeyWord = eEnableMusrT0;
   } else if (qName == "keep_minuit2_output") {
@@ -251,6 +253,13 @@ bool PAdminXMLParser::characters(const QString& str)
         flag = false;
       fAdmin->setMusrviewShowFourierFlag(flag);
       break;
+    case eMusrviewShowAvg:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setMusrviewShowAvgFlag(flag);
+    break;
     case eEnableMusrT0:
       if (str == "y")
         flag = true;
@@ -614,6 +623,7 @@ PAdmin::PAdmin() : QObject()
   fFileFormat = QString("");
 
   fMusrviewShowFourier = false;
+  fMusrviewShowAvg = false;
 
   fTitleFromDataFile  = false;
   fEnableMusrT0       = false;
@@ -836,6 +846,12 @@ int PAdmin::savePrefs(QString pref_fln)
           data[i] = "    <musrview_show_fourier>y</musrview_show_fourier>";
         else
           data[i] = "    <musrview_show_fourier>n</musrview_show_fourier>";
+      }
+      if (data[i].contains("<musrview_show_avg>") && data[i].contains("</musrview_show_avg>")) {
+        if (fMusrviewShowAvg)
+          data[i] = "    <musrview_show_avg>y</musrview_show_avg>";
+        else
+          data[i] = "    <musrview_show_avg>n</musrview_show_avg>";
       }
       if (data[i].contains("<enable_musrt0>") && data[i].contains("</enable_musrt0>")) {
         if (fEnableMusrT0)

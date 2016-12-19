@@ -37,7 +37,9 @@ using namespace std;
 #include "TF1.h"
 #include "TAxis.h"
 
-//#include "TFile.h"
+#include "Minuit2/FunctionMinimum.h"
+#include "Minuit2/MnUserParameters.h"
+#include "Minuit2/MnMinimize.h"
 
 #include "PMusr.h"
 #include "PFourier.h"
@@ -45,6 +47,227 @@ using namespace std;
 #define PI      3.14159265358979312
 #define PI_HALF 1.57079632679489656
 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// PFTPhaseCorrection
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+PFTPhaseCorrection::PFTPhaseCorrection(const Int_t minBin, const Int_t maxBin) :
+  fMinBin(minBin), fMaxBin(maxBin)
+{
+  Init();
+}
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+PFTPhaseCorrection::PFTPhaseCorrection(vector<Double_t> &reFT, vector<Double_t> &imFT, const Int_t minBin, const Int_t maxBin) :
+  fReal(reFT), fImag(imFT), fMinBin(minBin), fMaxBin(maxBin)
+{
+  Init();
+
+  if (fMinBin == -1)
+    fMinBin = 0;
+  if (fMaxBin == -1)
+    fMaxBin = fReal.size();
+  if (fMaxBin > fReal.size())
+    fMaxBin = fReal.size();
+
+  fRealPh.resize(fReal.size());
+  fImagPh.resize(fReal.size());
+}
+
+//--------------------------------------------------------------------------
+// Minimize (public)
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+void PFTPhaseCorrection::Minimize()
+{
+  // create Minuit2 parameters
+  ROOT::Minuit2::MnUserParameters upar;
+
+  upar.Add("c0", fPh_c0, 2.0);
+  upar.Add("c1", fPh_c1, 2.0);
+
+  // create minimizer
+  ROOT::Minuit2::MnMinimize mn_min(*this, upar);
+
+  // minimize
+  ROOT::Minuit2::FunctionMinimum min = mn_min();
+
+  if (min.IsValid()) {
+    fPh_c0 = min.UserState().Value("c0");
+    fPh_c1 = min.UserState().Value("c1");
+    fMin = min.Fval();
+  } else {
+    fMin = -1.0;
+    fValid = false;
+    cout << endl << ">> **WARNING** minimize failed to find a minimum for the real FT phase correction ..." << endl;
+    return;
+  }
+}
+
+//--------------------------------------------------------------------------
+// GetPhaseCorrectionParam (public)
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+Double_t PFTPhaseCorrection::GetPhaseCorrectionParam(UInt_t idx)
+{
+  Double_t result=0.0;
+
+  if (idx == 0)
+    result = fPh_c0;
+  else if (idx == 1)
+    result = fPh_c1;
+  else
+    cerr << ">> **ERROR** requested phase correction parameter with index=" << idx << " does not exist!" << endl;
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+// GetMinimum (public)
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+Double_t PFTPhaseCorrection::GetMinimum()
+{
+  if (!fValid) {
+    cerr << ">> **ERROR** requested minimum is invalid!" << endl;
+    return -1.0;
+  }
+
+  return fMin;
+}
+
+//--------------------------------------------------------------------------
+// Init (private)
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+void PFTPhaseCorrection::Init()
+{
+  fValid = true;
+  fPh_c0 = 0.0;
+  fPh_c1 = 0.0;
+  fGamma = 1.0;
+  fMin   = -1.0;
+}
+
+//--------------------------------------------------------------------------
+// CalcPhasedFT (private)
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+void PFTPhaseCorrection::CalcPhasedFT() const
+{
+  Double_t phi=0.0;
+  Double_t w=0.0;
+
+  for (UInt_t i=0; i<fRealPh.size(); i++) {
+    w = (Double_t)i / (Double_t)fReal.size();
+    phi = fPh_c0 + fPh_c1 * w;
+    fRealPh[i] = fReal[i]*cos(phi) - fImag[i]*sin(phi);
+    fImagPh[i] = fReal[i]*sin(phi) + fImag[i]*cos(phi);
+  }
+}
+
+//--------------------------------------------------------------------------
+// CalcRealPhFTDerivative (private)
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+void PFTPhaseCorrection::CalcRealPhFTDerivative() const
+{
+  fRealPhD.resize(fRealPh.size());
+
+  fRealPhD[0] = 1.0;
+  fRealPhD[fRealPh.size()-1] = 1.0;
+
+  for (UInt_t i=1; i<fRealPh.size()-1; i++)
+    fRealPhD[i] = fRealPh[i+1]-fRealPh[i];
+}
+
+//--------------------------------------------------------------------------
+// Penalty (private)
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+Double_t PFTPhaseCorrection::Penalty() const
+{
+  Double_t penalty = 0.0;
+
+  for (UInt_t i=fMinBin; i<fMaxBin; i++) {
+    if (fRealPh[i] < 0.0)
+      penalty += fRealPh[i]*fRealPh[i];
+  }
+
+  return fGamma*penalty;
+}
+
+//--------------------------------------------------------------------------
+// Entropy (private)
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+Double_t PFTPhaseCorrection::Entropy() const
+{
+  Double_t norm = 0.0;
+
+  for (UInt_t i=fMinBin; i<fMaxBin; i++)
+    norm += fabs(fRealPhD[i]);
+
+  Double_t entropy = 0.0;
+  Double_t dval = 0.0, hh = 0.0;
+
+  for (UInt_t i=fMinBin; i<fMaxBin; i++) {
+    dval = fabs(fRealPhD[i]);
+    if (dval > 1.0e-15) {
+      hh = dval / norm;
+      entropy -= hh * log(hh);
+    }
+  }
+
+  return entropy;
+}
+
+//--------------------------------------------------------------------------
+// operator() (private)
+//--------------------------------------------------------------------------
+/**
+ *
+ */
+double PFTPhaseCorrection::operator()(const vector<double> &par) const
+{
+  // par : [0]: c0, [1]: c1
+
+  fPh_c0 = par[0];
+  fPh_c1 = par[1];
+
+  CalcPhasedFT();
+  CalcRealPhFTDerivative();
+
+  return Entropy()+Penalty();
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// PFourier
 //--------------------------------------------------------------------------
 // Constructor
 //--------------------------------------------------------------------------
@@ -73,6 +296,7 @@ PFourier::PFourier(TH1F *data, Int_t unitTag, Double_t startTime, Double_t endTi
   fValid = true;
   fIn  = 0;
   fOut = 0;
+//as  fPhCorrectedReFT = 0;
 
   fApodization = F_APODIZATION_NONE;
 
@@ -160,6 +384,8 @@ PFourier::~PFourier()
     fftw_free(fIn);
   if (fOut)
     fftw_free(fOut);
+//as  if (fPhCorrectedReFT)
+//as    delete fPhCorrectedReFT;
 }
 
 //--------------------------------------------------------------------------
@@ -259,104 +485,100 @@ TH1F* PFourier::GetRealFourier(const Double_t scale)
 }
 
 //--------------------------------------------------------------------------
-// GetPhaseOptRealFourier (public)
+// GetPhaseOptRealFourier (public, static)
 //--------------------------------------------------------------------------
 /**
- * <p>returns the phase corrected real Fourier transform. The correction angle is
- * past back as well.
- * <p>Currently it simply does the following thing: (i) rotate the complex Fourier
- * transform through all angles in 1/2° steps, i.e.
- * \f$ f_{\rm rot} = (f_{\rm real} + i f_{\rm imag}) \exp(- \alpha)\f$,
- * hence \f$ f_{\rm rot} = f_{\rm real} \cos(\alpha) + f_{\rm imag} \sin(\alpha)\f$.
- * (ii) search the maximum of \f$ sum_{\alpha} {\cal R}\{f_{\rm rot}\}\f$ for all
- * \f$\alpha\f$. From this one gets \f$\alpha_{\rm opt}\f$. (iii) The 'optimal'
- * real Fourier transform is \f$f_{\rm opt} = (f_{\rm real} + i f_{\rm imag})
- * \exp(- \alpha_{\rm opt})\f$.
+ * <p>returns the phase corrected real Fourier transform.
  *
  * \return the TH1F histo of the phase 'optimzed' real Fourier transform.
  *
- * \param phase return value of the optimal phase
+ * \param re real part Fourier histogram
+ * \param im imaginary part Fourier histogram
+ * \param phase return value of the optimal phase dispersion phase[0]+phase[1]*i/N
  * \param scale normalisation factor
  * \param min minimal freq / field from which to optimise. Given in the choosen unit.
  * \param max maximal freq / field up to which to optimise. Given in the choosen unit.
  */
-TH1F* PFourier::GetPhaseOptRealFourier(Double_t &phase, const Double_t scale, const Double_t min, const Double_t max)
+TH1F* PFourier::GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, vector<Double_t> &phase,
+                                       const Double_t scale, const Double_t min, const Double_t max)
 {
-  UInt_t noOfFourierBins = 0;
-  if (fNoOfBins % 2 == 0)
-    noOfFourierBins = fNoOfBins/2;
-  else
-    noOfFourierBins = (fNoOfBins+1)/2;
+  if ((re == 0) || (im == 0))
+    return 0;
 
-  UInt_t minBin = 0;
-  UInt_t maxBin = noOfFourierBins;
+  phase.resize(2); // c0, c1
+
+  TAxis *axis = re->GetXaxis();
+
+  Int_t minBin = 1;
+  Int_t maxBin = axis->GetNbins();
+  Int_t noOfBins = axis->GetNbins();
+  Double_t res = axis->GetBinWidth(1);
 
   // check if minimum frequency is given. If yes, get the proper minBin
   if (min != -1.0) {
-    minBin = (UInt_t)(min/fResolution);
+    minBin = axis->FindFixBin(min);
+    if ((minBin == 0) || (minBin > maxBin)) {
+      minBin = 1;
+      cerr << "**WARNING** minimum frequency/field out of range. Will adopted it." << endl;
+    }
   }
 
   // check if maximum frequency is given. If yes, get the proper maxBin
   if (max != -1.0) {
-    maxBin = (UInt_t)(max/fResolution);
-    if (maxBin >= noOfFourierBins) {
-      maxBin = noOfFourierBins;
+    maxBin = axis->FindFixBin(max);
+    if ((maxBin == 0) || (maxBin > axis->GetNbins())) {
+      maxBin = axis->GetNbins();
       cerr << "**WARNING** maximum frequency/field out of range. Will adopted it." << endl;
     }
   }
 
   // copy the real/imag Fourier from min to max
   vector<Double_t> realF, imagF;
-  for (UInt_t i=minBin; i<=maxBin; i++) {
-    realF.push_back(fOut[i][0]);
-    imagF.push_back(fOut[i][1]);
+  for (Int_t i=minBin; i<=maxBin; i++) {
+    realF.push_back(re->GetBinContent(i));
+    imagF.push_back(im->GetBinContent(i));
   }
 
-  // rotate trough real/imag Fourier through 360° with a 1/2° resolution and keep the integral
-  Double_t rotRealIntegral[720];
-  Double_t sum = 0.0;
-  Double_t da = 8.72664625997164774e-03; // pi / 360
-  for (UInt_t i=0; i<720; i++) {
-    sum = 0.0;
-    for (UInt_t j=0; j<realF.size(); j++) {
-      sum += realF[j]*cos(da*i) + imagF[j]*sin(da*i);
-    }
-    rotRealIntegral[i] = sum;
+  // optimize real FT phase
+  PFTPhaseCorrection *phCorrectedReFT = new PFTPhaseCorrection(realF, imagF);
+  if (phCorrectedReFT == 0) {
+    cerr << endl << "**SEVERE ERROR** couldn't invoke PFTPhaseCorrection object." << endl;
+    return 0;
   }
 
-  // find the maximum in rotRealIntegral
-  Double_t maxRot = 0.0;
-  UInt_t maxRotBin = 0;
-  for (UInt_t i=0; i<720; i++) {
-    if (maxRot < rotRealIntegral[i]) {
-      maxRot = rotRealIntegral[i];
-      maxRotBin = i;
-    }
+  phCorrectedReFT->Minimize();
+  if (!phCorrectedReFT->IsValid()) {
+    cerr << endl << "**ERROR** could not find a valid phase correction minimum." << endl;
+    return 0;
   }
-
-  // keep the optimal phase
-  phase = maxRotBin*da;
+  phase[0] = phCorrectedReFT->GetPhaseCorrectionParam(0);
+  phase[1] = phCorrectedReFT->GetPhaseCorrectionParam(1);
 
   // clean up
+  if (phCorrectedReFT) {
+    delete phCorrectedReFT;
+    phCorrectedReFT = 0;
+  }
   realF.clear();
   imagF.clear();
 
   // invoke the real phase optimised histo to be filled. Caller is the owner!
   Char_t name[256];
   Char_t title[256];
-  snprintf(name, sizeof(name), "%s_Fourier_PhOptRe", fData->GetName());
-  snprintf(title, sizeof(title), "%s_Fourier_PhOptRe", fData->GetTitle());
+  snprintf(name, sizeof(name), "%s_Fourier_PhOptRe", re->GetName());
+  snprintf(title, sizeof(title), "%s_Fourier_PhOptRe", re->GetTitle());
 
-  TH1F *realPhaseOptFourier = new TH1F(name, title, noOfFourierBins, -fResolution/2.0, (Double_t)(noOfFourierBins-1)*fResolution+fResolution/2.0);
+  TH1F *realPhaseOptFourier = new TH1F(name, title, noOfBins, -res/2.0, (Double_t)(noOfBins-1)*res+res/2.0);
   if (realPhaseOptFourier == 0) {
-    fValid = false;
     cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the real part of the Fourier transform." << endl;
     return 0;
   }
 
   // fill realFourier vector
-  for (UInt_t i=0; i<noOfFourierBins; i++) {
-    realPhaseOptFourier->SetBinContent(i+1, scale*(fOut[i][0]*cos(phase) + fOut[i][1]*sin(phase)));
+  Double_t ph;
+  for (Int_t i=0; i<noOfBins; i++) {
+    ph = phase[0] + phase[1] * (Double_t)((Int_t)i-(Int_t)minBin) / (Double_t)(maxBin-minBin);
+    realPhaseOptFourier->SetBinContent(i+1, scale*(re->GetBinContent(i+1)*cos(ph) - im->GetBinContent(i+1)*sin(ph)));
     realPhaseOptFourier->SetBinError(i+1, 0.0);
   }
 

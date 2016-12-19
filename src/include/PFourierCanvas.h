@@ -71,7 +71,7 @@ typedef struct {
   TH1F *dataFourierPwr;          ///< power spectrum of the Fourier transform of the data histogram
   TH1F *dataFourierPhase;        ///< phase spectrum of the Fourier transform of the data histogram
   TH1F *dataFourierPhaseOptReal; ///< phase otpimized real Fourier transform of the data histogram
-  Double_t optPhase;             ///< optimal phase which maximizes the real Fourier
+  vector<Double_t> optPhase;     ///< optimal phase which maximizes the real Fourier
 } PFourierCanvasDataSet;
 
 //------------------------------------------------------------------------
@@ -159,6 +159,7 @@ class PFourierCanvas : public TObject, public TQObject
     virtual void InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
     virtual void CleanupAverage();
     virtual void HandleAverage();
+    virtual void CalcPhaseOptReal();
 
     virtual void PlotFourier();
     virtual void PlotFourierPhaseValue();
