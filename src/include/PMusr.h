@@ -815,10 +815,10 @@ typedef struct {
 
 //-------------------------------------------------------------
 /**
- * <p>Holds the informations
+ * <p>Holds information given at startup
  */
 typedef struct {
-  Bool_t writeExpectedChisq; ///< if set to true, expected chisq per block will be written
+  Bool_t writeExpectedChisq; ///< if set to true, expected chisq and chisq per block will be written
   Bool_t estimateN0;         ///< if set to true, for single histogram fits N0 will be estimated
 } PStartupOptions;
 
