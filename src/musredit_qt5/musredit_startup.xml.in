@@ -15,6 +15,7 @@
     <chisq_per_run_block>n</chisq_per_run_block>
     <estimate_n0>y</estimate_n0>
     <musrview_show_fourier>n</musrview_show_fourier>
+    <musrview_show_avg>n</musrview_show_avg>
     <enable_musrt0>y</enable_musrt0>
   </general>
   <recent_files>

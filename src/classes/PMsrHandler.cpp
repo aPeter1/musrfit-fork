@@ -6095,22 +6095,6 @@ Bool_t PMsrHandler::EstimateN0()
 }
 
 //--------------------------------------------------------------------------
-// GetAlphaEstimateN0 (public)
-//--------------------------------------------------------------------------
-/**
- * <p>returns alpha to estimate N0
- */
-/*as
-Double_t PMsrHandler::GetAlphaEstimateN0()
-{
-  if (fStartupOptions == 0)
-    return 0.0;
-
-  return fStartupOptions->alphaEstimateN0;
-}
-*/
-
-//--------------------------------------------------------------------------
 // NeededPrecision (private)
 //--------------------------------------------------------------------------
 /**

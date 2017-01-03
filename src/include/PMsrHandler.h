@@ -107,7 +107,6 @@ class PMsrHandler
 
     virtual void GetGroupingString(Int_t runNo, TString detector, TString &groupingStr);
     virtual Bool_t EstimateN0();
-//as    virtual Double_t GetAlphaEstimateN0();
 
   private:
     Bool_t                 fFourierOnly; ///< flag indicating if Fourier transform only is wished. If yes, some part of the msr-file blocks are not needed.
