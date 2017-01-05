@@ -33,7 +33,7 @@
     <item>
      <widget class="QTabWidget" name="fTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="fGeneral_tab">
        <attribute name="title">
@@ -45,7 +45,7 @@
           <x>10</x>
           <y>10</y>
           <width>421</width>
-          <height>25</height>
+          <height>35</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -121,9 +121,9 @@
        <widget class="QCheckBox" name="fTitleFromData_checkBox">
         <property name="geometry">
          <rect>
-          <x>170</x>
+          <x>190</x>
           <y>10</y>
-          <width>171</width>
+          <width>241</width>
           <height>23</height>
          </rect>
         </property>
@@ -134,9 +134,9 @@
        <widget class="QCheckBox" name="fPerRunBlockChisq_checkBox">
         <property name="geometry">
          <rect>
-          <x>170</x>
+          <x>190</x>
           <y>35</y>
-          <width>191</width>
+          <width>241</width>
           <height>22</height>
          </rect>
         </property>
@@ -147,9 +147,9 @@
        <widget class="QCheckBox" name="fEstimateN0_checkBox">
         <property name="geometry">
          <rect>
-          <x>170</x>
+          <x>190</x>
           <y>60</y>
-          <width>161</width>
+          <width>241</width>
           <height>22</height>
          </rect>
         </property>
@@ -167,7 +167,7 @@
          <rect>
           <x>10</x>
           <y>10</y>
-          <width>141</width>
+          <width>421</width>
           <height>22</height>
          </rect>
         </property>
@@ -180,7 +180,7 @@
          <rect>
           <x>10</x>
           <y>40</y>
-          <width>231</width>
+          <width>421</width>
           <height>21</height>
          </rect>
         </property>
