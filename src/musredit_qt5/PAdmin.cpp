@@ -296,6 +296,7 @@ bool PAdminXMLParser::characters(const QString& str)
         flag = true;
       else
         flag = false;
+      fAdmin->fMsr2DataParam.estimateN0 = flag;
       fAdmin->setEstimateN0Flag(flag);
       break;
     case eChisqPreRunBlock:
@@ -303,6 +304,7 @@ bool PAdminXMLParser::characters(const QString& str)
         flag = true;
       else
         flag = false;
+      fAdmin->fMsr2DataParam.perRunBlockChisq = flag;
       fAdmin->setChisqPerRunBlockFlag(flag);
       break;
     case eRecentFile:
@@ -641,8 +643,6 @@ PAdmin::PAdmin() : QObject()
   fEstimateN0         = true;
   fChisqPreRunBlock   = false;
 
-  fMsr2DataParam.firstRun = -1;
-  fMsr2DataParam.lastRun  = -1;
   fMsr2DataParam.runList  = QString("");
   fMsr2DataParam.runListFileName = QString("");
   fMsr2DataParam.msrFileExtension = QString("");
@@ -651,10 +651,12 @@ PAdmin::PAdmin() : QObject()
   fMsr2DataParam.writeDbHeader = true;
   fMsr2DataParam.ignoreDataHeaderInfo = false;
   fMsr2DataParam.keepMinuit2Output = false;
+  fMsr2DataParam.estimateN0 = fEstimateN0;
   fMsr2DataParam.writeColumnData = false;
   fMsr2DataParam.recreateDbFile = false;
   fMsr2DataParam.chainFit = true;
   fMsr2DataParam.openFilesAfterFitting = true;
+  fMsr2DataParam.perRunBlockChisq = fChisqPreRunBlock;
   fMsr2DataParam.titleFromDataFile = true;
   fMsr2DataParam.createMsrFileOnly = false;
   fMsr2DataParam.fitOnly = false;

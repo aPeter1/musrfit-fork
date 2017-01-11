@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>552</width>
+    <width>585</width>
     <height>594</height>
    </rect>
   </property>
@@ -25,8 +25,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>551</width>
-     <height>131</height>
+     <width>581</width>
+     <height>111</height>
     </rect>
    </property>
    <property name="font">
@@ -44,96 +44,16 @@
    <property name="checkable">
     <bool>false</bool>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>531</width>
-      <height>97</height>
+      <width>561</width>
+      <height>70</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QLabel" name="fFirst_label">
-         <property name="text">
-          <string>First</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="fFirst_lineEdit">
-         <property name="toolTip">
-          <string>start run number</string>
-         </property>
-         <property name="whatsThis">
-          <string>start run number</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="fLast_label">
-         <property name="text">
-          <string>Last</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="fLast_lineEdit">
-         <property name="toolTip">
-          <string>end run number</string>
-         </property>
-         <property name="statusTip">
-          <string>end run number</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>200</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="fOrFirstLast_label">
-         <property name="text">
-          <string>&lt;b&gt;OR&lt;/b&gt;</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::AutoText</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
@@ -219,8 +139,8 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>130</y>
-     <width>551</width>
+     <y>110</y>
+     <width>581</width>
      <height>71</height>
     </rect>
    </property>
@@ -232,8 +152,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>531</width>
-      <height>29</height>
+      <width>561</width>
+      <height>31</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -249,9 +169,12 @@
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
+       </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>40</width>
+         <width>30</width>
          <height>20</height>
         </size>
        </property>
@@ -284,8 +207,8 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>200</y>
-     <width>551</width>
+     <y>180</y>
+     <width>581</width>
      <height>80</height>
     </rect>
    </property>
@@ -297,8 +220,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>531</width>
-      <height>29</height>
+      <width>561</width>
+      <height>31</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -346,8 +269,8 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>280</y>
-     <width>551</width>
+     <y>260</y>
+     <width>581</width>
      <height>80</height>
     </rect>
    </property>
@@ -359,8 +282,8 @@
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>531</width>
-      <height>29</height>
+      <width>561</width>
+      <height>31</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -401,9 +324,9 @@
    <property name="geometry">
     <rect>
      <x>0</x>
-     <y>360</y>
-     <width>551</width>
-     <height>171</height>
+     <y>340</y>
+     <width>581</width>
+     <height>191</height>
     </rect>
    </property>
    <property name="title">
@@ -414,8 +337,8 @@
      <rect>
       <x>6</x>
       <y>20</y>
-      <width>541</width>
-      <height>116</height>
+      <width>560</width>
+      <height>131</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_9">
@@ -451,6 +374,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="fEstimateN0_checkBox">
+         <property name="text">
+          <string>Estimate N0</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item>
@@ -482,6 +412,13 @@
          </property>
          <property name="text">
           <string>Open Files after Fitting</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="fWritePerRunBlockChisq_checkBox">
+         <property name="text">
+          <string>Write per-run-block Chisq</string>
          </property>
         </widget>
        </item>
@@ -551,7 +488,7 @@
     <property name="geometry">
      <rect>
       <x>9</x>
-      <y>143</y>
+      <y>160</y>
       <width>141</width>
       <height>16</height>
      </rect>
@@ -566,9 +503,9 @@
    <widget class="QLineEdit" name="fParamList_lineEdit">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>140</y>
-      <width>395</width>
+      <x>164</x>
+      <y>157</y>
+      <width>401</width>
       <height>23</height>
      </rect>
     </property>
@@ -582,7 +519,7 @@
     <rect>
      <x>5</x>
      <y>540</y>
-     <width>541</width>
+     <width>571</width>
      <height>51</height>
     </rect>
    </property>
@@ -636,8 +573,6 @@
   </widget>
  </widget>
  <tabstops>
-  <tabstop>fFirst_lineEdit</tabstop>
-  <tabstop>fLast_lineEdit</tabstop>
   <tabstop>fRunList_lineEdit</tabstop>
   <tabstop>fRunListFileName_lineEdit</tabstop>
   <tabstop>fMsrFileExtension_lineEdit</tabstop>
@@ -709,38 +644,6 @@
     <hint type="destinationlabel">
      <x>96</x>
      <y>370</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fFirst_lineEdit</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>PMsr2DataDialog</receiver>
-   <slot>runFirstEntered(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>82</x>
-     <y>44</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>113</x>
-     <y>504</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>fLast_lineEdit</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>PMsr2DataDialog</receiver>
-   <slot>runLastEntered(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>229</x>
-     <y>44</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>348</x>
-     <y>500</y>
     </hint>
    </hints>
   </connection>
