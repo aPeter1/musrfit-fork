@@ -850,7 +850,9 @@ void PTextEdit::fileOpen()
   }
 
   // in case there is a 1st empty tab "noname", remove it
-  if (fTabWidget->tabText(0) == "noname") { // has to be the first, otherwise do nothing
+  QString tabStr = fTabWidget->tabText(0);
+  tabStr.remove('&'); // this is needed since the QTabWidget adds short-cut info as '&' to the tab name
+  if (tabStr == "noname") { // has to be the first, otherwise do nothing
     fFileSystemWatcher->removePath("noname");
 
     delete fTabWidget->widget(0);
@@ -864,12 +866,15 @@ void PTextEdit::fileOpen()
 void PTextEdit::fileOpenRecent()
 {
   QAction *action = qobject_cast<QAction *>(sender());
+
   if (action) {
     // check if this file is already open and if so, switch the tab
     QFileInfo finfo1, finfo2;
     QString tabFln;
     bool alreadyOpen = false;
-    finfo1.setFile(action->text());
+    QString fln = action->text();
+    fln.remove('&');
+    finfo1.setFile(fln);
 
     for (int i=0; i<fTabWidget->count(); i++) {
       tabFln = *fFilenames.find( dynamic_cast<PSubTextEdit*>(fTabWidget->widget(i)));
@@ -881,17 +886,25 @@ void PTextEdit::fileOpenRecent()
       }
     }
 
-    if (!alreadyOpen)
-      load(action->text());
-    else
+    if (!alreadyOpen) {
+      // make sure the file exists
+      if (!finfo1.exists()) {
+        QMessageBox::critical(this, "ERROR", QString("File '%1' does not exist.\nWill not do anything.").arg(fln));
+        return;
+      }
+      load(fln);
+    } else {
       fileReload();
-  }
+    }
 
-  // in case there is a 1st empty tab "noname", remove it
-  if (fTabWidget->tabText(0) == "noname") { // has to be the first, otherwise do nothing
-    fFileSystemWatcher->removePath("noname");
+    // in case there is a 1st empty tab "noname", remove it
+    fln = fTabWidget->tabText(0);
+    fln.remove("&");
+    if (fln == "noname") { // has to be the first, otherwise do nothing
+      fFileSystemWatcher->removePath("noname");
 
-    delete fTabWidget->widget(0);
+      delete fTabWidget->widget(0);
+    }
   }
 }
 
