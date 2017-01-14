@@ -929,13 +929,20 @@ int main(int argc, char *argv[])
   }
 
   bool found_fln = false;
-  // 1st check if the file name is found in the current directory
   string pathFln("");
-  pathFln = "./" + fileName;
+  // 1st check if the file name is the full path-file name and the file exists
+  pathFln = fileName;
   if (dump_file_exists(pathFln))
     found_fln = true;
 
-  // 2nd check if file name is found in any default search paths if not already found in the current directory
+  // 2nd check if the file name is found in the current directory
+  if (!found_fln) {
+    pathFln = "./" + fileName;
+    if (dump_file_exists(pathFln))
+      found_fln = true;
+  }
+
+  // 3rd check if file name is found in any default search paths if not already found in the current directory
   if (!found_fln) {
     PStringVector pathList = startupHandler->GetDataPathList();
     for (unsigned int i=0; i<pathList.size(); i++) {

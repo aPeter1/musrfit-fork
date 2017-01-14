@@ -2488,6 +2488,7 @@ void PTextEdit::musrDump()
   QVector<QString> cmd;
   QString str = fAdmin->getExecPath() + "/dump_header";
   cmd.append(str);
+  cmd.append("-fn");
   cmd.append(fileName);
 
   PDumpOutputHandler dumpOutputHandler(cmd);
