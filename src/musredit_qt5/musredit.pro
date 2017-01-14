@@ -104,6 +104,7 @@ HEADERS = musredit.h \
     PGetFourierBlockDialog.h \
     PGetPlotBlockDialog.h \
     PMsr2DataDialog.h \
+    PChangeDefaultPathsDialog.h \
     PMusrEditAbout.h
 
 SOURCES = PHelp.cpp \ 
@@ -128,6 +129,7 @@ SOURCES = PHelp.cpp \
     PGetFourierBlockDialog.cpp \
     PGetPlotBlockDialog.cpp \
     PMsr2DataDialog.cpp \
+    PChangeDefaultPathsDialog.cpp \
     PMusrEditAbout.cpp \
     main.cpp 
 
@@ -147,7 +149,8 @@ FORMS = forms/PFindDialog.ui \
     forms/PGetNonMusrRunBlockDialog.ui \
     forms/PGetFourierBlockDialog.ui \
     forms/PGetPlotBlockDialog.ui \
-    forms/PMsr2DataDialog.ui
+    forms/PMsr2DataDialog.ui \
+    forms/PChangeDefaultPathsDialog.ui
 
 RESOURCES = musredit.qrc
 

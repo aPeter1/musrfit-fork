@@ -33,7 +33,7 @@
     <item>
      <widget class="QTabWidget" name="fTabWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="fGeneral_tab">
        <attribute name="title">
@@ -73,6 +73,19 @@
           </spacer>
          </item>
         </layout>
+       </widget>
+       <widget class="QPushButton" name="fDefaultPath_pushButton">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>421</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Change Default Search Paths</string>
+        </property>
        </widget>
       </widget>
       <widget class="QWidget" name="fMusrfit_tab">

@@ -27,6 +27,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "PChangeDefaultPathsDialog.h"
 #include "PPrefsDialog.h"
 
 //----------------------------------------------------------------------------------------------------
@@ -66,6 +67,8 @@ PPrefsDialog::PPrefsDialog(PAdmin *admin) : fAdmin(admin)
 
   fTimeout_lineEdit->setText(QString("%1").arg(fAdmin->getTimeout()));
   fTimeout_lineEdit->setValidator(new QIntValidator(fTimeout_lineEdit));
+
+  QObject::connect(fDefaultPath_pushButton, SIGNAL(clicked()), this, SLOT(handleDefaultPaths()));
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -104,6 +107,22 @@ void PPrefsDialog::dumpRoot()
 {
   if (fDumpRoot_checkBox->isChecked())
     fDumpAscii_checkBox->setChecked(false);
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ *<p>SLOT: called when the QPushButton 'Change Default Search Paths' is clicked. Will call a
+ * dialog which allows to deal with the default search paths to look for data files.
+ */
+void PPrefsDialog::handleDefaultPaths()
+{
+  PChangeDefaultPathsDialog *dlg = new PChangeDefaultPathsDialog();
+
+  if (dlg->exec() == QDialog::Accepted) {
+
+  }
+
+  delete dlg;
 }
 
 //----------------------------------------------------------------------------------------------------
