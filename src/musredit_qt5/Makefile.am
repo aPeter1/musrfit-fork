@@ -2,4 +2,3 @@
 
 CLEANFILES = *~ core moc_* ui_*
 
-

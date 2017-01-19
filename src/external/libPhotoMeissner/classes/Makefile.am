@@ -20,6 +20,11 @@ dict_cpp_sources = \
   PStartupHandler_PMDict.cpp \
   PPhotoMeissnerDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  PPhotoMeissnerDict_rdict.pcm \
+  PStartupHandler_PMDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 

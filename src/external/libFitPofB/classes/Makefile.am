@@ -33,6 +33,12 @@ dict_cpp_sources = \
   TSkewedGssDict.cpp \
   TVortexDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  TLondon1DDict_rdict.pcm \
+  TSkewedGssDict_rdict.pcm \
+  TVortexDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
@@ -41,7 +47,7 @@ AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
-CLEANFILES = *Dict.cpp *Dict.h *~ ../include/*~ core
+CLEANFILES = *Dict.cpp *Dict.h *Dict* *~ ../include/*~ core
 
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h
 	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^

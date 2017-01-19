@@ -60,6 +60,11 @@ PDumpOutputHandler::PDumpOutputHandler(QVector<QString> &cmd)
   // QProcess related code
   fProc = new QProcess( this );
 
+  // make sure that the system environment variables are properly set
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+  fProc->setProcessEnvironment(env);
+
   // Set up the command and arguments.
   QString program = cmd[0];
   QStringList arguments;
@@ -68,6 +73,7 @@ PDumpOutputHandler::PDumpOutputHandler(QVector<QString> &cmd)
 
   connect( fProc, SIGNAL( readyReadStandardOutput() ), this, SLOT( readFromStdOut() ) );
   connect( fProc, SIGNAL( readyReadStandardError() ), this, SLOT( readFromStdErr() ) );
+
 
   fProc->start(program, arguments);
   if ( !fProc->waitForStarted() ) {

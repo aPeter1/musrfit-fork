@@ -57,8 +57,8 @@ class PPhotoMeissner : public PUserFcnBase
 
     Bool_t   fValid;      ///< flag indicating if initialization went through smoothly
 
-    static const Double_t fDegToRad = 0.0174532925199432955;
-    static const Double_t fTwoPi = 6.28318530717958623;
+    constexpr static const Double_t fDegToRad = 0.0174532925199432955;
+    constexpr static const Double_t fTwoPi = 6.28318530717958623;
 
     Double_t InuMinus(const Double_t nu, const Double_t x) const;
     Double_t FieldFilm(const Double_t z, const vector<Double_t> &par) const;

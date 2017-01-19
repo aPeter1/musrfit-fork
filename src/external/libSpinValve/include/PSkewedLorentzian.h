@@ -59,8 +59,8 @@ class PSkewedLorentzian : public PUserFcnBase
     UInt_t   fNoOfFields; ///< number of sampling points in field around the Lorentzian peak
     Double_t fRange;      ///< range in which the sampling points are placed, given in units of \beta(1\pm\Delta)
 
-    static const Double_t fDegToRad = 0.0174532925199432955;
-    static const Double_t fTwoPi = 6.28318530717958623;
+    constexpr static const Double_t fDegToRad = 0.0174532925199432955;
+    constexpr static const Double_t fTwoPi = 6.28318530717958623;
 
   // definition of the class for the ROOT dictionary
   ClassDef(PSkewedLorentzian, 1)

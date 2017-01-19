@@ -205,7 +205,7 @@ typedef            long int      Int32;
 #else /* other operating system */
 
 /* 32 bit word length */
-#if (defined(_WIN32) || defined(__linux__) || defined(_WIN32GCC))
+#if (defined(_WIN32) || defined(__linux__) || defined(_Darwin_) || defined(_WIN32GCC))
 typedef                 short    Int16;
 typedef                 int      Int32;
 #else

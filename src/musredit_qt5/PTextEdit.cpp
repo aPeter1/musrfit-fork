@@ -850,7 +850,9 @@ void PTextEdit::fileOpen()
   }
 
   // in case there is a 1st empty tab "noname", remove it
-  if (fTabWidget->tabText(0) == "noname") { // has to be the first, otherwise do nothing
+  QString tabStr = fTabWidget->tabText(0);
+  tabStr.remove('&'); // this is needed since the QTabWidget adds short-cut info as '&' to the tab name
+  if (tabStr == "noname") { // has to be the first, otherwise do nothing
     fFileSystemWatcher->removePath("noname");
 
     delete fTabWidget->widget(0);
@@ -864,12 +866,15 @@ void PTextEdit::fileOpen()
 void PTextEdit::fileOpenRecent()
 {
   QAction *action = qobject_cast<QAction *>(sender());
+
   if (action) {
     // check if this file is already open and if so, switch the tab
     QFileInfo finfo1, finfo2;
     QString tabFln;
     bool alreadyOpen = false;
-    finfo1.setFile(action->text());
+    QString fln = action->text();
+    fln.remove('&');
+    finfo1.setFile(fln);
 
     for (int i=0; i<fTabWidget->count(); i++) {
       tabFln = *fFilenames.find( dynamic_cast<PSubTextEdit*>(fTabWidget->widget(i)));
@@ -881,17 +886,25 @@ void PTextEdit::fileOpenRecent()
       }
     }
 
-    if (!alreadyOpen)
-      load(action->text());
-    else
+    if (!alreadyOpen) {
+      // make sure the file exists
+      if (!finfo1.exists()) {
+        QMessageBox::critical(this, "ERROR", QString("File '%1' does not exist.\nWill not do anything.").arg(fln));
+        return;
+      }
+      load(fln);
+    } else {
       fileReload();
-  }
+    }
 
-  // in case there is a 1st empty tab "noname", remove it
-  if (fTabWidget->tabText(0) == "noname") { // has to be the first, otherwise do nothing
-    fFileSystemWatcher->removePath("noname");
+    // in case there is a 1st empty tab "noname", remove it
+    fln = fTabWidget->tabText(0);
+    fln.remove("&");
+    if (fln == "noname") { // has to be the first, otherwise do nothing
+      fFileSystemWatcher->removePath("noname");
 
-    delete fTabWidget->widget(0);
+      delete fTabWidget->widget(0);
+    }
   }
 }
 
@@ -1866,6 +1879,8 @@ void PTextEdit::musrMsr2Data()
   // init fMsr2DataParam
   fMsr2DataParam->keepMinuit2Output = fAdmin->getKeepMinuit2OutputFlag();
   fMsr2DataParam->titleFromDataFile = fAdmin->getTitleFromDataFileFlag();
+  fMsr2DataParam->estimateN0 = fAdmin->getEstimateN0Flag();
+  fMsr2DataParam->perRunBlockChisq = fAdmin->getChisqPerRunBlockFlag();
 
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam, fAdmin->getHelpUrl("msr2data"));
 
@@ -1887,6 +1902,8 @@ void PTextEdit::musrMsr2Data()
     fMsr2DataParam = dlg->getMsr2DataParam();
     fAdmin->setKeepMinuit2OutputFlag(fMsr2DataParam->keepMinuit2Output);
     fAdmin->setTitleFromDataFileFlag(fMsr2DataParam->titleFromDataFile);
+    fAdmin->setEstimateN0Flag(fMsr2DataParam->estimateN0);
+    fAdmin->setChisqPerRunBlockFlag(fMsr2DataParam->perRunBlockChisq);
 
     // analyze parameters
     switch (dlg->getRunTag()) {
@@ -1896,20 +1913,10 @@ void PTextEdit::musrMsr2Data()
            QMessageBox::Ok, QMessageBox::NoButton);
         return;
         break;
-      case 0:  // first last
-        first = QString("%1").arg(fMsr2DataParam->firstRun);
-        last  = QString("%1").arg(fMsr2DataParam->lastRun);
-        if (first.isEmpty() || last.isEmpty()) {
-          QMessageBox::critical(this, "**ERROR**",
-            "If you choose the first/last option,\nfirst AND last needs to be provided.",
-            QMessageBox::Ok, QMessageBox::NoButton);
-          return;
-        }
-        break;
-      case 1:  // run list
+      case 0:  // run list
         runList = fMsr2DataParam->runList;
         break;
-      case 2:  // run list file name
+      case 1:  // run list file name
         runListFileName = fMsr2DataParam->runListFileName;
         fi.setFile(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + runListFileName);
         if (!fi.exists()) {
@@ -1936,10 +1943,6 @@ void PTextEdit::musrMsr2Data()
     // run list argument
     switch (dlg->getRunTag()) {
       case 0:
-        cmd.append(first);
-        cmd.append(last);
-        break;
-      case 1:
         end = 0;
         while (!runList.section(' ', end, end, QString::SectionSkipEmpty).isEmpty()) {
           end++;
@@ -1960,7 +1963,7 @@ void PTextEdit::musrMsr2Data()
           cmd.append(str);
         }
         break;
-      case 2:
+      case 1:
         cmd.append(runListFileName);
         break;
       default:
@@ -2025,6 +2028,16 @@ void PTextEdit::musrMsr2Data()
       cmd.append("-t");
     }
 
+    // estimate N0 (makes sence for single histo and muMinus fits only). Add flag only if a fit is done
+    if (fMsr2DataParam->estimateN0 && (fMsr2DataParam->fitOnly || fMsr2DataParam->templateRunNo != -1)) {
+      cmd.append("-e");
+    }
+
+    // write per-run-block chisq. Add flag only if a fit is done
+    if (fMsr2DataParam->perRunBlockChisq && (fMsr2DataParam->fitOnly || fMsr2DataParam->templateRunNo != -1)) {
+      cmd.append("-p");
+    }
+
     // DB output wished
     if (!fMsr2DataParam->dbOutputFileName.isEmpty()) {
       str = "-o" + fMsr2DataParam->dbOutputFileName;
@@ -2068,19 +2081,7 @@ void PTextEdit::musrMsr2Data()
 
       if (!fMsr2DataParam->global) { // standard fits
         switch(dlg->getRunTag()) {
-          case 0: // first run / last run list
-            if (fMsr2DataParam->firstRun != -1) {
-              for (int i=fMsr2DataParam->firstRun; i<=fMsr2DataParam->lastRun; i++) {
-                if (fMsr2DataParam->msrFileExtension.isEmpty())
-                  fln = QString("%1").arg(i) + ".msr";
-                else
-                  fln = QString("%1").arg(i) + fMsr2DataParam->msrFileExtension + ".msr";
-
-                load(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fln);
-              }
-            }
-            break;
-          case 1: // run list
+          case 0: // run list
             list = getRunList(runList, ok);
             if (!ok)
               return;
@@ -2094,7 +2095,7 @@ void PTextEdit::musrMsr2Data()
               load(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fln);
             }
             break;
-          case 2: // run list file
+          case 1: // run list file
             file = new QFile(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fMsr2DataParam->runListFileName);
             if (!file->open(QIODevice::ReadOnly)) {
               str = QString("Couldn't open run list file %1, sorry.").arg(fMsr2DataParam->runListFileName);
@@ -2130,13 +2131,10 @@ void PTextEdit::musrMsr2Data()
         // get the first run number needed to build the global fit file name
         fln = QString("");
         switch(dlg->getRunTag()) {
-          case 0: // first/last run
-            fln = QString("%1").arg(fMsr2DataParam->firstRun) + QString("+global") + fMsr2DataParam->msrFileExtension + QString(".msr");
-            break;
-          case 1: // run list
+          case 0: // run list
             fln = runList.section(" ", 0, 0, QString::SectionSkipEmpty) + QString("+global") + fMsr2DataParam->msrFileExtension + QString(".msr");
             break;
-          case 2: // run list file name
+          case 1: // run list file name
             file = new QFile(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fMsr2DataParam->runListFileName);
             if (!file->open(QIODevice::ReadOnly)) {
               str = QString("Couldn't open run list file %1, sorry.").arg(fMsr2DataParam->runListFileName);
@@ -2237,7 +2235,7 @@ void PTextEdit::musrView()
                           tr("Quit") );
     return;
   }
-}
+ }
 
 //----------------------------------------------------------------------------------------------------
 /**
@@ -2490,6 +2488,7 @@ void PTextEdit::musrDump()
   QVector<QString> cmd;
   QString str = fAdmin->getExecPath() + "/dump_header";
   cmd.append(str);
+  cmd.append("-fn");
   cmd.append(fileName);
 
   PDumpOutputHandler dumpOutputHandler(cmd);

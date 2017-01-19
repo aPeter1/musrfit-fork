@@ -20,6 +20,11 @@ dict_cpp_sources = \
   PStartupHandler_SVDict.cpp \
   PSkewedLorentzianDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  PStartupHandler_SVDict_rdict.pcm \
+  PSkewedLorentzianDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 

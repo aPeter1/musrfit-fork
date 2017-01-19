@@ -84,6 +84,14 @@ dict_cpp_sources = \
 dict_cpp_sources_userFcn = \
   PUserFcnBaseDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  PFourierCanvasDict_rdict.pcm \
+  PMusrCanvasDict_rdict.pcm \
+  PMusrT0Dict_rdict.pcm \
+  PStartupHandlerDict_rdict.pcm \
+  PUserFcnBaseDict_rdict.pcm
+
 include_HEADERS = $(h_sources) $(h_sources_userFcn)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources) $(h_linkdef_userFcn) $(dict_h_sources_userFcn)
 
@@ -92,7 +100,7 @@ AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources) $(dict_cpp_sources_userFcn) $(dict_h_sources_userFcn)
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
-CLEANFILES = *Dict.cpp *Dict.h *~ core
+CLEANFILES = *Dict.cpp *Dict.h *Dict* *~ core
 
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h
 	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^

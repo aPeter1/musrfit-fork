@@ -68,7 +68,7 @@ using namespace boost::algorithm;
  */
 bool isNumber(const string &s)
 {
-  unsigned int number;
+  unsigned int number(0);
   try {
     number = boost::lexical_cast<unsigned int>(s);
     return true;
@@ -123,8 +123,10 @@ void msr2data_syntax()
   cout << endl << "              the successive files are generated using the musrfit output from the preceding runs";
   cout << endl << "       msr-<template> : same as above without calling musrfit";
   cout << endl << "              In case any fitting option is present, this option is ignored!";
-  cout << endl << "       -k : if fitting is used, pass the option --keep-mn2-output to musrfit";
-  cout << endl << "       -t : if fitting is used, pass the option --title-from-data-file to musrfit";
+  cout << endl << "       -k, --keep-mn2-output : if fitting is used, pass the option --keep-mn2-output to musrfit";
+  cout << endl << "       -t, --title-from-data-file : if fitting is used, pass the option --title-from-data-file to musrfit";
+  cout << endl << "       -e, --estimateN0: estimate N0 for single histogram fits.";
+  cout << endl << "       -p, --per-run-block-chisq: will per run block chisq to the msr-file.";
   cout << endl;
   cout << endl << "       global : switch on the global-fit mode";
   cout << endl << "              Within that mode all specified runs will be united in a single msr file!";
@@ -216,7 +218,10 @@ string msr2data_validArguments(const vector<string> &arg)
 
   for (vector<string>::const_iterator iter(arg.begin()); iter != arg.end(); ++iter) {
     if ( (!iter->compare("header")) || (!iter->compare("noheader")) || (!iter->compare("nosummary")) \
-      || (!iter->substr(0,3).compare("fit")) || (!iter->compare("-k")) || (!iter->compare("-t")) \
+      || (!iter->substr(0,3).compare("fit")) || (!iter->compare("-k")) || (!iter->compare("--keep-mn2-output")) \
+      || (!iter->compare("-t")) || (!iter->compare("--title-from-data-file")) \
+      || (!iter->compare("-e")) || (!iter->compare("--estimateN0")) \
+      || (!iter->compare("-p")) || (!iter->compare("--per-run-block-chisq")) \
       || (!iter->compare("data")) || (!iter->substr(0,4).compare("msr-")) || (!iter->compare("global")) \
       || (!iter->compare("global+")) || (!iter->compare("global+!")) || (!iter->compare("new")) \
       || !iter->compare("paramList") )
@@ -265,6 +270,7 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
       if (!iter->compare("-o")) {
         if ((iterNext != arg.end()) && (iterNext->compare("header")) && (iterNext->compare("noheader")) && (iterNext->compare("nosummary")) \
             && (iterNext->substr(0,3).compare("fit")) && (iterNext->compare("-k")) && (iterNext->compare("-t")) \
+            && (iterNext->compare("-e")) && (iterNext->compare("-p")) \
             && (iterNext->compare("data")) && (iterNext->substr(0,3).compare("msr")) && (iterNext->compare("global")) \
             && (iterNext->compare("global+")) && (iterNext->compare("global+!")) && (iterNext->compare("new"))) {
           outputFile = *iterNext;
@@ -741,10 +747,14 @@ int main(int argc, char *argv[])
 
   // check if any options should be passed to musrfit
   if (temp) {
-    if (!msr2data_useOption(arg, "-k"))
+    if (!msr2data_useOption(arg, "-k") || !msr2data_useOption(arg, "--keep-mn2-output"))
       musrfitOptions.append("-k ");
-    if (!msr2data_useOption(arg, "-t"))
+    if (!msr2data_useOption(arg, "-t") || !msr2data_useOption(arg, "--title-from-data-file"))
       musrfitOptions.append("-t ");
+    if (!msr2data_useOption(arg, "-e") || !msr2data_useOption(arg, "--estimateN0"))
+      musrfitOptions.append("-e ");
+    if (!msr2data_useOption(arg, "-p") || !msr2data_useOption(arg, "--per-run-block-chisq"))
+      musrfitOptions.append("-p ");
   }
 
   // if no fitting should be done, check if only the input files should be created

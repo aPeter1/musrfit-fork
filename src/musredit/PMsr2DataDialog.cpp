@@ -54,18 +54,6 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString he
 
   fRunTag = -1;
 
-  fFirst_lineEdit->setValidator( new QIntValidator(fFirst_lineEdit) );
-  if (fMsr2DataParam->firstRun != -1) {
-    str = QString("%1").arg(fMsr2DataParam->firstRun);
-    fFirst_lineEdit->setText(str);
-  }
-
-  fLast_lineEdit->setValidator( new QIntValidator(fLast_lineEdit) );
-  if (fMsr2DataParam->lastRun != -1) {
-    str = QString("%1").arg(fMsr2DataParam->lastRun);
-    fLast_lineEdit->setText(str);
-  }
-
   if (!fMsr2DataParam->runListFileName.isEmpty()) {
     fRunListFileName_lineEdit->setText(fMsr2DataParam->runListFileName);
   }
@@ -95,10 +83,12 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString he
   fWriteDataHeader_checkBox->setChecked(fMsr2DataParam->writeDbHeader);
   fIgnoreDataHeaderInfo_checkBox->setChecked(fMsr2DataParam->ignoreDataHeaderInfo);
   fKeepMinuit2Output_checkBox->setChecked(fMsr2DataParam->keepMinuit2Output);
+  fEstimateN0_checkBox->setChecked(fMsr2DataParam->estimateN0);
   fWriteColumnData_checkBox->setChecked(fMsr2DataParam->writeColumnData);
   fRecreateDataFile_checkBox->setChecked(fMsr2DataParam->recreateDbFile);
   fChainFit_checkBox->setChecked(fMsr2DataParam->chainFit);
   fOpenFilesAfterFitting_checkBox->setChecked(fMsr2DataParam->openFilesAfterFitting);
+  fWritePerRunBlockChisq_checkBox->setChecked(fMsr2DataParam->perRunBlockChisq);
   fTitleFromData_checkBox->setChecked(fMsr2DataParam->titleFromDataFile);
   fCreateMsrFileOnly_checkBox->setChecked(fMsr2DataParam->createMsrFileOnly);
   fFitOnly_checkBox->setChecked(fMsr2DataParam->fitOnly);
@@ -115,16 +105,6 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString he
  */
 PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
 {
-  if (fFirst_lineEdit->text().isEmpty()) {
-    fMsr2DataParam->firstRun = -1;
-  } else {
-    fMsr2DataParam->firstRun = fFirst_lineEdit->text().toInt();
-  }
-  if (fLast_lineEdit->text().isEmpty()) {
-    fMsr2DataParam->lastRun  = -1;
-  } else {
-    fMsr2DataParam->lastRun  = fLast_lineEdit->text().toInt();
-  }
   fMsr2DataParam->runList  = fRunList_lineEdit->text();
   fMsr2DataParam->runListFileName = fRunListFileName_lineEdit->text();
   fMsr2DataParam->msrFileExtension = fMsrFileExtension_lineEdit->text();
@@ -138,10 +118,12 @@ PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
   fMsr2DataParam->writeDbHeader = fWriteDataHeader_checkBox->isChecked();
   fMsr2DataParam->ignoreDataHeaderInfo = fIgnoreDataHeaderInfo_checkBox->isChecked();
   fMsr2DataParam->keepMinuit2Output = fKeepMinuit2Output_checkBox->isChecked();
+  fMsr2DataParam->estimateN0 = fEstimateN0_checkBox->isChecked();
   fMsr2DataParam->writeColumnData = fWriteColumnData_checkBox->isChecked();
   fMsr2DataParam->recreateDbFile = fRecreateDataFile_checkBox->isChecked();
   fMsr2DataParam->chainFit = fChainFit_checkBox->isChecked();
   fMsr2DataParam->openFilesAfterFitting = fOpenFilesAfterFitting_checkBox->isChecked();
+  fMsr2DataParam->perRunBlockChisq = fWritePerRunBlockChisq_checkBox->isChecked();
   fMsr2DataParam->titleFromDataFile = fTitleFromData_checkBox->isChecked();
   fMsr2DataParam->createMsrFileOnly = fCreateMsrFileOnly_checkBox->isChecked();
   fMsr2DataParam->fitOnly = fFitOnly_checkBox->isChecked();
@@ -149,50 +131,6 @@ PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
   fMsr2DataParam->globalPlus = fGlobalPlus_checkBox->isChecked();
 
   return fMsr2DataParam;
-}
-
-//----------------------------------------------------------------------------------------------------
-/**
- * <p>SLOT: called when in the 'Run List Input', the 'First' text field is activated. It clears any
- * entries in 'Run List' and 'Run List File Name'. It furthermore sets the run tag.
- *
- * \param str string content of the QTextEdit field.
- */
-void PMsr2DataDialog::runFirstEntered(const QString &str)
-{
-
-  if (str.length() == 0)
-    return;
-
-  fRunTag = 0;
-
-  if (!fRunList_lineEdit->text().isEmpty())
-    fRunList_lineEdit->clear();
-  if (!fRunListFileName_lineEdit->text().isEmpty())
-    fRunListFileName_lineEdit->clear();
-}
-
-//----------------------------------------------------------------------------------------------------
-/**
- * <p>SLOT: called when in the 'Run List Input', the 'Last' text field is activated. It clears any
- * entries in 'Run List' and 'Run List File Name'. It furthermore sets the run tag.
- *
- * \param str string content of the QTextEdit field.
- */
-void PMsr2DataDialog::runLastEntered(const QString &str)
-{
-  if (str.length() == 0)
-    return;
-
-  fRunTag = 0;
-
-  if (!fRunList_lineEdit->text().isEmpty())
-    fRunList_lineEdit->clear();
-  if (!fRunListFileName_lineEdit->text().isEmpty())
-    fRunListFileName_lineEdit->clear();
-
-  if (fLast_lineEdit->text().length() == 1)
-    fLast_lineEdit->update();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -207,12 +145,8 @@ void PMsr2DataDialog::runListEntered(const QString &str)
   if (str.length() == 0)
     return;
 
-  fRunTag = 1;
+  fRunTag = 0;
 
-  if (!fFirst_lineEdit->text().isEmpty())
-    fFirst_lineEdit->clear();
-  if (!fLast_lineEdit->text().isEmpty())
-    fLast_lineEdit->clear();
   if (!fRunListFileName_lineEdit->text().isEmpty())
     fRunListFileName_lineEdit->clear();
 }
@@ -229,12 +163,8 @@ void PMsr2DataDialog::runListFileNameEntered(const QString &str)
   if (str.length() == 0)
     return;
 
-  fRunTag = 2;
+  fRunTag = 1;
 
-  if (!fFirst_lineEdit->text().isEmpty())
-    fFirst_lineEdit->clear();
-  if (!fLast_lineEdit->text().isEmpty())
-    fLast_lineEdit->clear();
   if (!fRunList_lineEdit->text().isEmpty())
     fRunList_lineEdit->clear();
 }

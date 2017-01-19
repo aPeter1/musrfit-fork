@@ -88,7 +88,7 @@ void* musrfit_timeout(void *args)
 void musrfit_syntax()
 {
   cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [-t, --title-from-data-file]";
-  cout << endl << "                            [-e, --estimateN0 <flag>] [-p, --per-run-block-chisq <flag>]";
+  cout << endl << "                            [-e, --estimateN0] [-p, --per-run-block-chisq]";
   cout << endl << "                            [--dump <type>] [--timeout <timeout_tag>] | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       'musrfit <msr-file>' will execute musrfit";

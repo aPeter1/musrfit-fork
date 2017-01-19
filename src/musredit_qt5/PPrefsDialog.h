@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010-2016 by Andreas Suter                              *
+ *   Copyright (C) 2010-2017 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -59,6 +59,7 @@ class PPrefsDialog : public QDialog, private Ui::PPrefsDialog
   public slots:
     void dumpAscii();
     void dumpRoot();
+    void handleDefaultPaths();
 
   private:
     PAdmin *fAdmin;

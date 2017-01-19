@@ -1,5 +1,4 @@
 ## Process this file with automake to create Makefile.in
-## $Id$
 
 h_sources = MuSR_td_PSI_bin.h
 cpp_sources = MuSR_td_PSI_bin.cpp 

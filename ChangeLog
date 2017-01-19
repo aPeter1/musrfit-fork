@@ -130,6 +130,8 @@ NEW 2015-02-13 first implementation of a standalone Fourier transform/plotter:
                A first simple minded lifetime correction is implemented as well.                
 NEW 2015-02-04 Integration of libBNMR for fitting beta-NMR relaxation data
 	       into automake of musrfit.
+NEW 2015-01-17 adding a branch for ROOT 6.x. This needs some minor adaptations due
+               to the new rootcint/rootclang and the stricter c++11.
 NEW 2014-12-18 first implementation of a GLOBAL block which allows to shorten
                a typical msr-file. Duplicate entries from the RUN blocks can be
                added here. Furthermore, the 'lifetimecorrection' flag is 

@@ -20,6 +20,11 @@ dict_cpp_sources = \
   TLemStatsDict.cxx \
   TLemRunHeaderDict.cxx
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  TLemStatsDict_rdict.pcm \
+  TLemRunHeaderDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
@@ -28,7 +33,7 @@ AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dist_h_sources)
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
-CLEANFILES = *Dict.cxx *Dict.h *~ core
+CLEANFILES = *Dict.cxx *Dict.h *Dict* *~ core
 
 %Dict.cxx %Dict.h: %.h %LinkDef.h
 	@ROOTCINT@ -v -f $*Dict.cxx -c -p $(INCLUDES) $^

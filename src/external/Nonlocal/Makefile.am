@@ -23,6 +23,11 @@ dict_cpp_sources = \
   PNL_PippardFitterDict.cpp \
   PNL_StartupHandlerDict.cpp
 
+pcmdir = $(libdir)
+pcm_DATA = \
+  PNL_PippardFitterDict_rdict.pcm \
+  PNL_StartupHandlerDict_rdict.pcm
+
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
 
@@ -31,7 +36,7 @@ AM_CXXFLAGS = $(LOCAL_LIB_CXXFLAGS)
 
 BUILT_SOURCES = $(dict_cpp_sources) $(dict_h_sources)
 AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
-CLEANFILES = *Dict.cpp *Dict.h *~ core
+CLEANFILES = *Dict.cpp *Dict.h *Dict* *~ core
 
 %Dict.cpp %Dict.h: %.h %LinkDef.h
 	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^

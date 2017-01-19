@@ -41,8 +41,6 @@
  * parameters see <code>msr2data --help</code> and the online documentation.
  */
 typedef struct {
-  int firstRun;                ///< first run number of a sequence of runs (usage 2 of msr2data)
-  int lastRun;                 ///< last run number of a sequence of runs (usage 2 of msr2data)
   QString runList;             ///< list of run numbers (usage 3 of msr2data)
   QString runListFileName;     ///< run list filename (usage 4 of msr2data)
   QString msrFileExtension;    ///< msr filename extension, e.g. '0100_h13.msr' -> '_h13'
@@ -57,6 +55,8 @@ typedef struct {
   bool chainFit;               ///< flag: true = chain fit, i.e. the template for a fit is the preceeding run. false = the template is always the source for the new msr-file
   bool openFilesAfterFitting;  ///< flag: true = open msr-file after fit in musredit. false = do not open msr-file after fit.
   bool titleFromDataFile;      ///< flag indicating if the title for the msr-file shall be extracted from the data-file ('-t' in msr2data)
+  bool estimateN0;             ///< flag indicating if the N0 shall be estimated for single histogram fitting
+  bool perRunBlockChisq;       ///< flag indicating if per-run-block-chisq shall be dumped into the msr-file
   bool createMsrFileOnly;      ///< flag: true = just create the msr-files without any fitting ('msr-<template>' in msr2data)
   bool fitOnly;                ///< flag: true = just perform the fits wihtout generating any msr-files ('fit' in msr2data).
   bool global;                 ///< flag: true = 'global' option

@@ -757,8 +757,8 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
     beamPeriod = 0.0;
 
   // check if start and end are in proper order
-  UInt_t start[2] = {fRunInfo->GetBkgRange(0), fRunInfo->GetBkgRange(2)};
-  UInt_t end[2]   = {fRunInfo->GetBkgRange(1), fRunInfo->GetBkgRange(3)};
+  Int_t start[2] = {fRunInfo->GetBkgRange(0), fRunInfo->GetBkgRange(2)};
+  Int_t end[2]   = {fRunInfo->GetBkgRange(1), fRunInfo->GetBkgRange(3)};
   for (UInt_t i=0; i<2; i++) {
     if (end[i] < start[i]) {
       cout << endl << "PRunAsymmetry::SubtractEstimatedBkg(): end = " << end[i] << " > start = " << start[i] << "! Will swap them!";

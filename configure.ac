@@ -1119,6 +1119,9 @@ case "${host_cpu}" in
     ;;
 esac
 
+CXXFLAGS="-std=c++11 ${CXXFLAGS}"
+AC_SUBST(CXXFLAGS)
+
 LOCAL_BIN_CXXFLAGS="${CPUFLAGS} -Wall -Wno-trigraphs"
 LOCAL_LIB_CXXFLAGS="${LOCAL_BIN_CXXFLAGS}"
 LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS}"
@@ -1143,7 +1146,7 @@ case "$host" in
     ;;
   *-*-darwin*)
     ARCH=DARWIN
-    LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D__linux__"
+    LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D_Darwin_"
     ;;
   *)
     ARCH=OTHERUNIX
