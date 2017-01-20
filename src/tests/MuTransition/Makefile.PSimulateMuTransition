@@ -97,4 +97,6 @@ install: all
 ifeq ($(OS),LINUX)
 	cp -pv $(SHLIB) $(ROOTSYS)/lib
 	cp -pv PSimulateMuTransition.h $(ROOTSYS)/include
+# for root6
+	cp -pv PSimulateMuTransitionDict_rdict.pcm $(ROOTSYS)/lib
 endif

@@ -27,20 +27,28 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+// 
+// either do
+// root> .L runMuSimulation.C
+// root> runMuSimulation()
+// 
+// or
+// root> .x runMuSimulation.C
+//
 
-#include "/apps/cern/root-git/include/TMusrRunHeader.h"
+#include "TMusrRunHeader.h"
+#include "PSimulateMuTransition.h"
+
 #define NDECAYHISTS 2
+
 
 void runMuSimulation()
 {
-  // load library
-  gSystem->Load("$ROOTSYS/lib/libPSimulateMuTransition");
+// load libraries during root startup, defined in rootlogon.C 
   
-  // load TMusrRunHeader class if not already done during root startup
-  if (!TClass::GetDict("TMusrRunHeader")) {
-    gROOT->LoadMacro("$(ROOTSYS)/lib/libTMusrRunHeader.so");
-  }
- 
+//   gSystem->Load("$ROOTSYS/lib/libPSimulateMuTransition");
+//   gSystem->Load("$ROOTSYS/lib/libTMusrRunHeader.so");
+
   char    titleStr[256];
   TFolder *histosFolder;
   TFolder *decayAnaModule, *scAnaModule;
@@ -57,7 +65,7 @@ void runMuSimulation()
   Double_t spinFlipRate = 0.01; //if spinFlipRate > 0.001 only spin-flip processes will be simulated
   Double_t capRate      = 0.0001;//*sqrt(T/200.); //assume that capture rate varies as sqrt(T), capRate = sigma*v*p , v ~ sqrt(T)  
   Double_t ionRate;  //assume Arrhenius behaviour ionRate = preFac*exp(-EA/kT)
-  ionRate           = 0.0001; //2.9e7 * exp(-EA/(0.08625*T)); // Ge: 2.9*10^7MHz "attempt" frequency; 1K = 0.08625 meV 
+  ionRate           = 0.1; //2.9e7 * exp(-EA/(0.08625*T)); // Ge: 2.9*10^7MHz "attempt" frequency; 1K = 0.08625 meV 
   Double_t B        = 106.5; //field in G
   Double_t Bvar     = 0.;   //field variance
   Double_t Freq12   = 40.433;  //Mu freq of the 12 transition
@@ -222,7 +230,10 @@ void runMuSimulation()
   gRunHeader->Write();
   fout->Close();
   cout << "Histograms written to " << histogramFileName.Data() << endl;
-  delete fout;
 
-  delete [] histo;
+//   delete fout;
+//   delete header;
+//   delete histo[0];
+//   delete histo[1];
+//   delete gRunHeader;
 }
