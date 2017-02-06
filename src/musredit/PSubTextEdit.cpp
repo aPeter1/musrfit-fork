@@ -64,6 +64,31 @@ PSubTextEdit::PSubTextEdit(PAdmin *admin, QWidget *parent) :
 
 //----------------------------------------------------------------------------------------------------
 /**
+ * @brief PSubTextEdit::getFitType
+ * @return
+ */
+int PSubTextEdit::getFitType()
+{
+  QString str = toPlainText();
+  int idx = str.indexOf("fittype");
+  if (idx == -1)
+    return -1;
+
+  bool ok;
+  for (int i=idx+7; i<str.length(); i++) {
+    if (str[i] != ' ') {
+      idx = QString(str[i]).toInt(&ok);
+      if (!ok)
+        idx = -1;
+      break;
+    }
+  }
+
+  return idx;
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
  * <p>Starts the msr-title input dialog window.
  */
 void PSubTextEdit::insertTitle()
