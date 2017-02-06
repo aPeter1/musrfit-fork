@@ -1727,7 +1727,8 @@ void PTextEdit::musrCalcChisq()
     return;
 
   int result = 0;
-  if (fAdmin->getEstimateN0Flag())
+  int fittype = currentEditor()->getFitType();
+  if (fAdmin->getEstimateN0Flag() && ((fittype==0) || (fittype==4)))
     result = QMessageBox::question(this, "Estimate N0 active",
                            "Do you wish a chisq/mlh evaluation with an automatic N0 estimate?");
 
@@ -1748,7 +1749,7 @@ void PTextEdit::musrCalcChisq()
   cmd.append(str);
   cmd.append(QFileInfo(*fFilenames.find( currentEditor())).fileName() );
   cmd.append("--chisq-only");
-  if (fAdmin->getEstimateN0Flag() && (result == QMessageBox::Yes))
+  if (fAdmin->getEstimateN0Flag() && (result == QMessageBox::Yes) && ((fittype==0) || (fittype==4)))
     cmd.append("--estimateN0");
   PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
   fitOutputHandler.setModal(true);
