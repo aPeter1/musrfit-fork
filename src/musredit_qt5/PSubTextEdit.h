@@ -46,6 +46,7 @@ class PSubTextEdit : public QPlainTextEdit
   public:
     PSubTextEdit(PAdmin *admin = 0, QWidget *parent = 0);
     virtual ~PSubTextEdit() {}
+    int getFitType();
 
   public slots:
     void insertTitle();
