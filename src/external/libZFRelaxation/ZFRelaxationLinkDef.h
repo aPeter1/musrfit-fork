@@ -27,7 +27,7 @@
  ***************************************************************************/
 
 // root dictionary stuff --------------------------------------------------
-#ifdef __CINT__
+#ifdef __CLING__
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -37,6 +37,6 @@
 #pragma link C++ class ZFMagExp+;
 #pragma link C++ class UniaxialStatGssKT+;
 
-#endif //__CINT__
+#endif //__CLING__
 // root dictionary stuff --------------------------------------------------
 

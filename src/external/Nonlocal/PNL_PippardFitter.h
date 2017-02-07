@@ -31,9 +31,9 @@
 #define _PNL_PIPPARDFITTER_H_
 
 // the following ifdef is needed for GCC 4.6 or higher, fftw 3.3 or higher and root 5.30.03 or lower
-#ifdef __CINT__
-typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
-#endif
+//#ifdef __CLING__
+//typedef struct { char a[7]; } __float128; // needed since cint doesn't know it
+//#endif
 #include <fftw3.h>
 
 #include "PUserFcnBase.h"

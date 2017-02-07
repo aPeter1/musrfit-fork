@@ -29,7 +29,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifdef __CINT__
+#ifdef __CLING__
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -40,4 +40,4 @@
 #pragma link C++ class SExpRlx+;
 #pragma link C++ class MLRes+;
 
-#endif //__CINT__
+#endif //__CLING__

@@ -71,7 +71,7 @@ class PFunctionHandler
 };
 
 // cint dictionary stuff --------------------------------------
-#ifdef __CINT__
+#ifdef __CLING__
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -79,7 +79,7 @@ class PFunctionHandler
 
 #pragma link C++ class PFunctionHandler+;
 
-#endif // end __CINT__
+#endif // end __CLING__
 //-------------------------------------------------------------
 
 #endif // _PFUNCTIONHANDLER_H_

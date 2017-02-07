@@ -27,7 +27,7 @@
  ***************************************************************************/
 
 // root dictionary stuff --------------------------------------------------
-#ifdef __CINT__
+#ifdef __CLING__
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -39,6 +39,6 @@
 #pragma link C++ class TMeanFieldsForScTrilayer+;
 #pragma link C++ class TMeanFieldsForScTrilayerWithInsulator+;
 
-#endif //__CINT__
+#endif //__CLING__
 // root dictionary stuff --------------------------------------------------
 
