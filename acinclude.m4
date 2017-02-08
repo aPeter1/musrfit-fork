@@ -18,7 +18,7 @@ dnl The macro defines the following substitution variables
 dnl
 dnl    ROOTCONF           full path to root-config
 dnl    ROOTEXEC           full path to root
-dnl    ROOTCINT           full path to rootcint
+dnl    ROOTCLING          full path to rootcling
 dnl    ROOTLIBDIR         Where the ROOT libraries are 
 dnl    ROOTINCDIR         Where the ROOT headers are 
 dnl    ROOTETCDIR         Where the ROOT configuration is
@@ -29,7 +29,7 @@ dnl    ROOTAUXLIBS        Auxilary libraries and linker flags for ROOT
 dnl    ROOTAUXCFLAGS      Auxilary compiler flags 
 dnl    ROOTRPATH          Same as ROOTLIBDIR
 dnl
-dnl The macro will fail if root-config and rootcint isn't found.
+dnl The macro will fail if root-config and rootcling isn't found.
 dnl
 dnl Christian Holm Christensen <cholm@nbi.dk>
 dnl
@@ -49,10 +49,10 @@ AC_DEFUN([ROOT_PATH],
   fi
   AC_PATH_PROG(ROOTCONF, root-config , no, $rootbin)
   AC_PATH_PROG(ROOTEXEC, root , no, $rootbin)
-  AC_PATH_PROG(ROOTCINT, rootcint , no, $rootbin)
+  AC_PATH_PROG(ROOTCLING, rootcling , no, $rootbin)
 	
   if test ! x"$ROOTCONF" = "xno" && \
-     test ! x"$ROOTCINT" = "xno" ; then 
+     test ! x"$ROOTCLING" = "xno" ; then 
 
     # define some variables 
     ROOTLIBDIR=`$ROOTCONF --libdir`

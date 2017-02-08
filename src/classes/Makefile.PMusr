@@ -202,27 +202,27 @@ $(EXTOBJS): ../external/MuSR_software/Class_MuSR_PSI/MuSR_td_PSI_bin.cpp
 
 TLemRunHeaderDict.cxx: ../external/TLemRunHeader/TLemRunHeader.h ../external/TLemRunHeader/TLemRunHeaderLinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -f $@ -c -p $^
+	rootcling -f $@ -c -p $^
 
 TLemStatsDict.cxx: ../external/TLemRunHeader/TLemStats.h ../external/TLemRunHeader/TLemStatsLinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -f $@ -c -p $^
+	rootcling -f $@ -c -p $^
 
 PStartupHandlerDict.cpp: ../include/PStartupHandler.h ../include/PStartupHandlerLinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -f $@ -c -p $^
+	rootcling -f $@ -c -p $^
 
 PMusrCanvasDict.cpp: ../include/PMusrCanvas.h ../include/PMusrCanvasLinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -v -f $@ -c -p $^
+	rootcling -v -f $@ -c -p $^
 
 PMusrT0Dict.cpp: ../include/PMusrT0.h ../include/PMusrT0LinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -v -f $@ -c -p $^
+	rootcling -v -f $@ -c -p $^
 
 PUserFcnBaseDict.cpp: ../include/PUserFcnBase.h ../include/PUserFcnBaseLinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -v -f $@ -c -p $^
+	rootcling -v -f $@ -c -p $^
 
 install: leminstall musrinstall
 

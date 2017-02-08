@@ -5,11 +5,11 @@ FITPARAMETER
         1 N_0         321.0     1.4         none        
         2 tau_0       1.9066    0.0038      none        0       none    
         3 Rate_0      0.0983    0.0052      none        0       none    
-        4 Freq_0      135.53824 0.00073     none        
+        4 Freq_0      135.53823 0.00073     none        
 
         5 N_1         306.1     1.3         none        
         6 tau_1       0.7409    0.0026      none        0       none    
-        7 Rate_1      0.026     0.027       none        0       none    
+        7 Rate_1      0.027     0.031       none        0       none    
         8 Freq_1      136.8968  0.0033      none        
 
         9 Asym_F1_0   0.0490    0.0015      none        0       none    
@@ -28,7 +28,7 @@ FITPARAMETER
        20 N_bgk_F3    1.465     0.033       none        
 
        21 Asym_F4_0   0.0512    0.0015      none        0       none    
-       22 Asym_F4_1   0.0521    0.0029      none        0       none    
+       22 Asym_F4_1   0.0521    0.0030      none        0       none    
        23 Phase_F4    144.6     1.5         none        
        24 N_bgk_F4    2.311     0.034       none        
 
@@ -40,7 +40,7 @@ FITPARAMETER
        29 Asym_F6_0   0.0502    0.0015      none        0       none    
        30 Asym_F6_1   0.0517    0.0030      none        0       none    
        31 Phase_F6    232.1     1.5         none        
-       32 N_bgk_F6    1.735     0.033       none        
+       32 N_bgk_F6    1.735     0.034       none        
 
        33 Asym_F7_0   0.0488    0.0015      none        0       none    
        34 Asym_F7_1   0.0575    0.0030      none        0       none    
@@ -48,12 +48,12 @@ FITPARAMETER
        36 N_bgk_F7    1.593     0.033       none        
 
        37 Asym_F8_0   0.0547    0.0015      none        0       none    
-       38 Asym_F8_1   0.0468    0.0029      none        0       none    
+       38 Asym_F8_1   0.0468    0.0030      none        0       none    
        39 Phase_F8    321.7     1.4         none        
        40 N_bgk_F8    1.469     0.033       none        
 
        41 Asym_B1_0   0.0476    0.0015      none        0       none    
-       42 Asym_B1_1   0.0535    0.0029      none        0       none    
+       42 Asym_B1_1   0.0535    0.0030      none        0       none    
        43 Phase_B1    3.6       1.5         none        
        44 N_bgk_B1    1.378     0.033       none        
 
@@ -64,8 +64,8 @@ FITPARAMETER
 
        49 Asym_B3_0   0.0494    0.0015      none        0       none    
        50 Asym_B3_1   0.0555    0.0030      none        0       none    
-       51 Phase_B3    98.1      1.5         none        
-       52 N_bgk_B3    0.969     0.032       none        
+       51 Phase_B3    98.2      1.5         none        
+       52 N_bgk_B3    0.968     0.032       none        
 
        53 Asym_B4_0   0.0505    0.0015      none        0       none    
        54 Asym_B4_1   0.0527    0.0030      none        0       none    
@@ -78,7 +78,7 @@ FITPARAMETER
        60 N_bgk_B5    1.642     0.033       none        
 
        61 Asym_B6_0   0.0512    0.0015      none        0       none    
-       62 Asym_B6_1   0.0477    0.0029      none        0       none    
+       62 Asym_B6_1   0.0477    0.0030      none        0       none    
        63 Phase_B6    231.7     1.5         none        
        64 N_bgk_B6    1.650     0.033       none        
 
@@ -183,7 +183,7 @@ SAVE
 
 ###############################################################
 PLOT 4   (mu minus plot)
-runs        1-16
+runs        1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16
 range    0   9
 
 ###############################################################
@@ -191,9 +191,9 @@ FOURIER
 units            Tesla   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
 fourier_power    14
 apodization      MEDIUM  # NONE, WEAK, MEDIUM, STRONG
-plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
-range            0.8     1.2
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL
+range            0.8    1.2
 
 ###############################################################
-STATISTIC --- 2016-04-25 17:05:56
+STATISTIC --- 2017-02-08 07:11:01
   maxLH = 238962.5, NDF = 230264, maxLH/NDF = 1.037776

@@ -27,6 +27,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "git-revision.h"
 #include "PMusrEditAbout.h"
 
 //---------------------------------------------------------------------------
@@ -36,6 +37,8 @@
 PMusrEditAbout::PMusrEditAbout(QWidget *parent, Qt::WindowFlags f) : QDialog(parent, f)
 {
   setupUi(this);
+
+  fGitRev_label->setText(QString("git: %1").arg(GIT_REVISION));
 
   setModal(true);
 }

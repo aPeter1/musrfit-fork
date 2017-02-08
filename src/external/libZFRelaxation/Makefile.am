@@ -29,7 +29,7 @@ AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
 CLEANFILES = *Dict.cpp *Dict.h *Dict* *~ core
 
 %Dict.cpp %Dict.h: %.h %LinkDef.h
-	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^
+	@ROOTCLING@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^
 
 lib_LTLIBRARIES = libZFRelaxation.la
 

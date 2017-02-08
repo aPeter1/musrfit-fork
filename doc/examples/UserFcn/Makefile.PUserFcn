@@ -46,11 +46,11 @@ clean:; 	@rm -f $(OBJS) *Dict* core*
 $(OBJS): %.o: %.cpp
 	$(CXX) $(INCLUDES) $(CXXFLAGS) -c $<
 
-# Generate the ROOT CINT dictionary
+# Generate the ROOT CLING dictionary
 
 PUserFcnDict.cpp: PUserFcn.h PUserFcnLinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -f $@ -c -p -I$(ROOTINCLUDE) $^
+	rootcling -f $@ -c -p -I$(ROOTINCLUDE) $^
 
 install: all
 	@echo "Installing shared lib: libTApproximation.so"

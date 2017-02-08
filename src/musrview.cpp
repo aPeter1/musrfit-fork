@@ -330,7 +330,7 @@ int main(int argc, char *argv[])
 
       musrCanvas->SetTimeout(timeout);
 
-      // ugly but rootcint cannot handle the spirit-parser framework
+      // ugly but rootcling cannot handle the spirit-parser framework
       musrCanvas->SetMsrHandler(msrHandler);
       musrCanvas->SetRunListCollection(runListCollection);
 

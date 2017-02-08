@@ -89,7 +89,7 @@ $(OBJS): %.o: %.cpp
 
 PUserFcnDict.cpp: ../include/PUserFcn.h ../include/PUserFcnLinkDef.h
 	@echo "Generating dictionary $@..."
-	rootcint -f $@ -c -p $^
+	rootcling -f $@ -c -p $^
 
 install: all
 	@echo "Installing shared lib: libPUserFcn.so ( you must be root ;-) )"

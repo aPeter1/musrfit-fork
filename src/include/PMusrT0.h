@@ -42,9 +42,9 @@
 #include <TTimer.h>
 
 #include "PMusr.h"
-#ifndef __MAKECINT__
+#ifndef __MAKECLING__
 #include "PMsrHandler.h"
-#endif // __MAKECINT__
+#endif // __MAKECLING__
 
 #define PMUSRT0_FORWARD  0
 #define PMUSRT0_BACKWARD 1
@@ -113,7 +113,7 @@ class PMusrT0Data {
 //--------------------------------------------------------------------------
 /**
  * <p>Handles the musrt0 graphical user interface.
- * <p>The preprocessor tag __MAKECINT__ is used to hide away from rootcint
+ * <p>The preprocessor tag __MAKECLING__ is used to hide away from rootcling
  * the overly complex spirit header files.
  */
 class PMusrT0 : public TObject, public TQObject
@@ -131,18 +131,18 @@ class PMusrT0 : public TObject, public TQObject
     virtual void Quit(); // SLOT
     virtual void SetTimeout(Int_t timeout);
 
-#ifndef __MAKECINT__
+#ifndef __MAKECLING__
     virtual void SetMsrHandler(PMsrHandler *msrHandler);
-#endif // __MAKECINT__
+#endif // __MAKECLING__
 
     virtual void InitT0();
     virtual void InitDataAndBkg();
     virtual Int_t GetStatus() { return fStatus; }
 
   private:
-#ifndef __MAKECINT__
+#ifndef __MAKECLING__
     PMsrHandler *fMsrHandler; ///< msr-file handler
-#endif // __MAKECINT__
+#endif // __MAKECLING__
     Int_t  fTimeout;          ///< timeout after which the Done signal should be emited. If timeout <= 0, no timeout is taking place
 
     Bool_t fValid; ///< true if raw data set are available, otherwise false
