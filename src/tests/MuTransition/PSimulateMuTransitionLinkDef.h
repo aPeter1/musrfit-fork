@@ -29,7 +29,7 @@
  ***************************************************************************/
 
 // changed for root6
-#ifdef __CLING__
+#ifdef __CINT__
 
 #pragma link off all globals;
 #pragma link off all classes;

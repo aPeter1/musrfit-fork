@@ -4,7 +4,7 @@
 
 ***************************************************************************/
 
-#ifdef __CLING__
+#ifdef __CINT__
 
 #pragma link off all globals;
 #pragma link off all classes;
@@ -12,4 +12,4 @@
 
 #pragma link C++ class PUserFcn+;
 
-#endif //__CLING__
+#endif //__CINT__
