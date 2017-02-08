@@ -36,7 +36,7 @@ AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
 CLEANFILES = *Dict.cxx *Dict.h *Dict* *~ core
 
 %Dict.cxx %Dict.h: %.h %LinkDef.h
-	@ROOTCINT@ -v -f $*Dict.cxx -c -p $(INCLUDES) $^
+	@ROOTCLING@ -v -f $*Dict.cxx -c -p $(INCLUDES) $^
 
 lib_LTLIBRARIES = libTLemRunHeader.la
 

@@ -50,7 +50,7 @@ AM_LDFLAGS = $(LOCAL_LIB_LDFLAGS) -L@ROOTLIBDIR@
 CLEANFILES = *Dict.cpp *Dict.h *Dict* *~ ../include/*~ core
 
 %Dict.cpp %Dict.h: ../include/%.h ../include/%LinkDef.h
-	@ROOTCINT@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^
+	@ROOTCLING@ -v -f $*Dict.cpp -c -p $(AM_CPPFLAGS) $^
 
 lib_LTLIBRARIES = libFitPofB.la
 

@@ -111,7 +111,7 @@ Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data
   // set timeout
   musrT0->SetTimeout(timeout);
 
-  // set the msr-file handler. The handler cannot be transfered at construction time since rootcint is not able to handle the PMsrHandler class
+  // set the msr-file handler. The handler cannot be transfered at construction time since rootcling is not able to handle the PMsrHandler class
   musrT0->SetMsrHandler(msrHandler);
 
   // check if only t0, data-, and bkg-range is wished, if not, only initialize t0 at this point

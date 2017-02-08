@@ -45,10 +45,10 @@
 #include <TLatex.h>
 
 #include "PMusr.h"
-#ifndef __MAKECINT__
+#ifndef __MAKECLING__
 #include "PMsrHandler.h"
 #include "PRunListCollection.h"
-#endif // __MAKECINT__
+#endif // __MAKECLING__
 
 #define YINFO  0.1
 #define YTITLE 0.95
@@ -197,7 +197,7 @@ typedef vector<PMusrCanvasAsciiDump> PMusrCanvasAsciiDumpVector;
 
 //--------------------------------------------------------------------------
 /**
- * <p>The preprocessor tag __MAKECINT__ is used to hide away from rootcint
+ * <p>The preprocessor tag __MAKECLING__ is used to hide away from rootcling
  * the overly complex spirit header files. 
  */
 class PMusrCanvas : public TObject, public TQObject
@@ -216,10 +216,10 @@ class PMusrCanvas : public TObject, public TQObject
 
     virtual Bool_t IsValid() { return fValid; }
 
-#ifndef __MAKECINT__
+#ifndef __MAKECLING__
     virtual void SetMsrHandler(PMsrHandler *msrHandler);
     virtual void SetRunListCollection(PRunListCollection *runList) { fRunList = runList; }
-#endif // __MAKECINT__
+#endif // __MAKECLING__
 
     virtual void SetTimeout(Int_t ival);
     virtual void UpdateParamTheoryPad();
@@ -277,10 +277,10 @@ class PMusrCanvas : public TObject, public TQObject
 
     TH1F *fHistoFrame; ///< fHistoFrame is a 'global' frame needed in order to plot histograms with (potentially) different x-frames
 
-#ifndef __MAKECINT__
+#ifndef __MAKECLING__
     PMsrHandler        *fMsrHandler; ///< msr-file handler
     PRunListCollection *fRunList;    ///< data handler
-#endif // __MAKECINT__
+#endif // __MAKECLING__
 
     PMusrCanvasDataSet fDataAvg; ///< set of all averaged data to be plotted (asymmetry/single histogram)
 
