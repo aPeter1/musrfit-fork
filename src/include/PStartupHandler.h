@@ -94,6 +94,7 @@ class PStartupHandler : public TObject, public TQObject
     PIntVector           fColorList;        ///< color list
 
     Bool_t StartupFileExists(Char_t *fln);
+    Bool_t WriteDefaulStartupFile();
 
   ClassDef(PStartupHandler, 1)
 };
