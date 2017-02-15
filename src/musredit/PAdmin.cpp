@@ -36,7 +36,10 @@ using namespace std;
 #include <QFile>
 #include <QTextStream>
 #include <QVector>
+#include <QDir>
+#include <QProcessEnvironment>
 
+#include "musrfit-info.h"
 #include "PAdmin.h"
 
 //--------------------------------------------------------------------------
@@ -259,7 +262,7 @@ bool PAdminXMLParser::characters(const QString& str)
       else
         flag = false;
       fAdmin->setMusrviewShowAvgFlag(flag);
-    break;
+      break;
     case eEnableMusrT0:
       if (str == "y")
         flag = true;
@@ -578,13 +581,21 @@ QString PAdminXMLParser::expandPath(const QString &str)
   QString msg;
   QString newStr="";
 
+  QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
+
   QStringList list = str.split("/");
 
   for ( QStringList::Iterator it = list.begin(); it != list.end(); ++it ) {
     token = *it;
     if (token.contains("$")) {
       token.remove('$');
-      path = std::getenv(token.toLatin1());
+      if (!procEnv.contains(token)) {
+        msg = QString("Couldn't find '%1'. Some things might not work properly").arg(token);
+        QMessageBox::warning(0, "**WARNING**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+        newStr = "";
+        break;
+      }
+      path = procEnv.value(token, "");
       if (path.isEmpty()) {
         msg = QString("Couldn't expand '%1'. Some things might not work properly").arg(token);
         QMessageBox::warning(0, "**WARNING**", msg, QMessageBox::Ok, QMessageBox::NoButton);
@@ -658,18 +669,25 @@ PAdmin::PAdmin() : QObject()
   QString path = QString("./");
   QString fln = QString("musredit_startup.xml");
   QString pathFln = path + fln;
+  QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
   if (!QFile::exists(pathFln)) {
     // 2nd: check $HOME/.musrfit/musredit/musredit_startup.xml
-    path = std::getenv("HOME");
+    path = procEnv.value("HOME", "");
     pathFln = path + "/.musrfit/musredit/" + fln;
     if (!QFile::exists(pathFln)) {
       // 3rd: check $MUSRFITPATH/musredit_startup.xml
-      path = std::getenv("MUSRFITPATH");
+      path = procEnv.value("MUSRFITPATH", "");
       pathFln = path + "/" + fln;
       if (!QFile::exists(pathFln)) {
         // 4th: check $ROOTSYS/bin/musredit_startup.xml
-        path = std::getenv("ROOTSYS");
+        path = procEnv.value("ROOTSYS", "");
         pathFln = path + "/bin/" + fln;
+        if (!QFile::exists(pathFln)) {
+          // 5th: not found anyware hence create it
+          path = procEnv.value("HOME", "");
+          pathFln = path + "/.musrfit/musredit/" + fln;
+          createMusreditStartupFile();
+        }
       }
     }
   }
@@ -861,6 +879,12 @@ int PAdmin::savePrefs(QString pref_fln)
         else
           data[i] = "    <enable_musrt0>n</enable_musrt0>";
       }
+      if (data[i].contains("<font_name>") && data[i].contains("</font_name>")) {
+        data[i] = QString("    <font_name>%1</font_name>").arg(fFontName);
+      }
+      if (data[i].contains("<font_size>") && data[i].contains("</font_size>")) {
+        data[i] = QString("    <font_size>%1</font_size>").arg(fFontSize);
+      }
     }
 
     // write prefs
@@ -910,6 +934,7 @@ void PAdmin::saveRecentFiles()
 {
   // check if musredit_startup.xml is present in the current directory, and if yes, use this file to
   // save the recent file names otherwise use the "master" musredit_startup.xml
+
   QString str("");
   QString fln = QString("./musredit_startup.xml");
   if (!QFile::exists(fln))
@@ -965,6 +990,302 @@ void PAdmin::saveRecentFiles()
     QString msg("Failed to write musredit_startup.xml. Neither a local nor a global copy found.");
     QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
   }
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief PAdmin::createMusreditStartupFile
+ */
+void PAdmin::createMusreditStartupFile()
+{
+  // get $HOME
+  QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
+  QString pathName = procEnv.value("HOME", "");
+  pathName += "/.musrfit/musredit";
+
+  // check if the directory $HOME/.musrfit/musredit exists if not create it
+  QDir dir(pathName);
+  if (!dir.exists()) {
+    // directory $HOME/.musrfit/musredit does not exist hence create it
+    dir.mkpath(pathName);
+  }
+
+  // create default musredit_startup.xml file in $HOME/.musrfit/musredit
+  pathName += "/musredit_startup.xml";
+  QFile file(pathName);
+
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    return;
+
+  QTextStream fout(&file);
+
+  fout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
+  fout << "<musredit_startup xmlns=\"http://lmu.web.psi.ch/musrfit/user/MUSR/MusrGui.html\">" << endl;
+  fout << "  <comment>" << endl;
+  fout << "    This is handling default setting parameters for the musredit." << endl;
+  fout << "  </comment>" << endl;
+  fout << "  <general>" << endl;
+  fout << "    <exec_path>" << MUSRFIT_PREFIX << "/bin</exec_path>" << endl;
+  fout << "    <default_save_path>./</default_save_path>" << endl;
+  fout << "    <msr_default_file_path>" << MUSRFIT_DOC_DIR << "/templates</msr_default_file_path>" << endl;
+  fout << "    <timeout>3600</timeout>" << endl;
+  fout << "    <keep_minuit2_output>n</keep_minuit2_output>" << endl;
+  fout << "    <dump_ascii>n</dump_ascii>" << endl;
+  fout << "    <dump_root>n</dump_root>" << endl;
+  fout << "    <title_from_data_file>y</title_from_data_file>" << endl;
+  fout << "    <chisq_per_run_block>n</chisq_per_run_block>" << endl;
+  fout << "    <estimate_n0>y</estimate_n0>" << endl;
+  fout << "    <musrview_show_fourier>n</musrview_show_fourier>" << endl;
+  fout << "    <musrview_show_avg>n</musrview_show_avg>" << endl;
+  fout << "    <enable_musrt0>y</enable_musrt0>" << endl;
+  fout << "  </general>" << endl;
+  fout << "  <recent_files>" << endl;
+  fout << "    <path_file_name>" << MUSRFIT_DOC_DIR << "/examples/test-histo-PSI-BIN.msr</path_file_name>" << endl;
+  fout << "  </recent_files>" << endl;
+  fout << "  <help_section>" << endl;
+  fout << "    <musr_web_main>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html</musr_web_main>" << endl;
+  fout << "    <musr_web_title>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html#TheTitle</musr_web_title>" << endl;
+  fout << "    <musr_web_parameters>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html#TheFitparameterBlock</musr_web_parameters>" << endl;
+  fout << "    <musr_web_theory>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html#TheTheoryBlock</musr_web_theory>" << endl;
+  fout << "    <musr_web_functions>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html#TheFunctionsBlock</musr_web_functions>" << endl;
+  fout << "    <musr_web_run>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html#TheRunBlock</musr_web_run>" << endl;
+  fout << "    <musr_web_command>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html#TheCommandsBlock</musr_web_command>" << endl;
+  fout << "    <musr_web_fourier>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html#TheFourierBlock</musr_web_fourier>" << endl;
+  fout << "    <musr_web_plot>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html#ThePlotBlock</musr_web_plot>" << endl;
+  fout << "    <musr_web_statistic>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html#TheStatisticBlock</musr_web_statistic>" << endl;
+  fout << "    <musr_web_msr2data>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/Msr2Data.html</musr_web_msr2data>" << endl;
+  fout << "    <musr_web_musrFT>file://" << MUSRFIT_DOC_DIR << "/html/user/MUSR/MusrFit.html#A_2.3_musrFT</musr_web_musrFT>" << endl;
+  fout << "  </help_section>" << endl;
+  fout << "  <font_settings>" << endl;
+#ifdef Q_OS_MAC
+  fout << "    <font_name>Courier New</font_name>" << endl;
+  fout << "    <font_size>16</font_size>" << endl;
+#else
+  fout << "    <font_name>Monospace</font_name>" << endl;
+  fout << "    <font_size>12</font_size>" << endl;
+#endif
+  fout << "  </font_settings>" << endl;
+  fout << "  <msr_file_defaults>" << endl;
+  fout << "    <beamline>mue4</beamline>" << endl;
+  fout << "    <institute>psi</institute>" << endl;
+  fout << "    <file_format>root-npp</file_format>" << endl;
+  fout << "    <lifetime_correction>y</lifetime_correction>" << endl;
+  fout << "  </msr_file_defaults>" << endl;
+  fout << "  <msr2data_defaults>" << endl;
+  fout << "    <chain_fit>y</chain_fit>" << endl;
+  fout << "    <write_data_header>y</write_data_header>" << endl;
+  fout << "    <ignore_data_header_info>n</ignore_data_header_info>" << endl;
+  fout << "    <keep_minuit2_output>n</keep_minuit2_output>" << endl;
+  fout << "    <write_column_data>n</write_column_data>" << endl;
+  fout << "    <recreate_data_file>n</recreate_data_file>" << endl;
+  fout << "    <open_file_after_fitting>y</open_file_after_fitting>" << endl;
+  fout << "    <create_msr_file_only>n</create_msr_file_only>" << endl;
+  fout << "    <fit_only>n</fit_only>" << endl;
+  fout << "    <global>n</global>" << endl;
+  fout << "    <global_plus>n</global_plus>" << endl;
+  fout << "  </msr2data_defaults>" << endl;
+  fout << "  <func_pixmap_path>" << MUSRFIT_DOC_DIR << "/latex_images</func_pixmap_path>" << endl;
+  fout << "  <theory_functions>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>asymmetry</name>" << endl;
+  fout << "      <comment></comment>" << endl;
+  fout << "      <label>Asymmetry</label>" << endl;
+  fout << "      <pixmap>asymmetry.png</pixmap>" << endl;
+  fout << "      <params>1</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>simplExpo</name>" << endl;
+  fout << "      <comment>(rate)</comment>" << endl;
+  fout << "      <label>simple Exp</label>" << endl;
+  fout << "      <pixmap>simpleExp.png</pixmap>" << endl;
+  fout << "      <params>1</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>generExpo</name>" << endl;
+  fout << "      <comment>(rate exponent)</comment>" << endl;
+  fout << "      <label>general Exp</label>" << endl;
+  fout << "      <pixmap>generalExp.png</pixmap>" << endl;
+  fout << "      <params>2</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>simpleGss</name>" << endl;
+  fout << "      <comment>(rate)</comment>" << endl;
+  fout << "      <label>simple Gauss</label>" << endl;
+  fout << "      <pixmap>simpleGauss.png</pixmap>" << endl;
+  fout << "      <params>1</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>statGssKT</name>" << endl;
+  fout << "      <comment>(rate)</comment>" << endl;
+  fout << "      <label>static Gauss KT</label>" << endl;
+  fout << "      <pixmap>statGssKT.png</pixmap>" << endl;
+  fout << "      <params>1</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>statGssKTLF</name>" << endl;
+  fout << "      <comment>(frequency damping)</comment>" << endl;
+  fout << "      <label>static Gauss KT LF</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>2</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>dynGssKTLF</name>" << endl;
+  fout << "      <comment>(frequency damping hopping-rate)</comment>" << endl;
+  fout << "      <label>dynamic Gauss KT LF</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>3</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>statExpKT</name>" << endl;
+  fout << "      <comment>(rate)</comment>" << endl;
+  fout << "      <label>static Lorentz KT</label>" << endl;
+  fout << "      <pixmap>statExpKT.png</pixmap>" << endl;
+  fout << "      <params>1</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>statExpKTLF</name>" << endl;
+  fout << "      <comment>(frequency damping)</comment>" << endl;
+  fout << "      <label>static Lorentz KT LF</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>2</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>dynExpKTLF</name>" << endl;
+  fout << "      <comment>(frequency damping hopping-rate)</comment>" << endl;
+  fout << "      <label>dynamic Lorentz KT LF</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>3</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>combiLGKT</name>" << endl;
+  fout << "      <comment>(lorentzRate gaussRate)</comment>" << endl;
+  fout << "      <label>combined Lorentz-Gauss KT</label>" << endl;
+  fout << "      <pixmap>combiLGKT.png</pixmap>" << endl;
+  fout << "      <params>2</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>strKT</name>" << endl;
+  fout << "      <comment>(rate beta)</comment>" << endl;
+  fout << "      <label>stretched Kubo-Toyabe</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>2</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>spinGlass</name>" << endl;
+  fout << "      <comment>(rate hopping-rate order)</comment>" << endl;
+  fout << "      <label>zero field spin glass function</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>3</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>rdAnisoHf</name>" << endl;
+  fout << "      <comment>(frequency rate)</comment>" << endl;
+  fout << "      <label>random anisotropic hyperfine function</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>2</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>abragam</name>" << endl;
+  fout << "      <comment>(rate hopping-rate)</comment>" << endl;
+  fout << "      <label>Abragam</label>" << endl;
+  fout << "      <pixmap>abragam.png</pixmap>" << endl;
+  fout << "      <params>2</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>TFieldCos</name>" << endl;
+  fout << "      <comment>(phase frequency)</comment>" << endl;
+  fout << "      <label>TF cos</label>" << endl;
+  fout << "      <pixmap>tfCos.png</pixmap>" << endl;
+  fout << "      <params>2</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>internFld</name>" << endl;
+  fout << "      <comment>(fraction phase frequency Trate Lrate)</comment>" << endl;
+  fout << "      <label>internal Lorentz field</label>" << endl;
+  fout << "      <pixmap>internalField.png</pixmap>" << endl;
+  fout << "      <params>5</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>internFldGK</name>" << endl;
+  fout << "      <comment>(fraction frequency Trate Lrate beta)</comment>" << endl;
+  fout << "      <label>internal field, Gaussian broadened</label>" << endl;
+  fout << "      <pixmap>internalFieldGK.png</pixmap>" << endl;
+  fout << "      <params>5</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>internFldLL</name>" << endl;
+  fout << "      <comment>(fraction frequency Trate Lrate)</comment>" << endl;
+  fout << "      <label>internal field, Lorentzian broadened</label>" << endl;
+  fout << "      <pixmap>internalFieldLL.png</pixmap>" << endl;
+  fout << "      <params>4</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>bessel</name>" << endl;
+  fout << "      <comment>(phase frequency)</comment>" << endl;
+  fout << "      <label>spherical Bessel 0th order</label>" << endl;
+  fout << "      <pixmap>bessel.png</pixmap>" << endl;
+  fout << "      <params>2</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>internBsl</name>" << endl;
+  fout << "      <comment>(fraction phase frequency Trate Lrate)</comment>" << endl;
+  fout << "      <label>static internal Bessel</label>" << endl;
+  fout << "      <pixmap>internalBessel.png</pixmap>" << endl;
+  fout << "      <params>5</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>skewedGss</name>" << endl;
+  fout << "      <comment>(phase frequency rate_m rate_p)</comment>" << endl;
+  fout << "      <label>skewed Gaussian</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>4</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>staticNKZF</name>" << endl;
+  fout << "      <comment>(damping_D0 R_b)</comment>" << endl;
+  fout << "      <label>static Noakes-Kalvius ZF</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>2</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>staticNKTF</name>" << endl;
+  fout << "      <comment>(phase frequency damping_D0 R_b)</comment>" << endl;
+  fout << "      <label>static Noakes-Kalvius TF</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>4</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>dynamicNKZF</name>" << endl;
+  fout << "      <comment>(damping_D0 R_b nu_c)</comment>" << endl;
+  fout << "      <label>dynamic Noakes-Kalvius ZF</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>3</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>dynamicNKTF</name>" << endl;
+  fout << "      <comment>(phase frequency damping_D0 R_b nu_c)</comment>" << endl;
+  fout << "      <label>dynamic Noakes-Kalvius TF</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>5</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>polynom</name>" << endl;
+  fout << "      <comment>(tshift p0 p1 ... pn)</comment>" << endl;
+  fout << "      <label>polynom</label>" << endl;
+  fout << "      <pixmap>polynom.png</pixmap>" << endl;
+  fout << "      <params>4</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "    <func>" << endl;
+  fout << "      <name>userFcn</name>" << endl;
+  fout << "      <comment></comment>" << endl;
+  fout << "      <label>user function</label>" << endl;
+  fout << "      <pixmap></pixmap>" << endl;
+  fout << "      <params>0</params>" << endl;
+  fout << "    </func>" << endl;
+  fout << "  </theory_functions>" << endl;
+  fout << "</musredit_startup>" << endl;
+
+  file.close();
 }
 
 //--------------------------------------------------------------------------

@@ -209,6 +209,7 @@ class PAdmin : public QObject
     QVector<PTheory> fTheory; ///< stores all known theories. Needed when generating theory blocks from within musredit.
 
     void saveRecentFiles(); ///< save recent file list
+    void createMusreditStartupFile(); ///< create default musredit_startup.xml
 };
 
 #endif // _PADMIN_H_

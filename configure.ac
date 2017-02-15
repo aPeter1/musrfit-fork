@@ -1263,8 +1263,6 @@ AC_CONFIG_FILES([Makefile \
                  src/musredit_qt5/Makefile \
                  src/musredit/Makefile \
                  src/musrgui/Makefile \
-                 src/musredit_qt5/musredit_startup.xml \
-                 src/musredit/musredit_startup.xml \
                  src/musrgui/musrgui_startup.xml])
 
 AC_OUTPUT
@@ -1425,3 +1423,15 @@ echo "   Programs:                ${INSTALLDIR}/bin"
 echo "   XML configuration files: ${HOME}/.musrfit"  
 echo "   Documentation:           ${DOCDIR}"
 echo ""
+
+dnl --------------
+dnl create header file that musredit knows at runtime where to find the documentation
+dnl --------------
+if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit_qt5"; then
+  echo \#define MUSRFIT_PREFIX \"${INSTALLDIR}\" > src/musredit_qt5/musrfit-info.h
+  echo \#define MUSRFIT_DOC_DIR \"${DOCDIR}\" >> src/musredit_qt5/musrfit-info.h
+fi
+if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit"; then
+  echo \#define MUSRFIT_PREFIX \"${INSTALLDIR}\" > src/musredit/musrfit-info.h
+  echo \#define MUSRFIT_DOC_DIR \"${DOCDIR}\" >> src/musredit/musrfit-info.h
+fi

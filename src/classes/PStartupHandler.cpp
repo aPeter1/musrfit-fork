@@ -27,6 +27,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
@@ -137,6 +140,23 @@ PStartupHandler::PStartupHandler()
       if (StartupFileExists(startup_path_name)) {
         fStartupFilePath = TString(startup_path_name);
         fStartupFileFound = true;
+      }
+    }
+  }
+
+  // if musrfit_startup.xml is still not found, will create a default one
+  if (!fStartupFileFound) {
+    cout << endl << "**INFO** no musrfit_startup.xml file found, will write a default one." << endl;
+    if (!WriteDefaulStartupFile()) {
+      cerr << endl << "**ERROR** couldn't write default musrfit_startup.xml." << endl;
+    } else {
+      home = getenv("HOME");
+      if (home != 0) {
+        sprintf(startup_path_name, "%s/.musrfit/musrfit_startup.xml", home);
+        if (StartupFileExists(startup_path_name)) {
+          fStartupFilePath = TString(startup_path_name);
+          fStartupFileFound = true;
+        }
       }
     }
   }
@@ -564,6 +584,107 @@ Bool_t PStartupHandler::StartupFileExists(Char_t *fln)
   }
 
   return result;
+}
+
+//--------------------------------------------------------------------------
+// WriteDefaulStartupFile
+//--------------------------------------------------------------------------
+Bool_t PStartupHandler::WriteDefaulStartupFile()
+{
+  // get home
+  Char_t startup_path_name[256];
+  Char_t *home=0;
+  home = getenv("HOME");
+  if (home == 0) {
+    cerr << endl << "**ERROR** couldn't obtain $HOME." << endl;
+    return false;
+  }
+
+  // first check that $HOME/.musrfit exists and if NOT create it
+  struct stat info;
+
+  sprintf(startup_path_name, "%s/.musrfit", home);
+  if (!stat(startup_path_name, &info)) {
+    if (!(info.st_mode & S_IFDIR))
+      return false;
+  } else {
+    if (mkdir(startup_path_name, 0777)) {
+      cerr << endl << "**ERROR** couldn't create '" << startup_path_name << "'" << endl;
+      return false;
+    }
+  }
+
+  // set path-name for musrfit_startup.xml
+  sprintf(startup_path_name, "%s/.musrfit/musrfit_startup.xml", home);
+
+  ofstream fout(startup_path_name, ofstream::out);
+  if (!fout.is_open()) {
+    cerr << endl << "**ERROR** couldn't open '" << startup_path_name << "' for writing." << endl;
+    return false;
+  }
+
+  // write default musrfit_startup.xml
+  fout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
+  fout << "<musrfit xmlns=\"http://lmu.web.psi.ch/musrfit/user/MUSR/WebHome.html\">" << endl;
+  fout << "    <comment>" << endl;
+  fout << "        Defines default settings for the musrfit package" << endl;
+  fout << "    </comment>" << endl;
+  fout << "    <data_path>/mnt/data/nemu/his</data_path>" << endl;
+  fout << "    <data_path>/mnt/data/nemu/wkm</data_path>" << endl;
+  fout << "    <data_path>/afs/psi.ch/project/nemu/data/his</data_path>" << endl;
+  fout << "    <data_path>/afs/psi.ch/project/nemu/data/wkm</data_path>" << endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/gps</data_path>" << endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/dolly</data_path>" << endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/gpd</data_path>" << endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/ltf</data_path>" << endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/alc</data_path>" << endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/hifi</data_path>" << endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/lem</data_path>" << endl;
+  fout << "    <fourier_settings>" << endl;
+  fout << "        <units>Gauss</units>" << endl;
+  fout << "        <fourier_power>0</fourier_power>" << endl;
+  fout << "        <apodization>none</apodization>" << endl;
+  fout << "        <plot>real_and_imag</plot>" << endl;
+  fout << "        <phase>0.0</phase>" << endl;
+  fout << "        <phase_increment>1.0</phase_increment>" << endl;
+  fout << "    </fourier_settings>" << endl;
+  fout << "    <root_settings>" << endl;
+  fout << "        <marker_list>" << endl;
+  fout << "            <!-- Root marker numbers -->" << endl;
+  fout << "            <marker>24</marker> <!-- open circle -->" << endl;
+  fout << "            <marker>25</marker> <!-- open square -->" << endl;
+  fout << "            <marker>26</marker> <!-- open triangle -->" << endl;
+  fout << "            <marker>27</marker> <!-- open diamond -->" << endl;
+  fout << "            <marker>28</marker> <!-- open cross -->" << endl;
+  fout << "            <marker>29</marker> <!-- full star -->" << endl;
+  fout << "            <marker>30</marker> <!-- open star -->" << endl;
+  fout << "            <marker>20</marker> <!-- full circle -->" << endl;
+  fout << "            <marker>21</marker> <!-- full square -->" << endl;
+  fout << "            <marker>22</marker> <!-- full triangle -->" << endl;
+  fout << "            <marker>23</marker> <!-- full triangle down -->" << endl;
+  fout << "            <marker>2</marker>  <!-- thin cross -->" << endl;
+  fout << "            <marker>3</marker>  <!-- thin star -->" << endl;
+  fout << "            <marker>5</marker>  <!-- thin x -->" << endl;
+  fout << "        </marker_list>" << endl;
+  fout << "        <color_list>" << endl;
+  fout << "            <!-- Color as RGB coded string -->" << endl;
+  fout << "            <color>0,0,0</color>      <!-- kBlack -->" << endl;
+  fout << "            <color>255,0,0</color>    <!-- kRed -->" << endl;
+  fout << "            <color>0,255,0</color>    <!-- kGreen -->" << endl;
+  fout << "            <color>0,0,255</color>    <!-- kBlue -->" << endl;
+  fout << "            <color>255,0,255</color>  <!-- kMagenta -->" << endl;
+  fout << "            <color>0,255,255</color>  <!-- kCyan -->" << endl;
+  fout << "            <color>153,0,255</color>  <!-- kViolet-3 -->" << endl;
+  fout << "            <color>102,102,51</color> <!-- kYellow-1 -->" << endl;
+  fout << "            <color>51,102,51</color>  <!-- kGreen-1 -->" << endl;
+  fout << "            <color>153,0,0</color>    <!-- kRed+2 -->" << endl;
+  fout << "        </color_list>" << endl;
+  fout << "    </root_settings>" << endl;
+  fout << "</musrfit>" << endl;
+
+  fout.close();
+
+  return true;
 }
 
 // -------------------------------------------------------------------------
