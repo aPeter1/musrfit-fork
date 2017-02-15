@@ -1,10 +1,6 @@
 TEMPLATE = app
 TARGET = musredit
 
-!exists( musredit_startup.xml ) {
-    error( "Configuration file musredit_startup.xml not found! Please configure musrfit first, before trying to install musredit!" )
-}
-
 # install path for musredit
 count( PREFIX, 1 ) {
     MUSREDIT_INSTALL_PATH = $${PREFIX}/bin
@@ -67,8 +63,6 @@ macx {
 unix:xml.path = $$(HOME)/.musrfit/musredit
 macx:xml.path = $$(HOME)/.musrfit/musredit
 win32:xml.path = c:/musrfit/bin
-xml.files = musredit_startup.xml
-INSTALLS += xml
 
 CONFIG += qt \
     warn_on \
@@ -78,7 +72,10 @@ QT += xml
 QT += webkit
 QT += network
 
+INCLUDEPATH += "../include"
+
 HEADERS = musredit.h \
+    musrfit-info.h \
     PHelp.h \
     PTextEdit.h \
     PSubTextEdit.h \
@@ -101,7 +98,8 @@ HEADERS = musredit.h \
     PGetFourierBlockDialog.h \
     PGetPlotBlockDialog.h \
     PMsr2DataDialog.h \
-    PMusrEditAbout.h
+    PMusrEditAbout.h \
+    ../include/git-revision.h
 
 SOURCES = PHelp.cpp \ 
     PTextEdit.cpp \
