@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <spin_valve_proximity xmlns="http://nemu.web.psi.ch/musrfit/libSpinValve">
   <comment>
-    $Id$
     number_of_fields: number of sampling points in field around the Lorentzian peak
     range: range in which the sampling points are placed, given in units of \beta(1\pm\Delta)
   </comment>
