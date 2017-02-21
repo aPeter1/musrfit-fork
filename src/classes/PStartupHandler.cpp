@@ -147,7 +147,7 @@ PStartupHandler::PStartupHandler()
   // if musrfit_startup.xml is still not found, will create a default one
   if (!fStartupFileFound) {
     cout << endl << "**INFO** no musrfit_startup.xml file found, will write a default one." << endl;
-    if (!WriteDefaulStartupFile()) {
+    if (!WriteDefaultStartupFile()) {
       cerr << endl << "**ERROR** couldn't write default musrfit_startup.xml." << endl;
     } else {
       home = getenv("HOME");
@@ -587,9 +587,9 @@ Bool_t PStartupHandler::StartupFileExists(Char_t *fln)
 }
 
 //--------------------------------------------------------------------------
-// WriteDefaulStartupFile
+// WriteDefaultStartupFile
 //--------------------------------------------------------------------------
-Bool_t PStartupHandler::WriteDefaulStartupFile()
+Bool_t PStartupHandler::WriteDefaultStartupFile()
 {
   // get home
   Char_t startup_path_name[256];
