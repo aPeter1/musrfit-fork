@@ -72,7 +72,7 @@ using namespace std;
 #include "PDumpOutputHandler.h"
 #include "PPrefsDialog.h"
 #include "PGetMusrFTOptionsDialog.h"
-#include "PGetDefaultDialog.h"
+//#include "PGetDefaultDialog.h"
 #include "PMusrEditAbout.h"
 #include "PMsr2DataDialog.h"
 
@@ -491,17 +491,10 @@ void PTextEdit::setupMusrActions()
   menuBar()->addMenu( menu );
 
   QAction *a;
-  a = new QAction( QIcon( QPixmap( ":/icons/musrAsym-plain.svg" ) ), tr( "&Asymmetry Default" ), this );
-  a->setShortcut( tr("Alt+A") );
-  a->setStatusTip( tr("Get Default Asymmetry msr-file") );
-  connect( a, SIGNAL( triggered() ), this, SLOT( musrGetAsymmetryDefault() ) );
-  tb->addAction(a);
-  menu->addAction(a);
-
-  a = new QAction( QIcon( QPixmap( ":/icons/musrSingleHisto-plain.svg" ) ), tr( "Single &Histogram Default" ), this );
-  a->setShortcut( tr("Alt+H") );
-  a->setStatusTip( tr("Get Default Single Histogram msr-file") );
-  connect( a, SIGNAL( triggered() ), this, SLOT( musrGetSingleHistoDefault() ) );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrWiz-32x32.svg" ) ), tr( "musr&Wiz" ), this );
+  a->setShortcut( tr("Alt+W") );
+  a->setStatusTip( tr("Call musrWiz which helps to create msr-files") );
+  connect( a, SIGNAL( triggered() ), this, SLOT( musrWiz() ) );
   tb->addAction(a);
   menu->addAction(a);
 
@@ -1597,124 +1590,11 @@ void PTextEdit::textSize( const QString &p )
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Loads a default asymmetry msr-file.
+ * @brief PTextEdit::musrWiz
  */
-void PTextEdit::musrGetAsymmetryDefault()
+void PTextEdit::musrWiz()
 {
-  QString runFileName, beamline, institute, fileFormat;
-
-  PGetDefaultDialog *dlg = new PGetDefaultDialog(fAdmin->getHelpUrl("main"));
-
-  if (dlg == 0) {
-    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke get default dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
-    return;
-  }
-
-  // set defaults
-  dlg->setBeamline(fAdmin->getBeamline());
-  dlg->setInstitute(fAdmin->getInstitute());
-  dlg->setFileFormat(fAdmin->getFileFormat());
-
-  dlg->exec();
-
-  if (dlg->result() != QDialog::Accepted) {
-    delete dlg;
-    dlg = 0;
-    return;
-  }
-
-  runFileName = dlg->getRunFileName();
-  beamline    = dlg->getBeamline();
-  institute   = dlg->getInstitute();
-  fileFormat  = dlg->getFileFormat();
-  delete dlg;
-  dlg = 0;
-
-  QFile file(fAdmin->getMsrDefaultFilePath()+"/asymDefault.msr");
-  if (file.open(QIODevice::ReadOnly)) {
-    // make a new file tab
-    fileNew();
-    QTextStream ts( &file );
-    QString line;
-    while ( !ts.atEnd() ) {
-      line = ts.readLine(); // line of text excluding '\n'
-      if (line.startsWith("RUN")) {
-        QString runHeader = "RUN " + runFileName + " " + beamline.toUpper() + " " + institute + " " + fileFormat.toUpper() + " (name beamline institute data-file-format)\n";
-        currentEditor()->insertPlainText(runHeader);
-      } else { // just copy the text
-        currentEditor()->insertPlainText(line+"\n");
-      }
-    }
-    currentEditor()->textCursor().setPosition(0);
-
-    file.close();
-  } else {
-    QMessageBox::critical(this, "**ERROR**",
-       "Couldn't find default asymmetry file template :-(",
-       QMessageBox::Ok, QMessageBox::NoButton);
-  }
-
-}
-
-//----------------------------------------------------------------------------------------------------
-/**
- * <p>Loads a default single histogram msr-file.
- */
-void PTextEdit::musrGetSingleHistoDefault()
-{
-  QString runFileName, beamline, institute, fileFormat;
-
-  PGetDefaultDialog *dlg = new PGetDefaultDialog();
-
-  if (dlg == 0) {
-    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke get default dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
-    return;
-  }
-
-  // set defaults
-  dlg->setBeamline(fAdmin->getBeamline());
-  dlg->setInstitute(fAdmin->getInstitute().toLower());
-  dlg->setFileFormat(fAdmin->getFileFormat().toLower());
-
-  dlg->exec();
-
-  if (dlg->result() != QDialog::Accepted) {
-    delete dlg;
-    dlg = 0;
-    return;
-  }
-
-  runFileName = dlg->getRunFileName();
-  beamline    = dlg->getBeamline();
-  institute   = dlg->getInstitute();
-  fileFormat  = dlg->getFileFormat();
-  delete dlg;
-  dlg = 0;
-
-  QFile file(fAdmin->getMsrDefaultFilePath()+"/singleHistoDefault.msr");
-  if (file.open(QIODevice::ReadOnly)) {
-    // make a new file tab
-    fileNew();
-    QTextStream ts( &file );
-    QString line;
-    while ( !ts.atEnd() ) {
-      line = ts.readLine(); // line of text excluding '\n'
-      if (line.startsWith("RUN")) {
-        QString runHeader = "RUN " + runFileName + " " + beamline.toUpper() + " " + institute + " " + fileFormat.toUpper() + " (name beamline institute data-file-format)\n";
-        currentEditor()->insertPlainText(runHeader);
-      } else { // just copy the text
-        currentEditor()->insertPlainText(line+"\n");
-      }
-    }
-    currentEditor()->textCursor().setPosition(0);
-
-    file.close();
-  } else {
-    QMessageBox::critical(this, "**ERROR**",
-       "Couldn't find default single histogram file template :-(",
-       QMessageBox::Ok, QMessageBox::NoButton);
-  }
-
+  QMessageBox::information(this, "**INFO**", "Will eventually call musrWiz");
 }
 
 //----------------------------------------------------------------------------------------------------

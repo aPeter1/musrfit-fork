@@ -114,8 +114,6 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eFileFormat;
   } else if (qName == "lifetime_correction") {
     fKeyWord = eLifetimeCorrection;
-  } else if (qName == "msr_default_file_path") {
-    fKeyWord = eMsrDefaultFilePath;
   } else if (qName == "musr_web_main") {
     fKeyWord = eHelpMain;
   } else if (qName == "musr_web_title") {
@@ -327,9 +325,6 @@ bool PAdminXMLParser::characters(const QString& str)
         flag = false;
       fAdmin->setLifetimeCorrectionFlag(flag);
       break;
-    case eMsrDefaultFilePath:
-      fAdmin->setMsrDefaultFilePath(QString(str.toLatin1()).trimmed());
-      break;
     case eHelpMain:
       fAdmin->setHelpUrl("main", str);
       break;
@@ -493,12 +488,6 @@ bool PAdminXMLParser::endDocument()
       fAdmin->setDefaultSavePath(str);
  }
 
-  if (fAdmin->getMsrDefaultFilePath().indexOf('$') >= 0) {
-    str = expandPath(fAdmin->getMsrDefaultFilePath());
-    if (!str.isEmpty())
-      fAdmin->setMsrDefaultFilePath(str);
-  }
-
   if (fAdmin->getTheoFuncPixmapPath().indexOf('$') >=0) {
     str = expandPath(fAdmin->getTheoFuncPixmapPath());
     if (!str.isEmpty())
@@ -628,7 +617,6 @@ PAdmin::PAdmin() : QObject()
   fPrefPathName = QString("");
   fExecPath = QString("");
   fDefaultSavePath = QString("");
-  fMsrDefaultFilePath = QString("");
   fTheoFuncPixmapPath = QString("");
 
   fBeamline   = QString("");

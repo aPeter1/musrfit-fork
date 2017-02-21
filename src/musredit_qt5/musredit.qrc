@@ -13,12 +13,11 @@
         <file>icons/document-print-plain.svg</file>
         <file>icons/view-refresh-plain.svg</file>
         <file>icons/document-save-plain.svg</file>
-        <file>icons/musrAsym-plain.svg</file>
+        <file>icons/musrWiz-32x32.svg</file>
         <file>icons/musrchisq-plain.svg</file>
         <file>icons/musrfit-plain.svg</file>
         <file>icons/msr2data-plain.svg</file>
         <file>icons/musrprefs-plain.svg</file>
-        <file>icons/musrSingleHisto-plain.svg</file>
         <file>icons/musrswap-plain.svg</file>
         <file>icons/musrt0-plain.svg</file>
         <file>icons/musrview-plain.svg</file>

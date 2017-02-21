@@ -90,7 +90,6 @@ HEADERS = musredit.h \
     PDumpOutputHandler.h \
     PPrefsDialog.h \
     PGetMusrFTOptionsDialog.h \
-    PGetDefaultDialog.h \
     PGetTitleBlockDialog.h \ 
     PGetParameterBlockDialog.h \
     PGetTheoryBlockDialog.h \
@@ -116,7 +115,6 @@ SOURCES = PHelp.cpp \
     PDumpOutputHandler.cpp \
     PPrefsDialog.cpp \
     PGetMusrFTOptionsDialog.cpp \
-    PGetDefaultDialog.cpp \
     PGetTitleBlockDialog.cpp \ 
     PGetParameterBlockDialog.cpp \
     PGetTheoryBlockDialog.cpp \
@@ -134,7 +132,6 @@ SOURCES = PHelp.cpp \
 FORMS = forms/PFindDialog.ui \
     forms/PReplaceDialog.ui \
     forms/PReplaceConfirmationDialog.ui \
-    forms/PGetDefaultDialog.ui \
     forms/PMusrEditAbout.ui \
     forms/PPrefsDialog.ui \
     forms/PGetMusrFTOptionsDialog.ui \

@@ -125,8 +125,7 @@ private slots:
   void textFamily( const QString &f );
   void textSize( const QString &p );
 
-  void musrGetAsymmetryDefault();
-  void musrGetSingleHistoDefault();
+  void musrWiz();
   void musrCalcChisq();
   void musrFit();
   void musrMsr2Data();

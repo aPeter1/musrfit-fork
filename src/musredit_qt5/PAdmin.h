@@ -72,7 +72,7 @@ class PAdminXMLParser : public QXmlDefaultHandler
                          eTitleFromDataFile, eChisqPreRunBlock, eEstimateN0,
                          eMusrviewShowFourier, eMusrviewShowAvg, eEnableMusrT0,
                          eFontName, eFontSize, eExecPath, eDefaultSavePath,
-                         eRecentFile, eBeamline, eInstitute, eFileFormat, eLifetimeCorrection, eMsrDefaultFilePath,
+                         eRecentFile, eBeamline, eInstitute, eFileFormat, eLifetimeCorrection,
                          eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
                          eFuncPixmap, eFuncParams, eHelpMain, eHelpTitle, eHelpParameters, eHelpTheory, eHelpFunctions,
                          eHelpRun, eHelpCommand, eHelpFourier, eHelpPlot, eHelpStatistic, eHelpMsr2Data, eHelpMusrFT,
@@ -131,7 +131,6 @@ class PAdmin : public QObject
     QString getInstitute() { return fInstitute; }
     QString getFileFormat() { return fFileFormat; }
     bool    getLifetimeCorrectionFlag() { return fLifetimeCorrection; }
-    QString getMsrDefaultFilePath() { return fMsrDefaultFilePath; }
     QString getHelpUrl(QString tag);
     QString getTheoFuncPixmapPath() { return fTheoFuncPixmapPath; }
     unsigned int getTheoryCounts() { return fTheory.size(); }
@@ -166,7 +165,6 @@ class PAdmin : public QObject
     void setInstitute(const QString str) { fInstitute = str; }
     void setFileFormat(const QString str) { fFileFormat = str; }
     void setLifetimeCorrectionFlag(const bool flag) { fLifetimeCorrection = flag; }
-    void setMsrDefaultFilePath(const QString str) { fMsrDefaultFilePath = str; }
     void setHelpUrl(const QString tag, const QString url);
     void setTheoFuncPixmapPath (const QString str) { fTheoFuncPixmapPath = str; }
     void addTheoryItem(const PTheory theo) { fTheory.push_back(theo); }
@@ -182,7 +180,6 @@ class PAdmin : public QObject
     QString fPrefPathName;       ///< path-name of the musredit_startup.xml
     QString fExecPath;           ///< system path to the musrfit executables
     QString fDefaultSavePath;    ///< default path where the msr-file should be saved
-    QString fMsrDefaultFilePath; ///< path where to find musredit source
     QString fTheoFuncPixmapPath; ///< path where the default pixmaps can be found
 
     QVector<QString> fRecentFile; ///< keep vector of recent path-file names
