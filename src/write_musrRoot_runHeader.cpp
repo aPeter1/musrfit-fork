@@ -62,9 +62,9 @@ int main(int argc, char *argv[])
 
   if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
-    cout << endl << "write_musrRoot_runHeader version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "write_musrRoot_runHeader version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #else
-    cout << endl << "write_musrRoot_runHeader git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "write_musrRoot_runHeader git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #endif
     return 0;
   }

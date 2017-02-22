@@ -38,7 +38,8 @@ PMusrEditAbout::PMusrEditAbout(QWidget *parent, Qt::WindowFlags f) : QDialog(par
 {
   setupUi(this);
 
-  fGitRev_label->setText(QString("git: %1").arg(GIT_REVISION));
+  fGitBranch_label->setText(QString("git-branch: %1").arg(GIT_BRANCH));
+  fGitRev_label->setText(QString("git-rev: %1").arg(GIT_CURRENT_SHA1));
 
   setModal(true);
 }

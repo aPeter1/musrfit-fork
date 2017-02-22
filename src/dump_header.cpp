@@ -762,9 +762,9 @@ int main(int argc, char *argv[])
       return 0;
     } else if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-v")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "dump_header: version " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "dump_header version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #else
-      cout << endl << "dump_header: git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "dump_header git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #endif
       return 0;
     } else if (!strcmp(argv[i], "-rn") || !strcmp(argv[i], "--runNo")) {

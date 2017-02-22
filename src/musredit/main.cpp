@@ -53,7 +53,7 @@ int main( int argc, char ** argv )
       cout << endl << endl;
       return 0;
     } else if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")) {
-      cout << endl << "musredit git-rev: " << GIT_REVISION;
+      cout << endl << "musredit git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1;
       cout << endl << endl;
       return 0;
     }

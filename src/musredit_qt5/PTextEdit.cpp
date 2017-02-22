@@ -72,7 +72,6 @@ using namespace std;
 #include "PDumpOutputHandler.h"
 #include "PPrefsDialog.h"
 #include "PGetMusrFTOptionsDialog.h"
-//#include "PGetDefaultDialog.h"
 #include "PMusrEditAbout.h"
 #include "PMsr2DataDialog.h"
 
