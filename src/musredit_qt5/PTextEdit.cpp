@@ -501,7 +501,7 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap( ":/icons/musrchisq-plain.svg" ) ), tr( "Calculate Chisq" ), this );
+  a = new QAction( QIcon( QPixmap( ":/icons/musrchisq-plain.svg" ) ), tr( "Calculate &Chisq" ), this );
   a->setShortcut( tr("Alt+C") );
   a->setStatusTip( tr("Calculate Chi Square (Log Max Likelihood)") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrCalcChisq() ) );
@@ -519,6 +519,13 @@ void PTextEdit::setupMusrActions()
   a->setShortcut( tr("Alt+S") );
   a->setStatusTip( tr("Swap msr-file <-> mlog-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrSwapMsrMlog() ) );
+  tb->addAction(a);
+  menu->addAction(a);
+
+  a = new QAction( QIcon( QPixmap( ":/icons/musrStep-32x32.svg" ) ), tr( "Set Ste&ps" ), this );
+  a->setShortcut( tr("Alt+P") );
+  a->setStatusTip( tr("Set Steps") );
+  connect( a, SIGNAL( triggered() ), this, SLOT( musrSetSteps() ) );
   tb->addAction(a);
   menu->addAction(a);
 
@@ -1594,6 +1601,9 @@ void PTextEdit::textSize( const QString &p )
  */
 void PTextEdit::musrWiz()
 {
+  if ( !currentEditor() )
+    return;
+
   QMessageBox::information(this, "**INFO**", "Will eventually call musrWiz");
 }
 
@@ -2249,6 +2259,15 @@ void PTextEdit::musrPrefs()
 
   delete dlg;
   dlg = 0;
+}
+
+//----------------------------------------------------------------------------------------------------
+void PTextEdit::musrSetSteps()
+{
+  if ( !currentEditor() )
+    return;
+
+  QMessageBox::information(this, "**INFO**", "Eventually this will allow to set the\nstep values of the current msr-file.");
 }
 
 //----------------------------------------------------------------------------------------------------

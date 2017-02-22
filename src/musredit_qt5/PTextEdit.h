@@ -134,6 +134,7 @@ private slots:
   void musrFT();
   void musrPrefs();
   void musrSwapMsrMlog();
+  void musrSetSteps();
   void musrDump();
 
   void helpContents();
