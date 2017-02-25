@@ -37,6 +37,7 @@
 #include <QTimer>
 #include <QString>
 #include <QVector>
+#include <QProcess>
 
 #include <QtDebug>
 
@@ -140,6 +141,8 @@ private slots:
   void helpContents();
   void helpAboutQt();
   void helpAbout();
+
+  void exitStatusMusrSetSteps(int exitCode, QProcess::ExitStatus exitStatus);
 
   void fontChanged( const QFont &f );
   void textChanged(const bool forced = false);

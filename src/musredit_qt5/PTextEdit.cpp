@@ -2266,7 +2266,55 @@ void PTextEdit::musrSetSteps()
   if ( !currentEditor() )
     return;
 
-  QMessageBox::information(this, "**INFO**", "Eventually this will allow to set the\nstep values of the current msr-file.");
+  // make sure I have a saved msr-file to work on
+  QString tabLabel = fTabWidget->tabText(fTabWidget->currentIndex());
+  if (tabLabel == "noname") {
+    QMessageBox::critical(this, "**ERROR**", "For musrStep a real mlog/msr-file is needed.");
+    return;
+  } else if (tabLabel == "noname*") {
+    fileSaveAs();
+  } else if (tabLabel.indexOf("*") > 0) {
+    fileSave();
+  }
+
+  // fill the command queue
+  QString cmd = fAdmin->getExecPath() + "/musrStep";
+  QString workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
+  QStringList arg;
+  QString str;
+
+  // get file name and feed it to the command queue
+  str = *fFilenames.find( currentEditor() );
+  int pos = str.lastIndexOf("/");
+  if (pos != -1)
+    str.remove(0, pos+1);
+  arg << str;
+
+  QProcess *proc = new QProcess(this);
+  if (proc == nullptr) {
+    QMessageBox::critical(0, "**ERROR**", "Couldn't invoke QProcess!");
+    return;
+  }
+
+  // handle return status of musrStep
+  connect(proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+          [=](int exitCode, QProcess::ExitStatus exitStatus){ exitStatusMusrSetSteps(exitCode, exitStatus); });
+
+  // make sure that the system environment variables are properly set
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+  proc->setProcessEnvironment(env);
+  proc->setWorkingDirectory(workDir);
+  proc->start(cmd, arg);
+  if (!proc->waitForStarted()) {
+    // error handling
+    QString msg(tr("Could not execute the output command: ")+cmd[0]);
+    QMessageBox::critical( 0,
+                          tr("Fatal error"),
+                          msg,
+                          tr("Quit") );
+    return;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2422,6 +2470,32 @@ void PTextEdit::helpAbout()
 void PTextEdit::helpAboutQt()
 {
   QMessageBox::aboutQt(this);
+}
+
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * @brief PTextEdit::existStatusMusrSetSteps
+ * @param exitCode
+ * @param exitStatus
+ */
+void PTextEdit::exitStatusMusrSetSteps(int exitCode, QProcess::ExitStatus exitStatus)
+{
+  if (exitStatus == QProcess::CrashExit) {
+    QMessageBox::critical(0, "**FATAL**", "musrStep returned CrashExit.");
+    return;
+  }
+
+  // dialog finished with reject
+  if (exitCode == 0)
+    return;
+
+  // dialog finished with save and quite, i.e. accept, hence reload
+  QString fln = *fFilenames.find( currentEditor() );
+  int idx = fTabWidget->currentIndex();
+
+  fileClose();
+  load(fln, idx);
 }
 
 //----------------------------------------------------------------------------------------------------
