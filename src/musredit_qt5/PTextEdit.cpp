@@ -1602,6 +1602,8 @@ void PTextEdit::musrWiz()
 {
   QString cmd = fAdmin->getExecPath() + "/musrWiz";
   QString workDir = "./"; // think about it!!
+  QStringList arg;
+  arg << "--log";
 
   QProcess *proc = new QProcess(this);
 
@@ -1610,7 +1612,7 @@ void PTextEdit::musrWiz()
   env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
   proc->setProcessEnvironment(env);
   proc->setWorkingDirectory(workDir);
-  proc->start(cmd);
+  proc->start(cmd, arg);
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
