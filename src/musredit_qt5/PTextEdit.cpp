@@ -28,6 +28,7 @@
  ***************************************************************************/
 
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include <QString>
@@ -1606,6 +1607,14 @@ void PTextEdit::musrWiz()
   arg << "--log";
 
   QProcess *proc = new QProcess(this);
+  if (proc == nullptr) {
+    QMessageBox::critical(0, "**ERROR**", "Couldn't invoke QProcess!");
+    return;
+  }
+
+  // handle return status of musrWiz
+  connect(proc, static_cast<void(QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+          [=](int exitCode, QProcess::ExitStatus exitStatus){ exitStatusMusrWiz(exitCode, exitStatus); });
 
   // make sure that the system environment variables are properly set
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -2490,6 +2499,58 @@ void PTextEdit::helpAboutQt()
   QMessageBox::aboutQt(this);
 }
 
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * @brief PTextEdit::exitStatusMusrWiz
+ * @param exitCode
+ * @param exitStatus
+ */
+void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
+{
+  if (exitStatus == QProcess::CrashExit) {
+    QMessageBox::critical(0, "**FATAL**", "musrWiz returned CrashExit.");
+    return;
+  }
+
+  // dialog finished with reject
+  if (exitCode == 0)
+    return;
+
+  // read .musrWiz.log
+  ifstream fin(".musrWiz.log", ifstream::in);
+  if (!fin.is_open()) {
+    QMessageBox::critical(0, "**ERROR**", "PTextEdit::exitStatusMusrWiz: couldn't read .musrWiz.log file.");
+    return;
+  }
+  char line[128];
+  bool musrT0tag = false;
+  QString str, pathFileName("");
+  while (fin.good()) {
+    fin.getline(line, 128);
+    str = line;
+    if (str.startsWith("path-file-name:")) {
+      pathFileName = str.mid(16);
+    } else if (str.startsWith("musrt0-tag: yes")) {
+      musrT0tag = true;
+    }
+  }
+  fin.close();
+
+  load(pathFileName);
+
+  // in case there is a 1st empty tab "noname", remove it
+  QString tabStr = fTabWidget->tabText(0);
+  tabStr.remove('&'); // this is needed since the QTabWidget adds short-cut info as '&' to the tab name
+  if (tabStr == "noname") { // has to be the first, otherwise do nothing
+    fFileSystemWatcher->removePath("noname");
+
+    delete fTabWidget->widget(0);
+  }
+
+  if (musrT0tag)
+    musrT0();
+}
 
 //----------------------------------------------------------------------------------------------------
 /**

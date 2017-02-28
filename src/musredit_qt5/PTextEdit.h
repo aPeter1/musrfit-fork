@@ -142,6 +142,7 @@ private slots:
   void helpAboutQt();
   void helpAbout();
 
+  void exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus);
   void exitStatusMusrSetSteps(int exitCode, QProcess::ExitStatus exitStatus);
 
   void fontChanged( const QFont &f );
