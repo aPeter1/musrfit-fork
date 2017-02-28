@@ -158,6 +158,7 @@ private slots:
   void setFileSystemWatcherActive();
 
 private:
+  bool fDarkTheme;
   PAdmin *fAdmin; ///< pointer to the xml-startup file informations. Needed for different purposes like default working- and executable directories etc.
   QFileSystemWatcher *fFileSystemWatcher; ///< checks if msr-files are changing on the disk while being open in musredit.
   bool fFileSystemWatcherActive; ///< flag to enable/disable the file system watcher

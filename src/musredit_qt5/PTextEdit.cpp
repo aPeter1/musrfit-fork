@@ -86,6 +86,12 @@ using namespace std;
 PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
     : QMainWindow( parent, f )
 {
+  QString str = QIcon::themeName();
+  if (str.contains("dark", Qt::CaseInsensitive))
+    fDarkTheme = true;
+  else
+    fDarkTheme = false;
+
   // reads and manages the conents of the xml-startup (musredit_startup.xml) file
   fAdmin = new PAdmin();
 
@@ -119,7 +125,12 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   textSize(QString("%1").arg(fAdmin->getFontSize()));
   fFontChanging = false;
 
-  setWindowIcon( QIcon( QPixmap( ":/icons/musrfit-plain.svg" ) ) );
+  QString iconName("");
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrfit-dark.svg");
+  else
+    iconName = QString(":/icons/musrfit-plain.svg");
+  setWindowIcon( QIcon( QPixmap(iconName) ) );
 
   // if arguments are give, try to load those files, otherwise create an empty new file
   if ( qApp->arguments().size() != 1 ) {
@@ -174,14 +185,23 @@ void PTextEdit::setupFileActions()
 
   QAction *a;
 
-  a = new QAction( QIcon( QPixmap(":/icons/document-new-plain.svg") ), tr( "&New..." ), this );
+  QString iconName("");
+  if (fDarkTheme)
+    iconName = QString(":/icons/document-new-dark.svg");
+  else
+    iconName = QString(":/icons/document-new-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&New..." ), this );
   a->setShortcut( tr("Ctrl+N") );
   a->setStatusTip( tr("Create a new msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileNew() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap(":/icons/document-open-plain.svg" ) ), tr( "&Open..." ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/document-open-dark.svg");
+  else
+    iconName = QString(":/icons/document-open-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Open..." ), this );
   a->setShortcut( tr("Ctrl+O") );
   a->setStatusTip( tr("Opens a msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileOpen() ) );
@@ -197,7 +217,11 @@ void PTextEdit::setupFileActions()
   }
   fillRecentFiles();
 
-  a = new QAction( QIcon( QPixmap(":/icons/view-refresh-plain.svg") ), tr( "Reload..." ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/view-refresh-dark.svg");
+  else
+    iconName = QString(":/icons/view-refresh-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "Reload..." ), this );
   a->setShortcut( tr("F5") );
   a->setStatusTip( tr("Reload msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileReload() ) );
@@ -210,7 +234,11 @@ void PTextEdit::setupFileActions()
 
   menu->addSeparator();
 
-  a = new QAction( QIcon( QPixmap(":/icons/document-save-plain.svg") ), tr( "&Save..." ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/document-save-dark.svg");
+  else
+    iconName = QString(":/icons/document-save-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Save..." ), this );
   a->setShortcut( tr("Ctrl+S") );
   a->setStatusTip( tr("Save msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileSave() ) );
@@ -228,7 +256,11 @@ void PTextEdit::setupFileActions()
 
   menu->addSeparator();
 
-  a = new QAction( QIcon( QPixmap(":/icons/document-print-plain.svg") ), tr( "&Print..." ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/document-print-dark.svg");
+  else
+    iconName = QString(":/icons/document-print-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Print..." ), this );
   a->setShortcut( tr("Ctrl+P") );
   a->setStatusTip( tr("Print msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( filePrint() ) );
@@ -276,15 +308,24 @@ void PTextEdit::setupEditActions()
   menuBar()->addMenu( menu );
 
   QAction *a;
+  QString iconName("");
 
-  a = new QAction( QIcon( QPixmap( ":/icons/edit-undo-plain.svg" ) ), tr( "&Undo" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/edit-undo-dark.svg");
+  else
+    iconName = QString(":/icons/edit-undo-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Undo" ), this );
   a->setShortcut( tr("Ctrl+Z") );
   a->setStatusTip( tr("Edit Undo") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editUndo() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/edit-redo-plain.svg" ) ), tr( "&Redo" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/edit-redo-dark.svg");
+  else
+    iconName = QString(":/icons/edit-redo-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Redo" ), this );
   a->setShortcut( tr("Ctrl+Y") );
   a->setStatusTip( tr("Edit Redo") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editRedo() ) );
@@ -301,21 +342,33 @@ void PTextEdit::setupEditActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap( ":/icons/edit-copy-plain.svg" ) ), tr( "&Copy" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/edit-copy-dark.svg");
+  else
+    iconName = QString(":/icons/edit-copy-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Copy" ), this );
   a->setShortcut( tr("Ctrl+C") );
   a->setStatusTip( tr("Edit Copy") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editCopy() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/edit-cut-plain.svg" ) ), tr( "Cu&t" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/edit-cut-dark.svg");
+  else
+    iconName = QString(":/icons/edit-cut-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "Cu&t" ), this );
   a->setShortcut( tr("Ctrl+X") );
   a->setStatusTip( tr("Edit Cut") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editCut() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/edit-paste-plain.svg" ) ), tr( "&Paste" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/edit-paste-dark.svg");
+  else
+    iconName = QString(":/icons/edit-paste-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Paste" ), this );
   a->setShortcut( tr("Ctrl+V") );
   a->setStatusTip( tr("Edit Paste") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editPaste() ) );
@@ -325,21 +378,33 @@ void PTextEdit::setupEditActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap( ":/icons/edit-find-plain.svg" ) ), tr( "&Find" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/edit-find-dark.svg");
+  else
+    iconName = QString(":/icons/edit-find-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Find" ), this );
   a->setShortcut( tr("Ctrl+F") );
   a->setStatusTip( tr("Edit Find") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editFind() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/go-next-use-plain.svg" ) ), tr( "Find &Next" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/go-next-use-dark.svg");
+  else
+    iconName = QString(":/icons/go-next-use-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "Find &Next" ), this );
   a->setShortcut( tr("F3") );
   a->setStatusTip( tr("Edit Find Next") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editFindNext() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/go-previous-use-plain.svg" ) ) , tr( "Find Pre&vious" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/go-previous-use-dark.svg");
+  else
+    iconName = QString(":/icons/go-previous-use-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ) , tr( "Find Pre&vious" ), this );
   a->setShortcut( tr("Shift+F4") );
   a->setStatusTip( tr("Edit Find Previous") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editFindPrevious() ) );
@@ -491,7 +556,12 @@ void PTextEdit::setupMusrActions()
   menuBar()->addMenu( menu );
 
   QAction *a;
-  a = new QAction( QIcon( QPixmap( ":/icons/musrWiz-32x32.svg" ) ), tr( "musr&Wiz" ), this );
+  QString iconName("");
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrWiz-32x32-dark.svg");
+  else
+    iconName = QString(":/icons/musrWiz-32x32.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "musr&Wiz" ), this );
   a->setShortcut( tr("Alt+W") );
   a->setStatusTip( tr("Call musrWiz which helps to create msr-files") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrWiz() ) );
@@ -501,35 +571,55 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap( ":/icons/musrchisq-plain.svg" ) ), tr( "Calculate &Chisq" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrchisq-dark.svg");
+  else
+    iconName = QString(":/icons/musrchisq-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "Calculate &Chisq" ), this );
   a->setShortcut( tr("Alt+C") );
   a->setStatusTip( tr("Calculate Chi Square (Log Max Likelihood)") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrCalcChisq() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/musrfit-plain.svg" ) ), tr( "&Fit" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrfit-dark.svg");
+  else
+    iconName = QString(":/icons/musrfit-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Fit" ), this );
   a->setShortcut( tr("Alt+F") );
   a->setStatusTip( tr("Fit") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrFit() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/musrswap-plain.svg" ) ), tr( "&Swap Msr <-> Mlog" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrswap-dark.svg");
+  else
+    iconName = QString(":/icons/musrswap-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Swap Msr <-> Mlog" ), this );
   a->setShortcut( tr("Alt+S") );
   a->setStatusTip( tr("Swap msr-file <-> mlog-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrSwapMsrMlog() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/musrStep-32x32.svg" ) ), tr( "Set Ste&ps" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrStep-32x32-dark.svg");
+  else
+    iconName = QString(":/icons/musrStep-32x32-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "Set Ste&ps" ), this );
   a->setShortcut( tr("Alt+P") );
   a->setStatusTip( tr("Set Steps") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrSetSteps() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/msr2data-plain.svg" ) ), tr( "&Msr2Data" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/msr2data-dark.svg");
+  else
+    iconName = QString(":/icons/msr2data-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Msr2Data" ), this );
   a->setShortcut( tr("Alt+M") );
   a->setStatusTip( tr("Start msr2data interface") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrMsr2Data() ) );
@@ -539,27 +629,43 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap( ":/icons/musrview-plain.svg" ) ), tr( "&View" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrview-dark.svg");
+  else
+    iconName = QString(":/icons/musrview-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&View" ), this );
   a->setShortcut( tr("Alt+V") );
   a->setStatusTip( tr("Start musrview") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrView() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  fMusrT0Action = new QAction( QIcon( QPixmap( ":/icons/musrt0-plain.svg" ) ), tr( "&T0" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrt0-dark.svg");
+  else
+    iconName = QString(":/icons/musrt0-plain.svg");
+  fMusrT0Action = new QAction( QIcon( QPixmap(iconName) ), tr( "&T0" ), this );
   fMusrT0Action->setStatusTip( tr("Start musrt0") );
   connect( fMusrT0Action, SIGNAL( triggered() ), this, SLOT( musrT0() ) );
   tb->addAction(fMusrT0Action);
   menu->addAction(fMusrT0Action);
   fMusrT0Action->setEnabled(fAdmin->getEnableMusrT0Flag());
 
-  a = new QAction( QIcon( QPixmap (":/icons/musrFT-plain.svg") ), tr( "Raw Fourier" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrFT-dark.svg");
+  else
+    iconName = QString(":/icons/musrFT-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "Raw Fourier" ), this );
   a->setStatusTip( tr("Start musrFT") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrFT() ) );
   tb->addAction(a);
   menu->addAction(a);
 
-  a = new QAction( QIcon( QPixmap( ":/icons/musrprefs-plain.svg" ) ), tr( "&Preferences" ), this );
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrprefs-dark.svg");
+  else
+    iconName = QString(":/icons/musrprefs-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Preferences" ), this );
   a->setStatusTip( tr("Show Preferences") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrPrefs() ) );
   tb->addAction(a);
@@ -568,7 +674,11 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
-  a = new QAction( QIcon( QPixmap(":/icons/musrdump-plain.svg")), tr( "&Dump Header"), this);
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrdump-dark.svg");
+  else
+    iconName = QString(":/icons/musrdump-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName)), tr( "&Dump Header"), this);
   a->setStatusTip( tr("Dumps muSR File Header Information") );
   connect( a, SIGNAL(triggered()), this, SLOT(musrDump()));
   tb->addAction(a);
