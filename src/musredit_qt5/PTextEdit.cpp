@@ -607,7 +607,7 @@ void PTextEdit::setupMusrActions()
   if (fDarkTheme)
     iconName = QString(":/icons/musrStep-32x32-dark.svg");
   else
-    iconName = QString(":/icons/musrStep-32x32-plain.svg");
+    iconName = QString(":/icons/musrStep-32x32.svg");
   a = new QAction( QIcon( QPixmap(iconName) ), tr( "Set Ste&ps" ), this );
   a->setShortcut( tr("Alt+P") );
   a->setStatusTip( tr("Set Steps") );
