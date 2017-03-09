@@ -159,6 +159,7 @@ private slots:
 
 private:
   bool fDarkTheme;
+  bool fDarkToolBarIcon;
   PAdmin *fAdmin; ///< pointer to the xml-startup file informations. Needed for different purposes like default working- and executable directories etc.
   QFileSystemWatcher *fFileSystemWatcher; ///< checks if msr-files are changing on the disk while being open in musredit.
   bool fFileSystemWatcherActive; ///< flag to enable/disable the file system watcher
@@ -181,6 +182,7 @@ private:
   QMenu *fRecentFilesMenu;   ///< recent file menu
   QAction *fRecentFilesAction[MAX_RECENT_FILES]; ///< array of the recent file actions
 
+  void getTheme();
   void fillRecentFiles();
   QStringList getRunList(QString runListStr, bool &ok);
 };
