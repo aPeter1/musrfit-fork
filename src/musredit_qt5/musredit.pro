@@ -1,6 +1,8 @@
 TEMPLATE = app
 TARGET = musredit
 
+QMAKE_CXXFLAGS += -std=c++11
+
 # install path for musredit
 count( PREFIX, 1 ) {
     MUSREDIT_INSTALL_PATH = $${PREFIX}/bin
