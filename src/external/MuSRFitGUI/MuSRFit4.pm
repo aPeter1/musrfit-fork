@@ -46,6 +46,7 @@ sub NEW {
     my ( $class, $parent ) = @_;
     $class->SUPER::NEW($parent);
     this->{ui} = Ui_MuSRFit4->setupUi(this);
+    my %All=CreateAllInput();      
 }
 
 # This file is part of MuSRFitGUI.
@@ -91,6 +92,7 @@ sub fileSave()
 	    "$FILENAME",
 	    "MSR Files (*.msr *.mlog)",
 	    this,
+
 	    "save file dialog",
 	    "Choose a filename to save under");
     
@@ -257,15 +259,16 @@ sub CreateAllInput()
     $All{"RunNumbers"} = this->{ui}->runNumbers->text();
     $All{"RunFiles"} = this->{ui}->runFiles->text();
     $All{"BeamLine"} = this->{ui}->beamLine->currentText;
-    $All{"RUNSType"} = this->{ui}->manualFile->isOn();
+    $All{"RUNSType"} = this->{ui}->manualFile->isChecked();
     $All{"YEAR"} = this->{ui}->year->currentText;
-    if ($All{"YEAR"} eq "") {
+    if (!defined($All{"YEAR"}) || $All{"YEAR"} eq "") {
 # If year combobox is empty fill it up from 2004 up to current year
 	    my ($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
 	    my $current_year = 1900 + $yearOffset;
+#	    my @years = ($current_year..2004);
+#	    this->{ui}->year->addItems(@years);
 	    for (my $i=$current_year;$i>=2004;$i--) {
-		this->{ui}->year->insertItem($i,-1);
-		print "inserted-$i\n";
+		this->{ui}->year->addItem($i);
 	    }
     }
 # Time range and BINS
@@ -297,7 +300,7 @@ sub CreateAllInput()
 	$All{"ltc"}="n";
     }
 # Minuit commands    
-    if ( $All{"go"} eq "" ) {
+    if ( !defined($All{"go"}) || $All{"go"} eq "" ) {
 	$All{"go"}="PLOT";
     }   
 # Get minimization process
@@ -322,7 +325,7 @@ sub CreateAllInput()
     $All{"FILENAME"}= this->{ui}->fileName->text;
 
 # From Fourier Tab
-    $All{"FUNITS"}= this->{ui}->fUnits->currentText;
+    $All{"FUNITS"}= this->{ui}->funits->currentText;
     $All{"FAPODIZATION"}= this->{ui}->fapodization->currentText;
     $All{"FPLOT"}= this->{ui}->fplot->currentText;
     $All{"FPHASE"}=this->{ui}->fphase->text;
@@ -339,13 +342,13 @@ sub CreateAllInput()
 # Get values of t0 and Bg/Data bins if given
     my $NHist = 1;
     foreach my $Hist (@Hists) {
-	foreach ("t0","Bg1","Bg2","Data1","Data2") {
+	foreach ("t0","bg1","bg2","data1","data2") {
 	    my $Name = "$_$NHist";
-	    $All{$Name}=child($Name)->text;
+	    $All{$Name}=child("Qt::LineEdit",$Name)->text;
 # TODO: If empty fill with defaults
 	    if ($All{$Name} eq "") {
 		$All{$Name}=MSR::T0BgData($_,$Hist,$All{"BeamLine"});
-		child($Name)->setText($All{$Name});
+		child("Qt::LineEdit",$Name)->setText($All{$Name});
 	    }
 	}
 	$NHist++;
@@ -373,9 +376,9 @@ sub CreateAllInput()
 	     18,"None"
 	     );
     
-    my $FT1=this->{ui}->fitType1->currentItem;
-    my $FT2=this->{ui}->fitType2->currentItem;
-    my $FT3=this->{ui}->fitType3->currentItem;
+    my $FT1=this->{ui}->fitType1->currentIndex;
+    my $FT2=this->{ui}->fitType2->currentIndex;
+    my $FT3=this->{ui}->fitType3->currentIndex;
     $All{"FitType1"} = $FTs{$FT1};
     $All{"FitType2"} = $FTs{$FT2};
     $All{"FitType3"} = $FTs{$FT3};
@@ -394,9 +397,9 @@ sub CreateAllInput()
     my @Paramcomp = @$Paramcomp_ref;
     
 # Functions block 
-    $All{"FunctionsBlock"}=this->{ui}->functionsBlock->text;
+    $All{"FunctionsBlock"}=this->{ui}->functionsBlock->toPlainText;
 # and the associated theory block
-    $All{"Func_T_Block"}=this->{ui}->theoryBlock->text;
+    $All{"Func_T_Block"}=this->{ui}->theoryBlock->toPlainText;
     
 # Shared settings are detected here
     $All{"EnableSharing"} = this->{ui}->buttonGroupSharing->isChecked();
@@ -438,8 +441,8 @@ sub CreateAllInput()
 	    } else {	
 # Check if shared or not, construct name of checkbox, find its handle and then 
 # check if it is checked		    
-		my $ChkName="ShParam_".$Component."_".$NP;
-		my $ChkBx = child($ChkName);
+		my $ChkName="shParam_".$Component."_".$NP;
+		my $ChkBx = child("Qt::Widget",$ChkName);
 		$Shared = $ChkBx->isChecked();
 	    }
 	    $All{"Sh_$Param"}=$Shared;
@@ -452,10 +455,12 @@ sub CreateAllInput()
 # Done with shared parameters detecting
     
 # Construct a default filename if empty
-    if ( $All{"FILENAME"} eq ""  && !$All{"RUNSType"}) {
-	$All{"FILENAME"}=$RUNS[0]."_".$All{"BeamLine"}."_".$All{"YEAR"};
-	if ($All{"BeamLine"} eq "LEM (PPC)") {
-	    $All{"FILENAME"}=$RUNS[0]."_LEM_".$All{"YEAR"};
+    if (defined($RUNS[0])) {
+	if ( $All{"FILENAME"} eq ""  && !$All{"RUNSType"}) {
+	    $All{"FILENAME"}=$RUNS[0]."_".$All{"BeamLine"}."_".$All{"YEAR"};
+	    if ($All{"BeamLine"} eq "LEM (PPC)") {
+		$All{"FILENAME"}=$RUNS[0]."_LEM_".$All{"YEAR"};
+	    }
 	}
     } else {
 	$All{"FILENAME"}="TMP";
@@ -472,21 +477,23 @@ sub CreateAllInput()
     my $erradd = "d";
     my $minadd = "_min";
     my $maxadd = "_max";
-    my $Header=this->{ui}->initParamTable->verticalHeader();
+    my $QTable=this->{ui}->initParamTable;
 # TODO: Should not go over all rows, only on parameters.
     if ($NParam > 0) {
+# Set appropriate number of rows
+	$QTable->setRowCount($NParam);
 	for (my $i=0;$i<$NParam;$i++) {
 # Take label of row, i.e. name of parameter
-	    my $Param=$Header->label($i);
+	    if (defined($QTable->verticalHeaderItem($i)) && defined($QTable->item($i,1))  && defined($QTable->item($i,2)) && defined($QTable->item($i,3)) && defined($QTable->item($i,4))) {
+		my $Param=$QTable->verticalHeaderItem($i)->text();
 # Then take the value, error, max and min (as numbers)
-	    $All{"$Param"}=1.0*this->{ui}->initParamTable->item($i,0)->text($i,0);
-	    $All{"$erradd$Param"}=1.0*this->{ui}->initParamTable->item($i,1)->text($i,1);
-	    $All{"$Param$minadd"}=1.0*this->{ui}->initParamTable->item($i,2)->text($i,2);
-	    $All{"$Param$maxadd"}=1.0*this->{ui}->initParamTable->item($i,3)->text($i,3);
+		$All{"$Param"}=1.0*$QTable->item($i,0)->text();
+		$All{"$erradd$Param"}=1.0*$QTable->item($i,1)->text();
+		$All{"$Param$minadd"}=1.0*$QTable->item($i,2)->text();
+		$All{"$Param$maxadd"}=1.0*$QTable->item($i,3)->text();
+	    }
 	}
     }
-
-    
 # Return Hash with all important values
     return %All;  
 }
@@ -497,7 +504,7 @@ sub CallMSRCreate()
     my %All=CreateAllInput();
     
 # Check if the option for checking for existing files is selected    
-    my $FileExistCheck= this->{ui}->fileExistCheck->isOn();
+    my $FileExistCheck= this->{ui}->fileExistCheck->isChecked();
     my $FILENAME=$All{"FILENAME"}.".msr";
     my $Answer=0;    
     if ($All{"RunNumbers"} ne ""  || $All{"RunFiles"} ne "") {
@@ -572,12 +579,15 @@ sub UpdateMSRFileInitTable()
 {
     my %All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"};
-    open (MSRF,q{<},"$FILENAME.msr" );
-    my @lines = <MSRF>;
-    close(IFILE);
+    my @lines=();
+    if (-e "$FILENAME.msr") {
+	open (MSRF,q{<},"$FILENAME.msr" );
+	@lines = <MSRF>;
+	close(IFILE);
+    }
     this->{ui}->textMSROutput->setText("");
     foreach my $line (@lines) {
-	this->{ui}->textMSROutput->append("$line");
+	this->{ui}->textMSROutput->insertPlainText("$line");
     }
     
     (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@lines);
@@ -585,7 +595,6 @@ sub UpdateMSRFileInitTable()
     
     my $PCount=0;
     foreach my $line (@FPBloc) {
-	$PCount++;
 	my @Param=split(/\s+/,$line);
 	
 # Depending on how many elements in @Param determine what they mean
@@ -603,7 +612,8 @@ sub UpdateMSRFileInitTable()
 	my $error = 1.0*$Param[4];
 	my $minvalue=0.0;
 	my $maxvalue=0.0;
-	if ($#Param == 4) {
+#	for (my $i=0;$i<=$#Param;$i++) { print "$i - $Param[$i]\n";}
+	if ($#Param == 4 || $#Param == 5) {
 	    $minvalue=0.0;
 	    $maxvalue=0.0;
 	}
@@ -611,16 +621,25 @@ sub UpdateMSRFileInitTable()
 	    $minvalue=1.0*$Param[5];
 	    $maxvalue=1.0*$Param[6];
 	}
-	elsif ($#Param == 5 || $#Param == 7) {
+	elsif ($#Param == 7) {
 	    $minvalue=1.0*$Param[6];
 	    $maxvalue=1.0*$Param[7];
 	}	    
-# Now update the initialization tabel	
-	this->{ui}->initParamTable->setText($PCount-1,0,$value);
-	this->{ui}->initParamTable->setText($PCount-1,1,$error);
-	this->{ui}->initParamTable->setText($PCount-1,2,$minvalue);
-	this->{ui}->initParamTable->setText($PCount-1,3,$maxvalue);
+# Now update the initialization tabel
+	my $QTable = this->{ui}->initParamTable;
+#	print "PCount=$PCount and value=$value\n";
+	if (defined($QTable->item($PCount,0)) & defined($QTable->item($PCount,1)) & defined($QTable->item($PCount,2)) & defined($QTable->item($PCount,3))) {
+	    $QTable->setItem($PCount,0,Qt::TableWidgetItem());
+	    $QTable->setItem($PCount,1,Qt::TableWidgetItem());
+	    $QTable->setItem($PCount,2,Qt::TableWidgetItem());
+	    $QTable->setItem($PCount,3,Qt::TableWidgetItem());
+	    $QTable->item($PCount,0)->setText($value);
+	    $QTable->item($PCount,1)->setText($error);
+	    $QTable->item($PCount,2)->setText($minvalue);
+	    $QTable->item($PCount,3)->setText($maxvalue);
+	}
 # Set bg color to mark different runs
+	$PCount++;
     }
     return;
 }
@@ -632,7 +651,7 @@ sub ActivateT0Hists()
     my $HistBox = "";
     for (my $iHist=1; $iHist<=4; $iHist++) {
 	$HistBox="groupHist$iHist";
-	my $HistBoxHandle = child($HistBox);
+	my $HistBoxHandle = child("Qt::Widget",$HistBox);
 	if ($iHist<=$#Hists+1) {
 # Activate this histogram box
 	    $HistBoxHandle->setHidden(0);
@@ -693,21 +712,21 @@ sub ActivateShComp()
 	
 	
 # Make the component appear first (only if we have multiple runs)
-	    my $ShCompG="SharingComp".$Component;
-	    my $ShCG = child($ShCompG);
+	    my $ShCompG="sharingComp".$Component;
+	    my $ShCG = child("Qt::Widget",$ShCompG);
 	    if ($#RUNS>0) {
 		$ShCG->setHidden(0);
 		$ShCG->setEnabled(1);
 	    }
-	    my $CompShLabel = "Comp".$Component."ShLabel";
-	    my $CompShL = child($CompShLabel);
+	    my $CompShLabel = "comp".$Component."ShLabel";
+	    my $CompShL = child("Qt::Widget",$CompShLabel);
 	    $CompShL->setText($All{"FitType$Component"});
 	
 # Change state/label of parameters
 	    for (my $i=1; $i<=9;$i++) {		
-		my $ParamChkBx="ShParam_".$Component."_".$i;
-		my $ChkBx = child($ParamChkBx);
-		if ($Params[$i-1] ne "") {
+		my $ParamChkBx="shParam_".$Component."_".$i;
+		my $ChkBx = child("Qt::Widget",$ParamChkBx);
+		if (defined($Params[$i-1])) {
 		    $ChkBx->setHidden(0);
 		    $ChkBx->setEnabled(1);
 		    $ChkBx ->setText($Params[$i-1]);
@@ -723,40 +742,47 @@ sub ActivateShComp()
 sub InitializeTab()
 {
     my %All=CreateAllInput();
-    this->{ui}->initParamTable->setLeftMargin(100);
-    my $NRows = this->{ui}->initParamTable->numRows();
+    my $QTable = this->{ui}->initParamTable;
+    my $NRows = $QTable->rowCount();
     
 # Remove any rows in table
     if ($NRows > 0) {
 	for (my $i=0;$i<$NRows;$i++) {
 # TODO: Better remove the row rather than hide it.
-	    this->{ui}->initParamTable->hideRow($i);
-#	    this->{ui}->initParamTable->removeRow($i);
+	    $QTable->hideRow($i);
+#	    $QTable->removeRow($i);
 	}
     }
     
     my %PTable=MSR::PrepParamTable(\%All);
     
 # Setup the table with the right size    
-    my $NParam=scalar keys( %PTable );
+#    my $NParam=scalar keys( %PTable );
+    my $NParam=keys( %PTable );
     if ($NParam>$NRows) {	
-	this->{ui}->initParamTable->setNumRows($NParam);
+	$QTable->setNumRows($NParam);
     }
+
+#    for (my $i=0;$i<$NParam;$i++) {print "Line=$PTable{$i}\n";}
+
     
-# Fill the table with labels and values of parametr 
+# Fill the table with labels and values of parameter 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
 	my ($Param,$value,$error,$minvalue,$maxvalue,$RUN) = split(/,/,$PTable{$PCount});
 # Now make sure we have no nans
 	if ($error eq "nan") { $error=0.1;}
-# If you use this then reading the parameters from the table is a problem
-# You need to extract the correct parameter name from the row label
-#	this->{ui}->initParamTable->verticalHeader()->setLabel( $PCount,"$RUN: $Param");
-	this->{ui}->initParamTable->verticalHeader()->setLabel( $PCount,"$Param");
-	this->{ui}->initParamTable->showRow($PCount);
-	this->{ui}->initParamTable->setText($PCount,0,$value);
-	this->{ui}->initParamTable->setText($PCount,1,$error);
-	this->{ui}->initParamTable->setText($PCount,2,$minvalue);
-	this->{ui}->initParamTable->setText($PCount,3,$maxvalue);
+	# Make sure items exist before addressing them
+	$QTable->setVerticalHeaderItem($PCount,Qt::TableWidgetItem());
+	$QTable->verticalHeaderItem($PCount)->setText($Param);
+	$QTable->showRow($PCount);
+	$QTable->setItem($PCount,0,Qt::TableWidgetItem());
+	$QTable->item($PCount,0)->setText($value);
+	$QTable->setItem($PCount,1,Qt::TableWidgetItem());
+	$QTable->item($PCount,1)->setText($error);
+	$QTable->setItem($PCount,2,Qt::TableWidgetItem());
+	$QTable->item($PCount,2)->setText($minvalue);
+	$QTable->setItem($PCount,3,Qt::TableWidgetItem());
+	$QTable->item($PCount,3)->setText($maxvalue);
     }
 }
 
@@ -791,7 +817,7 @@ sub GoFit()
 	my $Warning = "Error: The number of histograms should be 2 for an asymmetry fit!";
 	my $WarningWindow = Qt::MessageBox::information( this, "Error",$Warning);
     } else {
-	this->{ui}->musrfit_tabs->setCurrentPage(1);
+	this->{ui}->musrfit_tabs->setCurrentIndex(1);
 	my $Answer=CallMSRCreate();
 	if ($Answer) {
 	    my $FILENAME=$All{"FILENAME"}.".msr";
@@ -799,15 +825,15 @@ sub GoFit()
 		my $cmd="musrfit -t $FILENAME";
 		my $pid = open(FTO,"$cmd 2>&1 |");
 		while (<FTO>) {
-		    this->{ui}->fitTextOutput->append("$_");
+		    this->{ui}->fitTextOutput->insertPlainText("$_");
 		}
 		close(FTO);
 		$cmd="musrview $FILENAME &";
 		$pid = system($cmd);
 	    } else {
-		this->{ui}->fitTextOutput->append("Cannot find MSR file!");
+		this->{ui}->fitTextOutput->insertPlainText("Cannot find MSR file!");
 	    }
-	    this->{ui}->fitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+	    this->{ui}->fitTextOutput->insertPlainText("-----------------------------------------------------------------------------------------------------------------------------");
 # update MSR File tab and initialization table
 	    UpdateMSRFileInitTable();
 	}
@@ -833,8 +859,8 @@ sub GoPlot()
 		my $cmd="musrview $FILENAME &";
 		my $pid = system($cmd);
 	    } else {
-		this->{ui}->fitTextOutput->append("Cannot find MSR file!");
-		this->{ui}->fitTextOutput->append("-----------------------------------------------------------------------------------------------------------------------------");
+		this->{ui}->fitTextOutput->insertPlainText("Cannot find MSR file!");
+		this->{ui}->fitTextOutput->insertPlainText("-----------------------------------------------------------------------------------------------------------------------------");
 	    }
 	}
     }
@@ -874,7 +900,7 @@ sub T0Update()
 	foreach ("t0","Bg1","Bg2","Data1","Data2") {
 	    my $Name = "$_$NHist";
 	    my $tmp=MSR::T0BgData($_,$Hist,$All{"BeamLine"});
-	    child($Name)->setText($tmp);
+	    child("Qt::Widget",$Name)->setText($tmp);
 	}
 	$NHist++
 	    }
@@ -927,15 +953,21 @@ sub fileBrowse()
 sub AppendToFunctions()
 {
     my $ParName=this->{ui}->cParamsCombo->currentText();
-    my $Full_T_Block=this->{ui}->theoryBlock->text;
-    my $Constraint=this->{ui}->constraintLine->text;
+    my $Full_T_Block="";
+    my $Constraint="";
+    if (defined(this->{ui}->theoryBlock->toPlainText)) {
+	$Full_T_Block=this->{ui}->theoryBlock->toPlainText;
+    }
+    if (defined(this->{ui}->constraintLine->toPlainText)) {
+	$Constraint=this->{ui}->constraintLine->toPlainText;
+    }
 # Then clear the text
     this->{ui}->constraintLine->setText("");
     
 # Check how many constraints (lines) in FUNCTIONS Block    
     my $i=this->{ui}->functionsBlock->lines();
     my $ConstLine="fun$i = $Constraint\n";
-    this->{ui}->functionsBlock->append($ConstLine);
+    this->{ui}->functionsBlock->insertPlainText($ConstLine);
     
 # Replace parameter in theory block with fun$i
     $Full_T_Block=~ s/$ParName/fun$i/;
@@ -983,10 +1015,10 @@ sub InitializeFunctions()
 	
 # Add list to the constraints drop down menu
 	for (my $i=1; $i<=9;$i++) {		
-	    my $CParam = $Params[$i-1]."_".$Component;
-	    if ($Params[$i-1] ne "" ) {
+	    if (defined($Params[$i-1])) {
+		my $CParam = $Params[$i-1]."_".$Component;
 		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "No" && $Params[$i-1] ne "NBg") {
-		    this->{ui}->cParamsCombo->insertItem($CParam,-1);
+		    this->{ui}->cParamsCombo->addItem($CParam);
 		    $Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 		}
 # also enumerate the parameters as should be used in the FUNCTIONS Block
@@ -1044,5 +1076,23 @@ sub t0UpdateClicked()
     this->{ui}->t0Update->setEnabled(0);
 #    t0Update->setText("musrt0")
 }
+
+# Function: return widget attribute given its type and name
+sub child {
+# Take type and name from input
+    my ( $object, $name ) = @_;
+    
+    my $Attrib = this->findChildren($object,$name);
+    if (@$Attrib) {
+	$Attrib = @$Attrib[0];
+    } else {
+	$Attrib = 0;
+    }
+#    print "name = $name and attrib = $Attrib\n";
+
+# Return handle on widget
+    return($Attrib);
+}
+
 
 1;
