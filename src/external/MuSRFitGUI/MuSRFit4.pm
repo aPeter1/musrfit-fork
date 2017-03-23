@@ -34,7 +34,7 @@ use QtCore4::slots
     GoFit => [],
     GoPlot => [],
     ShowMuSRT0 => [],
-    T0Update => [],
+    t0Update => [],
     RunSelectionToggle => [],
     fileBrowse => [],
     AppendToFunctions => [],
@@ -89,12 +89,10 @@ sub fileSave()
     my %All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"}.".msr";
     my $file=Qt::FileDialog::getSaveFileName(
-	    "$FILENAME",
-	    "MSR Files (*.msr *.mlog)",
-	    this,
-
-	    "save file dialog",
-	    "Choose a filename to save under");
+	this,
+	"Save file",
+	"$FILENAME",
+	"MSR Files (*.msr *.mlog)");
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
@@ -114,11 +112,10 @@ sub fileSave()
 sub fileChangeDir()
 {
     my $newdir=Qt::FileDialog::getExistingDirectory(
-	    "",
-	    this,
-	    "get existing directory",
-	    "Choose a directory",
-	    1);
+	this,
+	"Change work directory",
+	"./",
+	"");
     chdir ("$newdir");
 }
 
@@ -140,16 +137,17 @@ sub fileExit()
 
 sub parametersExport()
 {
+# Exports the fit parameters for a table format file
+# This works only after a fit call, i.e. a plot call is not sufficient!
     my %All=CreateAllInput();      
 # Add also a flag for header
     $All{"Header"}=1;
     my $FILENAME=$All{"FILENAME"}.".dat";
     my $file=Qt::FileDialog::getSaveFileName(
-	    "$FILENAME",
-	    "Data Files (*.dat)",
-	    this,
-	    "export file dialog",
-	    "Choose a filename to export to");
+	this,
+	"Export parameters to file",
+	"$FILENAME",
+	"Data Files (*.dat)");
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
@@ -163,16 +161,17 @@ sub parametersExport()
 
 sub parametersAppend()
 {
+# Appends the fit parameters for a table format file
+# This works only after a fit call, i.e. a plot call is not sufficient!
     my %All=CreateAllInput();
 # Add also a flag for header
     $All{"Header"}=0;
     my $FILENAME=$All{"FILENAME"}.".dat";
     my $file=Qt::FileDialog::getOpenFileName(
-	    "./",
-	    "Data Files (*.dat)",
-	    this,
-	    "append file dialog",
-	    "Choose a filename to append to");
+	this,
+	"Append parameters to file",
+	"./",
+	"Data Files (*.dat)");
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
@@ -228,25 +227,28 @@ sub helpContents()
 sub helpAbout()
 {
     my $AboutText="
-		  This is a GUI that uses the musrfit binary, developed by Andreas Suter,
-		  to fit muSR spectra. 
+This is a GUI that uses the musrfit binary to fit
+muSR spectra. 
+ 
+MuSRFitGUI is free software: you can redistribute it
+and/or modify it under the terms of the GNU General 
+Public License as published by the Free Software 
+Foundation, either version 3 of the License, or (at 
+your option) any later version.
+	  
+MuSRFitGUI is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the 
+implied warranty of MERCHANTABILITY or FITNESS FOR A 
+PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+  
+You should have received a copy of the GNU General Public
+License along with MuSRFitGUI.  If not, see 
+<http://www.gnu.org/licenses/>.
 		  
-		  MuSRFitGUI is free software: you can redistribute it and/or modify
-		  it under the terms of the GNU General Public License as published by
-		  the Free Software Foundation, either version 3 of the License, or
-		  (at your option) any later version.
-		  
-		  MuSRFitGUI is distributed in the hope that it will be useful,
-		  but WITHOUT ANY WARRANTY; without even the implied warranty of
-		  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-		  GNU General Public License for more details.
-		  
-		  You should have received a copy of the GNU General Public License
-		  along with MuSRFitGUI.  If not, see <http://www.gnu.org/licenses/>.
-		  
-		  Copyright 2009 by Zaher Salman and the LEM Group.
-		  <zaher.salman\@psi.ch>
-		  ";
+Copyright 2009-2017 by Zaher Salman 
+<zaher.salman\@psi.ch>.
+";
     my $AboutWindow = Qt::MessageBox::information( this, "About MuSRFit GUI",$AboutText);
 }
 
@@ -471,7 +473,7 @@ sub CreateAllInput()
     my %PTable=MSR::PrepParamTable(\%All);
     
 # Setup the table with the right size    
-    my $NParam=scalar keys( %PTable );
+    my $NParam=keys( %PTable );
     
 # Read initial values of paramets from tabel
     my $erradd = "d";
@@ -482,11 +484,12 @@ sub CreateAllInput()
     if ($NParam > 0) {
 # Set appropriate number of rows
 	$QTable->setRowCount($NParam);
-	for (my $i=0;$i<$NParam;$i++) {
-# Take label of row, i.e. name of parameter
-	    if (defined($QTable->verticalHeaderItem($i)) && defined($QTable->item($i,1))  && defined($QTable->item($i,2)) && defined($QTable->item($i,3)) && defined($QTable->item($i,4))) {
+	for (my $i=0;$i<=$NParam;$i++) {
+	    # Make sure the row items exist/defined
+	    if (defined($QTable->verticalHeaderItem($i)) && defined($QTable->item($i,0))  && defined($QTable->item($i,1)) && defined($QTable->item($i,2)) && defined($QTable->item($i,3))) {
+		# Take label of row, i.e. name of parameter
 		my $Param=$QTable->verticalHeaderItem($i)->text();
-# Then take the value, error, max and min (as numbers)
+		# Then take the value, error, max and min (as numbers)
 		$All{"$Param"}=1.0*$QTable->item($i,0)->text();
 		$All{"$erradd$Param"}=1.0*$QTable->item($i,1)->text();
 		$All{"$Param$minadd"}=1.0*$QTable->item($i,2)->text();
@@ -773,15 +776,17 @@ sub InitializeTab()
 	if ($error eq "nan") { $error=0.1;}
 	# Make sure items exist before addressing them
 	$QTable->setVerticalHeaderItem($PCount,Qt::TableWidgetItem());
-	$QTable->verticalHeaderItem($PCount)->setText($Param);
+	# Make sure that the row exists
 	$QTable->showRow($PCount);
 	$QTable->setItem($PCount,0,Qt::TableWidgetItem());
-	$QTable->item($PCount,0)->setText($value);
 	$QTable->setItem($PCount,1,Qt::TableWidgetItem());
-	$QTable->item($PCount,1)->setText($error);
 	$QTable->setItem($PCount,2,Qt::TableWidgetItem());
-	$QTable->item($PCount,2)->setText($minvalue);
 	$QTable->setItem($PCount,3,Qt::TableWidgetItem());
+	# Fill in the values...
+	$QTable->verticalHeaderItem($PCount)->setText($Param);
+	$QTable->item($PCount,0)->setText($value);
+	$QTable->item($PCount,1)->setText($error);
+	$QTable->item($PCount,2)->setText($minvalue);
 	$QTable->item($PCount,3)->setText($maxvalue);
     }
 }
@@ -870,8 +875,9 @@ sub GoPlot()
 
 sub ShowMuSRT0()
 {
+# Open musrt0 to check and adjust t0 , Bg and Data bins
     my %All=CreateAllInput();
-    this->{ui}->musrfit_tabs->setCurrentPage(6);
+    this->{ui}->musrfit_tabs->setCurrentIndex(6);
 # Create MSR file and then run musrt0
     my $Answer=CallMSRCreate();
     
@@ -889,7 +895,7 @@ sub ShowMuSRT0()
 }
 
 
-sub T0Update()
+sub t0Update()
 {
     my %All = CreateAllInput();
     my @Hists = split(/,/, $All{"LRBF"} );
@@ -900,11 +906,12 @@ sub T0Update()
 	foreach ("t0","Bg1","Bg2","Data1","Data2") {
 	    my $Name = "$_$NHist";
 	    my $tmp=MSR::T0BgData($_,$Hist,$All{"BeamLine"});
-	    child("Qt::Widget",$Name)->setText($tmp);
+	    if (defined(child("Qt::Widget",$Name))) {
+		child("Qt::Widget",$Name)->setText($tmp);
+	    }
 	}
 	$NHist++
-	    }
-    
+    }
 }
 
 
@@ -958,14 +965,16 @@ sub AppendToFunctions()
     if (defined(this->{ui}->theoryBlock->toPlainText)) {
 	$Full_T_Block=this->{ui}->theoryBlock->toPlainText;
     }
-    if (defined(this->{ui}->constraintLine->toPlainText)) {
-	$Constraint=this->{ui}->constraintLine->toPlainText;
+    if (defined(this->{ui}->constraintLine->text)) {
+	$Constraint=this->{ui}->constraintLine->text;
     }
 # Then clear the text
     this->{ui}->constraintLine->setText("");
     
 # Check how many constraints (lines) in FUNCTIONS Block    
-    my $i=this->{ui}->functionsBlock->lines();
+#    my $i=this->{ui}->functionsBlock->blockCount();
+    my $fun_lines=this->{ui}->functionsBlock->toPlainText();
+    my $i= ($fun_lines =~ tr/\n//)+1;
     my $ConstLine="fun$i = $Constraint\n";
     this->{ui}->functionsBlock->insertPlainText($ConstLine);
     

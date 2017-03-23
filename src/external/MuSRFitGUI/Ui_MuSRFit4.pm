@@ -5,7 +5,7 @@
 #################################################################################
 ## Form generated from reading UI file 'MuSRFit4.ui'
 ##
-## Created: Wed Mar 22 17:10:29 2017
+## Created: Thu Mar 23 16:58:52 2017
 ##      by: Qt User Interface Compiler version 4.8.6
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -2991,14 +2991,6 @@ sub setupUi {
     $actionsToolBar->setObjectName( "actionsToolBar" );
     $actionsToolBar->setMinimumSize( Qt::Size(0, 0) );
     $muSRFit4->addToolBar( Qt::TopToolBarArea(), $actionsToolBar );
-    $comp1Label->setBuddy( $fitType1 );
-    $comp2Label->setBuddy( $fitType1 );
-    $comp3Label->setBuddy( $fitType1 );
-    $tisLabel->setBuddy( $tis );
-    $tfsLabel->setBuddy( $tfs );
-    $binsLabel->setBuddy( $bins );
-    $titleLabel->setBuddy( $title );
-    $fileNameLabel->setBuddy( $fileName );
     Qt::Widget::setTabOrder( $musrfit_tabs, $runNumbers );
     Qt::Widget::setTabOrder( $runNumbers, $beamLine );
     Qt::Widget::setTabOrder( $beamLine, $year );
@@ -3010,7 +3002,13 @@ sub setupUi {
     Qt::Widget::setTabOrder( $fitType3, $tis );
     Qt::Widget::setTabOrder( $tis, $tfs );
     Qt::Widget::setTabOrder( $tfs, $bins );
-    Qt::Widget::setTabOrder( $bins, $fitAsyType );
+    Qt::Widget::setTabOrder( $bins, $xi );
+    Qt::Widget::setTabOrder( $xi, $xf );
+    Qt::Widget::setTabOrder( $xf, $viewBin );
+    Qt::Widget::setTabOrder( $viewBin, $yi );
+    Qt::Widget::setTabOrder( $yi, $yf );
+    Qt::Widget::setTabOrder( $yf, $ltc );
+    Qt::Widget::setTabOrder( $ltc, $fitAsyType );
     Qt::Widget::setTabOrder( $fitAsyType, $histsLRBF );
     Qt::Widget::setTabOrder( $histsLRBF, $minimization );
     Qt::Widget::setTabOrder( $minimization, $errorCalc );
@@ -3051,9 +3049,9 @@ sub setupUi {
     Qt::Widget::setTabOrder( $funits, $fapodization );
     Qt::Widget::setTabOrder( $fapodization, $fplot );
     Qt::Widget::setTabOrder( $fplot, $frqMin );
-    Qt::Widget::setTabOrder( $frqMin, $frqMax );
-    Qt::Widget::setTabOrder( $frqMax, $fphase );
-    Qt::Widget::setTabOrder( $fphase, $rrfFrq );
+    Qt::Widget::setTabOrder( $frqMin, $fphase );
+    Qt::Widget::setTabOrder( $fphase, $frqMax );
+    Qt::Widget::setTabOrder( $frqMax, $rrfFrq );
     Qt::Widget::setTabOrder( $rrfFrq, $rrfUnits );
     Qt::Widget::setTabOrder( $rrfUnits, $rrfPack );
     Qt::Widget::setTabOrder( $rrfPack, $rrfPhase );
@@ -3130,6 +3128,8 @@ sub setupUi {
     Qt::Object::connect($t0Update, SIGNAL 'clicked()' , $muSRFit4, SLOT 't0UpdateClicked()' );
     Qt::Object::connect($buttonGroupSharing, SIGNAL 'toggled(bool)' , $muSRFit4, SLOT 'ActivateShComp()' );
     Qt::Object::connect($menuBar, SIGNAL 'triggered(QAction*)' , $muSRFit4, SLOT 'RunSelectionToggle()' );
+    Qt::Object::connect($fitType1, SIGNAL 'currentIndexChanged(int)' , $muSRFit4, SLOT 'InitializeFunctions()' );
+    Qt::Object::connect($beamLine, SIGNAL 'currentIndexChanged(int)' , $muSRFit4, SLOT 't0Update()' );
 
     $musrfit_tabs->setCurrentIndex( 0 );
     $fitType2->setCurrentIndex( 18 );
@@ -3159,7 +3159,7 @@ sub retranslateUi {
     $self->{helpAboutAction}->setText( Qt::Application::translate( 'MuSRFit4', "&About", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{helpAboutAction}->setIconText( Qt::Application::translate( 'MuSRFit4', "About", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{helpAboutAction}->setShortcut( Qt::KeySequence( '' ) );
-    $self->{fileExistCheck}->setText( Qt::Application::translate( 'MuSRFit4', "Overwrite MSR File", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{fileExistCheck}->setText( Qt::Application::translate( 'MuSRFit4', "No Overwrite", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{fileExistCheck}->setIconText( Qt::Application::translate( 'MuSRFit4', "Overwrite MSR File", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{fileExistCheck}->setToolTip( Qt::Application::translate( 'MuSRFit4', "Enable overwriting MSR files", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{fileExistCheck}->setWhatsThis( Qt::Application::translate( 'MuSRFit4', "Enable/Disable checking for MSR files.", undef, Qt::Application::UnicodeUTF8() ) );
