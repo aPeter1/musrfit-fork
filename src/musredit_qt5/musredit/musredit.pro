@@ -75,10 +75,11 @@ QT += network
 QT += printsupport
 QT += svg
 
-INCLUDEPATH += "../include"
+INCLUDEPATH += "../"
+INCLUDEPATH += "../../include"
 
 HEADERS = musredit.h \
-    musrfit-info.h \
+    ../musrfit-info.h \
     PHelp.h \
     PTextEdit.h \
     PSubTextEdit.h \
@@ -102,7 +103,7 @@ HEADERS = musredit.h \
     PMsr2DataDialog.h \
     PChangeDefaultPathsDialog.h \
     PMusrEditAbout.h \
-    ../include/git-revision.h
+    ../../include/git-revision.h
 
 SOURCES = PHelp.cpp \ 
     PTextEdit.cpp \
