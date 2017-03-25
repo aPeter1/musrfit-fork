@@ -1,0 +1,502 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<musrfit-functions>
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <!-- theory function templates -->
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <theo_template>
+    <pre_def_name>T: 1 [exp x cos](TF)</pre_def_name>
+    <theory>a 1\nse 2\ntf fun1 4</theory>
+    <theo_fun>fun1=par3+map1</theo_fun>
+    <theo_map no="1" name="RelPh"/>
+    <template_param no="1" name="Asy" value="0.2" step="0.02"/>
+    <template_param no="2" name="Lambda" value="0.5" step="0.02"/>
+    <template_param no="3" name="Ph" value="0.0" step="10.0"/>
+    <template_param no="4" name="Frq" value="100.0" step="1.0"/>
+  </theo_template>
+  <theo_template>
+    <pre_def_name>T: 2 [exp x cos](TF)</pre_def_name>
+    <theory>a 1\nse 2\ntf fun1 4\n+\na 5\nse 6\ntf fun1 7</theory>
+    <theo_fun>fun1=par3+map1</theo_fun>
+    <theo_map no="1" name="RelPh"/>
+    <template_param no="1" name="Asy_0" value="0.1" step="0.02"/>
+    <template_param no="2" name="Lambda_0" value="0.5" step="0.02"/>
+    <template_param no="3" name="Ph" value="0.0" step="10.0"/>
+    <template_param no="4" name="Frq_0" value="100.0" step="1.0"/>
+    <template_param no="5" name="Asy_1" value="0.1" step="0.02"/>
+    <template_param no="6" name="Lambda_1" value="0.5" step="0.02"/>
+    <template_param no="7" name="Frq_1" value="110.0" step="1.0"/>
+  </theo_template>
+  <theo_template>
+    <pre_def_name>T: 3 [exp x cos](TF)</pre_def_name>
+    <theory>a 1\nse 2\ntf fun1 4\n+\na 5\nse 6\ntf fun1 7\n+\na 8\nse 9\ntf fun1 10</theory>
+    <theo_fun>fun1=par3+map1</theo_fun>
+    <theo_map no="1" name="RelPh"/>
+    <template_param no="1" name="Asy_0" value="0.1" step="0.02"/>
+    <template_param no="2" name="Lambda_0" value="0.5" step="0.02"/>
+    <template_param no="3" name="Ph" value="0.0" step="10.0"/>
+    <template_param no="4" name="Frq_0" value="100.0" step="1.0"/>
+    <template_param no="5" name="Asy_1" value="0.1" step="0.02"/>
+    <template_param no="6" name="Lambda_1" value="0.5" step="0.1"/>
+    <template_param no="7" name="Frq_1" value="110.0" step="1.0"/>
+    <template_param no="8" name="Asy_2" value="0.1" step="0.02"/>
+    <template_param no="9" name="Lambda_2" value="1.5" step="0.1"/>
+    <template_param no="10" name="Frq_2" value="120.0" step="1.0"/>
+  </theo_template>
+  <theo_template>
+    <pre_def_name>T: 1 [gauss x cos](TF)</pre_def_name>
+    <theory>a 1\nsg 2\ntf fun1 4</theory>
+    <theo_fun>fun1=par3+map1</theo_fun>
+    <theo_map no="1" name="RelPh"/>
+    <template_param no="1" name="Asy" value="0.2" step="0.02"/>
+    <template_param no="2" name="Sigma" value="0.5" step="0.02"/>
+    <template_param no="3" name="Ph" value="0.0" step="10.0"/>
+    <template_param no="4" name="Frq" value="100.0" step="1.0"/>
+  </theo_template>
+  <theo_template>
+    <pre_def_name>T: 2 [gauss x cos](TF)</pre_def_name>
+    <theory>a 1\nsg 2\ntf fun1 4\n+\na 5\nsg 6\ntf fun1 7</theory>
+    <theo_fun>fun1=par3+map1</theo_fun>
+    <theo_map no="1" name="RelPh"/>
+    <template_param no="1" name="Asy_0" value="0.1" step="0.02"/>
+    <template_param no="2" name="Sigma_0" value="0.5" step="0.02"/>
+    <template_param no="3" name="Ph" value="0.0" step="10.0"/>
+    <template_param no="4" name="Frq_0" value="100.0" step="1.0"/>
+    <template_param no="5" name="Asy_1" value="0.1" step="0.02"/>
+    <template_param no="6" name="Sigma_1" value="0.5" step="0.02"/>
+    <template_param no="7" name="Frq_1" value="110.0" step="1.0"/>
+  </theo_template>
+  <theo_template>
+    <pre_def_name>T: 3 [gauss x cos](TF)</pre_def_name>
+    <theory>a 1\nsg 2\ntf fun1 4\n+\na 5\nsg 6\ntf fun1 7\n+\na 8\nsg 9\ntf fun1 10</theory>
+    <theo_fun>fun1=par3+map1</theo_fun>
+    <theo_map no="1" name="RelPh"/>
+    <template_param no="1" name="Asy_0" value="0.1" step="0.02"/>
+    <template_param no="2" name="Sigma_0" value="0.5" step="0.02"/>
+    <template_param no="3" name="Ph" value="0.0" step="10.0"/>
+    <template_param no="4" name="Frq_0" value="100.0" step="1.0"/>
+    <template_param no="5" name="Asy_1" value="0.1" step="0.02"/>
+    <template_param no="6" name="Sigma_1" value="0.5" step="0.1"/>
+    <template_param no="7" name="Frq_1" value="110.0" step="1.0"/>
+    <template_param no="8" name="Asy_2" value="0.1" step="0.02"/>
+    <template_param no="9" name="Sigma_2" value="1.5" step="0.1"/>
+    <template_param no="10" name="Frq_2" value="120.0" step="1.0"/>
+  </theo_template>
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <!-- List of all predefined theory functions -->
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <!-- Asymmetry -->
+  <func>
+    <name>asymmetry</name>
+    <abbrv>a</abbrv>
+    <no_of_parameters>1</no_of_parameters>
+    <parameter>
+      <param_name>Asym</param_name>
+      <param_value>0.2</param_value>
+    </parameter>
+  </func>
+  <!-- Exp -->
+  <func>
+    <name>simplExpo</name>
+    <abbrv>se</abbrv>
+    <no_of_parameters>1</no_of_parameters>
+    <parameter>
+      <param_name>Lambda</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+  </func>
+  <!-- Gaussian -->
+  <func>
+    <name>simpleGss</name>
+    <abbrv>sg</abbrv>
+    <no_of_parameters>1</no_of_parameters>
+    <parameter>
+      <param_name>Sigma</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+  </func>
+  <!-- Streteched Exp -->
+  <func>
+    <name>generExpo</name>
+    <abbrv>ge</abbrv>
+    <no_of_parameters>2</no_of_parameters>
+    <parameter>
+      <param_name>Lambda</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Beta</param_name>
+      <param_value>1.5</param_value>
+    </parameter>
+  </func>
+  <!-- Cos -->
+  <func>
+    <name>TFieldCos</name>
+    <abbrv>tf</abbrv>
+    <no_of_parameters>2</no_of_parameters>
+    <parameter>
+      <param_name>Ph</param_name>
+      <param_value>0.0</param_value>
+      <param_is_map>y</param_is_map>
+    </parameter>
+    <parameter>
+      <param_name>Freq</param_name>
+      <param_value>10.0</param_value>
+    </parameter>
+  </func>
+  <!-- internal field -->
+  <func>
+    <name>internFld</name>
+    <abbrv>if</abbrv>
+    <no_of_parameters>5</no_of_parameters>
+    <parameter>
+      <param_name>Weight</param_name>
+      <param_value>0.66</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Ph</param_name>
+      <param_value>0.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Freq</param_name>
+      <param_value>10.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>LambdaT</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>LambdaL</param_name>
+      <param_value>0.1</param_value>
+    </parameter>
+  </func>
+  <!-- Bessel -->
+  <func>
+    <name>Bessel</name>
+    <abbrv>b</abbrv>
+    <no_of_parameters>2</no_of_parameters>
+    <parameter>
+      <param_name>Ph</param_name>
+      <param_value>0.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Freq</param_name>
+      <param_value>10.0</param_value>
+    </parameter>
+  </func>
+  <!-- internal Bessel -->
+  <func>
+    <name>internBsl</name>
+    <abbrv>ib</abbrv>
+    <no_of_parameters>5</no_of_parameters>
+    <parameter>
+      <param_name>Weight</param_name>
+      <param_value>0.66</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Ph</param_name>
+      <param_value>0.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Freq</param_name>
+      <param_value>10.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>LambdaT</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>LambdaL</param_name>
+      <param_value>0.1</param_value>
+    </parameter>
+  </func>
+  <!-- GKT ZF -->
+  <func>
+    <name>statGssKT</name>
+    <abbrv>stg</abbrv>
+    <no_of_parameters>1</no_of_parameters>
+    <parameter>
+      <param_name>Sigma</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+  </func>
+  <!-- GKT LF -->
+  <func>
+    <name>statGssKTLF</name>
+    <abbrv>sgktlf</abbrv>
+    <no_of_parameters>2</no_of_parameters>
+    <parameter>
+      <param_name>Hopp</param_name>
+      <param_value>0.1</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Sigma</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+  </func>
+  <!-- GKT LF dynamic -->
+  <func>
+    <name>dynGssKTLF</name>
+    <abbrv>dgktlf</abbrv>
+    <no_of_parameters>3</no_of_parameters>
+    <parameter>
+      <param_name>Freq</param_name>
+      <param_value>0.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Sigma</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Gamma</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+  </func>
+  <!-- expKT ZF -->
+  <func>
+    <name>statExpKT</name>
+    <abbrv>sekt</abbrv>
+    <no_of_parameters>1</no_of_parameters>
+    <parameter>
+      <param_name>Lambda</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+  </func>
+  <!-- expKT LF -->
+  <func>
+    <name>statExpKTLF</name>
+    <abbrv>sektlf</abbrv>
+    <no_of_parameters>2</no_of_parameters>
+    <parameter>
+      <param_name>Hopp</param_name>
+      <param_value>0.1</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Lambda</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+  </func>
+  <!-- expKT LF dynamic -->
+  <func>
+    <name>dynExpKTLF</name>
+    <abbrv>dektlf</abbrv>
+    <no_of_parameters>3</no_of_parameters>
+    <parameter>
+      <param_name>Freq</param_name>
+      <param_value>0.1</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Lambda</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Gamma</param_name>
+      <param_value>0.5</param_value>
+    </parameter>      
+  </func>
+  <!-- KT Exp+Gaussian ZF -->
+  <func>
+    <name>combiLGKT</name>
+    <abbrv>lgkt</abbrv>
+    <no_of_parameters>2</no_of_parameters>
+    <parameter>
+      <param_name>Lambda</param_name>
+      <param_value>0.2</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Sigma</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+  </func>
+  <!-- KT Stretched -->
+  <func>
+    <name>strKT</name>
+    <abbrv>skt</abbrv>
+    <no_of_parameters>2</no_of_parameters>
+    <parameter>
+      <param_name>Sigma</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Beta</param_name>
+      <param_value>2.0</param_value>
+    </parameter>
+  </func>
+  <!-- Spin Glass Function -->
+  <func>
+    <name>spinGlass</name>
+    <abbrv>spg</abbrv>
+    <no_of_parameters>3</no_of_parameters>
+    <parameter>
+      <param_name>Lambda</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Gamma</param_name>
+      <param_value>0.1</param_value>
+    </parameter>
+    <parameter>
+      <param_name>q</param_name>
+      <param_value>0.8</param_value>
+    </parameter>
+  </func>
+  <!-- Random Anisotropy Hyperfine Fiels -->
+  <func>
+    <name>rdAnisoHf</name>
+    <abbrv>rahf</abbrv>
+    <no_of_parameters>2</no_of_parameters>
+    <parameter>
+      <param_name>Nu</param_name>
+      <param_value>1.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Lambda</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+  </func>
+  <!-- Abragam -->
+  <func>
+    <name>abragam</name>
+    <abbrv>ab</abbrv>
+    <no_of_parameters>2</no_of_parameters>
+    <parameter>
+      <param_name>Sigma</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Gamma</param_name>
+      <param_value>0.2</param_value>
+    </parameter>
+  </func>
+  <!-- skewed Gaussian -->
+  <func>
+    <name>skewedGss</name>
+    <abbrv>skg</abbrv>
+    <no_of_parameters>4</no_of_parameters>
+    <parameter>
+      <param_name>Ph</param_name>
+      <param_value>0.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Freq</param_name>
+      <param_value>10.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>SigmaPlus</param_name>
+      <param_value>1.1</param_value>
+    </parameter>
+    <parameter>
+      <param_name>SigmaMinus</param_name>
+      <param_value>0.3</param_value>
+    </parameter>
+  </func>
+  <!-- static Noakes Kalvius ZF function -->
+  <func>
+    <name>staticNKZF</name>
+    <abbrv>snkzf</abbrv>
+    <no_of_parameters>2</no_of_parameters>
+    <parameter>
+      <param_name>Delta</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Rb</param_name>
+      <param_value>0.2</param_value>
+    </parameter>
+  </func>
+  <!-- static Noakes Kalvius TF function -->
+  <func>
+    <name>staticNKTF</name>
+    <abbrv>snktf</abbrv>
+    <no_of_parameters>4</no_of_parameters>
+    <parameter>
+      <param_name>Ph</param_name>
+      <param_value>0.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Frq</param_name>
+      <param_value>10.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Delta</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Rb</param_name>
+      <param_value>0.2</param_value>
+    </parameter>
+  </func>
+  <!-- dynamic Noakes Kalvius ZF function -->
+  <func>
+    <name>dynamicNKZF</name>
+    <abbrv>dnkzf</abbrv>
+    <no_of_parameters>3</no_of_parameters>
+    <parameter>
+      <param_name>Delta</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Rb</param_name>
+      <param_value>0.2</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Hopp</param_name>
+      <param_value>1.0</param_value>
+    </parameter>
+  </func>  
+  <!-- dynamic Noakes Kalvius TF function -->
+  <func>
+    <name>dynamicNKTF</name>
+    <abbrv>dnktf</abbrv>
+    <no_of_parameters>5</no_of_parameters>
+    <parameter>
+      <param_name>Ph</param_name>
+      <param_value>0.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Frq</param_name>
+      <param_value>10.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Delta</param_name>
+      <param_value>0.5</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Rb</param_name>
+      <param_value>0.2</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Hopp</param_name>
+      <param_value>1.0</param_value>
+    </parameter>
+  </func>
+  <!-- mu^- exp TF -->
+  <func>
+    <name>muMinusExpTF</name>
+    <abbrv>mmsetf</abbrv>
+    <no_of_parameters>6</no_of_parameters>
+    <parameter>
+      <param_name>N0</param_name>
+      <param_value>100.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Tau</param_name>
+      <param_value>1.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Asym</param_name>
+      <param_value>0.08</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Lambda</param_name>
+      <param_value>1.1</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Ph</param_name>
+      <param_value>0.0</param_value>
+    </parameter>
+    <parameter>
+      <param_name>Frq</param_name>
+      <param_value>10.2</param_value>
+    </parameter>
+  </func>
+</musrfit-functions>

@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<instrument_def_psi xmlns="https://www.psi.ch/lmu/instrumentation">
+  <institute>PSI</institute>
+  <!-- +++++++++++++++++++++++++++ H A L 9 5 0 0 ++++++++++++++++++++++++++++++++++++ -->
+  <instrument name="HAL9500">
+    <run_name_template>dYYYY/tdc/tdc_hifi_YYYY_NNNNN </run_name_template>
+    <beamline>PIE3</beamline>
+    <data_file_format>PSI-MDU</data_file_format>    
+    <tf>
+      <no_of_detectors>16</no_of_detectors>
+      <fgb_offset>50</fgb_offset>
+      <lgb>409500</lgb>
+      <asym_bkg_range>500 15000</asym_bkg_range>
+      <logic_detector name="F1" rel_phase="0.0" forward="2"/>
+      <logic_detector name="F2" rel_phase="45.0" forward="3"/>
+      <logic_detector name="F3" rel_phase="90.0" forward="4"/>
+      <logic_detector name="F4" rel_phase="135.0" forward="5"/>
+      <logic_detector name="F5" rel_phase="180.0" forward="6"/>
+      <logic_detector name="F6" rel_phase="225.0" forward="7"/>
+      <logic_detector name="F7" rel_phase="270.0" forward="8"/>
+      <logic_detector name="F8" rel_phase="315.0" forward="9"/>
+      <logic_detector name="B1" rel_phase="0.0" forward="10"/>
+      <logic_detector name="B2" rel_phase="45.0" forward="11"/>
+      <logic_detector name="B3" rel_phase="90.0" forward="12"/>
+      <logic_detector name="B4" rel_phase="135.0" forward="13"/>
+      <logic_detector name="B5" rel_phase="180.0" forward="14"/>
+      <logic_detector name="B6" rel_phase="225.0" forward="15"/>
+      <logic_detector name="B7" rel_phase="270.0" forward="16"/>
+      <logic_detector name="B8" rel_phase="315.0" forward="17"/>
+      <logic_asym_detector name="F15" rel_phase="0.0" forward="2" backward="6" alpha="1.0"/>
+      <logic_asym_detector name="F26" rel_phase="45.0" forward="3" backward="7" alpha="1.0"/>
+      <logic_asym_detector name="F37" rel_phase="90.0" forward="4" backward="8" alpha="1.0"/>
+      <logic_asym_detector name="F48" rel_phase="135.0" forward="5" backward="9" alpha="1.0"/>
+      <logic_asym_detector name="B15" rel_phase="0.0" forward="10" backward="14" alpha="1.0"/>
+      <logic_asym_detector name="B26" rel_phase="45.0" forward="11" backward="15" alpha="1.0"/>
+      <logic_asym_detector name="B37" rel_phase="90.0" forward="12" backward="16" alpha="1.0"/>
+      <logic_asym_detector name="B48" rel_phase="135.0" forward="13" backward="17" alpha="1.0"/>
+    </tf>
+    <zf>
+      <!-- not yet defined -->
+    </zf>
+    <lf>
+      <!-- not yet defined -->
+    </lf>
+  </instrument>
+  <!-- +++++++++++++++++++++++++++ L E M +++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <instrument name="LEM">
+    <run_name_template>YYYY/lemYY_his_NNNN</run_name_template>
+    <beamline>MUE4</beamline>
+    <data_file_format>MUSR-ROOT</data_file_format>    
+    <tf name="WEW">
+      <no_of_detectors>8</no_of_detectors>
+      <fgb_offset>0</fgb_offset>
+      <lgb>63000</lgb>
+      <asym_bkg_range>200 1500</asym_bkg_range>
+      <logic_detector name="L" rel_phase="0.0" forward="1 5"/>
+      <logic_detector name="T" rel_phase="90.0" forward="2 6"/>
+      <logic_detector name="R" rel_phase="180.0" forward="3 7"/>
+      <logic_detector name="B" rel_phase="270.0" forward="4 8"/>
+      <logic_asym_detector name="LR" rel_phase="0.0" forward="1 5" backward="3 7" alpha="1.0"/>
+      <logic_asym_detector name="TB" rel_phase="90.0" forward="2 6" backward="4 8" alpha="1.0"/>
+    </tf>
+    <tf name="Bpar">
+      <no_of_detectors>4</no_of_detectors>
+      <fgb_offset>0</fgb_offset>
+      <lgb>63000</lgb>
+      <asym_bkg_range>200 1500</asym_bkg_range>
+      <logic_detector name="L" rel_phase="0.0" forward="1 5"/>
+      <logic_detector name="R" rel_phase="160.0" forward="3 7"/>
+      <logic_asym_detector name="LR" rel_phase="0.0" forward="1 5" backward="3 7" alpha="1.0"/>
+    </tf>
+    <zf name="NPP">
+      <no_of_detectors>4</no_of_detectors>
+      <fgb_offset>0</fgb_offset>
+      <lgb>63000</lgb>
+      <asym_bkg_range>200 1500</asym_bkg_range>
+      <logic_asym_detector name="LR" rel_phase="0.0" forward="1 5" backward="3 7" alpha="1.0"/>
+    </zf>
+    <zf name="PPC">
+      <no_of_detectors>4</no_of_detectors>
+      <fgb_offset>0</fgb_offset>
+      <lgb>63000</lgb>
+      <asym_bkg_range>200 1500</asym_bkg_range>
+      <logic_asym_detector name="LR" rel_phase="0.0" forward="21 25" backward="23 27" alpha="1.0"/>
+    </zf>
+    <lf name="NPP">
+      <no_of_detectors>8</no_of_detectors>
+      <fgb_offset>0</fgb_offset>
+      <lgb>63000</lgb>
+      <asym_bkg_range>200 1500</asym_bkg_range>
+      <logic_asym_detector name="UD" rel_phase="0.0" forward="1 2 3 4" backward="5 6 7 8" alpha="1.0"/>
+    </lf>
+    <lf name="PPC">
+      <no_of_detectors>8</no_of_detectors>
+      <fgb_offset>0</fgb_offset>
+      <lgb>63000</lgb>
+      <asym_bkg_range>200 1500</asym_bkg_range>
+      <logic_asym_detector name="UD" rel_phase="0.0" forward="21 22 23 24" backward="25 26 27 28" alpha="1.0"/>
+    </lf>
+  </instrument>
+  <!-- +++++++++++++++++++++++++++ G P S +++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <instrument name="GPS">
+    <run_name_template>dYYYY/tdc/deltat_tdc_gps_NNNN</run_name_template>
+    <beamline>PIM3</beamline>
+    <data_file_format>PSI-BIN</data_file_format>
+    <tf name="WEP">
+      <no_of_detectors>6</no_of_detectors>
+      <fgb_offset>10</fgb_offset>
+      <lgb>25600</lgb>
+      <asym_bkg_range>50 300</asym_bkg_range>
+      <logic_detector name="B" rel_phase="-45.0" forward="2"/>
+      <logic_detector name="U" rel_phase="45.0" forward="3"/>
+      <logic_detector name="F" rel_phase="135.0" forward="1"/>
+      <logic_detector name="D" rel_phase="225.0" forward="4"/>
+      <logic_asym_detector name="FB" rel_phase="-45.0" forward="2" backward="1" alpha="0.75"/>
+      <logic_asym_detector name="UD" rel_phase="45" forward="3" backward="4" alpha="1.0"/>
+    </tf>
+    <tf name="WED(L)">
+      <no_of_detectors>6</no_of_detectors>
+      <fgb_offset>10</fgb_offset>
+      <lgb>25600</lgb>
+      <asym_bkg_range>50 300</asym_bkg_range>
+      <logic_detector name="U" rel_phase="0.0" forward="3"/>
+      <logic_detector name="D" rel_phase="180.0" forward="4"/>
+      <logic_detector name="R" rel_phase="90.0" forward="5"/>
+      <logic_detector name="L" rel_phase="-90.0" forward="6"/>
+      <logic_asym_detector name="UD" rel_phase="0.0" forward="3" backward="4" alpha="1.0"/>
+      <logic_asym_detector name="RL" rel_phase="-90.0" forward="5" backward="6" alpha="1.0"/>
+    </tf>
+    <zf>
+      <no_of_detectors>6</no_of_detectors>
+      <fgb_offset>10</fgb_offset>
+      <lgb>25600</lgb>
+      <asym_bkg_range>50 300</asym_bkg_range>
+      <logic_asym_detector name="FB" rel_phase="0.0" forward="2" backward="1" alpha="0.5"/>
+    </zf>
+    <lf name="WED(L)">
+      <no_of_detectors>6</no_of_detectors>
+      <fgb_offset>20</fgb_offset>
+      <lgb>25600</lgb>
+      <asym_bkg_range>50 300</asym_bkg_range>
+      <logic_asym_detector name="FB" rel_phase="0.0" forward="2" backward="1" alpha="0.5"/>      
+    </lf>
+  </instrument>
+</instrument_def_psi>
