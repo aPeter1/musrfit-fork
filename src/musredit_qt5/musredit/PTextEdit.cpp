@@ -1829,6 +1829,9 @@ void PTextEdit::textSize( const QString &p )
 void PTextEdit::musrWiz()
 {
   QString cmd = fAdmin->getExecPath() + "/musrWiz";
+#if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
+  cmd = QString("/Applications/musrWiz.app/Contents/MacOS/musrWiz");
+#endif
   QString workDir = "./"; // think about it!!
   QStringList arg;
   arg << "--log";
@@ -2533,6 +2536,9 @@ void PTextEdit::musrSetSteps()
 
   // fill the command queue
   QString cmd = fAdmin->getExecPath() + "/musrStep";
+#if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
+  cmd = QString("/Applications/musrStep.app/Contents/MacOS/musrStep");
+#endif
   QString workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
   QStringList arg;
   QString str;
