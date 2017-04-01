@@ -1769,15 +1769,23 @@ PConclusionPage::PConclusionPage(PAdmin *admin, PMsrData *data, QString *msrFile
   fAdmin(admin),
   fMsrData(data)
 {
+  QDir ddir = QDir(*fMsrFilePath);
+
   setTitle("<h2>Create</h2>");
   setSubTitle("Now we create the msr-file.");
 
   QVBoxLayout *vLayout = new QVBoxLayout;
 
+  fMsrPathFileLabel = new QLabel("Current msr-File Path:");
+  fMsrFilePathLineEdit = new QLineEdit(ddir.absolutePath());
+  fMsrFilePathLineEdit->setReadOnly(true);
   fSaveAsMsrFile = new QPushButton("Save As (msr-file path)");
   fSaveAsTemplate = new QPushButton("Save As (template)");
 
+  vLayout->addWidget(fMsrPathFileLabel);
+  vLayout->addWidget(fMsrFilePathLineEdit);
   vLayout->addWidget(fSaveAsMsrFile);
+  vLayout->addStretch(1);
   vLayout->addWidget(fSaveAsTemplate);
 
   setLayout(vLayout);
@@ -1791,8 +1799,10 @@ void PConclusionPage::saveAsMsrFile()
 {
   QString str = QFileDialog::getExistingDirectory(this, tr("Save in Directory"), "./",
                                                   QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-  if (!str.isEmpty())
+  if (!str.isEmpty()) {
     *fMsrFilePath = str;
+    fMsrFilePathLineEdit->setText(str);
+  }
 }
 
 //-------------------------------------------------------------------------

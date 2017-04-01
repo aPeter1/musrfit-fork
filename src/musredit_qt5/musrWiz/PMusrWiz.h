@@ -370,6 +370,8 @@ class PConclusionPage : public QWizardPage
     PAdmin *fAdmin;
     PMsrData *fMsrData;
 
+    QLabel *fMsrPathFileLabel;
+    QLineEdit *fMsrFilePathLineEdit;
     QPushButton *fSaveAsMsrFile;
     QPushButton *fSaveAsTemplate;
 };
