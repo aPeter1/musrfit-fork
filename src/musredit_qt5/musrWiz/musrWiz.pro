@@ -50,7 +50,6 @@ QT += svg
 # set proper permission for Mac OSX
 macx {
    QMAKE_INSTALL_FILE = install -m 6755 -p -o $$(USER) -g staff
-   QMAKE_INSTALL_PROGRAM = install -m 6755 -p -o root -g admin
 }
 
 INCLUDEPATH += "../../include"
