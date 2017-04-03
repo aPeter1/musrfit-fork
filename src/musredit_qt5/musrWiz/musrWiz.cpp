@@ -37,7 +37,7 @@ void musrWiz_syntax()
   std::cout << "       --debug 0 : dump's the instrument definition(s) at startup." << std::endl;
   std::cout << "       --debug 1 : dump's the musrfit functions at startup." << std::endl;
   std::cout << "       --debug 2 : dump's the musrfit functions and instrument definition(s) at startup." << std::endl;
-  std::cout << "       --log     : writes a log-file '.musrWiz.log' which contains the path-file-name of" << std::endl;
+  std::cout << "       --log     : writes a log-file 'musrWiz.log' which contains the path-file-name of" << std::endl;
   std::cout << "                   the created msr-file." << std::endl;
   std::cout << "       --help    : shows this help." << std::endl << std::endl;
 }
@@ -94,23 +94,25 @@ int main(int argc, char *argv[])
 
   if (result == 1) { // if everything went fine up to this point
     // check if a log-file shall be written
+    QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
+    QString pathName = procEnv.value("HOME", "");
+    pathName += "/.musrfit/musredit/musrWiz.log";
     if (logFile) {
-      std::ofstream fout(".musrWiz.log", std::ofstream::out);
+      std::ofstream fout(pathName.toLatin1().data(), std::ofstream::out);
       fout << "path-file-name: " << info->getMsrPathName().toLatin1().data() << "/" << info->getMsrFileName().toLatin1().data() << std::endl;
       fout.close();
     }
 
-    // check if musrt0 shall be called. If the option --log is set, only add musrt0 flag to in the .musrWiz.log file
+    // check if musrt0 shall be called. If the option --log is set, only add musrt0 flag to in the musrWiz.log file
     if (info->getT0Tag() == T0_FROM_MUSR_T0) {
       if (logFile) {
-        std::ofstream fout(".musrWiz.log", std::ofstream::app);
+        std::ofstream fout(pathName.toLatin1().data(), std::ofstream::app);
         fout << "musrt0-tag: yes" << std::endl;
         fout.close();
       } else {
-        QProcessEnvironment pe = QProcessEnvironment::systemEnvironment();
-        QString musrt0Path = pe.value("MUSRFITPATH", "??");
+        QString musrt0Path = procEnv.value("MUSRFITPATH", "??");
         if (musrt0Path == "??") { // not found hence try ROOTSYS
-          musrt0Path = pe.value("ROOTSYS", "??");
+          musrt0Path = procEnv.value("ROOTSYS", "??");
           if (musrt0Path != "??") {
               musrt0Path += "/bin";
             }

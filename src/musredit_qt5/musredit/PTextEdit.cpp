@@ -2751,9 +2751,14 @@ void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
     return;
 
   // read .musrWiz.log
-  ifstream fin(".musrWiz.log", ifstream::in);
+  QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
+  QString pathName = procEnv.value("HOME", "");
+  pathName += "/.musrfit/musredit/musrWiz.log";
+  QString errMsg;
+  ifstream fin(pathName.toLatin1().data(), ifstream::in);
   if (!fin.is_open()) {
-    QMessageBox::critical(0, "**ERROR**", "PTextEdit::exitStatusMusrWiz: couldn't read .musrWiz.log file.");
+    errMsg = QString("PTextEdit::exitStatusMusrWiz: couldn't read %1 file.").arg(pathName);
+    QMessageBox::critical(0, "**ERROR**", errMsg);
     return;
   }
   char line[128];
@@ -2783,6 +2788,13 @@ void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
 
   if (musrT0tag)
     musrT0();
+  
+  // remove musrWiz.log file
+  QFile logFile(pathName);
+  if (!logFile.remove()) {
+    errMsg = QString("PTextEdit::exitStatusMusrWiz: couldn't delete %1 file.").arg(pathName);
+    QMessageBox::critical(0, "**ERROR**", errMsg);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
