@@ -71,7 +71,7 @@ CONFIG += qt \
 
 QT += widgets
 QT += xml
-QT += webkitwidgets
+QT += webenginewidgets
 QT += network
 QT += printsupport
 QT += svg

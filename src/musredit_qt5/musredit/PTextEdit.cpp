@@ -2709,7 +2709,7 @@ void PTextEdit::musrDump()
  */
 void PTextEdit::helpContents()
 {
-  PHelp *help = new PHelp(fAdmin->getHelpUrl("main"));
+  PHelp *help = new PHelp(fAdmin->getHelpUrl("main"), fDarkTheme);
   help->show();
 }
 

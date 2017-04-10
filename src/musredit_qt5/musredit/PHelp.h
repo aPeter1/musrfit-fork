@@ -32,7 +32,7 @@
 
 #include <QtWidgets>
 
-class QWebView;
+class QWebEngineView;
 QT_BEGIN_NAMESPACE
 class QLineEdit;
 QT_END_NAMESPACE
@@ -47,7 +47,7 @@ class PHelp : public QMainWindow
   Q_OBJECT
 
   public:
-    PHelp(const QString &url);
+    PHelp(const QString &url, const bool isDarkTheme=false);
     virtual ~PHelp();
 
   protected slots:
@@ -59,7 +59,8 @@ class PHelp : public QMainWindow
     void finishLoading(bool);
 
   private:
-    QWebView *fView; ///< web viewer
+    bool fDarkTheme;
+    QWebEngineView *fView; ///< web viewer
     QLineEdit *fLocationEdit; ///< url address line edit
     int fProgress; ///< progress value (0-100) while loading an url
 };

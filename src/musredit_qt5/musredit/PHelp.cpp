@@ -28,7 +28,7 @@
  ***************************************************************************/
 
 #include <QtWidgets>
-#include <QtWebKitWidgets>
+#include <QWebEngineView>
 #include <QNetworkProxyFactory>
 
 #include <QtDebug>
@@ -41,13 +41,21 @@
  *
  * \param url help url
  */
-PHelp::PHelp(const QString &url)
+PHelp::PHelp(const QString &url, const bool isDarkTheme) :
+  fDarkTheme(isDarkTheme)
 {
   fProgress = 0;
 
+  QString iconName("");
+  if (fDarkTheme)
+    iconName = QString(":/icons/musrfit-help-dark.svg");
+  else
+    iconName = QString(":/icons/musrfit-help-plain.svg");
+  setWindowIcon( QIcon( QPixmap(iconName) ) );
+
   QNetworkProxyFactory::setUseSystemConfiguration(true);
 
-  fView = new QWebView(this);
+  fView = new QWebEngineView(this);
   fView->load(QUrl(url));
   connect(fView, SIGNAL(loadFinished(bool)), SLOT(adjustLocation()));
   connect(fView, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
@@ -59,10 +67,10 @@ PHelp::PHelp(const QString &url)
   connect(fLocationEdit, SIGNAL(returnPressed()), SLOT(changeLocation()));
 
   QToolBar *toolBar = addToolBar(tr("Navigation"));
-  toolBar->addAction(fView->pageAction(QWebPage::Back));
-  toolBar->addAction(fView->pageAction(QWebPage::Forward));
-  toolBar->addAction(fView->pageAction(QWebPage::Reload));
-  toolBar->addAction(fView->pageAction(QWebPage::Stop));
+  toolBar->addAction(fView->pageAction(QWebEnginePage::Back));
+  toolBar->addAction(fView->pageAction(QWebEnginePage::Forward));
+  toolBar->addAction(fView->pageAction(QWebEnginePage::Reload));
+  toolBar->addAction(fView->pageAction(QWebEnginePage::Stop));
   toolBar->addWidget(fLocationEdit);
 
   QMenu *exitMenu = menuBar()->addMenu(tr("&File"));
