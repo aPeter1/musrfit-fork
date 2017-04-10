@@ -44,7 +44,11 @@ macx {
 }
 
 # install path for the application
-unix:target.path = $$(ROOTSYS)/bin
+unix {
+    message( "Determined installation path: $${MUSRSTEP_INSTALL_PATH}" )
+}
+
+unix:target.path = $${MUSRSTEP_INSTALL_PATH}
 macx:target.path = /Applications
 win32:target.path = c:/musrfit/bin
 

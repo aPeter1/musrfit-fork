@@ -1,8 +1,31 @@
 TEMPLATE = app
 TARGET = musrWiz
 
-# install path for the application
-unix:target.path = $$(ROOTSYS)/bin
+# install path for musrWiz
+count( PREFIX, 1 ) {
+    MUSRWIZ_INSTALL_PATH = $${PREFIX}/bin
+}
+isEmpty( MUSREDIT_INSTALL_PATH ) {
+    MUSR_FIT_PATH = $$(MUSRFITPATH)
+    count( MUSR_FIT_PATH, 1 ) {
+        MUSRWIZ_INSTALL_PATH = $$(MUSRFITPATH)
+    }
+}
+isEmpty( MUSREDIT_INSTALL_PATH ) {
+    ROOT_SYS_PATH = $$(ROOTSYS)
+    count( ROOT_SYS_PATH, 1 ) {
+        MUSRWIZ_INSTALL_PATH = $$(ROOTSYS)/bin
+    }
+}
+isEmpty( MUSREDIT_INSTALL_PATH ) {
+    MUSRWIZ_INSTALL_PATH = /usr/local/bin
+}
+
+unix {
+    message( "Determined installation path: $${MUSRWIZ_INSTALL_PATH}" )
+}
+
+unix:target.path = $${MUSRWIZ_INSTALL_PATH}
 macx:target.path = /Applications
 win32:target.path = c:/musrfit/bin
 
