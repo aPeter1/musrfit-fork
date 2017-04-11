@@ -32,7 +32,11 @@
 
 #include <QtWidgets>
 
+#ifdef HAVE_QT_WEB_ENGINE
 class QWebEngineView;
+#else
+class QWebView;
+#endif
 QT_BEGIN_NAMESPACE
 class QLineEdit;
 QT_END_NAMESPACE
@@ -60,7 +64,11 @@ class PHelp : public QMainWindow
 
   private:
     bool fDarkTheme;
+#ifdef HAVE_QT_WEB_ENGINE
     QWebEngineView *fView; ///< web viewer
+#else
+    QWebView *fView; ///< web viewer
+#endif
     QLineEdit *fLocationEdit; ///< url address line edit
     int fProgress; ///< progress value (0-100) while loading an url
 };

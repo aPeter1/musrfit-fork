@@ -28,7 +28,11 @@
  ***************************************************************************/
 
 #include <QtWidgets>
+#ifdef HAVE_QT_WEB_ENGINE
 #include <QWebEngineView>
+#else
+#include <QtWebKitWidgets>
+#endif
 #include <QNetworkProxyFactory>
 
 #include <QtDebug>
@@ -55,7 +59,11 @@ PHelp::PHelp(const QString &url, const bool isDarkTheme) :
 
   QNetworkProxyFactory::setUseSystemConfiguration(true);
 
+#ifdef HAVE_QT_WEB_ENGINE
   fView = new QWebEngineView(this);
+#else
+  fView = new QWebView(this);
+#endif
   fView->load(QUrl(url));
   connect(fView, SIGNAL(loadFinished(bool)), SLOT(adjustLocation()));
   connect(fView, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
@@ -67,10 +75,17 @@ PHelp::PHelp(const QString &url, const bool isDarkTheme) :
   connect(fLocationEdit, SIGNAL(returnPressed()), SLOT(changeLocation()));
 
   QToolBar *toolBar = addToolBar(tr("Navigation"));
+#ifdef HAVE_QT_WEB_ENGINE
   toolBar->addAction(fView->pageAction(QWebEnginePage::Back));
   toolBar->addAction(fView->pageAction(QWebEnginePage::Forward));
   toolBar->addAction(fView->pageAction(QWebEnginePage::Reload));
   toolBar->addAction(fView->pageAction(QWebEnginePage::Stop));
+#else
+  toolBar->addAction(fView->pageAction(QWebPage::Back));
+  toolBar->addAction(fView->pageAction(QWebPage::Forward));
+  toolBar->addAction(fView->pageAction(QWebPage::Reload));
+  toolBar->addAction(fView->pageAction(QWebPage::Stop));
+#endif
   toolBar->addWidget(fLocationEdit);
 
   QMenu *exitMenu = menuBar()->addMenu(tr("&File"));
