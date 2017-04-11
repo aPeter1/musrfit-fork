@@ -10,8 +10,13 @@ packagesExist(QtWebKit) {
   message("QtWebKit found")
   HAVE_QT_WEB_ENGINE = 0   
 }
+# Mac calls it Qt5WebKit, hence
+packagesExist(Qt5WebKit) {
+  message("Qt5WebKit found")
+  HAVE_QT_WEB_ENGINE = 0   
+}
 isEmpty(HAVE_QT_WEB_ENGINE) {
-  message("Neither QtWebKit nor Qt5WebEngine found. Something is wrong, please check")
+  message("Neither Qt(5)WebKit nor Qt5WebEngine found. Something is wrong, please check")
 }
 
 QMAKE_CXXFLAGS += -std=c++11
