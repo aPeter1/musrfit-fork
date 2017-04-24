@@ -750,7 +750,7 @@ void PTextEdit::setupMusrActions()
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&T0" ), this );
     connect( a, SIGNAL( triggered() ), this, SLOT( musrT0() ) );
   }
-  tb->addAction(a);
+  tb->addAction(fMusrT0Action);
   fMusrT0Action->setEnabled(fAdmin->getEnableMusrT0Flag());
 
   if (fDarkTheme)
