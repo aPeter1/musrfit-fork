@@ -1582,7 +1582,9 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
 
   switch (fPlotType) {
     case MSR_PLOT_SINGLE_HISTO:
+    case MSR_PLOT_SINGLE_HISTO_RRF:
     case MSR_PLOT_ASYM:
+    case MSR_PLOT_ASYM_RRF:
     case MSR_PLOT_MU_MINUS:
       if (fDifferenceView) { // difference view plot
         switch (fCurrentPlotView) {
