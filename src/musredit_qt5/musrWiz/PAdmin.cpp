@@ -888,7 +888,6 @@ bool PMusrWizDefaultXMLParser::fatalError( const QXmlParseException & exception 
 PAdmin::PAdmin() : QObject()
 {
   QString path, fln, pathFln;
-  bool found = false;
   int count = 0;
 
   fValid = true;
@@ -900,51 +899,30 @@ PAdmin::PAdmin() : QObject()
     // 2nd: check $HOME/.musrfit/musrWiz/musrWiz.xml
     path = std::getenv("HOME");
     pathFln = path + "/.musrfit/musrWiz/musrWiz.xml";
-    if (QFile::exists(pathFln)) {
-      found = true;
-    }
-  } else {
-    found = true;
-  }
-  if (found) {
     if (loadMusrWizDefault(pathFln)) {
       QMessageBox::warning(0, "WARNING", "Couldn't find musrWiz.xml file.");
     }
   }
 
   // load musrfit funcs
-  found = false;
   // 1st: check local directory
   pathFln = QString("./musrfit_funcs.xml");
   if (!QFile::exists(pathFln)) {
     // 2nd: check $HOME/.musrfit/musrWiz/musrfit_funcs.xml
     path = std::getenv("HOME");
     pathFln = path + "/.musrfit/musrWiz/musrfit_funcs.xml";
-    if (QFile::exists(pathFln)) {
-      found = true;
+    if (loadMusrfitFunc(pathFln)) {
+      fValid = false;
+      QMessageBox::critical(0, "FATAL ERROR", "Couldn't find any musrfit function definitions.");
+      return;
     }
-  } else {
-    found = true;
-  }
-  if (!found) {
-    fValid = false;
-    QMessageBox::critical(0, "FATAL ERROR", "Couldn't find musrfit_funcs.xml.");
-    return;
-  }
-  if (loadMusrfitFunc(pathFln)) {
-    fValid = false;
-    QMessageBox::critical(0, "FATAL ERROR", "Couldn't find any musrfit function definitions.");
-    return;
   }
 
   // load instrument definitions
-  found = false;
-
   QStringList instStr;
   instStr << "psi" << "triumf" << "isis" << "jparc";
 
   for (int i=0; i<instStr.size(); i++) {
-    found = false;
     // XML Parser part
     // 1st: check local directory
     path = QString("./");
@@ -953,18 +931,12 @@ PAdmin::PAdmin() : QObject()
     if (!QFile::exists(pathFln)) {
       // 2nd: check $HOME/.musrfit/musrWiz/instrument_def_XXX.xml
       path = std::getenv("HOME");
-      pathFln = path + "/.musrfit/musrWiz/" + fln;
-      if (QFile::exists(pathFln)) {
-        found = true;
-      }
-    } else {
-      found = true;
-    }
-    if (found) {
-      count++;
-      if (loadInstrumentDef(pathFln)) {
+      path += "/.musrfit/musrWiz/";
+      if (loadInstrumentDef(path, fln)) {
         fValid = false;
         return;
+      } else {
+        count++;
       }
     }
   }
@@ -1248,6 +1220,31 @@ PInstrument *PAdmin::getInstrument(QString institute, QString instrument)
  */
 int PAdmin::loadMusrWizDefault(QString fln)
 {
+  // check if fln already exists
+  if (!QFile::exists(fln)) {
+    QFile file(":/musrWiz.xml");
+    if (file.exists()) {
+      // get $HOME
+      QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
+      QString pathName = procEnv.value("HOME", "");
+      pathName += "/.musrfit/musrWiz";
+      // check if the directory $HOME/.musrfit/musrWiz exists if not create it
+      QDir dir(pathName);
+      if (!dir.exists()) {
+        // directory $HOME/.musrfit/musredit does not exist hence create it
+        dir.mkpath(pathName);
+      }
+      pathName += "/musrWiz.xml";
+      if (file.copy(pathName)) {
+        cout << "**INFO** '" << pathName.toLatin1().data() << "' did not exist, hence it is created." << endl;
+      } else {
+        QString msg = QString("Couldn't create '%1'. Please check.").arg(pathName);
+        QMessageBox::critical(0, "ERROR", msg);
+        return 1;
+      }
+    }
+  }
+
   PMusrWizDefaultXMLParser handler(this);
   QFile xmlFile(fln);
   QXmlInputSource source( &xmlFile );
@@ -1267,6 +1264,24 @@ int PAdmin::loadMusrWizDefault(QString fln)
  */
 int PAdmin::loadMusrfitFunc(QString fln)
 {
+  // check if fln already exists
+  if (!QFile::exists(fln)) {
+    QFile file(":/func_defs/musrfit_funcs.xml");
+    if (file.exists()) {
+      // get $HOME
+      QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
+      QString pathName = procEnv.value("HOME", "");
+      pathName += "/.musrfit/musrWiz/musrfit_funcs.xml";
+      if (file.copy(pathName)) {
+        cout << "**INFO** '" << pathName.toLatin1().data() << "' did not exist, hence it is created." << endl;
+      } else {
+        QString msg = QString("Couldn't create '%1'. Please check.").arg(pathName);
+        QMessageBox::critical(0, "ERROR", msg);
+        return 1;
+      }
+    }
+  }
+
   PFuncXMLParser handler(this);
   QFile xmlFile(fln);
   QXmlInputSource source( &xmlFile );
@@ -1283,18 +1298,41 @@ int PAdmin::loadMusrfitFunc(QString fln)
 //--------------------------------------------------------------------------
 /**
  * @brief PAdmin::loadInstrumentDef
+ * @param path
  * @param fln
  * @return
  */
-int PAdmin::loadInstrumentDef(QString fln)
+int PAdmin::loadInstrumentDef(QString path, QString fln)
 {
+  // check if fln already exists
+  QString pathFln = path+fln;
+  if (!QFile::exists(pathFln)) {
+    QString resFln = QString(":/instrument_defs/%1").arg(fln);
+    QFile file(resFln);
+    if (file.exists()) {
+      // get $HOME
+      QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
+      QString pathName = procEnv.value("HOME", "");
+      pathName += "/.musrfit/musrWiz/" + fln;
+      if (file.copy(pathName)) {
+        cout << "**INFO** '" << pathName.toLatin1().data() << "' did not exist, hence it is created." << endl;
+      } else {
+        QString msg = QString("Couldn't create '%1'. Please check.").arg(pathName);
+        QMessageBox::critical(0, "ERROR", msg);
+        return 1;
+      }
+    } else {
+      return 0;
+    }
+  }
+
   PInstrumentDefXMLParser handler(this);
-  QFile xmlFile(fln);
+  QFile xmlFile(pathFln);
   QXmlInputSource source( &xmlFile );
   QXmlSimpleReader reader;
   reader.setContentHandler( &handler );
   if (!reader.parse(source)) {
-    QString errMsg = QString("Error parsing %1 instrument def file.").arg(fln);
+    QString errMsg = QString("Error parsing %1 instrument def file.").arg(pathFln);
     QMessageBox::critical(0, "ERROR", errMsg);
     return 1;
   }
