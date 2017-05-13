@@ -1032,12 +1032,12 @@ void PAdmin::createMusreditStartupFile()
     line = fin.readLine();
     line.replace("@prefix@", MUSRFIT_PREFIX);
     line.replace("@DOCDIR@", MUSRFIT_DOC_DIR);
-    if (line.startsWith("<font_name>")) { // defaults: linux: Monospace, macOS: Courier New
+    if (line.contains("<font_name>")) { // defaults: linux: Monospace, macOS: Courier New
       if (QSysInfo::macVersion() != QSysInfo::MV_None) {
         line.replace("Monospace", "Courier New");
       }
     }
-    if (line.startsWith("<font_size>")) { // defaults: linux: 12, macOS: 16
+    if (line.contains("<font_size>")) { // defaults: linux: 12, macOS: 16
       if (QSysInfo::macVersion() != QSysInfo::MV_None) {
         line.replace("12", "16");
       }
