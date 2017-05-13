@@ -63,5 +63,6 @@
         <file>latex_images/statExpKT.png</file>
         <file>latex_images/statGssKT.png</file>
         <file>latex_images/tfCos.png</file>
+        <file>musredit_startup.xml.in</file>
     </qresource>
 </RCC>
