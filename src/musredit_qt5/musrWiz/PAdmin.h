@@ -196,7 +196,7 @@ class PAdmin : public QObject
 
     int loadMusrWizDefault(QString fln);
     int loadMusrfitFunc(QString fln);
-    int loadInstrumentDef(QString fln);
+    int loadInstrumentDef(QString path, QString fln);
 };
 
 #endif // _PADMIN_H_
