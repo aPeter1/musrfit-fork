@@ -54,11 +54,11 @@
       <lgb>63000</lgb>
       <asym_bkg_range>200 1500</asym_bkg_range>
       <logic_detector name="L" rel_phase="0.0" forward="1 5"/>
-      <logic_detector name="T" rel_phase="90.0" forward="2 6"/>
+      <logic_detector name="T" rel_phase="-90.0" forward="2 6"/>
       <logic_detector name="R" rel_phase="180.0" forward="3 7"/>
-      <logic_detector name="B" rel_phase="270.0" forward="4 8"/>
+      <logic_detector name="B" rel_phase="90.0" forward="4 8"/>
       <logic_asym_detector name="LR" rel_phase="0.0" forward="1 5" backward="3 7" alpha="1.0"/>
-      <logic_asym_detector name="TB" rel_phase="90.0" forward="2 6" backward="4 8" alpha="1.0"/>
+      <logic_asym_detector name="TB" rel_phase="-90.0" forward="2 6" backward="4 8" alpha="1.0"/>
     </tf>
     <tf name="WEW PPC">
       <no_of_detectors>8</no_of_detectors>
@@ -66,11 +66,11 @@
       <lgb>63000</lgb>
       <asym_bkg_range>200 1500</asym_bkg_range>
       <logic_detector name="L" rel_phase="0.0" forward="21 25"/>
-      <logic_detector name="T" rel_phase="90.0" forward="22 26"/>
+      <logic_detector name="T" rel_phase="-90.0" forward="22 26"/>
       <logic_detector name="R" rel_phase="180.0" forward="23 27"/>
-      <logic_detector name="B" rel_phase="270.0" forward="24 28"/>
+      <logic_detector name="B" rel_phase="90.0" forward="24 28"/>
       <logic_asym_detector name="LR" rel_phase="0.0" forward="21 25" backward="23 27" alpha="1.0"/>
-      <logic_asym_detector name="TB" rel_phase="90.0" forward="22 26" backward="24 28" alpha="1.0"/>
+      <logic_asym_detector name="TB" rel_phase="-90.0" forward="22 26" backward="24 28" alpha="1.0"/>
     </tf>
     <tf name="Bpar NPP">
       <no_of_detectors>4</no_of_detectors>
