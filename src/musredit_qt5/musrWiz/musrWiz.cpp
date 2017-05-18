@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
   if (argc == 2) {
     if (!strcmp(argv[1], "--version") || (!strcmp(argv[1], "-v"))) {
-      std::cout << std::endl << "musrWiz - alpha - git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
+      std::cout << std::endl << "musrWiz - git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
       return 0;
     } else if (!strcmp(argv[1], "--help")) {
       musrWiz_syntax();
