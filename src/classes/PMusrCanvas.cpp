@@ -4595,14 +4595,8 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
               dataYmax = GetMaximum(fData[i].data, dataXmin, dataXmax);
           }
           Double_t dd = 0.05*fabs(dataYmax-dataYmin);
-          if (!fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY) {
-            dataYmin -= dd;
-            dataYmax += dd;
-          } else {
-            if (dataYmin < 0)
-              dataYmin = 0.1;
-            dataYmax += dd;
-          }
+          dataYmin -= dd;
+          dataYmax += dd;
         }
       } else { // set the x-/y-range to the previous fHistoFrame range
         dataXmin = xmin;
@@ -4620,15 +4614,12 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
               dataYmax = GetMaximum(fData[i].data, dataXmin, dataXmax);
           }
           Double_t dd = 0.05*fabs(dataYmax-dataYmin);
-          if (!fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY) {
-            dataYmin -= dd;
-            dataYmax += dd;
-          } else {
-            if (dataYmin < 0)
-              dataYmin = 0.1;
-            dataYmax += dd;
-          }
+          dataYmin -= dd;
+          dataYmax += dd;
         }
+      }
+      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY) {
+        dataYmin = 1.0e-4 * dataYmax;
       }
 
       // create histo frame in order to plot histograms possibly with different x-frames
@@ -4751,14 +4742,8 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
               dataYmax = GetMaximum(fNonMusrData[i].data, dataXmin, dataXmax);
           }
           Double_t dd = 0.05*fabs(dataYmax-dataYmin);
-          if (!fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY) {
-            dataYmin -= dd;
-            dataYmax += dd;
-          } else {
-            if (dataYmin < 0)
-              dataYmin = 0.1;
-            dataYmax += dd;
-          }
+          dataYmin -= dd;
+          dataYmax += dd;
         }
       } else { // set the x-/y-range to the previous fHistoFrame range
         dataXmin = xmin;
@@ -4776,15 +4761,13 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
               dataYmax = GetMaximum(fNonMusrData[i].data, dataXmin, dataXmax);
           }
           Double_t dd = 0.05*fabs(dataYmax-dataYmin);
-          if (!fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY) {
-            dataYmin -= dd;
-            dataYmax += dd;
-          } else {
-            if (dataYmin < 0)
-              dataYmin = 0.1;
-            dataYmax += dd;
-          }
+          dataYmin -= dd;
+          dataYmax += dd;
         }
+      }
+      if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fLogY) {
+        if (dataYmin <= 0.0)
+          dataYmin = 1.0e-4 * dataYmax;
       }
 
       // create fMultiGraphData, and add all data and theory
