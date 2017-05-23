@@ -457,9 +457,9 @@ int main(int argc, char *argv[])
   if (argc == 2) {
     if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrfit version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "musrfit version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #else
-      cout << endl << "musrfit git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "musrfit git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #endif
       return PMUSR_SUCCESS;
     }

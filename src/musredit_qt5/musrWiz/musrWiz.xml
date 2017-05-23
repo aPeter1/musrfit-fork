@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<musrwiz>
+  <default_settings>
+    <institute>PSI</institute>
+    <instrument>LEM</instrument>
+    <fit_type>Single Histo</fit_type>
+  </default_settings>  
+</musrwiz>

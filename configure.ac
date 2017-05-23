@@ -1,7 +1,7 @@
 AC_REVISION([m4_esyscmd_s([git describe --always])])
 
 AC_PREREQ(2.63)
-AC_INIT([musrfit],[0.18.0],[andreas.suter@psi.ch])
+AC_INIT([musrfit],[1.0.0],[andreas.suter@psi.ch])
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_HOST
 #AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
@@ -34,8 +34,8 @@ dnl -----------------------------------------------
 
 
 #release versioning
-MUSR_MAJOR_VERSION=0
-MUSR_MINOR_VERSION=18
+MUSR_MAJOR_VERSION=1
+MUSR_MINOR_VERSION=0
 MUSR_MICRO_VERSION=0
 
 #release versioning

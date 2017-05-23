@@ -1,0 +1,12 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>icons/musrWiz-22x22.svg</file>
+    <file>icons/musrWiz-22x22-dark.svg</file>
+    <file>icons/musrWiz-32x32.svg</file>
+    <file>icons/musrWiz-32x32-dark.svg</file>
+    <file>musrWiz.xml</file>
+    <file>func_defs/musrfit_funcs.xml</file>
+    <file>instrument_defs/instrument_def_psi.xml</file>
+    <file>instrument_defs/instrument_def_isis.xml</file>
+</qresource>
+</RCC>

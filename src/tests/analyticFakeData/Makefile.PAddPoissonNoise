@@ -94,6 +94,13 @@ PAddPoissonNoiseDict.cpp: PAddPoissonNoise.h PAddPoissonNoiseLinkDef.h
 install: all
 	@echo "Installing shared lib: libPAddPoissonNoise.so ( you must be root ;-) )"
 ifeq ($(OS),LINUX)
+ifeq ($(ROOTSYS),/usr) 
+	cp -pv $(SHLIB) $(ROOTSYS)/lib64/root
+	cp -pv PAddPoissonNoiseDict_rdict.pcm $(ROOTSYS)/lib64/root
+	cp -pv PAddPoissonNoise.h $(ROOTSYS)/include/root
+else
 	cp -pv $(SHLIB) $(ROOTSYS)/lib
+	cp -pv PAddPoissonNoiseDict_rdict.pcm $(ROOTSYS)/lib
 	cp -pv PAddPoissonNoise.h $(ROOTSYS)/include
+endif
 endif

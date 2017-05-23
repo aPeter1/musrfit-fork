@@ -232,9 +232,9 @@ Int_t main(Int_t argc, Char_t *argv[])
   for (int i=1; i<argc; i++) {
     if (!strcmp(argv[i], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << ">> musrt0 version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "musrt0 version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #else
-      cout << endl << ">> musrt0 git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "musrt0 git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--help")) {

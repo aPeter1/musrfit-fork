@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<musredit_startup xmlns="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrGui.html">
+  <comment>
+    This is handling default setting parameters for the musredit.
+  </comment>
+  <general>
+    <exec_path>@prefix@/bin</exec_path>
+    <default_save_path>./</default_save_path>
+    <msr_default_file_path>@DOCDIR@/templates</msr_default_file_path>
+    <timeout>3600</timeout>
+    <keep_minuit2_output>n</keep_minuit2_output>
+    <dump_ascii>n</dump_ascii>
+    <dump_root>n</dump_root>
+    <title_from_data_file>y</title_from_data_file>
+    <chisq_per_run_block>n</chisq_per_run_block>
+    <estimate_n0>y</estimate_n0>
+    <musrview_show_fourier>n</musrview_show_fourier>
+    <musrview_show_avg>n</musrview_show_avg>
+    <enable_musrt0>y</enable_musrt0>
+  </general>
+  <recent_files>
+    <path_file_name>@DOCDIR@/examples/test-histo-PSI-BIN.msr</path_file_name>
+  </recent_files>
+  <help_section>
+    <musr_web_main>file://@DOCDIR@/html/user/MUSR/MusrFit.html</musr_web_main>
+    <musr_web_title>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheTitle</musr_web_title>
+    <musr_web_parameters>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheFitparameterBlock</musr_web_parameters>
+    <musr_web_theory>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheTheoryBlock</musr_web_theory>
+    <musr_web_functions>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheFunctionsBlock</musr_web_functions>
+    <musr_web_run>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheRunBlock</musr_web_run>
+    <musr_web_command>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheCommandsBlock</musr_web_command>
+    <musr_web_fourier>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheFourierBlock</musr_web_fourier>
+    <musr_web_plot>file://@DOCDIR@/html/user/MUSR/MusrFit.html#ThePlotBlock</musr_web_plot>
+    <musr_web_statistic>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheStatisticBlock</musr_web_statistic>
+    <musr_web_msr2data>file://@DOCDIR@/html/user/MUSR/Msr2Data.html</musr_web_msr2data>
+    <musr_web_musrFT>file://@DOCDIR@/html/user/MUSR/MusrFit.html#A_2.3_musrFT</musr_web_musrFT>
+  </help_section>
+  <font_settings>
+    <font_name>Monospace</font_name>
+    <font_size>12</font_size>
+  </font_settings>
+  <msr_file_defaults>
+    <beamline>mue4</beamline>
+    <institute>psi</institute>
+    <file_format>root-npp</file_format>
+    <lifetime_correction>y</lifetime_correction>
+  </msr_file_defaults>
+  <msr2data_defaults>
+    <chain_fit>y</chain_fit>
+    <write_data_header>y</write_data_header>
+    <ignore_data_header_info>n</ignore_data_header_info>
+    <keep_minuit2_output>n</keep_minuit2_output>
+    <write_column_data>n</write_column_data>
+    <recreate_data_file>n</recreate_data_file>
+    <open_file_after_fitting>y</open_file_after_fitting>
+    <create_msr_file_only>n</create_msr_file_only>
+    <fit_only>n</fit_only>
+    <global>n</global>
+    <global_plus>n</global_plus>
+  </msr2data_defaults>
+  <func_pixmap_path>@DOCDIR@/latex_images</func_pixmap_path>
+  <theory_functions>
+    <func>
+      <name>asymmetry</name>
+      <comment></comment>
+      <label>Asymmetry</label>
+      <pixmap>asymmetry.png</pixmap>
+      <params>1</params>
+    </func>
+    <func>
+      <name>simplExpo</name>
+      <comment>(rate)</comment>
+      <label>simple Exp</label>
+      <pixmap>simpleExp.png</pixmap>
+      <params>1</params>
+    </func>
+    <func>
+      <name>generExpo</name>
+      <comment>(rate exponent)</comment>
+      <label>general Exp</label>
+      <pixmap>generalExp.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>simpleGss</name>
+      <comment>(rate)</comment>
+      <label>simple Gauss</label>
+      <pixmap>simpleGauss.png</pixmap>
+      <params>1</params>
+    </func>
+    <func>
+      <name>statGssKT</name>
+      <comment>(rate)</comment>
+      <label>static Gauss KT</label>
+      <pixmap>statGssKT.png</pixmap>
+      <params>1</params>
+    </func>
+    <func>
+      <name>statGssKTLF</name>
+      <comment>(frequency damping)</comment>
+      <label>static Gauss KT LF</label>
+      <pixmap></pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>dynGssKTLF</name>
+      <comment>(frequency damping hopping-rate)</comment>
+      <label>dynamic Gauss KT LF</label>
+      <pixmap></pixmap>
+      <params>3</params>
+    </func>
+    <func>
+      <name>statExpKT</name>
+      <comment>(rate)</comment>
+      <label>static Lorentz KT</label>
+      <pixmap>statExpKT.png</pixmap>
+      <params>1</params>
+    </func>
+    <func>
+      <name>statExpKTLF</name>
+      <comment>(frequency damping)</comment>
+      <label>static Lorentz KT LF</label>
+      <pixmap></pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>dynExpKTLF</name>
+      <comment>(frequency damping hopping-rate)</comment>
+      <label>dynamic Lorentz KT LF</label>
+      <pixmap></pixmap>
+      <params>3</params>
+    </func>
+    <func>
+      <name>combiLGKT</name>
+      <comment>(lorentzRate gaussRate)</comment>
+      <label>combined Lorentz-Gauss KT</label>
+      <pixmap>combiLGKT.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>strKT</name>
+      <comment>(rate beta)</comment>
+      <label>stretched Kubo-Toyabe</label>
+      <pixmap></pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>spinGlass</name>
+      <comment>(rate hopping-rate order)</comment>
+      <label>zero field spin glass function</label>
+      <pixmap></pixmap>
+      <params>3</params>
+    </func>
+    <func>
+      <name>rdAnisoHf</name>
+      <comment>(frequency rate)</comment>
+      <label>random anisotropic hyperfine function</label>
+      <pixmap></pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>abragam</name>
+      <comment>(rate hopping-rate)</comment>
+      <label>Abragam</label>
+      <pixmap>abragam.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>TFieldCos</name>
+      <comment>(phase frequency)</comment>
+      <label>TF cos</label>
+      <pixmap>tfCos.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>internFld</name>
+      <comment>(fraction phase frequency Trate Lrate)</comment>
+      <label>internal Lorentz field</label>
+      <pixmap>internalField.png</pixmap>
+      <params>5</params>
+    </func>
+    <func>
+      <name>internFldGK</name>
+      <comment>(fraction frequency Trate Lrate beta)</comment>
+      <label>internal field, Gaussian broadened</label>
+      <pixmap>internalFieldGK.png</pixmap>
+      <params>5</params>
+    </func>
+    <func>
+      <name>internFldLL</name>
+      <comment>(fraction frequency Trate Lrate)</comment>
+      <label>internal field, Lorentzian broadened</label>
+      <pixmap>internalFieldLL.png</pixmap>
+      <params>4</params>
+    </func>
+    <func>
+      <name>bessel</name>
+      <comment>(phase frequency)</comment>
+      <label>spherical Bessel 0th order</label>
+      <pixmap>bessel.png</pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>internBsl</name>
+      <comment>(fraction phase frequency Trate Lrate)</comment>
+      <label>static internal Bessel</label>
+      <pixmap>internalBessel.png</pixmap>
+      <params>5</params>
+    </func>
+    <func>
+      <name>skewedGss</name>
+      <comment>(phase frequency rate_m rate_p)</comment>
+      <label>skewed Gaussian</label>
+      <pixmap></pixmap>
+      <params>4</params>
+    </func>
+    <func>
+      <name>staticNKZF</name>
+      <comment>(damping_D0 R_b)</comment>
+      <label>static Noakes-Kalvius ZF</label>
+      <pixmap></pixmap>
+      <params>2</params>
+    </func>
+    <func>
+      <name>staticNKTF</name>
+      <comment>(phase frequency damping_D0 R_b)</comment>
+      <label>static Noakes-Kalvius TF</label>
+      <pixmap></pixmap>
+      <params>4</params>
+    </func>
+    <func>
+      <name>dynamicNKZF</name>
+      <comment>(damping_D0 R_b nu_c)</comment>
+      <label>dynamic Noakes-Kalvius ZF</label>
+      <pixmap></pixmap>
+      <params>3</params>
+    </func>
+    <func>
+      <name>dynamicNKTF</name>
+      <comment>(phase frequency damping_D0 R_b nu_c)</comment>
+      <label>dynamic Noakes-Kalvius TF</label>
+      <pixmap></pixmap>
+      <params>5</params>
+    </func>
+    <func>
+      <name>polynom</name>
+      <comment>(tshift p0 p1 ... pn)</comment>
+      <label>polynom</label>
+      <pixmap>polynom.png</pixmap>
+      <params>4</params>
+    </func> 
+    <func>
+      <name>userFcn</name>
+      <comment></comment>
+      <label>user function</label>
+      <pixmap></pixmap>
+      <params>0</params>
+    </func> 
+  </theory_functions>
+</musredit_startup>
