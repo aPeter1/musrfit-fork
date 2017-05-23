@@ -1,4 +1,4 @@
-# musrfit - muSR data analysis package #
+# musrfit - muSR and beta-NMR data analysis package #
 
 ### Contents ###
 
