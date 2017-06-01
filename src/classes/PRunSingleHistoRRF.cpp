@@ -588,7 +588,7 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
       fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.6), 1);
       cerr << endl << ">> PRunSingleHistoRRF::PrepareFitData(): **WARNING** Neither fix background nor background bins are given!";
       cerr << endl << ">> Will try the following: bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
-      cerr << endl << ">> NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
+      cerr << endl << ">> NO GUARANTEE THAT THIS MAKES ANY SENSE! Better check ...";
       cerr << endl;
       if (!EstimateBkg(histoNo))
         return false;
@@ -832,7 +832,7 @@ Bool_t PRunSingleHistoRRF::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *gl
       cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
       cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
       cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
-      cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+      cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
       cerr << endl;
     }
   }
@@ -890,7 +890,7 @@ Bool_t PRunSingleHistoRRF::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *gl
           cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
           cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
           cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
-          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+          cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
         }
       }
@@ -944,14 +944,14 @@ Bool_t PRunSingleHistoRRF::GetProperDataRange()
     start = (Int_t)fT0s[0]+offset;
     fRunInfo->SetDataRange(start, 0);
     cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
   if (end < 0) {
     end = fForward.size();
     fRunInfo->SetDataRange(end, 1);
     cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **WARNING** data range was not provided, will try data range end = " << end << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
 

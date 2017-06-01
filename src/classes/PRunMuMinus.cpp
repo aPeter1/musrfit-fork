@@ -658,7 +658,7 @@ Bool_t PRunMuMinus::PrepareRawViewData(PRawRunData* runData, const UInt_t histoN
     start = ((Int_t)fT0s[0]+offset) - (((Int_t)fT0s[0]+offset)/packing)*packing;
     end = start + ((fForward.size()-start)/packing)*packing;
     cerr << endl << ">> PRunMuMinus::PrepareData(): **WARNING** data range was not provided, will try data range start = " << start << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
   // check if start, end, and t0 make any sense
@@ -807,7 +807,7 @@ Bool_t PRunMuMinus::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlo
       cerr << endl << ">> PRunMuMinus::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
       cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
       cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
-      cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+      cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
       cerr << endl;
     }
   }
@@ -865,7 +865,7 @@ Bool_t PRunMuMinus::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlo
           cerr << endl << ">> PRunMuMinus::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
           cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
           cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
-          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+          cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
         }
       }
@@ -919,14 +919,14 @@ Bool_t PRunMuMinus::GetProperDataRange()
     start = (Int_t)fT0s[0]+offset;
     fRunInfo->SetDataRange(start, 0);
     cerr << endl << ">> PRunMuMinus::GetProperDataRange(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
   if (end < 0) {
     end = fForward.size();
     fRunInfo->SetDataRange(end, 1);
     cerr << endl << ">> PRunMuMinus::GetProperDataRange(): **WARNING** data range was not provided, will try data range end = " << end << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
 

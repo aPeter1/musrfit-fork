@@ -635,7 +635,7 @@ Bool_t PRunAsymmetry::PrepareData()
       cerr << endl << ">> Will try the following:";
       cerr << endl << ">> forward:  bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
       cerr << endl << ">> backward: bkg start = " << fRunInfo->GetBkgRange(2) << ", bkg end = " << fRunInfo->GetBkgRange(3);
-      cerr << endl << ">> NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
+      cerr << endl << ">> NO GUARANTEE THAT THIS MAKES ANY SENSE! Better check ...";
       cerr << endl;
       if (!SubtractEstimatedBkg())
         return false;
@@ -1585,7 +1585,7 @@ Bool_t PRunAsymmetry::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalB
       cerr << endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
       cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
       cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(forwardHistoNo[i]);
-      cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+      cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
       cerr << endl;
     }
   }
@@ -1597,7 +1597,7 @@ Bool_t PRunAsymmetry::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalB
       cerr << endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
       cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
       cerr << endl << ">> will try the estimated one: backward t0 = " << runData->GetT0BinEstimated(backwardHistoNo[i]);
-      cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+      cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
       cerr << endl;
     }
   }
@@ -1669,7 +1669,7 @@ Bool_t PRunAsymmetry::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalB
           cerr << endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
           cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
           cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(forwardHistoNo[j]);
-          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+          cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
         }
       }
@@ -1681,7 +1681,7 @@ Bool_t PRunAsymmetry::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalB
           cerr << endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
           cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
           cerr << endl << ">> will try the estimated one: backward t0 = " << runData->GetT0BinEstimated(backwardHistoNo[j]);
-          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+          cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
           cerr << endl;
         }
       }
@@ -1734,28 +1734,28 @@ Bool_t PRunAsymmetry::GetProperDataRange(PRawRunData* runData, UInt_t histoNo[2]
     start[0] = (Int_t)t0[0]+offset;
     fRunInfo->SetDataRange(start[0], 0);
     cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (forward) was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start[0] << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
   if (start[1] < 0) {
     start[1] = (Int_t)t0[1]+offset;
     fRunInfo->SetDataRange(start[1], 2);
     cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (backward) was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start[1] << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
   if (end[0] < 0) {
     end[0] = runData->GetDataBin(histoNo[0])->size();
     fRunInfo->SetDataRange(end[0], 1);
     cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (forward) was not provided, will try data range end = " << end[0] << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
   if (end[1] < 0) {
     end[1] = runData->GetDataBin(histoNo[1])->size();
     fRunInfo->SetDataRange(end[1], 3);
     cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (backward) was not provided, will try data range end = " << end[1] << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
     cerr << endl;
   }
 
