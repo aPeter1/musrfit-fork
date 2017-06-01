@@ -31,12 +31,18 @@
 #include <vector>
 using namespace std;
 
+#include "/usr/local/include/TLemRunHeader.h"
+#include "/usr/local/include/TMusrRunHeader.h"
+#include "/usr/include/root/PAddPoissonNoise.h"
+
 void analyticFakeData(const TString type, UInt_t runNo)
 {
   // load library
-  gSystem->Load("$ROOTSYS/lib/libTLemRunHeader");
-  gSystem->Load("$ROOTSYS/lib/libTMusrRunHeader");
-  gSystem->Load("$ROOTSYS/lib/libPAddPoissonNoise");
+/*
+  cout << ">> loading libTLemRunHeader: " << gSystem->Load("/usr/local/lib/libTLemRunHeader") << endl;
+  cout << ">> loading libTMusrRunHeader: " << gSystem->Load("/usr/local/lib/libTMusrRunHeader") << endl;
+  cout << ">> loading libPAddPoissonNoise: " << gSystem->Load("$ROOTSYS/lib64/root/libPAddPoissonNoise") << endl;
+*/
 
   // generate data
   TFolder *histosFolder;
@@ -44,7 +50,7 @@ void analyticFakeData(const TString type, UInt_t runNo)
   TFolder *runHeader;
   TFolder *runInfo;
   UInt_t offset = 0;
-  const UInt_t noOfHistos = 4;
+  const UInt_t noOfHistos = 16;
   const UInt_t noOfChannels = 426600;
   const Double_t timeResolution = 0.025; // ns
   TRandom3 rand;
@@ -63,95 +69,101 @@ void analyticFakeData(const TString type, UInt_t runNo)
     t0.push_back(5000.0);
 
   cout << ">> define header" << endl;
+  TLemRunHeader  *headerOld;
+  TMusrRunHeader *headerNew;
+  TMusrRunPhysicalQuantity prop;
   if (!type.CompareTo("TLemRunHeader")) {
     // feed run info header
     runInfo = gROOT->GetRootFolder()->AddFolder("RunInfo", "LEM RunInfo");
     gROOT->GetListOfBrowsables()->Add(runInfo, "RunInfo");
-    TLemRunHeader *header = new TLemRunHeader();
+    headerOld = new TLemRunHeader();
     tstr.Form("0%d - test", runNo);
-    header->SetRunTitle(tstr);
-    header->SetLemSetup("trivial");
-    header->SetRunNumber(runNo);
-    header->SetStartTime(0);
-    header->SetStopTime(1);
-    header->SetModeratorHV(32.0, 0.01);
-    header->SetSampleHV(0.0, 0.01);
-    header->SetImpEnergy(31.8);
-    header->SetSampleTemperature(0.2, 0.001);
-    header->SetSampleBField(-1.0, 0.1);
-    header->SetTimeResolution(timeResolution);
-    header->SetNChannels(noOfChannels);
-    header->SetNHist(8);
-    header->SetCuts("none");
-    header->SetModerator("none");
-    header->SetTimeZero(t0);
-    runInfo->Add(header); //add header to RunInfo folder
+    headerOld->SetRunTitle(tstr);
+    headerOld->SetLemSetup("trivial");
+    headerOld->SetRunNumber(runNo);
+    headerOld->SetStartTime(0);
+    headerOld->SetStopTime(1);
+    headerOld->SetModeratorHV(32.0, 0.01);
+    headerOld->SetSampleHV(0.0, 0.01);
+    headerOld->SetImpEnergy(31.8);
+    headerOld->SetSampleTemperature(0.2, 0.001);
+    headerOld->SetSampleBField(-1.0, 0.1);
+    headerOld->SetTimeResolution(timeResolution);
+    headerOld->SetNChannels(noOfChannels);
+    headerOld->SetNHist(8);
+    headerOld->SetCuts("none");
+    headerOld->SetModerator("none");
+    Double_t *tt0 = new Double_t[noOfHistos];
+    for (Int_t i=0; i<noOfHistos; i++)
+      tt0[i] = t0[i];
+    headerOld->SetTimeZero(tt0);
+    delete [] tt0;
+    runInfo->Add(headerOld); //add header to RunInfo folder
   } else { // TMusrRunHeader
     runHeader = gROOT->GetRootFolder()->AddFolder("RunHeader", "MusrRoot RunHeader");
     gROOT->GetListOfBrowsables()->Add(runHeader, "RunHeader");
-    TMusrRunHeader *header = new TMusrRunHeader(true);
-    TMusrRunPhysicalQuantity prop;
+    headerNew = new TMusrRunHeader(true);
 
     // 1st write all the required RunInfo entries
 
-    header->Set("RunInfo/Generic Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/validation/MusrRoot.xsd");
-    header->Set("RunInfo/Specific Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/validation/MusrRootHAL9500.xsd");
-    header->Set("RunInfo/Generator", "analyticFakeData");
-    header->Set("RunInfo/File Name", fileName);
+    headerNew->Set("RunInfo/Generic Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/validation/MusrRoot.xsd");
+    headerNew->Set("RunInfo/Specific Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/validation/MusrRootHAL9500.xsd");
+    headerNew->Set("RunInfo/Generator", "analyticFakeData");
+    headerNew->Set("RunInfo/File Name", fileName);
     tstr.Form("0%d - test", runNo);
-    header->Set("RunInfo/Run Title", tstr);
-    header->Set("RunInfo/Run Number", (Int_t)runNo);
-    header->Set("RunInfo/Start Time", "1970-01-01 00:00:00");
-    header->Set("RunInfo/Stop Time", "1970-01-01 00:00:02");
+    headerNew->Set("RunInfo/Run Title", tstr);
+    headerNew->Set("RunInfo/Run Number", (Int_t)runNo);
+    headerNew->Set("RunInfo/Start Time", "1970-01-01 00:00:00");
+    headerNew->Set("RunInfo/Stop Time", "1970-01-01 00:00:02");
     prop.Set("Run Duration", 2, "sec");
-    header->Set("RunInfo/Run Duration", prop);
-    header->Set("RunInfo/Laboratory", "PSI");
-    header->Set("RunInfo/Instrument", "virtual");
+    headerNew->Set("RunInfo/Run Duration", prop);
+    headerNew->Set("RunInfo/Laboratory", "PSI");
+    headerNew->Set("RunInfo/Instrument", "virtual");
     prop.Set("Muon Beam Momentum", 28.1, "MeV/c");
-    header->Set("RunInfo/Muon Beam Momentum", prop);
-    header->Set("RunInfo/Muon Species", "positive muon");
-    header->Set("RunInfo/Muon Source", "computer");
-    header->Set("RunInfo/Setup", "virtual");
-    header->Set("RunInfo/Comment", "fake data runs");
-    header->Set("RunInfo/Sample Name", "virtual");
+    headerNew->Set("RunInfo/Muon Beam Momentum", prop);
+    headerNew->Set("RunInfo/Muon Species", "positive muon");
+    headerNew->Set("RunInfo/Muon Source", "computer");
+    headerNew->Set("RunInfo/Setup", "virtual");
+    headerNew->Set("RunInfo/Comment", "fake data runs");
+    headerNew->Set("RunInfo/Sample Name", "virtual");
     prop.Set("Sample Temperature", 1.0, "mK");
-    header->Set("RunInfo/Sample Temperature", prop);
+    headerNew->Set("RunInfo/Sample Temperature", prop);
     prop.Set("Sample Magnetic Field", 40.0, "T");
-    header->Set("RunInfo/Sample Magnetic Field", prop);
+    headerNew->Set("RunInfo/Sample Magnetic Field", prop);
     prop.Set("Sample Temperature", 1.0, "mK");
-    header->Set("RunInfo/No of Histos", (Int_t)noOfHistos);
+    headerNew->Set("RunInfo/No of Histos", (Int_t)noOfHistos);
     prop.Set("Time Resolution", timeResolution, "ns");
-    header->Set("RunInfo/Time Resolution", prop);
+    headerNew->Set("RunInfo/Time Resolution", prop);
     vector<Int_t> ivec;
     ivec.push_back(0);
-    header->Set("RunInfo/RedGreen Offsets", ivec);
+    headerNew->Set("RunInfo/RedGreen Offsets", ivec);
 
     offset = 1;
     // 2nd write all the required DetectorInfo entries
-    for (UInt_t i=0; i<4; i++) {
+    for (UInt_t i=0; i<noOfHistos; i++) {
       tstr.Form("DetectorInfo/Detector%03d/", i+offset);
       label = tstr + TString("Name");
       tstr1.Form("Detector%03d", (Int_t)(i+offset));
-      header->Set(label, tstr1);
+      headerNew->Set(label, tstr1);
       label = tstr + TString("Histo No");
-      header->Set(label, (Int_t)(i+offset));
+      headerNew->Set(label, (Int_t)(i+offset));
       label = tstr + TString("Histo Length");
-      header->Set(label, (Int_t)noOfChannels);
+      headerNew->Set(label, (Int_t)noOfChannels);
       label = tstr + TString("Time Zero Bin");
-      header->Set(label, t0[i]);
+      headerNew->Set(label, t0[i]);
       label = tstr + TString("First Good Bin");
-      header->Set(label, (Int_t)t0[i]);
+      headerNew->Set(label, (Int_t)t0[i]);
       label = tstr + TString("Last Good Bin");
-      header->Set(label, (Int_t)noOfChannels);
+      headerNew->Set(label, (Int_t)noOfChannels);
     }
     // 3rd write required SampleEnvironmentInfo entries
-    header->Set("SampleEnvironmentInfo/Cryo", "virtual");
+    headerNew->Set("SampleEnvironmentInfo/Cryo", "virtual");
 
     // 4th write required MagneticFieldEnvironmentInfo entries
-    header->Set("MagneticFieldEnvironmentInfo/Magnet Name", "virtual");
+    headerNew->Set("MagneticFieldEnvironmentInfo/Magnet Name", "virtual");
 
     // 5th write required BeamlineInfo entries
-    header->Set("BeamlineInfo/Name", "piE3");
+    headerNew->Set("BeamlineInfo/Name", "piE3");
   }
 
   // create histos
@@ -176,52 +188,56 @@ void analyticFakeData(const TString type, UInt_t runNo)
   cout << ">> define phase" << endl;
   vector<Double_t> phase;
   for (UInt_t i=0; i<noOfHistos; i++)
-    phase.push_back((5.0 + 2.0*rand.Rndm())*TMath::Pi()/180.0 + TMath::TwoPi()/noOfHistos * (Double_t)i);
+    phase.push_back((5.0 + 2.0*rand.Rndm())*TMath::Pi()/180.0 + TMath::TwoPi()/(Double_t)(noOfHistos/2.0) * (Double_t)(i % (noOfHistos/2)));
 
   const Double_t gamma = 0.0000135538817; // gamma/(2pi)
-  Double_t bb0 = 5000.0; // field in Gauss
-  Double_t rate0 = 7.0/1000.0; // in 1/ns
-  Double_t frac0 = 0.5;
+  Double_t bb0 = 70000.0; // field in Gauss
+  Double_t rate0 = 0.4/1000.0; // in 1/ns
+  Double_t frac0 = 1.0;
+/*
   Double_t bb1 = bb0 + 200.0; // field in Gauss
   Double_t rate1 = 0.75/1000.0; // in 1/ns
   Double_t frac1 = 0.2;
   Double_t bb2 = bb0 + 600.0; // field in Gauss
   Double_t rate2 = 0.25/1000.0; // in 1/ns
-
+*/
   // fake function parameters header info: only for test purposes
   cout << ">> write fake header for TMusrRoot" << endl;
   if (type.CompareTo("TLemRunHeader")) {
     TDoubleVector dvec;
-    header->Set("FakeFct/Def", "N0 exp(-t/tau_mu) [1 + sum_{k=0}^2 frac_k A_0 exp(-1/2 (t sigma_k)^2) cos(gamma_mu B_k t + phi)] + bkg");
+//    headerNew->Set("FakeFct/Def", "N0 exp(-t/tau_mu) [1 + sum_{k=0}^2 frac_k A_0 exp(-1/2 (t sigma_k)^2) cos(gamma_mu B_k t + phi)] + bkg");
+    headerNew->Set("FakeFct/Def", "N0 exp(-t/tau_mu) [1 + A_0 exp(-1/2 (t sigma0)^2) cos(gamma_mu B0 t + phi)] + bkg");
     for (UInt_t i=0; i<noOfHistos; i++)
       dvec.push_back(n0[i]);
-    header->Set("FakeFct/N0", dvec);
+    headerNew->Set("FakeFct/N0", dvec);
     dvec.clear();
     for (UInt_t i=0; i<noOfHistos; i++)
       dvec.push_back(bkg[i]);
-    header->Set("FakeFct/bkg", dvec);
+    headerNew->Set("FakeFct/bkg", dvec);
     dvec.clear();
     for (UInt_t i=0; i<noOfHistos; i++)
       dvec.push_back(a0[i]);
-    header->Set("FakeFct/A", dvec);
+    headerNew->Set("FakeFct/A", dvec);
     dvec.clear();
     for (UInt_t i=0; i<noOfHistos; i++)
       dvec.push_back(phase[i]);
-    header->Set("FakeFct/phase", dvec);
+    headerNew->Set("FakeFct/phase", dvec);
     prop.Set("B0", bb0, "G");
-    header->Set("FakeFct/B0", prop);
+    headerNew->Set("FakeFct/B0", prop);
     prop.Set("rate0", 1.0e3*rate0, "1/usec");
-    header->Set("FakeFct/rate0", prop);
-    header->Set("FakeFct/frac0", frac0);
+    headerNew->Set("FakeFct/rate0", prop);
+/*
+    headerNew->Set("FakeFct/frac0", frac0);
     prop.Set("B1", bb1, "G");
-    header->Set("FakeFct/B1", prop);
+    headerNew->Set("FakeFct/B1", prop);
     prop.Set("rate1", 1.0e3*rate1, "1/usec");
-    header->Set("FakeFct/rate1", prop);
-    header->Set("FakeFct/frac1", frac1);
+    headerNew->Set("FakeFct/rate1", prop);
+    headerNew->Set("FakeFct/frac1", frac1);
     prop.Set("B2", bb2, "G");
-    header->Set("FakeFct/B2", prop);
+    headerNew->Set("FakeFct/B2", prop);
     prop.Set("rate2", 1.0e3*rate2, "1/usec");
-    header->Set("FakeFct/rate2", prop);
+    headerNew->Set("FakeFct/rate2", prop);
+*/
   }
 
   cout << ">> create histo objects" << endl;
@@ -244,10 +260,14 @@ void analyticFakeData(const TString type, UInt_t runNo)
         histo[i]->SetBinContent(j+1, bkg[i]);
       } else {
         time = (Double_t)(j-t0[i])*timeResolution;
+/*
         dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+
                    frac0*a0[i]*TMath::Exp(-0.5*TMath::Power(time*rate0,2))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i]) +
                    frac1*a0[i]*TMath::Exp(-0.5*TMath::Power(time*rate1,2))*TMath::Cos(TMath::TwoPi()*gamma*bb1*time+phase[i]) +
                    (1.0-frac0-frac1)*a0[i]*TMath::Exp(-0.5*TMath::Power(time*rate2,2))*TMath::Cos(TMath::TwoPi()*gamma*bb2*time+phase[i]))+(Double_t)bkg[i];
+*/
+        dval = (Double_t)n0[i]*TMath::Exp(-time/tau)*(1.0+
+                   TMath::Exp(-0.5*TMath::Power(time*rate0,2))*TMath::Cos(TMath::TwoPi()*gamma*bb0*time+phase[i]))+(Double_t)bkg[i];
         histo[i]->SetBinContent(j+1, dval);
       }
     }
@@ -298,7 +318,7 @@ void analyticFakeData(const TString type, UInt_t runNo)
   if (!type.CompareTo("TLemRunHeader")) {
     runInfo->Write();
   } else {
-    if (header->FillFolder(runHeader))
+    if (headerNew->FillFolder(runHeader))
       runHeader->Write();
   }
 

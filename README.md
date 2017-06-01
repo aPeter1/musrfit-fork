@@ -1,4 +1,4 @@
-# musrfit - muSR data analysis package #
+# musrfit - muSR and beta-NMR data analysis package #
 
 ### Contents ###
 
@@ -19,7 +19,7 @@ Currently it allows the following things:
 
 * Linux
 * Mac OS X
-* Windows - not really, only for the very brave ones
+* Windows - not really, but possible.
 
 ### Documentation ####
 
@@ -29,5 +29,4 @@ For a more exhaustive user documentation see:
 
 ### Contact ###
 
-<andreas.suter@psi.ch>
-
+<zaher.salman@psi.ch>

@@ -298,9 +298,9 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
     tstr = argv[i];
     if (tstr.BeginsWith("--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrFT version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "musrFT version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #else
-      cout << endl << "musrFT git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "musrFT git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #endif
       return 1;
     } else if (tstr.BeginsWith("--help")) {

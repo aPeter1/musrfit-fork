@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en">
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 16 Dec 2016 16:01:01 GMT -->
-<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8"><!-- /Added by HTTrack -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 14 May 2017 18:08:39 GMT -->
+<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8" /><!-- /Added by HTTrack -->
 <head>
 <link rel="stylesheet" href="../pub/System/HeadlinesPlugin/style.css" type="text/css" media="all" />
 <title> MUSR :: MusrFitSetup</title>
@@ -14,13 +14,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <link rel="icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
 <link rel="shortcut icon" href="../pub/Main/WebPreferences/favicon.ico" type="image/x-icon" />
-<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1481904043" type="application/x-wiki" title="edit MusrFitSetup" />
+<link rel="alternate" href="https://intranet.psi.ch/wiki/bin/edit/MUSR/MusrFitSetup?t=1494785297" type="application/x-wiki" title="edit MusrFitSetup" />
 <meta name="TEXT_NUM_TOPICS" content="Number of topics:" />
 <meta name="TEXT_MODIFY_SEARCH" content="Modify search" />
-<meta name="robots" content="noindex" /><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRsshtml.html" />
-<base  /><!--[if IE]></base><![endif]--><link class='head FOOTNOTEPLUGIN_LINKCSS' rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
-<link class='head JQUERYPLUGIN::COMMENT' rel='stylesheet' href='../pub/System/CommentPlugin/commentf5b6.css?version=3.0' type='text/css' media='all' /><!--JQUERYPLUGIN::COMMENT-->
+<meta name="robots" content="noindex" /><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="WebRss" />
+<base  /><!--[if IE]></base><![endif]--><link class='head JQUERYPLUGIN::COMMENT' rel='stylesheet' href='../pub/System/CommentPlugin/commentf5b6.css?version=3.0' type='text/css' media='all' /><!--JQUERYPLUGIN::COMMENT-->
 <link class='head SMILIESPLUGIN' rel='stylesheet' href='../pub/System/SmiliesPlugin/smilies.css' type='text/css' media='all' /><!--SMILIESPLUGIN-->
+<link class='head FOOTNOTEPLUGIN_LINKCSS' rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
 <link class='head CLASSIFICATIONPLUGIN::CSS' rel="stylesheet" href="../pub/System/ClassificationPlugin/styles.css" media="all" /><!--CLASSIFICATIONPLUGIN::CSS--><link rel='stylesheet' href='../pub/System/SkinTemplates/base.css' media='all' type='text/css' />
 <style type="text/css" media="all">
 @import url('../pub/System/PatternSkinTheme/layout.css');
@@ -104,12 +104,12 @@
 <!--JQUERYPLUGIN::LIVEQUERY-->
 <!--JQUERYPLUGIN::FOSWIKI-->
 <!--JQUERYPLUGIN::MIGRATE-->
+<!--JavascriptFiles/foswikiString-->
+<!--JavascriptFiles/foswikiPref-->
+<!--JavascriptFiles/foswikiForm-->
 <!--JQUERYPLUGIN::METADATA-->
 
 <!--JQUERYPLUGIN::CHILI-->
-<!--JavascriptFiles/foswikiString-->
-<!--JavascriptFiles/foswikiForm-->
-<!--JavascriptFiles/foswikiPref-->
 <!--JQUERYPLUGIN::FOSWIKI::PREFERENCES-->
 <!--JQUERYPLUGIN::COMMENT-->
 <!--PatternSkin/pattern--><link class='head FOOTNOTEPLUGIN_LINKCSS' rel="stylesheet" href="../pub/System/FootNotePlugin/styles.css" type="text/css" media="all" /><!--FOOTNOTEPLUGIN_LINKCSS-->
@@ -187,7 +187,7 @@ Additionally, <span class='foswikiRedFG'>only if</span> <code>musrfit</code> sho
    $ <a href="http://www.hdfgroup.org/products/hdf4/">HDF4</a>: A library and multi-object file format for storing and managing data.
    $ <a href="http://www.hdfgroup.org/HDF5/">HDF5</a>: A data model, library, and file format for storing and managing data.
    $ <a href="http://www.minixml.org/">minixml</a>: A small <code>XML</code> library that can be used to read and write <code>XML</code> and <code>XML</code> -like data files. <em>Required version &#8805; 2.2</em>
-   $ <a href="http://www.nexusformat.org/">NeXus</a>: A common data format for neutron, x-ray, and muon science.
+   $ <a href="http://www.nexusformat.org/">NeXus</a>: A common data format for neutron, x-ray, and muon science. <em>Required version &#8805; 4.4</em>
 <p></p>
 If optionally the editor and graphical user interface <code><a href="MusrGui.html">musrgui</a></code> / <code><a href="MusrGui.html">musredit</a></code> is going to be installed there is one further requirement:
    $ <a href="http://qt.nokia.com/">Qt</a>: A cross-platform application and user interface framework. <em>Required version &#8805; 3.3 &#38; &#8810; 4.0 (<code>musrgui</code>) <strong>OR</strong> &#8805; 4.6 (<code>musredit</code>)</em> 
@@ -198,7 +198,7 @@ Each of the following sections focusing on the installation of <code>musrfit</co
 Before the further installation will be described, please note the following restrictions: <dl>
 <dt> GNU/Linux </dt><dd> No serious problems are known at the moment.
 </dd> <dt> MS Windows </dt><dd> The setup of <code>musrfit</code> (including the requirements) using <code>Visual C++</code> has not been tested. If anybody likes to do this: Just go ahead and have fun! However, not very much assistance can be expected, although it would be an interesting experiment.
-</dd> <dt> Mac OS X </dt><dd> On <code>10.6 Snow Leopard</code> <code>Qt3</code> for Mac is not supported any more since this was based on a 32-bit only API. <code>Snow Leopard</code> -users are advised to use the <code>Qt4</code> based <code>musredit</code> or to rely on the standard <code>Qt3</code> version for <code>X11</code> in order to run <code>musrgui</code>. On newer Mac OS X versions (&gt;= 10.8) you should use the <code>Qt4</code> base <code>musredit</code> only.
+</dd> <dt> Mac OS X </dt><dd> On <code>10.6 Snow Leopard</code> <code>Qt3</code> for Mac is not supported any more since this was based on a 32-bit only API. <code>Snow Leopard</code> -users are advised to use the <code>Qt4</code> based <code>musredit</code> or to rely on the standard <code>Qt3</code> version for <code>X11</code> in order to run <code>musrgui</code>. On newer Mac OS X versions (&gt;= 10.8) you should use the <code>Qt4</code> or better, if available, <code>Qt5</code> base <code>musredit</code> only.
 </dd></dl> 
 <p></p>
 <h1 id="A_3_GNU_47Linux"> 3  GNU/Linux </h1>
@@ -206,14 +206,33 @@ Before the further installation will be described, please note the following res
 <h3 id="A_3.1.1_Everything_but_61_61ROOT_61_61_and_61_61NeXus_61_61"> 3.1.1  Everything but <code><b>ROOT</b></code> and <code><b>NeXus</b></code> </h3>
 Depending on the GNU/Linux distribution chosen, the above mentioned software&mdash;except the <code>ROOT</code> system and the <code>NeXus</code> library&mdash;should be available from the distributor and could be easily installed in the form of binary packages. If done in this way there should be taken care of installing <strong>both</strong>, the libraries and the header (dev, devel) files.<br>
 On a <a href="https://www.scientificlinux.org/">Scientific Linux</a> (<a href="http://www.redhat.com/">Red Hat</a>, other RPM-package base Linux distributions) system the following command executed as superuser from the shell will do the trick (never type the '$' it is the shell prompt of your system):
+<p></p>
+For <strong>Qt4</strong>:
 <pre class="bash">
-&#36; yum install git boost-devel gsl-devel fftw-devel libxml2-devel qt-devel qtwebkit-devel
+&#36; yum install git cmake boost-devel gsl-devel fftw-devel libxml2-devel qt-devel qtwebkit-devel
 </pre> 
-When dealing with a distribution that uses the dpkg/apt package manager like <a href="http://www.debian.org/">Debian</a> or <a href="http://www.ubuntu.com/">Ubuntu</a> the installation would look like:
+<p></p>
+For <strong>Qt5</strong>:
 <pre class="bash">
-&#36; apt-get install git libboost-dev libgsl0-dev libfftw3-dev libxml2-dev libqt4-dev libqtwebkit-dev
+&#36; yum install epel-release
+&#36; yum install git cmake boost-devel gsl-devel fftw-devel libxml2-devel qt5-qtbase-devel qt5-qtsvg-devel qt5-qtwebkit-devel
+</pre> 
+<p></p>
+Depending on your distribution <strong>Qt4</strong> is still the default but is likely to be replaced by <strong>Qt5</strong> in the very near future.
+<p></p>
+When dealing with a distribution that uses the dpkg/apt package manager like <a href="http://www.debian.org/">Debian</a> or <a href="http://www.ubuntu.com/">Ubuntu</a> the installation would look like:
+<p></p>
+For <strong>Qt4</strong>:
+<pre class="bash">
+&#36; apt-get install git cmake libboost-dev libgsl0-dev libfftw3-dev libxml2-dev libqt4-dev libqtwebkit-dev
 </pre>
-Everyone should know best himself which is the way to install distribution software on the chosen distribution <img class='smily' src='../pub/Main/SmiliesPluginPSI_/wink.gif' alt='wink' title='wink' />
+<p></p>
+For <strong>Qt5</strong>:
+<pre class="bash">
+&#36; apt-get install git cmake libboost-dev libgsl0-dev libfftw3-dev libxml2-dev qt5-default qtbase5-dev libqt5svg5-dev libqt5webkit5-dev
+</pre>
+<p></p>
+Everyone should know best himself which is the way to install distribution software on the chosen distribution <img class='smily' src='../pub/Main/SmiliesPluginPSI/wink.gif' alt='wink' title='wink' />
 <p></p>
 In case the distribution does not include the required software it has to be compiled from the source files which normally means to download the source code from the corresponding website, to unpack the source tree and call the following from the shell:
 <pre class="bash">
@@ -249,9 +268,9 @@ A brief instruction how to get <code>NeXus</code> compiled from source:
 &#36; sudo make install
 </pre>
 <h3 id="A_3.1.3_61_61ROOT_61_61"> 3.1.3  <code><b>ROOT</b></code> </h3>
-<strong>Currently only ROOT 5.34/xx is support! Do NOT try to use ROOT 6.xx/yy yet!</strong>
+ROOT 5.34/xx is supported as legacy version only! <strong>The default now will be ROOT 6.xx/yy!</strong>
 <p></p>
-The <code>ROOT</code> system may or may not be part of the GNU/Linux distribution. Some distributions are packing <code>ROOT</code> in a manner incompatible with the way it is needed for <code>musrfit</code>. <strong>Therefore we advise to install <code>ROOT</code> from source</strong>. Before installing <code>ROOT</code> from source you will need to install some additional header packages. 
+The <code>ROOT</code> system may or may not be part of the GNU/Linux distribution. Some distributions are packing <code>ROOT</code> in a manner incompatible with the way it is needed for <code>musrfit</code>, though the situation is improving. If you are experienced enough you can try the packed ROOT version. Often ROOT is split in many sub-packages. Install the necessary ones (guess from the description below). <strong>One Warning</strong>: if the ROOT packages are upgraded after a <code>yum update</code> (<code>apt-get update; apt-get upgrade</code>) you might need to recompile <code>musrfit</code>. If you are not sure about all this: <strong>install <code>ROOT</code> from source</strong>. Before installing <code>ROOT</code> from source you will need to install some additional header packages. 
 <p></p>
 For RPM based systems (RedHat, Fedora, etc) this will likely to be <strong>libX11-devel</strong>, <strong>libXft-devel</strong>, <strong>libXpm-devel</strong>, and <strong>libXext-devel</strong>:
 <pre class="bash">
@@ -263,7 +282,7 @@ For a dpkg/apt based system (Debian, Ubuntu, etc) this will likely to be <strong
 &#36; apt-get install libX11-dev libxft-dev libxpm-dev libxext-dev
 </pre>
 <p></p>
-Also make sure that you have installed all required packages listed under <a class="foswikiCurrentTopicLink" href="#ReqSw">Requested Software</a> (e.g. fftw, gsl, etc).
+Also make sure that you have installed all required packages listed under <a class="foswikiCurrentTopicLink" href="#ReqSw">Required Software</a> (e.g. fftw, gsl, etc).
 <p></p>
 For the following it is assumed that <code>ROOT</code> shall be installed under <code>$HOME/Apps</code>. If you want to install it somewhere else, just systematically replace the related terms of the following description. For the following list of commands the '$' will be given, the command prompt. Do <strong>not</strong> enter it! Also some comments will be added starting with a '#' which can be omitted. They are only there to explain what is going on.
 <pre class="bash">
@@ -274,24 +293,28 @@ For the following it is assumed that <code>ROOT</code> shall be installed under 
 &#36; git clone http://root.cern.ch/git/root.git
 &#36; cd root
 &#36; git tag -l
-&#36; # git tag -l will list all available tags. In the next command choose the tag v5-34-xx
-&#36; # where xx is the highest listed number, e.g. v5-34-32
-&#36; git checkout -b v5-34-32 v5-34-32
+&#36; # git tag -l will list all available tags. In the next command choose the tag v6-08-04 or the latest official release number
+&#36; git checkout -b v6-08-04 v6-08-04
 &#36; # now ROOT is ready to be configured. Below you will find the minimal ROOT configuration needed.
-&#36; ./configure --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
+&#36; # since we are using cmake build now, first we will need to create the build directory.
+&#36; mkdir root&#95;build
+&#36; cd root&#95;build
+&#36; cmake ../ -Dgminimal&#61;ON -Dasimage&#61;ON -Dmathmore&#61;On -Dminuit2&#61;ON -Dxml&#61;ON -DCMAKE&#95;INSTALL&#95;PREFIX&#61;../root&#95;exec
 &#36; # next will be the make. If running on a multicore CPU you can speed up tremendously by calling
 &#36; # make with the option -j &#60;number&#62;, where &#60;number&#62; is the number of threads which you want to give,
 &#36; # e.g. make -j8
 &#36; make
+&#36; # as a last step of the ROOT build process we need to install it
+&#36; make install
 </pre>
 <p></p>
 What is still missing is that the system should be told where to find the <code>ROOT</code> installation, therefore the following is suggested: <ul>
 <li> As superuser create a file <strong>/etc/ld.so.conf.d/cern-root.conf</strong> where the path to the <code>lib</code> directory of <code>ROOT</code> is added and call <strong>/sbin/ldconfig</strong> afterwards. In the example mentioned above one way of doing this is (<strong>&lt;home&gt;</strong> has to be the path to your home, e.g. /home/luke_skywalker): <pre class="bash">
-&#36; echo &#34;&#60;home&#62;/Apps/root/lib&#34; &#62;&#62; /etc/ld.so.conf.d/cern-root.conf
+&#36; echo &#34;&#60;home&#62;/Apps/root/root&#95;exec/lib&#34; &#62;&#62; /etc/ld.so.conf.d/cern-root.conf
 &#36; /sbin/ldconfig
 </pre>
 </li> <li> <span class='foswikiRedFG'>Additionally</span>, as normal user one should append the following lines to the <strong>~/.bashrc</strong> and/or <strong>~/.bash_profile</strong> (<strong>~./profile</strong> on Debian like systems, and then either restart the shell or call the same commands once more from the shell) in order to change some path-setting environment variables: <pre class="bash">
-&#36; export ROOTSYS&#61;&#36;HOME/Apps/root
+&#36; export ROOTSYS&#61;&#36;HOME/Apps/root/root&#95;exec
 &#36; export PATH&#61;&#36;ROOTSYS/bin:&#36;PATH
 </pre>
 </li></ul> 
@@ -299,6 +322,7 @@ What is still missing is that the system should be told where to find the <code>
 If an update of <code>ROOT</code> is needed, simple do the following:<pre class="bash">
 &#36; cd &#36;HOME/Apps/root
 &#36; git pull
+&#36; cd root&#95;build
 &#36; make
 </pre>
 <p></p>
@@ -308,17 +332,23 @@ When all required software has been set up it can be proceeded with the <code>mu
 <pre class="bash">
 &#36; cd &#36;HOME/Apps
 &#36; git clone https://bitbucket.org/muonspin/musrfit.git
+&#36; # Only if legacy ROOT 5.xx.yy is used include the next line
+&#36; cd musrfit; git checkout root5
 </pre>
 or
 <pre class="bash">
 &#36; cd &#36;HOME/Apps
 &#36; git clone git://gitlab.psi.ch/nemu/musrfit.git
+&#36; # Only if legacy ROOT 5.xx.yy is used include the next line
+&#36; cd musrfit; git checkout root5
 </pre>
 <p></p>
-<strong>Note:</strong> musrfit has moved from svn to git. In case you still have an <em>old</em> svn version of musrfit, it is advised to remove it first. For svn users: for a smooth transition from svn to git, please check the following link: 
+<strong>Note 1:</strong> <code>musrfit</code> has moved from svn to git. In case you still have an <em>old</em> svn version of musrfit, it is advised to remove it first. For svn users: for a smooth transition from svn to git, please check the following link: 
 <a href="http://www.git-tower.com/blog/git-for-subversion-users-cheat-sheet/">Git for Subversion Users - A Cheat Sheet</a>.
 <p></p>
-If a local repository clone is already present, one can update it using:
+<strong>Note 2:</strong> after cloning the <code>musrfit</code> repo you will automatically be on the root6 branch. If you want to get legacy ROOT 5.34.xx support, you will needed to switch branches first.
+<p></p>
+If a local repository clone is already present (it needs to be newer than Dec. 2016), one can update it using:
 <pre class="bash">
 &#36; cd &#36;HOME/Apps/musrfit
 &#36; git pull
@@ -341,6 +371,7 @@ After the source-code extraction the <strong>autogen.sh</strong> script is calle
 </dd> <dt> --with-nexus </dt><dd> Set the prefix of the <code>NeXus</code> installation, e.g. /usr/local (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
 </dd> <dt> --with-qt3 </dt><dd> Set the prefix of the <code>Qt3</code> installation, e.g. /usr/lib/qt-3.3 (<em>only useful in conjunction with building <code>musrgui</code></em>)
 </dd> <dt> --with-qt4 </dt><dd> Set the prefix of the <code>Qt4</code> installation, e.g. /usr/lib/qt47 (<em>only useful in conjunction with building <code>musredit</code></em>)
+</dd> <dt> --with-qt5 </dt><dd> Set the prefix of the <code>Qt5</code> installation, e.g. /usr/lib64 (<em>only useful in conjunction with building <code>musredit</code></em>)
 </dd> <dt> --enable-NeXus </dt><dd> Enable the support of <code>NeXus</code> data files (<em>requires the <code>HDF4</code>, <code>HDF5</code> and <code>NeXus</code> libraries to be installed</em>).
 </dd> <dt> --disable-editor </dt><dd> Disable the integrated building of <code>musredit</code>/<code>musrgui</code>.
 </dd> <dt> --disable-omp </dt><dd> Switches off the <a href="http://en.wikipedia.org/wiki/OpenMP">OpenMP</a> features of <code>musrfit</code> (parallelization of the &chi;<sup>2</sup> calculation when compiled with GCC &ge; 4.2)
@@ -404,7 +435,10 @@ Notes
 <h1 id="A_4_MS_Windows"> 4  MS Windows </h1>
 <span class='foswikiRedFG'> The description here is only for the very brave ones. It hasn't been tested for quite a while and therefore gives you rather a flavour of what needs to be done rather than a real instruction how to setup <code>musrfit</code>. If you just need <code>musrfit</code> to work on a MS Windows platform, it is recommended to install it via a linux virtual machine!</span>
 <p></p>
-Under Windows a native installation is not supported but there is the possibility to run <code>musrfit</code> through <a href="http://www.cygwin.com/">Cygwin</a> which has the great advantage that one gains additionally various nice <code>UNIX</code> tools also for other purposes <img class='smily' src='../pub/Main/SmiliesPluginPSI_/wink.gif' alt='wink' title='wink' /> <br>
+<span class='foswikiBlueFG'> For adventurous guys using Windows 10, there is the possibility to activate the built in Ubuntu bash-shell. It allows to install <code>musrfit</code> as described in the Linux section. 
+</span>
+<p></p>
+Under Windows a native installation is not supported but there is the possibility to run <code>musrfit</code> through <a href="http://www.cygwin.com/">Cygwin</a> which has the great advantage that one gains additionally various nice <code>UNIX</code> tools also for other purposes <img class='smily' src='../pub/Main/SmiliesPluginPSI/wink.gif' alt='wink' title='wink' /> <br>
 <span class='foswikiRedFG'>Please also be aware of the fact that the X server which is going to be installed with Cygwin has to be started (e.g. by selecting it from the "Programs" folder) before any graphical application (<code>musrview</code>, <code>musrgui</code>, etc.) is run</span>.
 <p></p>
 <span class='foswikiPinkFG'>One more advice: Please never try to install either <code>ROOT</code> or <code>musrfit</code> from or to a directory containing spaces in the absolute path or in case you do, do not wonder if some errors occur!<br>
@@ -528,6 +562,7 @@ After the source-code extraction the <strong>autogen.sh</strong> script is calle
 </dd> <dt> --with-nexus </dt><dd> Set the prefix of the <code>NeXus</code> installation, e.g. /usr/local (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
 </dd> <dt> --with-qt3 </dt><dd> Set the prefix of the <code>Qt3</code> installation, e.g. /usr/lib/qt-3.3 (<em>only useful in conjunction with building <code>musrgui</code></em>)
 </dd> <dt> --with-qt4 </dt><dd> Set the prefix of the <code>Qt4</code> installation, e.g. /usr/lib/qt47 (<em>only useful in conjunction with building <code>musredit</code></em>)
+</dd> <dt> --with-qt5 </dt><dd> Set the prefix of the <code>Qt5</code> installation, e.g. /usr/lib/qt56 (<em>only useful in conjunction with building <code>musredit</code></em>)
 </dd> <dt> --enable-NeXus </dt><dd> Enable the support of <code>NeXus</code> data files (<em>requires the <code>HDF4</code>, <code>HDF5</code> and <code>NeXus</code> libraries to be installed</em>).
 </dd> <dt> --disable-editor </dt><dd> Disable the integrated building of <code>musredit</code>/<code>musrgui</code>.
 </dd> <dt> --disable-omp </dt><dd> Switches off the <a href="http://en.wikipedia.org/wiki/OpenMP">OpenMP</a> features of <code>musrfit</code> (parallelization of the &chi;<sup>2</sup> calculation when compiled with GCC &ge; 4.2)
@@ -636,23 +671,23 @@ With <code><b>qt4-mac</b></code>, <code>musredit</code> will be installed. If it
 <p></p>
 <span class='foswikiRedFG'>Only if</span> <code>musrfit</code> should support reading data files in the <code>NeXus</code> format the further <a class="foswikiCurrentTopicLink" href="#ReqSwNeXus">required</a> packages are set up:
 <pre class="bash">
-&#36; sudo port -v install jpeg6b hdf4 hdf5
+&#36; sudo port -v install hdf4 hdf5
 </pre>
 Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to be compiled and installed directly from the source code. Given the respective version numbers of <strong>2.9</strong> and <strong>4.4.2</strong> (which are subject to change with time, <strong>Only <code><b>NeXus</b></code> Version &gt;= 4.4 is support!</strong>) this can be achieved for example by:
 <pre class="bash">
-&#36; cd
-&#36; curl www.msweet.org/files/project3/mxml-2.9.tar.gz -G &#124; tar xz
-&#36; cd mxml-2.9
+&#36; # get and instal Mini-XML
+&#36; cd &#36;HOME/Applications
+&#36; git clone https://github.com/michaelrsweet/mxml.git
+&#36; cd mxml
 &#36; ./configure --prefix&#61;/usr/local
 &#36; make
 &#36; sudo make install
-&#36; cd &#36;HOME/Downloads
-&#36; # create a directory for the NeXus source code
-&#36; mkdir nexus
-&#36; cd nexus
+&#36; # get and install NeXus
+&#36; cd &#36;HOME/Applications
 &#36; # get the source code from the master repository
-&#36; git clone https://github.com/nexusformat/code.git
+&#36; git clone https://github.com/nexusformat/code.git nexus/code
 &#36; # next we will build NeXus out-of-source
+&#36; cd nexus
 &#36; mkdir build
 &#36; cd build
 &#36; cmake -DENABLE&#95;HDF5&#61;1 -DENABLE&#95;HDF4&#61;1 -DENABLE&#95;MXML&#61;1 ../code
@@ -660,29 +695,33 @@ Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to
 &#36; sudo make install
 </pre>
 <h3 id="A_5.1.3_61_61ROOT_61_61"> 5.1.3  <code><b>ROOT</b></code> </h3>
+ROOT 5.34/xx is supported as legacy version only! <strong>The default now will be ROOT 6.xx/yy!</strong>
+<p></p>
 The best way to get <code>ROOT</code> exactly the way needed for <code>musrfit</code> is to install it from source. Before describing it, please make sure that you have installed all required packages listed under <a class="foswikiCurrentTopicLink" href="#ReqSw">Requested Software</a> (e.g. fftw, gsl, etc).
 <p></p>
-For the following it is assumed that <code>ROOT</code> shall be installed under <code>$HOME/Apps</code>. If you want to install it somewhere else, just systematically replace the related terms of the following description. For the following list of commands the '$' will be given, the command prompt. Do <strong>not</strong> enter it! Also some comments will be added starting with a '#' which can be omitted. They are only there to explain what is going on.
+For the following it is assumed that <code>ROOT</code> shall be installed under <code>$HOME/Applications</code>. If you want to install it somewhere else, just systematically replace the related terms of the following description. For the following list of commands the '$' will be given, the command prompt. Do <strong>not</strong> enter it! Also some comments will be added starting with a '#' which can be omitted. They are only there to explain what is going on.
 <pre class="bash">
-&#36; cd &#36;HOME
-&#36; # creat the Apps directory if not already present
-&#36; mkdir Apps
-&#36; cd Apps
+&#36; cd &#36;HOME/Applications
 &#36; git clone http://root.cern.ch/git/root.git
 &#36; cd root
 &#36; git tag -l
-&#36; # git tag -l will list all available tags. In the next command choose the tag v5-34-xx
-&#36; # where xx is the highest listed number, e.g. v5-34-32
-&#36; git checkout -b v5-34-32 v5-34-32
+&#36; # git tag -l will list all available tags. In the next command choose the tag v6-08-xx
+&#36; # where xx is the highest listed number, e.g. v6-08-06
+&#36; git checkout -b v6-08-06 v6-08-06
 &#36; # now ROOT is ready to be configured. Below you will find the minimal ROOT configuration needed.
-&#36; ./configure --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
+&#36; # We will use the cmake out-of-source approach here.
+&#36; mkdir root&#95;build
+&#36; cd root&#95;build
+&#36; cmake ../ -Dgminimal&#61;ON -Dasimage&#61;ON -Dmathmore&#61;ON -Dminuit2&#61;ON -Dxml&#61;ON -DCMAKE&#95;INSTALL&#95;PREFIX&#61;&#36;HOME/Applications/root/root&#95;exec
 &#36; # next will be the make. If running on a multicore CPU you can speed up tremendously by calling
 &#36; # make with the option -j &#60;number&#62;, where &#60;number&#62; is the number of threads which you want to give,
 &#36; # e.g. make -j8
 &#36; make
+&#36; # make will take quite a while
+&#36; make install
 </pre>
 <p></p>
-For further details see <a href="http://root.cern.ch/drupal/content/installing-root-source">Installing ROOT from Source</a>.
+For further details see <a href="https://root.cern.ch/building-root">Installing ROOT from Source</a>.
 <p></p>
 Since Apple in its wisdom decided that programs started from a shell are treated differently than apps if it is coming to system variables, we need to work harder compared to a Linux system.
 <p></p>
@@ -695,11 +734,11 @@ In order to finalize the <code>ROOT</code> installation and to prepare already t
 &#60;plist version&#61;&#34;1.0&#34;&#62;
 &#60;dict&#62;
         &#60;key&#62;MUSRFITPATH&#60;/key&#62;
-        &#60;string&#62;&#36;HOME/Apps/root/bin&#60;/string&#62;         (where to find the musrfit executables)
+        &#60;string&#62;&#36;HOME/Applications/root/root&#95;exec/bin&#60;/string&#62; (where to find the musrfit executables)
         &#60;key&#62;QTDIR&#60;/key&#62;
-        &#60;string&#62;/opt/local/lib/qt3mac&#60;/string&#62;       (where to find Qt3 (for musrgui) or Qt4 (for musredit))
+        &#60;string&#62;/opt/local/lib/qt3mac&#60;/string&#62;                 (where to find Qt3 (for musrgui) or Qt4 (for musredit))
         &#60;key&#62;ROOTSYS&#60;/key&#62;
-        &#60;string&#62;&#36;HOME/Apps/root&#60;/string&#62;             (where to find the ROOT system)
+        &#60;string&#62;&#36;HOME/Applications/root/root&#95;exec&#60;/string&#62;     (where to find the ROOT system)
 &#60;/dict&#62;
 &#60;/plist&#62;
 </pre>
@@ -708,7 +747,7 @@ In order to finalize the <code>ROOT</code> installation and to prepare already t
 <p></p>
 One needs to add some system variables in <strong>~/.profile</strong>:
 <pre class="bash">
-export ROOTSYS&#61;&#36;HOME/Apps/root
+export ROOTSYS&#61;&#36;HOME/Applications/root/root&#95;exec
 launchctl setenv ROOTSYS &#36;ROOTSYS
 export MUSRFITPATH&#61;&#36;ROOTSYS/bin
 launchctl setenv MUSRFITPATH &#36;MUSRFITPATH
@@ -761,16 +800,21 @@ where <strong>x_yy_z</strong> has to be substituted by the correct version numbe
 <p></p>
 Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to be compiled and installed directly from the source code. Given the respective version numbers of <strong>2.9</strong> and <strong>4.3.2</strong> (which are subject to change with time) this can be achieved for example by:
 <pre class="bash">
-&#36; cd
-&#36; curl www.msweet.org/files/project3/mxml-2.9.tar.gz -G &#124; tar xz
-&#36; cd mxml-2.9
+&#36; # first build Mini-XML
+&#36; cd &#36;HOME/Applications
+&#36; git clone https://github.com/michaelrsweet/mxml.git
+&#36; cd mxml
 &#36; ./configure --prefix&#61;/usr/local
 &#36; make
 &#36; sudo make install
+&#36; # second build NeXus
 &#36; cd ..
-&#36; curl http://download.nexusformat.org/kits/nexus-4.3.2-20140413svn1919.tar.gz -G &#124; tar xz
-&#36; cd nexus-4.3.2-20140413svn1919
-&#36; ./configure --prefix&#61;/usr/local
+&#36; git clone https://github.com/nexusformat/code.git nexus/code
+&#36; cd nexus
+&#36; # build NeXus out-of-source
+&#36; mkdir build
+&#36; cd build
+&#36; cmake ../code -DENABLE&#95;HDF4&#61;1 -DENABLE&#95;HDF5&#61;1 -DENABLE&#95;MXML&#61;1
 &#36; make
 &#36; sudo make install
 </pre>
@@ -778,24 +822,25 @@ Unfortunately, the <code>minixml</code> and <code>NeXus</code> libraries have to
 <h3 id="A_5.2.3_61_61ROOT_61_61"> 5.2.3  <code><b>ROOT</b></code> </h3>
 The best way to get <code>ROOT</code> exactly the way needed for <code>musrfit</code> is to install it from source. Before describing it, please make sure that you have installed all required packages listed under <a class="foswikiCurrentTopicLink" href="#ReqSw">Requested Software</a> (e.g. fftw, gsl, etc).
 <p></p>
-For the following it is assumed that <code>ROOT</code> shall be installed under <code>$HOME/Apps</code>. If you want to install it somewhere else, just systematically replace the related terms of the following description. For the following list of commands the '$' will be given, the command prompt. Do <strong>not</strong> enter it! Also some comments will be added starting with a '#' which can be omitted. They are only there to explain what is going on.
+For the following it is assumed that <code>ROOT</code> shall be installed under <code>$HOME/Applications</code>. If you want to install it somewhere else, just systematically replace the related terms of the following description. For the following list of commands the '$' will be given, the command prompt. Do <strong>not</strong> enter it! Also some comments will be added starting with a '#' which can be omitted. They are only there to explain what is going on.
 <pre class="bash">
-&#36; cd &#36;HOME
-&#36; # creat the Apps directory if not already present
-&#36; mkdir Apps
-&#36; cd Apps
+&#36; cd &#36;HOME/Applications
 &#36; git clone http://root.cern.ch/git/root.git
 &#36; cd root
 &#36; git tag -l
-&#36; # git tag -l will list all available tags. In the next command choose the tag v5-34-xx
-&#36; # where xx is the highest listed number, e.g. v5-34-32
-&#36; git checkout -b v5-34-32 v5-34-32
+&#36; # git tag -l will list all available tags. In the next command choose the tag v6-08-06
+&#36; # where xx is the highest listed number, e.g. v6-08-06
+&#36; git checkout -b v6-08-06 v6-08-06
 &#36; # now ROOT is ready to be configured. Below you will find the minimal ROOT configuration needed.
-&#36; ./configure --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
+&#36; # the out-of-source approach will be followed
+&#36; mkdir root&#95;build
+&#36; cd root&#95;build
+&#36; cmake ../ -Dgminimal&#61;ON -Dasimage&#61;ON -Dmathmore&#61;ON -Dminuit2&#61;ON -Dxml&#61;ON -DCMAKE&#95;INSTALL&#95;PREFIX&#61;&#36;HOME/Applications/root/root&#95;exec
 &#36; # next will be the make. If running on a multicore CPU you can speed up tremendously by calling
 &#36; # make with the option -j &#60;number&#62;, where &#60;number&#62; is the number of threads which you want to give,
 &#36; # e.g. make -j8
 &#36; make
+&#36; make install
 </pre>
 <p></p>
 For further details see <a href="http://root.cern.ch/drupal/content/installing-root-source">Installing ROOT from Source</a>.
@@ -811,11 +856,11 @@ In order to finalize the <code>ROOT</code> installation and to prepare already t
 &#60;plist version&#61;&#34;1.0&#34;&#62;
 &#60;dict&#62;
         &#60;key&#62;MUSRFITPATH&#60;/key&#62;
-        &#60;string&#62;&#36;HOME/Apps/root/bin&#60;/string&#62;         (where to find the musrfit executables)
+        &#60;string&#62;&#36;HOME/Applications/root/root&#95;exec/bin&#60;/string&#62; (where to find the musrfit executables)
         &#60;key&#62;QTDIR&#60;/key&#62;
-        &#60;string&#62;/opt/local/lib/qt3mac&#60;/string&#62;       (where to find Qt3 (for musrgui) or Qt4 (for musredit))
+        &#60;string&#62;/opt/local/lib/qt3mac&#60;/string&#62;                 (where to find Qt3 (for musrgui) or Qt4 (for musredit))
         &#60;key&#62;ROOTSYS&#60;/key&#62;
-        &#60;string&#62;&#36;HOME/Apps/root&#60;/string&#62;             (where to find the ROOT system)
+        &#60;string&#62;&#36;HOME/Applications/root/root&#95;exec&#60;/string&#62;     (where to find the ROOT system)
 &#60;/dict&#62;
 &#60;/plist&#62;
 </pre>
@@ -824,23 +869,27 @@ In order to finalize the <code>ROOT</code> installation and to prepare already t
 <p></p>
 One needs to add some system variables in <strong>~/.profile</strong>:
 <pre class="bash">
-export ROOTSYS&#61;&#36;HOME/Apps/root
+export ROOTSYS&#61;&#36;HOME/Applications/root/root&#95;exec
 launchctl setenv ROOTSYS &#36;ROOTSYS
 export MUSRFITPATH&#61;&#36;ROOTSYS/bin
 launchctl setenv MUSRFITPATH &#36;MUSRFITPATH
 export PATH&#61;&#36;ROOTSYS/bin:&#36;QTDIR/bin:&#36;PATH
 </pre>
 <h2 id="A_5.3_61_61musrfit_61_61"> 5.3  <code><b>musrfit</b></code> </h2>
-First, the most recent source code should be downloaded.  First, the most recent source code should be downloaded. The preferred way of doing so is to clone the musrfit repository via git. Assuming the code should be located in ~/Apps/musrfit this is achieved most easily calling from the terminal
+First, the most recent source code should be downloaded.  First, the most recent source code should be downloaded. The preferred way of doing so is to clone the musrfit repository via git. Assuming the code should be located in ~/Applications/musrfit this is achieved most easily calling from the terminal
 <p></p>
 <pre class="bash">
-&#36; cd ~/Apps
+&#36; cd ~/Applications
 &#36; git clone https://bitbucket.org/muonspin/musrfit.git 
+&#36; # Only if legacy ROOT 5.xx.yy is used include the next line 
+&#36; cd musrfit; git checkout root5 
 </pre>
 or
 <pre class="bash">
-&#36; cd ~/Apps
+&#36; cd ~/Applications
 &#36; git clone git://gitlab.psi.ch/nemu/musrfit.git  
+&#36; # Only if legacy ROOT 5.xx.yy is used include the next line 
+&#36; cd musrfit; git checkout root5 
 </pre>
 <p></p>
 <p></p>
@@ -849,7 +898,7 @@ or
 <p></p>
 If a local repository clone is already present, one can update it using:
 <pre class="bash">
-&#36; cd ~/Apps/musrfit
+&#36; cd ~/Applications/musrfit
 &#36; git pull
 </pre>
 <p></p>
@@ -867,6 +916,7 @@ After the source-code extraction the <strong>autogen.sh</strong> script is calle
 </dd> <dt> --with-nexus </dt><dd> Set the prefix of the <code>NeXus</code> installation, e.g. /usr/local (<em>only useful in conjunction with the <code>NeXus</code> support</em>)
 </dd> <dt> --with-qt3 </dt><dd> Set the prefix of the <code>Qt3</code> installation, e.g. /opt/local/lib/qt-3.3 (<em>only useful in conjunction with building <code>musrgui</code></em>)
 </dd> <dt> --with-qt4 </dt><dd> Set the prefix of the <code>Qt4</code> installation, e.g. /opt/local/lib/qt-4.7 (<em>only useful in conjunction with building <code>musredit</code></em>)
+</dd> <dt> --with-qt5 </dt><dd> Set the prefix of the <code>Qt5</code> installation, e.g. /opt/local/libexec/qt5 (<em>only useful in conjunction with building <code>musredit</code></em>)
 </dd> <dt> --enable-NeXus </dt><dd> Enable the support of <code>NeXus</code> data files (<em>requires the <code>HDF4</code>, <code>HDF5</code> and <code>NeXus</code> libraries to be installed</em>).
 </dd> <dt> --disable-editor </dt><dd> Disable the integrated building of <code>musredit</code>/<code>musrgui</code>.
 </dd> <dt> --disable-omp </dt><dd> Switches off the <a href="http://en.wikipedia.org/wiki/OpenMP">OpenMP</a> features of <code>musrfit</code> (parallelization of the &chi;<sup>2</sup> calculation when compiled with GCC &ge; 4.2)
@@ -931,7 +981,7 @@ Notes
 In order to perform a quick test for finding out if the installation has been completed successfully, a few msr files together with the corresponding data files can be found in the <code>musrfit</code> source tree at <strong>doc/examples/</strong>.<br>
 If <code>musrgui</code> has been installed, just open one of the <strong>test-&#42;.msr</strong> files in the editor and test the <code>musrfit</code> functionalities. Otherwise, if only the terminal should be used, as an initial test for instance the following could be done:
 <pre class="bash">
-&#36; cd ~/Apps/musrfit/doc/examples
+&#36; cd ~/Applications/musrfit/doc/examples
 &#36; musrview test-histo-ROOT-NPP.msr
 </pre>
 <p></p>
@@ -940,7 +990,7 @@ If <code>musrgui</code> has been installed, just open one of the <strong>test-&#
 <p></p>
 </div>
 <div class="patternInfo">This topic: MUSR<span class='foswikiSeparator'>&nbsp;&gt;&nbsp;</span><a class="foswikiCurrentWebHomeLink" href="WebHome.html">WebHome</a> &gt; <a href="MusrFit.html">MusrFit</a><span class='foswikiSeparator'>&nbsp;&gt;&nbsp;</span>MusrFitSetup <br />
-Topic revision:  <span class='patternRevInfo'>25 Aug 2016, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
+Topic revision:  <span class='patternRevInfo'>27 Mar 2017, <a href="https://intranet.psi.ch/Main/AndreasSuter">AndreasSuter</a></span></div>
 </div>
 </div>
 </div>
@@ -958,6 +1008,5 @@ Topic revision:  <span class='patternRevInfo'>25 Aug 2016, <a href="https://intr
 
 </body>
 
-<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2010], Fri, 16 Dec 2016 16:01:02 GMT -->
-<!-- Added by HTTrack --><meta http-equiv="content-type" content="text/html;charset=utf-8"><!-- /Added by HTTrack -->
+<!-- Mirrored from intranet.psi.ch/MUSR/MusrFitSetup?cover=print by HTTrack Website Copier/3.x [XR&CO'2014], Sun, 14 May 2017 18:08:39 GMT -->
 </html>

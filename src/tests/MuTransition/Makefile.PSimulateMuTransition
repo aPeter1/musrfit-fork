@@ -52,6 +52,9 @@ LDFLAGS       = -g
 SOFLAGS       = -dynamic
 endif
 
+# installation directory
+INSTALL_DIR = /usr/local
+
 # the output from the root-config script:
 CXXFLAGS      += $(ROOTCFLAGS)
 LDFLAGS       +=
@@ -95,8 +98,8 @@ PSimulateMuTransitionDict.cpp: PSimulateMuTransition.h PSimulateMuTransitionLink
 install: all
 	@echo "Installing shared lib: libPSimulateMuTransition.so"
 ifeq ($(OS),LINUX)
-	cp -pv $(SHLIB) $(ROOTSYS)/lib
-	cp -pv PSimulateMuTransition.h $(ROOTSYS)/include
+	cp -pv $(SHLIB) $(INSTALL_DIR)/lib
+	cp -pv PSimulateMuTransition.h $(INSTALL_DIR)/include
 # for root6
-	cp -pv PSimulateMuTransitionDict_rdict.pcm $(ROOTSYS)/lib
+	cp -pv PSimulateMuTransitionDict_rdict.pcm $(INSTALL_DIR)/lib
 endif

@@ -6,8 +6,7 @@ EXTRA_DIST = autogen.sh acinclude.m4
 
 # The following is to install the documentation
 # It is a bit lengthy because one cannot simply install whole directories (except copying them recursively -- which also takes the .svn directories...)
-DOCDIRS = templates \
-          examples \
+DOCDIRS = examples \
           examples/data \
           examples/ASlibs \
           examples/ASlibs/data \

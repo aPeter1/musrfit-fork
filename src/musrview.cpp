@@ -127,9 +127,9 @@ int main(int argc, char *argv[])
       }
     } else if (!strcmp(argv[i], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrview version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "musrview version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #else
-      cout << endl << "musrview git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "musrview git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--help")) {

@@ -1343,6 +1343,8 @@ Bool_t PFitter::ExecuteMinos()
     // the 2nd condition is from an all together unused variable
     // the 3rd condition is a variable fixed via the FIX command
     if ((fMnUserParams.Error(i) != 0.0) && (fRunInfo->ParameterInUse(i) != 0) && (!fMnUserParams.Parameters().at(i).IsFixed())) {
+      cout << ">> PFitter::ExecuteMinos(): calculate errors for " << fParams[i].fName << endl;
+
       // 1-sigma MINOS errors
       ROOT::Minuit2::MinosError err = minos.Minos(i);
 

@@ -198,9 +198,9 @@ int main(int argc, char *argv[])
       any2many_syntax();
     else if (strstr(argv[1], "--v")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "any2many version: " << PACKAGE_VERSION << ", git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "any2many version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #else
-      cout << endl << "any2many git-rev: " << GIT_REVISION << endl << endl;
+      cout << endl << "any2many git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #endif
     } else {
       any2many_syntax();
