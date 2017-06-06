@@ -6154,7 +6154,7 @@ bool PRunDataHandler::DateToISO8601(string inDate, string &iso8601Date)
     return false;
 
   TString str("");
-  str.Form("%04d-%02d-%02d", 1900+tm.tm_year, tm.tm_mon, tm.tm_mday);
+  str.Form("%04d-%02d-%02d", 1900+tm.tm_year, tm.tm_mon+1, tm.tm_mday);
 
   iso8601Date = str.Data();
 
