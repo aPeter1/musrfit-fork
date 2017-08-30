@@ -1147,6 +1147,7 @@ case "$host" in
   *-*-darwin*)
     ARCH=DARWIN
     LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D_Darwin_"
+    LOCAL_BIN_LDFLAGS="${LOCAL_BIN_LDFLAGS} -Wl,-rpath ${ROOTLIBDIR}"
     ;;
   *)
     ARCH=OTHERUNIX
