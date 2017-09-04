@@ -3027,9 +3027,14 @@ void PTextEdit::getTheme()
 
   QString str = QIcon::themeName();
 
+  qDebug() << "debug> str=" << str << endl;
+
   if (str.contains("dark", Qt::CaseInsensitive)) {
     fDarkTheme = true;
     if (str.contains("ubuntu", Qt::CaseInsensitive)) {
+      fDarkToolBarIcon = false;
+    } else if (str.contains("xfce", Qt::CaseInsensitive)) {
+      fDarkTheme = false;
       fDarkToolBarIcon = false;
     } else {
       fDarkToolBarIcon = true;

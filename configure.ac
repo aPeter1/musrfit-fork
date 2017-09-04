@@ -421,7 +421,7 @@ dnl -----------------------------------------------
 dnl Check for ROOT
 dnl -----------------------------------------------
 
-ROOT_PATH([5.22/00], [], AC_MSG_ERROR([Either ROOT is not installed correctly or the version is too old... please check!]))
+ROOT_PATH([6.06/00], [], AC_MSG_ERROR([Either ROOT is not installed correctly or the version is too old... please check!]))
 
 ROOT_LIBS="-L${ROOTLIBDIR} ${ROOTGLIBS} ${ROOTAUXLIBS} -lMinuit2 -lMathMore -lXMLParser"
 ROOT_CFLAGS="-I${ROOTINCDIR} ${ROOTCFLAGS} ${ROOTAUXCFLAGS}"
@@ -1147,6 +1147,7 @@ case "$host" in
   *-*-darwin*)
     ARCH=DARWIN
     LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D_Darwin_"
+    LOCAL_BIN_LDFLAGS="${LOCAL_BIN_LDFLAGS} -Wl,-rpath ${ROOTLIBDIR}"
     ;;
   *)
     ARCH=OTHERUNIX
