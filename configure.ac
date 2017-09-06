@@ -1000,6 +1000,14 @@ if test "x$enable_editor" != "xno"; then
               [PKG_CHECK_MODULES(QT3MT, qt-mt >= 3.3.0 qt-mt < 4.0, [QT3MT_FOUND=yes], [QT3MT_FOUND=no])]
             )]
           )
+        fi        
+        if test "x${QT5_FOUND}" != "xyes"; then
+          PKG_CHECK_MODULES(QT5, Qt5WebEngine >= $QT5MINVER Qt5Xml >= $QT5MINVER, [QT5_FOUND=yes],
+            [AC_MSG_NOTICE([Qt5 (including Qt5WebEngine and Qt5Xml) not found!])
+             PKG_CHECK_MODULES(QT3, qt >= 3.3.0 qt < 4.0, [QT3_FOUND=yes],
+              [PKG_CHECK_MODULES(QT3MT, qt-mt >= 3.3.0 qt-mt < 4.0, [QT3MT_FOUND=yes], [QT3MT_FOUND=no])]
+            )]
+          )
         fi]
   )
 
@@ -1024,6 +1032,12 @@ if test "x$enable_editor" != "xno"; then
         QTEDITOR=musrgui
       fi
 
+      dnl if Qt5 but Qt5WebEngine instead of Qt5WebKit
+      if test "x$QTPATH" = "x"; then
+        QTPATH=$(pkg-config --variable=prefix Qt5WebEngine)
+        QTEDITOR=musredit_qt5
+      fi
+      
       AC_MSG_CHECKING([for qmake])
       if test "x${QTPATH}" != "xnone"; then
         if test "x$QTEDITOR" = "xmusredit_qt5"; then
