@@ -629,8 +629,6 @@ Bool_t PStartupHandler::WriteDefaultStartupFile()
   fout << "    <comment>" << endl;
   fout << "        Defines default settings for the musrfit package" << endl;
   fout << "    </comment>" << endl;
-  fout << "    <data_path>/mnt/data/nemu/his</data_path>" << endl;
-  fout << "    <data_path>/mnt/data/nemu/wkm</data_path>" << endl;
   fout << "    <data_path>/afs/psi.ch/project/nemu/data/his</data_path>" << endl;
   fout << "    <data_path>/afs/psi.ch/project/nemu/data/wkm</data_path>" << endl;
   fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/gps</data_path>" << endl;
