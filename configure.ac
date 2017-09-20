@@ -1,7 +1,7 @@
 AC_REVISION([m4_esyscmd_s([git describe --always])])
 
 AC_PREREQ(2.63)
-AC_INIT([musrfit],[1.0.0],[andreas.suter@psi.ch])
+AC_INIT([musrfit],[1.1.0],[andreas.suter@psi.ch])
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_HOST
 #AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
@@ -35,7 +35,7 @@ dnl -----------------------------------------------
 
 #release versioning
 MUSR_MAJOR_VERSION=1
-MUSR_MINOR_VERSION=0
+MUSR_MINOR_VERSION=1
 MUSR_MICRO_VERSION=0
 
 #release versioning
@@ -421,7 +421,7 @@ dnl -----------------------------------------------
 dnl Check for ROOT
 dnl -----------------------------------------------
 
-ROOT_PATH([5.22/00], [], AC_MSG_ERROR([Either ROOT is not installed correctly or the version is too old... please check!]))
+ROOT_PATH([6.06/00], [], AC_MSG_ERROR([Either ROOT is not installed correctly or the version is too old... please check!]))
 
 ROOT_LIBS="-L${ROOTLIBDIR} ${ROOTGLIBS} ${ROOTAUXLIBS} -lMinuit2 -lMathMore -lXMLParser"
 ROOT_CFLAGS="-I${ROOTINCDIR} ${ROOTCFLAGS} ${ROOTAUXCFLAGS}"
@@ -1000,6 +1000,14 @@ if test "x$enable_editor" != "xno"; then
               [PKG_CHECK_MODULES(QT3MT, qt-mt >= 3.3.0 qt-mt < 4.0, [QT3MT_FOUND=yes], [QT3MT_FOUND=no])]
             )]
           )
+        fi        
+        if test "x${QT5_FOUND}" != "xyes"; then
+          PKG_CHECK_MODULES(QT5, Qt5WebEngine >= $QT5MINVER Qt5Xml >= $QT5MINVER, [QT5_FOUND=yes],
+            [AC_MSG_NOTICE([Qt5 (including Qt5WebEngine and Qt5Xml) not found!])
+             PKG_CHECK_MODULES(QT3, qt >= 3.3.0 qt < 4.0, [QT3_FOUND=yes],
+              [PKG_CHECK_MODULES(QT3MT, qt-mt >= 3.3.0 qt-mt < 4.0, [QT3MT_FOUND=yes], [QT3MT_FOUND=no])]
+            )]
+          )
         fi]
   )
 
@@ -1024,6 +1032,12 @@ if test "x$enable_editor" != "xno"; then
         QTEDITOR=musrgui
       fi
 
+      dnl if Qt5 but Qt5WebEngine instead of Qt5WebKit
+      if test "x$QTPATH" = "x"; then
+        QTPATH=$(pkg-config --variable=prefix Qt5WebEngine)
+        QTEDITOR=musredit_qt5
+      fi
+      
       AC_MSG_CHECKING([for qmake])
       if test "x${QTPATH}" != "xnone"; then
         if test "x$QTEDITOR" = "xmusredit_qt5"; then
@@ -1147,6 +1161,7 @@ case "$host" in
   *-*-darwin*)
     ARCH=DARWIN
     LOCAL_PSIBIN_LIB_CXXFLAGS="${LOCAL_LIB_CXXFLAGS} -D_Darwin_"
+    LOCAL_BIN_LDFLAGS="${LOCAL_BIN_LDFLAGS} -Wl,-rpath ${ROOTLIBDIR}"
     ;;
   *)
     ARCH=OTHERUNIX
