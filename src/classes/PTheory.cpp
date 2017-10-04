@@ -2687,14 +2687,14 @@ void PTheory::CalculateGaussLFIntegral(const Double_t *val) const
   fLFIntegral.push_back(0.0); // start value of the integral
 
   ft = 0.0;
-  Double_t step = 0.0, lastStep = 1.0, diff = 0.0;
+  Double_t step = 0.0, lastft = 1.0, diff = 0.0;
   do {
     t  += dt;
     step = 0.5*dt*preFactor*(exp(-0.5*pow(Delta * (t-dt), 2.0))*sin(w0*(t-dt))+
                              exp(-0.5*pow(Delta * t, 2.0))*sin(w0*t));
-    diff = fabs(fabs(step)-fabs(lastStep));
-    lastStep = step;
     ft += step;
+    diff = fabs(fabs(lastft)-fabs(ft));
+    lastft = ft;
     fLFIntegral.push_back(ft);
   } while ((t <= 20.0) && (diff > 1.0e-10));
 }
@@ -2762,13 +2762,13 @@ void PTheory::CalculateLorentzLFIntegral(const Double_t *val) const
   ft += 0.5*dt*preFactor*(1.0+sin(w0*t)/(w0*t)*exp(-a*t));
   fLFIntegral.push_back(ft);
   // calculate all the other integral bin values
-  Double_t step = 0.0, lastStep = 1.0, diff = 0.0;
+  Double_t step = 0.0, lastft = 1.0, diff = 0.0;
   do {
     t  += dt;
     step = 0.5*dt*preFactor*(sin(w0*(t-dt))/(w0*(t-dt))*exp(-a*(t-dt))+sin(w0*t)/(w0*t)*exp(-a*t));
-    diff = fabs(fabs(step)-fabs(lastStep));
-    lastStep = step;
     ft += step;
+    diff = fabs(fabs(lastft)-fabs(ft));
+    lastft = ft;
     fLFIntegral.push_back(ft);
   } while ((t <= 20.0) && (diff > 1.0e-10));
 }
@@ -2792,7 +2792,7 @@ Double_t PTheory::GetLFIntegralValue(const Double_t t) const
   if (idx + 2 > fLFIntegral.size())
     return fLFIntegral.back();
 
-  // linearly interpolate between the two relvant function bins
+  // linearly interpolate between the two relevant function bins
   Double_t df = (fLFIntegral[idx+1]-fLFIntegral[idx])*(t/fSamplingTime-static_cast<Double_t>(idx));
 
   return fLFIntegral[idx]+df;
