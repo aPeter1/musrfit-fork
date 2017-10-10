@@ -1,0 +1,60 @@
+BaB6 T20K LF5G                                                
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+        1 alpha       0.7       0           none        0       none    
+        2 asy         0.2091    -0.0013     0.0013      0       0.33    
+        3 field       2.127     0           none        0       none    
+        4 width       0.5387    -0.0054     0.0055      0       100     
+        5 hopp        0.119     -0.013      0.014       0       100     
+        6 asyConst    0         0           none        
+
+###############################################################
+THEORY
+asymmetry      2
+dynGssKTLF  fun1     4     5    (frequency damping hopping-rate)
++
+asymmetry      6
+
+###############################################################
+FUNCTIONS
+fun1 = par3 * gamma_mu
+
+###############################################################
+RUN data/deltat_tdc_dolly_1020 PIE1 PSI PSI-BIN   (name beamline institute data-file-format)
+fittype         2         (asymmetry fit)
+alpha           1
+map             0    0    0    0    0    0    0    0    0    0
+forward         2 
+backward        1 
+background      15      146     13      148        # estimated bkg: 20.4846 / 4.8731
+data            170     9956    168     9110    
+t0              160.0   161.0   
+fit             0.25    10     
+packing         5
+
+###############################################################
+COMMANDS
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+phase            8
+#range_for_phase_correction 50.0 70.0
+range            0    800
+
+###############################################################
+PLOT 2   (asymmetry plot)
+runs     1   
+range    0   9.5   -0.15   0.3
+view_packing 150
+
+###############################################################
+STATISTIC --- 2013-07-01 20:40:44
+  chisq = 1911.7, NDF = 1905, chisq/NDF = 1.003494

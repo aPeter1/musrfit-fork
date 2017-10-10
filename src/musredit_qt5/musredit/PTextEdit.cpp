@@ -2589,7 +2589,8 @@ void PTextEdit::musrSwapMsrMlog()
   // get current file name
   QString currentFileName = *fFilenames.find( currentEditor() );
   QString swapFileName;
-  QString tempFileName = QString("__swap__.msr");
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  QString tempFileName = QString("%1/.musrfit/__swap__.msr").arg(env.value("HOME"));
 
   // check if it is a msr-, mlog-, or another file
   int idx;
