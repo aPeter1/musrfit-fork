@@ -1216,6 +1216,7 @@ dnl only define DOCDIR if not already present. This allows
 dnl to feed DOCDIR on the configure level which is useful when
 dnl for instance building a rpm.
 if test "x${DOCDIR}" = "x"
+then
   if test -d "${INSTALLDIR}/doc"
   then
     DOCDIR="${INSTALLDIR}/doc/musrfit"
