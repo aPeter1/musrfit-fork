@@ -1212,11 +1212,16 @@ else
   INSTALLDIR="${prefix}"
 fi
 
-if test -d "${INSTALLDIR}/doc"
-then
-  DOCDIR="${INSTALLDIR}/doc/musrfit"
-else
-  DOCDIR="${INSTALLDIR}/share/doc/musrfit"
+dnl only define DOCDIR if not already present. This allows
+dnl to feed DOCDIR on the configure level which is useful when
+dnl for instance building a rpm.
+if test "x${DOCDIR}" = "x"
+  if test -d "${INSTALLDIR}/doc"
+  then
+    DOCDIR="${INSTALLDIR}/doc/musrfit"
+  else
+    DOCDIR="${INSTALLDIR}/share/doc/musrfit"
+  fi
 fi
 
 AC_SUBST(DOCDIR)
