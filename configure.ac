@@ -1214,7 +1214,7 @@ fi
 
 dnl only define DOCDIR if not already present. This allows
 dnl to feed DOCDIR on the configure level which is useful when
-dnl for instance building a rpm.
+dnl for instance building a rpm. DOCDIR2 is needed for rpmbuild only
 if test "x${DOCDIR}" = "x"
 then
   if test -d "${INSTALLDIR}/doc"
@@ -1222,6 +1222,13 @@ then
     DOCDIR="${INSTALLDIR}/doc/musrfit"
   else
     DOCDIR="${INSTALLDIR}/share/doc/musrfit"
+  fi
+else
+  if test -d "${INSTALLDIR}/doc"
+  then
+    DOCDIR2="${INSTALLDIR}/doc/musrfit"
+  else
+    DOCDIR2="${INSTALLDIR}/share/doc/musrfit"
   fi
 fi
 
@@ -1447,12 +1454,21 @@ echo ""
 
 dnl --------------
 dnl create header file that musredit knows at runtime where to find the documentation
+dnl the DOCDIR2 tag is used for rpmbuild only
 dnl --------------
 if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit_qt5"; then
   echo \#define MUSRFIT_PREFIX \"${INSTALLDIR}\" > src/musredit_qt5/musrfit-info.h
-  echo \#define MUSRFIT_DOC_DIR \"${DOCDIR}\" >> src/musredit_qt5/musrfit-info.h
+  if test "x$DOCDIR2" = "x"; then
+    echo \#define MUSRFIT_DOC_DIR \"${DOCDIR}\" >> src/musredit_qt5/musrfit-info.h
+  else 
+    echo \#define MUSRFIT_DOC_DIR \"${DOCDIR2}\" >> src/musredit_qt5/musrfit-info.h
+  fi
 fi
 if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit"; then
   echo \#define MUSRFIT_PREFIX \"${INSTALLDIR}\" > src/musredit/musrfit-info.h
-  echo \#define MUSRFIT_DOC_DIR \"${DOCDIR}\" >> src/musredit/musrfit-info.h
+  if test "x$DOCDIR2" = "x"; then
+    echo \#define MUSRFIT_DOC_DIR \"${DOCDIR}\" >> src/musredit/musrfit-info.h
+  else
+    echo \#define MUSRFIT_DOC_DIR \"${DOCDIR2}\" >> src/musredit/musrfit-info.h
+  fi
 fi
