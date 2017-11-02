@@ -1138,7 +1138,12 @@ Bool_t PFitter::ExecuteHesse()
   TString str = TString::Format("Hesse:    %.3f sec", (end-start)/1.0e3);
   fElapsedTime.push_back(str);
   if (!mnState.IsValid()) {
-    cerr << endl << ">> PFitter::ExecuteHesse(): **WARNING** Hesse encountered some problems!";
+    cerr << endl << ">> PFitter::ExecuteHesse(): **WARNING** Hesse encountered a problem! The state found is invalid.";
+    cerr << endl;
+    return false;
+  }
+  if (!mnState.HasCovariance()) {
+    cerr << endl << ">> PFitter::ExecuteHesse(): **WARNING** Hesse encountered a problem! No covariance matrix available.";
     cerr << endl;
     return false;
   }
