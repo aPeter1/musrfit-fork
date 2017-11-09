@@ -1414,10 +1414,16 @@ Bool_t PRunAsymmetryRRF::GetProperDataRange(PRawRunData* runData, UInt_t histoNo
       return false;
     }
     // 3rd check if end is within proper bounds
-    if ((end[i] < 0) || (end[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetryRRF::GetProperDataRange(): **ERROR** end data bin doesn't make any sense!";
+    if (end[i] < 0) {
+      cerr << endl << ">> PRunAsymmetryRRF::GetProperDataRange(): **ERROR** end data bin (" << end[i] << ") doesn't make any sense!";
       cerr << endl;
       return false;
+    }
+    if (end[i] > (Int_t)runData->GetDataBin(histoNo[i])->size()) {
+      cerr << endl << ">> PRunAsymmetryRRF::GetProperDataRange(): **WARNING** end data bin (" << end[i] << ") > histo length (" << (Int_t)runData->GetDataBin(histoNo[i])->size() << ").";
+      cerr << endl << ">>    Will set end = (histo length - 1). Consider to change it in the msr-file." << endl;
+      cerr << endl;
+      end[i] = (Int_t)runData->GetDataBin(histoNo[i])->size()-1;
     }
     // 4th check if t0 is within proper bounds
     if ((t0[i] < 0) || (t0[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
