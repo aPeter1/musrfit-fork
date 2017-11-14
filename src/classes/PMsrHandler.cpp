@@ -163,6 +163,9 @@ Int_t PMsrHandler::ReadMsrFile()
       continue;
     }
 
+    // remove leading spaces
+    line.Remove(TString::kLeading, ' ');
+
     if (!line.IsWhitespace()) { // if not an empty line, handle it
       // check for a msr block
       if (line_no == 1) { // title
@@ -3184,14 +3187,14 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
   Bool_t error = false;
   Bool_t runLinePresent = false;
 
-  TString str;
+  TString str, line;
   TObjArray *tokens = 0;
   TObjString *ostr = 0;
 
   UInt_t addT0Counter = 0;
 
   Int_t ival;
-  Double_t dval;
+  Double_t dval;  
 
   iter = lines.begin();
   while ((iter != lines.end()) && !error) {
@@ -3209,8 +3212,13 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
       return false;
     }
 
+    // copy of the current line
+    line = iter->fLine;
+    // strip leading spaces from the begining
+    line.Remove(TString::kLeading, ' ');
+
     // RUN line ----------------------------------------------
-    if (iter->fLine.BeginsWith("run", TString::kIgnoreCase)) {
+    if (line.BeginsWith("run", TString::kIgnoreCase)) {
 
       runLinePresent = true; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3247,7 +3255,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // ADDRUN line ---------------------------------------------
-    if (iter->fLine.BeginsWith("addrun", TString::kIgnoreCase)) {
+    if (line.BeginsWith("addrun", TString::kIgnoreCase)) {
 
       if (!runLinePresent) {
         cerr << endl << ">> PMsrHandler::HandleRunEntry: **ERROR** Found ADDRUN without prior RUN, or";
@@ -3282,7 +3290,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // fittype -------------------------------------------------
-    if (iter->fLine.BeginsWith("fittype", TString::kIgnoreCase)) {
+    if (line.BeginsWith("fittype", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3310,7 +3318,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // alpha -------------------------------------------------
-    if (iter->fLine.BeginsWith("alpha", TString::kIgnoreCase)) {
+    if (line.BeginsWith("alpha", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3332,7 +3340,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // beta -------------------------------------------------
-    if (iter->fLine.BeginsWith("beta", TString::kIgnoreCase)) {
+    if (line.BeginsWith("beta", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3354,7 +3362,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // norm -------------------------------------------------
-    if (iter->fLine.BeginsWith("norm", TString::kIgnoreCase)) {
+    if (line.BeginsWith("norm", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3378,7 +3386,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // backgr.fit --------------------------------------------
-    if (iter->fLine.BeginsWith("backgr.fit", TString::kIgnoreCase)) {
+    if (line.BeginsWith("backgr.fit", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3400,7 +3408,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // lifetime ------------------------------------------------
-    if (iter->fLine.BeginsWith("lifetime ", TString::kIgnoreCase)) {
+    if (line.BeginsWith("lifetime ", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3422,7 +3430,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // lifetimecorrection ---------------------------------------
-    if (iter->fLine.BeginsWith("lifetimecorrection", TString::kIgnoreCase)) {
+    if (line.BeginsWith("lifetimecorrection", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3430,7 +3438,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // map ------------------------------------------------------
-    if (iter->fLine.BeginsWith("map", TString::kIgnoreCase)) {
+    if (line.BeginsWith("map", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3460,7 +3468,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // forward ------------------------------------------------
-    if (iter->fLine.BeginsWith("forward", TString::kIgnoreCase)) {
+    if (line.BeginsWith("forward", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3485,7 +3493,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // backward -----------------------------------------------
-    if (iter->fLine.BeginsWith("backward", TString::kIgnoreCase)) {
+    if (line.BeginsWith("backward", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3510,7 +3518,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // backgr.fix ----------------------------------------------
-    if (iter->fLine.BeginsWith("backgr.fix", TString::kIgnoreCase)) {
+    if (line.BeginsWith("backgr.fix", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3529,7 +3537,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // background ---------------------------------------------
-    if (iter->fLine.BeginsWith("background", TString::kIgnoreCase)) {
+    if (line.BeginsWith("background", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3553,7 +3561,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // data --------------------------------------------------
-    if (iter->fLine.BeginsWith("data", TString::kIgnoreCase)) {
+    if (line.BeginsWith("data", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3577,7 +3585,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // t0 -----------------------------------------------------
-    if (iter->fLine.BeginsWith("t0", TString::kIgnoreCase)) {
+    if (line.BeginsWith("t0", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3601,7 +3609,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // addt0 -----------------------------------------------------
-    if (iter->fLine.BeginsWith("addt0", TString::kIgnoreCase)) {
+    if (line.BeginsWith("addt0", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3627,7 +3635,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // fit -----------------------------------------------------
-    if (iter->fLine.BeginsWith("fit ", TString::kIgnoreCase)) {
+    if (line.BeginsWith("fit ", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3682,7 +3690,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // packing --------------------------------------------------
-    if (iter->fLine.BeginsWith("packing", TString::kIgnoreCase)) {
+    if (line.BeginsWith("packing", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
@@ -3704,7 +3712,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
     }
 
     // xy-data -----------------------------------------------
-    if (iter->fLine.BeginsWith("xy-data", TString::kIgnoreCase)) {
+    if (line.BeginsWith("xy-data", TString::kIgnoreCase)) {
 
       runLinePresent = false; // this is needed to make sure that a run line is present before and ADDRUN is following
 
