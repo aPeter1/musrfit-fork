@@ -830,7 +830,7 @@ void PTextEdit::setupHelpActions()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>load an msr-file.
+ * <p>load a msr-file.
  *
  * \param f filename
  * \param index if == -1, add the file as a new tab, otherwise, replace the contents of the tab at index.
@@ -2215,7 +2215,12 @@ void PTextEdit::musrMsr2Data()
       cmd.append("new");
     }
 
-    PFitOutputHandler fitOutputHandler(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath(), cmd);
+    // if NO tab is present use the local directory
+    QString workDir = QString("./");
+    if (fTabWidget->count() != 0) {
+      workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
+    }
+    PFitOutputHandler fitOutputHandler(workDir, cmd);
     fitOutputHandler.setModal(true);
     fFileSystemWatcherActive = false;
     fitOutputHandler.exec();
@@ -2239,7 +2244,11 @@ void PTextEdit::musrMsr2Data()
               else
                 fln += fMsr2DataParam->msrFileExtension + ".msr";
 
-              load(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fln);
+              workDir = QString("./");
+              if (fTabWidget->count() != 0) {
+                workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
+              }
+              load(workDir + "/" + fln);
             }
             break;
           case 1: // run list file
@@ -2261,7 +2270,11 @@ void PTextEdit::musrMsr2Data()
                 else
                   fln += fMsr2DataParam->msrFileExtension + ".msr";
 
-                load(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fln);
+                workDir = QString("./");
+                if (fTabWidget->count() != 0) {
+                  workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
+                }
+                load(workDir + "/" + fln);
               }
             }
 
