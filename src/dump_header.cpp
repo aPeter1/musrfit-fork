@@ -346,6 +346,7 @@ int dump_header_psi_bin(const string fileName, const string fileFormat)
     return 1;
 
   vector<string> vstr;
+  vector<double> dVal, dErrVal;
   cout << endl << "-------------------";
   cout << endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
   cout << endl << "-------------------";
@@ -378,7 +379,15 @@ int dump_header_psi_bin(const string fileName, const string fileFormat)
   cout << endl << "Comment            : n/a";
   cout << endl << "Sample Name        : " << psiBin.get_sample();
   cout << endl << "Sample Orientation : " << psiBin.get_orient();
-  cout << endl << "Sample Temperature : " << psiBin.get_temp();
+  dVal = psiBin.get_temperatures_vector();
+  dErrVal = psiBin.get_devTemperatures_vector();
+  if (dVal.size() != dErrVal.size()) {
+    cout << endl << "Sample Temperature : " << psiBin.get_temp();
+  } else {
+    for (unsigned int i=0; i<dVal.size(); i++) {
+      cout << endl << "Sample Temp. " << i+1 << "     : " << dVal[i] << " (" << dErrVal[i] << ")";
+    }
+  }
   cout << endl << "Sample Mag. Field  : " << psiBin.get_field();
   cout << endl << "No of Histos       : " << psiBin.get_numberHisto_int();
   cout << endl << "Time Resolution    : " << psiBin.get_binWidth_ns() << " ns";
