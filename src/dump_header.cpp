@@ -398,7 +398,8 @@ int dump_header_psi_bin(const string fileName, const string fileFormat)
     cout << endl << "Histo Length       : " << psiBin.get_histoLength_bin();
     cout << endl << "Time Zero Bin      : " << psiBin.get_t0_int(i);
     cout << endl << "First Good Bin     : " << psiBin.get_firstGood_int(i);
-    cout << endl << "Last Good Bin      : " << psiBin.get_firstGood_int(i);
+    cout << endl << "Last Good Bin      : " << psiBin.get_lastGood_int(i);
+    cout << endl << "No of Events       : " << psiBin.get_eventsHisto_long(i);
   }
   cout << endl << "-------------------" << endl << endl;
 
