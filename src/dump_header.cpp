@@ -385,7 +385,7 @@ int dump_header_psi_bin(const string fileName, const string fileFormat)
     cout << endl << "Sample Temperature : " << psiBin.get_temp();
   } else {
     for (unsigned int i=0; i<dVal.size(); i++) {
-      cout << endl << "Sample Temp. " << i+1 << "     : " << dVal[i] << " (" << dErrVal[i] << ")";
+      cout << endl << "Sample Temp. " << i+1 << "     : " << dVal[i] << " (" << dErrVal[i] << ") K";
     }
   }
   cout << endl << "Sample Mag. Field  : " << psiBin.get_field();
