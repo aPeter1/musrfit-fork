@@ -1502,10 +1502,23 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
  */
 void PMusrCanvas::LastCanvasClosed()
 {
-//  cout << endl << ">> in last canvas closed check ...";
+//  cerr << ">> in last canvas closed check. gROOT->GetListOfCanvases()->GetEntries()=" << gROOT->GetListOfCanvases()->GetEntries() << endl;
   if (gROOT->GetListOfCanvases()->IsEmpty()) {
     Done(0);
   }
+}
+
+//--------------------------------------------------------------------------
+// WindowClosed (SLOT)
+//--------------------------------------------------------------------------
+/**
+ * <p>Slot called when the canvas is closed. Seems to be necessary on some systems.
+ */
+void PMusrCanvas::WindowClosed()
+{
+//  cerr << ">> fMainCanvas->GetName()=" << fMainCanvas->GetName() << endl;
+  gROOT->GetListOfCanvases()->Remove(fMainCanvas);
+  LastCanvasClosed();
 }
 
 //--------------------------------------------------------------------------
@@ -2374,9 +2387,12 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
     return;
   }
 
+  fMainCanvas->Connect("Closed()", "PMusrCanvas", this, "LastCanvasClosed()");
+
   // add canvas menu if not in batch mode
   if (!fBatchMode) {
     fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp();
+    fImp->Connect("CloseWindow()", "PMusrCanvas", this, "WindowClosed()");
     fBar = fImp->GetMenuBar();
     fPopupMain = fBar->AddPopup("&Musrfit");
 
