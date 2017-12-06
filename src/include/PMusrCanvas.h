@@ -230,6 +230,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected); // SLOT
     virtual void HandleMenuPopup(Int_t id); // SLOT
     virtual void LastCanvasClosed(); // SLOT
+    virtual void WindowClosed(); // SLOT
 
     virtual void SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat);
     virtual void ExportData(const Char_t *fileName);
