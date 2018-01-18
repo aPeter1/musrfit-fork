@@ -1,7 +1,7 @@
 AC_REVISION([m4_esyscmd_s([git describe --always])])
 
 AC_PREREQ(2.63)
-AC_INIT([musrfit],[1.1.0],[andreas.suter@psi.ch])
+AC_INIT([musrfit],[1.2.0],[andreas.suter@psi.ch])
 AC_CONFIG_AUX_DIR(admin)
 AC_CANONICAL_HOST
 #AC_MSG_RESULT([${host} ${host_cpu} ${host_vendor} ${host_os}])
@@ -35,7 +35,7 @@ dnl -----------------------------------------------
 
 #release versioning
 MUSR_MAJOR_VERSION=1
-MUSR_MINOR_VERSION=1
+MUSR_MINOR_VERSION=2
 MUSR_MICRO_VERSION=0
 
 #release versioning
@@ -1212,11 +1212,24 @@ else
   INSTALLDIR="${prefix}"
 fi
 
-if test -d "${INSTALLDIR}/doc"
+dnl only define DOCDIR if not already present. This allows
+dnl to feed DOCDIR on the configure level which is useful when
+dnl for instance building a rpm. DOCDIR2 is needed for rpmbuild only
+if test "x${DOCDIR}" = "x"
 then
-  DOCDIR="${INSTALLDIR}/doc/musrfit"
+  if test -d "${INSTALLDIR}/doc"
+  then
+    DOCDIR="${INSTALLDIR}/doc/musrfit"
+  else
+    DOCDIR="${INSTALLDIR}/share/doc/musrfit"
+  fi
 else
-  DOCDIR="${INSTALLDIR}/share/doc/musrfit"
+  if test -d "${INSTALLDIR}/doc"
+  then
+    DOCDIR2="${INSTALLDIR}/doc/musrfit"
+  else
+    DOCDIR2="${INSTALLDIR}/share/doc/musrfit"
+  fi
 fi
 
 AC_SUBST(DOCDIR)
@@ -1441,12 +1454,21 @@ echo ""
 
 dnl --------------
 dnl create header file that musredit knows at runtime where to find the documentation
+dnl the DOCDIR2 tag is used for rpmbuild only
 dnl --------------
 if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit_qt5"; then
   echo \#define MUSRFIT_PREFIX \"${INSTALLDIR}\" > src/musredit_qt5/musrfit-info.h
-  echo \#define MUSRFIT_DOC_DIR \"${DOCDIR}\" >> src/musredit_qt5/musrfit-info.h
+  if test "x$DOCDIR2" = "x"; then
+    echo \#define MUSRFIT_DOC_DIR \"${DOCDIR}\" >> src/musredit_qt5/musrfit-info.h
+  else 
+    echo \#define MUSRFIT_DOC_DIR \"${DOCDIR2}\" >> src/musredit_qt5/musrfit-info.h
+  fi
 fi
 if test "x$enable_editor" != "xno" && test "x${QMAKEBIN}" != "x" && test "x${QTEDITOR}" = "xmusredit"; then
   echo \#define MUSRFIT_PREFIX \"${INSTALLDIR}\" > src/musredit/musrfit-info.h
-  echo \#define MUSRFIT_DOC_DIR \"${DOCDIR}\" >> src/musredit/musrfit-info.h
+  if test "x$DOCDIR2" = "x"; then
+    echo \#define MUSRFIT_DOC_DIR \"${DOCDIR}\" >> src/musredit/musrfit-info.h
+  else
+    echo \#define MUSRFIT_DOC_DIR \"${DOCDIR2}\" >> src/musredit/musrfit-info.h
+  fi
 fi

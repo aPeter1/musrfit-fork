@@ -12,6 +12,17 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.2.0, 2017/10/26
+=============================
+
+Adopted to be ready for rpm builds in a first step. This will be followed by debian style
+packages.
+
+Release of V1.1.0, 2017/10/26
+=============================
+
+Added full DKS support, i.e. additionally to CUDA also OpenCL for GPU's and CPU's in place.
+
 Release of V1.0.0, 2017/05/18
 =============================
 

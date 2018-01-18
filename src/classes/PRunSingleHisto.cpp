@@ -1560,10 +1560,16 @@ Bool_t PRunSingleHisto::GetProperDataRange()
     return false;
   }
   // 3rd check if end is within proper bounds
-  if ((end < 0) || (end > (Int_t)fForward.size())) {
+  if (end < 0) {
     cerr << endl << ">> PRunSingleHisto::GetProperDataRange(): **ERROR** end data bin (" << end << ") doesn't make any sense!";
     cerr << endl;
     return false;
+  }
+  if (end > (Int_t)fForward.size()) {
+    cerr << endl << ">> PRunSingleHisto::GetProperDataRange(): **WARNING** end data bin (" << end << ") > histo length (" << (Int_t)fForward.size() << ").";
+    cerr << endl << ">>    Will set end = (histo length - 1). Consider to change it in the msr-file." << endl;
+    cerr << endl;
+    end = (Int_t)fForward.size()-1;
   }
 
   // keep good bins for potential later use

@@ -325,8 +325,6 @@ int main(int argc, char *argv[])
         ok = false;
         break;
       }
-      // connect signal/slot
-      TQObject::Connect("TCanvas", "Closed()", "PMusrCanvas", musrCanvas, "LastCanvasClosed()");
 
       musrCanvas->SetTimeout(timeout);
 
