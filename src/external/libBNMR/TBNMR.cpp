@@ -88,15 +88,15 @@ double SExpRlx::operator()(double x, const vector<double> &par) const {
 
 
   if ( x >= 0 && x <= par[0] ) { 
-    TF1 sexp("sexp", "exp(-([0]-x)/[3])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 10000.0);
+    TF1 sexp("sexp", "exp(-([0]-x)/[3])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20000.0);
     sexp.SetParameters(x, par[1], par[2],tau_Li);
     sexp.SetNpx(1000);
     y=sexp.Integral(0.0,x)/(1-exp(-x/tau_Li))/tau_Li;
   } else if ( x > par[0] ) {
-    TF1 sexp("sexp", "exp(-([3]-x)/[4])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 10000.0);
+    TF1 sexp("sexp", "exp(-([3]-x)/[4])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20000.0);
     sexp.SetParameters(x, par[1], par[2], par[0],tau_Li);
     sexp.SetNpx(1000);
-    y=sexp.Integral(0.0,par[0])/(1-exp(-x/tau_Li))/tau_Li;
+    y=sexp.Integral(0.0,par[0])/(1-exp(-par[0]/tau_Li))/tau_Li;
   }  else {
     y = 0;
   }
@@ -124,7 +124,7 @@ double MLRes::operator()(double x, const vector<double> &par) const {
     TF1 sexp("sexp", "exp(-([3]-x)/[4])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 10000.0);
     sexp.SetParameters(x, par[1], par[2], par[0],tau_Li);
     sexp.SetNpx(1000);
-    y=sexp.Integral(0.0,par[0])/(1-exp(-x/tau_Li))/tau_Li;
+    y=sexp.Integral(0.0,par[0])/(1-exp(-par[0]/tau_Li))/tau_Li;
   }  else {
     y = 0;
   }
