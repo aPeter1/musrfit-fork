@@ -568,7 +568,8 @@ QString PMusrStep::updateParamLine(const QString str)
   int idx = -1;
   QString paramStr;
   for (int i=0; i<fParamVec.size(); i++) {
-    paramStr = fParamVec[i].name + " ";
+    // parameter name need to be sandwiched between spaces to prevent that e.g. 'MinusOne' is overwritten by an existing 'One'
+    paramStr = " " + fParamVec[i].name + " ";
     if (str.contains(paramStr)) {
       idx = i;
       break;
