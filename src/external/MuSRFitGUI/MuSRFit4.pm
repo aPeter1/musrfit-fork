@@ -278,14 +278,17 @@ sub CreateAllInput()
     $All{"Tfs"} = this->{ui}->tfs->text;
     $All{"BINS"} = this->{ui}->bins->text;
     $All{"FitAsyType"} = this->{ui}->fitAsyType->currentText;
+    $All{"FitAsyType"} =~ s/ //g;
     $All{"LRBF"} = this->{ui}->histsLRBF->text;
     my @Hists = split(/,/, $All{"LRBF"} );
 # Lifetime corrections in enabled/visible only for SingleHis fits
     if ( $All{"FitAsyType"} eq "Asymmetry" ) {
 	this->{ui}->ltc->setHidden(1);
+	$All{"fittype"}=2;
     }
     elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
 	this->{ui}->ltc->setHidden(0);
+	$All{"fittype"}=0;
     }
    
 # From Fitting Tab
@@ -313,13 +316,16 @@ sub CreateAllInput()
     $All{"ErrorCalc"} = this->{ui}->errorCalc->currentText();
     $All{"go"}=$All{"ErrorCalc"};
     
+# Commands block
+    $All{"CommandsBlock"}= $All{"Minimization"}."\n".$All{"ErrorCalc"};
+
     RunSelectionToggle();
     my @RUNS = ();
     if ($All{"RUNSType"} ) {
 	@RUNS = split( /,/, $All{"RunFiles"});
     } else {
 	$All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
-	@RUNS = split( /,/, $All{"RunNumbers"} );	
+	@RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );	
     }
         
 # From MSR File Tab
@@ -534,13 +540,11 @@ sub CallMSRCreate()
 		    print OUTF ("$FullMSRFile");
 		    close(OUTF);
 		} else {
-#		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRSh(\%All);
 		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSR(\%All);
 # Open output file FILENAME.msr
 		    open( OUTF,q{>},"$FILENAME" );
 		    print OUTF ("$FullMSRFile");
 		    close(OUTF);
-		    
 # if it is multiple runs then the produced file is a template
 		    my $FILENAME=$All{"FILENAME"}.".msr";
 		    my $Extension = "_".$All{"BeamLine"}."_".$All{"YEAR"};
@@ -674,7 +678,7 @@ sub ActivateT0Hists()
 sub ActivateShComp()
 {
     my %All=CreateAllInput();
-    my @RUNS = split( /,/, $All{"RunNumbers"} );
+    my @RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );
     
 # Hide all sharing components
     this->{ui}->sharingComp1->setHidden(1);
@@ -906,9 +910,9 @@ sub t0Update()
 	foreach ("t0","Bg1","Bg2","Data1","Data2") {
 	    my $Name = "$_$NHist";
 	    my $tmp=MSR::T0BgData($_,$Hist,$All{"BeamLine"});
-	    if (defined(child("Qt::Widget",$Name))) {
-		child("Qt::Widget",$Name)->setText($tmp);
-	    }
+#	    if (defined(child("Qt::Widget",$Name))) {
+#		child("Qt::Widget",$Name)->setText($tmp);
+#	    }
 	}
 	$NHist++
     }
@@ -986,7 +990,7 @@ sub AppendToFunctions()
 sub InitializeFunctions()
 {
     my %All=CreateAllInput();
-    my @RUNS = split( /,/, $All{"RunNumbers"} );
+    my @RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );
     
     my @FitTypes =();
     foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {

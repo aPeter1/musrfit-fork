@@ -5,8 +5,8 @@
 #################################################################################
 ## Form generated from reading UI file 'MuSRFit4.ui'
 ##
-## Created: Thu Mar 23 16:58:52 2017
-##      by: Qt User Interface Compiler version 4.8.6
+## Created: Mon Jan 29 14:11:03 2018
+##      by: Qt User Interface Compiler version 4.8.7
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -162,24 +162,24 @@ sub year {
     return shift->{year};
 }
 
-sub yearLabel {
-    return shift->{yearLabel};
-}
-
-sub beamLineLabel {
-    return shift->{beamLineLabel};
-}
-
-sub beamLine {
-    return shift->{beamLine};
+sub runNumbers {
+    return shift->{runNumbers};
 }
 
 sub spacer2 {
     return shift->{spacer2};
 }
 
-sub runNumbers {
-    return shift->{runNumbers};
+sub beamLine {
+    return shift->{beamLine};
+}
+
+sub yearLabel {
+    return shift->{yearLabel};
+}
+
+sub beamLineLabel {
+    return shift->{beamLineLabel};
 }
 
 sub groupBox {
@@ -993,7 +993,7 @@ sub setupUi {
     if ( !defined $muSRFit4->objectName() ) {
         $muSRFit4->setObjectName( "muSRFit4" );
     }
-    $muSRFit4->resize( 600, 505 );
+    $muSRFit4->resize( 674, 541 );
     my $sizePolicy = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Expanding() );
     $self->{$sizePolicy} = $sizePolicy;
     $sizePolicy->setHorizontalStretch( 1 );
@@ -1219,9 +1219,13 @@ sub setupUi {
     my $runsAuto = Qt::GroupBox( $runsPage );
     $self->{runsAuto} = $runsAuto;
     $runsAuto->setObjectName( "runsAuto" );
-    $sizePolicy->setHeightForWidth( $runsAuto->sizePolicy()->hasHeightForWidth() );
-    $runsAuto->setSizePolicy( $sizePolicy );
-    $runsAuto->setMinimumSize( Qt::Size(0, 80) );
+    my $sizePolicy4 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Maximum() );
+    $self->{$sizePolicy4} = $sizePolicy4;
+    $sizePolicy4->setHorizontalStretch( 1 );
+    $sizePolicy4->setVerticalStretch( 1 );
+    $sizePolicy4->setHeightForWidth( $runsAuto->sizePolicy()->hasHeightForWidth() );
+    $runsAuto->setSizePolicy( $sizePolicy4 );
+    $runsAuto->setMinimumSize( Qt::Size(0, 100) );
     $runsAuto->setAlignment( Qt::AlignHCenter()|Qt::AlignTop() );
     my $gridLayout_3 = Qt::GridLayout( $runsAuto );
     $self->{gridLayout_3} = $gridLayout_3;
@@ -1232,6 +1236,8 @@ sub setupUi {
     $self->{runNumbers_2} = $runNumbers_2;
     $runNumbers_2->setSpacing( 0 );
     $runNumbers_2->setObjectName( "runNumbers_2" );
+    $runNumbers_2->setSizeConstraint( Qt::Layout::SetDefaultConstraint() );
+    $runNumbers_2->setContentsMargins(-1, 0, -1, 0 );
     my $year = Qt::ComboBox( $runsAuto );
     $self->{year} = $year;
     $year->setObjectName( "year" );
@@ -1246,45 +1252,6 @@ sub setupUi {
 
     $runNumbers_2->addWidget( $year, 1, 4, 1, 1 );
 
-    my $yearLabel = Qt::Label( $runsAuto );
-    $self->{yearLabel} = $yearLabel;
-    $yearLabel->setObjectName( "yearLabel" );
-    my $sizePolicy4 = Qt::SizePolicy( Qt::SizePolicy::Preferred(), Qt::SizePolicy::Preferred() );
-    $self->{$sizePolicy4} = $sizePolicy4;
-    $sizePolicy4->setHorizontalStretch( 0 );
-    $sizePolicy4->setVerticalStretch( 0 );
-    $sizePolicy4->setHeightForWidth( $yearLabel->sizePolicy()->hasHeightForWidth() );
-    $yearLabel->setSizePolicy( $sizePolicy4 );
-    $yearLabel->setMinimumSize( Qt::Size(0, 20) );
-    $yearLabel->setWordWrap( 0 );
-
-    $runNumbers_2->addWidget( $yearLabel, 1, 3, 1, 1 );
-
-    my $beamLineLabel = Qt::Label( $runsAuto );
-    $self->{beamLineLabel} = $beamLineLabel;
-    $beamLineLabel->setObjectName( "beamLineLabel" );
-    $sizePolicy4->setHeightForWidth( $beamLineLabel->sizePolicy()->hasHeightForWidth() );
-    $beamLineLabel->setSizePolicy( $sizePolicy4 );
-    $beamLineLabel->setMinimumSize( Qt::Size(0, 20) );
-    $beamLineLabel->setMaximumSize( Qt::Size(16777215, 30) );
-    $beamLineLabel->setWordWrap( 0 );
-
-    $runNumbers_2->addWidget( $beamLineLabel, 1, 1, 1, 1 );
-
-    my $beamLine = Qt::ComboBox( $runsAuto );
-    $self->{beamLine} = $beamLine;
-    $beamLine->setObjectName( "beamLine" );
-    $sizePolicy2->setHeightForWidth( $beamLine->sizePolicy()->hasHeightForWidth() );
-    $beamLine->setSizePolicy( $sizePolicy2 );
-    $beamLine->setMinimumSize( Qt::Size(0, 20) );
-    $beamLine->setMaximumSize( Qt::Size(16777215, 25) );
-
-    $runNumbers_2->addWidget( $beamLine, 1, 2, 1, 1 );
-
-    my $spacer2 = Qt::SpacerItem( 181, 21, Qt::SizePolicy::Expanding(), Qt::SizePolicy::Minimum() );
-
-    $runNumbers_2->addItem( $spacer2, 1, 0, 1, 1 );
-
     my $runNumbers = Qt::LineEdit( $runsAuto );
     $self->{runNumbers} = $runNumbers;
     $runNumbers->setObjectName( "runNumbers" );
@@ -1296,6 +1263,45 @@ sub setupUi {
 
     $runNumbers_2->addWidget( $runNumbers, 0, 0, 1, 5 );
 
+    my $spacer2 = Qt::SpacerItem( 181, 21, Qt::SizePolicy::Expanding(), Qt::SizePolicy::Minimum() );
+
+    $runNumbers_2->addItem( $spacer2, 1, 0, 1, 1 );
+
+    my $beamLine = Qt::ComboBox( $runsAuto );
+    $self->{beamLine} = $beamLine;
+    $beamLine->setObjectName( "beamLine" );
+    $sizePolicy2->setHeightForWidth( $beamLine->sizePolicy()->hasHeightForWidth() );
+    $beamLine->setSizePolicy( $sizePolicy2 );
+    $beamLine->setMinimumSize( Qt::Size(0, 20) );
+    $beamLine->setMaximumSize( Qt::Size(16777215, 25) );
+
+    $runNumbers_2->addWidget( $beamLine, 1, 2, 1, 1 );
+
+    my $yearLabel = Qt::Label( $runsAuto );
+    $self->{yearLabel} = $yearLabel;
+    $yearLabel->setObjectName( "yearLabel" );
+    my $sizePolicy5 = Qt::SizePolicy( Qt::SizePolicy::Preferred(), Qt::SizePolicy::Preferred() );
+    $self->{$sizePolicy5} = $sizePolicy5;
+    $sizePolicy5->setHorizontalStretch( 0 );
+    $sizePolicy5->setVerticalStretch( 0 );
+    $sizePolicy5->setHeightForWidth( $yearLabel->sizePolicy()->hasHeightForWidth() );
+    $yearLabel->setSizePolicy( $sizePolicy5 );
+    $yearLabel->setMinimumSize( Qt::Size(0, 20) );
+    $yearLabel->setWordWrap( 0 );
+
+    $runNumbers_2->addWidget( $yearLabel, 1, 3, 1, 1 );
+
+    my $beamLineLabel = Qt::Label( $runsAuto );
+    $self->{beamLineLabel} = $beamLineLabel;
+    $beamLineLabel->setObjectName( "beamLineLabel" );
+    $sizePolicy5->setHeightForWidth( $beamLineLabel->sizePolicy()->hasHeightForWidth() );
+    $beamLineLabel->setSizePolicy( $sizePolicy5 );
+    $beamLineLabel->setMinimumSize( Qt::Size(0, 30) );
+    $beamLineLabel->setMaximumSize( Qt::Size(16777215, 30) );
+    $beamLineLabel->setWordWrap( 0 );
+
+    $runNumbers_2->addWidget( $beamLineLabel, 1, 1, 1, 1 );
+
 
     $gridLayout_3->addLayout( $runNumbers_2, 0, 0, 1, 1 );
 
@@ -1305,12 +1311,12 @@ sub setupUi {
     my $groupBox = Qt::GroupBox( $runsPage );
     $self->{groupBox} = $groupBox;
     $groupBox->setObjectName( "groupBox" );
-    my $sizePolicy5 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Expanding() );
-    $self->{$sizePolicy5} = $sizePolicy5;
-    $sizePolicy5->setHorizontalStretch( 0 );
-    $sizePolicy5->setVerticalStretch( 0 );
-    $sizePolicy5->setHeightForWidth( $groupBox->sizePolicy()->hasHeightForWidth() );
-    $groupBox->setSizePolicy( $sizePolicy5 );
+    my $sizePolicy6 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Expanding() );
+    $self->{$sizePolicy6} = $sizePolicy6;
+    $sizePolicy6->setHorizontalStretch( 0 );
+    $sizePolicy6->setVerticalStretch( 0 );
+    $sizePolicy6->setHeightForWidth( $groupBox->sizePolicy()->hasHeightForWidth() );
+    $groupBox->setSizePolicy( $sizePolicy6 );
     $groupBox->setMinimumSize( Qt::Size(0, 220) );
     $groupBox->setBaseSize( Qt::Size(0, 0) );
     my $gridLayout_8 = Qt::GridLayout( $groupBox );
@@ -1761,8 +1767,8 @@ sub setupUi {
     my $buttonGroupSharing = Qt::GroupBox( $sharingPage );
     $self->{buttonGroupSharing} = $buttonGroupSharing;
     $buttonGroupSharing->setObjectName( "buttonGroupSharing" );
-    $sizePolicy5->setHeightForWidth( $buttonGroupSharing->sizePolicy()->hasHeightForWidth() );
-    $buttonGroupSharing->setSizePolicy( $sizePolicy5 );
+    $sizePolicy6->setHeightForWidth( $buttonGroupSharing->sizePolicy()->hasHeightForWidth() );
+    $buttonGroupSharing->setSizePolicy( $sizePolicy6 );
     $buttonGroupSharing->setAlignment( Qt::AlignLeading() );
     $buttonGroupSharing->setCheckable( 1 );
     $buttonGroupSharing->setChecked( 0 );
@@ -1779,12 +1785,12 @@ sub setupUi {
     $self->{sharingComp1} = $sharingComp1;
     $sharingComp1->setObjectName( "sharingComp1" );
     $sharingComp1->setEnabled( 0 );
-    my $sizePolicy6 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::MinimumExpanding() );
-    $self->{$sizePolicy6} = $sizePolicy6;
-    $sizePolicy6->setHorizontalStretch( 0 );
-    $sizePolicy6->setVerticalStretch( 0 );
-    $sizePolicy6->setHeightForWidth( $sharingComp1->sizePolicy()->hasHeightForWidth() );
-    $sharingComp1->setSizePolicy( $sizePolicy6 );
+    my $sizePolicy7 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::MinimumExpanding() );
+    $self->{$sizePolicy7} = $sizePolicy7;
+    $sizePolicy7->setHorizontalStretch( 0 );
+    $sizePolicy7->setVerticalStretch( 0 );
+    $sizePolicy7->setHeightForWidth( $sharingComp1->sizePolicy()->hasHeightForWidth() );
+    $sharingComp1->setSizePolicy( $sizePolicy7 );
     $sharingComp1->setAlignment( Qt::AlignLeading() );
     my $layout14 = Qt::Widget( $sharingComp1 );
     $self->{layout14} = $layout14;
@@ -1872,8 +1878,8 @@ sub setupUi {
     $self->{sharingComp2} = $sharingComp2;
     $sharingComp2->setObjectName( "sharingComp2" );
     $sharingComp2->setEnabled( 0 );
-    $sizePolicy6->setHeightForWidth( $sharingComp2->sizePolicy()->hasHeightForWidth() );
-    $sharingComp2->setSizePolicy( $sizePolicy6 );
+    $sizePolicy7->setHeightForWidth( $sharingComp2->sizePolicy()->hasHeightForWidth() );
+    $sharingComp2->setSizePolicy( $sizePolicy7 );
     my $comp2ShLabel = Qt::Label( $sharingComp2 );
     $self->{comp2ShLabel} = $comp2ShLabel;
     $comp2ShLabel->setObjectName( "comp2ShLabel" );
@@ -1958,8 +1964,8 @@ sub setupUi {
     $self->{sharingComp3} = $sharingComp3;
     $sharingComp3->setObjectName( "sharingComp3" );
     $sharingComp3->setEnabled( 0 );
-    $sizePolicy6->setHeightForWidth( $sharingComp3->sizePolicy()->hasHeightForWidth() );
-    $sharingComp3->setSizePolicy( $sizePolicy6 );
+    $sizePolicy7->setHeightForWidth( $sharingComp3->sizePolicy()->hasHeightForWidth() );
+    $sharingComp3->setSizePolicy( $sizePolicy7 );
     $sharingComp3->setAlignment( Qt::AlignJustify()|Qt::AlignVCenter() );
     my $comp3ShLabel = Qt::Label( $sharingComp3 );
     $self->{comp3ShLabel} = $comp3ShLabel;
@@ -2095,8 +2101,8 @@ sub setupUi {
     my $titleLabel = Qt::Label( $groupTitle );
     $self->{titleLabel} = $titleLabel;
     $titleLabel->setObjectName( "titleLabel" );
-    $sizePolicy4->setHeightForWidth( $titleLabel->sizePolicy()->hasHeightForWidth() );
-    $titleLabel->setSizePolicy( $sizePolicy4 );
+    $sizePolicy5->setHeightForWidth( $titleLabel->sizePolicy()->hasHeightForWidth() );
+    $titleLabel->setSizePolicy( $sizePolicy5 );
     $titleLabel->setWordWrap( 0 );
 
     $vboxLayout1->addWidget( $titleLabel );
@@ -2104,12 +2110,12 @@ sub setupUi {
     my $title = Qt::LineEdit( $groupTitle );
     $self->{title} = $title;
     $title->setObjectName( "title" );
-    my $sizePolicy7 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Fixed() );
-    $self->{$sizePolicy7} = $sizePolicy7;
-    $sizePolicy7->setHorizontalStretch( 1 );
-    $sizePolicy7->setVerticalStretch( 1 );
-    $sizePolicy7->setHeightForWidth( $title->sizePolicy()->hasHeightForWidth() );
-    $title->setSizePolicy( $sizePolicy7 );
+    my $sizePolicy8 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Fixed() );
+    $self->{$sizePolicy8} = $sizePolicy8;
+    $sizePolicy8->setHorizontalStretch( 1 );
+    $sizePolicy8->setVerticalStretch( 1 );
+    $sizePolicy8->setHeightForWidth( $title->sizePolicy()->hasHeightForWidth() );
+    $title->setSizePolicy( $sizePolicy8 );
 
     $vboxLayout1->addWidget( $title );
 
@@ -2163,8 +2169,8 @@ sub setupUi {
     my $fourierBox = Qt::GroupBox( $fourierPage );
     $self->{fourierBox} = $fourierBox;
     $fourierBox->setObjectName( "fourierBox" );
-    $sizePolicy5->setHeightForWidth( $fourierBox->sizePolicy()->hasHeightForWidth() );
-    $fourierBox->setSizePolicy( $sizePolicy5 );
+    $sizePolicy6->setHeightForWidth( $fourierBox->sizePolicy()->hasHeightForWidth() );
+    $fourierBox->setSizePolicy( $sizePolicy6 );
     my $layout34 = Qt::Widget( $fourierBox );
     $self->{layout34} = $layout34;
     $layout34->setObjectName( "layout34" );
@@ -2178,28 +2184,28 @@ sub setupUi {
     my $frqMax = Qt::LineEdit( $layout34 );
     $self->{frqMax} = $frqMax;
     $frqMax->setObjectName( "frqMax" );
-    $sizePolicy4->setHeightForWidth( $frqMax->sizePolicy()->hasHeightForWidth() );
-    $frqMax->setSizePolicy( $sizePolicy4 );
+    $sizePolicy5->setHeightForWidth( $frqMax->sizePolicy()->hasHeightForWidth() );
+    $frqMax->setSizePolicy( $sizePolicy5 );
 
     $gridLayout7->addWidget( $frqMax, 0, 6, 1, 1 );
 
     my $funits = Qt::ComboBox( $layout34 );
     $self->{funits} = $funits;
     $funits->setObjectName( "funits" );
-    my $sizePolicy8 = Qt::SizePolicy( Qt::SizePolicy::Ignored(), Qt::SizePolicy::Preferred() );
-    $self->{$sizePolicy8} = $sizePolicy8;
-    $sizePolicy8->setHorizontalStretch( 0 );
-    $sizePolicy8->setVerticalStretch( 0 );
-    $sizePolicy8->setHeightForWidth( $funits->sizePolicy()->hasHeightForWidth() );
-    $funits->setSizePolicy( $sizePolicy8 );
+    my $sizePolicy9 = Qt::SizePolicy( Qt::SizePolicy::Ignored(), Qt::SizePolicy::Preferred() );
+    $self->{$sizePolicy9} = $sizePolicy9;
+    $sizePolicy9->setHorizontalStretch( 0 );
+    $sizePolicy9->setVerticalStretch( 0 );
+    $sizePolicy9->setHeightForWidth( $funits->sizePolicy()->hasHeightForWidth() );
+    $funits->setSizePolicy( $sizePolicy9 );
 
     $gridLayout7->addWidget( $funits, 0, 2, 1, 1 );
 
     my $fplot = Qt::ComboBox( $layout34 );
     $self->{fplot} = $fplot;
     $fplot->setObjectName( "fplot" );
-    $sizePolicy4->setHeightForWidth( $fplot->sizePolicy()->hasHeightForWidth() );
-    $fplot->setSizePolicy( $sizePolicy4 );
+    $sizePolicy5->setHeightForWidth( $fplot->sizePolicy()->hasHeightForWidth() );
+    $fplot->setSizePolicy( $sizePolicy5 );
 
     $gridLayout7->addWidget( $fplot, 2, 2, 1, 1 );
 
@@ -2234,8 +2240,8 @@ sub setupUi {
     my $fapodization = Qt::ComboBox( $layout34 );
     $self->{fapodization} = $fapodization;
     $fapodization->setObjectName( "fapodization" );
-    $sizePolicy4->setHeightForWidth( $fapodization->sizePolicy()->hasHeightForWidth() );
-    $fapodization->setSizePolicy( $sizePolicy4 );
+    $sizePolicy5->setHeightForWidth( $fapodization->sizePolicy()->hasHeightForWidth() );
+    $fapodization->setSizePolicy( $sizePolicy5 );
 
     $gridLayout7->addWidget( $fapodization, 1, 2, 1, 1 );
 
@@ -2270,8 +2276,8 @@ sub setupUi {
     my $fphase = Qt::LineEdit( $layout34 );
     $self->{fphase} = $fphase;
     $fphase->setObjectName( "fphase" );
-    $sizePolicy4->setHeightForWidth( $fphase->sizePolicy()->hasHeightForWidth() );
-    $fphase->setSizePolicy( $sizePolicy4 );
+    $sizePolicy5->setHeightForWidth( $fphase->sizePolicy()->hasHeightForWidth() );
+    $fphase->setSizePolicy( $sizePolicy5 );
 
     $gridLayout7->addWidget( $fphase, 1, 4, 1, 1 );
 
@@ -2292,8 +2298,8 @@ sub setupUi {
     my $frqMin = Qt::LineEdit( $layout34 );
     $self->{frqMin} = $frqMin;
     $frqMin->setObjectName( "frqMin" );
-    $sizePolicy4->setHeightForWidth( $frqMin->sizePolicy()->hasHeightForWidth() );
-    $frqMin->setSizePolicy( $sizePolicy4 );
+    $sizePolicy5->setHeightForWidth( $frqMin->sizePolicy()->hasHeightForWidth() );
+    $frqMin->setSizePolicy( $sizePolicy5 );
 
     $gridLayout7->addWidget( $frqMin, 0, 4, 1, 1 );
 
@@ -2316,12 +2322,12 @@ sub setupUi {
     my $rrfBox = Qt::GroupBox( $fourierPage );
     $self->{rrfBox} = $rrfBox;
     $rrfBox->setObjectName( "rrfBox" );
-    $sizePolicy5->setHeightForWidth( $rrfBox->sizePolicy()->hasHeightForWidth() );
-    $rrfBox->setSizePolicy( $sizePolicy5 );
+    $sizePolicy6->setHeightForWidth( $rrfBox->sizePolicy()->hasHeightForWidth() );
+    $rrfBox->setSizePolicy( $sizePolicy6 );
     my $layout35 = Qt::Widget( $rrfBox );
     $self->{layout35} = $layout35;
     $layout35->setObjectName( "layout35" );
-    $layout35->setGeometry( Qt::Rect(10, 18, 265, 100) );
+    $layout35->setGeometry( Qt::Rect(10, 18, 265, 107) );
     my $gridLayout8 = Qt::GridLayout( $layout35 );
     $self->{gridLayout8} = $gridLayout8;
     $gridLayout8->setSpacing( 5 );
@@ -2668,12 +2674,12 @@ sub setupUi {
     $self->{t0Update} = $t0Update;
     $t0Update->setObjectName( "t0Update" );
     $t0Update->setEnabled( 0 );
-    my $sizePolicy9 = Qt::SizePolicy( Qt::SizePolicy::Fixed(), Qt::SizePolicy::Fixed() );
-    $self->{$sizePolicy9} = $sizePolicy9;
-    $sizePolicy9->setHorizontalStretch( 0 );
-    $sizePolicy9->setVerticalStretch( 0 );
-    $sizePolicy9->setHeightForWidth( $t0Update->sizePolicy()->hasHeightForWidth() );
-    $t0Update->setSizePolicy( $sizePolicy9 );
+    my $sizePolicy10 = Qt::SizePolicy( Qt::SizePolicy::Fixed(), Qt::SizePolicy::Fixed() );
+    $self->{$sizePolicy10} = $sizePolicy10;
+    $sizePolicy10->setHorizontalStretch( 0 );
+    $sizePolicy10->setVerticalStretch( 0 );
+    $sizePolicy10->setHeightForWidth( $t0Update->sizePolicy()->hasHeightForWidth() );
+    $t0Update->setSizePolicy( $sizePolicy10 );
 
     $hboxLayout2->addWidget( $t0Update );
 
@@ -2835,16 +2841,16 @@ sub setupUi {
     my $cParamsCombo = Qt::ComboBox( $tabPage );
     $self->{cParamsCombo} = $cParamsCombo;
     $cParamsCombo->setObjectName( "cParamsCombo" );
-    $sizePolicy9->setHeightForWidth( $cParamsCombo->sizePolicy()->hasHeightForWidth() );
-    $cParamsCombo->setSizePolicy( $sizePolicy9 );
+    $sizePolicy10->setHeightForWidth( $cParamsCombo->sizePolicy()->hasHeightForWidth() );
+    $cParamsCombo->setSizePolicy( $sizePolicy10 );
 
     $hboxLayout3->addWidget( $cParamsCombo );
 
     my $textLabel1_4_6 = Qt::Label( $tabPage );
     $self->{textLabel1_4_6} = $textLabel1_4_6;
     $textLabel1_4_6->setObjectName( "textLabel1_4_6" );
-    $sizePolicy9->setHeightForWidth( $textLabel1_4_6->sizePolicy()->hasHeightForWidth() );
-    $textLabel1_4_6->setSizePolicy( $sizePolicy9 );
+    $sizePolicy10->setHeightForWidth( $textLabel1_4_6->sizePolicy()->hasHeightForWidth() );
+    $textLabel1_4_6->setSizePolicy( $sizePolicy10 );
     $textLabel1_4_6->setWordWrap( 0 );
 
     $hboxLayout3->addWidget( $textLabel1_4_6 );
@@ -2861,8 +2867,8 @@ sub setupUi {
     my $addConstraint = Qt::PushButton( $tabPage );
     $self->{addConstraint} = $addConstraint;
     $addConstraint->setObjectName( "addConstraint" );
-    $sizePolicy9->setHeightForWidth( $addConstraint->sizePolicy()->hasHeightForWidth() );
-    $addConstraint->setSizePolicy( $sizePolicy9 );
+    $sizePolicy10->setHeightForWidth( $addConstraint->sizePolicy()->hasHeightForWidth() );
+    $addConstraint->setSizePolicy( $sizePolicy10 );
 
     $hboxLayout3->addWidget( $addConstraint );
 
@@ -2965,7 +2971,7 @@ sub setupUi {
     $self->{menuBar} = $menuBar;
     $menuBar->setObjectName( "menuBar" );
     $menuBar->setEnabled( 1 );
-    $menuBar->setGeometry( Qt::Rect(0, 0, 600, 20) );
+    $menuBar->setGeometry( Qt::Rect(0, 0, 674, 27) );
     my $fileMenu = Qt::Menu( $menuBar );
     $self->{fileMenu} = $fileMenu;
     $fileMenu->setObjectName( "fileMenu" );
@@ -3194,20 +3200,24 @@ sub retranslateUi {
     $self->{browse}->setText( Qt::Application::translate( 'MuSRFit4', "Browse", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{fitAsyTypeLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Fit type", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{fitAsyType}->insertItems(0, [Qt::Application::translate( 'MuSRFit4', "Asymmetry", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "SingleHist", undef, Qt::Application::UnicodeUTF8() )]);
+        Qt::Application::translate( 'MuSRFit4', "Single Hist", undef, Qt::Application::UnicodeUTF8() ),
+        Qt::Application::translate( 'MuSRFit4', "Asymmetry GLB", undef, Qt::Application::UnicodeUTF8() ),
+        Qt::Application::translate( 'MuSRFit4', "Single Hist GLB", undef, Qt::Application::UnicodeUTF8() )]);
     $self->{histsLRBFLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Histograms list", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{histsLRBF}->setText( Qt::Application::translate( 'MuSRFit4', "1 5,3 7", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{runsAuto}->setTitle( Qt::Application::translate( 'MuSRFit4', "RUN Numbers", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{yearLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Year", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{beamLineLabel}->setText( Qt::Application::translate( 'MuSRFit4', "On beam line", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{runNumbers}->setToolTip( Qt::Application::translate( 'MuSRFit4', "Numbers of RUNs to fit. Multiple runs are comma separated.", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{runNumbers}->setWhatsThis( Qt::Application::translate( 'MuSRFit4', "Numbers of RUNs to fit. Multiple runs are comma separated.", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{runNumbers}->setText( '' );
     $self->{beamLine}->insertItems(0, [Qt::Application::translate( 'MuSRFit4', "LEM", undef, Qt::Application::UnicodeUTF8() ),
+        Qt::Application::translate( 'MuSRFit4', "GPD", undef, Qt::Application::UnicodeUTF8() ),
+        Qt::Application::translate( 'MuSRFit4', "HAL", undef, Qt::Application::UnicodeUTF8() ),
         Qt::Application::translate( 'MuSRFit4', "GPS", undef, Qt::Application::UnicodeUTF8() ),
         Qt::Application::translate( 'MuSRFit4', "Dolly", undef, Qt::Application::UnicodeUTF8() ),
         Qt::Application::translate( 'MuSRFit4', "LTF", undef, Qt::Application::UnicodeUTF8() ),
         Qt::Application::translate( 'MuSRFit4', "LEM (PPC)", undef, Qt::Application::UnicodeUTF8() )]);
-    $self->{runNumbers}->setToolTip( Qt::Application::translate( 'MuSRFit4', "Numbers of RUNs to fit. Multiple runs are comma separated.", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{runNumbers}->setWhatsThis( Qt::Application::translate( 'MuSRFit4', "Numbers of RUNs to fit. Multiple runs are comma separated.", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{runNumbers}->setText( '' );
+    $self->{yearLabel}->setText( Qt::Application::translate( 'MuSRFit4', "  Year  ", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{beamLineLabel}->setText( Qt::Application::translate( 'MuSRFit4', "On beam line  ", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{groupBox}->setTitle( Qt::Application::translate( 'MuSRFit4', "Theory Function", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{comp1Label}->setText( Qt::Application::translate( 'MuSRFit4', "First Component", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{comp2Label}->setText( Qt::Application::translate( 'MuSRFit4', "Second Component", undef, Qt::Application::UnicodeUTF8() ) );

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>505</height>
+    <width>674</width>
+    <height>541</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -236,7 +236,17 @@
               </item>
               <item>
                <property name="text">
-                <string>SingleHist</string>
+                <string>Single Hist</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Asymmetry GLB</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Single Hist GLB</string>
                </property>
               </item>
              </widget>
@@ -303,7 +313,7 @@
           <item row="0" column="0">
            <widget class="QGroupBox" name="runsAuto">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
               <horstretch>1</horstretch>
               <verstretch>1</verstretch>
              </sizepolicy>
@@ -311,7 +321,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>80</height>
+              <height>100</height>
              </size>
             </property>
             <property name="title">
@@ -323,6 +333,15 @@
             <layout class="QGridLayout" name="gridLayout_3">
              <item row="0" column="0">
               <layout class="QGridLayout" name="runNumbers_2">
+               <property name="sizeConstraint">
+                <enum>QLayout::SetDefaultConstraint</enum>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
                <property name="spacing">
                 <number>0</number>
                </property>
@@ -360,119 +379,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="3">
-                <widget class="QLabel" name="yearLabel">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Year</string>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
-                <widget class="QLabel" name="beamLineLabel">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>30</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>On beam line</string>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="2">
-                <widget class="QComboBox" name="beamLine">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>25</height>
-                  </size>
-                 </property>
-                 <item>
-                  <property name="text">
-                   <string>LEM</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>GPS</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>Dolly</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>LTF</string>
-                  </property>
-                 </item>
-                 <item>
-                  <property name="text">
-                   <string>LEM (PPC)</string>
-                  </property>
-                 </item>
-                </widget>
-               </item>
-               <item row="1" column="0">
-                <spacer name="spacer2">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Expanding</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>181</width>
-                   <height>21</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
                <item row="0" column="0" colspan="5">
                 <widget class="QLineEdit" name="runNumbers">
                  <property name="sizePolicy">
@@ -504,6 +410,129 @@
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <spacer name="spacer2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Expanding</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>181</width>
+                   <height>21</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="1" column="2">
+                <widget class="QComboBox" name="beamLine">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>25</height>
+                  </size>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>LEM</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>GPD</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>HAL</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>GPS</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Dolly</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>LTF</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>LEM (PPC)</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item row="1" column="3">
+                <widget class="QLabel" name="yearLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>  Year  </string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QLabel" name="beamLineLabel">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>30</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>On beam line  </string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>false</bool>
                  </property>
                 </widget>
                </item>
@@ -3488,7 +3517,7 @@
              <x>10</x>
              <y>18</y>
              <width>265</width>
-             <height>100</height>
+             <height>107</height>
             </rect>
            </property>
            <layout class="QGridLayout">
@@ -5412,8 +5441,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>600</width>
-     <height>20</height>
+     <width>674</width>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="fileMenu">
