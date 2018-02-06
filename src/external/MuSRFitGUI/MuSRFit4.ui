@@ -231,7 +231,7 @@
               </property>
               <item>
                <property name="text">
-                <string>Asymmetry</string>
+                <string>Asymmetry GLB</string>
                </property>
               </item>
               <item>
@@ -241,12 +241,7 @@
               </item>
               <item>
                <property name="text">
-                <string>Asymmetry GLB</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Single Hist GLB</string>
+                <string>Asymmetry</string>
                </property>
               </item>
              </widget>

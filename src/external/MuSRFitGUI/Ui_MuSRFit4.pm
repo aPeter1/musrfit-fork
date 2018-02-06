@@ -5,7 +5,7 @@
 #################################################################################
 ## Form generated from reading UI file 'MuSRFit4.ui'
 ##
-## Created: Mon Jan 29 14:11:03 2018
+## Created: Mon Feb 5 15:38:20 2018
 ##      by: Qt User Interface Compiler version 4.8.7
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -3199,10 +3199,9 @@ sub retranslateUi {
     $self->{browse}->setWhatsThis( Qt::Application::translate( 'MuSRFit4', "Browse to select data files for fitting.", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{browse}->setText( Qt::Application::translate( 'MuSRFit4', "Browse", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{fitAsyTypeLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Fit type", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{fitAsyType}->insertItems(0, [Qt::Application::translate( 'MuSRFit4', "Asymmetry", undef, Qt::Application::UnicodeUTF8() ),
+    $self->{fitAsyType}->insertItems(0, [Qt::Application::translate( 'MuSRFit4', "Asymmetry GLB", undef, Qt::Application::UnicodeUTF8() ),
         Qt::Application::translate( 'MuSRFit4', "Single Hist", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Asymmetry GLB", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Single Hist GLB", undef, Qt::Application::UnicodeUTF8() )]);
+        Qt::Application::translate( 'MuSRFit4', "Asymmetry", undef, Qt::Application::UnicodeUTF8() )]);
     $self->{histsLRBFLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Histograms list", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{histsLRBF}->setText( Qt::Application::translate( 'MuSRFit4', "1 5,3 7", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{runsAuto}->setTitle( Qt::Application::translate( 'MuSRFit4', "RUN Numbers", undef, Qt::Application::UnicodeUTF8() ) );
