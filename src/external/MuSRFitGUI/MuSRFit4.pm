@@ -282,13 +282,12 @@ sub CreateAllInput()
     $All{"LRBF"} = this->{ui}->histsLRBF->text;
     my @Hists = split(/,/, $All{"LRBF"} );
 # Lifetime corrections in enabled/visible only for SingleHis fits
-    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
-	this->{ui}->ltc->setHidden(1);
-	$All{"fittype"}=2;
-    }
-    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
+    if ( $All{"FitAsyType"} eq "SingleHist" ) {
 	this->{ui}->ltc->setHidden(0);
 	$All{"fittype"}=0;
+    } else {
+	this->{ui}->ltc->setHidden(1);
+	$All{"fittype"}=2;
     }
    
 # From Fitting Tab
@@ -419,10 +418,9 @@ sub CreateAllInput()
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );
 	
-	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
+	if ( $Component == 1 && ($All{"FitAsyType"} eq "Asymmetry" || $All{"FitAsyType"} eq "AsymmetryGLB" )) {
 	    unshift( @Params, "Alpha" );
-	}	
-	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
+	} elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
 	    unshift( @Params, ( "No", "NBg" ) );
 	}
 	
@@ -441,7 +439,7 @@ sub CreateAllInput()
 	    }
 	    
 # Is there any point of sharing, multiple runs?
-	    if ( $#RUNS == 0 && $All{"FitAsyType"} eq "Asymmetry") {
+	    if ( $#RUNS == 0 && ($All{"FitAsyType"} eq "Asymmetry" || $All{"FitAsyType"} eq "AsymmetryGLB")) {
 		$Shared = 1;
 	    }
 	    elsif ( $#RUNS == 0 && $#Hists == 0 &&  $All{"FitAsyType"} eq "SingleHist" )  {
@@ -532,49 +530,54 @@ sub CallMSRCreate()
 	}
 	
 	if ($Answer) {
-	    if ( $All{"FitAsyType"} eq "Asymmetry" ) {
+	    if ( $All{"FitAsyType"} eq "Asymmetry") {
 		if ($All{"RUNSType"}) {
-		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSR(\%All);
+		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRUni(\%All);
 # Open output file FILENAME.msr
 		    open( OUTF,q{>},"$FILENAME" );
 		    print OUTF ("$FullMSRFile");
 		    close(OUTF);
 		} else {
-		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSR(\%All);
+		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRUni(\%All);
 # Open output file FILENAME.msr
 		    open( OUTF,q{>},"$FILENAME" );
 		    print OUTF ("$FullMSRFile");
 		    close(OUTF);
-# if it is multiple runs then the produced file is a template
-		    my $FILENAME=$All{"FILENAME"}.".msr";
-		    my $Extension = "_".$All{"BeamLine"}."_".$All{"YEAR"};
-		    if ($All{"BeamLine"} eq "LEM (PPC)") {
-			$Extension = "_LEM_".$All{"YEAR"};
-		    }
-		    
-		    if (-e $FILENAME) {
-			my $RUN0 = $FILENAME;
-			$RUN0 =~ s/$Extension//g;
-			$RUN0 =~ s/.msr//g;
-			my $cmd = $All{"RunNumbers"};
-			$cmd =~ s/,/ /g;
-			$cmd = "msr2data \[".$cmd."\] ".$Extension." msr-".$RUN0." global";
-			$cmd = $cmd."; mv $RUN0+global$Extension.msr ".$FILENAME;
-			print $cmd."\n";
-			my $pid = open(FTO,"$cmd 2>&1 |");
-			while (<FTO>) {
-			    this->{ui}->fitTextOutput->append("$_");
-			}
-			close(FTO);
-		    }
 		}
-	    }
-	    elsif ( $All{"FitAsyType"} eq "SingleHist" ) {
-		my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRSingleHist(\%All);
-# Open output file FILENAME.msr
-		open( OUTF,q{>},"$FILENAME" );
+	    } else {
+		my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRGLB(\%All);
+		my @RUNS = split( /,/,MSR::ExpandRunNumbers($All{"RunNumbers"}));
+		my @Hists = split( /,/, $All{"LRBF"} );
+		# Write to template file 
+		open( OUTF,q{>},"$RUNS[0]_tmpl.msr" );
 		print OUTF ("$FullMSRFile");
 		close(OUTF);
+
+		# Change runs line in the final global fit
+		my $NSpectra = ($#RUNS+1)*($#Hists+1);
+		my $NewRunLine = "runs ".join(" ",(1...$NSpectra));
+		# Use msr2data to generate global fit MSR file
+		my $RunList = join(" ",@RUNS);
+		my $cmd = "msr2data \[".$RunList."\] "." _tmpl msr-".$RUNS[0]." global";
+		# create the global file 
+		print $cmd."\n";
+		my $pid = open(FTO,"$cmd 2>&1 |");
+		while (<FTO>) {
+		    this->{ui}->fitTextOutput->append("$_");
+		}
+		close(FTO);
+		# change the stupid name
+		my $StupidName = $RUNS[0]."+global_tmpl.msr";
+		# change stupid default runs line
+		$cmd = "cp $StupidName $FILENAME; perl -pi -e 's/runs.*?(?=\n)/$NewRunLine/s' $FILENAME";
+		$pid = open(FTO,"$cmd 2>&1 |");
+		print $cmd."\n";
+		while (<FTO>) {
+		    this->{ui}->fitTextOutput->append("$_");
+		}
+		close(FTO);
+		# feed in values of parameters if they exist
+		
 	    }
 	    UpdateMSRFileInitTable();
 	}
@@ -614,7 +617,8 @@ sub UpdateMSRFileInitTable()
 #  if it is last element or there are two more = positive error, check $#Param=5/7
 #  if there is only one more                            = minimum, check $#Param=6
 	
-# To summarize, check the value of $#Param
+	# To summarize, check the value of $#Param
+	my $name=$Param[2];
 	my $value=1.0*$Param[3];
 	my $error = 1.0*$Param[4];
 	my $minvalue=0.0;
@@ -640,6 +644,8 @@ sub UpdateMSRFileInitTable()
 	    $QTable->setItem($PCount,1,Qt::TableWidgetItem());
 	    $QTable->setItem($PCount,2,Qt::TableWidgetItem());
 	    $QTable->setItem($PCount,3,Qt::TableWidgetItem());
+	    # Set also label or row
+	    $QTable->verticalHeaderItem($PCount)->setText($name);
 	    $QTable->item($PCount,0)->setText($value);
 	    $QTable->item($PCount,1)->setText($error);
 	    $QTable->item($PCount,2)->setText($minvalue);
@@ -710,7 +716,7 @@ sub ActivateShComp()
 	    my $Parameters=$Paramcomp[$Component-1];
 	    my @Params = split( /\s+/, $Parameters );
 	
-	    if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
+	    if ( $Component == 1 && ($All{"FitAsyType"} eq "Asymmetry" || $All{"FitAsyType"} eq "AsymmetryGLB")) {
 		unshift( @Params, "Alpha" );
 	    }
 	    elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
@@ -821,7 +827,7 @@ sub GoFit()
 # Check here is the number of histograms makes sense
 # other wise give error.
     my @Hists = split( /,/, $All{"LRBF"} );
-    if ($All{"FitAsyType"} eq "Asymmetry" && $#Hists != 1) {
+    if (($All{"FitAsyType"} eq "Asymmetry" || $All{"FitAsyType"} eq "AsymmetryGLB") && $#Hists != 1) {
 # we have a problem here send error message
 	my $Warning = "Error: The number of histograms should be 2 for an asymmetry fit!";
 	my $WarningWindow = Qt::MessageBox::information( this, "Error",$Warning);
@@ -856,7 +862,7 @@ sub GoPlot()
 # Check here is the number of histograms makes sense
 # other wise give error.
     my @Hists = split( /,/, $All{"LRBF"} );
-    if ($All{"FitAsyType"} eq "Asymmetry" && $#Hists != 1) {
+    if (($All{"FitAsyType"} eq "Asymmetry" || $All{"FitAsyType"} eq "AsymmetryGLB") && $#Hists != 1) {
 # we have a problem here send error message
 	my $Warning = "Error: The number of histograms should be 2 for an asymmetry fit!";
 	my $WarningWindow = Qt::MessageBox::information( this, "Error",$Warning);
@@ -1019,7 +1025,7 @@ sub InitializeFunctions()
 	my @Params = split( /\s+/, $Parameters );	
 
 # Alpha, No and NBg are counted in the parameters
-	if ( $Component == 1 && $All{"FitAsyType"} eq "Asymmetry" ) {
+	if ( $Component == 1 && ($All{"FitAsyType"} eq "Asymmetry" || $All{"FitAsyType"} eq "AsymmetryGLB" )) {
 	    unshift( @Params, "Alpha" );
 	}
 	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
