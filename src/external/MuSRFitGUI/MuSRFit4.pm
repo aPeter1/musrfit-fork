@@ -421,7 +421,18 @@ sub CreateAllInput()
 	if ( $Component == 1 && ($All{"FitAsyType"} eq "Asymmetry" || $All{"FitAsyType"} eq "AsymmetryGLB" )) {
 	    unshift( @Params, "Alpha" );
 	} elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "No", "NBg" ) );
+	    if (grep(/Phi/,@Params)) {
+		# remove the Phi and put it back for each histogram
+		@Params = grep ! /Phi/,@Params;
+		# for each histogram
+		foreach my $Hist (@Hists) {
+		    # take only first histogram from sum
+		    ($Hist,my  $tmp) = split(/ /,$Hist);
+		    # Doesn't make sense to share No or NBg!
+		    # unshift( @Params, ( "N0$Hist", "NBg$Hist", "Phi$Hist" ) );
+		    push(@Params,"Phi$Hist");
+		}
+	    }
 	}
 	
 # This is the counter for parameters of this component
@@ -431,27 +442,25 @@ sub CreateAllInput()
 	foreach my $Param (@Params) {
 	    my $Param_ORG = $Param;
 # TODO: I need to take care of single hist fits here
-	    if ( $All{"FitAsyType"} eq "SingleHist" ) {
-		$Param=$Param.$Hists[0];	    
-	    }
+#	    if ( $All{"FitAsyType"} eq "SingleHist" ) {
+#		$Param=$Param.$Hists[0];	    
+#	    }
 	    if ( $#FitTypes != 0 && (   $Param ne "Alpha" && $Param ne "No" && $Param ne "NBg" ) ){
 		$Param = join( "", $Param, "_", $Component);
 	    }
 	    
 # Is there any point of sharing, multiple runs?
-	    if ( $#RUNS == 0 && ($All{"FitAsyType"} eq "Asymmetry" || $All{"FitAsyType"} eq "AsymmetryGLB")) {
-		$Shared = 1;
-	    }
-	    elsif ( $#RUNS == 0 && $#Hists == 0 &&  $All{"FitAsyType"} eq "SingleHist" )  {
+	    if ( $#RUNS == 0 ) {
 		$Shared = 1;
 	    } else {	
 # Check if shared or not, construct name of checkbox, find its handle and then 
-# check if it is checked		    
+# check if it is checked
 		my $ChkName="shParam_".$Component."_".$NP;
 		my $ChkBx = child("Qt::Widget",$ChkName);
 		$Shared = $ChkBx->isChecked();
 	    }
 	    $All{"Sh_$Param"}=$Shared;
+	    print "Param $Param is $Shared\n";
 	    $NP++;
 	}
 #Loop on parameters
@@ -577,7 +586,30 @@ sub CallMSRCreate()
 		}
 		close(FTO);
 		# feed in values of parameters if they exist
-		
+		my $wholefile = "";
+		my $newline = "";
+		{open (MSRF,q{<},"$FILENAME" );
+		 local $/ = undef;
+		 $wholefile = <MSRF>;
+		 close(MSRF);}
+		my %PTable=MSR::PrepParamTable(\%All);
+		my $NParam=keys( %PTable );
+		for (my $iP=0;$iP<$NParam;$iP++) {
+		    my ($Param,$value,$error,$minvalue,$maxvalue,$RUNtmp) = split(/,/,$PTable{$iP});
+		    if (defined($All{"$Param"})) {
+			# replace the corresponding $Param  line
+			if ( $All{"$Param\_min"} == $All{"$Param\_max"} ) {
+			    $All{"$Param\_min"} = "";
+			    $All{"$Param\_max"} = "";
+			}
+			$newline = join("    ",($Param,$All{"$Param"},$All{"d$Param"},$All{"d$Param"},$All{"$Param\_min"},$All{"$Param\_max"}));
+			$wholefile =~ s/$Param.*/$newline/;
+		    }
+		}
+		# Now rewrite the msr file
+		open (MSRF,q{>},"$FILENAME" );
+		print MSRF $wholefile;
+		close(MSRF);
 	    }
 	    UpdateMSRFileInitTable();
 	}
@@ -593,7 +625,7 @@ sub UpdateMSRFileInitTable()
     if (-e "$FILENAME.msr") {
 	open (MSRF,q{<},"$FILENAME.msr" );
 	@lines = <MSRF>;
-	close(IFILE);
+	close(MSRF);
     }
     this->{ui}->textMSROutput->setText("");
     foreach my $line (@lines) {
@@ -685,6 +717,7 @@ sub ActivateShComp()
 {
     my %All=CreateAllInput();
     my @RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );
+    my @Hists = split( /,/, $All{"LRBF"} );
     
 # Hide all sharing components
     this->{ui}->sharingComp1->setHidden(1);
@@ -718,9 +751,20 @@ sub ActivateShComp()
 	
 	    if ( $Component == 1 && ($All{"FitAsyType"} eq "Asymmetry" || $All{"FitAsyType"} eq "AsymmetryGLB")) {
 		unshift( @Params, "Alpha" );
-	    }
-	    elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-		unshift( @Params, ( "No", "NBg" ) );
+	    } elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
+		if (grep(/Phi/,@Params)) {
+		    # remove the Phi and put it back for each histogram
+		    @Params = grep ! /Phi/,@Params;
+		    # for each histogram
+		    foreach my $Hist (@Hists) {
+			# take only first histogram from sum
+			($Hist,my $tmp) = split(/ /,$Hist);
+			# Doesn't make sense to share No or NBg!
+			# unshift( @Params, ( "N0$Hist", "NBg$Hist", "Phi$Hist" ) );
+			push(@Params,"Phi$Hist");
+		    }
+		}
+		# unshift( @Params, ( "No", "NBg" ) );
 	    }
 	
 	
@@ -776,12 +820,10 @@ sub InitializeTab()
 	$QTable->setNumRows($NParam);
     }
 
-#    for (my $i=0;$i<$NParam;$i++) {print "Line=$PTable{$i}\n";}
-
-    
 # Fill the table with labels and values of parameter 
     for (my $PCount=0;$PCount<$NParam;$PCount++) {
 	my ($Param,$value,$error,$minvalue,$maxvalue,$RUN) = split(/,/,$PTable{$PCount});
+#	print $PTable{$PCount}."\n";
 # Now make sure we have no nans
 	if ($error eq "nan") { $error=0.1;}
 	# Make sure items exist before addressing them
@@ -805,14 +847,17 @@ sub TabChanged()
 {
 # TODO: First check if there are some runs given, otherwise disbale
     my %All=CreateAllInput();
-    
-# First make sure we have sharing initialized    
-    ActivateShComp();
-# Here we need to apply sharing if selected...
-    InitializeTab();
-    UpdateMSRFileInitTable();
-# And also setup T0 and Bg bins
-    ActivateT0Hists();
+    my $curTab = this->{ui}->musrfit_tabs->currentIndex();
+    if ($curTab >= 2 && $curTab <= 4) {
+	# First make sure we have sharing initialized    
+	ActivateShComp();
+	# Here we need to apply sharing if selected...
+	InitializeTab();
+	UpdateMSRFileInitTable();
+    } elsif ($curTab == 7) {
+	# And also setup T0 and Bg bins
+	ActivateT0Hists();
+    }
     
 # Initialize FUNCTIONS block only if it has not been initialized yet
     if ($All{"Func_T_Block"} eq "" ) {
@@ -823,6 +868,7 @@ sub TabChanged()
 
 sub GoFit()
 {
+    # This function should be able to do both plot and fit, check who called you.
     my %All=CreateAllInput();
 # Check here is the number of histograms makes sense
 # other wise give error.
@@ -834,17 +880,15 @@ sub GoFit()
     } else {
 	this->{ui}->musrfit_tabs->setCurrentIndex(1);
 	my $Answer=CallMSRCreate();
+	my $FILENAME=$All{"FILENAME"}.".msr";
 	if ($Answer) {
-	    my $FILENAME=$All{"FILENAME"}.".msr";
 	    if (-e $FILENAME) {
-		my $cmd="musrfit -t $FILENAME";
+		my $cmd="musrfit -t $FILENAME; musrview $FILENAME &";
 		my $pid = open(FTO,"$cmd 2>&1 |");
 		while (<FTO>) {
 		    this->{ui}->fitTextOutput->insertPlainText("$_");
 		}
 		close(FTO);
-		$cmd="musrview $FILENAME &";
-		$pid = system($cmd);
 	    } else {
 		this->{ui}->fitTextOutput->insertPlainText("Cannot find MSR file!");
 	    }
@@ -858,6 +902,7 @@ sub GoFit()
 
 sub GoPlot()
 {
+    # This function should be able to do both plot and fit, check who called you.
     my %All=CreateAllInput();
 # Check here is the number of histograms makes sense
 # other wise give error.
@@ -997,7 +1042,8 @@ sub InitializeFunctions()
 {
     my %All=CreateAllInput();
     my @RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );
-    
+    my @Hists = split( /,/, $All{"LRBF"} );
+
     my @FitTypes =();
     foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
 	if ( $FitType ne "None" ) {
@@ -1027,9 +1073,20 @@ sub InitializeFunctions()
 # Alpha, No and NBg are counted in the parameters
 	if ( $Component == 1 && ($All{"FitAsyType"} eq "Asymmetry" || $All{"FitAsyType"} eq "AsymmetryGLB" )) {
 	    unshift( @Params, "Alpha" );
-	}
-	elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
-	    unshift( @Params, ( "No", "NBg" ) );
+	} elsif ( $Component == 1 && $All{"FitAsyType"} eq "SingleHist" ) {
+	    if (grep(/Phi/,@Params)) {
+		# remove the Phi and put it back for each histogram
+		@Params = grep ! /Phi/,@Params;
+		# for each histogram
+		foreach my $Hist (@Hists) {
+		    # take only first histogram from sum
+		    ($Hist,my $tmp) = split(/ /,$Hist);
+		    # Doesn't make sense to share No or NBg!
+		    # unshift( @Params, ( "N0$Hist", "NBg$Hist", "Phi$Hist" ) );
+		    push(@Params,"Phi$Hist");
+		}
+	    }
+	    # unshift( @Params, ( "No", "NBg" ) );
 	}
 	
 # Add list to the constraints drop down menu
@@ -1065,7 +1122,7 @@ sub t0UpdateClicked()
     my $FILENAME=$All{"FILENAME"};
     open (MSRF,q{<},"$FILENAME.msr" );
     my @lines = <MSRF>;
-    close(IFILE);
+    close(MSRF);
     
     my @T0s = grep {/t0 /} @lines;
     my @Bgs = grep {/background /} @lines;
