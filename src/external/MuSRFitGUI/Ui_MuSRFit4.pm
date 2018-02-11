@@ -5,7 +5,7 @@
 #################################################################################
 ## Form generated from reading UI file 'MuSRFit4.ui'
 ##
-## Created: Sun Feb 11 15:43:10 2018
+## Created: Sun Feb 11 15:47:22 2018
 ##      by: Qt User Interface Compiler version 4.8.7
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -90,60 +90,12 @@ sub runsPage {
     return shift->{runsPage};
 }
 
-sub gridLayout_1 {
-    return shift->{gridLayout_1};
+sub layoutWidget {
+    return shift->{layoutWidget};
 }
 
-sub gridLayout_2 {
-    return shift->{gridLayout_2};
-}
-
-sub runsMan {
-    return shift->{runsMan};
-}
-
-sub gridLayout_4 {
-    return shift->{gridLayout_4};
-}
-
-sub runFiles_2 {
-    return shift->{runFiles_2};
-}
-
-sub spacer3 {
-    return shift->{spacer3};
-}
-
-sub runFiles {
-    return shift->{runFiles};
-}
-
-sub browse {
-    return shift->{browse};
-}
-
-sub gridLayout_6 {
-    return shift->{gridLayout_6};
-}
-
-sub fitAsyTypeLabel {
-    return shift->{fitAsyTypeLabel};
-}
-
-sub fitAsyType {
-    return shift->{fitAsyType};
-}
-
-sub histsLRBFLabel {
-    return shift->{histsLRBFLabel};
-}
-
-sub histsLRBF {
-    return shift->{histsLRBF};
-}
-
-sub spacer4 {
-    return shift->{spacer4};
+sub verticalLayout_2 {
+    return shift->{verticalLayout_2};
 }
 
 sub runsAuto {
@@ -182,24 +134,76 @@ sub beamLineLabel {
     return shift->{beamLineLabel};
 }
 
-sub groupBox {
-    return shift->{groupBox};
+sub runsMan {
+    return shift->{runsMan};
 }
 
-sub textLabel1_4_2_3 {
-    return shift->{textLabel1_4_2_3};
+sub gridLayout_4 {
+    return shift->{gridLayout_4};
 }
 
-sub layoutWidget {
-    return shift->{layoutWidget};
+sub runFiles_2 {
+    return shift->{runFiles_2};
 }
 
-sub gridLayout1 {
-    return shift->{gridLayout1};
+sub spacer3 {
+    return shift->{spacer3};
+}
+
+sub runFiles {
+    return shift->{runFiles};
+}
+
+sub browse {
+    return shift->{browse};
+}
+
+sub horizontalLayout_3 {
+    return shift->{horizontalLayout_3};
+}
+
+sub verticalLayout {
+    return shift->{verticalLayout};
+}
+
+sub horizontalLayout_2 {
+    return shift->{horizontalLayout_2};
 }
 
 sub comp1Label {
     return shift->{comp1Label};
+}
+
+sub numComps {
+    return shift->{numComps};
+}
+
+sub theoryFunction {
+    return shift->{theoryFunction};
+}
+
+sub scrollAreaWidgetContents {
+    return shift->{scrollAreaWidgetContents};
+}
+
+sub columnView {
+    return shift->{columnView};
+}
+
+sub scrollArea {
+    return shift->{scrollArea};
+}
+
+sub scrollAreaWidgetContents_2 {
+    return shift->{scrollAreaWidgetContents_2};
+}
+
+sub layoutWidget2 {
+    return shift->{layoutWidget2};
+}
+
+sub gridLayout_1 {
+    return shift->{gridLayout_1};
 }
 
 sub tisLabel {
@@ -214,10 +218,6 @@ sub binsLabel {
     return shift->{binsLabel};
 }
 
-sub fitType1 {
-    return shift->{fitType1};
-}
-
 sub tis {
     return shift->{tis};
 }
@@ -228,10 +228,6 @@ sub tfs {
 
 sub bins {
     return shift->{bins};
-}
-
-sub comp2Label {
-    return shift->{comp2Label};
 }
 
 sub textLabel1_4 {
@@ -246,10 +242,6 @@ sub textLabel1_4_2_2 {
     return shift->{textLabel1_4_2_2};
 }
 
-sub fitType2 {
-    return shift->{fitType2};
-}
-
 sub xi {
     return shift->{xi};
 }
@@ -260,10 +252,6 @@ sub xf {
 
 sub viewBin {
     return shift->{viewBin};
-}
-
-sub comp3Label {
-    return shift->{comp3Label};
 }
 
 sub textLabel1_4_2 {
@@ -278,10 +266,6 @@ sub textLabel1_4_4 {
     return shift->{textLabel1_4_4};
 }
 
-sub fitType3 {
-    return shift->{fitType3};
-}
-
 sub yi {
     return shift->{yi};
 }
@@ -294,12 +278,36 @@ sub ltc {
     return shift->{ltc};
 }
 
+sub gridLayout_6 {
+    return shift->{gridLayout_6};
+}
+
+sub fitAsyTypeLabel {
+    return shift->{fitAsyTypeLabel};
+}
+
+sub fitAsyType {
+    return shift->{fitAsyType};
+}
+
+sub histsLRBFLabel {
+    return shift->{histsLRBFLabel};
+}
+
+sub histsLRBF {
+    return shift->{histsLRBF};
+}
+
+sub spacer4 {
+    return shift->{spacer4};
+}
+
 sub fittingPage {
     return shift->{fittingPage};
 }
 
-sub gridLayout2 {
-    return shift->{gridLayout2};
+sub gridLayout1 {
+    return shift->{gridLayout1};
 }
 
 sub fitGrid {
@@ -334,8 +342,8 @@ sub sharingPage {
     return shift->{sharingPage};
 }
 
-sub gridLayout3 {
-    return shift->{gridLayout3};
+sub gridLayout2 {
+    return shift->{gridLayout2};
 }
 
 sub buttonGroupSharing {
@@ -510,8 +518,8 @@ sub initializationPage {
     return shift->{initializationPage};
 }
 
-sub gridLayout4 {
-    return shift->{gridLayout4};
+sub gridLayout3 {
+    return shift->{gridLayout3};
 }
 
 sub initParamTable {
@@ -522,8 +530,8 @@ sub msrPage {
     return shift->{msrPage};
 }
 
-sub gridLayout5 {
-    return shift->{gridLayout5};
+sub gridLayout4 {
+    return shift->{gridLayout4};
 }
 
 sub vboxLayout {
@@ -534,8 +542,8 @@ sub groupTitle {
     return shift->{groupTitle};
 }
 
-sub gridLayout6 {
-    return shift->{gridLayout6};
+sub gridLayout5 {
+    return shift->{gridLayout5};
 }
 
 sub vboxLayout1 {
@@ -570,8 +578,8 @@ sub fourierPage {
     return shift->{fourierPage};
 }
 
-sub gridLayout7 {
-    return shift->{gridLayout7};
+sub gridLayout6 {
+    return shift->{gridLayout6};
 }
 
 sub fourierBox {
@@ -582,8 +590,8 @@ sub layout34 {
     return shift->{layout34};
 }
 
-sub gridLayout8 {
-    return shift->{gridLayout8};
+sub gridLayout7 {
+    return shift->{gridLayout7};
 }
 
 sub frqMax {
@@ -666,8 +674,8 @@ sub layout35 {
     return shift->{layout35};
 }
 
-sub gridLayout9 {
-    return shift->{gridLayout9};
+sub gridLayout8 {
+    return shift->{gridLayout8};
 }
 
 sub textLabel1_6_2_2 {
@@ -710,8 +718,8 @@ sub t0Page {
     return shift->{t0Page};
 }
 
-sub gridLayout10 {
-    return shift->{gridLayout10};
+sub gridLayout9 {
+    return shift->{gridLayout9};
 }
 
 sub hboxLayout1 {
@@ -894,16 +902,16 @@ sub tabPage {
     return shift->{tabPage};
 }
 
-sub gridLayout11 {
-    return shift->{gridLayout11};
+sub gridLayout10 {
+    return shift->{gridLayout10};
 }
 
 sub vboxLayout7 {
     return shift->{vboxLayout7};
 }
 
-sub gridLayout12 {
-    return shift->{gridLayout12};
+sub gridLayout11 {
+    return shift->{gridLayout11};
 }
 
 sub theoryBlock_Label {
@@ -1001,7 +1009,7 @@ sub setupUi {
     if ( !defined $muSRFit4->objectName() ) {
         $muSRFit4->setObjectName( "muSRFit4" );
     }
-    $muSRFit4->resize( 694, 556 );
+    $muSRFit4->resize( 705, 574 );
     my $sizePolicy = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Expanding() );
     $self->{$sizePolicy} = $sizePolicy;
     $sizePolicy->setHorizontalStretch( 1 );
@@ -1010,19 +1018,19 @@ sub setupUi {
     $muSRFit4->setSizePolicy( $sizePolicy );
     $muSRFit4->setMinimumSize( Qt::Size(600, 505) );
     my $icon = Qt::Icon();
-    $icon->addPixmap(Qt::Pixmap("icos/MuSRFit.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
+    $icon->addPixmap(Qt::Pixmap("../../../../../../.designer/backup/icos/MuSRFit.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
     $muSRFit4->setWindowIcon( $icon );
     my $fileSaveAction = Qt::Action($muSRFit4);
     $self->{fileSaveAction} = $fileSaveAction;
     $fileSaveAction->setObjectName( "fileSaveAction" );
     my $icon1 = Qt::Icon();
-    $icon1->addPixmap(Qt::Pixmap("icos/save.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
+    $icon1->addPixmap(Qt::Pixmap("../../../../../../.designer/backup/icos/save.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
     $fileSaveAction->setIcon( $icon1 );
     my $fileExitAction = Qt::Action($muSRFit4);
     $self->{fileExitAction} = $fileExitAction;
     $fileExitAction->setObjectName( "fileExitAction" );
     my $icon2 = Qt::Icon();
-    $icon2->addPixmap(Qt::Pixmap("icos/exit.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
+    $icon2->addPixmap(Qt::Pixmap("../../../../../../.designer/backup/icos/exit.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
     $fileExitAction->setIcon( $icon2 );
     my $helpAboutAction = Qt::Action($muSRFit4);
     $self->{helpAboutAction} = $helpAboutAction;
@@ -1040,7 +1048,7 @@ sub setupUi {
     $self->{fileChangeDirAction} = $fileChangeDirAction;
     $fileChangeDirAction->setObjectName( "fileChangeDirAction" );
     my $icon3 = Qt::Icon();
-    $icon3->addPixmap(Qt::Pixmap("icos/chdir.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
+    $icon3->addPixmap(Qt::Pixmap("../../../../../../.designer/backup/icos/chdir.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
     $fileChangeDirAction->setIcon( $icon3 );
     my $optionsnew_itemAction = Qt::Action($muSRFit4);
     $self->{optionsnew_itemAction} = $optionsnew_itemAction;
@@ -1049,32 +1057,32 @@ sub setupUi {
     $self->{parametersExport_AsAction} = $parametersExport_AsAction;
     $parametersExport_AsAction->setObjectName( "parametersExport_AsAction" );
     my $icon4 = Qt::Icon();
-    $icon4->addPixmap(Qt::Pixmap("icos/Export.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
+    $icon4->addPixmap(Qt::Pixmap("../../../../../../.designer/backup/icos/Export.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
     $parametersExport_AsAction->setIcon( $icon4 );
     my $parametersAppend_ToAction = Qt::Action($muSRFit4);
     $self->{parametersAppend_ToAction} = $parametersAppend_ToAction;
     $parametersAppend_ToAction->setObjectName( "parametersAppend_ToAction" );
     my $icon5 = Qt::Icon();
-    $icon5->addPixmap(Qt::Pixmap("icos/Append.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
+    $icon5->addPixmap(Qt::Pixmap("../../../../../../.designer/backup/icos/Append.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
     $parametersAppend_ToAction->setIcon( $icon5 );
     my $fit = Qt::Action($muSRFit4);
     $self->{fit} = $fit;
     $fit->setObjectName( "fit" );
     my $icon6 = Qt::Icon();
-    $icon6->addPixmap(Qt::Pixmap("icos/Fit.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
+    $icon6->addPixmap(Qt::Pixmap("../../../../../../.designer/backup/icos/Fit.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
     $fit->setIcon( $icon6 );
     my $plot = Qt::Action($muSRFit4);
     $self->{plot} = $plot;
     $plot->setObjectName( "plot" );
     $plot->setCheckable( 0 );
     my $icon7 = Qt::Icon();
-    $icon7->addPixmap(Qt::Pixmap("icos/Plot.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
+    $icon7->addPixmap(Qt::Pixmap("../../../../../../.designer/backup/icos/Plot.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
     $plot->setIcon( $icon7 );
     my $t0 = Qt::Action($muSRFit4);
     $self->{t0} = $t0;
     $t0->setObjectName( "t0" );
     my $icon8 = Qt::Icon();
-    $icon8->addPixmap(Qt::Pixmap("icos/T0.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
+    $icon8->addPixmap(Qt::Pixmap("../../../../../../.designer/backup/icos/T0.png"), Qt::Icon::Normal(), Qt::Icon::Off() );
     $t0->setIcon( $icon8 );
     my $optionsFourier = Qt::Action($muSRFit4);
     $self->{optionsFourier} = $optionsFourier;
@@ -1103,23 +1111,119 @@ sub setupUi {
     my $runsPage = Qt::Widget(  );
     $self->{runsPage} = $runsPage;
     $runsPage->setObjectName( "runsPage" );
-    my $gridLayout_1 = Qt::GridLayout( $runsPage );
-    $self->{gridLayout_1} = $gridLayout_1;
-    $gridLayout_1->setSpacing( 6 );
-    $gridLayout_1->setMargin( 11 );
-    $gridLayout_1->setObjectName( "gridLayout_1" );
-    my $gridLayout_2 = Qt::GridLayout(  );
-    $self->{gridLayout_2} = $gridLayout_2;
-    $gridLayout_2->setSpacing( 0 );
-    $gridLayout_2->setObjectName( "gridLayout_2" );
-    $gridLayout_2->setSizeConstraint( Qt::Layout::SetMinimumSize() );
-    my $runsMan = Qt::GroupBox( $runsPage );
-    $self->{runsMan} = $runsMan;
-    $runsMan->setObjectName( "runsMan" );
+    my $layoutWidget = Qt::Widget( $runsPage );
+    $self->{layoutWidget} = $layoutWidget;
+    $layoutWidget->setObjectName( "layoutWidget" );
+    $layoutWidget->setGeometry( Qt::Rect(1, 1, 676, 355) );
+    my $verticalLayout_2 = Qt::VBoxLayout( $layoutWidget );
+    $self->{verticalLayout_2} = $verticalLayout_2;
+    $verticalLayout_2->setSpacing( 6 );
+    $verticalLayout_2->setMargin( 11 );
+    $verticalLayout_2->setObjectName( "verticalLayout_2" );
+    $verticalLayout_2->setContentsMargins(0, 0, 0, 0 );
+    my $runsAuto = Qt::GroupBox( $layoutWidget );
+    $self->{runsAuto} = $runsAuto;
+    $runsAuto->setObjectName( "runsAuto" );
     my $sizePolicy1 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Maximum() );
     $self->{$sizePolicy1} = $sizePolicy1;
     $sizePolicy1->setHorizontalStretch( 1 );
     $sizePolicy1->setVerticalStretch( 1 );
+    $sizePolicy1->setHeightForWidth( $runsAuto->sizePolicy()->hasHeightForWidth() );
+    $runsAuto->setSizePolicy( $sizePolicy1 );
+    $runsAuto->setMinimumSize( Qt::Size(0, 100) );
+    $runsAuto->setAlignment( Qt::AlignLeading()|Qt::AlignLeft()|Qt::AlignTop() );
+    my $gridLayout_3 = Qt::GridLayout( $runsAuto );
+    $self->{gridLayout_3} = $gridLayout_3;
+    $gridLayout_3->setSpacing( 6 );
+    $gridLayout_3->setMargin( 11 );
+    $gridLayout_3->setObjectName( "gridLayout_3" );
+    my $runNumbers_2 = Qt::GridLayout(  );
+    $self->{runNumbers_2} = $runNumbers_2;
+    $runNumbers_2->setSpacing( 0 );
+    $runNumbers_2->setObjectName( "runNumbers_2" );
+    $runNumbers_2->setSizeConstraint( Qt::Layout::SetMinimumSize() );
+    $runNumbers_2->setContentsMargins(-1, 0, -1, 0 );
+    my $year = Qt::ComboBox( $runsAuto );
+    $self->{year} = $year;
+    $year->setObjectName( "year" );
+    my $sizePolicy2 = Qt::SizePolicy( Qt::SizePolicy::Fixed(), Qt::SizePolicy::Preferred() );
+    $self->{$sizePolicy2} = $sizePolicy2;
+    $sizePolicy2->setHorizontalStretch( 0 );
+    $sizePolicy2->setVerticalStretch( 0 );
+    $sizePolicy2->setHeightForWidth( $year->sizePolicy()->hasHeightForWidth() );
+    $year->setSizePolicy( $sizePolicy2 );
+    $year->setMinimumSize( Qt::Size(0, 20) );
+    $year->setMaximumSize( Qt::Size(16777215, 25) );
+    $year->setEditable( 0 );
+    $year->setInsertPolicy( Qt::ComboBox::InsertAtTop() );
+    $year->setAutoCompletion( 1 );
+    $year->setDuplicatesEnabled( 0 );
+
+    $runNumbers_2->addWidget( $year, 1, 4, 1, 1 );
+
+    my $runNumbers = Qt::LineEdit( $runsAuto );
+    $self->{runNumbers} = $runNumbers;
+    $runNumbers->setObjectName( "runNumbers" );
+    my $sizePolicy3 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Fixed() );
+    $self->{$sizePolicy3} = $sizePolicy3;
+    $sizePolicy3->setHorizontalStretch( 0 );
+    $sizePolicy3->setVerticalStretch( 0 );
+    $sizePolicy3->setHeightForWidth( $runNumbers->sizePolicy()->hasHeightForWidth() );
+    $runNumbers->setSizePolicy( $sizePolicy3 );
+    $runNumbers->setMinimumSize( Qt::Size(0, 23) );
+    $runNumbers->setMaximumSize( Qt::Size(16777215, 25) );
+    $runNumbers->setAlignment( Qt::AlignLeading()|Qt::AlignLeft()|Qt::AlignTop() );
+
+    $runNumbers_2->addWidget( $runNumbers, 0, 0, 1, 5 );
+
+    my $spacer2 = Qt::SpacerItem( 181, 21, Qt::SizePolicy::Expanding(), Qt::SizePolicy::Minimum() );
+
+    $runNumbers_2->addItem( $spacer2, 1, 0, 1, 1 );
+
+    my $beamLine = Qt::ComboBox( $runsAuto );
+    $self->{beamLine} = $beamLine;
+    $beamLine->setObjectName( "beamLine" );
+    $sizePolicy2->setHeightForWidth( $beamLine->sizePolicy()->hasHeightForWidth() );
+    $beamLine->setSizePolicy( $sizePolicy2 );
+    $beamLine->setMinimumSize( Qt::Size(0, 20) );
+    $beamLine->setMaximumSize( Qt::Size(16777215, 25) );
+
+    $runNumbers_2->addWidget( $beamLine, 1, 2, 1, 1 );
+
+    my $yearLabel = Qt::Label( $runsAuto );
+    $self->{yearLabel} = $yearLabel;
+    $yearLabel->setObjectName( "yearLabel" );
+    my $sizePolicy4 = Qt::SizePolicy( Qt::SizePolicy::Preferred(), Qt::SizePolicy::Preferred() );
+    $self->{$sizePolicy4} = $sizePolicy4;
+    $sizePolicy4->setHorizontalStretch( 0 );
+    $sizePolicy4->setVerticalStretch( 0 );
+    $sizePolicy4->setHeightForWidth( $yearLabel->sizePolicy()->hasHeightForWidth() );
+    $yearLabel->setSizePolicy( $sizePolicy4 );
+    $yearLabel->setMinimumSize( Qt::Size(0, 20) );
+    $yearLabel->setWordWrap( 0 );
+
+    $runNumbers_2->addWidget( $yearLabel, 1, 3, 1, 1 );
+
+    my $beamLineLabel = Qt::Label( $runsAuto );
+    $self->{beamLineLabel} = $beamLineLabel;
+    $beamLineLabel->setObjectName( "beamLineLabel" );
+    $sizePolicy4->setHeightForWidth( $beamLineLabel->sizePolicy()->hasHeightForWidth() );
+    $beamLineLabel->setSizePolicy( $sizePolicy4 );
+    $beamLineLabel->setMinimumSize( Qt::Size(0, 30) );
+    $beamLineLabel->setMaximumSize( Qt::Size(16777215, 30) );
+    $beamLineLabel->setWordWrap( 0 );
+
+    $runNumbers_2->addWidget( $beamLineLabel, 1, 1, 1, 1 );
+
+
+    $gridLayout_3->addLayout( $runNumbers_2, 0, 0, 1, 1 );
+
+
+    $verticalLayout_2->addWidget( $runsAuto );
+
+    my $runsMan = Qt::GroupBox( $layoutWidget );
+    $self->{runsMan} = $runsMan;
+    $runsMan->setObjectName( "runsMan" );
     $sizePolicy1->setHeightForWidth( $runsMan->sizePolicy()->hasHeightForWidth() );
     $runsMan->setSizePolicy( $sizePolicy1 );
     $runsMan->setMinimumSize( Qt::Size(0, 80) );
@@ -1142,12 +1246,8 @@ sub setupUi {
     $self->{runFiles} = $runFiles;
     $runFiles->setObjectName( "runFiles" );
     $runFiles->setEnabled( 1 );
-    my $sizePolicy2 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Fixed() );
-    $self->{$sizePolicy2} = $sizePolicy2;
-    $sizePolicy2->setHorizontalStretch( 0 );
-    $sizePolicy2->setVerticalStretch( 0 );
-    $sizePolicy2->setHeightForWidth( $runFiles->sizePolicy()->hasHeightForWidth() );
-    $runFiles->setSizePolicy( $sizePolicy2 );
+    $sizePolicy3->setHeightForWidth( $runFiles->sizePolicy()->hasHeightForWidth() );
+    $runFiles->setSizePolicy( $sizePolicy3 );
     $runFiles->setMinimumSize( Qt::Size(0, 23) );
     $runFiles->setMaximumSize( Qt::Size(16777215, 25) );
 
@@ -1157,12 +1257,8 @@ sub setupUi {
     $self->{browse} = $browse;
     $browse->setObjectName( "browse" );
     $browse->setEnabled( 1 );
-    my $sizePolicy3 = Qt::SizePolicy( Qt::SizePolicy::Fixed(), Qt::SizePolicy::Preferred() );
-    $self->{$sizePolicy3} = $sizePolicy3;
-    $sizePolicy3->setHorizontalStretch( 0 );
-    $sizePolicy3->setVerticalStretch( 0 );
-    $sizePolicy3->setHeightForWidth( $browse->sizePolicy()->hasHeightForWidth() );
-    $browse->setSizePolicy( $sizePolicy3 );
+    $sizePolicy2->setHeightForWidth( $browse->sizePolicy()->hasHeightForWidth() );
+    $browse->setSizePolicy( $sizePolicy2 );
     $browse->setMinimumSize( Qt::Size(0, 20) );
     $browse->setMaximumSize( Qt::Size(16777215, 25) );
 
@@ -1172,181 +1268,31 @@ sub setupUi {
     $gridLayout_4->addLayout( $runFiles_2, 0, 0, 1, 1 );
 
 
-    $gridLayout_2->addWidget( $runsMan, 1, 0, 1, 1 );
+    $verticalLayout_2->addWidget( $runsMan );
 
-    my $gridLayout_6 = Qt::GridLayout(  );
-    $self->{gridLayout_6} = $gridLayout_6;
-    $gridLayout_6->setSpacing( 6 );
-    $gridLayout_6->setObjectName( "gridLayout_6" );
-    $gridLayout_6->setSizeConstraint( Qt::Layout::SetMinimumSize() );
-    my $fitAsyTypeLabel = Qt::Label( $runsPage );
-    $self->{fitAsyTypeLabel} = $fitAsyTypeLabel;
-    $fitAsyTypeLabel->setObjectName( "fitAsyTypeLabel" );
-    my $sizePolicy4 = Qt::SizePolicy( Qt::SizePolicy::Preferred(), Qt::SizePolicy::Fixed() );
-    $self->{$sizePolicy4} = $sizePolicy4;
-    $sizePolicy4->setHorizontalStretch( 0 );
-    $sizePolicy4->setVerticalStretch( 0 );
-    $sizePolicy4->setHeightForWidth( $fitAsyTypeLabel->sizePolicy()->hasHeightForWidth() );
-    $fitAsyTypeLabel->setSizePolicy( $sizePolicy4 );
-    $fitAsyTypeLabel->setWordWrap( 0 );
-
-    $gridLayout_6->addWidget( $fitAsyTypeLabel, 0, 0, 1, 1 );
-
-    my $fitAsyType = Qt::ComboBox( $runsPage );
-    $self->{fitAsyType} = $fitAsyType;
-    $fitAsyType->setObjectName( "fitAsyType" );
-    $sizePolicy4->setHeightForWidth( $fitAsyType->sizePolicy()->hasHeightForWidth() );
-    $fitAsyType->setSizePolicy( $sizePolicy4 );
-    $fitAsyType->setMinimumSize( Qt::Size(0, 25) );
-    $fitAsyType->setMaximumSize( Qt::Size(16777215, 25) );
-
-    $gridLayout_6->addWidget( $fitAsyType, 0, 1, 1, 1 );
-
-    my $histsLRBFLabel = Qt::Label( $runsPage );
-    $self->{histsLRBFLabel} = $histsLRBFLabel;
-    $histsLRBFLabel->setObjectName( "histsLRBFLabel" );
-    $sizePolicy4->setHeightForWidth( $histsLRBFLabel->sizePolicy()->hasHeightForWidth() );
-    $histsLRBFLabel->setSizePolicy( $sizePolicy4 );
-    $histsLRBFLabel->setWordWrap( 0 );
-
-    $gridLayout_6->addWidget( $histsLRBFLabel, 0, 2, 1, 1 );
-
-    my $histsLRBF = Qt::LineEdit( $runsPage );
-    $self->{histsLRBF} = $histsLRBF;
-    $histsLRBF->setObjectName( "histsLRBF" );
-    $sizePolicy4->setHeightForWidth( $histsLRBF->sizePolicy()->hasHeightForWidth() );
-    $histsLRBF->setSizePolicy( $sizePolicy4 );
-    $histsLRBF->setMinimumSize( Qt::Size(0, 25) );
-    $histsLRBF->setMaximumSize( Qt::Size(16777215, 25) );
-
-    $gridLayout_6->addWidget( $histsLRBF, 0, 3, 1, 1 );
-
-    my $spacer4 = Qt::SpacerItem( 81, 21, Qt::SizePolicy::Expanding(), Qt::SizePolicy::Minimum() );
-
-    $gridLayout_6->addItem( $spacer4, 0, 4, 1, 1 );
-
-
-    $gridLayout_2->addLayout( $gridLayout_6, 3, 0, 1, 1 );
-
-    my $runsAuto = Qt::GroupBox( $runsPage );
-    $self->{runsAuto} = $runsAuto;
-    $runsAuto->setObjectName( "runsAuto" );
-    $sizePolicy1->setHeightForWidth( $runsAuto->sizePolicy()->hasHeightForWidth() );
-    $runsAuto->setSizePolicy( $sizePolicy1 );
-    $runsAuto->setMinimumSize( Qt::Size(0, 100) );
-    $runsAuto->setAlignment( Qt::AlignLeading()|Qt::AlignLeft()|Qt::AlignTop() );
-    my $gridLayout_3 = Qt::GridLayout( $runsAuto );
-    $self->{gridLayout_3} = $gridLayout_3;
-    $gridLayout_3->setSpacing( 6 );
-    $gridLayout_3->setMargin( 11 );
-    $gridLayout_3->setObjectName( "gridLayout_3" );
-    my $runNumbers_2 = Qt::GridLayout(  );
-    $self->{runNumbers_2} = $runNumbers_2;
-    $runNumbers_2->setSpacing( 0 );
-    $runNumbers_2->setObjectName( "runNumbers_2" );
-    $runNumbers_2->setSizeConstraint( Qt::Layout::SetDefaultConstraint() );
-    $runNumbers_2->setContentsMargins(-1, 0, -1, 0 );
-    my $year = Qt::ComboBox( $runsAuto );
-    $self->{year} = $year;
-    $year->setObjectName( "year" );
-    $sizePolicy3->setHeightForWidth( $year->sizePolicy()->hasHeightForWidth() );
-    $year->setSizePolicy( $sizePolicy3 );
-    $year->setMinimumSize( Qt::Size(0, 20) );
-    $year->setMaximumSize( Qt::Size(16777215, 25) );
-    $year->setEditable( 0 );
-    $year->setInsertPolicy( Qt::ComboBox::InsertAtTop() );
-    $year->setAutoCompletion( 1 );
-    $year->setDuplicatesEnabled( 0 );
-
-    $runNumbers_2->addWidget( $year, 1, 4, 1, 1 );
-
-    my $runNumbers = Qt::LineEdit( $runsAuto );
-    $self->{runNumbers} = $runNumbers;
-    $runNumbers->setObjectName( "runNumbers" );
-    $sizePolicy2->setHeightForWidth( $runNumbers->sizePolicy()->hasHeightForWidth() );
-    $runNumbers->setSizePolicy( $sizePolicy2 );
-    $runNumbers->setMinimumSize( Qt::Size(0, 23) );
-    $runNumbers->setMaximumSize( Qt::Size(16777215, 25) );
-    $runNumbers->setAlignment( Qt::AlignLeading()|Qt::AlignLeft()|Qt::AlignTop() );
-
-    $runNumbers_2->addWidget( $runNumbers, 0, 0, 1, 5 );
-
-    my $spacer2 = Qt::SpacerItem( 181, 21, Qt::SizePolicy::Expanding(), Qt::SizePolicy::Minimum() );
-
-    $runNumbers_2->addItem( $spacer2, 1, 0, 1, 1 );
-
-    my $beamLine = Qt::ComboBox( $runsAuto );
-    $self->{beamLine} = $beamLine;
-    $beamLine->setObjectName( "beamLine" );
-    $sizePolicy3->setHeightForWidth( $beamLine->sizePolicy()->hasHeightForWidth() );
-    $beamLine->setSizePolicy( $sizePolicy3 );
-    $beamLine->setMinimumSize( Qt::Size(0, 20) );
-    $beamLine->setMaximumSize( Qt::Size(16777215, 25) );
-
-    $runNumbers_2->addWidget( $beamLine, 1, 2, 1, 1 );
-
-    my $yearLabel = Qt::Label( $runsAuto );
-    $self->{yearLabel} = $yearLabel;
-    $yearLabel->setObjectName( "yearLabel" );
-    my $sizePolicy5 = Qt::SizePolicy( Qt::SizePolicy::Preferred(), Qt::SizePolicy::Preferred() );
-    $self->{$sizePolicy5} = $sizePolicy5;
-    $sizePolicy5->setHorizontalStretch( 0 );
-    $sizePolicy5->setVerticalStretch( 0 );
-    $sizePolicy5->setHeightForWidth( $yearLabel->sizePolicy()->hasHeightForWidth() );
-    $yearLabel->setSizePolicy( $sizePolicy5 );
-    $yearLabel->setMinimumSize( Qt::Size(0, 20) );
-    $yearLabel->setWordWrap( 0 );
-
-    $runNumbers_2->addWidget( $yearLabel, 1, 3, 1, 1 );
-
-    my $beamLineLabel = Qt::Label( $runsAuto );
-    $self->{beamLineLabel} = $beamLineLabel;
-    $beamLineLabel->setObjectName( "beamLineLabel" );
-    $sizePolicy5->setHeightForWidth( $beamLineLabel->sizePolicy()->hasHeightForWidth() );
-    $beamLineLabel->setSizePolicy( $sizePolicy5 );
-    $beamLineLabel->setMinimumSize( Qt::Size(0, 30) );
-    $beamLineLabel->setMaximumSize( Qt::Size(16777215, 30) );
-    $beamLineLabel->setWordWrap( 0 );
-
-    $runNumbers_2->addWidget( $beamLineLabel, 1, 1, 1, 1 );
-
-
-    $gridLayout_3->addLayout( $runNumbers_2, 0, 0, 1, 1 );
-
-
-    $gridLayout_2->addWidget( $runsAuto, 0, 0, 1, 1 );
-
-    my $groupBox = Qt::GroupBox( $runsPage );
-    $self->{groupBox} = $groupBox;
-    $groupBox->setObjectName( "groupBox" );
-    my $sizePolicy6 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Expanding() );
-    $self->{$sizePolicy6} = $sizePolicy6;
-    $sizePolicy6->setHorizontalStretch( 0 );
-    $sizePolicy6->setVerticalStretch( 0 );
-    $sizePolicy6->setHeightForWidth( $groupBox->sizePolicy()->hasHeightForWidth() );
-    $groupBox->setSizePolicy( $sizePolicy6 );
-    $groupBox->setMinimumSize( Qt::Size(0, 220) );
-    $groupBox->setBaseSize( Qt::Size(0, 0) );
-    $groupBox->setAlignment( Qt::AlignLeading()|Qt::AlignLeft()|Qt::AlignVCenter() );
-    my $textLabel1_4_2_3 = Qt::Label( $groupBox );
-    $self->{textLabel1_4_2_3} = $textLabel1_4_2_3;
-    $textLabel1_4_2_3->setObjectName( "textLabel1_4_2_3" );
-    $textLabel1_4_2_3->setGeometry( Qt::Rect(430, 170, 130, 16) );
-    $textLabel1_4_2_3->setWordWrap( 0 );
-    my $layoutWidget = Qt::Widget( $groupBox );
-    $self->{layoutWidget} = $layoutWidget;
-    $layoutWidget->setObjectName( "layoutWidget" );
-    $layoutWidget->setGeometry( Qt::Rect(10, 30, 641, 181) );
-    my $gridLayout1 = Qt::GridLayout( $layoutWidget );
-    $self->{gridLayout1} = $gridLayout1;
-    $gridLayout1->setSpacing( 6 );
-    $gridLayout1->setMargin( 11 );
-    $gridLayout1->setObjectName( "gridLayout1" );
-    $gridLayout1->setSizeConstraint( Qt::Layout::SetMinimumSize() );
-    $gridLayout1->setContentsMargins(0, 0, 0, 0 );
+    my $horizontalLayout_3 = Qt::HBoxLayout(  );
+    $self->{horizontalLayout_3} = $horizontalLayout_3;
+    $horizontalLayout_3->setSpacing( 6 );
+    $horizontalLayout_3->setObjectName( "horizontalLayout_3" );
+    my $verticalLayout = Qt::VBoxLayout(  );
+    $self->{verticalLayout} = $verticalLayout;
+    $verticalLayout->setSpacing( 6 );
+    $verticalLayout->setObjectName( "verticalLayout" );
+    my $horizontalLayout_2 = Qt::HBoxLayout(  );
+    $self->{horizontalLayout_2} = $horizontalLayout_2;
+    $horizontalLayout_2->setSpacing( 6 );
+    $horizontalLayout_2->setObjectName( "horizontalLayout_2" );
     my $comp1Label = Qt::Label( $layoutWidget );
     $self->{comp1Label} = $comp1Label;
     $comp1Label->setObjectName( "comp1Label" );
+    my $sizePolicy5 = Qt::SizePolicy( Qt::SizePolicy::Preferred(), Qt::SizePolicy::Fixed() );
+    $self->{$sizePolicy5} = $sizePolicy5;
+    $sizePolicy5->setHorizontalStretch( 0 );
+    $sizePolicy5->setVerticalStretch( 0 );
+    $sizePolicy5->setHeightForWidth( $comp1Label->sizePolicy()->hasHeightForWidth() );
+    $comp1Label->setSizePolicy( $sizePolicy5 );
+    $comp1Label->setMinimumSize( Qt::Size(0, 25) );
+    $comp1Label->setMaximumSize( Qt::Size(16777215, 25) );
     my $palette = Qt::Palette();
     my $brush = Qt::Brush(Qt::Color(0, 0, 0, 255));
     $brush->setStyle( Qt::SolidPattern() );
@@ -1419,324 +1365,303 @@ sub setupUi {
     $palette->setBrush(Qt::Palette::Disabled(), Qt::Palette::Link(), $brush8);
     $palette->setBrush(Qt::Palette::Disabled(), Qt::Palette::LinkVisited(), $brush9);
     $comp1Label->setPalette( $palette );
+    $comp1Label->setAlignment( Qt::AlignLeading()|Qt::AlignLeft()|Qt::AlignVCenter() );
     $comp1Label->setWordWrap( 0 );
 
-    $gridLayout1->addWidget( $comp1Label, 0, 0, 1, 1 );
+    $horizontalLayout_2->addWidget( $comp1Label );
 
-    my $tisLabel = Qt::Label( $layoutWidget );
+    my $numComps = Qt::SpinBox( $layoutWidget );
+    $self->{numComps} = $numComps;
+    $numComps->setObjectName( "numComps" );
+    $numComps->setMinimumSize( Qt::Size(0, 25) );
+    $numComps->setMaximumSize( Qt::Size(16777215, 25) );
+    $numComps->setMinimum( 1 );
+
+    $horizontalLayout_2->addWidget( $numComps );
+
+
+    $verticalLayout->addLayout( $horizontalLayout_2 );
+
+    my $theoryFunction = Qt::ScrollArea( $layoutWidget );
+    $self->{theoryFunction} = $theoryFunction;
+    $theoryFunction->setObjectName( "theoryFunction" );
+    my $sizePolicy6 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Expanding() );
+    $self->{$sizePolicy6} = $sizePolicy6;
+    $sizePolicy6->setHorizontalStretch( 0 );
+    $sizePolicy6->setVerticalStretch( 0 );
+    $sizePolicy6->setHeightForWidth( $theoryFunction->sizePolicy()->hasHeightForWidth() );
+    $theoryFunction->setSizePolicy( $sizePolicy6 );
+    $theoryFunction->setMinimumSize( Qt::Size(280, 0) );
+    $theoryFunction->setVerticalScrollBarPolicy( Qt::ScrollBarAsNeeded() );
+    $theoryFunction->setWidgetResizable( 1 );
+    my $scrollAreaWidgetContents = Qt::Widget(  );
+    $self->{scrollAreaWidgetContents} = $scrollAreaWidgetContents;
+    $scrollAreaWidgetContents->setObjectName( "scrollAreaWidgetContents" );
+    $scrollAreaWidgetContents->setGeometry( Qt::Rect(0, 0, 276, 70) );
+    my $columnView = Qt::VBoxLayout( $scrollAreaWidgetContents );
+    $self->{columnView} = $columnView;
+    $columnView->setObjectName( "columnView" );
+    $columnView->setGeometry( Qt::Rect(10, 10, 261, 151) );
+    $theoryFunction->setWidget( $scrollAreaWidgetContents );
+
+    $verticalLayout->addWidget( $theoryFunction );
+
+
+    $horizontalLayout_3->addLayout( $verticalLayout );
+
+    my $scrollArea = Qt::ScrollArea( $layoutWidget );
+    $self->{scrollArea} = $scrollArea;
+    $scrollArea->setObjectName( "scrollArea" );
+    my $sizePolicy7 = Qt::SizePolicy( Qt::SizePolicy::Minimum(), Qt::SizePolicy::Minimum() );
+    $self->{$sizePolicy7} = $sizePolicy7;
+    $sizePolicy7->setHorizontalStretch( 0 );
+    $sizePolicy7->setVerticalStretch( 0 );
+    $sizePolicy7->setHeightForWidth( $scrollArea->sizePolicy()->hasHeightForWidth() );
+    $scrollArea->setSizePolicy( $sizePolicy7 );
+    $scrollArea->setMinimumSize( Qt::Size(384, 0) );
+    $scrollArea->setWidgetResizable( 1 );
+    my $scrollAreaWidgetContents_2 = Qt::Widget(  );
+    $self->{scrollAreaWidgetContents_2} = $scrollAreaWidgetContents_2;
+    $scrollAreaWidgetContents_2->setObjectName( "scrollAreaWidgetContents_2" );
+    $scrollAreaWidgetContents_2->setGeometry( Qt::Rect(0, 0, 380, 105) );
+    my $layoutWidget2 = Qt::Widget( $scrollAreaWidgetContents_2 );
+    $self->{layoutWidget2} = $layoutWidget2;
+    $layoutWidget2->setObjectName( "layoutWidget2" );
+    $layoutWidget2->setGeometry( Qt::Rect(10, 10, 355, 180) );
+    my $gridLayout_1 = Qt::GridLayout( $layoutWidget2 );
+    $self->{gridLayout_1} = $gridLayout_1;
+    $gridLayout_1->setSpacing( 6 );
+    $gridLayout_1->setMargin( 11 );
+    $gridLayout_1->setObjectName( "gridLayout_1" );
+    $gridLayout_1->setContentsMargins(5, 0, 5, 0 );
+    my $tisLabel = Qt::Label( $layoutWidget2 );
     $self->{tisLabel} = $tisLabel;
     $tisLabel->setObjectName( "tisLabel" );
-    $sizePolicy4->setHeightForWidth( $tisLabel->sizePolicy()->hasHeightForWidth() );
-    $tisLabel->setSizePolicy( $sizePolicy4 );
+    $sizePolicy5->setHeightForWidth( $tisLabel->sizePolicy()->hasHeightForWidth() );
+    $tisLabel->setSizePolicy( $sizePolicy5 );
     $tisLabel->setWordWrap( 0 );
 
-    $gridLayout1->addWidget( $tisLabel, 0, 1, 1, 1 );
+    $gridLayout_1->addWidget( $tisLabel, 0, 0, 1, 1 );
 
-    my $tfsLabel = Qt::Label( $layoutWidget );
+    my $tfsLabel = Qt::Label( $layoutWidget2 );
     $self->{tfsLabel} = $tfsLabel;
     $tfsLabel->setObjectName( "tfsLabel" );
-    $sizePolicy4->setHeightForWidth( $tfsLabel->sizePolicy()->hasHeightForWidth() );
-    $tfsLabel->setSizePolicy( $sizePolicy4 );
+    $sizePolicy5->setHeightForWidth( $tfsLabel->sizePolicy()->hasHeightForWidth() );
+    $tfsLabel->setSizePolicy( $sizePolicy5 );
     $tfsLabel->setWordWrap( 0 );
 
-    $gridLayout1->addWidget( $tfsLabel, 0, 2, 1, 1 );
+    $gridLayout_1->addWidget( $tfsLabel, 0, 1, 1, 1 );
 
-    my $binsLabel = Qt::Label( $layoutWidget );
+    my $binsLabel = Qt::Label( $layoutWidget2 );
     $self->{binsLabel} = $binsLabel;
     $binsLabel->setObjectName( "binsLabel" );
-    $sizePolicy4->setHeightForWidth( $binsLabel->sizePolicy()->hasHeightForWidth() );
-    $binsLabel->setSizePolicy( $sizePolicy4 );
+    $sizePolicy5->setHeightForWidth( $binsLabel->sizePolicy()->hasHeightForWidth() );
+    $binsLabel->setSizePolicy( $sizePolicy5 );
     $binsLabel->setWordWrap( 0 );
 
-    $gridLayout1->addWidget( $binsLabel, 0, 3, 1, 1 );
+    $gridLayout_1->addWidget( $binsLabel, 0, 2, 1, 1 );
 
-    my $fitType1 = Qt::ComboBox( $layoutWidget );
-    $self->{fitType1} = $fitType1;
-    $fitType1->setObjectName( "fitType1" );
-    $sizePolicy2->setHeightForWidth( $fitType1->sizePolicy()->hasHeightForWidth() );
-    $fitType1->setSizePolicy( $sizePolicy2 );
-    $fitType1->setMinimumSize( Qt::Size(0, 25) );
-    $fitType1->setMaximumSize( Qt::Size(16777215, 25) );
-    $fitType1->setAutoCompletion( 0 );
-    $fitType1->setDuplicatesEnabled( 0 );
-
-    $gridLayout1->addWidget( $fitType1, 1, 0, 1, 1 );
-
-    my $tis = Qt::LineEdit( $layoutWidget );
+    my $tis = Qt::LineEdit( $layoutWidget2 );
     $self->{tis} = $tis;
     $tis->setObjectName( "tis" );
-    $sizePolicy2->setHeightForWidth( $tis->sizePolicy()->hasHeightForWidth() );
-    $tis->setSizePolicy( $sizePolicy2 );
+    $sizePolicy3->setHeightForWidth( $tis->sizePolicy()->hasHeightForWidth() );
+    $tis->setSizePolicy( $sizePolicy3 );
     $tis->setMinimumSize( Qt::Size(0, 25) );
     $tis->setMaximumSize( Qt::Size(16777215, 25) );
 
-    $gridLayout1->addWidget( $tis, 1, 1, 1, 1 );
+    $gridLayout_1->addWidget( $tis, 1, 0, 1, 1 );
 
-    my $tfs = Qt::LineEdit( $layoutWidget );
+    my $tfs = Qt::LineEdit( $layoutWidget2 );
     $self->{tfs} = $tfs;
     $tfs->setObjectName( "tfs" );
-    $sizePolicy2->setHeightForWidth( $tfs->sizePolicy()->hasHeightForWidth() );
-    $tfs->setSizePolicy( $sizePolicy2 );
+    $sizePolicy3->setHeightForWidth( $tfs->sizePolicy()->hasHeightForWidth() );
+    $tfs->setSizePolicy( $sizePolicy3 );
     $tfs->setMinimumSize( Qt::Size(0, 25) );
     $tfs->setMaximumSize( Qt::Size(16777215, 25) );
 
-    $gridLayout1->addWidget( $tfs, 1, 2, 1, 1 );
+    $gridLayout_1->addWidget( $tfs, 1, 1, 1, 1 );
 
-    my $bins = Qt::LineEdit( $layoutWidget );
+    my $bins = Qt::LineEdit( $layoutWidget2 );
     $self->{bins} = $bins;
     $bins->setObjectName( "bins" );
-    $sizePolicy2->setHeightForWidth( $bins->sizePolicy()->hasHeightForWidth() );
-    $bins->setSizePolicy( $sizePolicy2 );
+    $sizePolicy3->setHeightForWidth( $bins->sizePolicy()->hasHeightForWidth() );
+    $bins->setSizePolicy( $sizePolicy3 );
     $bins->setMinimumSize( Qt::Size(0, 25) );
     $bins->setMaximumSize( Qt::Size(16777215, 25) );
 
-    $gridLayout1->addWidget( $bins, 1, 3, 1, 1 );
+    $gridLayout_1->addWidget( $bins, 1, 2, 1, 1 );
 
-    my $comp2Label = Qt::Label( $layoutWidget );
-    $self->{comp2Label} = $comp2Label;
-    $comp2Label->setObjectName( "comp2Label" );
-    $comp2Label->setMinimumSize( Qt::Size(0, 25) );
-    my $palette1 = Qt::Palette();
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::WindowText(), $brush);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Button(), $brush1);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Light(), $brush2);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Midlight(), $brush3);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Dark(), $brush4);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Mid(), $brush5);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Text(), $brush);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::BrightText(), $brush2);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::ButtonText(), $brush);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Base(), $brush2);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Window(), $brush6);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Shadow(), $brush);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Highlight(), $brush7);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::HighlightedText(), $brush2);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Link(), $brush);
-    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::LinkVisited(), $brush);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::WindowText(), $brush);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Button(), $brush1);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Light(), $brush2);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Midlight(), $brush2);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Dark(), $brush4);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Mid(), $brush5);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Text(), $brush);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::BrightText(), $brush2);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::ButtonText(), $brush);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Base(), $brush2);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Window(), $brush6);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Shadow(), $brush);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Highlight(), $brush7);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::HighlightedText(), $brush2);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Link(), $brush8);
-    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::LinkVisited(), $brush9);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::WindowText(), $brush10);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Button(), $brush1);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Light(), $brush2);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Midlight(), $brush2);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Dark(), $brush4);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Mid(), $brush5);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Text(), $brush10);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::BrightText(), $brush2);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::ButtonText(), $brush10);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Base(), $brush2);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Window(), $brush6);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Shadow(), $brush);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Highlight(), $brush7);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::HighlightedText(), $brush2);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Link(), $brush8);
-    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::LinkVisited(), $brush9);
-    $comp2Label->setPalette( $palette1 );
-    $comp2Label->setWordWrap( 0 );
-
-    $gridLayout1->addWidget( $comp2Label, 2, 0, 1, 1 );
-
-    my $textLabel1_4 = Qt::Label( $layoutWidget );
+    my $textLabel1_4 = Qt::Label( $layoutWidget2 );
     $self->{textLabel1_4} = $textLabel1_4;
     $textLabel1_4->setObjectName( "textLabel1_4" );
+    my $sizePolicy8 = Qt::SizePolicy( Qt::SizePolicy::Preferred(), Qt::SizePolicy::Minimum() );
+    $self->{$sizePolicy8} = $sizePolicy8;
+    $sizePolicy8->setHorizontalStretch( 0 );
+    $sizePolicy8->setVerticalStretch( 0 );
+    $sizePolicy8->setHeightForWidth( $textLabel1_4->sizePolicy()->hasHeightForWidth() );
+    $textLabel1_4->setSizePolicy( $sizePolicy8 );
     $textLabel1_4->setMinimumSize( Qt::Size(0, 25) );
     $textLabel1_4->setWordWrap( 0 );
 
-    $gridLayout1->addWidget( $textLabel1_4, 2, 1, 1, 1 );
+    $gridLayout_1->addWidget( $textLabel1_4, 2, 0, 1, 1 );
 
-    my $textLabel1_8 = Qt::Label( $layoutWidget );
+    my $textLabel1_8 = Qt::Label( $layoutWidget2 );
     $self->{textLabel1_8} = $textLabel1_8;
     $textLabel1_8->setObjectName( "textLabel1_8" );
+    $sizePolicy8->setHeightForWidth( $textLabel1_8->sizePolicy()->hasHeightForWidth() );
+    $textLabel1_8->setSizePolicy( $sizePolicy8 );
     $textLabel1_8->setMinimumSize( Qt::Size(0, 25) );
     $textLabel1_8->setWordWrap( 0 );
 
-    $gridLayout1->addWidget( $textLabel1_8, 2, 2, 1, 1 );
+    $gridLayout_1->addWidget( $textLabel1_8, 2, 1, 1, 1 );
 
-    my $textLabel1_4_2_2 = Qt::Label( $layoutWidget );
+    my $textLabel1_4_2_2 = Qt::Label( $layoutWidget2 );
     $self->{textLabel1_4_2_2} = $textLabel1_4_2_2;
     $textLabel1_4_2_2->setObjectName( "textLabel1_4_2_2" );
+    $sizePolicy8->setHeightForWidth( $textLabel1_4_2_2->sizePolicy()->hasHeightForWidth() );
+    $textLabel1_4_2_2->setSizePolicy( $sizePolicy8 );
     $textLabel1_4_2_2->setMinimumSize( Qt::Size(0, 25) );
     $textLabel1_4_2_2->setWordWrap( 0 );
 
-    $gridLayout1->addWidget( $textLabel1_4_2_2, 2, 3, 1, 1 );
+    $gridLayout_1->addWidget( $textLabel1_4_2_2, 2, 2, 1, 1 );
 
-    my $fitType2 = Qt::ComboBox( $layoutWidget );
-    $self->{fitType2} = $fitType2;
-    $fitType2->setObjectName( "fitType2" );
-    $sizePolicy2->setHeightForWidth( $fitType2->sizePolicy()->hasHeightForWidth() );
-    $fitType2->setSizePolicy( $sizePolicy2 );
-    $fitType2->setMinimumSize( Qt::Size(0, 25) );
-    $fitType2->setMaximumSize( Qt::Size(16777215, 25) );
-
-    $gridLayout1->addWidget( $fitType2, 3, 0, 1, 1 );
-
-    my $xi = Qt::LineEdit( $layoutWidget );
+    my $xi = Qt::LineEdit( $layoutWidget2 );
     $self->{xi} = $xi;
     $xi->setObjectName( "xi" );
     $xi->setMinimumSize( Qt::Size(0, 25) );
 
-    $gridLayout1->addWidget( $xi, 3, 1, 1, 1 );
+    $gridLayout_1->addWidget( $xi, 3, 0, 1, 1 );
 
-    my $xf = Qt::LineEdit( $layoutWidget );
+    my $xf = Qt::LineEdit( $layoutWidget2 );
     $self->{xf} = $xf;
     $xf->setObjectName( "xf" );
     $xf->setMinimumSize( Qt::Size(0, 25) );
 
-    $gridLayout1->addWidget( $xf, 3, 2, 1, 1 );
+    $gridLayout_1->addWidget( $xf, 3, 1, 1, 1 );
 
-    my $viewBin = Qt::LineEdit( $layoutWidget );
+    my $viewBin = Qt::LineEdit( $layoutWidget2 );
     $self->{viewBin} = $viewBin;
     $viewBin->setObjectName( "viewBin" );
     $viewBin->setMinimumSize( Qt::Size(0, 25) );
 
-    $gridLayout1->addWidget( $viewBin, 3, 3, 1, 1 );
+    $gridLayout_1->addWidget( $viewBin, 3, 2, 1, 1 );
 
-    my $comp3Label = Qt::Label( $layoutWidget );
-    $self->{comp3Label} = $comp3Label;
-    $comp3Label->setObjectName( "comp3Label" );
-    my $palette2 = Qt::Palette();
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::WindowText(), $brush);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Button(), $brush1);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Light(), $brush2);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Midlight(), $brush3);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Dark(), $brush4);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Mid(), $brush5);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Text(), $brush);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::BrightText(), $brush2);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::ButtonText(), $brush);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Base(), $brush2);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Window(), $brush6);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Shadow(), $brush);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Highlight(), $brush7);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::HighlightedText(), $brush2);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Link(), $brush);
-    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::LinkVisited(), $brush);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::WindowText(), $brush);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Button(), $brush1);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Light(), $brush2);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Midlight(), $brush2);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Dark(), $brush4);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Mid(), $brush5);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Text(), $brush);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::BrightText(), $brush2);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::ButtonText(), $brush);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Base(), $brush2);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Window(), $brush6);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Shadow(), $brush);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Highlight(), $brush7);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::HighlightedText(), $brush2);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Link(), $brush8);
-    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::LinkVisited(), $brush9);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::WindowText(), $brush10);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Button(), $brush1);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Light(), $brush2);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Midlight(), $brush2);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Dark(), $brush4);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Mid(), $brush5);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Text(), $brush10);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::BrightText(), $brush2);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::ButtonText(), $brush10);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Base(), $brush2);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Window(), $brush6);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Shadow(), $brush);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Highlight(), $brush7);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::HighlightedText(), $brush2);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Link(), $brush8);
-    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::LinkVisited(), $brush9);
-    $comp3Label->setPalette( $palette2 );
-    $comp3Label->setWordWrap( 0 );
-
-    $gridLayout1->addWidget( $comp3Label, 4, 0, 1, 1 );
-
-    my $textLabel1_4_2 = Qt::Label( $layoutWidget );
+    my $textLabel1_4_2 = Qt::Label( $layoutWidget2 );
     $self->{textLabel1_4_2} = $textLabel1_4_2;
     $textLabel1_4_2->setObjectName( "textLabel1_4_2" );
     $textLabel1_4_2->setMinimumSize( Qt::Size(0, 25) );
     $textLabel1_4_2->setWordWrap( 0 );
 
-    $gridLayout1->addWidget( $textLabel1_4_2, 4, 1, 1, 1 );
+    $gridLayout_1->addWidget( $textLabel1_4_2, 4, 0, 1, 1 );
 
-    my $textLabel1_4_3 = Qt::Label( $layoutWidget );
+    my $textLabel1_4_3 = Qt::Label( $layoutWidget2 );
     $self->{textLabel1_4_3} = $textLabel1_4_3;
     $textLabel1_4_3->setObjectName( "textLabel1_4_3" );
     $textLabel1_4_3->setMinimumSize( Qt::Size(0, 25) );
     $textLabel1_4_3->setWordWrap( 0 );
 
-    $gridLayout1->addWidget( $textLabel1_4_3, 4, 2, 1, 1 );
+    $gridLayout_1->addWidget( $textLabel1_4_3, 4, 1, 1, 1 );
 
-    my $textLabel1_4_4 = Qt::Label( $layoutWidget );
+    my $textLabel1_4_4 = Qt::Label( $layoutWidget2 );
     $self->{textLabel1_4_4} = $textLabel1_4_4;
     $textLabel1_4_4->setObjectName( "textLabel1_4_4" );
-    $sizePolicy2->setHeightForWidth( $textLabel1_4_4->sizePolicy()->hasHeightForWidth() );
-    $textLabel1_4_4->setSizePolicy( $sizePolicy2 );
+    $sizePolicy3->setHeightForWidth( $textLabel1_4_4->sizePolicy()->hasHeightForWidth() );
+    $textLabel1_4_4->setSizePolicy( $sizePolicy3 );
     $textLabel1_4_4->setMinimumSize( Qt::Size(0, 25) );
     $textLabel1_4_4->setWordWrap( 0 );
 
-    $gridLayout1->addWidget( $textLabel1_4_4, 4, 3, 1, 1 );
+    $gridLayout_1->addWidget( $textLabel1_4_4, 4, 2, 1, 1 );
 
-    my $fitType3 = Qt::ComboBox( $layoutWidget );
-    $self->{fitType3} = $fitType3;
-    $fitType3->setObjectName( "fitType3" );
-    $sizePolicy2->setHeightForWidth( $fitType3->sizePolicy()->hasHeightForWidth() );
-    $fitType3->setSizePolicy( $sizePolicy2 );
-    $fitType3->setMinimumSize( Qt::Size(0, 25) );
-    $fitType3->setMaximumSize( Qt::Size(16777215, 25) );
-
-    $gridLayout1->addWidget( $fitType3, 5, 0, 1, 1 );
-
-    my $yi = Qt::LineEdit( $layoutWidget );
+    my $yi = Qt::LineEdit( $layoutWidget2 );
     $self->{yi} = $yi;
     $yi->setObjectName( "yi" );
     $yi->setMinimumSize( Qt::Size(0, 25) );
 
-    $gridLayout1->addWidget( $yi, 5, 1, 1, 1 );
+    $gridLayout_1->addWidget( $yi, 5, 0, 1, 1 );
 
-    my $yf = Qt::LineEdit( $layoutWidget );
+    my $yf = Qt::LineEdit( $layoutWidget2 );
     $self->{yf} = $yf;
     $yf->setObjectName( "yf" );
     $yf->setMinimumSize( Qt::Size(0, 25) );
 
-    $gridLayout1->addWidget( $yf, 5, 2, 1, 1 );
+    $gridLayout_1->addWidget( $yf, 5, 1, 1, 1 );
 
-    my $ltc = Qt::CheckBox( $layoutWidget );
+    my $ltc = Qt::CheckBox( $layoutWidget2 );
     $self->{ltc} = $ltc;
     $ltc->setObjectName( "ltc" );
-    $sizePolicy2->setHeightForWidth( $ltc->sizePolicy()->hasHeightForWidth() );
-    $ltc->setSizePolicy( $sizePolicy2 );
+    $sizePolicy3->setHeightForWidth( $ltc->sizePolicy()->hasHeightForWidth() );
+    $ltc->setSizePolicy( $sizePolicy3 );
     $ltc->setMinimumSize( Qt::Size(0, 25) );
     $ltc->setChecked( 1 );
 
-    $gridLayout1->addWidget( $ltc, 5, 3, 1, 1 );
+    $gridLayout_1->addWidget( $ltc, 5, 2, 1, 1 );
+
+    $scrollArea->setWidget( $scrollAreaWidgetContents_2 );
+
+    $horizontalLayout_3->addWidget( $scrollArea );
 
 
-    $gridLayout_2->addWidget( $groupBox, 2, 0, 1, 1 );
+    $verticalLayout_2->addLayout( $horizontalLayout_3 );
+
+    my $gridLayout_6 = Qt::GridLayout(  );
+    $self->{gridLayout_6} = $gridLayout_6;
+    $gridLayout_6->setSpacing( 6 );
+    $gridLayout_6->setObjectName( "gridLayout_6" );
+    $gridLayout_6->setSizeConstraint( Qt::Layout::SetMinimumSize() );
+    my $fitAsyTypeLabel = Qt::Label( $layoutWidget );
+    $self->{fitAsyTypeLabel} = $fitAsyTypeLabel;
+    $fitAsyTypeLabel->setObjectName( "fitAsyTypeLabel" );
+    $sizePolicy5->setHeightForWidth( $fitAsyTypeLabel->sizePolicy()->hasHeightForWidth() );
+    $fitAsyTypeLabel->setSizePolicy( $sizePolicy5 );
+    $fitAsyTypeLabel->setWordWrap( 0 );
+
+    $gridLayout_6->addWidget( $fitAsyTypeLabel, 0, 0, 1, 1 );
+
+    my $fitAsyType = Qt::ComboBox( $layoutWidget );
+    $self->{fitAsyType} = $fitAsyType;
+    $fitAsyType->setObjectName( "fitAsyType" );
+    $sizePolicy5->setHeightForWidth( $fitAsyType->sizePolicy()->hasHeightForWidth() );
+    $fitAsyType->setSizePolicy( $sizePolicy5 );
+    $fitAsyType->setMinimumSize( Qt::Size(0, 25) );
+    $fitAsyType->setMaximumSize( Qt::Size(16777215, 25) );
+
+    $gridLayout_6->addWidget( $fitAsyType, 0, 1, 1, 1 );
+
+    my $histsLRBFLabel = Qt::Label( $layoutWidget );
+    $self->{histsLRBFLabel} = $histsLRBFLabel;
+    $histsLRBFLabel->setObjectName( "histsLRBFLabel" );
+    $sizePolicy5->setHeightForWidth( $histsLRBFLabel->sizePolicy()->hasHeightForWidth() );
+    $histsLRBFLabel->setSizePolicy( $sizePolicy5 );
+    $histsLRBFLabel->setWordWrap( 0 );
+
+    $gridLayout_6->addWidget( $histsLRBFLabel, 0, 2, 1, 1 );
+
+    my $histsLRBF = Qt::LineEdit( $layoutWidget );
+    $self->{histsLRBF} = $histsLRBF;
+    $histsLRBF->setObjectName( "histsLRBF" );
+    $sizePolicy5->setHeightForWidth( $histsLRBF->sizePolicy()->hasHeightForWidth() );
+    $histsLRBF->setSizePolicy( $sizePolicy5 );
+    $histsLRBF->setMinimumSize( Qt::Size(0, 25) );
+    $histsLRBF->setMaximumSize( Qt::Size(16777215, 25) );
+
+    $gridLayout_6->addWidget( $histsLRBF, 0, 3, 1, 1 );
+
+    my $spacer4 = Qt::SpacerItem( 81, 21, Qt::SizePolicy::Expanding(), Qt::SizePolicy::Minimum() );
+
+    $gridLayout_6->addItem( $spacer4, 0, 4, 1, 1 );
 
 
-    $gridLayout_1->addLayout( $gridLayout_2, 0, 0, 1, 1 );
+    $verticalLayout_2->addLayout( $gridLayout_6 );
 
     $musrfit_tabs->addTab( $runsPage, Qt::Application::translate( 'MuSRFit4', "RUNS", undef, Qt::Application::UnicodeUTF8() ) );
     my $fittingPage = Qt::Widget(  );
     $self->{fittingPage} = $fittingPage;
     $fittingPage->setObjectName( "fittingPage" );
-    my $gridLayout2 = Qt::GridLayout( $fittingPage );
-    $self->{gridLayout2} = $gridLayout2;
-    $gridLayout2->setSpacing( 6 );
-    $gridLayout2->setMargin( 11 );
-    $gridLayout2->setObjectName( "gridLayout2" );
+    my $gridLayout1 = Qt::GridLayout( $fittingPage );
+    $self->{gridLayout1} = $gridLayout1;
+    $gridLayout1->setSpacing( 6 );
+    $gridLayout1->setMargin( 11 );
+    $gridLayout1->setObjectName( "gridLayout1" );
     my $fitGrid = Qt::VBoxLayout(  );
     $self->{fitGrid} = $fitGrid;
     $fitGrid->setSpacing( 6 );
@@ -1781,23 +1706,23 @@ sub setupUi {
     $fitGrid->addLayout( $fitLayout );
 
 
-    $gridLayout2->addLayout( $fitGrid, 0, 0, 1, 1 );
+    $gridLayout1->addLayout( $fitGrid, 0, 0, 1, 1 );
 
     my $fitTextOutput = Qt::TextEdit( $fittingPage );
     $self->{fitTextOutput} = $fitTextOutput;
     $fitTextOutput->setObjectName( "fitTextOutput" );
 
-    $gridLayout2->addWidget( $fitTextOutput, 1, 0, 1, 1 );
+    $gridLayout1->addWidget( $fitTextOutput, 1, 0, 1, 1 );
 
     $musrfit_tabs->addTab( $fittingPage, Qt::Application::translate( 'MuSRFit4', "Fitting", undef, Qt::Application::UnicodeUTF8() ) );
     my $sharingPage = Qt::Widget(  );
     $self->{sharingPage} = $sharingPage;
     $sharingPage->setObjectName( "sharingPage" );
-    my $gridLayout3 = Qt::GridLayout( $sharingPage );
-    $self->{gridLayout3} = $gridLayout3;
-    $gridLayout3->setSpacing( 6 );
-    $gridLayout3->setMargin( 11 );
-    $gridLayout3->setObjectName( "gridLayout3" );
+    my $gridLayout2 = Qt::GridLayout( $sharingPage );
+    $self->{gridLayout2} = $gridLayout2;
+    $gridLayout2->setSpacing( 6 );
+    $gridLayout2->setMargin( 11 );
+    $gridLayout2->setObjectName( "gridLayout2" );
     my $buttonGroupSharing = Qt::GroupBox( $sharingPage );
     $self->{buttonGroupSharing} = $buttonGroupSharing;
     $buttonGroupSharing->setObjectName( "buttonGroupSharing" );
@@ -1819,12 +1744,12 @@ sub setupUi {
     $self->{sharingComp1} = $sharingComp1;
     $sharingComp1->setObjectName( "sharingComp1" );
     $sharingComp1->setEnabled( 0 );
-    my $sizePolicy7 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::MinimumExpanding() );
-    $self->{$sizePolicy7} = $sizePolicy7;
-    $sizePolicy7->setHorizontalStretch( 0 );
-    $sizePolicy7->setVerticalStretch( 0 );
-    $sizePolicy7->setHeightForWidth( $sharingComp1->sizePolicy()->hasHeightForWidth() );
-    $sharingComp1->setSizePolicy( $sizePolicy7 );
+    my $sizePolicy9 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::MinimumExpanding() );
+    $self->{$sizePolicy9} = $sizePolicy9;
+    $sizePolicy9->setHorizontalStretch( 0 );
+    $sizePolicy9->setVerticalStretch( 0 );
+    $sizePolicy9->setHeightForWidth( $sharingComp1->sizePolicy()->hasHeightForWidth() );
+    $sharingComp1->setSizePolicy( $sizePolicy9 );
     $sharingComp1->setAlignment( Qt::AlignLeading() );
     my $layout14 = Qt::Widget( $sharingComp1 );
     $self->{layout14} = $layout14;
@@ -1912,8 +1837,8 @@ sub setupUi {
     $self->{sharingComp2} = $sharingComp2;
     $sharingComp2->setObjectName( "sharingComp2" );
     $sharingComp2->setEnabled( 0 );
-    $sizePolicy7->setHeightForWidth( $sharingComp2->sizePolicy()->hasHeightForWidth() );
-    $sharingComp2->setSizePolicy( $sizePolicy7 );
+    $sizePolicy9->setHeightForWidth( $sharingComp2->sizePolicy()->hasHeightForWidth() );
+    $sharingComp2->setSizePolicy( $sizePolicy9 );
     my $comp2ShLabel = Qt::Label( $sharingComp2 );
     $self->{comp2ShLabel} = $comp2ShLabel;
     $comp2ShLabel->setObjectName( "comp2ShLabel" );
@@ -1998,8 +1923,8 @@ sub setupUi {
     $self->{sharingComp3} = $sharingComp3;
     $sharingComp3->setObjectName( "sharingComp3" );
     $sharingComp3->setEnabled( 0 );
-    $sizePolicy7->setHeightForWidth( $sharingComp3->sizePolicy()->hasHeightForWidth() );
-    $sharingComp3->setSizePolicy( $sizePolicy7 );
+    $sizePolicy9->setHeightForWidth( $sharingComp3->sizePolicy()->hasHeightForWidth() );
+    $sharingComp3->setSizePolicy( $sizePolicy9 );
     $sharingComp3->setAlignment( Qt::AlignJustify()|Qt::AlignVCenter() );
     my $comp3ShLabel = Qt::Label( $sharingComp3 );
     $self->{comp3ShLabel} = $comp3ShLabel;
@@ -2085,34 +2010,34 @@ sub setupUi {
     $gridLayout_7->addLayout( $horizontalLayout, 0, 0, 1, 1 );
 
 
-    $gridLayout3->addWidget( $buttonGroupSharing, 0, 0, 1, 1 );
+    $gridLayout2->addWidget( $buttonGroupSharing, 0, 0, 1, 1 );
 
     $musrfit_tabs->addTab( $sharingPage, Qt::Application::translate( 'MuSRFit4', "Sharing", undef, Qt::Application::UnicodeUTF8() ) );
     my $initializationPage = Qt::Widget(  );
     $self->{initializationPage} = $initializationPage;
     $initializationPage->setObjectName( "initializationPage" );
-    my $gridLayout4 = Qt::GridLayout( $initializationPage );
-    $self->{gridLayout4} = $gridLayout4;
-    $gridLayout4->setSpacing( 6 );
-    $gridLayout4->setMargin( 11 );
-    $gridLayout4->setObjectName( "gridLayout4" );
+    my $gridLayout3 = Qt::GridLayout( $initializationPage );
+    $self->{gridLayout3} = $gridLayout3;
+    $gridLayout3->setSpacing( 6 );
+    $gridLayout3->setMargin( 11 );
+    $gridLayout3->setObjectName( "gridLayout3" );
     my $initParamTable = Qt::TableWidget( $initializationPage );
     $self->{initParamTable} = $initParamTable;
     $initParamTable->setObjectName( "initParamTable" );
     $initParamTable->setRowCount( 1 );
     $initParamTable->setColumnCount( 4 );
 
-    $gridLayout4->addWidget( $initParamTable, 0, 0, 1, 1 );
+    $gridLayout3->addWidget( $initParamTable, 0, 0, 1, 1 );
 
     $musrfit_tabs->addTab( $initializationPage, Qt::Application::translate( 'MuSRFit4', "Initialization", undef, Qt::Application::UnicodeUTF8() ) );
     my $msrPage = Qt::Widget(  );
     $self->{msrPage} = $msrPage;
     $msrPage->setObjectName( "msrPage" );
-    my $gridLayout5 = Qt::GridLayout( $msrPage );
-    $self->{gridLayout5} = $gridLayout5;
-    $gridLayout5->setSpacing( 6 );
-    $gridLayout5->setMargin( 11 );
-    $gridLayout5->setObjectName( "gridLayout5" );
+    my $gridLayout4 = Qt::GridLayout( $msrPage );
+    $self->{gridLayout4} = $gridLayout4;
+    $gridLayout4->setSpacing( 6 );
+    $gridLayout4->setMargin( 11 );
+    $gridLayout4->setObjectName( "gridLayout4" );
     my $vboxLayout = Qt::VBoxLayout(  );
     $self->{vboxLayout} = $vboxLayout;
     $vboxLayout->setSpacing( 6 );
@@ -2121,13 +2046,13 @@ sub setupUi {
     my $groupTitle = Qt::GroupBox( $msrPage );
     $self->{groupTitle} = $groupTitle;
     $groupTitle->setObjectName( "groupTitle" );
-    $sizePolicy2->setHeightForWidth( $groupTitle->sizePolicy()->hasHeightForWidth() );
-    $groupTitle->setSizePolicy( $sizePolicy2 );
-    my $gridLayout6 = Qt::GridLayout( $groupTitle );
-    $self->{gridLayout6} = $gridLayout6;
-    $gridLayout6->setSpacing( 6 );
-    $gridLayout6->setMargin( 11 );
-    $gridLayout6->setObjectName( "gridLayout6" );
+    $sizePolicy3->setHeightForWidth( $groupTitle->sizePolicy()->hasHeightForWidth() );
+    $groupTitle->setSizePolicy( $sizePolicy3 );
+    my $gridLayout5 = Qt::GridLayout( $groupTitle );
+    $self->{gridLayout5} = $gridLayout5;
+    $gridLayout5->setSpacing( 6 );
+    $gridLayout5->setMargin( 11 );
+    $gridLayout5->setObjectName( "gridLayout5" );
     my $vboxLayout1 = Qt::VBoxLayout(  );
     $self->{vboxLayout1} = $vboxLayout1;
     $vboxLayout1->setSpacing( 6 );
@@ -2135,8 +2060,8 @@ sub setupUi {
     my $titleLabel = Qt::Label( $groupTitle );
     $self->{titleLabel} = $titleLabel;
     $titleLabel->setObjectName( "titleLabel" );
-    $sizePolicy5->setHeightForWidth( $titleLabel->sizePolicy()->hasHeightForWidth() );
-    $titleLabel->setSizePolicy( $sizePolicy5 );
+    $sizePolicy4->setHeightForWidth( $titleLabel->sizePolicy()->hasHeightForWidth() );
+    $titleLabel->setSizePolicy( $sizePolicy4 );
     $titleLabel->setWordWrap( 0 );
 
     $vboxLayout1->addWidget( $titleLabel );
@@ -2144,12 +2069,12 @@ sub setupUi {
     my $title = Qt::LineEdit( $groupTitle );
     $self->{title} = $title;
     $title->setObjectName( "title" );
-    my $sizePolicy8 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Fixed() );
-    $self->{$sizePolicy8} = $sizePolicy8;
-    $sizePolicy8->setHorizontalStretch( 1 );
-    $sizePolicy8->setVerticalStretch( 1 );
-    $sizePolicy8->setHeightForWidth( $title->sizePolicy()->hasHeightForWidth() );
-    $title->setSizePolicy( $sizePolicy8 );
+    my $sizePolicy10 = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::Fixed() );
+    $self->{$sizePolicy10} = $sizePolicy10;
+    $sizePolicy10->setHorizontalStretch( 1 );
+    $sizePolicy10->setVerticalStretch( 1 );
+    $sizePolicy10->setHeightForWidth( $title->sizePolicy()->hasHeightForWidth() );
+    $title->setSizePolicy( $sizePolicy10 );
 
     $vboxLayout1->addWidget( $title );
 
@@ -2167,8 +2092,8 @@ sub setupUi {
     my $fileName = Qt::LineEdit( $groupTitle );
     $self->{fileName} = $fileName;
     $fileName->setObjectName( "fileName" );
-    $sizePolicy2->setHeightForWidth( $fileName->sizePolicy()->hasHeightForWidth() );
-    $fileName->setSizePolicy( $sizePolicy2 );
+    $sizePolicy3->setHeightForWidth( $fileName->sizePolicy()->hasHeightForWidth() );
+    $fileName->setSizePolicy( $sizePolicy3 );
 
     $hboxLayout->addWidget( $fileName );
 
@@ -2176,7 +2101,7 @@ sub setupUi {
     $vboxLayout1->addLayout( $hboxLayout );
 
 
-    $gridLayout6->addLayout( $vboxLayout1, 0, 0, 1, 1 );
+    $gridLayout5->addLayout( $vboxLayout1, 0, 0, 1, 1 );
 
 
     $vboxLayout->addWidget( $groupTitle );
@@ -2189,17 +2114,17 @@ sub setupUi {
     $vboxLayout->addWidget( $textMSROutput );
 
 
-    $gridLayout5->addLayout( $vboxLayout, 0, 0, 1, 1 );
+    $gridLayout4->addLayout( $vboxLayout, 0, 0, 1, 1 );
 
     $musrfit_tabs->addTab( $msrPage, Qt::Application::translate( 'MuSRFit4', "MSR File", undef, Qt::Application::UnicodeUTF8() ) );
     my $fourierPage = Qt::Widget(  );
     $self->{fourierPage} = $fourierPage;
     $fourierPage->setObjectName( "fourierPage" );
-    my $gridLayout7 = Qt::GridLayout( $fourierPage );
-    $self->{gridLayout7} = $gridLayout7;
-    $gridLayout7->setSpacing( 6 );
-    $gridLayout7->setMargin( 11 );
-    $gridLayout7->setObjectName( "gridLayout7" );
+    my $gridLayout6 = Qt::GridLayout( $fourierPage );
+    $self->{gridLayout6} = $gridLayout6;
+    $gridLayout6->setSpacing( 6 );
+    $gridLayout6->setMargin( 11 );
+    $gridLayout6->setObjectName( "gridLayout6" );
     my $fourierBox = Qt::GroupBox( $fourierPage );
     $self->{fourierBox} = $fourierBox;
     $fourierBox->setObjectName( "fourierBox" );
@@ -2209,149 +2134,149 @@ sub setupUi {
     $self->{layout34} = $layout34;
     $layout34->setObjectName( "layout34" );
     $layout34->setGeometry( Qt::Rect(12, 19, 510, 117) );
-    my $gridLayout8 = Qt::GridLayout( $layout34 );
-    $self->{gridLayout8} = $gridLayout8;
-    $gridLayout8->setSpacing( 5 );
-    $gridLayout8->setMargin( 5 );
-    $gridLayout8->setObjectName( "gridLayout8" );
-    $gridLayout8->setContentsMargins(0, 0, 0, 0 );
+    my $gridLayout7 = Qt::GridLayout( $layout34 );
+    $self->{gridLayout7} = $gridLayout7;
+    $gridLayout7->setSpacing( 5 );
+    $gridLayout7->setMargin( 5 );
+    $gridLayout7->setObjectName( "gridLayout7" );
+    $gridLayout7->setContentsMargins(0, 0, 0, 0 );
     my $frqMax = Qt::LineEdit( $layout34 );
     $self->{frqMax} = $frqMax;
     $frqMax->setObjectName( "frqMax" );
-    $sizePolicy5->setHeightForWidth( $frqMax->sizePolicy()->hasHeightForWidth() );
-    $frqMax->setSizePolicy( $sizePolicy5 );
+    $sizePolicy4->setHeightForWidth( $frqMax->sizePolicy()->hasHeightForWidth() );
+    $frqMax->setSizePolicy( $sizePolicy4 );
 
-    $gridLayout8->addWidget( $frqMax, 0, 6, 1, 1 );
+    $gridLayout7->addWidget( $frqMax, 0, 6, 1, 1 );
 
     my $funits = Qt::ComboBox( $layout34 );
     $self->{funits} = $funits;
     $funits->setObjectName( "funits" );
-    my $sizePolicy9 = Qt::SizePolicy( Qt::SizePolicy::Ignored(), Qt::SizePolicy::Preferred() );
-    $self->{$sizePolicy9} = $sizePolicy9;
-    $sizePolicy9->setHorizontalStretch( 0 );
-    $sizePolicy9->setVerticalStretch( 0 );
-    $sizePolicy9->setHeightForWidth( $funits->sizePolicy()->hasHeightForWidth() );
-    $funits->setSizePolicy( $sizePolicy9 );
+    my $sizePolicy11 = Qt::SizePolicy( Qt::SizePolicy::Ignored(), Qt::SizePolicy::Preferred() );
+    $self->{$sizePolicy11} = $sizePolicy11;
+    $sizePolicy11->setHorizontalStretch( 0 );
+    $sizePolicy11->setVerticalStretch( 0 );
+    $sizePolicy11->setHeightForWidth( $funits->sizePolicy()->hasHeightForWidth() );
+    $funits->setSizePolicy( $sizePolicy11 );
 
-    $gridLayout8->addWidget( $funits, 0, 2, 1, 1 );
+    $gridLayout7->addWidget( $funits, 0, 2, 1, 1 );
 
     my $fplot = Qt::ComboBox( $layout34 );
     $self->{fplot} = $fplot;
     $fplot->setObjectName( "fplot" );
-    $sizePolicy5->setHeightForWidth( $fplot->sizePolicy()->hasHeightForWidth() );
-    $fplot->setSizePolicy( $sizePolicy5 );
+    $sizePolicy4->setHeightForWidth( $fplot->sizePolicy()->hasHeightForWidth() );
+    $fplot->setSizePolicy( $sizePolicy4 );
 
-    $gridLayout8->addWidget( $fplot, 2, 2, 1, 1 );
+    $gridLayout7->addWidget( $fplot, 2, 2, 1, 1 );
 
     my $textLabel1_3_8 = Qt::Label( $layout34 );
     $self->{textLabel1_3_8} = $textLabel1_3_8;
     $textLabel1_3_8->setObjectName( "textLabel1_3_8" );
     $textLabel1_3_8->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $textLabel1_3_8, 2, 6, 1, 1 );
+    $gridLayout7->addWidget( $textLabel1_3_8, 2, 6, 1, 1 );
 
     my $textLabel1_7 = Qt::Label( $layout34 );
     $self->{textLabel1_7} = $textLabel1_7;
     $textLabel1_7->setObjectName( "textLabel1_7" );
     $textLabel1_7->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $textLabel1_7, 1, 3, 1, 1 );
+    $gridLayout7->addWidget( $textLabel1_7, 1, 3, 1, 1 );
 
     my $fplotLabel = Qt::Label( $layout34 );
     $self->{fplotLabel} = $fplotLabel;
     $fplotLabel->setObjectName( "fplotLabel" );
     $fplotLabel->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $fplotLabel, 2, 1, 1, 1 );
+    $gridLayout7->addWidget( $fplotLabel, 2, 1, 1, 1 );
 
     my $textLabel1_3_4 = Qt::Label( $layout34 );
     $self->{textLabel1_3_4} = $textLabel1_3_4;
     $textLabel1_3_4->setObjectName( "textLabel1_3_4" );
     $textLabel1_3_4->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $textLabel1_3_4, 1, 6, 1, 1 );
+    $gridLayout7->addWidget( $textLabel1_3_4, 1, 6, 1, 1 );
 
     my $fapodization = Qt::ComboBox( $layout34 );
     $self->{fapodization} = $fapodization;
     $fapodization->setObjectName( "fapodization" );
-    $sizePolicy5->setHeightForWidth( $fapodization->sizePolicy()->hasHeightForWidth() );
-    $fapodization->setSizePolicy( $sizePolicy5 );
+    $sizePolicy4->setHeightForWidth( $fapodization->sizePolicy()->hasHeightForWidth() );
+    $fapodization->setSizePolicy( $sizePolicy4 );
 
-    $gridLayout8->addWidget( $fapodization, 1, 2, 1, 1 );
+    $gridLayout7->addWidget( $fapodization, 1, 2, 1, 1 );
 
     my $fapodizationLabel = Qt::Label( $layout34 );
     $self->{fapodizationLabel} = $fapodizationLabel;
     $fapodizationLabel->setObjectName( "fapodizationLabel" );
     $fapodizationLabel->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $fapodizationLabel, 1, 1, 1, 1 );
+    $gridLayout7->addWidget( $fapodizationLabel, 1, 1, 1, 1 );
 
     my $textLabel1_3_3 = Qt::Label( $layout34 );
     $self->{textLabel1_3_3} = $textLabel1_3_3;
     $textLabel1_3_3->setObjectName( "textLabel1_3_3" );
     $textLabel1_3_3->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $textLabel1_3_3, 1, 5, 1, 1 );
+    $gridLayout7->addWidget( $textLabel1_3_3, 1, 5, 1, 1 );
 
     my $textLabel1_2 = Qt::Label( $layout34 );
     $self->{textLabel1_2} = $textLabel1_2;
     $textLabel1_2->setObjectName( "textLabel1_2" );
     $textLabel1_2->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $textLabel1_2, 0, 5, 1, 1 );
+    $gridLayout7->addWidget( $textLabel1_2, 0, 5, 1, 1 );
 
     my $textLabel1_3_6 = Qt::Label( $layout34 );
     $self->{textLabel1_3_6} = $textLabel1_3_6;
     $textLabel1_3_6->setObjectName( "textLabel1_3_6" );
     $textLabel1_3_6->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $textLabel1_3_6, 2, 4, 1, 1 );
+    $gridLayout7->addWidget( $textLabel1_3_6, 2, 4, 1, 1 );
 
     my $fphase = Qt::LineEdit( $layout34 );
     $self->{fphase} = $fphase;
     $fphase->setObjectName( "fphase" );
-    $sizePolicy5->setHeightForWidth( $fphase->sizePolicy()->hasHeightForWidth() );
-    $fphase->setSizePolicy( $sizePolicy5 );
+    $sizePolicy4->setHeightForWidth( $fphase->sizePolicy()->hasHeightForWidth() );
+    $fphase->setSizePolicy( $sizePolicy4 );
 
-    $gridLayout8->addWidget( $fphase, 1, 4, 1, 1 );
+    $gridLayout7->addWidget( $fphase, 1, 4, 1, 1 );
 
     my $textLabel1_3_5 = Qt::Label( $layout34 );
     $self->{textLabel1_3_5} = $textLabel1_3_5;
     $textLabel1_3_5->setObjectName( "textLabel1_3_5" );
     $textLabel1_3_5->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $textLabel1_3_5, 2, 3, 1, 1 );
+    $gridLayout7->addWidget( $textLabel1_3_5, 2, 3, 1, 1 );
 
     my $textLabel1_3_7 = Qt::Label( $layout34 );
     $self->{textLabel1_3_7} = $textLabel1_3_7;
     $textLabel1_3_7->setObjectName( "textLabel1_3_7" );
     $textLabel1_3_7->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $textLabel1_3_7, 2, 5, 1, 1 );
+    $gridLayout7->addWidget( $textLabel1_3_7, 2, 5, 1, 1 );
 
     my $frqMin = Qt::LineEdit( $layout34 );
     $self->{frqMin} = $frqMin;
     $frqMin->setObjectName( "frqMin" );
-    $sizePolicy5->setHeightForWidth( $frqMin->sizePolicy()->hasHeightForWidth() );
-    $frqMin->setSizePolicy( $sizePolicy5 );
+    $sizePolicy4->setHeightForWidth( $frqMin->sizePolicy()->hasHeightForWidth() );
+    $frqMin->setSizePolicy( $sizePolicy4 );
 
-    $gridLayout8->addWidget( $frqMin, 0, 4, 1, 1 );
+    $gridLayout7->addWidget( $frqMin, 0, 4, 1, 1 );
 
     my $textLabel1 = Qt::Label( $layout34 );
     $self->{textLabel1} = $textLabel1;
     $textLabel1->setObjectName( "textLabel1" );
     $textLabel1->setWordWrap( 0 );
 
-    $gridLayout8->addWidget( $textLabel1, 0, 3, 1, 1 );
+    $gridLayout7->addWidget( $textLabel1, 0, 3, 1, 1 );
 
     my $label = Qt::Label( $layout34 );
     $self->{label} = $label;
     $label->setObjectName( "label" );
 
-    $gridLayout8->addWidget( $label, 0, 1, 1, 1 );
+    $gridLayout7->addWidget( $label, 0, 1, 1, 1 );
 
 
-    $gridLayout7->addWidget( $fourierBox, 0, 0, 1, 1 );
+    $gridLayout6->addWidget( $fourierBox, 0, 0, 1, 1 );
 
     my $rrfBox = Qt::GroupBox( $fourierPage );
     $self->{rrfBox} = $rrfBox;
@@ -2362,83 +2287,83 @@ sub setupUi {
     $self->{layout35} = $layout35;
     $layout35->setObjectName( "layout35" );
     $layout35->setGeometry( Qt::Rect(10, 18, 265, 107) );
-    my $gridLayout9 = Qt::GridLayout( $layout35 );
-    $self->{gridLayout9} = $gridLayout9;
-    $gridLayout9->setSpacing( 5 );
-    $gridLayout9->setMargin( 5 );
-    $gridLayout9->setObjectName( "gridLayout9" );
-    $gridLayout9->setContentsMargins(0, 0, 0, 0 );
+    my $gridLayout8 = Qt::GridLayout( $layout35 );
+    $self->{gridLayout8} = $gridLayout8;
+    $gridLayout8->setSpacing( 5 );
+    $gridLayout8->setMargin( 5 );
+    $gridLayout8->setObjectName( "gridLayout8" );
+    $gridLayout8->setContentsMargins(0, 0, 0, 0 );
     my $textLabel1_6_2_2 = Qt::Label( $layout35 );
     $self->{textLabel1_6_2_2} = $textLabel1_6_2_2;
     $textLabel1_6_2_2->setObjectName( "textLabel1_6_2_2" );
     $textLabel1_6_2_2->setWordWrap( 0 );
 
-    $gridLayout9->addWidget( $textLabel1_6_2_2, 2, 0, 1, 1 );
+    $gridLayout8->addWidget( $textLabel1_6_2_2, 2, 0, 1, 1 );
 
     my $textLabel1_6 = Qt::Label( $layout35 );
     $self->{textLabel1_6} = $textLabel1_6;
     $textLabel1_6->setObjectName( "textLabel1_6" );
     $textLabel1_6->setWordWrap( 0 );
 
-    $gridLayout9->addWidget( $textLabel1_6, 0, 0, 1, 1 );
+    $gridLayout8->addWidget( $textLabel1_6, 0, 0, 1, 1 );
 
     my $textLabel1_6_2_4 = Qt::Label( $layout35 );
     $self->{textLabel1_6_2_4} = $textLabel1_6_2_4;
     $textLabel1_6_2_4->setObjectName( "textLabel1_6_2_4" );
     $textLabel1_6_2_4->setWordWrap( 0 );
 
-    $gridLayout9->addWidget( $textLabel1_6_2_4, 2, 2, 1, 1 );
+    $gridLayout8->addWidget( $textLabel1_6_2_4, 2, 2, 1, 1 );
 
     my $rrfFrq = Qt::LineEdit( $layout35 );
     $self->{rrfFrq} = $rrfFrq;
     $rrfFrq->setObjectName( "rrfFrq" );
 
-    $gridLayout9->addWidget( $rrfFrq, 0, 1, 1, 1 );
+    $gridLayout8->addWidget( $rrfFrq, 0, 1, 1, 1 );
 
     my $textLabel1_6_2_3 = Qt::Label( $layout35 );
     $self->{textLabel1_6_2_3} = $textLabel1_6_2_3;
     $textLabel1_6_2_3->setObjectName( "textLabel1_6_2_3" );
     $textLabel1_6_2_3->setWordWrap( 0 );
 
-    $gridLayout9->addWidget( $textLabel1_6_2_3, 1, 2, 1, 1 );
+    $gridLayout8->addWidget( $textLabel1_6_2_3, 1, 2, 1, 1 );
 
     my $rrfPack = Qt::LineEdit( $layout35 );
     $self->{rrfPack} = $rrfPack;
     $rrfPack->setObjectName( "rrfPack" );
 
-    $gridLayout9->addWidget( $rrfPack, 1, 1, 1, 1 );
+    $gridLayout8->addWidget( $rrfPack, 1, 1, 1, 1 );
 
     my $textLabel1_6_2 = Qt::Label( $layout35 );
     $self->{textLabel1_6_2} = $textLabel1_6_2;
     $textLabel1_6_2->setObjectName( "textLabel1_6_2" );
     $textLabel1_6_2->setWordWrap( 0 );
 
-    $gridLayout9->addWidget( $textLabel1_6_2, 1, 0, 1, 1 );
+    $gridLayout8->addWidget( $textLabel1_6_2, 1, 0, 1, 1 );
 
     my $rrfUnits = Qt::ComboBox( $layout35 );
     $self->{rrfUnits} = $rrfUnits;
     $rrfUnits->setObjectName( "rrfUnits" );
 
-    $gridLayout9->addWidget( $rrfUnits, 0, 2, 1, 1 );
+    $gridLayout8->addWidget( $rrfUnits, 0, 2, 1, 1 );
 
     my $rrfPhase = Qt::LineEdit( $layout35 );
     $self->{rrfPhase} = $rrfPhase;
     $rrfPhase->setObjectName( "rrfPhase" );
 
-    $gridLayout9->addWidget( $rrfPhase, 2, 1, 1, 1 );
+    $gridLayout8->addWidget( $rrfPhase, 2, 1, 1, 1 );
 
 
-    $gridLayout7->addWidget( $rrfBox, 1, 0, 1, 1 );
+    $gridLayout6->addWidget( $rrfBox, 1, 0, 1, 1 );
 
     $musrfit_tabs->addTab( $fourierPage, Qt::Application::translate( 'MuSRFit4', "FFT/RRF", undef, Qt::Application::UnicodeUTF8() ) );
     my $t0Page = Qt::Widget(  );
     $self->{t0Page} = $t0Page;
     $t0Page->setObjectName( "t0Page" );
-    my $gridLayout10 = Qt::GridLayout( $t0Page );
-    $self->{gridLayout10} = $gridLayout10;
-    $gridLayout10->setSpacing( 6 );
-    $gridLayout10->setMargin( 11 );
-    $gridLayout10->setObjectName( "gridLayout10" );
+    my $gridLayout9 = Qt::GridLayout( $t0Page );
+    $self->{gridLayout9} = $gridLayout9;
+    $gridLayout9->setSpacing( 6 );
+    $gridLayout9->setMargin( 11 );
+    $gridLayout9->setObjectName( "gridLayout9" );
     my $hboxLayout1 = Qt::HBoxLayout(  );
     $self->{hboxLayout1} = $hboxLayout1;
     $hboxLayout1->setSpacing( 6 );
@@ -2694,7 +2619,7 @@ sub setupUi {
     $hboxLayout1->addWidget( $groupHist4 );
 
 
-    $gridLayout10->addLayout( $hboxLayout1, 0, 0, 1, 1 );
+    $gridLayout9->addLayout( $hboxLayout1, 0, 0, 1, 1 );
 
     my $hboxLayout2 = Qt::HBoxLayout(  );
     $self->{hboxLayout2} = $hboxLayout2;
@@ -2708,38 +2633,210 @@ sub setupUi {
     $self->{t0Update} = $t0Update;
     $t0Update->setObjectName( "t0Update" );
     $t0Update->setEnabled( 0 );
-    my $sizePolicy10 = Qt::SizePolicy( Qt::SizePolicy::Fixed(), Qt::SizePolicy::Fixed() );
-    $self->{$sizePolicy10} = $sizePolicy10;
-    $sizePolicy10->setHorizontalStretch( 0 );
-    $sizePolicy10->setVerticalStretch( 0 );
-    $sizePolicy10->setHeightForWidth( $t0Update->sizePolicy()->hasHeightForWidth() );
-    $t0Update->setSizePolicy( $sizePolicy10 );
+    my $sizePolicy12 = Qt::SizePolicy( Qt::SizePolicy::Fixed(), Qt::SizePolicy::Fixed() );
+    $self->{$sizePolicy12} = $sizePolicy12;
+    $sizePolicy12->setHorizontalStretch( 0 );
+    $sizePolicy12->setVerticalStretch( 0 );
+    $sizePolicy12->setHeightForWidth( $t0Update->sizePolicy()->hasHeightForWidth() );
+    $t0Update->setSizePolicy( $sizePolicy12 );
 
     $hboxLayout2->addWidget( $t0Update );
 
 
-    $gridLayout10->addLayout( $hboxLayout2, 1, 0, 1, 1 );
+    $gridLayout9->addLayout( $hboxLayout2, 1, 0, 1, 1 );
 
     $musrfit_tabs->addTab( $t0Page, Qt::Application::translate( 'MuSRFit4', "t0/Bg", undef, Qt::Application::UnicodeUTF8() ) );
     my $tabPage = Qt::Widget(  );
     $self->{tabPage} = $tabPage;
     $tabPage->setObjectName( "tabPage" );
-    my $gridLayout11 = Qt::GridLayout( $tabPage );
-    $self->{gridLayout11} = $gridLayout11;
-    $gridLayout11->setSpacing( 6 );
-    $gridLayout11->setMargin( 11 );
-    $gridLayout11->setObjectName( "gridLayout11" );
+    my $gridLayout10 = Qt::GridLayout( $tabPage );
+    $self->{gridLayout10} = $gridLayout10;
+    $gridLayout10->setSpacing( 6 );
+    $gridLayout10->setMargin( 11 );
+    $gridLayout10->setObjectName( "gridLayout10" );
     my $vboxLayout7 = Qt::VBoxLayout(  );
     $self->{vboxLayout7} = $vboxLayout7;
     $vboxLayout7->setSpacing( 6 );
     $vboxLayout7->setObjectName( "vboxLayout7" );
-    my $gridLayout12 = Qt::GridLayout(  );
-    $self->{gridLayout12} = $gridLayout12;
-    $gridLayout12->setSpacing( 6 );
-    $gridLayout12->setObjectName( "gridLayout12" );
+    my $gridLayout11 = Qt::GridLayout(  );
+    $self->{gridLayout11} = $gridLayout11;
+    $gridLayout11->setSpacing( 6 );
+    $gridLayout11->setObjectName( "gridLayout11" );
     my $theoryBlock_Label = Qt::Label( $tabPage );
     $self->{theoryBlock_Label} = $theoryBlock_Label;
     $theoryBlock_Label->setObjectName( "theoryBlock_Label" );
+    my $palette1 = Qt::Palette();
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::WindowText(), $brush);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Button(), $brush1);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Light(), $brush2);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Midlight(), $brush3);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Dark(), $brush4);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Mid(), $brush5);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Text(), $brush);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::BrightText(), $brush2);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::ButtonText(), $brush);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Base(), $brush2);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Window(), $brush6);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Shadow(), $brush);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Highlight(), $brush7);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::HighlightedText(), $brush2);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::Link(), $brush);
+    $palette1->setBrush(Qt::Palette::Active(), Qt::Palette::LinkVisited(), $brush);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::WindowText(), $brush);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Button(), $brush1);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Light(), $brush2);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Midlight(), $brush2);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Dark(), $brush4);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Mid(), $brush5);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Text(), $brush);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::BrightText(), $brush2);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::ButtonText(), $brush);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Base(), $brush2);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Window(), $brush6);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Shadow(), $brush);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Highlight(), $brush7);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::HighlightedText(), $brush2);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::Link(), $brush8);
+    $palette1->setBrush(Qt::Palette::Inactive(), Qt::Palette::LinkVisited(), $brush9);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::WindowText(), $brush10);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Button(), $brush1);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Light(), $brush2);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Midlight(), $brush2);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Dark(), $brush4);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Mid(), $brush5);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Text(), $brush10);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::BrightText(), $brush2);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::ButtonText(), $brush10);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Base(), $brush2);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Window(), $brush6);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Shadow(), $brush);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Highlight(), $brush7);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::HighlightedText(), $brush2);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::Link(), $brush8);
+    $palette1->setBrush(Qt::Palette::Disabled(), Qt::Palette::LinkVisited(), $brush9);
+    $theoryBlock_Label->setPalette( $palette1 );
+    $theoryBlock_Label->setWordWrap( 0 );
+
+    $gridLayout11->addWidget( $theoryBlock_Label, 0, 0, 1, 1 );
+
+    my $theoryBlock = Qt::TextEdit( $tabPage );
+    $self->{theoryBlock} = $theoryBlock;
+    $theoryBlock->setObjectName( "theoryBlock" );
+    $theoryBlock->setEnabled( 1 );
+
+    $gridLayout11->addWidget( $theoryBlock, 1, 0, 1, 1 );
+
+    my $parametersList_Label = Qt::Label( $tabPage );
+    $self->{parametersList_Label} = $parametersList_Label;
+    $parametersList_Label->setObjectName( "parametersList_Label" );
+    my $palette2 = Qt::Palette();
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::WindowText(), $brush);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Button(), $brush1);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Light(), $brush2);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Midlight(), $brush3);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Dark(), $brush4);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Mid(), $brush5);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Text(), $brush);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::BrightText(), $brush2);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::ButtonText(), $brush);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Base(), $brush2);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Window(), $brush6);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Shadow(), $brush);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Highlight(), $brush7);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::HighlightedText(), $brush2);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::Link(), $brush);
+    $palette2->setBrush(Qt::Palette::Active(), Qt::Palette::LinkVisited(), $brush);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::WindowText(), $brush);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Button(), $brush1);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Light(), $brush2);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Midlight(), $brush2);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Dark(), $brush4);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Mid(), $brush5);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Text(), $brush);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::BrightText(), $brush2);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::ButtonText(), $brush);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Base(), $brush2);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Window(), $brush6);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Shadow(), $brush);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Highlight(), $brush7);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::HighlightedText(), $brush2);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::Link(), $brush8);
+    $palette2->setBrush(Qt::Palette::Inactive(), Qt::Palette::LinkVisited(), $brush9);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::WindowText(), $brush10);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Button(), $brush1);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Light(), $brush2);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Midlight(), $brush2);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Dark(), $brush4);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Mid(), $brush5);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Text(), $brush10);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::BrightText(), $brush2);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::ButtonText(), $brush10);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Base(), $brush2);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Window(), $brush6);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Shadow(), $brush);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Highlight(), $brush7);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::HighlightedText(), $brush2);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::Link(), $brush8);
+    $palette2->setBrush(Qt::Palette::Disabled(), Qt::Palette::LinkVisited(), $brush9);
+    $parametersList_Label->setPalette( $palette2 );
+    $parametersList_Label->setWordWrap( 0 );
+
+    $gridLayout11->addWidget( $parametersList_Label, 0, 1, 1, 1 );
+
+    my $parametersList = Qt::TextEdit( $tabPage );
+    $self->{parametersList} = $parametersList;
+    $parametersList->setObjectName( "parametersList" );
+    $parametersList->setEnabled( 1 );
+
+    $gridLayout11->addWidget( $parametersList, 1, 1, 1, 1 );
+
+
+    $vboxLayout7->addLayout( $gridLayout11 );
+
+    my $hboxLayout3 = Qt::HBoxLayout(  );
+    $self->{hboxLayout3} = $hboxLayout3;
+    $hboxLayout3->setSpacing( 6 );
+    $hboxLayout3->setObjectName( "hboxLayout3" );
+    my $cParamsCombo = Qt::ComboBox( $tabPage );
+    $self->{cParamsCombo} = $cParamsCombo;
+    $cParamsCombo->setObjectName( "cParamsCombo" );
+    $sizePolicy12->setHeightForWidth( $cParamsCombo->sizePolicy()->hasHeightForWidth() );
+    $cParamsCombo->setSizePolicy( $sizePolicy12 );
+
+    $hboxLayout3->addWidget( $cParamsCombo );
+
+    my $textLabel1_4_6 = Qt::Label( $tabPage );
+    $self->{textLabel1_4_6} = $textLabel1_4_6;
+    $textLabel1_4_6->setObjectName( "textLabel1_4_6" );
+    $sizePolicy12->setHeightForWidth( $textLabel1_4_6->sizePolicy()->hasHeightForWidth() );
+    $textLabel1_4_6->setSizePolicy( $sizePolicy12 );
+    $textLabel1_4_6->setWordWrap( 0 );
+
+    $hboxLayout3->addWidget( $textLabel1_4_6 );
+
+    my $constraintLine = Qt::LineEdit( $tabPage );
+    $self->{constraintLine} = $constraintLine;
+    $constraintLine->setObjectName( "constraintLine" );
+    $sizePolicy3->setHeightForWidth( $constraintLine->sizePolicy()->hasHeightForWidth() );
+    $constraintLine->setSizePolicy( $sizePolicy3 );
+    $constraintLine->setMinimumSize( Qt::Size(0, 25) );
+
+    $hboxLayout3->addWidget( $constraintLine );
+
+    my $addConstraint = Qt::PushButton( $tabPage );
+    $self->{addConstraint} = $addConstraint;
+    $addConstraint->setObjectName( "addConstraint" );
+    $sizePolicy12->setHeightForWidth( $addConstraint->sizePolicy()->hasHeightForWidth() );
+    $addConstraint->setSizePolicy( $sizePolicy12 );
+
+    $hboxLayout3->addWidget( $addConstraint );
+
+
+    $vboxLayout7->addLayout( $hboxLayout3 );
+
+    my $textLabel2_2_3_4 = Qt::Label( $tabPage );
+    $self->{textLabel2_2_3_4} = $textLabel2_2_3_4;
+    $textLabel2_2_3_4->setObjectName( "textLabel2_2_3_4" );
     my $palette3 = Qt::Palette();
     $palette3->setBrush(Qt::Palette::Active(), Qt::Palette::WindowText(), $brush);
     $palette3->setBrush(Qt::Palette::Active(), Qt::Palette::Button(), $brush1);
@@ -2789,179 +2886,7 @@ sub setupUi {
     $palette3->setBrush(Qt::Palette::Disabled(), Qt::Palette::HighlightedText(), $brush2);
     $palette3->setBrush(Qt::Palette::Disabled(), Qt::Palette::Link(), $brush8);
     $palette3->setBrush(Qt::Palette::Disabled(), Qt::Palette::LinkVisited(), $brush9);
-    $theoryBlock_Label->setPalette( $palette3 );
-    $theoryBlock_Label->setWordWrap( 0 );
-
-    $gridLayout12->addWidget( $theoryBlock_Label, 0, 0, 1, 1 );
-
-    my $theoryBlock = Qt::TextEdit( $tabPage );
-    $self->{theoryBlock} = $theoryBlock;
-    $theoryBlock->setObjectName( "theoryBlock" );
-    $theoryBlock->setEnabled( 1 );
-
-    $gridLayout12->addWidget( $theoryBlock, 1, 0, 1, 1 );
-
-    my $parametersList_Label = Qt::Label( $tabPage );
-    $self->{parametersList_Label} = $parametersList_Label;
-    $parametersList_Label->setObjectName( "parametersList_Label" );
-    my $palette4 = Qt::Palette();
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::WindowText(), $brush);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Button(), $brush1);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Light(), $brush2);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Midlight(), $brush3);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Dark(), $brush4);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Mid(), $brush5);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Text(), $brush);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::BrightText(), $brush2);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::ButtonText(), $brush);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Base(), $brush2);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Window(), $brush6);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Shadow(), $brush);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Highlight(), $brush7);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::HighlightedText(), $brush2);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::Link(), $brush);
-    $palette4->setBrush(Qt::Palette::Active(), Qt::Palette::LinkVisited(), $brush);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::WindowText(), $brush);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Button(), $brush1);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Light(), $brush2);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Midlight(), $brush2);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Dark(), $brush4);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Mid(), $brush5);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Text(), $brush);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::BrightText(), $brush2);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::ButtonText(), $brush);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Base(), $brush2);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Window(), $brush6);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Shadow(), $brush);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Highlight(), $brush7);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::HighlightedText(), $brush2);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::Link(), $brush8);
-    $palette4->setBrush(Qt::Palette::Inactive(), Qt::Palette::LinkVisited(), $brush9);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::WindowText(), $brush10);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Button(), $brush1);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Light(), $brush2);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Midlight(), $brush2);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Dark(), $brush4);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Mid(), $brush5);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Text(), $brush10);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::BrightText(), $brush2);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::ButtonText(), $brush10);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Base(), $brush2);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Window(), $brush6);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Shadow(), $brush);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Highlight(), $brush7);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::HighlightedText(), $brush2);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::Link(), $brush8);
-    $palette4->setBrush(Qt::Palette::Disabled(), Qt::Palette::LinkVisited(), $brush9);
-    $parametersList_Label->setPalette( $palette4 );
-    $parametersList_Label->setWordWrap( 0 );
-
-    $gridLayout12->addWidget( $parametersList_Label, 0, 1, 1, 1 );
-
-    my $parametersList = Qt::TextEdit( $tabPage );
-    $self->{parametersList} = $parametersList;
-    $parametersList->setObjectName( "parametersList" );
-    $parametersList->setEnabled( 1 );
-
-    $gridLayout12->addWidget( $parametersList, 1, 1, 1, 1 );
-
-
-    $vboxLayout7->addLayout( $gridLayout12 );
-
-    my $hboxLayout3 = Qt::HBoxLayout(  );
-    $self->{hboxLayout3} = $hboxLayout3;
-    $hboxLayout3->setSpacing( 6 );
-    $hboxLayout3->setObjectName( "hboxLayout3" );
-    my $cParamsCombo = Qt::ComboBox( $tabPage );
-    $self->{cParamsCombo} = $cParamsCombo;
-    $cParamsCombo->setObjectName( "cParamsCombo" );
-    $sizePolicy10->setHeightForWidth( $cParamsCombo->sizePolicy()->hasHeightForWidth() );
-    $cParamsCombo->setSizePolicy( $sizePolicy10 );
-
-    $hboxLayout3->addWidget( $cParamsCombo );
-
-    my $textLabel1_4_6 = Qt::Label( $tabPage );
-    $self->{textLabel1_4_6} = $textLabel1_4_6;
-    $textLabel1_4_6->setObjectName( "textLabel1_4_6" );
-    $sizePolicy10->setHeightForWidth( $textLabel1_4_6->sizePolicy()->hasHeightForWidth() );
-    $textLabel1_4_6->setSizePolicy( $sizePolicy10 );
-    $textLabel1_4_6->setWordWrap( 0 );
-
-    $hboxLayout3->addWidget( $textLabel1_4_6 );
-
-    my $constraintLine = Qt::LineEdit( $tabPage );
-    $self->{constraintLine} = $constraintLine;
-    $constraintLine->setObjectName( "constraintLine" );
-    $sizePolicy2->setHeightForWidth( $constraintLine->sizePolicy()->hasHeightForWidth() );
-    $constraintLine->setSizePolicy( $sizePolicy2 );
-    $constraintLine->setMinimumSize( Qt::Size(0, 25) );
-
-    $hboxLayout3->addWidget( $constraintLine );
-
-    my $addConstraint = Qt::PushButton( $tabPage );
-    $self->{addConstraint} = $addConstraint;
-    $addConstraint->setObjectName( "addConstraint" );
-    $sizePolicy10->setHeightForWidth( $addConstraint->sizePolicy()->hasHeightForWidth() );
-    $addConstraint->setSizePolicy( $sizePolicy10 );
-
-    $hboxLayout3->addWidget( $addConstraint );
-
-
-    $vboxLayout7->addLayout( $hboxLayout3 );
-
-    my $textLabel2_2_3_4 = Qt::Label( $tabPage );
-    $self->{textLabel2_2_3_4} = $textLabel2_2_3_4;
-    $textLabel2_2_3_4->setObjectName( "textLabel2_2_3_4" );
-    my $palette5 = Qt::Palette();
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::WindowText(), $brush);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Button(), $brush1);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Light(), $brush2);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Midlight(), $brush3);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Dark(), $brush4);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Mid(), $brush5);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Text(), $brush);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::BrightText(), $brush2);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::ButtonText(), $brush);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Base(), $brush2);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Window(), $brush6);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Shadow(), $brush);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Highlight(), $brush7);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::HighlightedText(), $brush2);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::Link(), $brush);
-    $palette5->setBrush(Qt::Palette::Active(), Qt::Palette::LinkVisited(), $brush);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::WindowText(), $brush);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Button(), $brush1);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Light(), $brush2);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Midlight(), $brush2);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Dark(), $brush4);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Mid(), $brush5);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Text(), $brush);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::BrightText(), $brush2);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::ButtonText(), $brush);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Base(), $brush2);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Window(), $brush6);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Shadow(), $brush);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Highlight(), $brush7);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::HighlightedText(), $brush2);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::Link(), $brush8);
-    $palette5->setBrush(Qt::Palette::Inactive(), Qt::Palette::LinkVisited(), $brush9);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::WindowText(), $brush10);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Button(), $brush1);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Light(), $brush2);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Midlight(), $brush2);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Dark(), $brush4);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Mid(), $brush5);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Text(), $brush10);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::BrightText(), $brush2);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::ButtonText(), $brush10);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Base(), $brush2);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Window(), $brush6);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Shadow(), $brush);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Highlight(), $brush7);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::HighlightedText(), $brush2);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::Link(), $brush8);
-    $palette5->setBrush(Qt::Palette::Disabled(), Qt::Palette::LinkVisited(), $brush9);
-    $textLabel2_2_3_4->setPalette( $palette5 );
+    $textLabel2_2_3_4->setPalette( $palette3 );
     $textLabel2_2_3_4->setWordWrap( 0 );
 
     $vboxLayout7->addWidget( $textLabel2_2_3_4 );
@@ -2994,7 +2919,7 @@ sub setupUi {
     $vboxLayout7->addLayout( $hboxLayout4 );
 
 
-    $gridLayout11->addLayout( $vboxLayout7, 0, 0, 1, 1 );
+    $gridLayout10->addLayout( $vboxLayout7, 0, 0, 1, 1 );
 
     $musrfit_tabs->addTab( $tabPage, Qt::Application::translate( 'MuSRFit4', "Constraints", undef, Qt::Application::UnicodeUTF8() ) );
 
@@ -3005,7 +2930,7 @@ sub setupUi {
     $self->{menuBar} = $menuBar;
     $menuBar->setObjectName( "menuBar" );
     $menuBar->setEnabled( 1 );
-    $menuBar->setGeometry( Qt::Rect(0, 0, 694, 27) );
+    $menuBar->setGeometry( Qt::Rect(0, 0, 705, 27) );
     my $fileMenu = Qt::Menu( $menuBar );
     $self->{fileMenu} = $fileMenu;
     $fileMenu->setObjectName( "fileMenu" );
@@ -3036,19 +2961,7 @@ sub setupUi {
     Qt::Widget::setTabOrder( $beamLine, $year );
     Qt::Widget::setTabOrder( $year, $runFiles );
     Qt::Widget::setTabOrder( $runFiles, $browse );
-    Qt::Widget::setTabOrder( $browse, $fitType1 );
-    Qt::Widget::setTabOrder( $fitType1, $fitType2 );
-    Qt::Widget::setTabOrder( $fitType2, $fitType3 );
-    Qt::Widget::setTabOrder( $fitType3, $tis );
-    Qt::Widget::setTabOrder( $tis, $tfs );
-    Qt::Widget::setTabOrder( $tfs, $bins );
-    Qt::Widget::setTabOrder( $bins, $xi );
-    Qt::Widget::setTabOrder( $xi, $xf );
-    Qt::Widget::setTabOrder( $xf, $viewBin );
-    Qt::Widget::setTabOrder( $viewBin, $yi );
-    Qt::Widget::setTabOrder( $yi, $yf );
-    Qt::Widget::setTabOrder( $yf, $ltc );
-    Qt::Widget::setTabOrder( $ltc, $fitAsyType );
+    Qt::Widget::setTabOrder( $browse, $fitAsyType );
     Qt::Widget::setTabOrder( $fitAsyType, $histsLRBF );
     Qt::Widget::setTabOrder( $histsLRBF, $minimization );
     Qt::Widget::setTabOrder( $minimization, $errorCalc );
@@ -3168,12 +3081,10 @@ sub setupUi {
     Qt::Object::connect($t0Update, SIGNAL 'clicked()' , $muSRFit4, SLOT 't0UpdateClicked()' );
     Qt::Object::connect($buttonGroupSharing, SIGNAL 'toggled(bool)' , $muSRFit4, SLOT 'ActivateShComp()' );
     Qt::Object::connect($menuBar, SIGNAL 'triggered(QAction*)' , $muSRFit4, SLOT 'RunSelectionToggle()' );
-    Qt::Object::connect($fitType1, SIGNAL 'currentIndexChanged(int)' , $muSRFit4, SLOT 'InitializeFunctions()' );
     Qt::Object::connect($beamLine, SIGNAL 'currentIndexChanged(int)' , $muSRFit4, SLOT 't0Update()' );
+    Qt::Object::connect($numComps, SIGNAL 'valueChanged(int)' , $muSRFit4, SLOT 'addFitType()' );
 
     $musrfit_tabs->setCurrentIndex( 0 );
-    $fitType2->setCurrentIndex( 18 );
-    $fitType3->setCurrentIndex( 18 );
 
 
     Qt::MetaObject::connectSlotsByName( $muSRFit4 );
@@ -3226,18 +3137,6 @@ sub retranslateUi {
     $self->{optionsFourier}->setIconText( Qt::Application::translate( 'MuSRFit4', "Fourier", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{optionsT0}->setText( Qt::Application::translate( 'MuSRFit4', "T0 and Bg bins", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{optionsT0}->setIconText( Qt::Application::translate( 'MuSRFit4', "T0 and Bg bins", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{runsMan}->setTitle( Qt::Application::translate( 'MuSRFit4', "RUN Files", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{runFiles}->setToolTip( Qt::Application::translate( 'MuSRFit4', "Names of data files to be fit. Multiple data files are comma separated.", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{runFiles}->setWhatsThis( Qt::Application::translate( 'MuSRFit4', "Names of data files to be fit. Multiple data files are comma separated.", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{browse}->setToolTip( Qt::Application::translate( 'MuSRFit4', "Browse to select data files for fitting.", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{browse}->setWhatsThis( Qt::Application::translate( 'MuSRFit4', "Browse to select data files for fitting.", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{browse}->setText( Qt::Application::translate( 'MuSRFit4', "Browse", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{fitAsyTypeLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Fit type", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{fitAsyType}->insertItems(0, [Qt::Application::translate( 'MuSRFit4', "Asymmetry GLB", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Single Hist", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Asymmetry", undef, Qt::Application::UnicodeUTF8() )]);
-    $self->{histsLRBFLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Histograms list", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{histsLRBF}->setText( Qt::Application::translate( 'MuSRFit4', "1 5,3 7", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{runsAuto}->setTitle( Qt::Application::translate( 'MuSRFit4', "RUN Numbers", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{runNumbers}->setToolTip( Qt::Application::translate( 'MuSRFit4', "Numbers of RUNs to fit. Multiple runs are comma separated.", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{runNumbers}->setWhatsThis( Qt::Application::translate( 'MuSRFit4', "Numbers of RUNs to fit. Multiple runs are comma separated.", undef, Qt::Application::UnicodeUTF8() ) );
@@ -3251,80 +3150,32 @@ sub retranslateUi {
         Qt::Application::translate( 'MuSRFit4', "LEM (PPC)", undef, Qt::Application::UnicodeUTF8() )]);
     $self->{yearLabel}->setText( Qt::Application::translate( 'MuSRFit4', "  Year  ", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{beamLineLabel}->setText( Qt::Application::translate( 'MuSRFit4', "On beam line  ", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{groupBox}->setTitle( Qt::Application::translate( 'MuSRFit4', "Theory Function", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{textLabel1_4_2_3}->setText( '' );
-    $self->{comp1Label}->setText( Qt::Application::translate( 'MuSRFit4', "First Component", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{runsMan}->setTitle( Qt::Application::translate( 'MuSRFit4', "RUN Files", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{runFiles}->setToolTip( Qt::Application::translate( 'MuSRFit4', "Names of data files to be fit. Multiple data files are comma separated.", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{runFiles}->setWhatsThis( Qt::Application::translate( 'MuSRFit4', "Names of data files to be fit. Multiple data files are comma separated.", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{browse}->setToolTip( Qt::Application::translate( 'MuSRFit4', "Browse to select data files for fitting.", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{browse}->setWhatsThis( Qt::Application::translate( 'MuSRFit4', "Browse to select data files for fitting.", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{browse}->setText( Qt::Application::translate( 'MuSRFit4', "Browse", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{comp1Label}->setText( Qt::Application::translate( 'MuSRFit4', "Number of components", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{tisLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Initial Fit Time", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{tfsLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Final Fit Time", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{binsLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Fit Binning Factor", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{fitType1}->insertItems(0, [Qt::Application::translate( 'MuSRFit4', "Exponential", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Stretch Exp.", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Exponential Cos", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Cos", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Stretch Cos", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lorentzian Dynamic KT", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Dynamic KT", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Background", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lorentzian Kubo-Toyabe LF x Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Kubo-Toyabe LF x Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lorentzian Kubo-Toyabe LF x Str Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Kubo-Toyabe LF x Str Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "MolMag", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Meissner State Model", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT x Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT x SExp", undef, Qt::Application::UnicodeUTF8() )]);
     $self->{tis}->setText( Qt::Application::translate( 'MuSRFit4', "0", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{tfs}->setText( Qt::Application::translate( 'MuSRFit4', "8", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{bins}->setText( Qt::Application::translate( 'MuSRFit4', "100", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{comp2Label}->setText( Qt::Application::translate( 'MuSRFit4', "Second Component", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{textLabel1_4}->setText( Qt::Application::translate( 'MuSRFit4', "Min X", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{textLabel1_8}->setText( Qt::Application::translate( 'MuSRFit4', "Max X", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{textLabel1_4_2_2}->setText( Qt::Application::translate( 'MuSRFit4', "View Binning Factor", undef, Qt::Application::UnicodeUTF8() ) );
-    $self->{fitType2}->insertItems(0, [Qt::Application::translate( 'MuSRFit4', "Exponential", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Stretch Exp.", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Exponential Cos", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Cos", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Stretch Cos", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lorentzian Dynamic KT", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Dynamic KT", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Background", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lorentzian Kubo-Toyabe LF x Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Kubo-Toyabe LF x Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lorentzian Kubo-Toyabe LF x Str Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Kubo-Toyabe LF x Str Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "MolMag", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Meissner State Model", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT x Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT x SExp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "None", undef, Qt::Application::UnicodeUTF8() )]);
-    $self->{comp3Label}->setText( Qt::Application::translate( 'MuSRFit4', "Third Component", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{textLabel1_4_2}->setText( Qt::Application::translate( 'MuSRFit4', "Min Y", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{textLabel1_4_3}->setText( Qt::Application::translate( 'MuSRFit4', "Max Y", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{textLabel1_4_4}->setText( '' );
-    $self->{fitType3}->insertItems(0, [Qt::Application::translate( 'MuSRFit4', "Exponential", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Stretch Exp.", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Exponential Cos", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Cos", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Stretch Cos", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lorentzian Dynamic KT", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Dynamic KT", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Background", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lorentzian Kubo-Toyabe LF x Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Kubo-Toyabe LF x Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lorentzian Kubo-Toyabe LF x Str Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Gaussian Kubo-Toyabe LF x Str Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "MolMag", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Meissner State Model", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT x Exp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT x SExp", undef, Qt::Application::UnicodeUTF8() ),
-        Qt::Application::translate( 'MuSRFit4', "None", undef, Qt::Application::UnicodeUTF8() )]);
     $self->{ltc}->setText( Qt::Application::translate( 'MuSRFit4', "Life time correction", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{fitAsyTypeLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Fit type", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{fitAsyType}->insertItems(0, [Qt::Application::translate( 'MuSRFit4', "Asymmetry GLB", undef, Qt::Application::UnicodeUTF8() ),
+        Qt::Application::translate( 'MuSRFit4', "Single Hist", undef, Qt::Application::UnicodeUTF8() ),
+        Qt::Application::translate( 'MuSRFit4', "Asymmetry", undef, Qt::Application::UnicodeUTF8() )]);
+    $self->{histsLRBFLabel}->setText( Qt::Application::translate( 'MuSRFit4', "Histograms list", undef, Qt::Application::UnicodeUTF8() ) );
+    $self->{histsLRBF}->setText( Qt::Application::translate( 'MuSRFit4', "1 5,3 7", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{musrfit_tabs}->setTabText( $self->{musrfit_tabs}->indexOf( $self->{runsPage}), Qt::Application::translate( 'MuSRFit4', "RUNS", undef, Qt::Application::UnicodeUTF8() ) );
     $self->{errorCalc}->insertItems(0, [Qt::Application::translate( 'MuSRFit4', "HESSE", undef, Qt::Application::UnicodeUTF8() ),
         Qt::Application::translate( 'MuSRFit4', "MINOS", undef, Qt::Application::UnicodeUTF8() )]);
