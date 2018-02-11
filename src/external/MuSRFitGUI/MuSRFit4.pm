@@ -39,6 +39,7 @@ use QtCore4::slots
     fileBrowse => [],
     AppendToFunctions => [],
     InitializeFunctions => [],
+    addFitType => [],
     t0UpdateClicked => [];
 use Ui_MuSRFit4;
 
@@ -255,6 +256,8 @@ Copyright 2009-2017 by Zaher Salman
 sub CreateAllInput()
 {
     my %All=();
+
+    
     
 # From RUNS Tab
 # Run data file
@@ -382,18 +385,32 @@ sub CreateAllInput()
 	     17,"LGKTSExp",
 	     18,"None"
 	     );
-    
-    my $FT1=this->{ui}->fitType1->currentIndex;
-    my $FT2=this->{ui}->fitType2->currentIndex;
-    my $FT3=this->{ui}->fitType3->currentIndex;
-    $All{"FitType1"} = $FTs{$FT1};
-    $All{"FitType2"} = $FTs{$FT2};
-    $All{"FitType3"} = $FTs{$FT3};
+
+    # Check the number of components
+    my $numComps = 0;
+    my $FT1=0;
+    my $FT2=0;
+    my $FT3=0;
     my @FitTypes =();
-    my $FitType="";
-    foreach $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) {
-	    push( @FitTypes, $FitType );	    
+    my $FT=0;
+    if (defined(this->{ui}->numComps)) {
+	# new style, check the number of components
+	$numComps = this->{ui}->numComps->value;
+	if ($numComps != this->{ui}->columnView->count() ) {
+	    addFitType();
+	}
+    } else {
+	# old style, only 3 componenets
+	$numComps = 3;
+    }
+	    
+    # loop over fitTypes
+    for (my $i=1;$i<=$numComps;$i++) {
+	my $FTi=child("Qt::ComboBox","fitType$i");
+	$All{"FitType$i"} = $FTs{$FTi->currentIndex};
+	print "i=$i with value ".$All{"FitType$i"}."\n";
+	if ( $All{"FitType$i"} ne "None" ) {
+	    push( @FitTypes, $All{"FitType$i"} );	    
 	}
     }
     
@@ -414,7 +431,7 @@ sub CreateAllInput()
     my $Shared = 0; 
     my $PCount =0;
     my $Component=1;
-    foreach $FitType (@FitTypes) {
+    foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );
 	
@@ -460,7 +477,6 @@ sub CreateAllInput()
 		$Shared = $ChkBx->isChecked();
 	    }
 	    $All{"Sh_$Param"}=$Shared;
-	    print "Param $Param is $Shared\n";
 	    $NP++;
 	}
 #Loop on parameters
@@ -1164,11 +1180,176 @@ sub child {
     } else {
 	$Attrib = 0;
     }
-#    print "name = $name and attrib = $Attrib\n";
 
 # Return handle on widget
     return($Attrib);
 }
 
+sub addFitType {
+    # Input number of components
+    my $numComps = this->{ui}->numComps->value;
+    # count number of exisitng components
+    my $NButtons = this->{ui}->columnView->count();
+    # create ComboBox in theoryFunction parent
+    my $fitType = Qt::ComboBox( this->{ui}->theoryFunction );
+
+    # do we have less components that we need
+    if ($numComps > $NButtons) {
+	# add as needed
+	for (my $i=$NButtons+1;$i<=$numComps;$i++) {
+	    my $nameComp = "fitType$i";
+	    this->{ui}->columnView->addWidget( $fitType );
+	    $fitType->setObjectName( $nameComp );
+	    $fitType->setMinimumSize( Qt::Size(0, 25) );
+	    $fitType->setMaximumSize( Qt::Size(255, 25) );
+	    $fitType->insertItems(0,
+	      [Qt::Application::translate( 'MuSRFit4', "Exponential", undef,Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Gaussian", undef,Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Stretch Exp.",undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Exponential Cos",undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Gaussian Cos",undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Stretch Cos",undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Lorentzian Dynamic KT", undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Gaussian Dynamic KT", undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Background",undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Lorentzian Kubo-Toyabe LF x Exp", undef,Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Gaussian Kubo-Toyabe LF x Exp", undef,Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Lorentzian Kubo-Toyabe LF x Str Exp", undef,Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Gaussian Kubo-Toyabe LF x Str Exp", undef,Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "MolMag", undef,Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Meissner State Model", undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT", undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT x Exp", undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT x SExp", undef, Qt::Application::UnicodeUTF8() ),
+	       Qt::Application::translate( 'MuSRFit4', "None", undef,Qt::Application::UnicodeUTF8() )]);
+	    if ($i==1) {
+		$fitType->setCurrentIndex( 0 );
+	    } else {
+		$fitType->setCurrentIndex( 18 );
+	    }
+	}
+    } else {
+	for (my $i=$NButtons;$i > $numComps ;$i--) {
+	    # component is there, delete it
+	    my $widget = this->{ui}->columnView->itemAt($i-1)->widget();
+	    $widget -> hide();
+	    this->{ui}->columnView->removeWidget($widget);
+	    undef $widget;
+	}
+    }		
+}
+
+sub addSharingComp {
+    my $self = this->{ui};
+    # Input number of components
+    my $numComps = $self->numComps->value;
+    # count number of exisitng components
+    my $NShComps = $self->horizontalLayout->count();
+    my $sharingComp = Qt::GroupBox( $self->buttonGroupSharing );
+    my $sizePolicy = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::MinimumExpanding() );
+    $self->{$sizePolicy} = $sizePolicy;
+    $sizePolicy->setHorizontalStretch( 0 );
+    $sizePolicy->setVerticalStretch( 0 );
+    $sizePolicy->setHeightForWidth( $sharingComp->sizePolicy()->hasHeightForWidth() );
+    for (my $i=2;$i<=$numComps;$i++) {
+	$sharingComp->setObjectName( "sharingComp$i" );
+	$sharingComp->setEnabled( 0 );
+	$sharingComp->setSizePolicy( $sizePolicy );
+	$sharingComp->setAlignment( Qt::AlignLeading() );
+	my $layout = Qt::Widget( $sharingComp );
+	$layout->setObjectName( "layoutSh$i" );
+	$layout->setGeometry( Qt::Rect(40, 60, 81, 266) );
+	my $_5 = Qt::VBoxLayout( $layout );
+	$self->{_5} = $_5;
+	$_5->setSpacing( 0 );
+	$_5->setMargin( 0 );
+	$_5->setObjectName( "_5" );
+	$_5->setContentsMargins(0, 0, 0, 0 );
+	my $shParam_1_1 = Qt::CheckBox( $layout );
+	$self->{shParam_1_1} = $shParam_1_1;
+	$shParam_1_1->setObjectName( "shParam_1_1" );
+	
+	$_5->addWidget( $shParam_1_1 );
+	
+	my $shParam_1_2 = Qt::CheckBox( $layout );
+	$self->{shParam_1_2} = $shParam_1_2;
+	$shParam_1_2->setObjectName( "shParam_1_2" );
+	
+	$_5->addWidget( $shParam_1_2 );
+	
+	my $shParam_1_3 = Qt::CheckBox( $layout );
+	$self->{shParam_1_3} = $shParam_1_3;
+	$shParam_1_3->setObjectName( "shParam_1_3" );
+	
+	$_5->addWidget( $shParam_1_3 );
+	
+	my $shParam_1_4 = Qt::CheckBox( $layout );
+	$self->{shParam_1_4} = $shParam_1_4;
+	$shParam_1_4->setObjectName( "shParam_1_4" );
+	
+	$_5->addWidget( $shParam_1_4 );
+	
+	my $shParam_1_5 = Qt::CheckBox( $layout );
+	$self->{shParam_1_5} = $shParam_1_5;
+	$shParam_1_5->setObjectName( "shParam_1_5" );
+	$shParam_1_5->setEnabled( 0 );
+	$shParam_1_5->setTristate( 0 );
+	
+	$_5->addWidget( $shParam_1_5 );
+	
+	my $shParam_1_6 = Qt::CheckBox( $layout );
+	$self->{shParam_1_6} = $shParam_1_6;
+	$shParam_1_6->setObjectName( "shParam_1_6" );
+	$shParam_1_6->setEnabled( 0 );
+	$shParam_1_6->setTristate( 0 );
+	
+	$_5->addWidget( $shParam_1_6 );
+	
+	my $shParam_1_7 = Qt::CheckBox( $layout );
+	$self->{shParam_1_7} = $shParam_1_7;
+	$shParam_1_7->setObjectName( "shParam_1_7" );
+	$shParam_1_7->setEnabled( 0 );
+	$shParam_1_7->setTristate( 0 );
+	
+	$_5->addWidget( $shParam_1_7 );
+	
+	my $shParam_1_8 = Qt::CheckBox( $layout );
+	$self->{shParam_1_8} = $shParam_1_8;
+	$shParam_1_8->setObjectName( "shParam_1_8" );
+	$shParam_1_8->setEnabled( 0 );
+	$shParam_1_8->setTristate( 0 );
+	
+	$_5->addWidget( $shParam_1_8 );
+	
+	my $shParam_1_9 = Qt::CheckBox( $layout );
+	$self->{shParam_1_9} = $shParam_1_9;
+	$shParam_1_9->setObjectName( "shParam_1_9" );
+	$shParam_1_9->setEnabled( 0 );
+	$shParam_1_9->setTristate( 0 );
+
+	$_5->addWidget( $shParam_1_9 );
+
+	my $comp1ShLabel = Qt::Label( $sharingComp );
+	$self->{comp1ShLabel} = $comp1ShLabel;
+	$comp1ShLabel->setObjectName( "comp1ShLabel" );
+	$comp1ShLabel->setGeometry( Qt::Rect(2, 30, 141, 20) );
+	$comp1ShLabel->setWordWrap( 0 );
+	
+	$self->horizontalLayout->addWidget( $sharingComp );
+
+	$self->{sharingComp1}->setTitle( Qt::Application::translate( 'MuSRFit4', "1st Component", undef, Qt::Application::UnicodeUTF8() ) );
+	$self->{shParam_1_1}->setText( Qt::Application::translate( 'MuSRFit4', "Param1", undef, Qt::Application::UnicodeUTF8() ) );
+	$self->{shParam_1_2}->setText( Qt::Application::translate( 'MuSRFit4', "Param2", undef, Qt::Application::UnicodeUTF8() ) );
+	$self->{shParam_1_3}->setText( Qt::Application::translate( 'MuSRFit4', "Param3", undef, Qt::Application::UnicodeUTF8() ) );
+	$self->{shParam_1_4}->setText( Qt::Application::translate( 'MuSRFit4', "Param4", undef, Qt::Application::UnicodeUTF8() ) );
+	$self->{shParam_1_5}->setText( Qt::Application::translate( 'MuSRFit4', "Param5", undef, Qt::Application::UnicodeUTF8() ) );
+	$self->{shParam_1_6}->setText( Qt::Application::translate( 'MuSRFit4', "Param6", undef, Qt::Application::UnicodeUTF8() ) );
+	$self->{shParam_1_7}->setText( Qt::Application::translate( 'MuSRFit4', "Param7", undef, Qt::Application::UnicodeUTF8() ) );
+	$self->{shParam_1_8}->setText( Qt::Application::translate( 'MuSRFit4', "Param8", undef, Qt::Application::UnicodeUTF8() ) );
+	$self->{shParam_1_9}->setText( Qt::Application::translate( 'MuSRFit4', "Param9", undef, Qt::Application::UnicodeUTF8() ) );
+	$self->{comp1ShLabel}->setText( Qt::Application::translate( 'MuSRFit4', "FitType1", undef, Qt::Application::UnicodeUTF8() ) );
+    }
+
+}
 
 1;
