@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>705</width>
-    <height>574</height>
+    <height>587</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -27,7 +27,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../../../../../../.designer/backup/icos/MuSRFit.png</normaloff>../../../../../../.designer/backup/icos/MuSRFit.png</iconset>
+    <normaloff>icos/MuSRFit.png</normaloff>icos/MuSRFit.png</iconset>
   </property>
   <property name="windowIconText">
    <string>MuSRFitGUI</string>
@@ -70,24 +70,12 @@
           <x>1</x>
           <y>1</y>
           <width>676</width>
-          <height>355</height>
+          <height>461</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
           <widget class="QGroupBox" name="runsAuto">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
-             <horstretch>1</horstretch>
-             <verstretch>1</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>100</height>
-            </size>
-           </property>
            <property name="title">
             <string>RUN Numbers</string>
            </property>
@@ -428,12 +416,6 @@
               <layout class="QHBoxLayout" name="horizontalLayout_2">
                <item>
                 <widget class="QLabel" name="comp1Label">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
@@ -946,7 +928,7 @@
                   <x>0</x>
                   <y>0</y>
                   <width>276</width>
-                  <height>70</height>
+                  <height>180</height>
                  </rect>
                 </property>
                 <widget class="QVBoxLayout" name="columnView" native="true">
@@ -967,7 +949,7 @@
            <item>
             <widget class="QScrollArea" name="scrollArea">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
@@ -987,7 +969,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>380</width>
-                <height>105</height>
+                <height>215</height>
                </rect>
               </property>
               <widget class="QWidget" name="layoutWidget2">
@@ -1331,7 +1313,7 @@
          <item>
           <layout class="QGridLayout" name="gridLayout_6">
            <property name="sizeConstraint">
-            <enum>QLayout::SetMinimumSize</enum>
+            <enum>QLayout::SetDefaultConstraint</enum>
            </property>
            <item row="0" column="0">
             <widget class="QLabel" name="fitAsyTypeLabel">
@@ -1589,7 +1571,7 @@
                 </sizepolicy>
                </property>
                <property name="title">
-                <string>1st Component</string>
+                <string>Component 1</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignLeading</set>
@@ -1720,277 +1702,6 @@
                 <property name="wordWrap">
                  <bool>false</bool>
                 </property>
-               </widget>
-              </widget>
-             </item>
-             <item>
-              <widget class="QGroupBox" name="sharingComp2">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="title">
-                <string>2nd Component</string>
-               </property>
-               <widget class="QLabel" name="comp2ShLabel">
-                <property name="geometry">
-                 <rect>
-                  <x>2</x>
-                  <y>30</y>
-                  <width>141</width>
-                  <height>20</height>
-                 </rect>
-                </property>
-                <property name="text">
-                 <string>FitType2</string>
-                </property>
-                <property name="wordWrap">
-                 <bool>false</bool>
-                </property>
-               </widget>
-               <widget class="QWidget" name="layout13">
-                <property name="geometry">
-                 <rect>
-                  <x>40</x>
-                  <y>60</y>
-                  <width>81</width>
-                  <height>266</height>
-                 </rect>
-                </property>
-                <layout class="QVBoxLayout" name="_1">
-                 <property name="spacing">
-                  <number>0</number>
-                 </property>
-                 <property name="margin">
-                  <number>0</number>
-                 </property>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_2_1">
-                   <property name="text">
-                    <string>Param1</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_2_2">
-                   <property name="text">
-                    <string>Param2</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_2_3">
-                   <property name="text">
-                    <string>Param3</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_2_4">
-                   <property name="text">
-                    <string>Param4</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_2_5">
-                   <property name="text">
-                    <string>Param5</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_2_6">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>Param6</string>
-                   </property>
-                   <property name="tristate">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_2_7">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>Param7</string>
-                   </property>
-                   <property name="tristate">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_2_8">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>Param8</string>
-                   </property>
-                   <property name="tristate">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_2_9">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>Param9</string>
-                   </property>
-                   <property name="tristate">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </widget>
-             </item>
-             <item>
-              <widget class="QGroupBox" name="sharingComp3">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="title">
-                <string>3rd Component</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignJustify|Qt::AlignVCenter</set>
-               </property>
-               <widget class="QLabel" name="comp3ShLabel">
-                <property name="geometry">
-                 <rect>
-                  <x>2</x>
-                  <y>30</y>
-                  <width>141</width>
-                  <height>20</height>
-                 </rect>
-                </property>
-                <property name="text">
-                 <string>FitType3</string>
-                </property>
-                <property name="wordWrap">
-                 <bool>false</bool>
-                </property>
-               </widget>
-               <widget class="QWidget" name="layout15">
-                <property name="geometry">
-                 <rect>
-                  <x>41</x>
-                  <y>58</y>
-                  <width>81</width>
-                  <height>266</height>
-                 </rect>
-                </property>
-                <layout class="QVBoxLayout" name="_3">
-                 <item>
-                  <widget class="QCheckBox" name="shParam_3_1">
-                   <property name="text">
-                    <string>Param1</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_3_2">
-                   <property name="text">
-                    <string>Param2</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_3_3">
-                   <property name="text">
-                    <string>Param3</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_3_4">
-                   <property name="text">
-                    <string>Param4</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_3_5">
-                   <property name="text">
-                    <string>Param5</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_3_6">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>Param6</string>
-                   </property>
-                   <property name="tristate">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_3_7">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>Param7</string>
-                   </property>
-                   <property name="tristate">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_3_8">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>Param8</string>
-                   </property>
-                   <property name="tristate">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QCheckBox" name="shParam_3_9">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>Param9</string>
-                   </property>
-                   <property name="tristate">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
                </widget>
               </widget>
              </item>
@@ -4461,7 +4172,7 @@
   <action name="fileSaveAction">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../../../.designer/backup/icos/save.png</normaloff>../../../../../../.designer/backup/icos/save.png</iconset>
+     <normaloff>icos/save.png</normaloff>icos/save.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Save MSR...</string>
@@ -4479,7 +4190,7 @@
   <action name="fileExitAction">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../../../.designer/backup/icos/exit.png</normaloff>../../../../../../.designer/backup/icos/exit.png</iconset>
+     <normaloff>icos/exit.png</normaloff>icos/exit.png</iconset>
    </property>
    <property name="text">
     <string>E&amp;xit</string>
@@ -4536,7 +4247,7 @@
   <action name="fileChangeDirAction">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../../../.designer/backup/icos/chdir.png</normaloff>../../../../../../.designer/backup/icos/chdir.png</iconset>
+     <normaloff>icos/chdir.png</normaloff>icos/chdir.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Change dir</string>
@@ -4559,7 +4270,7 @@
   <action name="parametersExport_AsAction">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../../../.designer/backup/icos/Export.png</normaloff>../../../../../../.designer/backup/icos/Export.png</iconset>
+     <normaloff>icos/Export.png</normaloff>icos/Export.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Export As...</string>
@@ -4574,7 +4285,7 @@
   <action name="parametersAppend_ToAction">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../../../.designer/backup/icos/Append.png</normaloff>../../../../../../.designer/backup/icos/Append.png</iconset>
+     <normaloff>icos/Append.png</normaloff>icos/Append.png</iconset>
    </property>
    <property name="text">
     <string>&amp;Append To...</string>
@@ -4589,7 +4300,7 @@
   <action name="fit">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../../../.designer/backup/icos/Fit.png</normaloff>../../../../../../.designer/backup/icos/Fit.png</iconset>
+     <normaloff>icos/Fit.png</normaloff>icos/Fit.png</iconset>
    </property>
    <property name="iconText">
     <string>Fit and Plot</string>
@@ -4604,7 +4315,7 @@
    </property>
    <property name="icon">
     <iconset>
-     <normaloff>../../../../../../.designer/backup/icos/Plot.png</normaloff>../../../../../../.designer/backup/icos/Plot.png</iconset>
+     <normaloff>icos/Plot.png</normaloff>icos/Plot.png</iconset>
    </property>
    <property name="iconText">
     <string>Plot</string>
@@ -4616,7 +4327,7 @@
   <action name="t0">
    <property name="icon">
     <iconset>
-     <normaloff>../../../../../../.designer/backup/icos/T0.png</normaloff>../../../../../../.designer/backup/icos/T0.png</iconset>
+     <normaloff>icos/T0.png</normaloff>icos/T0.png</iconset>
    </property>
    <property name="iconText">
     <string>Show t0 and Bg Bins</string>
@@ -4678,24 +4389,6 @@
   <tabstop>shParam_1_7</tabstop>
   <tabstop>shParam_1_8</tabstop>
   <tabstop>shParam_1_9</tabstop>
-  <tabstop>shParam_2_1</tabstop>
-  <tabstop>shParam_2_2</tabstop>
-  <tabstop>shParam_2_3</tabstop>
-  <tabstop>shParam_2_4</tabstop>
-  <tabstop>shParam_2_5</tabstop>
-  <tabstop>shParam_2_6</tabstop>
-  <tabstop>shParam_2_7</tabstop>
-  <tabstop>shParam_2_8</tabstop>
-  <tabstop>shParam_2_9</tabstop>
-  <tabstop>shParam_3_1</tabstop>
-  <tabstop>shParam_3_2</tabstop>
-  <tabstop>shParam_3_3</tabstop>
-  <tabstop>shParam_3_4</tabstop>
-  <tabstop>shParam_3_5</tabstop>
-  <tabstop>shParam_3_6</tabstop>
-  <tabstop>shParam_3_7</tabstop>
-  <tabstop>shParam_3_8</tabstop>
-  <tabstop>shParam_3_9</tabstop>
   <tabstop>initParamTable</tabstop>
   <tabstop>title</tabstop>
   <tabstop>fileName</tabstop>
@@ -4893,7 +4586,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>686</x>
-     <y>655</y>
+     <y>555</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -4909,7 +4602,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>686</x>
-     <y>368</y>
+     <y>329</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -4957,7 +4650,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>687</x>
-     <y>656</y>
+     <y>556</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -5004,8 +4697,8 @@
    <slot>t0Update()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>544</x>
-     <y>188</y>
+     <x>542</x>
+     <y>189</y>
     </hint>
     <hint type="destinationlabel">
      <x>603</x>
@@ -5020,8 +4713,8 @@
    <slot>addFitType()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>235</x>
-     <y>345</y>
+     <x>292</x>
+     <y>340</y>
     </hint>
     <hint type="destinationlabel">
      <x>703</x>

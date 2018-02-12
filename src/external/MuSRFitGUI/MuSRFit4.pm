@@ -403,12 +403,16 @@ sub CreateAllInput()
 	# old style, only 3 componenets
 	$numComps = 3;
     }
+    $All{"numComps"}=$numComps;
 	    
     # loop over fitTypes
     for (my $i=1;$i<=$numComps;$i++) {
 	my $FTi=child("Qt::ComboBox","fitType$i");
-	$All{"FitType$i"} = $FTs{$FTi->currentIndex};
-	print "i=$i with value ".$All{"FitType$i"}."\n";
+	if ($FTi == 0) {
+	    $All{"FitType$i"} = "None";
+	} else {
+	    $All{"FitType$i"} = $FTs{$FTi->currentIndex};
+	}
 	if ( $All{"FitType$i"} ne "None" ) {
 	    push( @FitTypes, $All{"FitType$i"} );	    
 	}
@@ -427,6 +431,9 @@ sub CreateAllInput()
     
 # Shared settings are detected here
     $All{"EnableSharing"} = this->{ui}->buttonGroupSharing->isChecked();
+    # Make sure all sharing boxes exist
+    #addSharingComp();
+
 
     my $Shared = 0; 
     my $PCount =0;
@@ -474,7 +481,7 @@ sub CreateAllInput()
 # check if it is checked
 		my $ChkName="shParam_".$Component."_".$NP;
 		my $ChkBx = child("Qt::Widget",$ChkName);
-		$Shared = $ChkBx->isChecked();
+		if ($ChkBx != 0) {$Shared = $ChkBx->isChecked();}
 	    }
 	    $All{"Sh_$Param"}=$Shared;
 	    $NP++;
@@ -735,18 +742,23 @@ sub ActivateShComp()
     my @RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );
     my @Hists = split( /,/, $All{"LRBF"} );
     
-# Hide all sharing components
-    this->{ui}->sharingComp1->setHidden(1);
-    this->{ui}->sharingComp2->setHidden(1);
-    this->{ui}->sharingComp3->setHidden(1);
-    this->{ui}->sharingComp1->setEnabled(0);
-    this->{ui}->sharingComp2->setEnabled(0);
-    this->{ui}->sharingComp3->setEnabled(0);
+    # Make sure all sharing boxes exist
+    addSharingComp();
+
+    my $NShComps = this->{ui}->horizontalLayout->count();
+    my $sharingComp = "";
+    my $i = 1;
+    # Hide all sharing components
+    for ($i = 1; $i<=$NShComps;$i++) {
+	$sharingComp = child("Qt::GroupBox","sharingComp$i");
+	$sharingComp->setHidden(1);
+	$sharingComp->setEnabled(0);
+    }
     
     my @FitTypes =();
-    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) {
-	    push( @FitTypes, $FitType );	    
+    for ($i=1;$i<=$All{"numComps"};$i++)  {
+	if ( $All{"FitType$i"} ne "None" ) {
+	    push( @FitTypes, $All{"FitType$i"} );	    
 	}
     }
     
@@ -796,7 +808,7 @@ sub ActivateShComp()
 	    $CompShL->setText($All{"FitType$Component"});
 	
 # Change state/label of parameters
-	    for (my $i=1; $i<=9;$i++) {		
+	    for ($i=1; $i<=9;$i++) {		
 		my $ParamChkBx="shParam_".$Component."_".$i;
 		my $ChkBx = child("Qt::Widget",$ParamChkBx);
 		if (defined($Params[$i-1])) {
@@ -1061,9 +1073,9 @@ sub InitializeFunctions()
     my @Hists = split( /,/, $All{"LRBF"} );
 
     my @FitTypes =();
-    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) {
-	    push( @FitTypes, $FitType );	    
+    for (my $i=1;$i<=$All{"numComps"};$i++)  {
+	if ( $All{"FitType$i"} ne "None" ) {
+	    push( @FitTypes, $All{"FitType$i"} );	    
 	}
     }
     
@@ -1203,27 +1215,29 @@ sub addFitType {
 	    $fitType->setMinimumSize( Qt::Size(0, 25) );
 	    $fitType->setMaximumSize( Qt::Size(255, 25) );
 	    $fitType->insertItems(0,
-	      [Qt::Application::translate( 'MuSRFit4', "Exponential", undef,Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Gaussian", undef,Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Stretch Exp.",undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Exponential Cos",undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Gaussian Cos",undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Stretch Cos",undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Lorentzian Dynamic KT", undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Gaussian Dynamic KT", undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Background",undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Lorentzian Kubo-Toyabe LF x Exp", undef,Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Gaussian Kubo-Toyabe LF x Exp", undef,Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Lorentzian Kubo-Toyabe LF x Str Exp", undef,Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Gaussian Kubo-Toyabe LF x Str Exp", undef,Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "MolMag", undef,Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Meissner State Model", undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT", undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT x Exp", undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "Lor-Gss combi KT x SExp", undef, Qt::Application::UnicodeUTF8() ),
-	       Qt::Application::translate( 'MuSRFit4', "None", undef,Qt::Application::UnicodeUTF8() )]);
+	      ["Exponential",
+	       "Gaussian",
+	       "Stretch Exp.",
+	       "Exponential Cos",
+	       "Gaussian Cos",
+	       "Stretch Cos",
+	       "Lorentzian Dynamic KT",
+	       "Gaussian Dynamic KT",
+	       "Background",
+	       "Lorentzian Kubo-Toyabe LF x Exp",
+	       "Gaussian Kubo-Toyabe LF x Exp",
+	       "Lorentzian Kubo-Toyabe LF x Str Exp",
+	       "Gaussian Kubo-Toyabe LF x Str Exp",
+	       "MolMag",
+	       "Meissner State Model",
+	       "Lor-Gss combi KT",
+	       "Lor-Gss combi KT x Exp",
+	       "Lor-Gss combi KT x SExp",
+	       "None",]);
 	    if ($i==1) {
-		$fitType->setCurrentIndex( 0 );
+		$fitType->setCurrentIndex(0);
+		# remove the "None" option for the 1st component
+		$fitType->removeItem(18);
 	    } else {
 		$fitType->setCurrentIndex( 18 );
 	    }
@@ -1245,111 +1259,51 @@ sub addSharingComp {
     my $numComps = $self->numComps->value;
     # count number of exisitng components
     my $NShComps = $self->horizontalLayout->count();
-    my $sharingComp = Qt::GroupBox( $self->buttonGroupSharing );
-    my $sizePolicy = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::MinimumExpanding() );
-    $self->{$sizePolicy} = $sizePolicy;
-    $sizePolicy->setHorizontalStretch( 0 );
-    $sizePolicy->setVerticalStretch( 0 );
-    $sizePolicy->setHeightForWidth( $sharingComp->sizePolicy()->hasHeightForWidth() );
-    for (my $i=2;$i<=$numComps;$i++) {
-	$sharingComp->setObjectName( "sharingComp$i" );
-	$sharingComp->setEnabled( 0 );
-	$sharingComp->setSizePolicy( $sizePolicy );
-	$sharingComp->setAlignment( Qt::AlignLeading() );
-	my $layout = Qt::Widget( $sharingComp );
-	$layout->setObjectName( "layoutSh$i" );
-	$layout->setGeometry( Qt::Rect(40, 60, 81, 266) );
-	my $_5 = Qt::VBoxLayout( $layout );
-	$self->{_5} = $_5;
-	$_5->setSpacing( 0 );
-	$_5->setMargin( 0 );
-	$_5->setObjectName( "_5" );
-	$_5->setContentsMargins(0, 0, 0, 0 );
-	my $shParam_1_1 = Qt::CheckBox( $layout );
-	$self->{shParam_1_1} = $shParam_1_1;
-	$shParam_1_1->setObjectName( "shParam_1_1" );
+    my @sharingComps = ();
+    for (my $i=$NShComps+1;$i<=$numComps;$i++) {
+	$sharingComps[$i] = Qt::GroupBox( $self->buttonGroupSharing );
+	my $sizePolicy = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::MinimumExpanding() );
+	$self->{$sizePolicy} = $sizePolicy;
+	$sizePolicy->setHorizontalStretch( 0 );
+	$sizePolicy->setVerticalStretch( 0 );
+	$sizePolicy->setHeightForWidth( $sharingComps[$i]->sizePolicy()->hasHeightForWidth() );
+	# check is this component exists
+	if (child("Qt::GroupBox","sharingComp$i") == 0) {
+	    $sharingComps[$i]->setObjectName( "sharingComp$i" );
+	    $sharingComps[$i]->setEnabled( 0 );
+	    $sharingComps[$i]->setSizePolicy( $sizePolicy );
+	    $sharingComps[$i]->setAlignment( Qt::AlignLeading() );
+	    $sharingComps[$i]->setTitle("Component $i");
+	    my $layout = Qt::Widget( $sharingComps[$i] );
+	    $layout->setObjectName( "layoutSh$i" );
+	    $layout->setGeometry( Qt::Rect(40, 60, 81, 266) );
+	    my $shBoxLayout = Qt::VBoxLayout( $layout );
+	    $self->{shBoxLayout} = $shBoxLayout;
+	    $shBoxLayout->setSpacing( 0 );
+	    $shBoxLayout->setMargin( 0 );
+	    $shBoxLayout->setObjectName( "shBoxLayout$i" );
+	    $shBoxLayout->setContentsMargins(0, 0, 0, 0 );
+	    my @shParam = ();
+	    for (my $j=1;$j<=9;$j++) {
+		$shParam[$j] = Qt::CheckBox( $layout );
+		$self->{shParam} = $shParam[$j];
+		$shParam[$j]->setObjectName( "shParam_".$i."_$j" );
+		$shParam[$j]->setText("Param$j");
+		$shBoxLayout->addWidget( $shParam[$j] );
+	    }
+		
+	    my $compShLabel = Qt::Label( $sharingComps[$i] );
+	    $self->{compShLabel} = $compShLabel;
+	    $compShLabel->setObjectName( "comp".$i."ShLabel" );
+	    $compShLabel->setGeometry( Qt::Rect(2, 30, 141, 20) );
+	    $compShLabel->setWordWrap( 0 );
 	
-	$_5->addWidget( $shParam_1_1 );
-	
-	my $shParam_1_2 = Qt::CheckBox( $layout );
-	$self->{shParam_1_2} = $shParam_1_2;
-	$shParam_1_2->setObjectName( "shParam_1_2" );
-	
-	$_5->addWidget( $shParam_1_2 );
-	
-	my $shParam_1_3 = Qt::CheckBox( $layout );
-	$self->{shParam_1_3} = $shParam_1_3;
-	$shParam_1_3->setObjectName( "shParam_1_3" );
-	
-	$_5->addWidget( $shParam_1_3 );
-	
-	my $shParam_1_4 = Qt::CheckBox( $layout );
-	$self->{shParam_1_4} = $shParam_1_4;
-	$shParam_1_4->setObjectName( "shParam_1_4" );
-	
-	$_5->addWidget( $shParam_1_4 );
-	
-	my $shParam_1_5 = Qt::CheckBox( $layout );
-	$self->{shParam_1_5} = $shParam_1_5;
-	$shParam_1_5->setObjectName( "shParam_1_5" );
-	$shParam_1_5->setEnabled( 0 );
-	$shParam_1_5->setTristate( 0 );
-	
-	$_5->addWidget( $shParam_1_5 );
-	
-	my $shParam_1_6 = Qt::CheckBox( $layout );
-	$self->{shParam_1_6} = $shParam_1_6;
-	$shParam_1_6->setObjectName( "shParam_1_6" );
-	$shParam_1_6->setEnabled( 0 );
-	$shParam_1_6->setTristate( 0 );
-	
-	$_5->addWidget( $shParam_1_6 );
-	
-	my $shParam_1_7 = Qt::CheckBox( $layout );
-	$self->{shParam_1_7} = $shParam_1_7;
-	$shParam_1_7->setObjectName( "shParam_1_7" );
-	$shParam_1_7->setEnabled( 0 );
-	$shParam_1_7->setTristate( 0 );
-	
-	$_5->addWidget( $shParam_1_7 );
-	
-	my $shParam_1_8 = Qt::CheckBox( $layout );
-	$self->{shParam_1_8} = $shParam_1_8;
-	$shParam_1_8->setObjectName( "shParam_1_8" );
-	$shParam_1_8->setEnabled( 0 );
-	$shParam_1_8->setTristate( 0 );
-	
-	$_5->addWidget( $shParam_1_8 );
-	
-	my $shParam_1_9 = Qt::CheckBox( $layout );
-	$self->{shParam_1_9} = $shParam_1_9;
-	$shParam_1_9->setObjectName( "shParam_1_9" );
-	$shParam_1_9->setEnabled( 0 );
-	$shParam_1_9->setTristate( 0 );
-
-	$_5->addWidget( $shParam_1_9 );
-
-	my $comp1ShLabel = Qt::Label( $sharingComp );
-	$self->{comp1ShLabel} = $comp1ShLabel;
-	$comp1ShLabel->setObjectName( "comp1ShLabel" );
-	$comp1ShLabel->setGeometry( Qt::Rect(2, 30, 141, 20) );
-	$comp1ShLabel->setWordWrap( 0 );
-	
-	$self->horizontalLayout->addWidget( $sharingComp );
-
-	$self->{sharingComp1}->setTitle( Qt::Application::translate( 'MuSRFit4', "1st Component", undef, Qt::Application::UnicodeUTF8() ) );
-	$self->{shParam_1_1}->setText( Qt::Application::translate( 'MuSRFit4', "Param1", undef, Qt::Application::UnicodeUTF8() ) );
-	$self->{shParam_1_2}->setText( Qt::Application::translate( 'MuSRFit4', "Param2", undef, Qt::Application::UnicodeUTF8() ) );
-	$self->{shParam_1_3}->setText( Qt::Application::translate( 'MuSRFit4', "Param3", undef, Qt::Application::UnicodeUTF8() ) );
-	$self->{shParam_1_4}->setText( Qt::Application::translate( 'MuSRFit4', "Param4", undef, Qt::Application::UnicodeUTF8() ) );
-	$self->{shParam_1_5}->setText( Qt::Application::translate( 'MuSRFit4', "Param5", undef, Qt::Application::UnicodeUTF8() ) );
-	$self->{shParam_1_6}->setText( Qt::Application::translate( 'MuSRFit4', "Param6", undef, Qt::Application::UnicodeUTF8() ) );
-	$self->{shParam_1_7}->setText( Qt::Application::translate( 'MuSRFit4', "Param7", undef, Qt::Application::UnicodeUTF8() ) );
-	$self->{shParam_1_8}->setText( Qt::Application::translate( 'MuSRFit4', "Param8", undef, Qt::Application::UnicodeUTF8() ) );
-	$self->{shParam_1_9}->setText( Qt::Application::translate( 'MuSRFit4', "Param9", undef, Qt::Application::UnicodeUTF8() ) );
-	$self->{comp1ShLabel}->setText( Qt::Application::translate( 'MuSRFit4', "FitType1", undef, Qt::Application::UnicodeUTF8() ) );
+	    $self->horizontalLayout->addWidget( $sharingComps[$i] );
+	    $compShLabel->setText("FitType$i");
+	} else {
+	    print "Exist, skip component $i\n";
+	}
     }
-
 }
 
 1;
