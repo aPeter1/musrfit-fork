@@ -56,7 +56,7 @@ sub CreateMSRUni {
 #
 # Input in %All
 # Required:
-#  $All{"FitType1/2/3"} - Function types, 3 components
+#  $All{"FitTypei"}     - Function types, i components
 #  $All{"LRBF"}         - Histograms, comma separated
 #  $All{"Tis"}           
 #  $All{"Tfs"}
@@ -86,10 +86,11 @@ sub CreateMSRUni {
     my $DEBUG = "";
     # Start with empty array
     my @FitTypes = ();
-
-    foreach ($All{"FitType1"},$All{"FitType2"},$All{"FitType3"}) {
-	if ($_ ne "None") {
-	    @FitTypes=(@FitTypes,$_);
+    # loop over fitTypes
+    if (!defined($All{"numComps"})) {$All{"numComps"}=3;}
+    for (my $i=1;$i<=$All{"numComps"};$i++) {
+	if ( defined($All{"FitType$i"}) &&$All{"FitType$i"} ne "None" ) {
+	    push( @FitTypes, $All{"FitType$i"} );	    
 	}
     }
 
@@ -1047,10 +1048,15 @@ sub PrepParamTable {
     }
     my @Hists = split( /,/, $All{"LRBF"} );
 
-    my @FitTypes =();
-    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
+    my @FitTypes = ();
+    # loop over fitTypes
+    if (!defined($All{"numComps"})) {$All{"numComps"}=3;}
+    for (my $i=1;$i<=$All{"numComps"};$i++) {
+	if ( defined($All{"FitType$i"}) &&$All{"FitType$i"} ne "None" ) {
+	    push( @FitTypes, $All{"FitType$i"} );	    
+	}
     }
+
 # Get theory block to determine the size of the table 
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
 # For now the line below does not work. Why?    
@@ -1239,10 +1245,15 @@ sub ExportParams {
     }
     my @Hists = split( /,/, $All{"LRBF"} );
 
-    my @FitTypes =();
-    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
+    my @FitTypes = ();
+    # loop over fitTypes
+    if (!defined($All{"numComps"})) {$All{"numComps"}=3;}
+    for (my $i=1;$i<=$All{"numComps"};$i++) {
+	if ( defined($All{"FitType$i"}) &&$All{"FitType$i"} ne "None" ) {
+	    push( @FitTypes, $All{"FitType$i"} );	    
+	}
     }
+
     # Get theory block to determine the size of the table
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
     # For now the line below does not work. Why?    
