@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>705</width>
-    <height>587</height>
+    <width>706</width>
+    <height>516</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -33,6 +33,12 @@
    <string>MuSRFitGUI</string>
   </property>
   <widget class="QWidget" name="widget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
    <layout class="QGridLayout">
     <item row="0" column="0">
      <widget class="QTabWidget" name="musrfit_tabs">
@@ -57,12 +63,21 @@
         <height>32767</height>
        </size>
       </property>
+      <property name="toolTip">
+       <string notr="true"/>
+      </property>
+      <property name="accessibleName">
+       <string notr="true"/>
+      </property>
+      <property name="accessibleDescription">
+       <string notr="true"/>
+      </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
       <widget class="QWidget" name="runsPage">
        <attribute name="title">
-        <string>RUNS</string>
+        <string notr="true">RUNS</string>
        </attribute>
        <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
@@ -70,12 +85,18 @@
           <x>1</x>
           <y>1</y>
           <width>676</width>
-          <height>461</height>
+          <height>375</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
           <widget class="QGroupBox" name="runsAuto">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="title">
             <string>RUN Numbers</string>
            </property>
@@ -95,7 +116,7 @@
                <number>0</number>
               </property>
               <property name="spacing">
-               <number>0</number>
+               <number>5</number>
               </property>
               <item row="1" column="4">
                <widget class="QComboBox" name="year">
@@ -114,7 +135,7 @@
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>25</height>
+                  <height>29</height>
                  </size>
                 </property>
                 <property name="editable">
@@ -148,7 +169,7 @@
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>25</height>
+                  <height>29</height>
                  </size>
                 </property>
                 <property name="toolTip">
@@ -198,7 +219,7 @@
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>25</height>
+                  <height>29</height>
                  </size>
                 </property>
                 <item>
@@ -322,6 +343,9 @@
            <layout class="QGridLayout" name="gridLayout_4">
             <item row="0" column="0">
              <layout class="QGridLayout" name="runFiles_2" rowstretch="1,0">
+              <property name="spacing">
+               <number>5</number>
+              </property>
               <item row="1" column="0">
                <spacer name="spacer3">
                 <property name="orientation">
@@ -358,7 +382,7 @@
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>25</height>
+                  <height>29</height>
                  </size>
                 </property>
                 <property name="toolTip">
@@ -389,7 +413,7 @@
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>25</height>
+                  <height>29</height>
                  </size>
                 </property>
                 <property name="toolTip">
@@ -419,13 +443,13 @@
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>25</height>
+                   <height>29</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>25</height>
+                   <height>29</height>
                   </size>
                  </property>
                  <property name="palette">
@@ -886,13 +910,13 @@
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
-                   <height>25</height>
+                   <height>29</height>
                   </size>
                  </property>
                  <property name="maximumSize">
                   <size>
                    <width>16777215</width>
-                   <height>25</height>
+                   <height>29</height>
                   </size>
                  </property>
                  <property name="minimum">
@@ -928,7 +952,7 @@
                   <x>0</x>
                   <y>0</y>
                   <width>276</width>
-                  <height>180</height>
+                  <height>70</height>
                  </rect>
                 </property>
                 <widget class="QVBoxLayout" name="columnView" native="true">
@@ -969,7 +993,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>380</width>
-                <height>215</height>
+                <height>109</height>
                </rect>
               </property>
               <widget class="QWidget" name="layoutWidget2">
@@ -978,7 +1002,7 @@
                  <x>10</x>
                  <y>10</y>
                  <width>355</width>
-                 <height>180</height>
+                 <height>192</height>
                 </rect>
                </property>
                <layout class="QGridLayout" name="gridLayout_1">
@@ -986,6 +1010,9 @@
                  <number>5</number>
                 </property>
                 <property name="rightMargin">
+                 <number>5</number>
+                </property>
+                <property name="spacing">
                  <number>5</number>
                 </property>
                 <item row="0" column="0">
@@ -1047,13 +1074,13 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1072,13 +1099,13 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1097,13 +1124,13 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
                     <width>16777215</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1122,7 +1149,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1144,7 +1171,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1166,7 +1193,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1182,7 +1209,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                  </widget>
@@ -1192,7 +1219,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                  </widget>
@@ -1202,7 +1229,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                  </widget>
@@ -1212,7 +1239,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1228,7 +1255,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1250,7 +1277,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1266,7 +1293,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                  </widget>
@@ -1276,7 +1303,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                  </widget>
@@ -1292,7 +1319,7 @@
                   <property name="minimumSize">
                    <size>
                     <width>0</width>
-                    <height>25</height>
+                    <height>29</height>
                    </size>
                   </property>
                   <property name="text">
@@ -1314,6 +1341,9 @@
           <layout class="QGridLayout" name="gridLayout_6">
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
+           </property>
+           <property name="spacing">
+            <number>5</number>
            </property>
            <item row="0" column="0">
             <widget class="QLabel" name="fitAsyTypeLabel">
@@ -1342,13 +1372,13 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>25</height>
+               <height>29</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>25</height>
+               <height>29</height>
               </size>
              </property>
              <item>
@@ -1395,13 +1425,13 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>25</height>
+               <height>29</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>16777215</width>
-               <height>25</height>
+               <height>29</height>
               </size>
              </property>
              <property name="text">
@@ -1439,12 +1469,15 @@
          <layout class="QVBoxLayout" name="fitGrid">
           <item>
            <layout class="QGridLayout" name="fitLayout">
+            <property name="spacing">
+             <number>5</number>
+            </property>
             <item row="1" column="1">
              <widget class="QComboBox" name="errorCalc">
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>25</height>
+                <height>29</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -1470,7 +1503,7 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>25</height>
+                <height>29</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -1790,6 +1823,9 @@
             <layout class="QGridLayout">
              <item row="0" column="0">
               <layout class="QVBoxLayout">
+               <property name="spacing">
+                <number>5</number>
+               </property>
                <item>
                 <widget class="QLabel" name="titleLabel">
                  <property name="sizePolicy">
@@ -2299,12 +2335,27 @@
                <x>5</x>
                <y>18</y>
                <width>100</width>
-               <height>150</height>
+               <height>171</height>
               </rect>
              </property>
              <layout class="QVBoxLayout">
+              <property name="spacing">
+               <number>5</number>
+              </property>
               <item>
                <widget class="QLabel" name="textLabel2">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>29</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>t0</string>
                 </property>
@@ -2315,6 +2366,18 @@
               </item>
               <item>
                <widget class="QLabel" name="textLabel2_2_2_3">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>29</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Bg1</string>
                 </property>
@@ -2325,6 +2388,18 @@
               </item>
               <item>
                <widget class="QLabel" name="textLabel2_2_2">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>29</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Bg2</string>
                 </property>
@@ -2335,6 +2410,18 @@
               </item>
               <item>
                <widget class="QLabel" name="textLabel2_2_2_2">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>29</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Data 1</string>
                 </property>
@@ -2345,6 +2432,18 @@
               </item>
               <item>
                <widget class="QLabel" name="textLabel2_2_2_2_2">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>29</height>
+                 </size>
+                </property>
                 <property name="text">
                  <string>Data 2</string>
                 </property>
@@ -2380,12 +2479,12 @@
                <x>8</x>
                <y>17</y>
                <width>75</width>
-               <height>150</height>
+               <height>167</height>
               </rect>
              </property>
              <layout class="QVBoxLayout">
               <property name="spacing">
-               <number>0</number>
+               <number>5</number>
               </property>
               <property name="margin">
                <number>0</number>
@@ -2429,12 +2528,12 @@
                <x>8</x>
                <y>17</y>
                <width>75</width>
-               <height>150</height>
+               <height>167</height>
               </rect>
              </property>
              <layout class="QVBoxLayout">
               <property name="spacing">
-               <number>0</number>
+               <number>5</number>
               </property>
               <property name="margin">
                <number>0</number>
@@ -2478,12 +2577,12 @@
                <x>8</x>
                <y>17</y>
                <width>75</width>
-               <height>150</height>
+               <height>167</height>
               </rect>
              </property>
              <layout class="QVBoxLayout">
               <property name="spacing">
-               <number>0</number>
+               <number>5</number>
               </property>
               <property name="margin">
                <number>0</number>
@@ -2527,12 +2626,12 @@
                <x>8</x>
                <y>17</y>
                <width>75</width>
-               <height>150</height>
+               <height>167</height>
               </rect>
              </property>
              <layout class="QVBoxLayout">
               <property name="spacing">
-               <number>0</number>
+               <number>5</number>
               </property>
               <property name="margin">
                <number>0</number>
@@ -3567,7 +3666,7 @@
               <property name="minimumSize">
                <size>
                 <width>0</width>
-                <height>25</height>
+                <height>29</height>
                </size>
               </property>
              </widget>
@@ -4085,7 +4184,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>705</width>
+     <width>706</width>
      <height>27</height>
     </rect>
    </property>
@@ -4585,8 +4684,8 @@
    <slot>InitializeFunctions()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>686</x>
-     <y>555</y>
+     <x>687</x>
+     <y>496</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -4601,8 +4700,8 @@
    <slot>AppendToFunctions()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>686</x>
-     <y>329</y>
+     <x>687</x>
+     <y>299</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -4617,8 +4716,8 @@
    <slot>ActivateShComp()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>38</x>
-     <y>200</y>
+     <x>48</x>
+     <y>125</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -4649,8 +4748,8 @@
    <slot>t0UpdateClicked()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>687</x>
-     <y>556</y>
+     <x>688</x>
+     <y>497</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -4665,8 +4764,8 @@
    <slot>ActivateShComp()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>38</x>
-     <y>200</y>
+     <x>48</x>
+     <y>125</y>
     </hint>
     <hint type="destinationlabel">
      <x>20</x>
@@ -4697,8 +4796,8 @@
    <slot>t0Update()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>542</x>
-     <y>189</y>
+     <x>532</x>
+     <y>198</y>
     </hint>
     <hint type="destinationlabel">
      <x>603</x>
@@ -4719,6 +4818,54 @@
     <hint type="destinationlabel">
      <x>703</x>
      <y>397</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>numComps</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>MuSRFit4</receiver>
+   <slot>addSharingComp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>343</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>711</x>
+     <y>372</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>runNumbers</sender>
+   <signal>textEdited(QString)</signal>
+   <receiver>MuSRFit4</receiver>
+   <slot>runsLineNotEmpy()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>150</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>709</x>
+     <y>181</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>constraintLine</sender>
+   <signal>editingFinished()</signal>
+   <receiver>MuSRFit4</receiver>
+   <slot>AppendToFunctions()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>461</x>
+     <y>294</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>712</x>
+     <y>217</y>
     </hint>
    </hints>
   </connection>
@@ -4743,5 +4890,7 @@
   <slot>TabChanged()</slot>
   <slot>t0Update()</slot>
   <slot>addFitType()</slot>
+  <slot>addSharingComp()</slot>
+  <slot>runsLineNotEmpy()</slot>
  </slots>
 </ui>

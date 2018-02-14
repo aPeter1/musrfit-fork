@@ -9,47 +9,50 @@ use QtCore4::isa qw( Qt::MainWindow );
 #use QtCore4::isa qw( Qt::Widget );
 use QtCore4::debug qw(ambiguous);
 use QtCore4::slots
-    fileOpen => [],
+#    fileOpen => [],
     fileSave => [],
     fileChangeDir => [],
-    filePrint => [],
+#    filePrint => [],
     fileExit => [],
     parametersExport => [],
     parametersAppend => [],
-    editUndo => [],
-    editRedo => [],
-    editCut => [],
-    editCopy => [],
-    editPaste => [],
-    helpIndex => [],
-    helpContents => [],
+#    editUndo => [],
+#    editRedo => [],
+#    editCut => [],
+#    editCopy => [],
+#    editPaste => [],
+#    helpIndex => [],
+#    helpContents => [],
     helpAbout => [],
-    CreateAllInput => [],
-    CallMSRCreate => [],
-    UpdateMSRFileInitTable => [],
-    ActivateT0Hists => [],
+#    CreateAllInput => [],
+#    UpdateMSRFileInitTable => [],
+#    ActivateT0Hists => [],
     ActivateShComp => [],
-    InitializeTab => [],
+#    InitializeTab => [],
     TabChanged => [],
     GoFit => [],
     GoPlot => [],
     ShowMuSRT0 => [],
     t0Update => [],
     RunSelectionToggle => [],
-    fileBrowse => [],
+#    fileBrowse => [],
     AppendToFunctions => [],
     InitializeFunctions => [],
     addFitType => [],
+    addSharingComp => [],
+    runsLineNotEmpy => [],
     t0UpdateClicked => [];
 use Ui_MuSRFit4;
+use MSR;
 
-my $self = "";
+our $self = "";
+our %All = ();
 
 sub NEW {
     my ( $class, $parent ) = @_;
     $class->SUPER::NEW($parent);
     $self = Ui_MuSRFit4->setupUi(this);
-    my %All=CreateAllInput();      
+    %All=CreateAllInput();      
 }
 
 # This file is part of MuSRFitGUI.
@@ -89,7 +92,6 @@ sub fileOpen()
 
 sub fileSave()
 {
-    my %All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"}.".msr";
     my $file=Qt::FileDialog::getSaveFileName(
 	this,
@@ -142,7 +144,6 @@ sub parametersExport()
 {
 # Exports the fit parameters for a table format file
 # This works only after a fit call, i.e. a plot call is not sufficient!
-    my %All=CreateAllInput();      
     my @RUNS = ();
     if ($All{"RUNSType"} ) {
 	@RUNS = split( /,/, $All{"RunFiles"});
@@ -164,6 +165,8 @@ sub parametersExport()
 # If the user gave a filename the copy to it
     if ($file ne "") {
 	if ($All{"FitAsyType"} eq "Asymmetry") {
+	    # Update All from GUI
+	    %All=CreateAllInput();      
 	    # my style
 	    my $Text = MSR::ExportParams(\%All);
 	    open( DATF,q{>},"$file" );
@@ -186,7 +189,6 @@ sub parametersAppend()
 {
 # Appends the fit parameters for a table format file
 # This works only after a fit call, i.e. a plot call is not sufficient!
-    my %All=CreateAllInput();
     my @RUNS = ();
     if ($All{"RUNSType"} ) {
 	@RUNS = split( /,/, $All{"RunFiles"});
@@ -208,6 +210,8 @@ sub parametersAppend()
 # If the user gave a filename the copy to it
     if ($file ne "") {
 	if ($All{"FitAsyType"} eq "Asymmetry") {
+	    # Update All values from GUI
+	    %All=CreateAllInput();
 	    my $Text = MSR::ExportParams(\%All);
 	    open( DATF,q{>>},"$file" );
 	    print DATF $Text;
@@ -297,12 +301,8 @@ Copyright 2009-2017 by Zaher Salman
 
 sub CreateAllInput()
 {
-    my %All=();
-
-    
-    
-# From RUNS Tab
-# Run data file
+    # From RUNS Tab
+    # Run data file
     $All{"RunNumbers"} = $self->runNumbers->text();
     $All{"RunFiles"} = $self->runFiles->text();
     $All{"BeamLine"} = $self->beamLine->currentText;
@@ -581,25 +581,20 @@ sub CreateAllInput()
 
 sub CallMSRCreate()
 {
-    use MSR;
-    my %All=CreateAllInput();
-    
-# Check if the option for checking for existing files is selected    
+    # Check if the option for checking for existing files is selected    
     my $FileExistCheck= $self->fileExistCheck->isChecked();
     my $FILENAME=$All{"FILENAME"}.".msr";
     my $Answer=0;    
     if ($All{"RunNumbers"} ne ""  || $All{"RunFiles"} ne "") {
 	if ( $FileExistCheck==1 ) {
 	    if (-e $FILENAME) {
-# Warning: MSR file exists
-#		my $Warning = "Warning: MSR file $FILENAME Already exists!\nIf you continue it will overwriten.";
+		# Warning: MSR file exists
 		my $Warning = "Warning: MSR file $FILENAME Already exists!\nDo you want to overwrite it?";
-#		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
-# $Answer =1,0 for yes and no
+		# $Answer =1,0 for yes and no
 		$Answer= Qt::MessageBox::warning( this, "Warning",$Warning, "&No", "&Yes", undef, 1,1);
 	    }
 	} else {
-# Just overwrite file
+	    # Just overwrite file
 	    $Answer=1;
 	}
 	
@@ -607,13 +602,13 @@ sub CallMSRCreate()
 	    if ( $All{"FitAsyType"} eq "Asymmetry") {
 		if ($All{"RUNSType"}) {
 		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRUni(\%All);
-# Open output file FILENAME.msr
+		    # Open output file FILENAME.msr
 		    open( OUTF,q{>},"$FILENAME" );
 		    print OUTF ("$FullMSRFile");
 		    close(OUTF);
 		} else {
 		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRUni(\%All);
-# Open output file FILENAME.msr
+		    # Open output file FILENAME.msr
 		    open( OUTF,q{>},"$FILENAME" );
 		    print OUTF ("$FullMSRFile");
 		    close(OUTF);
@@ -632,8 +627,12 @@ sub CallMSRCreate()
 		my $NewRunLine = "runs ".join(" ",(1...$NSpectra));
 		# Use msr2data to generate global fit MSR file
 		my $RunList = join(" ",@RUNS);
-		my $cmd = "msr2data \[".$RunList."\] "." _tmpl msr-".$RUNS[0]." global";
-		# create the global file 
+		my $StupidName = $RUNS[0]."+global_tmpl.msr";
+		my $cmd = "cp $RUNS[0]_tmpl.msr $StupidName";
+		#if ($#RUNS != 0) {
+		    # For multiple runs create global file
+		    $cmd = "msr2data \[".$RunList."\] "." _tmpl msr-".$RUNS[0]." global";
+		#} 
 		print $cmd."\n";
 		my $pid = open(FTO,"$cmd 2>&1 |");
 		while (<FTO>) {
@@ -641,7 +640,6 @@ sub CallMSRCreate()
 		}
 		close(FTO);
 		# change the stupid name
-		my $StupidName = $RUNS[0]."+global_tmpl.msr";
 		# change stupid default runs line
 		$cmd = "cp $StupidName $FILENAME; perl -pi -e 's/runs.*?(?=\n)/$NewRunLine/s' $FILENAME";
 		$pid = open(FTO,"$cmd 2>&1 |");
@@ -683,7 +681,6 @@ sub CallMSRCreate()
 
 sub UpdateMSRFileInitTable()
 {
-    my %All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"};
     my @lines=();
     if (-e "$FILENAME.msr") {
@@ -755,7 +752,7 @@ sub UpdateMSRFileInitTable()
 
 sub ActivateT0Hists()
 {
-    my %All=CreateAllInput();
+    $All{"LRBF"}=$self->histsLRBF->text;
     my @Hists = split(/,/, $All{"LRBF"} );
     my $HistBox = "";
     for (my $iHist=1; $iHist<=4; $iHist++) {
@@ -779,7 +776,8 @@ sub ActivateT0Hists()
 
 sub ActivateShComp()
 {
-    my %All=CreateAllInput();
+    # Update All from GUI
+    %All=CreateAllInput();
     my @RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );
     my @Hists = split( /,/, $All{"LRBF"} );
     
@@ -867,7 +865,8 @@ sub ActivateShComp()
 
 sub InitializeTab()
 {
-    my %All=CreateAllInput();
+    # Update All values from GUI
+    %All=CreateAllInput();
     my $QTable = $self->initParamTable;
     my $NRows = $QTable->rowCount();
     
@@ -914,8 +913,7 @@ sub InitializeTab()
 
 sub TabChanged()
 {
-# TODO: First check if there are some runs given, otherwise disbale
-    my %All=CreateAllInput();
+    # TODO: First check if there are some runs given, otherwise disbale
     my $curTab = $self->musrfit_tabs->currentIndex();
     if ($curTab >= 2 && $curTab <= 4) {
 	# First make sure we have sharing initialized    
@@ -923,22 +921,22 @@ sub TabChanged()
 	# Here we need to apply sharing if selected...
 	InitializeTab();
 	UpdateMSRFileInitTable();
-    } elsif ($curTab == 7) {
+    } elsif ($curTab == 6) {
 	# And also setup T0 and Bg bins
 	ActivateT0Hists();
+    } elsif ($curTab == 7) {
+	# Initialize FUNCTIONS block only if it has not been initialized yet
+	if ($All{"FunctionsBlock"} eq "" ) {
+	    InitializeFunctions();
+	}
     }
-    
-# Initialize FUNCTIONS block only if it has not been initialized yet
-    if ($All{"Func_T_Block"} eq "" ) {
-	InitializeFunctions();
-    }    
 }
 
 
 sub GoFit()
 {
     # This function should be able to do both plot and fit, check who called you.
-    my %All=CreateAllInput();
+     %All=CreateAllInput();
 # Check here is the number of histograms makes sense
 # other wise give error.
     my @Hists = split( /,/, $All{"LRBF"} );
@@ -972,7 +970,7 @@ sub GoFit()
 sub GoPlot()
 {
     # This function should be able to do both plot and fit, check who called you.
-    my %All=CreateAllInput();
+    %All=CreateAllInput();
 # Check here is the number of histograms makes sense
 # other wise give error.
     my @Hists = split( /,/, $All{"LRBF"} );
@@ -999,10 +997,9 @@ sub GoPlot()
 
 sub ShowMuSRT0()
 {
-# Open musrt0 to check and adjust t0 , Bg and Data bins
-    my %All=CreateAllInput();
+    # Open musrt0 to check and adjust t0 , Bg and Data bins
     $self->musrfit_tabs->setCurrentIndex(6);
-# Create MSR file and then run musrt0
+    # Create MSR file and then run musrt0
     my $Answer=CallMSRCreate();
     
     if ($Answer) {
@@ -1021,7 +1018,7 @@ sub ShowMuSRT0()
 
 sub t0Update()
 {
-    my %All = CreateAllInput();
+    $All{"LRBF"}=$self->histsLRBF->text;
     my @Hists = split(/,/, $All{"LRBF"} );
     
 # Get values of t0 and Bg/Data bins if given
@@ -1030,9 +1027,6 @@ sub t0Update()
 	foreach ("t0","Bg1","Bg2","Data1","Data2") {
 	    my $Name = "$_$NHist";
 	    my $tmp=MSR::T0BgData($_,$Hist,$All{"BeamLine"});
-#	    if (defined(child("Qt::Widget",$Name))) {
-#		child("Qt::Widget",$Name)->setText($tmp);
-#	    }
 	}
 	$NHist++
     }
@@ -1063,7 +1057,6 @@ sub RunSelectionToggle()
 sub fileBrowse()
 {
     my $RunFiles=$self->runFiles->text();
-    print "Runs:$RunFiles\n";
     my $files_ref=Qt::FileDialog::getOpenFileNames(
 	    "Data files (*.root *.bin)",
 	    "./",
@@ -1109,10 +1102,10 @@ sub AppendToFunctions()
 
 sub InitializeFunctions()
 {
-    my %All=CreateAllInput();
+    # Update All values from GUI
+    %All=CreateAllInput();
     my @RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );
     my @Hists = split( /,/, $All{"LRBF"} );
-
     my @FitTypes =();
     for (my $i=1;$i<=$All{"numComps"};$i++)  {
 	if ( $All{"FitType$i"} ne "None" ) {
@@ -1186,8 +1179,8 @@ sub InitializeFunctions()
 
 sub t0UpdateClicked()
 {
-# Read MSR file and get new values of t0,Bg and Data
-    my %All=CreateAllInput();      
+    # Read MSR file and get new values of t0,Bg and Data
+    #%All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"};
     open (MSRF,q{<},"$FILENAME.msr" );
     my @lines = <MSRF>;
@@ -1199,7 +1192,6 @@ sub t0UpdateClicked()
 
     my @Hists = split(/,/, $All{"LRBF"} );
     my $NHist = $#Hists+1;
-    print "Histograms: $NHist\n";
     
     my $FinHist = 1;
 # First T0s
@@ -1339,11 +1331,17 @@ sub addSharingComp {
 	    $compShLabel->setWordWrap( 0 );
 	
 	    $self->horizontalLayout->addWidget( $sharingComps[$i] );
+	    # Connect slot
+	    Qt::Object::connect($sharingComps[$i], SIGNAL 'currentIndexChanged()' , $self, SLOT 'InitializeFunctions()' );
 	    $compShLabel->setText("FitType$i");
 	} else {
-	    print "Exist, skip component $i\n";
+	    print "Exists, skip component $i\n";
 	}
     }
+}
+
+sub runsLineNotEmpy()
+{
 }
 
 1;
