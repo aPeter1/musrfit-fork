@@ -9,44 +9,50 @@ use QtCore4::isa qw( Qt::MainWindow );
 #use QtCore4::isa qw( Qt::Widget );
 use QtCore4::debug qw(ambiguous);
 use QtCore4::slots
-    fileOpen => [],
+#    fileOpen => [],
     fileSave => [],
     fileChangeDir => [],
-    filePrint => [],
+#    filePrint => [],
     fileExit => [],
     parametersExport => [],
     parametersAppend => [],
-    editUndo => [],
-    editRedo => [],
-    editCut => [],
-    editCopy => [],
-    editPaste => [],
-    helpIndex => [],
-    helpContents => [],
+#    editUndo => [],
+#    editRedo => [],
+#    editCut => [],
+#    editCopy => [],
+#    editPaste => [],
+#    helpIndex => [],
+#    helpContents => [],
     helpAbout => [],
-    CreateAllInput => [],
-    CallMSRCreate => [],
-    UpdateMSRFileInitTable => [],
-    ActivateT0Hists => [],
+#    CreateAllInput => [],
+#    UpdateMSRFileInitTable => [],
+#    ActivateT0Hists => [],
     ActivateShComp => [],
-    InitializeTab => [],
+#    InitializeTab => [],
     TabChanged => [],
     GoFit => [],
     GoPlot => [],
     ShowMuSRT0 => [],
     t0Update => [],
     RunSelectionToggle => [],
-    fileBrowse => [],
+#    fileBrowse => [],
     AppendToFunctions => [],
     InitializeFunctions => [],
+    addFitType => [],
+    addSharingComp => [],
+    runsLineNotEmpy => [],
     t0UpdateClicked => [];
 use Ui_MuSRFit4;
+use MSR;
+
+our $self = "";
+our %All = ();
 
 sub NEW {
     my ( $class, $parent ) = @_;
     $class->SUPER::NEW($parent);
-    this->{ui} = Ui_MuSRFit4->setupUi(this);
-    my %All=CreateAllInput();      
+    $self = Ui_MuSRFit4->setupUi(this);
+    %All=CreateAllInput();      
 }
 
 # This file is part of MuSRFitGUI.
@@ -86,7 +92,6 @@ sub fileOpen()
 
 sub fileSave()
 {
-    my %All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"}.".msr";
     my $file=Qt::FileDialog::getSaveFileName(
 	this,
@@ -139,10 +144,18 @@ sub parametersExport()
 {
 # Exports the fit parameters for a table format file
 # This works only after a fit call, i.e. a plot call is not sufficient!
-    my %All=CreateAllInput();      
+    my @RUNS = ();
+    if ($All{"RUNSType"} ) {
+	@RUNS = split( /,/, $All{"RunFiles"});
+    } else {
+	$All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
+	@RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );	
+    }
 # Add also a flag for header
     $All{"Header"}=1;
+    my $StupidName = $RUNS[0]."+global_tmpl.msr";
     my $FILENAME=$All{"FILENAME"}.".dat";
+    my $MSR = $All{"FILENAME"}.".msr";
     my $file=Qt::FileDialog::getSaveFileName(
 	this,
 	"Export parameters to file",
@@ -151,10 +164,23 @@ sub parametersExport()
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
-	my $Text = MSR::ExportParams(\%All);
-	open( DATF,q{>},"$file" );
-	print DATF $Text;
-	close(DATF);
+	if ($All{"FitAsyType"} eq "Asymmetry") {
+	    # Update All from GUI
+	    %All=CreateAllInput();      
+	    # my style
+	    my $Text = MSR::ExportParams(\%All);
+	    open( DATF,q{>},"$file" );
+	    print DATF $Text;
+	    close(DATF);
+	} else {
+	    # msr2data style
+	    my $RunList = join(" ",@RUNS);
+	    my $cmd = "cp $MSR $StupidName; msr2data \[".$RunList."\] "." _tmpl new global data -o $file";
+	    my $pid = open(FTO,"$cmd 2>&1 |");
+	    while (<FTO>) {
+		$self->fitTextOutput->append("$_");
+	    }
+	}
     }
 }
 
@@ -163,10 +189,18 @@ sub parametersAppend()
 {
 # Appends the fit parameters for a table format file
 # This works only after a fit call, i.e. a plot call is not sufficient!
-    my %All=CreateAllInput();
+    my @RUNS = ();
+    if ($All{"RUNSType"} ) {
+	@RUNS = split( /,/, $All{"RunFiles"});
+    } else {
+	$All{"RunNumbers"} =~ s/[\ \.\~\/\&\*\[\;\>\<\^\$\(\)\`\|\]\'\@]/,/g;
+	@RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );	
+    }
 # Add also a flag for header
     $All{"Header"}=0;
+    my $StupidName = $RUNS[0]."+global_tmpl.msr";
     my $FILENAME=$All{"FILENAME"}.".dat";
+    my $MSR = $All{"FILENAME"}.".msr";
     my $file=Qt::FileDialog::getOpenFileName(
 	this,
 	"Append parameters to file",
@@ -175,10 +209,23 @@ sub parametersAppend()
     
 # If the user gave a filename the copy to it
     if ($file ne "") {
-	my $Text = MSR::ExportParams(\%All);
-	open( DATF,q{>>},"$file" );
-	print DATF $Text;
-	close(DATF);
+	if ($All{"FitAsyType"} eq "Asymmetry") {
+	    # Update All values from GUI
+	    %All=CreateAllInput();
+	    my $Text = MSR::ExportParams(\%All);
+	    open( DATF,q{>>},"$file" );
+	    print DATF $Text;
+	    close(DATF);
+	} else {
+	    # msr2data style
+	    my $RunList = join(" ",@RUNS);
+	    my $cmd = "cp $MSR $StupidName; msr2data \[".$RunList."\] "." _tmpl global data -o $file";
+	    my $pid = open(FTO,"$cmd 2>&1 |");
+	    while (<FTO>) {
+		$self->fitTextOutput->append("$_");
+	    }
+	    close(FTO);
+	}
     }
 }
 
@@ -254,51 +301,49 @@ Copyright 2009-2017 by Zaher Salman
 
 sub CreateAllInput()
 {
-    my %All=();
-    
-# From RUNS Tab
-# Run data file
-    $All{"RunNumbers"} = this->{ui}->runNumbers->text();
-    $All{"RunFiles"} = this->{ui}->runFiles->text();
-    $All{"BeamLine"} = this->{ui}->beamLine->currentText;
-    $All{"RUNSType"} = this->{ui}->manualFile->isChecked();
-    $All{"YEAR"} = this->{ui}->year->currentText;
+    # From RUNS Tab
+    # Run data file
+    $All{"RunNumbers"} = $self->runNumbers->text();
+    $All{"RunFiles"} = $self->runFiles->text();
+    $All{"BeamLine"} = $self->beamLine->currentText;
+    $All{"RUNSType"} = $self->manualFile->isChecked();
+    $All{"YEAR"} = $self->year->currentText;
     if (!defined($All{"YEAR"}) || $All{"YEAR"} eq "") {
 # If year combobox is empty fill it up from 2004 up to current year
 	    my ($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
 	    my $current_year = 1900 + $yearOffset;
 #	    my @years = ($current_year..2004);
-#	    this->{ui}->year->addItems(@years);
+#	    $self->year->addItems(@years);
 	    for (my $i=$current_year;$i>=2004;$i--) {
-		this->{ui}->year->addItem($i);
+		$self->year->addItem($i);
 	    }
     }
 # Time range and BINS
-    $All{"Tis"} = this->{ui}->tis->text;
-    $All{"Tfs"} = this->{ui}->tfs->text;
-    $All{"BINS"} = this->{ui}->bins->text;
-    $All{"FitAsyType"} = this->{ui}->fitAsyType->currentText;
+    $All{"Tis"} = $self->tis->text;
+    $All{"Tfs"} = $self->tfs->text;
+    $All{"BINS"} = $self->bins->text;
+    $All{"FitAsyType"} = $self->fitAsyType->currentText;
     $All{"FitAsyType"} =~ s/ //g;
-    $All{"LRBF"} = this->{ui}->histsLRBF->text;
+    $All{"LRBF"} = $self->histsLRBF->text;
     my @Hists = split(/,/, $All{"LRBF"} );
 # Lifetime corrections in enabled/visible only for SingleHis fits
     if ( $All{"FitAsyType"} eq "SingleHist" ) {
-	this->{ui}->ltc->setHidden(0);
+	$self->ltc->setHidden(0);
 	$All{"fittype"}=0;
     } else {
-	this->{ui}->ltc->setHidden(1);
+	$self->ltc->setHidden(1);
 	$All{"fittype"}=2;
     }
    
 # From Fitting Tab
 # Plot range
-    $All{"Xi"}=this->{ui}->xi->text;
-    $All{"Xf"}=this->{ui}->xf->text;
-    $All{"Yi"}=this->{ui}->yi->text;
-    $All{"Yf"}=this->{ui}->yf->text;
-    $All{"ViewBin"}=this->{ui}->viewBin->text;
+    $All{"Xi"}=$self->xi->text;
+    $All{"Xf"}=$self->xf->text;
+    $All{"Yi"}=$self->yi->text;
+    $All{"Yf"}=$self->yf->text;
+    $All{"ViewBin"}=$self->viewBin->text;
 # Life time correction   
-    if (this->{ui}->ltc->isChecked()) {
+    if ($self->ltc->isChecked()) {
 	$All{"ltc"}="y";
     } else {
 	$All{"ltc"}="n";
@@ -308,11 +353,11 @@ sub CreateAllInput()
 	$All{"go"}="PLOT";
     }   
 # Get minimization process
-    $All{"Minimization"} = this->{ui}->minimization->currentText();
+    $All{"Minimization"} = $self->minimization->currentText();
     $All{"go"}=$All{"Minimization"};
     
 # Get Error calculation process
-    $All{"ErrorCalc"} = this->{ui}->errorCalc->currentText();
+    $All{"ErrorCalc"} = $self->errorCalc->currentText();
     $All{"go"}=$All{"ErrorCalc"};
     
 # Commands block
@@ -328,23 +373,23 @@ sub CreateAllInput()
     }
         
 # From MSR File Tab
-    $All{"TITLE"}= this->{ui}->title->text;
-    $All{"FILENAME"}= this->{ui}->fileName->text;
+    $All{"TITLE"}= $self->title->text;
+    $All{"FILENAME"}= $self->fileName->text;
 
 # From Fourier Tab
-    $All{"FUNITS"}= this->{ui}->funits->currentText;
-    $All{"FAPODIZATION"}= this->{ui}->fapodization->currentText;
-    $All{"FPLOT"}= this->{ui}->fplot->currentText;
-    $All{"FPHASE"}=this->{ui}->fphase->text;
+    $All{"FUNITS"}= $self->funits->currentText;
+    $All{"FAPODIZATION"}= $self->fapodization->currentText;
+    $All{"FPLOT"}= $self->fplot->currentText;
+    $All{"FPHASE"}=$self->fphase->text;
 # Fourier range
-    $All{"FrqMin"}=this->{ui}->frqMin->text;
-    $All{"FrqMax"}=this->{ui}->frqMax->text;
+    $All{"FrqMin"}=$self->frqMin->text;
+    $All{"FrqMax"}=$self->frqMax->text;
  
 # Rotating reference frame parameters
-    $All{"RRFFrq"}=this->{ui}->rrfFrq->text;
-    $All{"RRFPack"}=this->{ui}->rrfPack->text;
-    $All{"RRFPhase"}=this->{ui}->rrfPhase->text;
-    $All{"RRFUnits"}=this->{ui}->rrfUnits->currentText;
+    $All{"RRFFrq"}=$self->rrfFrq->text;
+    $All{"RRFPack"}=$self->rrfPack->text;
+    $All{"RRFPhase"}=$self->rrfPhase->text;
+    $All{"RRFUnits"}=$self->rrfUnits->currentText;
     
 # Get values of t0 and Bg/Data bins if given
     my $NHist = 1;
@@ -382,18 +427,36 @@ sub CreateAllInput()
 	     17,"LGKTSExp",
 	     18,"None"
 	     );
-    
-    my $FT1=this->{ui}->fitType1->currentIndex;
-    my $FT2=this->{ui}->fitType2->currentIndex;
-    my $FT3=this->{ui}->fitType3->currentIndex;
-    $All{"FitType1"} = $FTs{$FT1};
-    $All{"FitType2"} = $FTs{$FT2};
-    $All{"FitType3"} = $FTs{$FT3};
+
+    # Check the number of components
+    my $numComps = 0;
+    my $FT1=0;
+    my $FT2=0;
+    my $FT3=0;
     my @FitTypes =();
-    my $FitType="";
-    foreach $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) {
-	    push( @FitTypes, $FitType );	    
+    my $FT=0;
+    if (defined($self->numComps)) {
+	# new style, check the number of components
+	$numComps = $self->numComps->value;
+	if ($numComps != $self->columnView->count() ) {
+	    addFitType();
+	}
+    } else {
+	# old style, only 3 componenets
+	$numComps = 3;
+    }
+    $All{"numComps"}=$numComps;
+	    
+    # loop over fitTypes
+    for (my $i=1;$i<=$numComps;$i++) {
+	my $FTi=child("Qt::ComboBox","fitType$i");
+	if ($FTi == 0) {
+	    $All{"FitType$i"} = "None";
+	} else {
+	    $All{"FitType$i"} = $FTs{$FTi->currentIndex};
+	}
+	if ( $All{"FitType$i"} ne "None" ) {
+	    push( @FitTypes, $All{"FitType$i"} );	    
 	}
     }
     
@@ -404,17 +467,20 @@ sub CreateAllInput()
     my @Paramcomp = @$Paramcomp_ref;
     
 # Functions block 
-    $All{"FunctionsBlock"}=this->{ui}->functionsBlock->toPlainText;
+    $All{"FunctionsBlock"}=$self->functionsBlock->toPlainText;
 # and the associated theory block
-    $All{"Func_T_Block"}=this->{ui}->theoryBlock->toPlainText;
+    $All{"Func_T_Block"}=$self->theoryBlock->toPlainText;
     
 # Shared settings are detected here
-    $All{"EnableSharing"} = this->{ui}->buttonGroupSharing->isChecked();
+    $All{"EnableSharing"} = $self->buttonGroupSharing->isChecked();
+    # Make sure all sharing boxes exist
+    #addSharingComp();
+
 
     my $Shared = 0; 
     my $PCount =0;
     my $Component=1;
-    foreach $FitType (@FitTypes) {
+    foreach my $FitType (@FitTypes) {
 	my $Parameters=$Paramcomp[$Component-1];
 	my @Params = split( /\s+/, $Parameters );
 	
@@ -457,10 +523,9 @@ sub CreateAllInput()
 # check if it is checked
 		my $ChkName="shParam_".$Component."_".$NP;
 		my $ChkBx = child("Qt::Widget",$ChkName);
-		$Shared = $ChkBx->isChecked();
+		if ($ChkBx != 0) {$Shared = $ChkBx->isChecked();}
 	    }
 	    $All{"Sh_$Param"}=$Shared;
-	    print "Param $Param is $Shared\n";
 	    $NP++;
 	}
 #Loop on parameters
@@ -492,7 +557,7 @@ sub CreateAllInput()
     my $erradd = "d";
     my $minadd = "_min";
     my $maxadd = "_max";
-    my $QTable=this->{ui}->initParamTable;
+    my $QTable=$self->initParamTable;
 # TODO: Should not go over all rows, only on parameters.
     if ($NParam > 0) {
 # Set appropriate number of rows
@@ -516,25 +581,20 @@ sub CreateAllInput()
 
 sub CallMSRCreate()
 {
-    use MSR;
-    my %All=CreateAllInput();
-    
-# Check if the option for checking for existing files is selected    
-    my $FileExistCheck= this->{ui}->fileExistCheck->isChecked();
+    # Check if the option for checking for existing files is selected    
+    my $FileExistCheck= $self->fileExistCheck->isChecked();
     my $FILENAME=$All{"FILENAME"}.".msr";
     my $Answer=0;    
     if ($All{"RunNumbers"} ne ""  || $All{"RunFiles"} ne "") {
 	if ( $FileExistCheck==1 ) {
 	    if (-e $FILENAME) {
-# Warning: MSR file exists
-#		my $Warning = "Warning: MSR file $FILENAME Already exists!\nIf you continue it will overwriten.";
+		# Warning: MSR file exists
 		my $Warning = "Warning: MSR file $FILENAME Already exists!\nDo you want to overwrite it?";
-#		my $WarningWindow = Qt::MessageBox::information( this, "Warning",$Warning);
-# $Answer =1,0 for yes and no
+		# $Answer =1,0 for yes and no
 		$Answer= Qt::MessageBox::warning( this, "Warning",$Warning, "&No", "&Yes", undef, 1,1);
 	    }
 	} else {
-# Just overwrite file
+	    # Just overwrite file
 	    $Answer=1;
 	}
 	
@@ -542,13 +602,13 @@ sub CallMSRCreate()
 	    if ( $All{"FitAsyType"} eq "Asymmetry") {
 		if ($All{"RUNSType"}) {
 		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRUni(\%All);
-# Open output file FILENAME.msr
+		    # Open output file FILENAME.msr
 		    open( OUTF,q{>},"$FILENAME" );
 		    print OUTF ("$FullMSRFile");
 		    close(OUTF);
 		} else {
 		    my ($Full_T_Block,$Paramcomp_ref,$FullMSRFile)= MSR::CreateMSRUni(\%All);
-# Open output file FILENAME.msr
+		    # Open output file FILENAME.msr
 		    open( OUTF,q{>},"$FILENAME" );
 		    print OUTF ("$FullMSRFile");
 		    close(OUTF);
@@ -567,22 +627,24 @@ sub CallMSRCreate()
 		my $NewRunLine = "runs ".join(" ",(1...$NSpectra));
 		# Use msr2data to generate global fit MSR file
 		my $RunList = join(" ",@RUNS);
-		my $cmd = "msr2data \[".$RunList."\] "." _tmpl msr-".$RUNS[0]." global";
-		# create the global file 
+		my $StupidName = $RUNS[0]."+global_tmpl.msr";
+		my $cmd = "cp $RUNS[0]_tmpl.msr $StupidName";
+		#if ($#RUNS != 0) {
+		    # For multiple runs create global file
+		    $cmd = "msr2data \[".$RunList."\] "." _tmpl msr-".$RUNS[0]." global";
+		#} 
 		print $cmd."\n";
 		my $pid = open(FTO,"$cmd 2>&1 |");
 		while (<FTO>) {
-		    this->{ui}->fitTextOutput->append("$_");
+		    $self->fitTextOutput->append("$_");
 		}
 		close(FTO);
 		# change the stupid name
-		my $StupidName = $RUNS[0]."+global_tmpl.msr";
 		# change stupid default runs line
 		$cmd = "cp $StupidName $FILENAME; perl -pi -e 's/runs.*?(?=\n)/$NewRunLine/s' $FILENAME";
 		$pid = open(FTO,"$cmd 2>&1 |");
-		print $cmd."\n";
 		while (<FTO>) {
-		    this->{ui}->fitTextOutput->append("$_");
+		    $self->fitTextOutput->append("$_");
 		}
 		close(FTO);
 		# feed in values of parameters if they exist
@@ -619,7 +681,6 @@ sub CallMSRCreate()
 
 sub UpdateMSRFileInitTable()
 {
-    my %All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"};
     my @lines=();
     if (-e "$FILENAME.msr") {
@@ -627,9 +688,9 @@ sub UpdateMSRFileInitTable()
 	@lines = <MSRF>;
 	close(MSRF);
     }
-    this->{ui}->textMSROutput->setText("");
+    $self->textMSROutput->setText("");
     foreach my $line (@lines) {
-	this->{ui}->textMSROutput->insertPlainText("$line");
+	$self->textMSROutput->insertPlainText("$line");
     }
     
     (my $TBlock_ref, my $FPBlock_ref)=MSR::ExtractBlks(@lines);
@@ -669,7 +730,7 @@ sub UpdateMSRFileInitTable()
 	    $maxvalue=1.0*$Param[7];
 	}	    
 # Now update the initialization tabel
-	my $QTable = this->{ui}->initParamTable;
+	my $QTable = $self->initParamTable;
 #	print "PCount=$PCount and value=$value\n";
 	if (defined($QTable->item($PCount,0)) & defined($QTable->item($PCount,1)) & defined($QTable->item($PCount,2)) & defined($QTable->item($PCount,3))) {
 	    $QTable->setItem($PCount,0,Qt::TableWidgetItem());
@@ -691,7 +752,7 @@ sub UpdateMSRFileInitTable()
 
 sub ActivateT0Hists()
 {
-    my %All=CreateAllInput();
+    $All{"LRBF"}=$self->histsLRBF->text;
     my @Hists = split(/,/, $All{"LRBF"} );
     my $HistBox = "";
     for (my $iHist=1; $iHist<=4; $iHist++) {
@@ -715,22 +776,28 @@ sub ActivateT0Hists()
 
 sub ActivateShComp()
 {
-    my %All=CreateAllInput();
+    # Update All from GUI
+    %All=CreateAllInput();
     my @RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );
     my @Hists = split( /,/, $All{"LRBF"} );
     
-# Hide all sharing components
-    this->{ui}->sharingComp1->setHidden(1);
-    this->{ui}->sharingComp2->setHidden(1);
-    this->{ui}->sharingComp3->setHidden(1);
-    this->{ui}->sharingComp1->setEnabled(0);
-    this->{ui}->sharingComp2->setEnabled(0);
-    this->{ui}->sharingComp3->setEnabled(0);
+    # Make sure all sharing boxes exist
+    addSharingComp();
+
+    my $NShComps = $self->horizontalLayout->count();
+    my $sharingComp = "";
+    my $i = 1;
+    # Hide all sharing components
+    for ($i = 1; $i<=$NShComps;$i++) {
+	$sharingComp = child("Qt::GroupBox","sharingComp$i");
+	$sharingComp->setHidden(1);
+	$sharingComp->setEnabled(0);
+    }
     
     my @FitTypes =();
-    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) {
-	    push( @FitTypes, $FitType );	    
+    for ($i=1;$i<=$All{"numComps"};$i++)  {
+	if ( $All{"FitType$i"} ne "None" ) {
+	    push( @FitTypes, $All{"FitType$i"} );	    
 	}
     }
     
@@ -780,7 +847,7 @@ sub ActivateShComp()
 	    $CompShL->setText($All{"FitType$Component"});
 	
 # Change state/label of parameters
-	    for (my $i=1; $i<=9;$i++) {		
+	    for ($i=1; $i<=9;$i++) {		
 		my $ParamChkBx="shParam_".$Component."_".$i;
 		my $ChkBx = child("Qt::Widget",$ParamChkBx);
 		if (defined($Params[$i-1])) {
@@ -798,8 +865,9 @@ sub ActivateShComp()
 
 sub InitializeTab()
 {
-    my %All=CreateAllInput();
-    my $QTable = this->{ui}->initParamTable;
+    # Update All values from GUI
+    %All=CreateAllInput();
+    my $QTable = $self->initParamTable;
     my $NRows = $QTable->rowCount();
     
 # Remove any rows in table
@@ -845,31 +913,30 @@ sub InitializeTab()
 
 sub TabChanged()
 {
-# TODO: First check if there are some runs given, otherwise disbale
-    my %All=CreateAllInput();
-    my $curTab = this->{ui}->musrfit_tabs->currentIndex();
+    # TODO: First check if there are some runs given, otherwise disbale
+    my $curTab = $self->musrfit_tabs->currentIndex();
     if ($curTab >= 2 && $curTab <= 4) {
 	# First make sure we have sharing initialized    
 	ActivateShComp();
 	# Here we need to apply sharing if selected...
 	InitializeTab();
 	UpdateMSRFileInitTable();
-    } elsif ($curTab == 7) {
+    } elsif ($curTab == 6) {
 	# And also setup T0 and Bg bins
 	ActivateT0Hists();
+    } elsif ($curTab == 7) {
+	# Initialize FUNCTIONS block only if it has not been initialized yet
+	if ($All{"FunctionsBlock"} eq "" ) {
+	    InitializeFunctions();
+	}
     }
-    
-# Initialize FUNCTIONS block only if it has not been initialized yet
-    if ($All{"Func_T_Block"} eq "" ) {
-	InitializeFunctions();
-    }    
 }
 
 
 sub GoFit()
 {
     # This function should be able to do both plot and fit, check who called you.
-    my %All=CreateAllInput();
+     %All=CreateAllInput();
 # Check here is the number of histograms makes sense
 # other wise give error.
     my @Hists = split( /,/, $All{"LRBF"} );
@@ -878,7 +945,7 @@ sub GoFit()
 	my $Warning = "Error: The number of histograms should be 2 for an asymmetry fit!";
 	my $WarningWindow = Qt::MessageBox::information( this, "Error",$Warning);
     } else {
-	this->{ui}->musrfit_tabs->setCurrentIndex(1);
+	$self->musrfit_tabs->setCurrentIndex(1);
 	my $Answer=CallMSRCreate();
 	my $FILENAME=$All{"FILENAME"}.".msr";
 	if ($Answer) {
@@ -886,13 +953,13 @@ sub GoFit()
 		my $cmd="musrfit -t $FILENAME; musrview $FILENAME &";
 		my $pid = open(FTO,"$cmd 2>&1 |");
 		while (<FTO>) {
-		    this->{ui}->fitTextOutput->insertPlainText("$_");
+		    $self->fitTextOutput->insertPlainText("$_");
 		}
 		close(FTO);
 	    } else {
-		this->{ui}->fitTextOutput->insertPlainText("Cannot find MSR file!");
+		$self->fitTextOutput->insertPlainText("Cannot find MSR file!");
 	    }
-	    this->{ui}->fitTextOutput->insertPlainText("-----------------------------------------------------------------------------------------------------------------------------");
+	    $self->fitTextOutput->insertPlainText("-----------------------------------------------------------------------------------------------------------------------------");
 # update MSR File tab and initialization table
 	    UpdateMSRFileInitTable();
 	}
@@ -903,7 +970,7 @@ sub GoFit()
 sub GoPlot()
 {
     # This function should be able to do both plot and fit, check who called you.
-    my %All=CreateAllInput();
+    %All=CreateAllInput();
 # Check here is the number of histograms makes sense
 # other wise give error.
     my @Hists = split( /,/, $All{"LRBF"} );
@@ -919,8 +986,8 @@ sub GoPlot()
 		my $cmd="musrview $FILENAME &";
 		my $pid = system($cmd);
 	    } else {
-		this->{ui}->fitTextOutput->insertPlainText("Cannot find MSR file!");
-		this->{ui}->fitTextOutput->insertPlainText("-----------------------------------------------------------------------------------------------------------------------------");
+		$self->fitTextOutput->insertPlainText("Cannot find MSR file!");
+		$self->fitTextOutput->insertPlainText("-----------------------------------------------------------------------------------------------------------------------------");
 	    }
 	}
     }
@@ -930,10 +997,9 @@ sub GoPlot()
 
 sub ShowMuSRT0()
 {
-# Open musrt0 to check and adjust t0 , Bg and Data bins
-    my %All=CreateAllInput();
-    this->{ui}->musrfit_tabs->setCurrentIndex(6);
-# Create MSR file and then run musrt0
+    # Open musrt0 to check and adjust t0 , Bg and Data bins
+    $self->musrfit_tabs->setCurrentIndex(6);
+    # Create MSR file and then run musrt0
     my $Answer=CallMSRCreate();
     
     if ($Answer) {
@@ -941,7 +1007,7 @@ sub ShowMuSRT0()
 	if (-e $FILENAME) {
 	    my $cmd="musrt0 $FILENAME &";
 	    my $pid = system($cmd);
-	    this->{ui}->t0Update->setEnabled(1)
+	    $self->t0Update->setEnabled(1)
 	} else {
 	    print STDERR "Cannot find MSR file!\n";
 	}
@@ -952,7 +1018,7 @@ sub ShowMuSRT0()
 
 sub t0Update()
 {
-    my %All = CreateAllInput();
+    $All{"LRBF"}=$self->histsLRBF->text;
     my @Hists = split(/,/, $All{"LRBF"} );
     
 # Get values of t0 and Bg/Data bins if given
@@ -961,9 +1027,6 @@ sub t0Update()
 	foreach ("t0","Bg1","Bg2","Data1","Data2") {
 	    my $Name = "$_$NHist";
 	    my $tmp=MSR::T0BgData($_,$Hist,$All{"BeamLine"});
-#	    if (defined(child("Qt::Widget",$Name))) {
-#		child("Qt::Widget",$Name)->setText($tmp);
-#	    }
 	}
 	$NHist++
     }
@@ -972,29 +1035,28 @@ sub t0Update()
 
 sub RunSelectionToggle()
 {
-    my $ManualFile= this->{ui}->manualFile->isChecked();
+    my $ManualFile= $self->manualFile->isChecked();
     if ($ManualFile) {
 # Manual RUN selection
-	this->{ui}->runsMan->setEnabled(1);
-	this->{ui}->runsMan->setHidden(0);
-	this->{ui}->runNumbers->setText("");
-	this->{ui}->runsAuto->setEnabled(0);
-	this->{ui}->runsAuto->setHidden(1);
+	$self->runsMan->setEnabled(1);
+	$self->runsMan->setHidden(0);
+	$self->runNumbers->setText("");
+	$self->runsAuto->setEnabled(0);
+	$self->runsAuto->setHidden(1);
     } else {
 # Auto RUN selection
-	this->{ui}->runsMan->setEnabled(0);
-	this->{ui}->runsMan->setHidden(1);
-	this->{ui}->runFiles->setText("");
-	this->{ui}->runsAuto->setEnabled(1);
-	this->{ui}->runsAuto->setHidden(0);
+	$self->runsMan->setEnabled(0);
+	$self->runsMan->setHidden(1);
+	$self->runFiles->setText("");
+	$self->runsAuto->setEnabled(1);
+	$self->runsAuto->setHidden(0);
     }
     
 }
 
 sub fileBrowse()
 {
-    my $RunFiles=this->{ui}->runFiles->text();
-    print "Runs:$RunFiles\n";
+    my $RunFiles=$self->runFiles->text();
     my $files_ref=Qt::FileDialog::getOpenFileNames(
 	    "Data files (*.root *.bin)",
 	    "./",
@@ -1009,45 +1071,45 @@ sub fileBrowse()
 # Add files to existing list
 	$RunFiles=join(",",$RunFiles,@files);
     }
-    this->{ui}->runFiles->setText($RunFiles);
+    $self->runFiles->setText($RunFiles);
 }
 
 sub AppendToFunctions()
 {
-    my $ParName=this->{ui}->cParamsCombo->currentText();
+    my $ParName=$self->cParamsCombo->currentText();
     my $Full_T_Block="";
     my $Constraint="";
-    if (defined(this->{ui}->theoryBlock->toPlainText)) {
-	$Full_T_Block=this->{ui}->theoryBlock->toPlainText;
+    if (defined($self->theoryBlock->toPlainText)) {
+	$Full_T_Block=$self->theoryBlock->toPlainText;
     }
-    if (defined(this->{ui}->constraintLine->text)) {
-	$Constraint=this->{ui}->constraintLine->text;
+    if (defined($self->constraintLine->text)) {
+	$Constraint=$self->constraintLine->text;
     }
 # Then clear the text
-    this->{ui}->constraintLine->setText("");
+    $self->constraintLine->setText("");
     
 # Check how many constraints (lines) in FUNCTIONS Block    
-#    my $i=this->{ui}->functionsBlock->blockCount();
-    my $fun_lines=this->{ui}->functionsBlock->toPlainText();
+#    my $i=$self->functionsBlock->blockCount();
+    my $fun_lines=$self->functionsBlock->toPlainText();
     my $i= ($fun_lines =~ tr/\n//)+1;
     my $ConstLine="fun$i = $Constraint\n";
-    this->{ui}->functionsBlock->insertPlainText($ConstLine);
+    $self->functionsBlock->insertPlainText($ConstLine);
     
 # Replace parameter in theory block with fun$i
     $Full_T_Block=~ s/$ParName/fun$i/;
-    this->{ui}->theoryBlock->setText($Full_T_Block);
+    $self->theoryBlock->setText($Full_T_Block);
 }
 
 sub InitializeFunctions()
 {
-    my %All=CreateAllInput();
+    # Update All values from GUI
+    %All=CreateAllInput();
     my @RUNS = split( /,/, MSR::ExpandRunNumbers($All{"RunNumbers"}) );
     my @Hists = split( /,/, $All{"LRBF"} );
-
     my @FitTypes =();
-    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) {
-	    push( @FitTypes, $FitType );	    
+    for (my $i=1;$i<=$All{"numComps"};$i++)  {
+	if ( $All{"FitType$i"} ne "None" ) {
+	    push( @FitTypes, $All{"FitType$i"} );	    
 	}
     }
     
@@ -1058,10 +1120,10 @@ sub InitializeFunctions()
     
 # Initialize Parameters List in function block (constraints).    
     my $ParametersList="";
-    this->{ui}->parametersList->setText("");
+    $self->parametersList->setText("");
 # Counter for function block (with out Alpha etc.)
     my $ParCount=0;
-    this->{ui}->cParamsCombo->clear();
+    $self->cParamsCombo->clear();
     
 # Possibly use the parameters block to axtract names for the dropdown menu
 # this makes sense if we can use fun in map line. Check!
@@ -1094,22 +1156,22 @@ sub InitializeFunctions()
 	    if (defined($Params[$i-1])) {
 		my $CParam = $Params[$i-1]."_".$Component;
 		if ($Params[$i-1] ne "Alpha" && $Params[$i-1] ne "No" && $Params[$i-1] ne "NBg") {
-		    this->{ui}->cParamsCombo->addItem($CParam);
+		    $self->cParamsCombo->addItem($CParam);
 		    $Full_T_Block=~ s/\b$Params[$i-1]\b/$CParam/;
 		}
 # also enumerate the parameters as should be used in the FUNCTIONS Block
 		$ParCount++;
 		$ParametersList=$ParametersList."$CParam \t is \t par$ParCount\n";
-		this->{ui}->parametersList->setText($ParametersList);
+		$self->parametersList->setText($ParametersList);
 	    }
 	}
 	$Component++;
     }  
 # Set theory block in Constraints    
-    this->{ui}->theoryBlock->setText($Full_T_Block);
+    $self->theoryBlock->setText($Full_T_Block);
 # Then clear the text
-    this->{ui}->constraintLine->setText("");
-    this->{ui}->functionsBlock->setText("");
+    $self->constraintLine->setText("");
+    $self->functionsBlock->setText("");
 }
 
 
@@ -1117,8 +1179,8 @@ sub InitializeFunctions()
 
 sub t0UpdateClicked()
 {
-# Read MSR file and get new values of t0,Bg and Data
-    my %All=CreateAllInput();      
+    # Read MSR file and get new values of t0,Bg and Data
+    #%All=CreateAllInput();      
     my $FILENAME=$All{"FILENAME"};
     open (MSRF,q{<},"$FILENAME.msr" );
     my @lines = <MSRF>;
@@ -1130,7 +1192,6 @@ sub t0UpdateClicked()
 
     my @Hists = split(/,/, $All{"LRBF"} );
     my $NHist = $#Hists+1;
-    print "Histograms: $NHist\n";
     
     my $FinHist = 1;
 # First T0s
@@ -1149,7 +1210,7 @@ sub t0UpdateClicked()
     }	
     
 # Finally, disable the update button
-    this->{ui}->t0Update->setEnabled(0);
+    $self->t0Update->setEnabled(0);
 #    t0Update->setText("musrt0")
 }
 
@@ -1164,11 +1225,123 @@ sub child {
     } else {
 	$Attrib = 0;
     }
-#    print "name = $name and attrib = $Attrib\n";
 
 # Return handle on widget
     return($Attrib);
 }
 
+sub addFitType {
+    # Input number of components
+    my $numComps = $self->numComps->value;
+    # count number of exisitng components
+    my $NButtons = $self->columnView->count();
+    # create ComboBox in theoryFunction parent
+    my $fitType = Qt::ComboBox( $self->theoryFunction );
+
+    # do we have less components that we need
+    if ($numComps > $NButtons) {
+	# add as needed
+	for (my $i=$NButtons+1;$i<=$numComps;$i++) {
+	    my $nameComp = "fitType$i";
+	    $self->columnView->addWidget( $fitType );
+	    $fitType->setObjectName( $nameComp );
+	    $fitType->setMinimumSize( Qt::Size(0, 25) );
+	    $fitType->setMaximumSize( Qt::Size(255, 25) );
+	    $fitType->insertItems(0,
+	      ["Exponential",
+	       "Gaussian",
+	       "Stretch Exp.",
+	       "Exponential Cos",
+	       "Gaussian Cos",
+	       "Stretch Cos",
+	       "Lorentzian Dynamic KT",
+	       "Gaussian Dynamic KT",
+	       "Background",
+	       "Lorentzian Kubo-Toyabe LF x Exp",
+	       "Gaussian Kubo-Toyabe LF x Exp",
+	       "Lorentzian Kubo-Toyabe LF x Str Exp",
+	       "Gaussian Kubo-Toyabe LF x Str Exp",
+	       "MolMag",
+	       "Meissner State Model",
+	       "Lor-Gss combi KT",
+	       "Lor-Gss combi KT x Exp",
+	       "Lor-Gss combi KT x SExp",
+	       "None",]);
+	    if ($i==1) {
+		$fitType->setCurrentIndex(0);
+		# remove the "None" option for the 1st component
+		$fitType->removeItem(18);
+	    } else {
+		$fitType->setCurrentIndex( 18 );
+	    }
+	}
+    } else {
+	for (my $i=$NButtons;$i > $numComps ;$i--) {
+	    # component is there, delete it
+	    my $widget = $self->columnView->itemAt($i-1)->widget();
+	    $widget -> hide();
+	    $self->columnView->removeWidget($widget);
+	    undef $widget;
+	}
+    }		
+}
+
+sub addSharingComp {
+    # Input number of components
+    my $numComps = $self->numComps->value;
+    # count number of exisitng components
+    my $NShComps = $self->horizontalLayout->count();
+    my @sharingComps = ();
+    for (my $i=$NShComps+1;$i<=$numComps;$i++) {
+	$sharingComps[$i] = Qt::GroupBox( $self->buttonGroupSharing );
+	my $sizePolicy = Qt::SizePolicy( Qt::SizePolicy::Expanding(), Qt::SizePolicy::MinimumExpanding() );
+	$self->{$sizePolicy} = $sizePolicy;
+	$sizePolicy->setHorizontalStretch( 0 );
+	$sizePolicy->setVerticalStretch( 0 );
+	$sizePolicy->setHeightForWidth( $sharingComps[$i]->sizePolicy()->hasHeightForWidth() );
+	# check is this component exists
+	if (child("Qt::GroupBox","sharingComp$i") == 0) {
+	    $sharingComps[$i]->setObjectName( "sharingComp$i" );
+	    $sharingComps[$i]->setEnabled( 0 );
+	    $sharingComps[$i]->setSizePolicy( $sizePolicy );
+	    $sharingComps[$i]->setAlignment( Qt::AlignLeading() );
+	    $sharingComps[$i]->setTitle("Component $i");
+	    my $layout = Qt::Widget( $sharingComps[$i] );
+	    $layout->setObjectName( "layoutSh$i" );
+	    $layout->setGeometry( Qt::Rect(40, 60, 81, 266) );
+	    my $shBoxLayout = Qt::VBoxLayout( $layout );
+	    $self->{shBoxLayout} = $shBoxLayout;
+	    $shBoxLayout->setSpacing( 0 );
+	    $shBoxLayout->setMargin( 0 );
+	    $shBoxLayout->setObjectName( "shBoxLayout$i" );
+	    $shBoxLayout->setContentsMargins(0, 0, 0, 0 );
+	    my @shParam = ();
+	    for (my $j=1;$j<=9;$j++) {
+		$shParam[$j] = Qt::CheckBox( $layout );
+		$self->{shParam} = $shParam[$j];
+		$shParam[$j]->setObjectName( "shParam_".$i."_$j" );
+		$shParam[$j]->setText("Param$j");
+		$shBoxLayout->addWidget( $shParam[$j] );
+	    }
+		
+	    my $compShLabel = Qt::Label( $sharingComps[$i] );
+	    $self->{compShLabel} = $compShLabel;
+	    $compShLabel->setObjectName( "comp".$i."ShLabel" );
+	    $compShLabel->setGeometry( Qt::Rect(2, 30, 141, 20) );
+	    $compShLabel->setWordWrap( 0 );
+	
+	    $self->horizontalLayout->addWidget( $sharingComps[$i] );
+	    # Connect slot
+	    Qt::Object::connect($sharingComps[$i], SIGNAL 'currentIndexChanged()' , $self, SLOT 'InitializeFunctions()' );
+	    $compShLabel->setText("FitType$i");
+	} else {
+	    print "Exists, skip component $i\n";
+	}
+    }
+}
+
+sub runsLineNotEmpy()
+{
+}
 
 1;
