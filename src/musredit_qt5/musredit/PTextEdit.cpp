@@ -706,8 +706,8 @@ void PTextEdit::setupMusrActions()
     iconName = QString(":/icons/msr2data-dark.svg");
   else
     iconName = QString(":/icons/msr2data-plain.svg");
-  a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Msr2Data" ), this );
-  a->setShortcut( tr("Alt+M") );
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "Msr&2Data" ), this );
+  a->setShortcut( tr("Alt+2") );
   a->setStatusTip( tr("Start msr2data interface") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrMsr2Data() ) );
   menu->addAction(a);
