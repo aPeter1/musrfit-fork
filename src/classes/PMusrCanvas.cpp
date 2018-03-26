@@ -1014,8 +1014,13 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   if (event != kKeyPress)
      return;
 
-  if (fBatchMode)
+  if (fBatchMode) {
+    if (fStartWithAvg) { // this is needed to get the averaging in the batch mode
+      HandleAverage();
+      PlotAverage(true);
+    }
     return;
+  }
 
   // handle keys and popup menu entries
   enum eKeySwitch {kNotRelevant, kData, kDiffData, kFourier, kDiffFourier, kFourierDiff};
@@ -1553,7 +1558,10 @@ void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
     return;
   }
 
-  sprintf(ext, "_%d", fPlotNumber);
+  if (fStartWithFourier)
+    sprintf(ext, "_%d_F", fPlotNumber);
+  else
+    sprintf(ext, "_%d", fPlotNumber);
   str.Replace(idx, size, ext, strlen(ext));
   idx += strlen(ext);
   size = strlen(ext);
