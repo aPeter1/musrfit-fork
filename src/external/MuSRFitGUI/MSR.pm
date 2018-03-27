@@ -278,6 +278,7 @@ sub CreateMSRUni {
 		}
 		if ($All{"Data1$NHist"} ne $EMPTY && $All{"Data2$NHist"} ne $EMPTY) {
 		    $Data_Line =$Data_Line."    ".$All{"Data1$NHist"}."    ".$All{"Data2$NHist"};
+<<<<<<< HEAD
 		}
 		if ($All{"t0$NHist"} ne $EMPTY) {
 		    $T0_Line=$T0_Line."      ".$All{"t0$NHist"};  
@@ -1262,7 +1263,6 @@ sub ExportParams {
             push( @FitTypes, $All{"FitType$i"} );           
         }
     }
-
     # Get theory block to determine the size of the table
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
     # For now the line below does not work. Why?    
