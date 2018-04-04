@@ -36,7 +36,7 @@
 #include "TBulkTriVortexFieldCalc.h"
 
 #define gBar 0.0135538817
-#define pi 3.14159265358979323846
+#define PI 3.14159265358979323846
 
 /**
  * <p>Class used to calculate static magnetic field distributions
