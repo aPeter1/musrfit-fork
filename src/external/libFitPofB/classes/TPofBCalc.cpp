@@ -188,7 +188,7 @@ void TPofBCalc::Calculate(const string &type, const vector<double> &para) {
   if (type == "skg"){ // skewed Gaussian
 
     fBmin = 0.0;
-    fBmax = para[2]/gBar+10.0*fabs(para[4])/(2.0*pi*gBar);
+    fBmax = para[2]/gBar+10.0*fabs(para[4])/(2.0*PI*gBar);
 
     int a3(static_cast<int>(floor(fBmax/fDB)));
     int a4(static_cast<int>(ceil(fBmax/fDB)));
@@ -196,8 +196,8 @@ void TPofBCalc::Calculate(const string &type, const vector<double> &para) {
     int BmaxIndex((a3 < a4) ? a4 : (a4 + 1));
     int B0Index(static_cast<int>(ceil(para[2]/(gBar*fDB))));
 
-    double expominus(para[3]*para[3]/(2.0*pi*pi*gBar*gBar));
-    double expoplus(para[4]*para[4]/(2.0*pi*pi*gBar*gBar));
+    double expominus(para[3]*para[3]/(2.0*PI*PI*gBar*gBar));
+    double expoplus(para[4]*para[4]/(2.0*PI*PI*gBar*gBar));
     double B0(para[2]/(gBar));
 
     int i;
@@ -642,7 +642,7 @@ void TPofBCalc::AddBackground(double B, double s, double w) {
     return;
 
   int i;
-  double BsSq(s*s/(gBar*gBar*4.0*pi*pi));
+  double BsSq(s*s/(gBar*gBar*4.0*PI*PI));
 
   // calculate Gaussian background
   double bg[fPBSize];
