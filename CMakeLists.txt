@@ -8,6 +8,7 @@ option(nexus "build optional NeXus support. Needed for ISIS" OFF)
 option(ASlibs "build optional ASlibs" OFF)
 option(BMWlibs "build optional BMWlibs" OFF)
 option(BNMRlibs "build optional beta-NMR libs" OFF)
+option(qt_based_tools "try to install Qt based tools" ON)
 
 #--- check for all the needed packages ----------------------------------------------------------
 
@@ -42,36 +43,38 @@ find_package(LibXml2 REQUIRED)
 find_package(OpenMP REQUIRED)
 
 #--- check for Qt -------------------------------------------------------------------------------
-# first try Qt5
-# Find the QtCore library
-find_package(Qt5Core)
-# Find the QtWidgets library
-find_package(Qt5Widgets)
-# Find the QtXml library
-find_package(Qt5Xml)
+if (qt_based_tools)
+  # first try Qt5
+  # Find the QtCore library
+  find_package(Qt5Core)
+  # Find the QtWidgets library
+  find_package(Qt5Widgets)
+  # Find the QtXml library
+  find_package(Qt5Xml)
 
-# only temporarily needed for debug //as35
-if (Qt5Core_FOUND)
-  message("-- Found Qt5Core")
-endif (Qt5Core_FOUND)
-if (Qt5Widgets_FOUND)
-  message("-- Found Qt5Widgets")
-endif (Qt5Widgets_FOUND)
-if (Qt5Xml_FOUND)
-  message("-- Found Qt5Xml")
-endif (Qt5Xml_FOUND)
+  # only temporarily needed for debug //as35
+  if (Qt5Core_FOUND)
+    message("-- Found Qt5Core")
+  endif (Qt5Core_FOUND)
+  if (Qt5Widgets_FOUND)
+    message("-- Found Qt5Widgets")
+  endif (Qt5Widgets_FOUND)
+  if (Qt5Xml_FOUND)
+    message("-- Found Qt5Xml")
+  endif (Qt5Xml_FOUND)
 
-# if Qt5 is not found, try Qt4
-if (NOT Qt5Core_FOUND)
-  find_package(Qt4 COMPONENTS QtGui QtWebKit QtXml)
-  message("Qt4 found: ${Qt4_FOUND} //as35")
-endif (NOT Qt5Core_FOUND)
+  # if Qt5 is not found, try Qt4
+  if (NOT Qt5Core_FOUND)
+    find_package(Qt4 COMPONENTS QtGui QtWebKit QtXml)
+    message("Qt4 found: ${Qt4_FOUND} //as35")
+  endif (NOT Qt5Core_FOUND)
 
-# if Qt5 and Qt4 is not found try Qt3. Hopefully you never reach this point
-if (NOT Qt4_FOUND AND NOT Qt5_FOUND)
-  find_package(Qt3)
-  message("Qt3 found: ${QT_FOUND} //as35")
-endif (NOT Qt4_FOUND AND NOT Qt5_FOUND)
+  # if Qt5 and Qt4 is not found try Qt3. Hopefully you never reach this point
+  if (NOT Qt4_FOUND AND NOT Qt5_FOUND)
+    find_package(Qt3)
+    message("Qt3 found: ${QT_FOUND} //as35")
+  endif (NOT Qt4_FOUND AND NOT Qt5_FOUND)
+endif (qt_based_tools)
 
 #--- if NeXus check also for HDF4, HDF5, and MXML -----------------------------------------------
 if (nexus)
@@ -158,27 +161,30 @@ else (BNMRlibs)
   message("   BNMRlibs                           : no")
 endif (BNMRlibs)
 
-message("")
-message(" Qt5 base tools:")
+if (qt_based_tools)
 if (Qt5Core_FOUND)
+  message("")
+  message(" Qt5 based tools:")
   message("   musredit, musrStep, musrWiz, mupp  : yes")
-else (Qt5Core_FOUND)
-  message("   musredit, musrStep, musrWiz, mupp  : no")
 endif (Qt5Core_FOUND)
-message("")
-message(" Qt4 base tools (deprecated):")
 if (Qt4_FOUND)
+  message("")
+  message(" Qt4 based tools (deprecated):")
   message("   musredit                           : yes")
-else (Qt4_FOUND)
-  message("   musredit                           : no")
 endif (Qt4_FOUND)
-message("")
-message(" Qt3 base tools (outdated):")
-if (Qt3Core_FOUND)
+if (QT_FOUND)
+  message("")
+  message(" Qt3 based tools (outdated):")
   message("   musrgui                            : yes")
-else (Qt3Core_FOUND)
-  message("   musrgui                            : no")
-endif (Qt3Core_FOUND)
+endif (QT_FOUND)
+if (NOT Qt5Core_FOUND AND NOT Qt4_FOUND AND NOT QT_FOUND)
+  message("")
+  message(" NO Qt based tools will be installed since Qt is not found or not installed on the system")
+endif (NOT Qt5Core_FOUND AND NOT Qt4_FOUND AND NOT QT_FOUND)
+else (qt_based_tools)
+  message("")
+  message(" Qt based tools (musredit, musrStep, musrWiz, mupp) have been disabled")
+endif (qt_based_tools)
 message("")
 message(" Installation directories:")
 message(" -------------------------")
