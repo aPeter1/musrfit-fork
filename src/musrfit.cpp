@@ -89,11 +89,13 @@ void musrfit_syntax()
 {
   cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [-t, --title-from-data-file]";
   cout << endl << "                            [-e, --estimateN0] [-p, --per-run-block-chisq]";
-  cout << endl << "                            [--dump <type>] [--timeout <timeout_tag>] | --version | --help";
+  cout << endl << "                            [--dump <type>] [--timeout <timeout_tag>] |";
+  cout << endl << "                            --nexus-support | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       'musrfit <msr-file>' will execute musrfit";
   cout << endl << "       'musrfit' or 'musrfit --help' will show this help";
   cout << endl << "       'musrfit --version' will print the musrfit version";
+  cout << endl << "       'musrfit --nexus-support' will print if NeXus support is available.";
   cout << endl << "       -k, --keep-mn2-output: will rename the files MINUIT2.OUTPUT and ";
   cout << endl << "              MINUIT2.root to <msr-file>-mn2.output and <msr-file>-mn2.root,";
   cout << endl << "              respectively,";
@@ -462,9 +464,14 @@ int main(int argc, char *argv[])
       cout << endl << "musrfit git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #endif
       return PMUSR_SUCCESS;
-    }
-
-    if (!strcmp(argv[1], "--help")) {
+    } else if (!strcmp(argv[1], "--nexus-support")) {
+#ifdef PNEXUS_ENABLED
+      cout << endl << ">> musrfit: NeXus support enabled." << endl << endl;
+#else
+      cout << endl << ">> musrfit: NeXus support NOT enabled." << endl << endl;
+#endif
+      return PMUSR_SUCCESS;
+    } else if (!strcmp(argv[1], "--help")) {
       show_syntax = true;
     }
   }
