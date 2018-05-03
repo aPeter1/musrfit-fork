@@ -12,6 +12,9 @@ option(qt_based_tools "try to install Qt based tools" ON)
 
 #--- check for all the needed packages ----------------------------------------------------------
 
+#--- add path to my own find modules and other stuff
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 #--- check for git ------------------------------------------------------------------------------
 find_package(Git REQUIRED)
 
@@ -32,9 +35,7 @@ find_package(Boost REQUIRED)
 find_package(GSL REQUIRED)
 
 #--- check for fftw3 ----------------------------------------------------------------------------
-#[==[ // needs to be written by as35
 find_package(FFTW3 REQUIRED)
-#]==]
 
 #--- check for libxml2 --------------------------------------------------------------------------
 find_package(LibXml2 REQUIRED)
@@ -52,34 +53,23 @@ if (qt_based_tools)
   # Find the QtXml library
   find_package(Qt5Xml)
 
-  # only temporarily needed for debug //as35
-  if (Qt5Core_FOUND)
-    message("-- Found Qt5Core")
-  endif (Qt5Core_FOUND)
-  if (Qt5Widgets_FOUND)
-    message("-- Found Qt5Widgets")
-  endif (Qt5Widgets_FOUND)
-  if (Qt5Xml_FOUND)
-    message("-- Found Qt5Xml")
-  endif (Qt5Xml_FOUND)
-
   # if Qt5 is not found, try Qt4
   if (NOT Qt5Core_FOUND)
     find_package(Qt4 COMPONENTS QtGui QtWebKit QtXml)
-    message("Qt4 found: ${Qt4_FOUND} //as35")
   endif (NOT Qt5Core_FOUND)
 
   # if Qt5 and Qt4 is not found try Qt3. Hopefully you never reach this point
-  if (NOT Qt4_FOUND AND NOT Qt5_FOUND)
-    find_package(Qt3)
-    message("Qt3 found: ${QT_FOUND} //as35")
-  endif (NOT Qt4_FOUND AND NOT Qt5_FOUND)
+  if (NOT Qt5Core_FOUND)
+    if (NOT Qt4_FOUND)
+      find_package(Qt3)
+    endif (NOT Qt4_FOUND)
+  endif (NOT Qt5Core_FOUND)
 endif (qt_based_tools)
 
 #--- if NeXus check also for HDF4, HDF5, and MXML -----------------------------------------------
 if (nexus)
-  find_package(HDF5 REQUIRED)
-  find_package(HDF4 REQUIRED)
+  find_package(HDF5 COMPONENTS CXX REQUIRED )
+#//as35 - STILL NEEDED?? -> find_package(HDF4 REQUIRED)
   find_package(MXML REQUIRED)
   find_package(NeXus REQUIRED)
 endif (nexus)
@@ -106,7 +96,7 @@ message("")
 message(" Requirements:")
 message(" -------------")
 message("")
-message(" FFTW3   found in //as35 STILL MISSING")
+message(" FFTW3   found in ${FFTW3_INCLUDE_DIR}")
 message(" GSL     found in ${GSL_INCLUDE_DIRS}")
 message(" BOOST   found in ${Boost_INCLUDE_DIRS}")
 message(" LibXML2 found in ${LIBXML2_INCLUDE_DIR}")
@@ -114,9 +104,9 @@ message(" ROOT    found in ${ROOT_INCLUDE_DIRS}")
 
 if (nexus)
   message("")
-  message(" HDF4   found in ${HDF4_INCLUDE_DIRS}")
+#//as35  message(" HDF4   found in ${HDF4_INCLUDE_DIRS}")
   message(" HDF5   found in ${HDF5_INCLUDE_DIRS}")
-  message(" NeXus  found in //as35 STILL MISSING") 
+  message(" NeXus  found in ${NEXUS_INCLUDE_DIR}") 
 endif (nexus)
 
 if (BMWlibs)
@@ -125,7 +115,7 @@ if (BMWlibs)
 endif (BMWlibs)
 
 message("")
-message(" Qt     found in  ${Qt5Core_INCLUDE_DIRS} (Version: ${Qt5Core_VERSION})")
+message(" Qt      found in  ${Qt5Core_INCLUDE_DIRS} (Version: ${Qt5Core_VERSION})")
 message("")
 message(" Features:")
 message(" ---------")
