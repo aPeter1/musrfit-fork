@@ -64,6 +64,7 @@ target_include_directories(dump_header
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/TLemRunHeader>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/MuSR_software/Class_MuSR_PSI/>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/mud/src>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/nexus>
 )
 target_link_libraries(dump_header ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 

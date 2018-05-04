@@ -65,12 +65,13 @@ add_library(PMusr SHARED
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PMusr BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${NEXUS_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/MusrRoot>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/TLemRunHeader>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/MuSR_software/Class_MuSR_PSI>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/mud/src>
-    $<BUILD_INTERFACE:${NEXUS_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/nexus>
 )
 
 add_library(PUserFcnBase SHARED
