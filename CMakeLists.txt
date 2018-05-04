@@ -74,6 +74,7 @@ if (nexus)
 #//as35 - STILL NEEDED?? -> find_package(HDF4 REQUIRED)
   find_package(MXML REQUIRED)
   find_package(NeXus REQUIRED)
+  add_definitions(-DPNEXUS_ENABLED)
 endif (nexus)
 
 #--- check for Cuba lib if BMWlibs are enabled --------------------------------

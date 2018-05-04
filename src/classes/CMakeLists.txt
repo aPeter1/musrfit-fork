@@ -70,6 +70,7 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/TLemRunHeader>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/MuSR_software/Class_MuSR_PSI>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/mud/src>
+    $<BUILD_INTERFACE:${NEXUS_INCLUDE_DIR}>
 )
 
 add_library(PUserFcnBase SHARED

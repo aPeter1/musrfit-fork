@@ -57,6 +57,7 @@ target_link_libraries(any2many ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 add_executable(dump_header git-revision.h dump_header.cpp)
 target_include_directories(dump_header 
   BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${NEXUS_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/MusrRoot>
