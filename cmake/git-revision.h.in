@@ -1,0 +1,8 @@
+#ifndef GIT_VERSION_H
+#define GIT_VERSION_H
+
+#define GIT_BRANCH "@GIT_BRANCH@"
+#define GIT_CURRENT_SHA1 @GIT_CURRENT_SHA1@
+
+#endif // GIT_VERSION_H
+
