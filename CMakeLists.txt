@@ -1,24 +1,24 @@
 # - musrfit 
 cmake_minimum_required(VERSION 3.6)
 
-project(musrfit VERSION 1.3.0 LANGUAGES CXX)
+project(musrfit VERSION 1.3.0 LANGUAGES C CXX)
 
-#--- musrfit specific options -------------------------------------------------------------------
+#--- musrfit specific options -------------------------------------------------
 option(nexus "build optional NeXus support. Needed for ISIS" OFF)
 option(ASlibs "build optional ASlibs" OFF)
 option(BMWlibs "build optional BMWlibs" OFF)
 option(BNMRlibs "build optional beta-NMR libs" OFF)
-option(qt_based_tools "try to install Qt based tools" ON)
+option(qt_based_tools "try to install Qt based tools (musredit, musrWiz, musrStep, mupp)" ON)
 
-#--- check for all the needed packages ----------------------------------------------------------
+#--- check for all the needed packages ----------------------------------------
 
 #--- add path to my own find modules and other stuff
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-#--- check for git ------------------------------------------------------------------------------
+#--- check for git ------------------------------------------------------------
 find_package(Git REQUIRED)
 
-#--- check for ROOT -----------------------------------------------------------------------------
+#--- check for ROOT -----------------------------------------------------------
 find_package(ROOT 6.06 REQUIRED COMPONENTS MathMore Minuit2 XMLParser)
 if (ROOT_mathmore_FOUND)
   execute_process(COMMAND root-config --bindir OUTPUT_VARIABLE ROOT_BINDIR)
@@ -26,24 +26,26 @@ if (ROOT_mathmore_FOUND)
   execute_process(COMMAND root-config --version OUTPUT_VARIABLE ROOT_VERSION)
   string(STRIP ${ROOT_VERSION} ROOT_VERSION)
   message("-- Found ROOT: ${ROOT_BINDIR} (found version: ${ROOT_VERSION})")
+  #---Define useful ROOT functions and macros (e.g. ROOT_GENERATE_DICTIONARY)
+  include(${ROOT_USE_FILE})
 endif (ROOT_mathmore_FOUND)
 
-#--- check for boost ----------------------------------------------------------------------------
+#--- check for boost ----------------------------------------------------------
 find_package(Boost REQUIRED)
 
-#--- check for gsl ------------------------------------------------------------------------------
+#--- check for gsl ------------------------------------------------------------
 find_package(GSL REQUIRED)
 
-#--- check for fftw3 ----------------------------------------------------------------------------
+#--- check for fftw3 ----------------------------------------------------------
 find_package(FFTW3 REQUIRED)
 
-#--- check for libxml2 --------------------------------------------------------------------------
+#--- check for libxml2 --------------------------------------------------------
 find_package(LibXml2 REQUIRED)
 
-#--- check for OpenMP ---------------------------------------------------------------------------
+#--- check for OpenMP ---------------------------------------------------------
 find_package(OpenMP REQUIRED)
 
-#--- check for Qt -------------------------------------------------------------------------------
+#--- check for Qt -------------------------------------------------------------
 if (qt_based_tools)
   # first try Qt5
   # Find the QtCore library
@@ -66,7 +68,7 @@ if (qt_based_tools)
   endif (NOT Qt5Core_FOUND)
 endif (qt_based_tools)
 
-#--- if NeXus check also for HDF4, HDF5, and MXML -----------------------------------------------
+#--- if NeXus check also for HDF4, HDF5, and MXML -----------------------------
 if (nexus)
   find_package(HDF5 COMPONENTS CXX REQUIRED )
 #//as35 - STILL NEEDED?? -> find_package(HDF4 REQUIRED)
@@ -74,11 +76,11 @@ if (nexus)
   find_package(NeXus REQUIRED)
 endif (nexus)
 
-#--- check for Cuba lib if BMWlibs are enabled --------------------------------------------------
+#--- check for Cuba lib if BMWlibs are enabled --------------------------------
+#//as35 probably always stick to the internal one ...
 
-#[==[
+#--- propagate to the sub-directories -----------------------------------------
 add_subdirectory(src)
-#]==]
 
 #--- write summary of the installation 
 message("")
@@ -186,4 +188,4 @@ message("")
 message("-------------------------------------------------------------------------")
 message("")
 
-#--- end ---
+#--- end ----------------------------------------------------------------------
