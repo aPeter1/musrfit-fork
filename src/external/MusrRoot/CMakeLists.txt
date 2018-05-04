@@ -19,6 +19,10 @@ add_library(TMusrRunHeader SHARED
   TMusrRunHeader.cpp
   TMusrRunHeaderDict.cxx
 )
+#--- make sure that the include directory is found ----------------------------
+target_include_directories(
+  TMusrRunHeader BEFORE PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
 
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(TMusrRunHeader ${ROOT_LIBRARIES})

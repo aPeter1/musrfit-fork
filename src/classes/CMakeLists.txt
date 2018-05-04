@@ -2,6 +2,7 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+
 root_generate_dictionary(
   PFourierCanvasDict ${MUSRFIT_INC}/PFourierCanvas.h LINKDEF ${MUSRFIT_INC}/PFourierCanvasLinkDef.h
 )
@@ -61,10 +62,23 @@ add_library(PMusr SHARED
   PStartupHandlerDict.cxx
   PTheory.cpp
 )
+#--- make sure that the include directory is found ----------------------------
+target_include_directories(
+  PMusr BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${MUSRFIT_INC}>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/MusrRoot>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/TLemRunHeader>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/MuSR_software/Class_MuSR_PSI>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/mud/src>
+)
 
 add_library(PUserFcnBase SHARED
   PUserFcnBase.cpp
   PUserFcnBaseDict.cxx
+)
+#--- make sure that the include directory is found ----------------------------
+target_include_directories(
+  PUserFcnBase BEFORE PRIVATE $<BUILD_INTERFACE:${MUSRFIT_INC}>
 )
 
 #--- add library dependencies -------------------------------------------------

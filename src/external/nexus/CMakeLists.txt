@@ -15,6 +15,10 @@ configure_file("PNeXus.pc.in" "PNeXus.pc" @ONLY)
 add_library(PNeXus SHARED
   PNeXus.cpp
 )
+#--- make sure that the include directory is found ----------------------------
+target_include_directories(
+  PNeXus BEFORE PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
 
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(PNeXus ${NEXUS_LIBRARY})
