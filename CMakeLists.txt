@@ -43,7 +43,10 @@ find_package(FFTW3 REQUIRED)
 find_package(LibXml2 REQUIRED)
 
 #--- check for OpenMP ---------------------------------------------------------
-find_package(OpenMP REQUIRED)
+find_package(OpenMP)
+if (OpenMP_FOUND)
+  add_definitions(-DHAVE_GOMP)
+endif (OpenMP_FOUND)
 
 #--- check for Qt -------------------------------------------------------------
 if (qt_based_tools)
