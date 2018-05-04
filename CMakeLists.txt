@@ -19,7 +19,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(Git REQUIRED)
 
 #--- check for ROOT -----------------------------------------------------------
-find_package(ROOT 6.06 REQUIRED COMPONENTS MathMore Minuit2 XMLParser)
+find_package(ROOT 6.06 REQUIRED COMPONENTS Gui MathMore Minuit2 XMLParser)
 if (ROOT_mathmore_FOUND)
   execute_process(COMMAND root-config --bindir OUTPUT_VARIABLE ROOT_BINDIR)
   string(STRIP ${ROOT_BINDIR} ROOT_BINDIR)

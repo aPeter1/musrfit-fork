@@ -47,13 +47,16 @@ add_library(PMusr SHARED
   PMusr.cpp
   PMusrT0.cpp
   PMusrT0Dict.cxx
+  PPrepFourier.cpp
   PRunAsymmetry.cpp
+  PRunAsymmetryRRF.cpp
   PRunBase.cpp
   PRunDataHandler.cpp
   PRunListCollection.cpp
   PRunMuMinus.cpp
   PRunNonMusr.cpp
   PRunSingleHisto.cpp
+  PRunSingleHistoRRF.cpp
   PStartupHandler.cpp
   PStartupHandlerDict.cxx
   PTheory.cpp
