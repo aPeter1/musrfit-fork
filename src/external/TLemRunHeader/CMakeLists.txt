@@ -39,6 +39,8 @@ install(TARGETS TLemRunHeader DESTINATION lib)
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/libTLemRunHeaderDict_rdict.pcm 
         ${CMAKE_CURRENT_BINARY_DIR}/libTLemRunHeaderDict.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libTLemStatsDict_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libTLemStatsDict.rootmap
   DESTINATION lib
 )
 
