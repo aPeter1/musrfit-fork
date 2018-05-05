@@ -93,6 +93,10 @@ add_library(PUserFcnBase SHARED
 target_include_directories(
   PUserFcnBase BEFORE PRIVATE $<BUILD_INTERFACE:${MUSRFIT_INC}>
 )
+#--- add OpenMP compile options if needed -------------------------------------
+if (OpenMP_FOUND)
+  target_compile_options(PMusr PUBLIC ${OpenMP_CXX_FLAGS})
+endif (OpenMP_FOUND)
 
 #--- add library dependencies -------------------------------------------------
 set(DependOnLibs ${ROOT_LIBARIES})

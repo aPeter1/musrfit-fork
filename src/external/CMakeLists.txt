@@ -1,11 +1,13 @@
-#[==[
 if (ASlibs)
   add_subdirectory(Nonlocal)
+#[==[
   add_subdirectory(MagProximity)
   add_subdirectory(libPhotoMeissner)
   add_subdirectory(libSpinValve)
+#]==]
 endif (ASlibs)
 
+#[==[
 if (BMWlibs)
   add_subdirectory(libCuba)
   add_subdirectory(BMWtools)

@@ -111,7 +111,7 @@ message(" BOOST   found in ${Boost_INCLUDE_DIRS}")
 message(" LibXML2 found in ${LIBXML2_INCLUDE_DIR}")
 message(" ROOT    found in ${ROOT_INCLUDE_DIRS}")
 if (OpenMP_FOUND)
-  message(" OpenMP  found (version ${OpenMP_VERSION})")
+  message(" OpenMP  found (version ${OpenMP_CXX_VERSION})")
 endif (OpenMP_FOUND)
 
 if (nexus)
