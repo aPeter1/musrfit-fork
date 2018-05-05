@@ -9,6 +9,15 @@ set(PSIBIN_VERSION "0.1.0")
 set(PSIBIN_LIBRARY_NAME "Class_MuSR_PSI")
 configure_file("Class_MuSR_PSI.pc.in" "Class_MuSR_PSI.pc" @ONLY)
 
+#--- OS dependent pre-compiler settings for PSI-BIN ---------------------------
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+  add_definitions(-D__linux__)
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+  add_definitions(-D_Darwin_)
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+  add_definitions(-D_WIN32)
+endif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+
 #--- lib creation -------------------------------------------------------------
 add_library(Class_MuSR_PSI SHARED MuSR_td_PSI_bin.cpp)
 
