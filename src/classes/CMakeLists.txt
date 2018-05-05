@@ -4,19 +4,29 @@
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 
 root_generate_dictionary(
-  PFourierCanvasDict ${MUSRFIT_INC}/PFourierCanvas.h LINKDEF ${MUSRFIT_INC}/PFourierCanvasLinkDef.h
+  PFourierCanvasDict 
+  -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PFourierCanvas.h 
+  LINKDEF ${MUSRFIT_INC}/PFourierCanvasLinkDef.h
 )
 root_generate_dictionary(
-  PMusrCanvasDict ${MUSRFIT_INC}/PMusrCanvas.h LINKDEF ${MUSRFIT_INC}/PMusrCanvasLinkDef.h
+  PMusrCanvasDict 
+  -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PMusrCanvas.h 
+  LINKDEF ${MUSRFIT_INC}/PMusrCanvasLinkDef.h
 )
 root_generate_dictionary(
-  PMusrT0Dict ${MUSRFIT_INC}/PMusrT0.h LINKDEF ${MUSRFIT_INC}/PMusrT0LinkDef.h
+  PMusrT0Dict 
+  -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PMusrT0.h 
+  LINKDEF ${MUSRFIT_INC}/PMusrT0LinkDef.h
 )
 root_generate_dictionary(
-  PStartupHandlerDict ${MUSRFIT_INC}/PStartupHandler.h LINKDEF ${MUSRFIT_INC}/PStartupHandlerLinkDef.h
+  PStartupHandlerDict 
+  -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PStartupHandler.h 
+  LINKDEF ${MUSRFIT_INC}/PStartupHandlerLinkDef.h
 )
 root_generate_dictionary(
-  PUserFcnBaseDict ${MUSRFIT_INC}/PUserFcnBase.h LINKDEF ${MUSRFIT_INC}/PUserFcnBaseLinkDef.h
+  PUserFcnBaseDict 
+  -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PUserFcnBase.h 
+  LINKDEF ${MUSRFIT_INC}/PUserFcnBaseLinkDef.h
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -64,7 +74,8 @@ add_library(PMusr SHARED
 )
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
-  PMusr BEFORE PRIVATE 
+  PMusr BEFORE PRIVATE
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${NEXUS_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/MusrRoot>
