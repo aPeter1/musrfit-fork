@@ -33,7 +33,7 @@ target_include_directories(
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(PNL_PippardFitter PUserFcnBase ${FFTW3_LIBRARIES} ${ROOT_LIBRARIES})
 
-#--- install TMusrRunHeader solib ---------------------------------------------
+#--- install PNL_PippardFitter solib ------------------------------------------
 install(TARGETS PNL_PippardFitter DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
@@ -45,7 +45,7 @@ install(
   DESTINATION lib
 )
 
-#--- install TMusrRunHeader header --------------------------------------------
+#--- install PNL_PippardFitter header -----------------------------------------
 install(
   FILES 
     PNL_PippardFitter.h 
