@@ -2,9 +2,7 @@ if (ASlibs)
   add_subdirectory(Nonlocal)
   add_subdirectory(MagProximity)
   add_subdirectory(libPhotoMeissner)
-#[==[
   add_subdirectory(libSpinValve)
-#]==]
 endif (ASlibs)
 
 #[==[
