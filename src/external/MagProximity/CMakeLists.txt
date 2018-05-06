@@ -1,8 +1,13 @@
 # - Mag. Proximity library ----------------------------------------------------
 
 #--- generate necessary dictionaries ------------------------------------------
+set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 root_generate_dictionary(
-  PMagProximityFitterDict PMagProximityFitter.h LINKDEF PMagProximityFitterLinkDef.h
+  PMagProximityFitterDict 
+  -I${FFTW3_INCLUDE}
+  -I${MUSRFIT_INC}
+  PMagProximityFitter.h 
+  LINKDEF PMagProximityFitterLinkDef.h
 )
 root_generate_dictionary(
   PMPStartupHandlerDict PMPStartupHandler.h LINKDEF PMPStartupHandlerLinkDef.h
@@ -27,11 +32,14 @@ add_library(PMagProximityFitter SHARED
 )
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
-  PMagProximityFitter BEFORE PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  PMagProximityFitter BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${MUSRFIT_INC}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PMagProximityFitter PUserFcnBase ${ROOT_LIBRARIES})
+target_link_libraries(PMagProximityFitter ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
 
 #--- install PMagProximityFitter solib ----------------------------------------
 install(TARGETS PMagProximityFitter DESTINATION lib)

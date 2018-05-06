@@ -1,8 +1,14 @@
 # - Nonlocal library ----------------------------------------------------------
 
 #--- generate necessary dictionaries ------------------------------------------
+set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+
 root_generate_dictionary(
-  PNL_PippardFitterDict PNL_PippardFitter.h LINKDEF PNL_PippardFitterLinkDef.h
+  PNL_PippardFitterDict 
+  -I${FFTW3_INCLUDE_DIR} 
+  -I${MUSRFIT_INC}
+  PNL_PippardFitter.h 
+  LINKDEF PNL_PippardFitterLinkDef.h
 )
 root_generate_dictionary(
   PNL_StartupHandlerDict PNL_StartupHandler.h LINKDEF PNL_StartupHandlerLinkDef.h
@@ -27,11 +33,14 @@ add_library(PNL_PippardFitter SHARED
 )
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
-  PNL_PippardFitter BEFORE PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  PNL_PippardFitter BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${MUSRFIT_INC}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PNL_PippardFitter PUserFcnBase ${FFTW3_LIBRARIES} ${ROOT_LIBRARIES})
+target_link_libraries(PNL_PippardFitter ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
 
 #--- install PNL_PippardFitter solib ------------------------------------------
 install(TARGETS PNL_PippardFitter DESTINATION lib)
