@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PPhotoMeissner
+Description: C++ shared library providing the photo Meissner fitter class
+Version: @P_PHOTO_MEISSNER_VERSION@
+Libs: -L${libdir} -l@P_PHOTO_MEISSNER_LIBRARY_NAME@
+Cflags: -I${includedir}
