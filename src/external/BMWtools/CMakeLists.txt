@@ -2,6 +2,7 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+set(CUBA_INC ${CMAKE_SOURCE_DIR}/src/external/libCuba/src)
 
 root_generate_dictionary(
   BMWStartupHandlerDict LINKDEF BMWStartupHandlerLinkDef.h
@@ -27,8 +28,9 @@ add_library(BMWtools SHARED
 )
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
-  PNL_PippardFitter BEFORE PRIVATE 
+  BMWtools BEFORE PRIVATE 
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${CUBA_INC}>
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
