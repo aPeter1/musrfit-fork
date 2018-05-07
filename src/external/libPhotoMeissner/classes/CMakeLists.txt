@@ -43,7 +43,7 @@ target_include_directories(
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PPhotoMeissner ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
+target_link_libraries(PPhotoMeissner ${FFTW3_LIBRARY} ${GSL_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
 
 #--- install PPhotoMeissner solib ---------------------------------------------
 install(TARGETS PPhotoMeissner DESTINATION lib)
