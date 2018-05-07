@@ -111,7 +111,11 @@ if (nexus)
   set(DependOnLibs ${DependOnLibs} PNeXus)
 endif (nexus)
 if (OpenMP_FOUND)
-  set(DependOnLibs ${DependOnLibs} ${OpenMP_CXX_LIBRARIES})
+  if (OpenMP_CXX_LIBRARIES)
+    set(DependOnLibs ${DependOnLibs} ${OpenMP_CXX_LIBRARIES})
+  else (OpenMP_CXX_LIBRARIES)
+    set(DependOnLibs ${DependOnLibs} ${OpenMP_CXX_FLAGS}) # for older cmake OpenMP_CXX_LIBRARIES is not defined
+  endif (OpenMP_CXX_LIBRARIES)
 endif (OpenMP_FOUND)
 
 target_link_libraries(PUserFcnBase ${ROOT_LIBRARIES})
