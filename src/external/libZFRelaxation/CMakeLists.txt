@@ -2,11 +2,13 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+set(BMW_TOOLS_INC ${CMAKE_SOURCE_DIR}/src/external/BMWtools)
 
 root_generate_dictionary(
   ZFRelaxationDict 
   -I${FFTW3_INCLUDE_DIR} 
   -I${MUSRFIT_INC}
+  -I${BMW_TOOLS_INC}
   ZFRelaxation.h
   LINKDEF ZFRelaxationLinkDef.h
 )
@@ -32,6 +34,7 @@ target_include_directories(
   ZFRelaxation BEFORE PRIVATE 
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
+    $<BUILD_INTERFACE:${BMW_TOOLS_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
