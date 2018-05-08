@@ -5,7 +5,7 @@ set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 set(CUBA_INC ${CMAKE_SOURCE_DIR}/src/external/libCuba/src)
 
 root_generate_dictionary(
-  BMWStartupHandlerDict LINKDEF BMWStartupHandlerLinkDef.h
+  BMWStartupHandlerDict BMWStartupHandler.h LINKDEF BMWStartupHandlerLinkDef.h
 )
 
 #--- create pkg-config info ---------------------------------------------------
