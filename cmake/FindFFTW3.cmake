@@ -7,21 +7,29 @@
 #  FFTW3_OMP_LIBRARY, library to link against to use FFTW3_omp
 #  FFTW3_THREADS_LIBRARY, library to link against to use FFTW3_threads
 #  FFTW3_FOUND, if false, do not try to use FFTW3.
+#  FFTW3_OMP_FOUND, if false, do not try to use OpenMP FFTW3.
+#  FFTW3_THREADS_FOUND, if false, do not try to use threaded FFTW3.
 # ---
 #  FFTW3L_LIBRARY, library to link against to use FFTW3l
 #  FFTW3L_OMP_LIBRARY, library to link against to use FFTW3l_omp
 #  FFTW3L_THREADS_LIBRARY, library to link against to use FFTW3l_threads
 #  FFTW3L_FOUND, if false, do not try to use FFTW3l.
+#  FFTW3L_OMP_FOUND, if false, do not try to use OpenMP FFTW3l.
+#  FFTW3L_THREADS_FOUND, if false, do not try to use threaded FFTW3l.
 # ---
 #  FFTW3F_LIBRARY, library to link against to use FFTW3f
 #  FFTW3F_OMP_LIBRARY, library to link against to use FFTW3f_omp
 #  FFTW3F_THREADS_LIBRARY, library to link against to use FFTW3f_threads
 #  FFTW3F_FOUND, if false, do not try to use FFTW3f.
+#  FFTW3F_OMP_FOUND, if false, do not try to use OpenMP FFTW3f.
+#  FFTW3F_THREADS_FOUND, if false, do not try to use threaded FFTW3f.
 # ---
 #  FFTW3Q_LIBRARY, library to link against to use FFTW3q
 #  FFTW3Q_OMP_LIBRARY, library to link against to use FFTW3q_omp
 #  FFTW3Q_THREADS_LIBRARY, library to link against to use FFTW3q_threads
 #  FFTW3Q_FOUND, if false, do not try to use FFTW3q.
+#  FFTW3Q_OMP_FOUND, if false, do not try to use OpenMP FFTW3q.
+#  FFTW3Q_THREADS_FOUND, if false, do not try to use threaded FFTW3q.
 
 find_path(FFTW3_INCLUDE_DIR fftw3.h
   HINTS "/usr/include" "/opt/local/include"
@@ -53,27 +61,81 @@ include(${CMAKE_ROOT}/Modules/FindPackageHandleStandardArgs.cmake)
 find_package_handle_standard_args(FFTW3
                                   REQUIRED_VARS FFTW3_LIBRARY FFTW3_INCLUDE_DIR
                                   VERSION_VAR "3")
+find_package_handle_standard_args(FFTW3_OMP
+                                  REQUIRED_VARS FFTW3_OMP_LIBRARY FFTW3_INCLUDE_DIR
+                                  VERSION_VAR "3")
+find_package_handle_standard_args(FFTW3_THREAD
+                                  REQUIRED_VARS FFTW3_THREAD_LIBRARY FFTW3_INCLUDE_DIR
+                                  VERSION_VAR "3")
+
 find_package_handle_standard_args(FFTW3L
                                   REQUIRED_VARS FFTW3L_LIBRARY FFTW3_INCLUDE_DIR
                                   VERSION_VAR "3")
+find_package_handle_standard_args(FFTW3L_OMP
+                                  REQUIRED_VARS FFTW3L_OMP_LIBRARY FFTW3_INCLUDE_DIR
+                                  VERSION_VAR "3")
+find_package_handle_standard_args(FFTW3L_THREAD
+                                  REQUIRED_VARS FFTW3L_THREAD_LIBRARY FFTW3_INCLUDE_DIR
+                                  VERSION_VAR "3")
+
 find_package_handle_standard_args(FFTW3F
                                   REQUIRED_VARS FFTW3F_LIBRARY FFTW3_INCLUDE_DIR
                                   VERSION_VAR "3")
+find_package_handle_standard_args(FFTW3F_OMP
+                                  REQUIRED_VARS FFTW3F_OMP_LIBRARY FFTW3_INCLUDE_DIR
+                                  VERSION_VAR "3")
+find_package_handle_standard_args(FFTW3F_THREAD
+                                  REQUIRED_VARS FFTW3F_THREAD_LIBRARY FFTW3_INCLUDE_DIR
+                                  VERSION_VAR "3")
+
 find_package_handle_standard_args(FFTW3Q
                                   REQUIRED_VARS FFTW3Q_LIBRARY FFTW3_INCLUDE_DIR
+                                  VERSION_VAR "3")
+find_package_handle_standard_args(FFTW3Q_OMP
+                                  REQUIRED_VARS FFTW3Q_OMP_LIBRARY FFTW3_INCLUDE_DIR
+                                  VERSION_VAR "3")
+find_package_handle_standard_args(FFTW3Q_THREAD
+                                  REQUIRED_VARS FFTW3Q_THREAD_LIBRARY FFTW3_INCLUDE_DIR
                                   VERSION_VAR "3")
 
 if (NOT FFTW3_FOUND)
   unset(FFTW3_LIBRARY)
 endif()
+if (NOT FFTW3_OMP_FOUND)
+  unset(FFTW3_OMP_LIBRARY)
+endif()
+if (NOT FFTW3_THREAD_FOUND)
+  unset(FFTW3_THREAD_LIBRARY)
+endif()
+
 if (NOT FFTW3L_FOUND)
   unset(FFTW3L_LIBRARY)
 endif()
+if (NOT FFTW3L_OMP_FOUND)
+  unset(FFTW3L_OMP_LIBRARY)
+endif()
+if (NOT FFTW3L_THREAD_FOUND)
+  unset(FFTW3L_THREAD_LIBRARY)
+endif()
+
 if (NOT FFTW3F_FOUND)
   unset(FFTW3F_LIBRARY)
 endif()
+if (NOT FFTW3F_OMP_FOUND)
+  unset(FFTW3F_OMP_LIBRARY)
+endif()
+if (NOT FFTW3F_THREAD_FOUND)
+  unset(FFTW3F_THREAD_LIBRARY)
+endif()
+
 if (NOT FFTW3Q_FOUND)
   unset(FFTW3Q_LIBRARY)
+endif()
+if (NOT FFTW3Q_OMP_FOUND)
+  unset(FFTW3Q_OMP_LIBRARY)
+endif()
+if (NOT FFTW3Q_THREAD_FOUND)
+  unset(FFTW3Q_THREAD_LIBRARY)
 endif()
 
 mark_as_advanced(
