@@ -6,9 +6,7 @@ if (ASlibs)
 endif (ASlibs)
 
 if (BMWlibs)
-#[==[
   add_subdirectory(libCuba)
-#]==]
   add_subdirectory(BMWtools)
   add_subdirectory(libCalcMeanFieldsLEM)
   add_subdirectory(libFitPofB)

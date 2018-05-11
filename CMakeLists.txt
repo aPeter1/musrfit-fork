@@ -11,6 +11,27 @@ option(BNMRlibs "build optional beta-NMR libs" OFF)
 option(qt_based_tools "try to install Qt based tools (musredit, musrWiz, musrStep, mupp)" ON)
 option(try_OpenMP "try to use OpenMP if available" ON)
 
+#--- perform some checks and generate the config.h ----------------------------
+include(CheckIncludeFiles)
+include(CheckFunctionExists)
+check_include_files(alloca.h HAVE_ALLOCA_H)
+check_include_files("sys/ipc.h;sys/shm.h" HAVE_SHMGET)
+check_function_exists(fork HAVE_FORK)
+check_include_files(dlfcn.h HAVE_DLFCN_H)
+check_function_exists(erf HAVE_ERF)
+check_function_exists(getloadavg HAVE_GETLOADAVG)
+check_include_files(inttypes.h HAVE_INTTYPES_H)
+check_include_files(memory.h HAVE_MEMORY_H)
+check_function_exists(powl HAVE_POWL)
+check_include_files(memory.h HAVE_MEMORY_H)
+check_include_files(stdint.h HAVE_STDINT_H)
+check_include_files(stdlib.h HAVE_STDLIB_H)
+check_include_files(string.h HAVE_STRING_H)
+check_include_files(strings.h HAVE_STRINGS_H)
+check_include_files(sys/stat.h HAVE_SYS_STAT_H)
+check_include_files(sys/types.h HAVE_SYS_TYPES_H)
+check_include_files(sys/unistd.h HAVE_UNISTD_H)
+
 #--- check for all the needed packages ----------------------------------------
 
 #--- add path to my own find modules and other stuff
@@ -39,6 +60,12 @@ find_package(GSL REQUIRED)
 
 #--- check for fftw3 ----------------------------------------------------------
 find_package(FFTW3 REQUIRED)
+if (FFTW3_THREAD_FOUND)
+  set(HAVE_LIBFFTW3_THREADS 1 CACHE INTERNAL "fftw3_threads are available")
+endif (FFTW3_THREAD_FOUND)
+if (FFTW3F_THREAD_FOUND)
+  set(HAVE_LIBFFTW3F_THREADS 1 CACHE INTERNAL "fftw3f_threads are available")
+endif (FFTW3F_THREAD_FOUND)
 
 #--- check for libxml2 --------------------------------------------------------
 find_package(LibXml2 REQUIRED)
@@ -47,7 +74,8 @@ find_package(LibXml2 REQUIRED)
 if (try_OpenMP)
   find_package(OpenMP)
   if (OpenMP_FOUND)
-    add_definitions(-DHAVE_GOMP)
+#    add_definitions(-DHAVE_GOMP)
+    set(HAVE_GOMP 1 CACHE INTERNAL "Have GOMP")
   endif (OpenMP_FOUND)
 endif (try_OpenMP)
 
@@ -85,6 +113,10 @@ endif (nexus)
 
 #--- check for Cuba lib if BMWlibs are enabled --------------------------------
 #//as35 probably always stick to the internal one ...
+
+#--- all checks done -> feed config.h -----------------------------------------
+set(HAVE_CONFIG_H 1 CACHE INTERNAL "config.h is available")
+configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 #--- propagate to the sub-directories -----------------------------------------
 add_subdirectory(src)
