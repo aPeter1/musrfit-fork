@@ -9,37 +9,32 @@ set(CUBA_VERSION "1.0.0")
 set(CUBA_LIBRARY_NAME "cuba")
 configure_file("cuba.pc.in" "cuba.pc" @ONLY)
 
+add_subdirectory(cuhre)
+add_subdirectory(divonne)
+add_subdirectory(suave)
+add_subdirectory(vegas)
+
 #--- lib creation -------------------------------------------------------------
 add_library(cuba SHARED
-  cuhre/Cuhre.c
-  divonne/Divonne.c
-  suave/Suave.c
-  vegas/Vegas.c
-  common/WorkerIni.c
-)
-#--- make sure that the include directory is found ----------------------------
-target_include_directories(
-  cuba BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/common>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/cuhre>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/divonne>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/suave>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/vegas>
+  $<TARGET_OBJECTS:cuhre>
+  $<TARGET_OBJECTS:divonne>
+  $<TARGET_OBJECTS:suave>
+  $<TARGET_OBJECTS:vegas>
 )
 
-#--- check for pre compile flags ----------------------------------------------
-set(COMP_DEF "")
-if (HAVE_FORK)
-  set(COMP_DEF ${COMP_DEF} "-DHAVE_FORK")
-endif (HAVE_FORK)
-if (HAVE_ALLOCA_H)
-  set(COMP_DEF ${COMP_DEF} "-DHAVE_ALLOCA_H")
-endif (HAVE_ALLOCA_H)
-if (HAVE_SHMGET)
-  set(COMP_DEF ${COMP_DEF} "-DHAVE_SHMGET")
-endif (HAVE_SHMGET)
+#--- install cuba solib -------------------------------------------------------
+install(TARGETS cuba DESTINATION lib)
 
-target_compile_definitions(
-  cuba PRIVATE ${COMP_DEF}
+#--- install cuba header ------------------------------------------------------
+install(
+  FILES 
+    cuba.h 
+  DESTINATION 
+    include
 )
 
+#--- install pkg-config info --------------------------------------------------
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/cuba.pc
+  DESTINATION lib/pkgconfig
+)

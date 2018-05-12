@@ -12,7 +12,7 @@
 #include "config.h"
 #endif
 
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
 #define _XOPEN_SOURCE
 
 #include <stdio.h>
