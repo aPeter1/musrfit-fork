@@ -36,7 +36,7 @@ target_include_directories(
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(BMWtools ${ROOT_LIBRARIES}) # //as35 cuba lib needs to be added here!!
+target_link_libraries(BMWtools ${ROOT_LIBRARIES} cuba)
 
 #--- install BMWtools solib ---------------------------------------------------
 install(TARGETS BMWtools DESTINATION lib)

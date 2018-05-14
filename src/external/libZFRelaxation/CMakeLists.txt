@@ -39,7 +39,7 @@ target_include_directories(
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(ZFRelaxation ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase BMWtools) # //as35 cuba lib still missing
+target_link_libraries(ZFRelaxation ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase BMWtools) 
 
 #--- install ZFRelaxation solib -----------------------------------------------
 install(TARGETS ZFRelaxation DESTINATION lib)

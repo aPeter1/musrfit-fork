@@ -10,9 +10,7 @@ if (BMWlibs)
   add_subdirectory(BMWtools)
   add_subdirectory(libCalcMeanFieldsLEM)
   add_subdirectory(libFitPofB)
-#[==[
   add_subdirectory(libGapIntegrals)
-#]==]
   add_subdirectory(libLFRelaxation)
   add_subdirectory(libZFRelaxation)
 endif (BMWlibs)

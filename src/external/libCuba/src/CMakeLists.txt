@@ -5,7 +5,7 @@ set(prefix "${CMAKE_INSTALL_PREFIX}")
 set(exec_prefix "\$\{prefix\}")
 set(libdir "\$\{exec_prefix\}/lib")
 set(includedir "\$\{prefix\}/include")   
-set(CUBA_VERSION "1.0.0")
+set(CUBA_VERSION "4.2.0")
 set(CUBA_LIBRARY_NAME "cuba")
 configure_file("cuba.pc.in" "cuba.pc" @ONLY)
 
