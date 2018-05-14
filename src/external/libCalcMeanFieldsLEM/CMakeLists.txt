@@ -42,7 +42,9 @@ target_include_directories(
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(CalcMeanFieldsLEM ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
+target_link_libraries(CalcMeanFieldsLEM 
+  ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} BMWtools FitPofB PUserFcnBase
+)
 
 #--- install CalcMeanFieldsLEM solib ------------------------------------------
 install(TARGETS CalcMeanFieldsLEM DESTINATION lib)

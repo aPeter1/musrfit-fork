@@ -25,13 +25,13 @@ configure_file("TLFRelaxation.pc.in" "TLFRelaxation.pc" @ONLY)
 #]==]
 
 #--- lib creation -------------------------------------------------------------
-add_library(TLFRelaxation SHARED
+add_library(LFRelaxation SHARED
   TLFRelaxation.cpp
   TLFRelaxationDict.cxx
 )
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
-  TLFRelaxation BEFORE PRIVATE 
+  LFRelaxation BEFORE PRIVATE 
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${BMW_TOOLS_INC}>
@@ -39,10 +39,10 @@ target_include_directories(
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(TLFRelaxation ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase BMWtools) # //as35 cuba lib still missing
+target_link_libraries(LFRelaxation ${GSL_LIBRARIES} ${FFTW3F_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase BMWtools) # //as35 cuba lib still missing
 
-#--- install TLFRelaxation solib ----------------------------------------------
-install(TARGETS TLFRelaxation DESTINATION lib)
+#--- install LFRelaxation solib -----------------------------------------------
+install(TARGETS LFRelaxation DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
