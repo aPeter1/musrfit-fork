@@ -6,6 +6,8 @@
 		last modified 25 Sep 13 th
 */
 
+#include <sys/select.h>
+
 #define MINSLICE 10
 #define MINCORES 1
 /*#define MINCORES 2*/
