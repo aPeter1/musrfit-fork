@@ -12,6 +12,7 @@ option(qt_based_tools "try to install Qt based tools (musredit, musrWiz, musrSte
 option(try_OpenMP "try to use OpenMP if available" ON)
 
 #--- perform some checks and generate the config.h ----------------------------
+include(CheckTypeSize)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 check_include_files(alloca.h HAVE_ALLOCA_H)
@@ -31,6 +32,12 @@ check_include_files(strings.h HAVE_STRINGS_H)
 check_include_files(sys/stat.h HAVE_SYS_STAT_H)
 check_include_files(sys/types.h HAVE_SYS_TYPES_H)
 check_include_files(sys/unistd.h HAVE_UNISTD_H)
+check_type_size("long double" LONG_DOUBLE)
+check_type_size("double" DOUBLE)
+if (${LONG_DOUBLE} GREATER ${DOUBLE})
+  set(HAVE_LONG_DOUBLE 1)
+  set(HAVE_LONG_DOUBLE_WIDER 1)
+endif (${LONG_DOUBLE} GREATER ${DOUBLE})
 
 #--- check for all the needed packages ----------------------------------------
 

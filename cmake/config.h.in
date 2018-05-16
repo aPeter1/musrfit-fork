@@ -23,6 +23,12 @@
 // Define to 1 if you have the <inttypes.h> header file.
 #cmakedefine HAVE_INTTYPES_H 1
 
+// Define to 1 if the type `long double' works and has more range or precision than `double'.
+#cmakedefine HAVE_LONG_DOUBLE 1
+
+// Define to 1 if the type `long double' works and has more range or precision than `double'.
+#cmakedefine HAVE_LONG_DOUBLE_WIDER 1
+
 // Define to 1 if fftw3f_threads are available
 #cmakedefine HAVE_LIBFFTW3F_THREADS 1
 
