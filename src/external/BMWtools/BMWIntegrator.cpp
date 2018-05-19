@@ -31,6 +31,7 @@
 #include "cuba.h"
 
 #define USERDATA NULL
+#define SPIN NULL
 #define SEED 0
 #define STATEFILE NULL
 
@@ -45,6 +46,7 @@ std::vector<double> TDWaveGapIntegralCuhre::fPar;
 double TDWaveGapIntegralCuhre::IntegrateFunc()
 {
   const unsigned int NCOMP(1);
+  const unsigned int NVEC(1);
   const double EPSREL (1e-4);
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
@@ -57,9 +59,9 @@ double TDWaveGapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA, NVEC,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY, STATEFILE,
+    KEY, STATEFILE, SPIN,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -96,6 +98,7 @@ std::vector<double> TCosSqDWaveGapIntegralCuhre::fPar;
 double TCosSqDWaveGapIntegralCuhre::IntegrateFunc()
 {
   const unsigned int NCOMP(1);
+  const unsigned int NVEC(1);
   const double EPSREL (1e-8);
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
@@ -108,9 +111,9 @@ double TCosSqDWaveGapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA, NVEC,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY, STATEFILE,
+    KEY, STATEFILE, SPIN,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -147,6 +150,7 @@ std::vector<double> TSinSqDWaveGapIntegralCuhre::fPar;
 double TSinSqDWaveGapIntegralCuhre::IntegrateFunc()
 {
   const unsigned int NCOMP(1);
+  const unsigned int NVEC(1);
   const double EPSREL (1e-8);
   const double EPSABS (1e-10);
   const unsigned int VERBOSE (0);
@@ -159,9 +163,9 @@ double TSinSqDWaveGapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA, NVEC,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY, STATEFILE,
+    KEY, STATEFILE, SPIN,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -198,6 +202,7 @@ std::vector<double> TAnSWaveGapIntegralCuhre::fPar;
 double TAnSWaveGapIntegralCuhre::IntegrateFunc()
 {
   const unsigned int NCOMP(1);
+  const unsigned int NVEC(1);
   const double EPSREL (1e-4);
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
@@ -210,9 +215,9 @@ double TAnSWaveGapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA, NVEC,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY, STATEFILE,
+    KEY, STATEFILE, SPIN,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -249,6 +254,7 @@ std::vector<double> TAnSWaveGapIntegralDivonne::fPar;
 double TAnSWaveGapIntegralDivonne::IntegrateFunc()
 {
   const unsigned int NCOMP(1);
+  const unsigned int NVEC(1);
   const double EPSREL (1e-4);
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
@@ -268,10 +274,10 @@ double TAnSWaveGapIntegralDivonne::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Divonne(fNDim, NCOMP, Integrand, USERDATA,
+  Divonne(fNDim, NCOMP, Integrand, USERDATA, NVEC,
     EPSREL, EPSABS, VERBOSE, SEED, MINEVAL, MAXEVAL,
     KEY1, KEY2, KEY3, MAXPASS, BORDER, MAXCHISQ, MINDEVIATION,
-    NGIVEN, LDXGIVEN, NULL, NEXTRA, NULL, STATEFILE,
+    NGIVEN, LDXGIVEN, NULL, NEXTRA, NULL, STATEFILE, SPIN,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -308,6 +314,7 @@ std::vector<double> TAnSWaveGapIntegralSuave::fPar;
 double TAnSWaveGapIntegralSuave::IntegrateFunc()
 {
   const unsigned int NCOMP(1);
+  const unsigned int NVEC(1);
   const double EPSREL (1e-4);
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
@@ -316,14 +323,15 @@ double TAnSWaveGapIntegralSuave::IntegrateFunc()
   const unsigned int MAXEVAL (1000000);
 
   const unsigned int NNEW (1000);
+  const unsigned int NMIN (2);
   const double FLATNESS (25.);
 
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Suave(fNDim, NCOMP, Integrand, USERDATA,
+  Suave(fNDim, NCOMP, Integrand, USERDATA, NVEC,
     EPSREL, EPSABS, VERBOSE | LAST, SEED, MINEVAL, MAXEVAL,
-    NNEW, FLATNESS, STATEFILE,
+    NNEW, NMIN, FLATNESS, STATEFILE, SPIN,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -360,6 +368,7 @@ std::vector<double> TNonMonDWave1GapIntegralCuhre::fPar;
 double TNonMonDWave1GapIntegralCuhre::IntegrateFunc()
 {
   const unsigned int NCOMP(1);
+  const unsigned int NVEC(1);
   const double EPSREL (1e-4);
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
@@ -372,9 +381,9 @@ double TNonMonDWave1GapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA, NVEC,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY, STATEFILE,
+    KEY, STATEFILE, SPIN,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
@@ -411,6 +420,7 @@ std::vector<double> TNonMonDWave2GapIntegralCuhre::fPar;
 double TNonMonDWave2GapIntegralCuhre::IntegrateFunc()
 {
   const unsigned int NCOMP(1);
+  const unsigned int NVEC(1);
   const double EPSREL (1e-4);
   const double EPSABS (1e-6);
   const unsigned int VERBOSE (0);
@@ -423,9 +433,9 @@ double TNonMonDWave2GapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand, USERDATA,
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA, NVEC,
     EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY, STATEFILE,
+    KEY, STATEFILE, SPIN,
     &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];

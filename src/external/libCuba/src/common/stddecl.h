@@ -1,7 +1,7 @@
 /*
 	stddecl.h
 		declarations common to all Cuba routines
-		last modified 17 Sep 13 th
+		last modified 23 Apr 15 th
 */
 
 
@@ -13,7 +13,6 @@
 #endif
 
 #define _DEFAULT_SOURCE
-#define _XOPEN_SOURCE
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,6 +29,7 @@
 #ifdef HAVE_FORK
 #include <sys/wait.h>
 #include <sys/socket.h>
+#include <signal.h>
 #ifdef HAVE_SHMGET
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -83,10 +83,31 @@ void *alloca (size_t);
 
 #define SAMPLESIZE (NW + t->ndim + t->ncomp)*sizeof(real)
 
+
+enum { uninitialized = 0x61627563 };
+
+#define EnvInit(var, name, default) \
+  if( var == uninitialized ) { \
+    cchar *env = getenv(name); \
+    if( env == NULL ) var = default; \
+    else { \
+      var = atoi(env); \
+      if( cubaverb_ ) { \
+        char out[64]; \
+        sprintf(out, "env " name " = %d", (int)var); \
+        Print(out); \
+      } \
+    } \
+  }
+
+#define VerboseInit() EnvInit(cubaverb_, "CUBAVERBOSE", 0)
+#define MaxVerbose(flags) (flags + IDim(IMin(cubaverb_, 3) - ((flags) & 3)))
+
 #define VERBOSE (t->flags & 3)
 #define LAST (t->flags & 4)
 #define SHARPEDGES (t->flags & 8)
 #define KEEPFILE (t->flags & 16)
+#define ZAPSTATE (t->flags & 32)
 #define REGIONS (t->flags & 128)
 #define RNG (t->flags >> 8)
 
@@ -120,7 +141,7 @@ void *alloca (size_t);
 
 #define Zap(d) memset(d, 0, sizeof(d))
 
-#define MaxErr(avg) Max(t->epsrel*fabs(avg), t->epsabs)
+#define MaxErr(avg) Max(t->epsrel*fabsx(avg), t->epsabs)
 
 #ifdef __cplusplus
 #define mallocset(p, n) (*(void **)&p = malloc(n))
@@ -157,8 +178,21 @@ void *alloca (size_t);
 
 #ifdef MLVERSION
 #define ML_ONLY(...) __VA_ARGS__
+#define ML_NOT(...)
 #else
 #define ML_ONLY(...)
+#define ML_NOT(...) __VA_ARGS__
+
+#define CORE_MASTER (int []){32768}
+#define MasterInit() do if( !cubafun_.init ) { \
+  cubafun_.init = true; \
+  if( cubafun_.initfun ) cubafun_.initfun(cubafun_.initarg, CORE_MASTER); \
+} while( 0 )
+#define MasterExit() do if( cubafun_.init ) { \
+  cubafun_.init = false; \
+  if( cubafun_.exitfun ) cubafun_.exitfun(cubafun_.exitarg, CORE_MASTER); \
+} while( 0 )
+#define Invalid(s) ((s) == NULL || *(int *)(s) == -1)
 
 #ifdef HAVE_FORK
 #undef FORK_ONLY
@@ -168,37 +202,40 @@ void *alloca (size_t);
 #undef SHM_ONLY
 #define SHM_ONLY(...) __VA_ARGS__
 
-#define ShmMap(t, ...) if( t->shmid != -1 ) { \
-  t->frame = shmat(t->shmid, NULL, 0); \
-  if( t->frame == (void *)-1 ) Abort("shmat"); \
-  __VA_ARGS__ \
-}
-
-#define ShmRm(t) shmctl(t->shmid, IPC_RMID, NULL);
+#define MasterAlloc(t) \
+  t->shmid = shmget(IPC_PRIVATE, t->nframe*SAMPLESIZE, IPC_CREAT | 0600)
+#define MasterFree(t) shmctl(t->shmid, IPC_RMID, NULL)
+#define WorkerAlloc(t)
+#define WorkerFree(r)
 
 #undef ShmAlloc
-#define ShmAlloc(t, ...) \
-  t->shmid = shmget(IPC_PRIVATE, t->nframe*SAMPLESIZE, IPC_CREAT | 0600); \
-  ShmMap(t, __VA_ARGS__)
+#define ShmAlloc(t, who) \
+  who##Alloc(t); \
+  if( t->shmid != -1 ) { \
+    t->frame = shmat(t->shmid, NULL, 0); \
+    if( t->frame == (void *)-1 ) Abort("shmat"); \
+  }
 
 #undef ShmFree
-#define ShmFree(t, ...) if( t->shmid != -1 ) { \
-  shmdt(t->frame); \
-  __VA_ARGS__ \
-}
+#define ShmFree(t, who) \
+  if( t->shmid != -1 ) { \
+    shmdt(t->frame); \
+    who##Free(t); \
+  }
 
 #endif
 #endif
 #endif
   
-#define FrameAlloc(t, ...) \
-  SHM_ONLY(ShmAlloc(t, __VA_ARGS__) else) \
+#define FrameAlloc(t, who) \
+  SHM_ONLY(ShmAlloc(t, who) else) \
   MemAlloc(t->frame, t->nframe*SAMPLESIZE);
 
-#define FrameFree(t, ...) DIV_ONLY(if( t->nframe )) { \
-  SHM_ONLY(ShmFree(t, __VA_ARGS__) else) \
-  free(t->frame); \
-}
+#define FrameFree(t, who) \
+  DIV_ONLY(if( t->nframe )) { \
+    SHM_ONLY(ShmFree(t, who) else) \
+    free(t->frame); \
+  }
 
 
 #define StateDecl \
@@ -219,7 +256,9 @@ struct stat st
 
 typedef long long int signature_t;
 
-#define StateSignature(t, i) (0x41425543 + \
+enum { signature = 0x41425543 };
+
+#define StateSignature(t, i) (signature + \
   ((signature_t)(i) << 60) + \
   ((signature_t)(t)->ncomp << 48) + \
   ((signature_t)(t)->ndim << 32))
@@ -306,38 +345,99 @@ typedef const count ccount;
 #define PREFIX(s) ll##s
 #define NUMBER "%lld"
 #define NUMBER7 "%7lld"
+#define NUMBER_MAX LLONG_MAX
 typedef long long int number;
 #else
 #define PREFIX(s) s
 #define NUMBER "%d"
 #define NUMBER7 "%7d"
+#define NUMBER_MAX INT_MAX
 typedef int number;
 #endif
 typedef const number cnumber;
 
 #define REAL "%g"
 #define REALF "%f"
-typedef /*long*/ double real;
-	/* Switching to long double is not as trivial as it
-	   might seem here.  sqrt, erf, exp, pow need to be
-	   replaced by their long double versions (sqrtl, ...),
-	   printf formats need to be updated similarly, and
-	   ferrying long doubles to Mathematica is of course
-	   quite another matter, too. */
+#define SHOW(r) (double)(r)
+	/* floating-point numbers are printed with SHOW */
+
+#if REALSIZE == 16
+#include <quadmath.h>
+typedef __float128 real;
+#define RC(x) x##Q
+#define sqrtx sqrtq
+#define expx expq
+#define powx powq
+#define erfx erfq
+#define fabsx fabsq
+#define ldexpx ldexpq
+#define REAL_MAX_EXP FLT128_MAX_EXP
+#define REAL_MAX FLT128_MAX
+#elif REALSIZE == 10
+typedef long double real;
+#define RC(x) x##L
+#define sqrtx sqrtl
+#define expx expl
+#define powx powl
+#define erfx erfl
+#define fabsx fabsl
+#define ldexpx ldexpl
+#define REAL_MAX_EXP LDBL_MAX_EXP
+#define REAL_MAX LDBL_MAX
+#define MLPutRealxList MLPutReal128List
+#define MLGetRealxList MLGetReal128List
+#define MLReleaseRealxList MLReleaseReal128List
+#else
+typedef double real;
+#define RC(x) x
+#define sqrtx sqrt
+#define expx exp
+#define powx pow
+#define erfx erf
+#define fabsx fabs
+#define ldexpx ldexp
+#define REAL_MAX_EXP DBL_MAX_EXP
+#define REAL_MAX DBL_MAX
+#define MLPutRealxList MLPutReal64List
+#define MLGetRealxList MLGetReal64List
+#define MLReleaseRealxList MLReleaseReal64List
+#endif
 
 typedef const real creal;
 
-typedef void (*subroutine)();
+typedef void (*subroutine)(void *, cint *);
 
 typedef struct {
   subroutine initfun;
   void *initarg;
   subroutine exitfun;
   void *exitarg;
-} workerini;
+  bool init;
+} coreinit;
+
+typedef struct {
+  int ncores, naccel;
+  int pcores, paccel;
+} corespec;
+
+typedef struct {
+  int fd, pid;
+} fdpid;
+
+typedef struct {
+  corespec spec;
+  fdpid fp[];
+} Spin;
 
 
 struct _this;
+
+typedef struct {
+  void (*worker)(struct _this *, csize_t, cint, cint);
+  struct _this *thisptr;
+  size_t thissize;
+} dispatch;
+
 
 typedef unsigned int state_t;
 
@@ -407,7 +507,7 @@ static inline real Max(creal a, creal b) {
 }
 
 static inline real Weight(creal sum, creal sqsum, cnumber n) {
-  creal w = sqrt(sqsum*n);
+  creal w = sqrtx(sqsum*n);
   return (n - 1)/Max((w + sum)*(w - sum), NOTZERO);
 }
 
@@ -452,7 +552,7 @@ static inline void Print(MLCONST char *s)
 
 #else
 
-#define Print(s) puts(s); fflush(stdout)
+#define Print(s) { puts(s); fflush(stdout); }
 
 #endif
 
