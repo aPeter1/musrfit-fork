@@ -17,7 +17,7 @@ add_subdirectory(vegas)
 
 #--- lib creation -------------------------------------------------------------
 add_library(cuba SHARED
-  $<TARGET_OBJECTS:workerini>
+  $<TARGET_OBJECTS:common>
   $<TARGET_OBJECTS:cuhre>
   $<TARGET_OBJECTS:divonne>
   $<TARGET_OBJECTS:suave>

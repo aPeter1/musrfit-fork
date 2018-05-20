@@ -164,11 +164,6 @@ if (nexus)
   message(" NeXus   found in ${NEXUS_INCLUDE_DIR}") 
 endif (nexus)
 
-if (BMWlibs)
-  message("")
-  message(" CUBA   found in //as35 STILL MISSING")
-endif (BMWlibs)
-
 message("")
 if (qt_based_tools)
   if (Qt5Core_FOUND)
