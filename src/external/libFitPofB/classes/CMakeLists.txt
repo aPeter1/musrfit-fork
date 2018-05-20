@@ -73,7 +73,7 @@ target_include_directories(
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(FitPofB ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase BMWtools)
+target_link_libraries(FitPofB ${FFTW3_LIBRARY} ${FFTW3F_LIBRARY} ${ROOT_LIBRARIES} TLemRunHeader PUserFcnBase BMWtools)
 
 #--- install FitPofB solib ----------------------------------------------------
 install(TARGETS FitPofB DESTINATION lib)
