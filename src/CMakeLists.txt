@@ -1,14 +1,13 @@
 #--- add further sub-directories ----------------------------------------------
 add_subdirectory(classes)
 add_subdirectory(external)
-#[==[
-if (Qt5Core_FOUND OR Qt4_FOUND)
+if (Qt5Core_FOUND)
+  add_subdirectory(musredit_qt5)
+elseif (Qt4_FOUND)
   add_subdirectory(musredit)
-endif (Qt5Core_FOUND OR Qt4_FOUND)
-if (QT_FOUND)
+elseif (QT_FOUND)
   add_subdirectory(musrgui)
-endif (QT_FOUND)
-#]==]
+endif (Qt5Core_FOUND)
 
 #--- define the musrfit libs --------------------------------------------------
 set(MUSRFIT_LIBS ${MUSRFIT_LIBS} mud)

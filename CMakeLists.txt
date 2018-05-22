@@ -91,10 +91,12 @@ if (qt_based_tools)
   # first try Qt5
   # Find the QtCore library
   find_package(Qt5Core)
-  # Find the QtWidgets library
-  find_package(Qt5Widgets)
-  # Find the QtXml library
-  find_package(Qt5Xml)
+  if (Qt5Core_FOUND)
+    # Find the QtWidgets library
+    find_package(Qt5Widgets CONFIG REQUIRED)
+    # Find the QtXml library
+    find_package(Qt5Xml CONFIG REQUIRED)
+  endif  (Qt5Core_FOUND)
 
   # if Qt5 is not found, try Qt4
   if (NOT Qt5Core_FOUND)
