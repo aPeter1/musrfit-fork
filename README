@@ -1,4 +1,5 @@
 README
+------
 
 musrfit - muSR data analysis package
 
@@ -19,6 +20,7 @@ Currently it allows the following things:
   (e.g. GL vortex lattice, Meissner screening including low-energy muon stopping profiles)
 
 Currently supported platforms
+-----------------------------
 
 * Linux
 * Mac OS X
@@ -26,6 +28,7 @@ Currently supported platforms
 * Any platform - http://musruser.psi.ch/cgi-bin/musrfit.cgi
 
 Documentation
+-------------
 
 For a more extensive user documentation see:
 
