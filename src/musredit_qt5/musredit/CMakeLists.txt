@@ -74,6 +74,7 @@ set(CMAKE_AUTOMOC ON)
 # Create code from a list of Qt designer ui files
 set(CMAKE_AUTOUIC ON)
 #]==]
+set(CMAKE_AUTOUIC OFF)
 
 # call qt/uic
 qt5_wrap_ui(out_ui ${musredit_ui})
