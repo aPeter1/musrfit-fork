@@ -44,7 +44,7 @@
    <property name="checkable">
     <bool>false</bool>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget_0">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -147,7 +147,7 @@
    <property name="title">
     <string>msr File Extension</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_1">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -215,7 +215,7 @@
    <property name="title">
     <string>Template Run Input</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_2">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -277,7 +277,7 @@
    <property name="title">
     <string>Parameter Output File Name</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_3">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -332,7 +332,7 @@
    <property name="title">
     <string>Options</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_4">
     <property name="geometry">
      <rect>
       <x>6</x>
@@ -514,7 +514,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget_5">
    <property name="geometry">
     <rect>
      <x>5</x>
