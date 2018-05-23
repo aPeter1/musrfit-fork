@@ -76,7 +76,7 @@ void PGetFourierBlockDialog::checkPhaseParameter()
 
   ival = str.toInt(&ok);
   if (!ok) { // i.e. the phase entry is not a number. Check for parXX
-    str.trimmed();
+    str = str.trimmed();
     if (str.startsWith("par")) { //
       str.remove("par");
       ival = str.toInt(&ok);

@@ -2262,7 +2262,7 @@ void PTextEdit::musrMsr2Data()
             stream = new QTextStream(file);
             while ( !stream->atEnd() ) {
               str = stream->readLine(); // line of text excluding '\n'
-              str.trimmed();
+              str = str.trimmed();
               if (!str.isEmpty() && !str.startsWith("#") && !str.startsWith("run", Qt::CaseInsensitive)) {
                 fln = str.section(' ', 0, 0, QString::SectionSkipEmpty);
                 if (fMsr2DataParam->msrFileExtension.isEmpty())
@@ -2305,7 +2305,7 @@ void PTextEdit::musrMsr2Data()
             stream = new QTextStream(file);
             while ( !stream->atEnd() ) {
               str = stream->readLine(); // line of text excluding '\n'
-              str.trimmed();
+              str = str.trimmed();
               if (!str.isEmpty() && !str.startsWith("#") && !str.startsWith("run", Qt::CaseInsensitive)) {
                 fln = str.section(' ', 0, 0, QString::SectionSkipEmpty);
                 break;
