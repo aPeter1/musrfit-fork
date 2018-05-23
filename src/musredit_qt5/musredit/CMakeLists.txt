@@ -105,3 +105,10 @@ target_include_directories(musredit
 
 target_link_libraries(musredit ${qt_libs})
 
+#--- installation info --------------------------------------------------------
+install(
+  TARGETS
+    musredit
+  RUNTIME DESTINATION
+    bin
+)
