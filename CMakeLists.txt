@@ -96,6 +96,12 @@ if (qt_based_tools)
     find_package(Qt5Widgets CONFIG REQUIRED)
     # Find the QtXml library
     find_package(Qt5Xml CONFIG REQUIRED)
+    # Find the QtNetwork library
+    find_package(Qt5Network CONFIG REQUIRED)
+    # Find the QtSvg library
+    find_package(Qt5Svg CONFIG REQUIRED)
+    # Fing the QtPrintSupport
+    find_package(Qt5PrintSupport CONFIG REQUIRED)
   endif  (Qt5Core_FOUND)
 
   # if Qt5 is not found, try Qt4
