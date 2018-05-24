@@ -113,3 +113,15 @@ install(
   RUNTIME DESTINATION
     bin
 )
+
+#--- documentation installation info ------------------------------------------
+install(
+  DIRECTORY
+    ${CMAKE_SOURCE_DIR}/doc/examples
+    ${CMAKE_SOURCE_DIR}/doc/html
+    ${CMAKE_SOURCE_DIR}/doc/memos
+  DESTINATION
+    ${CMAKE_INSTALL_PREFIX}/share/doc/musrfit
+  MESSAGE_NEVER
+)
+
