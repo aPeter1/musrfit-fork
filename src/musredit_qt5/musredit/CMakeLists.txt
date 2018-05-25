@@ -1,7 +1,5 @@
 #--- musredit for Qt > 5.0 ----------------------------------------------------
 
-message("debug> will deal with the build of musredit (Qt 5)")
-
 #--- check if Qt5WebEngine or Qt5WebKit is present ----------------------------
 find_package(Qt5WebEngine QUIET)
 find_package(Qt5WebKit QUIET)
