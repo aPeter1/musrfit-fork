@@ -26,6 +26,7 @@ target_compile_definitions(
 set(COMP_OPT "-O3")
 set(COMP_OPT ${COMP_OPT} "-fomit-frame-pointer")
 set(COMP_OPT ${COMP_OPT} "-ffast-math")
+set(COMP_OPT ${COMP_OPT} "-fPIC")
 target_compile_options(
   cuhre PRIVATE ${COMP_OPT}
 )
