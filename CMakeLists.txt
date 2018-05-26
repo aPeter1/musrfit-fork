@@ -10,6 +10,9 @@ option(BMWlibs "build optional BMWlibs" OFF)
 option(BNMRlibs "build optional beta-NMR libs" OFF)
 option(qt_based_tools "try to install Qt based tools (musredit, musrWiz, musrStep, mupp)" ON)
 option(try_OpenMP "try to use OpenMP if available" ON)
+# define qt_version with possible values 'auto' or version '3', '4', '5'
+set(qt_version AUTO CACHE STRING "provide a specific Qt version to be used.")
+set_property(CACHE qt_version PROPERTY STRINGS AUTO 3 4 5)
 
 #--- perform some checks and generate the config.h ----------------------------
 include(CheckTypeSize)
@@ -88,33 +91,72 @@ endif (try_OpenMP)
 
 #--- check for Qt -------------------------------------------------------------
 if (qt_based_tools)
-  # first try Qt5
-  # Find the QtCore library
-  find_package(Qt5Core)
-  if (Qt5Core_FOUND)
-    # Find the QtWidgets library
-    find_package(Qt5Widgets CONFIG REQUIRED)
-    # Find the QtXml library
-    find_package(Qt5Xml CONFIG REQUIRED)
-    # Find the QtNetwork library
-    find_package(Qt5Network CONFIG REQUIRED)
-    # Find the QtSvg library
-    find_package(Qt5Svg CONFIG REQUIRED)
-    # Fing the QtPrintSupport
-    find_package(Qt5PrintSupport CONFIG REQUIRED)
-  endif  (Qt5Core_FOUND)
+  # check for any Qt, i.e. AUTO
+  if (qt_version STREQUAL AUTO)
+    # first try Qt5
+    # Find the QtCore library
+    find_package(Qt5Core)
+    if (Qt5Core_FOUND)
+      # Find the QtWidgets library
+      find_package(Qt5Widgets CONFIG REQUIRED)
+      # Find the QtXml library
+      find_package(Qt5Xml CONFIG REQUIRED)
+      # Find the QtNetwork library
+      find_package(Qt5Network CONFIG REQUIRED)
+      # Find the QtSvg library
+      find_package(Qt5Svg CONFIG REQUIRED)
+      # Fing the QtPrintSupport
+      find_package(Qt5PrintSupport CONFIG REQUIRED)
+    endif (Qt5Core_FOUND)
 
-  # if Qt5 is not found, try Qt4
-  if (NOT Qt5Core_FOUND)
+    # if Qt5 is not found, try Qt4
+    if (NOT Qt5Core_FOUND)
+      find_package(Qt4 COMPONENTS QtGui QtWebKit QtXml)
+    endif (NOT Qt5Core_FOUND)
+
+    # if Qt5 and Qt4 is not found try Qt3. Hopefully you never reach this point
+    if (NOT Qt5Core_FOUND)
+      if (NOT Qt4_FOUND)
+        find_package(Qt3)
+      endif (NOT Qt4_FOUND)
+    endif (NOT Qt5Core_FOUND)
+  endif (qt_version STREQUAL AUTO)
+
+  # check specifically for Qt5
+  if (qt_version STREQUAL 5)
+    # Find the QtCore library
+    find_package(Qt5Core)
+    if (Qt5Core_FOUND)
+      # Find the QtWidgets library
+      find_package(Qt5Widgets CONFIG REQUIRED)
+      # Find the QtXml library
+      find_package(Qt5Xml CONFIG REQUIRED)
+      # Find the QtNetwork library
+      find_package(Qt5Network CONFIG REQUIRED)
+      # Find the QtSvg library
+      find_package(Qt5Svg CONFIG REQUIRED)
+      # Fing the QtPrintSupport
+      find_package(Qt5PrintSupport CONFIG REQUIRED)
+    else (Qt5Core_FOUND)
+      message(FATAL_ERROR "Couldn't find the specifically requested Qt5 version.")
+    endif (Qt5Core_FOUND)
+  endif (qt_version STREQUAL 5)
+
+  # check specifically for Qt4
+  if (qt_version STREQUAL 4)
     find_package(Qt4 COMPONENTS QtGui QtWebKit QtXml)
-  endif (NOT Qt5Core_FOUND)
-
-  # if Qt5 and Qt4 is not found try Qt3. Hopefully you never reach this point
-  if (NOT Qt5Core_FOUND)
     if (NOT Qt4_FOUND)
-      find_package(Qt3)
+      message(FATAL_ERROR "Couldn't find the specifically requested Qt4 version.")
     endif (NOT Qt4_FOUND)
-  endif (NOT Qt5Core_FOUND)
+  endif (qt_version STREQUAL 4)
+
+  # check specifically for Qt3
+  if (qt_version STREQUAL 3)
+    find_package(Qt3)
+    if (NOT QT_FOUND)
+      message(FATAL_ERROR "Couldn't find the specifically requested Qt3 version.")
+    endif (NOT QT_FOUND)
+  endif (qt_version STREQUAL 3)
 endif (qt_based_tools)
 
 #--- if NeXus check also for HDF4, HDF5, and MXML -----------------------------
