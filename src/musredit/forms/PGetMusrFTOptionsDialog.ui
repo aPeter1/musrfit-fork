@@ -34,7 +34,7 @@
    <property name="title">
     <string> Fourier </string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget0">
     <property name="geometry">
      <rect>
       <x>21</x>
@@ -337,7 +337,7 @@ p, li { white-space: pre-wrap; }
    <property name="title">
     <string> Histo Info </string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget1">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -605,7 +605,7 @@ p, li { white-space: pre-wrap; }
    <property name="title">
     <string>File Selection</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget2">
     <property name="geometry">
      <rect>
       <x>19</x>
@@ -711,7 +711,7 @@ p, li { white-space: pre-wrap; }
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget3">
    <property name="geometry">
     <rect>
      <x>20</x>
