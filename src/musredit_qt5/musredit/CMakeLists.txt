@@ -80,11 +80,21 @@ qt5_wrap_ui(out_ui ${musredit_ui})
 # add qt/rcc
 qt5_add_resources(musredit_rcc musredit.qrc)
 
-add_executable(musredit 
-  ${musredit_src}
-  ${out_ui}
-  ${musredit_rcc}
-)
+set(macosx_icon icons/musredit.icns)
+if (APPLE)
+  add_executable(musredit MACOSX_BUNDLE
+    ${musredit_src}
+    ${out_ui}
+    ${musredit_rcc}
+    ${macosx_icon}
+  )
+else (APPLE)
+  add_executable(musredit 
+    ${musredit_src}
+    ${out_ui}
+    ${musredit_rcc}
+  )
+endif (APPLE)
 
 if (Qt5WebEngine_FOUND)
   target_compile_options(musredit
@@ -105,12 +115,28 @@ target_include_directories(musredit
 target_link_libraries(musredit ${qt_libs})
 
 #--- installation info --------------------------------------------------------
-install(
-  TARGETS
-    musredit
-  RUNTIME DESTINATION
-    bin
-)
+if (APPLE)
+  set_target_properties(musredit PROPERTIES
+    MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_BUNDLE_NAME "musredit"
+    MACOSX_BUNDLE_INFO_STRING "musredit simplifies the handling of the msr-files for uSR fitting."
+    MACOSX_BUNDLE_ICON_FILE "musredit.icns"
+    MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_VERSION}"
+    MACOSX_FRAMEWORK_IDENTIFIER ch.psi.musredit
+    MACOSX_BUNDLE_COPYRIGHT "Andreas Suter"
+    RESOURCE ${macosx_icon}
+  )
+endif (APPLE)
+
+if (APPLE)
+  install( TARGETS musredit
+    BUNDLE DESTINATION /Applications
+  )
+else (APPLE)
+  install( TARGETS musredit
+    RUNTIME DESTINATION bin
+  )
+endif (APPLE)
 
 #--- documentation installation info ------------------------------------------
 install(
