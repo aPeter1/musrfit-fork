@@ -817,7 +817,7 @@ void PTextEdit::setupHelpActions()
   connect( a, SIGNAL( triggered() ), this, SLOT( helpContents() ));
   menu->addAction(a);
 
-  a = new QAction(tr( "About ..." ), this );
+  a = new QAction(tr( "Author(s) ..." ), this );
   a->setStatusTip( tr("Help About") );
   connect( a, SIGNAL( triggered() ), this, SLOT( helpAbout() ));
   menu->addAction(a);
