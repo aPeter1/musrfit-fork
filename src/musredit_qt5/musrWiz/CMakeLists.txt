@@ -25,10 +25,19 @@ set(CMAKE_AUTOUIC OFF)
 # add qt/rcc
 qt5_add_resources(musrWiz_rcc musrWiz.qrc)
 
-add_executable(musrWiz 
-  ${musrWiz_src}
-  ${musrWiz_rcc}
-)
+set(macosx_icon icons/musrWiz.icns)
+if (APPLE)
+  add_executable(musrWiz MACOSX_BUNDLE
+    ${musrWiz_src}
+    ${musrWiz_rcc}
+    ${macosx_icon}    
+  )
+else (APPLE)
+  add_executable(musrWiz 
+    ${musrWiz_src}
+    ${musrWiz_rcc}
+  )
+endif (APPLE)
 
 target_include_directories(musrWiz
   BEFORE PRIVATE
@@ -42,10 +51,25 @@ target_include_directories(musrWiz
 target_link_libraries(musrWiz ${qt_libs})
 
 #--- installation info --------------------------------------------------------
-install(
-  TARGETS
-    musrWiz
-  RUNTIME DESTINATION
-    bin
-)
+if (APPLE)
+  set_target_properties(musrWiz PROPERTIES
+    MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_BUNDLE_NAME "musrWiz"
+    MACOSX_BUNDLE_INFO_STRING "musrfit: musrWiz allows to create input msr-files if no templates are available."
+    MACOSX_BUNDLE_ICON_FILE "musrWiz.icns"
+    MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_VERSION}"
+    MACOSX_BUNDLE_GUI_IDENTIFIER "ch.psi.lmu.musrWiz"
+    MACOSX_BUNDLE_COPYRIGHT "Andreas Suter"
+    RESOURCE ${macosx_icon}
+  )
+endif (APPLE)
 
+if (APPLE)
+  install( TARGETS musrWiz
+    BUNDLE DESTINATION /Applications
+  )
+else (APPLE)
+  install( TARGETS musrWiz
+    RUNTIME DESTINATION bin
+  )
+endif (APPLE)

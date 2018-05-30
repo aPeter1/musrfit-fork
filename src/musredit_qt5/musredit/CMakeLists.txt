@@ -119,10 +119,10 @@ if (APPLE)
   set_target_properties(musredit PROPERTIES
     MACOSX_BUNDLE TRUE
     MACOSX_BUNDLE_BUNDLE_NAME "musredit"
-    MACOSX_BUNDLE_INFO_STRING "musredit simplifies the handling of the msr-files for uSR fitting."
+    MACOSX_BUNDLE_INFO_STRING "musrfit: musredit simplifies the handling of the msr-files for uSR fitting."
     MACOSX_BUNDLE_ICON_FILE "musredit.icns"
     MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_VERSION}"
-    MACOSX_FRAMEWORK_IDENTIFIER ch.psi.musredit
+    MACOSX_BUNDLE_GUI_IDENTIFIER "ch.psi.lmu.musredit"
     MACOSX_BUNDLE_COPYRIGHT "Andreas Suter"
     RESOURCE ${macosx_icon}
   )

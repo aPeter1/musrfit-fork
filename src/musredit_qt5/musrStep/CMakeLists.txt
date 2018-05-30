@@ -21,10 +21,19 @@ set(CMAKE_AUTOUIC OFF)
 # add qt/rcc
 qt5_add_resources(musrStep_rcc musrStep.qrc)
 
-add_executable(musrStep 
-  ${musrStep_src}
-  ${musrStep_rcc}
-)
+set(macosx_icon icons/musrStep.icns)
+if (APPLE)
+  add_executable(musrStep MACOSX_BUNDLE
+    ${musrStep_src}
+    ${musrStep_rcc}
+    ${macosx_icon}
+  )
+else (APPLE)
+  add_executable(musrStep 
+    ${musrStep_src}
+    ${musrStep_rcc}
+  )
+endif (APPLE)
 
 target_include_directories(musrStep
   BEFORE PRIVATE
@@ -38,10 +47,26 @@ target_include_directories(musrStep
 target_link_libraries(musrStep ${qt_libs})
 
 #--- installation info --------------------------------------------------------
-install(
-  TARGETS
-    musrStep
-  RUNTIME DESTINATION
-    bin
-)
+if (APPLE)
+  set_target_properties(musrStep PROPERTIES
+    MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_BUNDLE_NAME "musrStep"
+    MACOSX_BUNDLE_INFO_STRING "musrfit: musrStep allows to reset/set the initial step size of a msr-files."
+    MACOSX_BUNDLE_ICON_FILE "musrStep.icns"
+    MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_VERSION}"
+    MACOSX_BUNDLE_GUI_IDENTIFIER "ch.psi.lmu.musrStep"
+    MACOSX_BUNDLE_COPYRIGHT "Andreas Suter"
+    RESOURCE ${macosx_icon}
+  )
+endif (APPLE)
+
+if (APPLE)
+  install( TARGETS musrStep
+    BUNDLE DESTINATION /Applications
+  )
+else (APPLE)
+  install( TARGETS musrStep
+    RUNTIME DESTINATION bin
+  )
+endif (APPLE)
 
