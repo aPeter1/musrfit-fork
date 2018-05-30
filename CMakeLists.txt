@@ -81,13 +81,13 @@ endif (FFTW3F_THREAD_FOUND)
 find_package(LibXml2 REQUIRED)
 
 #--- check for OpenMP ---------------------------------------------------------
-if (try_OpenMP)
+if (try_OpenMP AND NOT APPLE)
   find_package(OpenMP)
   if (OpenMP_FOUND)
     add_definitions(-DHAVE_GOMP)
     set(HAVE_GOMP 1 CACHE INTERNAL "Have GOMP")
   endif (OpenMP_FOUND)
-endif (try_OpenMP)
+endif (try_OpenMP AND NOT APPLE)
 
 #--- check for Qt -------------------------------------------------------------
 if (qt_based_tools)
