@@ -20,6 +20,12 @@ add_library(mud SHARED
   mud_tri_ti.c
 )
 
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(mud
+  PROPERTIES
+    VERSION ${MUD_VERSION}
+)
+
 #--- install mud solib --------------------------------------------------------
 install(TARGETS mud DESTINATION lib) 
 

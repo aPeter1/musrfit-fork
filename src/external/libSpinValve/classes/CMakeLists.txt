@@ -34,6 +34,13 @@ add_library(PSpinValve SHARED
   PStartupHandler_SV.cpp
   PStartupHandler_SVDict.cxx
 )
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(PSpinValve
+  PROPERTIES
+    VERSION ${P_SPIN_VALVE_VERSION}
+)
+
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PSpinValve BEFORE PRIVATE 

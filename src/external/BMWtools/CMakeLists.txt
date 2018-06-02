@@ -29,6 +29,13 @@ add_library(BMWtools SHARED
   TTrimSPDataHandler.cpp
   BMWIntegrator.cpp
 )
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(BMWtools
+  PROPERTIES
+    VERSION "1.0.0"
+)
+
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   BMWtools BEFORE PRIVATE 

@@ -31,6 +31,13 @@ add_library(CalcMeanFieldsLEM SHARED
   TCalcMeanFieldsLEM.cpp
   TCalcMeanFieldsLEMDict.cxx
 )
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(CalcMeanFieldsLEM
+  PROPERTIES
+    VERSION "1.0.0"
+)
+
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   CalcMeanFieldsLEM BEFORE PRIVATE 

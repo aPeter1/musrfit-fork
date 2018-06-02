@@ -15,6 +15,13 @@ configure_file("PNeXus.pc.in" "PNeXus.pc" @ONLY)
 add_library(PNeXus SHARED
   PNeXus.cpp
 )
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(PNeXus
+  PROPERTIES
+    VERSION ${PNEXUS_VERSION}
+)
+
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PNeXus BEFORE PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

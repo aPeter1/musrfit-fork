@@ -24,6 +24,12 @@ target_include_directories(
   TMusrRunHeader BEFORE PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(TMusrRunHeader
+  PROPERTIES
+    VERSION ${MUSR_ROOT_VERSION}
+)
+
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(TMusrRunHeader ${ROOT_LIBRARIES})
 

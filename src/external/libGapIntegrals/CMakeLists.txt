@@ -29,6 +29,13 @@ add_library(GapIntegrals SHARED
   TGapIntegrals.cpp
   TGapIntegralsDict.cxx
 )
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(GapIntegrals
+  PROPERTIES
+    VERSION "1.0.0"
+)
+
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   GapIntegrals BEFORE PRIVATE 

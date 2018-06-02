@@ -24,6 +24,12 @@ add_library(cuba SHARED
   $<TARGET_OBJECTS:vegas>
 )
 
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(cuba
+  PROPERTIES
+    VERSION ${CUBA_VERSION}
+)
+
 #--- install cuba solib -------------------------------------------------------
 install(TARGETS cuba DESTINATION lib)
 

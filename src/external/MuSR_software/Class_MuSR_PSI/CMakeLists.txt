@@ -21,6 +21,12 @@ endif (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 #--- lib creation -------------------------------------------------------------
 add_library(Class_MuSR_PSI SHARED MuSR_td_PSI_bin.cpp)
 
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(Class_MuSR_PSI
+  PROPERTIES
+    VERSION ${PSIBIN_VERSION}
+)
+
 #--- install Class_MuSR_PSI solib ---------------------------------------------
 install(TARGETS Class_MuSR_PSI DESTINATION lib)
 

@@ -24,6 +24,13 @@ add_library(TLemRunHeader SHARED
   TLemStats.cxx
   TLemStatsDict.cxx
 )
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(TLemRunHeader
+  PROPERTIES
+    VERSION ${LEM_VERSION}
+)
+
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   TLemRunHeader BEFORE PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

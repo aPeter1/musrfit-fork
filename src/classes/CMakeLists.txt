@@ -34,7 +34,7 @@ set(prefix "${CMAKE_INSTALL_PREFIX}")
 set(exec_prefix "\$\{prefix\}")
 set(libdir "\$\{exec_prefix\}/lib")
 set(includedir "\$\{prefix\}/include")   
-set(MUSR_VERSION "1.2.0")
+set(MUSR_VERSION "1.3.0")
 set(MUSR_LIBRARY_NAME "PMusr")
 configure_file("PMusr.pc.in" "PMusr.pc" @ONLY)
 set(USERFCN_LIBRARY_NAME "PUserFcnBase")
@@ -88,6 +88,16 @@ target_include_directories(
 add_library(PUserFcnBase SHARED
   PUserFcnBase.cpp
   PUserFcnBaseDict.cxx
+)
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(PMusr
+  PROPERTIES
+    VERSION ${MUSR_VERSION}
+)
+set_target_properties(PUserFcnBase
+  PROPERTIES
+    VERSION ${MUSR_VERSION}
 )
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(

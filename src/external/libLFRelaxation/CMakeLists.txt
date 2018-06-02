@@ -29,6 +29,13 @@ add_library(LFRelaxation SHARED
   TLFRelaxation.cpp
   TLFRelaxationDict.cxx
 )
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(LFRelaxation
+  PROPERTIES
+    VERSION "1.0.0"
+)
+
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   LFRelaxation BEFORE PRIVATE 

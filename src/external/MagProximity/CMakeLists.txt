@@ -18,8 +18,8 @@ set(prefix "${CMAKE_INSTALL_PREFIX}")
 set(exec_prefix "\$\{prefix\}")
 set(libdir "\$\{exec_prefix\}/lib")
 set(includedir "\$\{prefix\}/include")   
-set(PNL_PIPPARDFITTER_VERSION "1.0.0")
-set(PNL_PIPPARDFITTER_LIBRARY_NAME "PMagProximityFitter")
+set(P_MAG_PROXIMITY_FITTER_VERSION "1.0.0")
+set(P_MAG_PROXIMITY_FITTER_LIBRARY_NAME "PMagProximityFitter")
 configure_file("PMagProximityFitter.pc.in" "PMagProximityFitter.pc" @ONLY)
 
 #--- lib creation -------------------------------------------------------------
@@ -36,6 +36,12 @@ target_include_directories(
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(PMagProximityFitter
+  PROPERTIES
+    VERSION ${P_MAG_PROXIMITY_FITTER_VERSION}
 )
 
 #--- add library dependencies -------------------------------------------------

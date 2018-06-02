@@ -61,6 +61,13 @@ add_library(FitPofB SHARED
   TSkewedGss.cpp
   TSkewedGssDict.cxx
 )
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(FitPofB
+  PROPERTIES
+    VERSION "1.0.0"
+)
+
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   FitPofB BEFORE PRIVATE 

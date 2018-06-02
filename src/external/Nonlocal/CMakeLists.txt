@@ -39,6 +39,12 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(PNL_PippardFitter
+  PROPERTIES
+    VERSION ${PNL_PIPPARDFITTER_VERSION}
+)
+
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(PNL_PippardFitter ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
 

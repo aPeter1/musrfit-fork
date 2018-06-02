@@ -34,6 +34,13 @@ add_library(PPhotoMeissner SHARED
   PStartupHandler_PM.cpp
   PStartupHandler_PMDict.cxx
 )
+
+#--- set target properties, e.g. version --------------------------------------
+set_target_properties(PPhotoMeissner
+  PROPERTIES
+    VERSION ${P_PHOTO_MEISSNER_VERSION}
+)
+
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PPhotoMeissner BEFORE PRIVATE 
