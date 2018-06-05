@@ -45,6 +45,9 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
+#--- add compile options for optimization -------------------------------------
+target_compile_options(BMWtools PUBLIC -O3)
+
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(BMWtools ${ROOT_LIBRARIES} cuba)
 

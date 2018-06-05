@@ -48,6 +48,9 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
+#--- add compile options for optimization -------------------------------------
+target_compile_options(CalcMeanFieldsLEM PUBLIC -O3)
+
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(CalcMeanFieldsLEM 
   ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} BMWtools FitPofB PUserFcnBase
