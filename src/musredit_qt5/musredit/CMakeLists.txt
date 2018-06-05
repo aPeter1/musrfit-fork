@@ -6,15 +6,15 @@ find_package(Qt5WebKit QUIET)
 
 set(qt_libs Qt5::Core Qt5::Widgets Qt5::Network Qt5::Xml Qt5::Svg Qt5::PrintSupport)
 if (Qt5WebEngine_FOUND)
-  message("debug> Qt5WebEngine is present.")
+  message("-- Qt5WebEngine is present.")
   find_package(Qt5WebEngineWidgets QUIET CONFIG REQUIRED)
   set(qt_libs ${qt_libs} Qt5::WebEngine Qt5::WebEngineWidgets)
 elseif (Qt5WebKit_FOUND)
-  message("debug> Qt5WebKit is present.")
+  message("-- Qt5WebKit is present.")
   find_package(Qt5WebKitWidgets QUIET CONFIG REQUIRED)
   set(qt_libs ${qt_libs} Qt5::WebKit Qt5::WebKitWidgets)
 else (Qt5WebEngine_FOUND)
-  message("debug> Neither Qt5WebEngine nor Qt5WebKit found.")
+  message("-- Neither Qt5WebEngine nor Qt5WebKit found.")
 endif (Qt5WebEngine_FOUND)
 
 set(musredit_src
