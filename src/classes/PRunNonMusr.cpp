@@ -41,6 +41,8 @@ PRunNonMusr::PRunNonMusr() : PRunBase()
 {
   fNoOfFitBins  = 0;
   fPacking = 1;
+  fStartTimeBin = 0;
+  fEndTimeBin = 0;
 
   fHandleTag = kEmpty;
 
@@ -105,13 +107,11 @@ Double_t PRunNonMusr::CalcChiSquare(const std::vector<Double_t>& par)
   }
 
   // calculate chi square
-  Double_t x;
-  for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
+  Double_t x(1.0);
+  for (UInt_t i=fStartTimeBin; i<=fEndTimeBin; i++) {
     x = fData.GetX()->at(i);
-    if ((x>=fFitStartTime) && (x<=fFitEndTime)) {
-      diff = fData.GetValue()->at(i) - fTheory->Func(x, par, fFuncValues);
-      chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
-    }
+    diff = fData.GetValue()->at(i) - fTheory->Func(x, par, fFuncValues);
+    chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
   }
 
   return chisq;
@@ -277,6 +277,17 @@ Bool_t PRunNonMusr::PrepareFitData()
     x = fData.GetX()->at(i);
     if ((x >= fFitStartTime) && (x <= fFitEndTime))
       fNoOfFitBins++;
+  }
+
+  // get start/end bin
+  const PDoubleVector *xx = fData.GetX();
+  fStartTimeBin = 0;
+  fEndTimeBin = xx->size()-1;
+  for (UInt_t i=0; i<xx->size(); i++) {
+    if (xx->at(i) < fFitStartTime)
+      fStartTimeBin = i;
+    if (xx->at(i) < fFitEndTime)
+      fEndTimeBin = i;
   }
 
   return success;
