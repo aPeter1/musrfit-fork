@@ -104,10 +104,6 @@ target_include_directories(
   PUserFcnBase BEFORE PRIVATE $<BUILD_INTERFACE:${MUSRFIT_INC}>
 )
 
-#--- add compile options for optimization -------------------------------------
-target_compile_options(PMusr PUBLIC -O2)
-target_compile_options(PUserFcnBase PUBLIC -O2)
-
 #--- add OpenMP compile options if needed -------------------------------------
 if (OpenMP_FOUND)
   target_compile_options(PMusr PUBLIC ${OpenMP_CXX_FLAGS})
