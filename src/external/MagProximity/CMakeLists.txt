@@ -44,9 +44,6 @@ set_target_properties(PMagProximityFitter
     VERSION ${P_MAG_PROXIMITY_FITTER_VERSION}
 )
 
-#--- add compile options for optimization -------------------------------------
-target_compile_options(PMagProximityFitter PUBLIC -O3)
-
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(PMagProximityFitter ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
 

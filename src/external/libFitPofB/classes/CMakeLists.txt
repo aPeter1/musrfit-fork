@@ -79,9 +79,6 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
 )
 
-#--- add compile options for optimization -------------------------------------
-target_compile_options(FitPofB PUBLIC -O3)
-
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(FitPofB 
     ${FFTW3_LIBRARY} ${FFTW3F_LIBRARY} ${ROOT_LIBRARIES} 

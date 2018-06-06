@@ -30,9 +30,6 @@ set_target_properties(BNMR
     VERSION "1.0.0"
 )
 
-#--- add compile options for optimization -------------------------------------
-target_compile_options(BNMR PUBLIC -O3)
-
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(BNMR ${ROOT_LIBRARIES} PUserFcnBase)
 

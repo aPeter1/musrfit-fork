@@ -30,9 +30,6 @@ set_target_properties(TMusrRunHeader
     VERSION ${MUSR_ROOT_VERSION}
 )
 
-#--- add compile options for optimization -------------------------------------
-target_compile_options(TMusrRunHeader PUBLIC -O3)
-
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(TMusrRunHeader ${ROOT_LIBRARIES})
 

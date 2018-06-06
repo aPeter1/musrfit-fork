@@ -36,9 +36,6 @@ target_include_directories(
   TLemRunHeader BEFORE PRIVATE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
-#--- add compile options for optimization -------------------------------------
-target_compile_options(TLemRunHeader PUBLIC -O3)
-
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(TLemRunHeader ${ROOT_LIBRARIES})
 
