@@ -75,7 +75,7 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
   fValid = true;
 
   fRunNo = static_cast<Int_t>(runNo);
-  if ((runNo < 0) || (runNo > fMsrInfo->GetMsrRunList()->size())) {
+  if (runNo > fMsrInfo->GetMsrRunList()->size()) {
     fRunInfo = 0;
     return;
   }

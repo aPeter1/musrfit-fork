@@ -764,7 +764,7 @@ Bool_t PRunSingleHisto::PrepareData()
         addRunSize = addRunData->GetDataBin(histoNo[k])->size();
         for (UInt_t j=0; j<addRunData->GetDataBin(histoNo[k])->size(); j++) { // loop over the bin indices
           // make sure that the index stays in the proper range
-          if ((j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k] >= 0) && (j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k] < addRunSize)) {
+          if (((Int_t)j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k] >= 0) && (j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k] < addRunSize)) {
             forward[k][j] += addRunData->GetDataBin(histoNo[k])->at(j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k]);
           }
         }
@@ -782,7 +782,7 @@ Bool_t PRunSingleHisto::PrepareData()
   for (UInt_t i=1; i<histoNo.size(); i++) { // loop over the groupings
     for (UInt_t j=0; j<runData->GetDataBin(histoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
-      if ((j+fT0s[i]-fT0s[0] >= 0) && (j+fT0s[i]-fT0s[0] < runData->GetDataBin(histoNo[i])->size())) {
+      if (((Int_t)j+fT0s[i]-fT0s[0] >= 0) && (j+fT0s[i]-fT0s[0] < runData->GetDataBin(histoNo[i])->size())) {
         fForward[j] += forward[i][j+(Int_t)fT0s[i]-(Int_t)fT0s[0]];
       }
     }
@@ -1766,7 +1766,7 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
   }
 
   // check if start is within histogram bounds
-  if ((start < 0) || (start >= fForward.size())) {
+  if (start >= fForward.size()) {
     cerr << endl << ">> PRunSingleHisto::EstimatBkg(): **ERROR** background bin values out of bound!";
     cerr << endl << ">> histo lengths    = " << fForward.size();
     cerr << endl << ">> background start = " << start;
@@ -1775,7 +1775,7 @@ Bool_t PRunSingleHisto::EstimateBkg(UInt_t histoNo)
   }
 
   // check if end is within histogram bounds
-  if ((end < 0) || (end >= fForward.size())) {
+  if (end >= fForward.size()) {
     cerr << endl << ">> PRunSingleHisto::EstimatBkg(): **ERROR** background bin values out of bound!";
     cerr << endl << ">> histo lengths  = " << fForward.size();
     cerr << endl << ">> background end = " << end;
