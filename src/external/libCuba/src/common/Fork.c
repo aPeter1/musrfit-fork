@@ -95,9 +95,16 @@ Extern void SUFFIX(cubafork)(Spin **pspin)
   for( core = -spin->spec.naccel; core < spin->spec.ncores; ++core ) {
     int fd[2];
     pid_t pid;
+    //as35 the next two if's fix the crash when compiling with -DNDEBUG
+    if (socketpair(AF_LOCAL, SOCK_STREAM, 0, fd) == -1)
+      assert(0);
+    if ((pid = fork()) == -1)
+      assert(0);
+    /*//as35 see comment just above
     assert(
       socketpair(AF_LOCAL, SOCK_STREAM, 0, fd) != -1 &&
       (pid = fork()) != -1 );
+    */
     if( pid == 0 ) {
       close(fd[0]);
       free(spin);
