@@ -23,4 +23,7 @@ target_compile_definitions(
   divonne PRIVATE ${COMP_DEF}
 )
 
-
+#--- set compiler options -----------------------------------------------------
+target_compile_options(
+  divonne PRIVATE -fPIC
+)

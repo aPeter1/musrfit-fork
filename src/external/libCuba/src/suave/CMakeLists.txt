@@ -23,3 +23,7 @@ target_compile_definitions(
   suave PRIVATE ${COMP_DEF}
 )
 
+#--- set compiler options -----------------------------------------------------
+target_compile_options(
+  suave PRIVATE -fPIC
+)

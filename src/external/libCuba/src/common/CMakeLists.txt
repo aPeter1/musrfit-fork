@@ -25,3 +25,7 @@ target_compile_definitions(
   common PRIVATE ${COMP_DEF}
 )
 
+#--- set compiler options -----------------------------------------------------
+target_compile_options(
+  common PRIVATE -fPIC
+)
