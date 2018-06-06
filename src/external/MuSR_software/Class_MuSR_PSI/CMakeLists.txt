@@ -27,6 +27,9 @@ set_target_properties(Class_MuSR_PSI
     VERSION ${PSIBIN_VERSION}
 )
 
+#--- add compile options for optimization -------------------------------------
+target_compile_options(Class_MuSR_PSI PUBLIC -O3)
+
 #--- install Class_MuSR_PSI solib ---------------------------------------------
 install(TARGETS Class_MuSR_PSI DESTINATION lib)
 

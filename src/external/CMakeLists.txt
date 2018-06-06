@@ -15,6 +15,10 @@ if (BMWlibs)
   add_subdirectory(libZFRelaxation)
 endif (BMWlibs)
 
+if (BNMRlibs)
+  add_subdirectory(libBNMR)
+endif (BNMRlibs)
+
 add_subdirectory(mud)
 add_subdirectory(MusrRoot)
 add_subdirectory(TLemRunHeader)

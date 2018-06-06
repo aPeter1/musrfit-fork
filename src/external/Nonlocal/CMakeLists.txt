@@ -45,6 +45,9 @@ set_target_properties(PNL_PippardFitter
     VERSION ${PNL_PIPPARDFITTER_VERSION}
 )
 
+#--- add compile options for optimization -------------------------------------
+target_compile_options(PNL_PippardFitter PUBLIC -O3)
+
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(PNL_PippardFitter ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
 

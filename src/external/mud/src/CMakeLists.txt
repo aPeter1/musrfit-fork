@@ -26,6 +26,9 @@ set_target_properties(mud
     VERSION ${MUD_VERSION}
 )
 
+#--- add compile options for optimization -------------------------------------
+target_compile_options(mud PUBLIC -O3)
+
 #--- install mud solib --------------------------------------------------------
 install(TARGETS mud DESTINATION lib) 
 

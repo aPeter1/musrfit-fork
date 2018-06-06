@@ -45,8 +45,13 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
+#--- add compile options for optimization -------------------------------------
+target_compile_options(LFRelaxation PUBLIC -O3)
+
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(LFRelaxation ${GSL_LIBRARIES} ${FFTW3F_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase BMWtools) # //as35 cuba lib still missing
+target_link_libraries(LFRelaxation ${GSL_LIBRARIES} ${FFTW3F_LIBRARY} 
+   ${ROOT_LIBRARIES} PUserFcnBase cuba BMWtools
+)
 
 #--- install LFRelaxation solib -----------------------------------------------
 install(TARGETS LFRelaxation DESTINATION lib)

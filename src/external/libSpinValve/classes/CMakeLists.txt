@@ -49,6 +49,9 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
 )
 
+#--- add compile options for optimization -------------------------------------
+target_compile_options(PSpinValve PUBLIC -O3)
+
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(PSpinValve ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
 
