@@ -13,6 +13,7 @@ root_generate_dictionary(
 )
 root_generate_dictionary(
   PStartupHandler_PMDict 
+  -I${MUSRFIT_INC}
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
   PStartupHandler_PM.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PStartupHandler_PMLinkDef.h

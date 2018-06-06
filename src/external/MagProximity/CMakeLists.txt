@@ -10,7 +10,10 @@ root_generate_dictionary(
   LINKDEF PMagProximityFitterLinkDef.h
 )
 root_generate_dictionary(
-  PMPStartupHandlerDict PMPStartupHandler.h LINKDEF PMPStartupHandlerLinkDef.h
+  PMPStartupHandlerDict 
+  -I${MUSRFIT_INC}
+  PMPStartupHandler.h 
+  LINKDEF PMPStartupHandlerLinkDef.h
 )
 
 #--- create pkg-config info ---------------------------------------------------
