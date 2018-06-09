@@ -32,7 +32,7 @@ using namespace std;
 
 #include <QApplication>
 
-#include "../include/git-revision.h"
+#include "git-revision.h"
 #include "PTextEdit.h"
 #include "PFitOutputHandler.h"
 

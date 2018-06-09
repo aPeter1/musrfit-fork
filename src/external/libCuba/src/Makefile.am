@@ -11,7 +11,7 @@ lib_LTLIBRARIES = libcuba.la
 
 libcuba_la_SOURCES =
 
-libcuba_la_LIBADD = cuhre/libcuhre.la divonne/libdivonne.la suave/libsuave.la vegas/libvegas.la -lm
+libcuba_la_LIBADD = common/libcommon.la cuhre/libcuhre.la divonne/libdivonne.la suave/libsuave.la vegas/libvegas.la -lm
 libcuba_la_LDFLAGS = -version-info $(CUBA_LIBRARY_VERSION) -release $(CUBA_RELEASE) $(AM_LDFLAGS)
 
 pkgconfigdir = $(libdir)/pkgconfig

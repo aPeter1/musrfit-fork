@@ -332,7 +332,7 @@ p, li { white-space: pre-wrap; }
    <property name="title">
     <string> Histo Info </string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_0">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -600,7 +600,7 @@ p, li { white-space: pre-wrap; }
    <property name="title">
     <string>File Selection</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget_1">
     <property name="geometry">
      <rect>
       <x>19</x>
@@ -706,7 +706,7 @@ p, li { white-space: pre-wrap; }
     </layout>
    </widget>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget_3">
    <property name="geometry">
     <rect>
      <x>20</x>

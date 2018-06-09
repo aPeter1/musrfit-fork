@@ -2607,7 +2607,7 @@ void PMsrHandler::SetMsrBkgRangeEntry(UInt_t runNo, UInt_t idx, Int_t bin)
 Int_t PMsrHandler::ParameterInUse(UInt_t paramNo)
 {
   // check that paramNo is within acceptable range
-  if ((paramNo < 0) || (paramNo >= fParam.size()))
+  if (paramNo >= fParam.size())
     return -1;
 
   return fParamInUse[paramNo];
@@ -6164,10 +6164,10 @@ UInt_t PMsrHandler::LastSignificant(Double_t dval, UInt_t precLimit)
   }
 
   // find last significant digit
-  for (UInt_t i=strlen(str)-1; i>=0; i--) {
+  for (Int_t i=strlen(str)-1; i>=0; i--) {
     if (str[i] != '0') {
-      if ((i-decimalPoint) < precLimit)
-        lastSignificant = i-decimalPoint;
+      if (((UInt_t)i-decimalPoint) < precLimit)
+        lastSignificant = (UInt_t)i-decimalPoint;
       else
         lastSignificant = precLimit;
       break;

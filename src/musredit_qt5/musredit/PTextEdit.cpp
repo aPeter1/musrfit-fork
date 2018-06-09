@@ -817,7 +817,7 @@ void PTextEdit::setupHelpActions()
   connect( a, SIGNAL( triggered() ), this, SLOT( helpContents() ));
   menu->addAction(a);
 
-  a = new QAction(tr( "About ..." ), this );
+  a = new QAction(tr( "Author(s) ..." ), this );
   a->setStatusTip( tr("Help About") );
   connect( a, SIGNAL( triggered() ), this, SLOT( helpAbout() ));
   menu->addAction(a);
@@ -2262,7 +2262,7 @@ void PTextEdit::musrMsr2Data()
             stream = new QTextStream(file);
             while ( !stream->atEnd() ) {
               str = stream->readLine(); // line of text excluding '\n'
-              str.trimmed();
+              str = str.trimmed();
               if (!str.isEmpty() && !str.startsWith("#") && !str.startsWith("run", Qt::CaseInsensitive)) {
                 fln = str.section(' ', 0, 0, QString::SectionSkipEmpty);
                 if (fMsr2DataParam->msrFileExtension.isEmpty())
@@ -2305,7 +2305,7 @@ void PTextEdit::musrMsr2Data()
             stream = new QTextStream(file);
             while ( !stream->atEnd() ) {
               str = stream->readLine(); // line of text excluding '\n'
-              str.trimmed();
+              str = str.trimmed();
               if (!str.isEmpty() && !str.startsWith("#") && !str.startsWith("run", Qt::CaseInsensitive)) {
                 fln = str.section(' ', 0, 0, QString::SectionSkipEmpty);
                 break;

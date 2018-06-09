@@ -566,7 +566,7 @@ Bool_t PRunAsymmetryRRF::PrepareData()
         addRunSize = addRunData->GetDataBin(forwardHistoNo[k])->size();
         for (UInt_t j=0; j<addRunData->GetDataBin(forwardHistoNo[k])->size(); j++) { // loop over the bin indices
           // make sure that the index stays in the proper range
-          if ((j+(Int_t)fAddT0s[i-1][2*k]-(Int_t)fT0s[2*k] >= 0) && (j+(Int_t)fAddT0s[i-1][2*k]-(Int_t)fT0s[2*k] < addRunSize)) {
+          if (((Int_t)j+(Int_t)fAddT0s[i-1][2*k]-(Int_t)fT0s[2*k] >= 0) && (j+(Int_t)fAddT0s[i-1][2*k]-(Int_t)fT0s[2*k] < addRunSize)) {
             forward[k][j] += addRunData->GetDataBin(forwardHistoNo[k])->at(j+(Int_t)fAddT0s[i-1][2*k]-(Int_t)fT0s[2*k]);
           }
         }
@@ -577,7 +577,7 @@ Bool_t PRunAsymmetryRRF::PrepareData()
         addRunSize = addRunData->GetDataBin(backwardHistoNo[k])->size();
         for (UInt_t j=0; j<addRunData->GetDataBin(backwardHistoNo[k])->size(); j++) { // loop over the bin indices
           // make sure that the index stays in the proper range
-          if ((j+(Int_t)fAddT0s[i-1][2*k+1]-(Int_t)fT0s[2*k+1] >= 0) && (j+(Int_t)fAddT0s[i-1][2*k+1]-(Int_t)fT0s[2*k+1] < addRunSize)) {
+          if (((Int_t)j+(Int_t)fAddT0s[i-1][2*k+1]-(Int_t)fT0s[2*k+1] >= 0) && (j+(Int_t)fAddT0s[i-1][2*k+1]-(Int_t)fT0s[2*k+1] < addRunSize)) {
             backward[k][j] += addRunData->GetDataBin(backwardHistoNo[k])->at(j+(Int_t)fAddT0s[i-1][2*k+1]-(Int_t)fT0s[2*k+1]);
           }
         }
@@ -597,7 +597,7 @@ Bool_t PRunAsymmetryRRF::PrepareData()
   for (UInt_t i=1; i<forwardHistoNo.size(); i++) { // loop over the groupings
     for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
-      if ((j+fT0s[2*i]-fT0s[0] >= 0) && (j+fT0s[2*i]-fT0s[0] < runData->GetDataBin(forwardHistoNo[i])->size())) {
+      if (((Int_t)j+fT0s[2*i]-fT0s[0] >= 0) && (j+fT0s[2*i]-fT0s[0] < runData->GetDataBin(forwardHistoNo[i])->size())) {
         fForward[j] += forward[i][j+(Int_t)fT0s[2*i]-(Int_t)fT0s[0]];
       }
     }
@@ -771,8 +771,7 @@ Bool_t PRunAsymmetryRRF::SubtractEstimatedBkg()
   }
 
   // check if start is within histogram bounds
-  if ((start[0] < 0) || (start[0] >= fForward.size()) ||
-      (start[1] < 0) || (start[1] >= fBackward.size())) {
+  if ((start[0] >= fForward.size()) || (start[1] >= fBackward.size())) {
     cerr << endl << ">> PRunAsymmetryRRF::SubtractEstimatedBkg(): **ERROR** background bin values out of bound!";
     cerr << endl << ">> histo lengths (f/b)  = (" << fForward.size() << "/" << fBackward.size() << ").";
     cerr << endl << ">> background start (f/b) = (" << start[0] << "/" << start[1] << ").";
@@ -780,8 +779,7 @@ Bool_t PRunAsymmetryRRF::SubtractEstimatedBkg()
   }
 
   // check if end is within histogram bounds
-  if ((end[0] < 0) || (end[0] >= fForward.size()) ||
-      (end[1] < 0) || (end[1] >= fBackward.size())) {
+  if ((end[0] >= fForward.size()) || (end[1] >= fBackward.size())) {
     cerr << endl << ">> PRunAsymmetryRRF::SubtractEstimatedBkg(): **ERROR** background bin values out of bound!";
     cerr << endl << ">> histo lengths (f/b)  = (" << fForward.size() << "/" << fBackward.size() << ").";
     cerr << endl << ">> background end (f/b) = (" << end[0] << "/" << end[1] << ").";

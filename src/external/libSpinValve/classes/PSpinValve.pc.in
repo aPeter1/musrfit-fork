@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PSpinValve
+Description: C++ shared library providing the spin valve fitter class
+Version: @P_SPIN_VALVE_VERSION@
+Libs: -L${libdir} -l@P_SPIN_VALVE_LIBRARY_NAME@
+Cflags: -I${includedir}

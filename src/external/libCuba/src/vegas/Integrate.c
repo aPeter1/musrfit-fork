@@ -2,7 +2,7 @@
 	Integrate.c
 		integrate over the unit hypercube
 		this file is part of Vegas
-		last modified 8 Aug 13 th
+		last modified 13 Mar 15 th
 */
 
 
@@ -31,6 +31,7 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
   if( VERBOSE > 1 ) {
     sprintf(out, "Vegas input parameters:\n"
       "  ndim " COUNT "\n  ncomp " COUNT "\n"
+      ML_NOT("  nvec " NUMBER "\n")
       "  epsrel " REAL "\n  epsabs " REAL "\n"
       "  flags %d\n  seed %d\n"
       "  mineval " NUMBER "\n  maxeval " NUMBER "\n"
@@ -38,7 +39,8 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
       "  nbatch " NUMBER "\n  gridno %d\n"
       "  statefile \"%s\"",
       t->ndim, t->ncomp,
-      t->epsrel, t->epsabs,
+      ML_NOT(t->nvec,)
+      SHOW(t->epsrel), SHOW(t->epsabs),
       t->flags, t->seed,
       t->mineval, t->maxeval,
       t->nstart, t->nincrease, t->nbatch,
@@ -49,7 +51,7 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
   if( BadComponent(t) ) return -2;
   if( BadDimension(t) ) return -1;
 
-  FrameAlloc(t, ShmRm(t));
+  FrameAlloc(t, Master);
   ForkCores(t);
   Alloc(bins, t->nbatch*t->ndim);
 
@@ -68,12 +70,12 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
     t->rng.skiprandom(t, t->neval);
   }
 
-  if( ini ) {
+  if( ini | ZAPSTATE ) {
+    t->neval = 0;
     state->niter = 0;
     state->nsamples = t->nstart;
     FClear(state->cumul);
-    GetGrid(t, state_grid);
-    t->neval = 0;
+    if( ini ) GetGrid(t, state_grid);
   }
 
   /* main iteration loop */
@@ -143,7 +145,7 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
       real avg = sigsq*(c->avgsum += w*c->sum);
 
       c->avg = LAST ? (sigsq = 1/w, c->sum) : avg;
-      c->err = sqrt(sigsq);
+      c->err = sqrtx(sigsq);
       fail |= (c->err > MaxErr(c->avg));
 
       if( state->niter == 0 ) c->guess = c->sum;
@@ -163,7 +165,8 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
       for( c = state->cumul, comp = 0; c < C; ++c )
         oe += sprintf(oe, "\n[" COUNT "] "
           REAL " +- " REAL "  \tchisq " REAL " (" COUNT " df)",
-          ++comp, c->avg, c->err, c->chisq, state->niter);
+          ++comp, SHOW(c->avg), SHOW(c->err),
+          SHOW(c->chisq), state->niter);
       Print(out);
     }
 
@@ -215,8 +218,7 @@ static int Integrate(This *t, real *integral, real *error, real *prob)
 abort:
   PutGrid(t, state_grid);
   free(bins);
-  WaitCores(t);
-  FrameFree(t);
+  FrameFree(t, Master);
 
   StateRemove(t);
 

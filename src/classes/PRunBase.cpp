@@ -34,10 +34,7 @@
 #include <TString.h>
 #include <TObjArray.h>
 #include <TObjString.h>
-//#include <TFile.h>
 #include <TFolder.h>
-
-#include "TLemRunHeader.h"
 
 #include "PRunBase.h"
 
@@ -78,7 +75,7 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
   fValid = true;
 
   fRunNo = static_cast<Int_t>(runNo);
-  if ((runNo < 0) || (runNo > fMsrInfo->GetMsrRunList()->size())) {
+  if (runNo > fMsrInfo->GetMsrRunList()->size()) {
     fRunInfo = 0;
     return;
   }

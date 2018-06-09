@@ -3,7 +3,7 @@
 		the sampling routine for the
 		Mathematica versions of the Cuba routines
 		by Thomas Hahn
-		last modified 19 Mar 12 th
+		last modified 13 Mar 15 th
 */
 
 
@@ -11,20 +11,20 @@ static void DoSample(This *t, cnumber n, real *x, real *f
   VES_ONLY(, real *w, ccount iter))
 {
   real *mma_f;
-  long mma_n;
+  int mma_n;
 
   if( MLAbort ) longjmp(t->abort, -99);
 
   MLPutFunction(stdlink, "EvaluatePacket", 1);
   MLPutFunction(stdlink, "Cuba`" ROUTINE "`sample", 1 VES_ONLY(+2) DIV_ONLY(+1));
-  MLPutRealList(stdlink, x, n*t->ndim);
-  VES_ONLY(MLPutRealList(stdlink, w, n);
+  MLPutRealxList(stdlink, x, n*t->ndim);
+  VES_ONLY(MLPutRealxList(stdlink, w, n);
            MLPutInteger(stdlink, iter);)
   DIV_ONLY(MLPutInteger(stdlink, t->phase);)
   MLEndPacket(stdlink);
 
   MLNextPacket(stdlink);
-  if( !MLGetRealList(stdlink, &mma_f, &mma_n) ) {
+  if( !MLGetRealxList(stdlink, &mma_f, &mma_n) ) {
     MLClearError(stdlink);
     MLNewPacket(stdlink);
     longjmp(t->abort, -99);
@@ -33,12 +33,12 @@ static void DoSample(This *t, cnumber n, real *x, real *f
   t->neval += mma_n;
 
   if( mma_n != n*t->ncomp ) {
-    MLDisownRealList(stdlink, mma_f, mma_n);
+    MLReleaseRealxList(stdlink, mma_f, mma_n);
     longjmp(t->abort, -3);
   }
  
   Copy(f, mma_f, n*t->ncomp);
-  MLDisownRealList(stdlink, mma_f, mma_n);
+  MLReleaseRealxList(stdlink, mma_f, mma_n);
 }
 
 /*********************************************************************/
@@ -50,16 +50,16 @@ static count SampleExtra(This *t, cBounds *b)
 {
   count n, nget;
   real *mma_f;
-  long mma_n;
+  int mma_n;
 
   MLPutFunction(stdlink, "EvaluatePacket", 1);
   MLPutFunction(stdlink, "Cuba`Divonne`findpeak", 2);
-  MLPutRealList(stdlink, (real *)b, 2*t->ndim);
+  MLPutRealxList(stdlink, (real *)b, 2*t->ndim);
   MLPutInteger(stdlink, t->phase);
   MLEndPacket(stdlink);
 
   MLNextPacket(stdlink);
-  if( !MLGetRealList(stdlink, &mma_f, &mma_n) ) {
+  if( !MLGetRealxList(stdlink, &mma_f, &mma_n) ) {
     MLClearError(stdlink);
     MLNewPacket(stdlink);
     longjmp(t->abort, -99);
@@ -73,7 +73,7 @@ static count SampleExtra(This *t, cBounds *b)
     Copy(t->fextra, mma_f + nget*t->ndim, n*t->ncomp);
   }
 
-  MLDisownRealList(stdlink, mma_f, mma_n);
+  MLReleaseRealxList(stdlink, mma_f, mma_n);
 
   return n;
 }

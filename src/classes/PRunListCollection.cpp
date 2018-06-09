@@ -788,7 +788,7 @@ PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
 
   switch (tag) {
     case kIndex:
-      if ((index < 0) || (index >= fRunSingleHistoList.size())) {
+      if (index >= fRunSingleHistoList.size()) {
         cerr << endl << ">> PRunListCollection::GetSingleHisto(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
@@ -831,7 +831,7 @@ PRunData* PRunListCollection::GetSingleHistoRRF(UInt_t index, EDataSwitch tag)
 
   switch (tag) {
     case kIndex:
-      if ((index < 0) || (index >= fRunSingleHistoRRFList.size())) {
+      if (index >= fRunSingleHistoRRFList.size()) {
         cerr << endl << ">> PRunListCollection::GetSingleHistoRRF(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
@@ -874,7 +874,7 @@ PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
 
   switch (tag) {
     case kIndex: // called from musrfit when dumping the data
-      if ((index < 0) || (index > fRunAsymmetryList.size())) {
+      if (index > fRunAsymmetryList.size()) {
         cerr << endl << ">> PRunListCollection::GetAsymmetry(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
@@ -917,7 +917,7 @@ PRunData* PRunListCollection::GetAsymmetryRRF(UInt_t index, EDataSwitch tag)
 
   switch (tag) {
     case kIndex: // called from musrfit when dumping the data
-      if ((index < 0) || (index > fRunAsymmetryRRFList.size())) {
+      if (index > fRunAsymmetryRRFList.size()) {
         cerr << endl << ">> PRunListCollection::GetAsymmetryRRF(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
@@ -960,7 +960,7 @@ PRunData* PRunListCollection::GetMuMinus(UInt_t index, EDataSwitch tag)
 
   switch (tag) {
     case kIndex:
-      if ((index < 0) || (index > fRunMuMinusList.size())) {
+      if (index > fRunMuMinusList.size()) {
         cerr << endl << ">> PRunListCollection::GetMuMinus(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
@@ -1002,7 +1002,7 @@ PRunData* PRunListCollection::GetNonMusr(UInt_t index, EDataSwitch tag)
 
   switch (tag) {
     case kIndex:
-      if ((index < 0) || (index > fRunNonMusrList.size())) {
+      if (index > fRunNonMusrList.size()) {
         cerr << endl << ">> PRunListCollection::GetNonMusr(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;

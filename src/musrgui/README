@@ -1,10 +1,14 @@
 #---------------------------------------------------------------------
 # README
-# Andreas Suter, 2010/10/06
+# Andreas Suter, 2018/05/22
 #---------------------------------------------------------------------
 
 musrgui requires >= Qt 3.3.x and < Qt 4. If you have Qt 4.6.y or newer, 
-use musredit instead.
+use musredit instead. If you have Qt 5.x, use musredit_qt5 instead.
+
+musrgui by now should be considered as not only outdated, but it will 
+be hard to find a platform on which it is still compiling. So, if there
+is no urgent need: don't use it!
 
 #---------------------------------------------------------------------
 # this is the end ...

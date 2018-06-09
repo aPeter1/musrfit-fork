@@ -2,13 +2,15 @@
 	Sample.c
 		most of what is related to sampling
 		this file is part of Divonne
-		last modified 30 Aug 13 th
+		last modified 12 Mar 15 th
 */
 
 
-#define MARKMASK 0xfffffff
+#define MARKMASK NUMBER_MAX
 #define Marked(x) ((x) & ~MARKMASK)
 #define Unmark(x) ((x) & MARKMASK)
+
+#define NWANTMAX NUMBER_MAX
 
 #define EXTRAPOLATE_EPS (.25*t->border.lower)
 /*#define EXTRAPOLATE_EPS 0x1p-26*/
@@ -96,7 +98,7 @@ static void SampleKorobov(This *t, ccount iregion)
   }
 
   if( dist > 0 ) {
-    dist = sqrt(dist)/EXTRAPOLATE_EPS;
+    dist = sqrtx(dist)/EXTRAPOLATE_EPS;
     for( dim = 0; dim < t->ndim; ++dim ) {
       real x2 = x[dim], dx = x2 - t->border.upper;
       if( dx > 0 ) {
@@ -148,7 +150,7 @@ static void SampleKorobov(This *t, ccount iregion)
          1..39 = multiplicator,        Korobov numbers,
        40..inf = absolute # of points, Korobov numbers.  */
 
-static count SamplesLookup(This *t, Samples *samples, cint key,
+static number SamplesLookup(This *t, Samples *samples, cint key,
   cnumber nwant, cnumber nmax, number nmin)
 {
   number n;
@@ -191,7 +193,8 @@ static count SamplesLookup(This *t, Samples *samples, cint key,
 static void SamplesAlloc(cThis *t, Samples *samples)
 {
 #define FIRST -INT_MAX
-#define MarkLast(x) (x | Marked(INT_MAX))
+#define MarkLast(x) ((x) | 0x40000000)
+#define UnmarkLast(x) ((x) & 0x3fffffff)
 
 #include "KorobovCoeff.c"
 
@@ -205,12 +208,12 @@ static void SamplesAlloc(cThis *t, Samples *samples)
 
     while( i = IMin(IDim(i), max),
            n > (p = prime[i + 1]) || n <= prime[i] ) {
-      cint d = (n - Unmark(p)) >> ++shift;
+      cint d = (n - UnmarkLast(p)) >> ++shift;
       i += Min1(d);
     }
 
     samples->coeff = coeff[i][t->ndim - KOROBOV_MINDIM];
-    samples->neff = p = Unmark(p);
+    samples->neff = p = UnmarkLast(p);
     samples->n = p/2 + 1;
   }
 
@@ -240,7 +243,7 @@ static real Sample(This *t, creal *x0)
   }
 
   if( dist > 0 ) {
-    dist = sqrt(dist)/EXTRAPOLATE_EPS;
+    dist = sqrtx(dist)/EXTRAPOLATE_EPS;
     for( dim = 0; dim < t->ndim; ++dim ) {
       real x2 = xtmp[dim], dx, b;
       if( (dx = x2 - (b = t->border.lower)) < 0 ||

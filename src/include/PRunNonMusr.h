@@ -65,6 +65,9 @@ class PRunNonMusr : public PRunBase
 
     UInt_t fNoOfFitBins;    ///< number of bins to be be fitted
     Int_t  fPacking;        ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
+
+    Int_t fStartTimeBin;    ///< bin at which the fit starts
+    Int_t fEndTimeBin;      ///< bin at which the fit ends
 };
 
 #endif // _PRUNNONMUSR_H_

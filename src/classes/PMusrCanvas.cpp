@@ -6475,10 +6475,10 @@ UInt_t PMusrCanvas::GetNeededAccuracy(PMsrParamStructure param)
     }
 
     // find last significant digit
-    for (UInt_t i=strlen(str)-1; i>=0; i--) {
+    for (Int_t i=strlen(str)-1; i>=0; i--) {
       if (str[i] != '0') {
-        if ((i-decimalPoint) < precLimit)
-          accuracy = i-decimalPoint;
+        if (((UInt_t)i-decimalPoint) < precLimit)
+          accuracy = (UInt_t)i-decimalPoint;
         else
           accuracy = precLimit;
         break;

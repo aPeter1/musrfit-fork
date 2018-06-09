@@ -103,7 +103,7 @@ PDumpOutputHandler::~PDumpOutputHandler()
     fProc->waitForFinished();
   }
   if (fProc->state() == QProcess::Running) {
-    QString cmd = "kill -9 "+ fProcPID;
+    QString cmd = "kill -9 "+ QString("%1").arg(fProcPID);
     QString msg = "fProc still running even after Qt kill, will try system kill cmd: "+cmd;
     qDebug() << msg << endl;
     system(cmd.toLatin1());

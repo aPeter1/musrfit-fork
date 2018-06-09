@@ -44,7 +44,7 @@
    <property name="checkable">
     <bool>false</bool>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget0">
     <property name="geometry">
      <rect>
       <x>11</x>
@@ -160,7 +160,7 @@ p, li { white-space: pre-wrap; }
    <property name="title">
     <string>msr File Extension</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget1">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -228,7 +228,7 @@ p, li { white-space: pre-wrap; }
    <property name="title">
     <string>Template Run Input</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget2">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -295,7 +295,7 @@ p, li { white-space: pre-wrap; }
    <property name="title">
     <string>Data Output File Name</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget3">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -350,7 +350,7 @@ p, li { white-space: pre-wrap; }
    <property name="title">
     <string>Options</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="layoutWidget4">
     <property name="geometry">
      <rect>
       <x>6</x>
@@ -550,7 +550,7 @@ p, li { white-space: pre-wrap; }
     </property>
    </widget>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QWidget" name="layoutWidget5">
    <property name="geometry">
     <rect>
      <x>5</x>

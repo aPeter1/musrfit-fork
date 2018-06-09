@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PNL_PippardFitter
+Description: C++ shared library providing the nonlocal sc fitter class
+Version: @PNL_PIPPARDFITTER_VERSION@
+Libs: -L${libdir} -l@PNL_PIPPARDFITTER_LIBRARY_NAME@
+Cflags: -I${includedir}

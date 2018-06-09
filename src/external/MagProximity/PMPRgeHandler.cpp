@@ -94,7 +94,7 @@ Double_t PMPRgeHandler::GetRgeValue(const Int_t index, const Double_t dist)
 
   UInt_t distIdx = (UInt_t)(dist/(fRgeDataList[index].stoppingDistance[1]-fRgeDataList[index].stoppingDistance[0]));
 
-  if ((distIdx >= fRgeDataList[index].stoppingDistance.size()) || (distIdx < 0)) {
+  if (distIdx >= fRgeDataList[index].stoppingDistance.size()) {
     rgeVal = 0.0;
   } else {
     rgeVal = fRgeDataList[index].stoppingAmplitude[distIdx] +
