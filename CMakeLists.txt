@@ -27,6 +27,11 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 #--- perform some checks and generate the config.h ----------------------------
+
+#--- the next two lines are needed that the math functions are found ----------
+set(CMAKE_REQUIRED_INCLUDES math.h)
+set(CMAKE_REQUIRED_LIBRARIES m) 
+
 include(CheckTypeSize)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
