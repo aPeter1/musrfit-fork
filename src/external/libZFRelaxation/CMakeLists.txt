@@ -46,8 +46,16 @@ target_include_directories(
 )
 
 #--- add library dependencies -------------------------------------------------
+if (OpenMP_FOUND)
+  target_compile_options(ZFRelaxation PUBLIC ${OpenMP_CXX_FLAGS})
+endif (OpenMP_FOUND)
+
+set(gomp "")
+if (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
+  set(gomp gomp)
+endif (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
 target_link_libraries(ZFRelaxation 
-  ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase cuba BMWtools
+  ${gomp} ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase cuba BMWtools
 ) 
 
 #--- install ZFRelaxation solib -----------------------------------------------

@@ -46,7 +46,17 @@ target_include_directories(
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(LFRelaxation ${GSL_LIBRARIES} ${FFTW3F_LIBRARY} 
+if (OpenMP_FOUND)
+  target_compile_options(LFRelaxation PUBLIC ${OpenMP_CXX_FLAGS})
+endif (OpenMP_FOUND)
+
+set(gomp "")
+if (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
+  set(gomp gomp)
+endif (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
+target_link_libraries(LFRelaxation 
+   ${gomp}
+   ${GSL_LIBRARIES} ${FFTW3F_LIBRARY} 
    ${ROOT_LIBRARIES} PUserFcnBase cuba BMWtools
 )
 
