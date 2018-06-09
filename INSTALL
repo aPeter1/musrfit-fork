@@ -2,19 +2,19 @@
 # INSTALL
 #---------------------------------------------------------------------
 
-There are currently 2 wasy to build musrfit:
+There are currently two ways to build musrfit,
 
-1) via the automake tool chain (this will phase out until 2019)
-2) via the cmake tool chain (this will be the default starting from now)
+1) using automake tool chain (this will be phased out until 2019)
+2) using cmake tool chain (this will be the default starting from now)
 
-In the following it is assumed that the system variable ROOTSYS is already
-defined and pointing to the place where CERN/ROOT is installed.
+In what follows we assume that the system variable ROOTSYS is already
+defined and points to the installation directory of CERN/ROOT.
 
 #----------------------------------
-# Install via automake tool chain
+# Install using automake tool chain
 #----------------------------------
 
-To get it build:
+To get it built:
 
    sh autogen.sh
    ./configure --prefix=$ROOTSYS             (or where ever musrfit should be installed)
@@ -22,25 +22,25 @@ To get it build:
    make install                              (as superuser -- maybe)
    /sbin/ldconfig                            (as superuser)   
 
-configure comes with a couple of options. For details either execute
+configure comes with a couple of options. For details execute
 
   ./configure --help
 
 or check under http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html
-for a more detailed description.
+for a detailed description.
 
-An example with NeXus support and BMWlibs needed would look like this
+For example, to include NeXus support and BNMRlibs,
 
    sh autogen.sh
-   ./configure --enable-NeXus --enable-BMWlibs --prefix=$ROOTSYS 
+   ./configure --enable-NeXus --enable-BNMRlibs --prefix=$ROOTSYS 
    make 
    make install                              (as superuser -- maybe)
    /sbin/ldconfig                            (as superuser)
    
-In the optimal case, everything is set up ;-)
+If all goes well, you should be good to go ;-)
 
 #----------------------------------
-# Install via cmake tool chain
+# Install using cmake tool chain
 #----------------------------------
 
 cmake minimal required version is 3.6.
@@ -55,8 +55,7 @@ directory and
    make install                              (as superuser -- maybe)
    /sbin/ldconfig                            (as superuser)
     
-cmake configuration allows a couple of switches.  For details check the user
-docu under 
+cmake configuration allows a couple of switches.  For details check the documentation at 
 
    http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html
 
@@ -69,16 +68,16 @@ An example with NeXus support and BMWlibs needed would look like this
    make install                              (as superuser -- maybe)
    /sbin/ldconfig                            (as superuser)
 
-In the optimal case, everything is set up ;-)
+If all goes well, you should be good to go ;-)
 
 #----------------------------------
-# Link to the docu
+# Link to the documentation
 #----------------------------------
 
-More information about the software requirements and the installation can be found at:
+More information regarding software requirements and installation can be found at
 
-http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html
+   http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html
 
 #---------------------------------------------------------------------
-# this is the end ...
+# good luck ...
 #---------------------------------------------------------------------
