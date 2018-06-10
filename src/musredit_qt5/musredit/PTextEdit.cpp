@@ -2745,6 +2745,9 @@ void PTextEdit::mupp()
 {
   QString cmd("");
   cmd = fAdmin->getExecPath() + "/mupp";
+#if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
+  cmd = QString("/Applications/mupp.app/Contents/MacOS/mupp");
+#endif
 
   QProcess *proc = new QProcess(this);
 
