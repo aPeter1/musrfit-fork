@@ -82,7 +82,7 @@ endif (APPLE)
 
 #--- install ------------------------------------------------------------------
 if (APPLE)
-  install(TARGETS mupp BUNDLE DESTINATION ${CMAKE_INSTALL_PREFIX})
+  install(TARGETS mupp BUNDLE DESTINATION /Applications)
 else (APPLE)
   install(TARGETS mupp DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif (APPLE)
