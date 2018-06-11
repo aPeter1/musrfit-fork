@@ -1,7 +1,7 @@
 # - musrfit 
 cmake_minimum_required(VERSION 3.6)
 
-project(musrfit VERSION 1.3.0 LANGUAGES C CXX)
+project(musrfit VERSION 1.4.0 LANGUAGES C CXX)
 
 #--- musrfit specific options -------------------------------------------------
 option(nexus "build optional NeXus support. Needed for ISIS" OFF)
