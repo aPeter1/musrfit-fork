@@ -80,9 +80,19 @@ target_include_directories(
 )
 
 #--- add library dependencies -------------------------------------------------
+if (OpenMP_FOUND)
+  target_compile_options(FitPofB PUBLIC ${OpenMP_CXX_FLAGS})
+endif (OpenMP_FOUND)
+
+set(gomp "")
+if (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
+  set(gomp gomp)
+endif (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
 target_link_libraries(FitPofB 
+    ${gomp}
     ${FFTW3_LIBRARY} ${FFTW3F_LIBRARY} ${ROOT_LIBRARIES} 
-    TLemRunHeader PUserFcnBase BMWtools)
+    TLemRunHeader PUserFcnBase BMWtools
+)
 
 #--- install FitPofB solib ----------------------------------------------------
 install(TARGETS FitPofB DESTINATION lib)

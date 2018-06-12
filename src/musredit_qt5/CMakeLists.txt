@@ -9,3 +9,4 @@ configure_file(
 add_subdirectory(musredit)
 add_subdirectory(musrStep)
 add_subdirectory(musrWiz)
+add_subdirectory(mupp)

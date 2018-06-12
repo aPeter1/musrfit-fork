@@ -718,6 +718,22 @@ void PTextEdit::setupMusrActions()
   }
   tb->addAction(a);
 
+  if (fDarkTheme)
+    iconName = QString(":/icons/mupp-dark.svg");
+  else
+    iconName = QString(":/icons/mupp-plain.svg");
+  a = new QAction( QIcon( QPixmap(iconName) ), tr( "m&upp" ), this );
+  a->setShortcut( tr("Alt+U") );
+  a->setStatusTip( tr("Start mupp, the muSR parameter plotter") );
+  connect( a, SIGNAL( triggered() ), this, SLOT( mupp() ) );
+  menu->addAction(a);
+  if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
+    iconName = QString(":/icons/mupp-plain.svg");
+    a = new QAction( QIcon( QPixmap(iconName) ), tr( "m&upp" ), this );
+    connect( a, SIGNAL( triggered() ), this, SLOT( mupp() ) );
+  }
+  tb->addAction(a);
+
   menu->addSeparator();
   tb->addSeparator();
 
@@ -2395,7 +2411,7 @@ void PTextEdit::musrView()
                           tr("Quit") );
     return;
   }
- }
+}
 
 //----------------------------------------------------------------------------------------------------
 /**
@@ -2531,6 +2547,9 @@ void PTextEdit::musrPrefs()
 }
 
 //----------------------------------------------------------------------------------------------------
+/**
+ * @brief PTextEdit::musrSetSteps
+ */
 void PTextEdit::musrSetSteps()
 {
   if ( !currentEditor() )
@@ -2715,6 +2734,40 @@ void PTextEdit::musrDump()
   PDumpOutputHandler dumpOutputHandler(cmd);
   dumpOutputHandler.setModal(false);
   dumpOutputHandler.exec();
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * @brief PTextEdit::mupp
+ * <p>Calls mupp, the muSR parameter plotter.
+ */
+void PTextEdit::mupp()
+{
+  QString cmd("");
+  cmd = fAdmin->getExecPath() + "/mupp";
+#if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
+  cmd = QString("/Applications/mupp.app/Contents/MacOS/mupp");
+#endif
+
+  QProcess *proc = new QProcess(this);
+
+  QString workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
+
+  // make sure that the system environment variables are properly set
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+  proc->setProcessEnvironment(env);
+  proc->setWorkingDirectory(workDir);
+  proc->start(cmd);
+  if (!proc->waitForStarted()) {
+    // error handling
+    QString msg(tr("Could not execute the output command: ")+cmd);
+    QMessageBox::critical( 0,
+                          tr("Fatal error"),
+                          msg,
+                          tr("Quit") );
+    return;
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 # - musrfit 
 cmake_minimum_required(VERSION 3.6)
 
-project(musrfit VERSION 1.3.0 LANGUAGES C CXX)
+project(musrfit VERSION 1.4.0 LANGUAGES C CXX)
 
 #--- musrfit specific options -------------------------------------------------
 option(nexus "build optional NeXus support. Needed for ISIS" OFF)
@@ -27,12 +27,16 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 #--- perform some checks and generate the config.h ----------------------------
+
+#--- the next two lines are needed that the math functions are found ----------
+set(CMAKE_REQUIRED_INCLUDES math.h)
+set(CMAKE_REQUIRED_LIBRARIES m) 
+
 include(CheckTypeSize)
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
 check_include_files(alloca.h HAVE_ALLOCA_H)
 check_include_files("sys/ipc.h;sys/shm.h" HAVE_SHMGET)
-check_function_exists(fork HAVE_FORK)
 check_include_files(dlfcn.h HAVE_DLFCN_H)
 check_function_exists(erf HAVE_ERF)
 check_function_exists(getloadavg HAVE_GETLOADAVG)

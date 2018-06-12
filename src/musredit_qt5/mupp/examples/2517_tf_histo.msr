@@ -1,0 +1,95 @@
+YBCO-40nm, T=120.00 K, E=3.79 keV, B=~800(G)/138.41(A), Tr/Sa=12.02/7.29 kV, SR=-10.00
+###############################################################
+FITPARAMETER
+#      Nr. Name       Value      Step       Pos_Error   Boundaries
+        1 Asy         0.0744    -0.0023     0.0024      
+        2 Sigma       0.357     -0.023      0.024       0       none    
+        3 Ph          189.3     -3.6        3.6         
+        4 Field       805.92    -0.36       0.35        
+# L
+        5 RelPh_L     0         0           none        
+        6 N0_L        50.34     -0.13       0.13        
+        7 N_bkg_L     0.872     -0.017      0.017       
+# T
+        8 RelPh_T     -81.8     -4.4        4.4         
+        9 N0_T        44.87     -0.12       0.12        
+       10 N_bkg_T     0.809     -0.016      0.016       
+# R
+       11 RelPh_R     195.0     -4.3        4.3         
+       12 alpha_LR    0.9807    -0.0036     0.0036      
+       13 N_bkg_R     0.923     -0.017      0.017       
+# B
+       14 RelPh_B     102.8     -4.3        4.3         
+       15 alpha_TB    1.1769    -0.0044     0.0044      
+       16 N_bkg_B     0.946     -0.017      0.017       
+
+###############################################################
+THEORY
+asymmetry      1
+simpleGss      2          (rate)
+TFieldCos   fun1  fun2       (phase frequency)
+
+###############################################################
+FUNCTIONS
+fun1 = par3 + map1
+fun2 = gamma_mu * par4
+fun3 = par6 * par12
+fun4 = par9 * par15
+
+###############################################################
+GLOBAL
+fittype         0         (single histogram fit)
+fit             0.05    10     
+data            2500    66500   2500    66500   
+packing         10
+
+###############################################################
+RUN 2017/lem17_his_2517 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+map             5    0    0    0    0    0    0    0    0    0
+forward         41 45 
+norm            6
+backgr.fit      7
+#-----------------------------------------------
+RUN 2017/lem17_his_2517 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+map             8    0    0    0    0    0    0    0    0    0
+forward         42 46 
+norm            9
+backgr.fit      10
+#-----------------------------------------------
+RUN 2017/lem17_his_2517 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+map            11    0    0    0    0    0    0    0    0    0
+forward         43 47 
+norm            fun3
+backgr.fit      13
+#-----------------------------------------------
+RUN 2017/lem17_his_2517 MUE4 PSI MUSR-ROOT   (name beamline institute data-file-format)
+map            14    0    0    0    0    0    0    0    0    0
+forward         44 48 
+norm            fun4
+backgr.fit      16
+
+###############################################################
+COMMANDS
+MAX_LIKELIHOOD
+#PRINT_LEVEL 2
+MINIMIZE
+MINOS
+SAVE
+
+###############################################################
+PLOT 0   (single histo plot)
+lifetimecorrection
+runs     1   2   3   4   
+range    0   10   -0.25   0.25
+view_packing 50
+
+###############################################################
+FOURIER
+units            Gauss   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
+fourier_power    13
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL
+
+###############################################################
+STATISTIC --- 2017-08-04 12:51:58
+  maxLH = 20794.6, NDF = 20365, maxLH/NDF = 1.021097
