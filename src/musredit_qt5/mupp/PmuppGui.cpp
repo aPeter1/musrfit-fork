@@ -1669,7 +1669,7 @@ void PmuppGui::startMuppPlot()
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
   QString cmd = QString("%1/bin/mupp_plot").arg(MUPP_PREFIX);
 #if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
-  cmd = QString("/Applications/bin/mupp_plot"); // as35 not yet ready
+  cmd = QString("/Applications/mupp.app/Contents/MacOS/mupp_plot"); // as35 not yet ready
 #endif
   QString workDir = QString("./");
   QStringList arg;
@@ -1687,7 +1687,7 @@ void PmuppGui::startMuppPlot()
   fMuppPlot->start(cmd, arg);
   if (!fMuppPlot->waitForStarted()) {
     // error handling
-    QString msg(tr("Could not execute the output command: ")+cmd[0]);
+    QString msg(tr("Could not execute the output command: ")+cmd);
     QMessageBox::critical( 0,
                           tr("Fatal error"),
                           msg,

@@ -64,4 +64,8 @@ target_include_directories(mupp_plot
 target_link_libraries(mupp_plot ${ROOT_LIBRARIES})
 
 #--- install ------------------------------------------------------------------
-install(TARGETS mupp_plot DESTINATION bin)
+if (APPLE)
+  install(TARGETS mupp_plot DESTINATION /Applications/mupp.app/Contents/MacOS)
+else (APPLE)
+  install(TARGETS mupp_plot DESTINATION bin)
+endif (APPLE)
