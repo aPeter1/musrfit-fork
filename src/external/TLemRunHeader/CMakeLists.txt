@@ -3,9 +3,11 @@
 #--- generate necessary dictionaries ------------------------------------------
 root_generate_dictionary(
   TLemRunHeaderDict TLemRunHeader.h LINKDEF TLemRunHeaderLinkDef.h
+  MODULE TLemRunHeader
 )
 root_generate_dictionary(
-  TLemStatsDict TLemStats.h LINKDEF TLemStatsLinkDef.h 
+  TLemStatsDict TLemStats.h LINKDEF TLemStatsLinkDef.h
+  MODULE TLemStats 
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -44,10 +46,10 @@ install(TARGETS TLemRunHeader DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTLemRunHeaderDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libTLemRunHeaderDict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libTLemStatsDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libTLemStatsDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTLemRunHeader_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libTLemRunHeader.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libTLemStats_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libTLemStats.rootmap
   DESTINATION lib
 )
 

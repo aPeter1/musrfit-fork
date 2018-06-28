@@ -11,6 +11,7 @@ root_generate_dictionary(
   -I${BMW_TOOLS_INC}
   TLFRelaxation.h
   LINKDEF TLFRelaxationLinkDef.h
+  MODULE TLFRelaxation
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -65,8 +66,8 @@ install(TARGETS LFRelaxation DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTLFRelaxationDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libTLFRelaxationDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTLFRelaxation_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libTLFRelaxation.rootmap
   DESTINATION lib
 )
 

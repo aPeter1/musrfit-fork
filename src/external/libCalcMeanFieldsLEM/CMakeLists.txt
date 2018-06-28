@@ -13,6 +13,7 @@ root_generate_dictionary(
   -I${POFB_INC}
   TCalcMeanFieldsLEM.h
   LINKDEF TCalcMeanFieldsLEMLinkDef.h
+  MODULE TCalcMeanFieldsLEM
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -58,8 +59,8 @@ install(TARGETS CalcMeanFieldsLEM DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTCalcMeanFieldsLEMDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libTCalcMeanFieldsLEMDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTCalcMeanFieldsLEM_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libTCalcMeanFieldsLEM.rootmap
   DESTINATION lib
 )
 

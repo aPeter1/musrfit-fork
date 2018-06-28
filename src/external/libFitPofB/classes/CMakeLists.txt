@@ -14,6 +14,7 @@ root_generate_dictionary(
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
   TLondon1D.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/TLondon1DLinkDef.h
+  MODULE TLondon1D
 )
 root_generate_dictionary(
   TVortexDict 
@@ -24,6 +25,7 @@ root_generate_dictionary(
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
   TVortex.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/TVortexLinkDef.h
+  MODULE TVortex
 )
 root_generate_dictionary(
   TSkewedGssDict 
@@ -34,6 +36,7 @@ root_generate_dictionary(
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
   TSkewedGss.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/TSkewedGssLinkDef.h
+  MODULE TSkewedGss
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -99,12 +102,12 @@ install(TARGETS FitPofB DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTLondon1DDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libTLondon1DDict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libTVortexDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libTVortexDict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libTSkewedGssDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libTSkewedGssDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTLondon1D_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libTLondon1D.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libTVortex_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libTVortex.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libTSkewedGss_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libTSkewedGss.rootmap
   DESTINATION lib
 )
 

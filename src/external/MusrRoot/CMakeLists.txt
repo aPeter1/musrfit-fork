@@ -3,6 +3,7 @@
 #--- generate necessary dictionaries ------------------------------------------
 root_generate_dictionary(
   TMusrRunHeaderDict TMusrRunHeader.h LINKDEF TMusrRunHeaderLinkDef.h
+  MODULE TMusrRunHeader
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -38,8 +39,8 @@ install(TARGETS TMusrRunHeader DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTMusrRunHeaderDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libTMusrRunHeaderDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTMusrRunHeader_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libTMusrRunHeader.rootmap
   DESTINATION lib
 )
 

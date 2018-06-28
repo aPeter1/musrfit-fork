@@ -9,6 +9,7 @@ root_generate_dictionary(
   -I${MUSRFIT_INC}
   TBNMR.h 
   LINKDEF TBNMRLinkDef.h
+  MODULE TBNMR
 )
 
 #--- lib creation -------------------------------------------------------------
@@ -38,8 +39,8 @@ install(TARGETS BNMR DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTBNMRDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libTBNMRDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTBNMR_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libTBNMR.rootmap
   DESTINATION lib
 )
 

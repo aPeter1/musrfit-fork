@@ -8,12 +8,14 @@ root_generate_dictionary(
   -I${MUSRFIT_INC}
   PMagProximityFitter.h 
   LINKDEF PMagProximityFitterLinkDef.h
+  MODULE PMagProximityFitter
 )
 root_generate_dictionary(
   PMPStartupHandlerDict 
   -I${MUSRFIT_INC}
   PMPStartupHandler.h 
   LINKDEF PMPStartupHandlerLinkDef.h
+  MODULE PMPStartupHandler
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -55,10 +57,10 @@ install(TARGETS PMagProximityFitter DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPMagProximityFitterDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libPMagProximityFitterDict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libPMPStartupHandlerDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libPMPStartupHandlerDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPMagProximityFitter_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libPMagProximityFitter.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPMPStartupHandler_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libPMPStartupHandler.rootmap
   DESTINATION lib
 )
 
