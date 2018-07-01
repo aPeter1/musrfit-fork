@@ -450,6 +450,23 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid)
           title += token[i];
         title = title.trimmed();
         run.SetName(title);
+        // check that the number of parameters is the same for all runs
+        if (collection.GetNoOfRuns() > 0) {
+          if (collection.GetRun(0).GetNoOfParam() != run.GetNoOfParam()) {
+            cerr << endl;
+            cerr << "----" << endl;
+            cerr << "**ERROR** in " << fln.toLatin1().data() << "." << endl;
+            cerr << "  first run (#" << collection.GetRun(0).GetNumber() << ") has ";
+            cerr << collection.GetRun(0).GetNoOfParam() << " params." << endl;
+            cerr << "  current run (#" << run.GetNumber() << ") has ";
+            cerr << run.GetNoOfParam() << " params!" << endl;
+            cerr << "Inspect your db-file!" << endl;
+            cerr << "----" << endl;
+            file.close();
+            valid = false;
+            return collection;
+          }
+        }
         collection.AddRun(run);
         run.Clear();
       } else { // parameter
