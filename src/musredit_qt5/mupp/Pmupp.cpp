@@ -180,9 +180,10 @@ void PParamDataHandler::NewCollection(const QString name)
  * @param collectionName
  * @param arg
  * @param workDir
+ * @param errorMsg
  * @return
  */
-bool PParamDataHandler::analyzeFileList(const QStringList &fln, QString &collectionName, QStringList &arg, QString &workDir)
+bool PParamDataHandler::analyzeFileList(const QStringList &fln, QString &collectionName, QStringList &arg, QString &workDir, QString &errorMsg)
 {
   // 1) check all the msr-files have the same structure: <runNo><extension>.msr with <extension> the same
   //    for all msr-files present.
@@ -205,16 +206,16 @@ bool PParamDataHandler::analyzeFileList(const QStringList &fln, QString &collect
     // get index of position between <run> and <extenstion>
     pos0 = flnCurrent.indexOf("_");
     if (pos0 == -1) {
-      QMessageBox::critical(0, "ERROR", "msr-file name has a structure which cannot be handled.\n\
-It should be <run><extension>, where <run> is the run number\n\
-and <extension> needs to start with a '_'.");
+      errorMsg = "msr-file name has a structure which cannot be handled.\n\
+                  It should be <run><extension>, where <run> is the run number\n\
+                  and <extension> needs to start with a '_'.";
        return false;
     }
     pos1 = flnCurrent.lastIndexOf(".");
     if ((pos1 == -1) || (pos1 < pos0)) {
-      QMessageBox::critical(0, "ERROR", "msr-file name has a structure which cannot be handled.\n\
-It should be <run><extension>.msr, where <run> is the run number\n\
-and <extension> needs to start with a '_'.");
+      errorMsg = "msr-file name has a structure which cannot be handled.\n\
+                  It should be <run><extension>.msr, where <run> is the run number\n\
+                  and <extension> needs to start with a '_'.";
        return false;
     }
 
@@ -222,7 +223,7 @@ and <extension> needs to start with a '_'.");
     runStr = flnCurrent.left(pos0);
     runStr.toInt(&ok); // output not needed, only check that it is a number
     if (!ok) {
-      QMessageBox::critical(0, "ERROR", QString("Found run number string '%1' which is not a number.").arg(runStr));
+      errorMsg = QString("Found run number string '%1' which is not a number.").arg(runStr);
       return false;
     }
     run << runStr;
@@ -235,7 +236,7 @@ and <extension> needs to start with a '_'.");
 
     // make sure all extensions are identical
     if ((i>0) && (ext != extCurrent)) {
-      QMessageBox::critical(0, "ERROR", "Currently mixed msr-file extensions cannot be handled.");
+      errorMsg = "Currently mixed msr-file extensions cannot be handled.";
       return false;
     }
   }
@@ -255,9 +256,10 @@ and <extension> needs to start with a '_'.");
 /**
  * @brief PParamDataHandler::ReadParamFile
  * @param fln
+ * @param errorMsg
  * @return
  */
-bool PParamDataHandler::ReadParamFile(const QStringList fln)
+bool PParamDataHandler::ReadParamFile(const QStringList fln, QString &errorMsg)
 {
   bool valid = true;
   PmuppRun run;
@@ -278,7 +280,7 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln)
     // analyse file name list to get the appropriate parts for msr2data
     QStringList arg;
     QString workDir("./");
-    if (!analyzeFileList(fln, collName, arg, workDir))
+    if (!analyzeFileList(fln, collName, arg, workDir, errorMsg))
       return false;
 
     // make sure that the system environment variables are properly set
@@ -295,7 +297,7 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln)
       // try ROOTSYS
       cmd = env.value("ROOTSYS") + QString("/bin/msr2data");
       if (!QFile::exists(cmd)) {
-        QMessageBox::critical(0, "ERROR", "cannot find msr2data need here.");
+        errorMsg = "cannot find msr2data need here.";
         return false;
       }
     }
@@ -306,18 +308,13 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln)
     fProc->setWorkingDirectory(workDir);
     fProc->start(cmd, arg);
     if (!fProc->waitForFinished()) {
-      // error handling
-      QString msg(tr("Could not execute the output command: ")+cmd[0]);
-      QMessageBox::critical( 0,
-                            tr("Fatal error"),
-                            msg,
-                            tr("Quit") );
+      errorMsg = QString(tr("Could not execute the output command: ")+cmd[0]);
       return false;
     }
 
     // since the db-file should now be present, just load it
-    collection = ReadDbFile(pathName, valid);
-    if (!valid) {
+    collection = ReadDbFile(pathName, valid, errorMsg);
+    if (!valid) {      
       cerr << endl;
       cerr << "----" << endl;
       cerr << "**ERROR** read db-file failure (" << pathName.toLatin1().data() << "." << endl;
@@ -331,21 +328,18 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln)
   } else { // db-, dat-file list
     for (int i=0; i<fln.size(); i++) {
       if (fln[i].endsWith(".db")) {
-        collection = ReadDbFile(fln[i], valid);
+        collection = ReadDbFile(fln[i], valid, errorMsg);
         if (!valid) {
-          cerr << endl;
-          cerr << "----" << endl;
-          cerr << "**ERROR** read db-file failure." << endl;
-          cerr << "----" << endl;
           return false;
         }
         if (!fln[i].startsWith("/")) { // file name only, or relative path
           if (fln[i].startsWith("..")) { // relative path
             int idx = fln[i].lastIndexOf("/");
             if (idx == -1) { // should never happen
+              errorMsg = QString("found '%1' which shouldn't be possible!").arg(fln[i]);
               cerr << endl;
               cerr << "----" << endl;
-              cerr << "**ERROR** found '" << fln[i].toLatin1().data() << "' which shouldn't be possible" << endl;
+              cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
               cerr << "----" << endl;
               return false;
             }
@@ -369,19 +363,16 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln)
         collection.SetName(collName);
         fCollection.push_back(collection);
       } else if (fln[i].endsWith(".dat") || fln[i].endsWith(".txt")) {
-        collection = ReadColumnParamFile(fln[i], valid);
+        collection = ReadColumnParamFile(fln[i], valid, errorMsg);
         if (!valid) {
-          cerr << endl;
-          cerr << "----" << endl;
-          cerr << "**ERROR** read db-file failure." << endl;
-          cerr << "----" << endl;
           return false;
         }
         fCollection.push_back(collection);
       } else {
+        errorMsg = QString("unkown file type for ")+fln[i];
         cerr << endl;
         cerr << "*********" << endl;
-        cerr << "**ERROR** unkown file type for " << fln[i].toLatin1().data() << endl;
+        cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
         cerr << "*********" << endl;
         return false;
       }
@@ -398,17 +389,20 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln)
 /**
  * @brief PParamDataHandler::ReadDbFile
  * @param fln
+ * @param valid
+ * @param errorMsg
  * @return
  */
-PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid)
+PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QString &errorMsg)
 {
   PmuppCollection collection;
   PmuppRun run;
   QFile file(fln);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    errorMsg = QString("couldn't open ") + fln;
     cerr << endl;
     cerr << "----" << endl;
-    cerr << "**ERROR** couldn't open " << fln.toLatin1().data() << endl;
+    cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
     cerr << "----" << endl;
     valid = false;
     return collection;
@@ -434,9 +428,10 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid)
       token.clear();
       token = line.split(",", QString::SkipEmptyParts);
       if (token.size()==0) {
+        errorMsg = fln + QString(". No parameter tokens.");
         cerr << endl;
         cerr << "----" << endl;
-        cerr << "**ERROR** in" << fln.toLatin1().data() <<". No parameter tokens." << endl;
+        cerr << "**ERROR** in " << errorMsg.toLatin1().data() << endl;
         cerr << "----" << endl;
         file.close();
         valid = false;
@@ -453,14 +448,13 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid)
         // check that the number of parameters is the same for all runs
         if (collection.GetNoOfRuns() > 0) {
           if (collection.GetRun(0).GetNoOfParam() != run.GetNoOfParam()) {
+            errorMsg = fln + QString(".\n");
+            errorMsg += QString("  first   run (#%1) has %2 params.\n").arg(collection.GetRun(0).GetNumber()).arg(collection.GetRun(0).GetNoOfParam());
+            errorMsg += QString("  current run (#%1) has %2 params.\n").arg(run.GetNumber()).arg(run.GetNoOfParam());
+            errorMsg += QString("  Inspect your db-file!");
             cerr << endl;
             cerr << "----" << endl;
-            cerr << "**ERROR** in " << fln.toLatin1().data() << "." << endl;
-            cerr << "  first run (#" << collection.GetRun(0).GetNumber() << ") has ";
-            cerr << collection.GetRun(0).GetNoOfParam() << " params." << endl;
-            cerr << "  current run (#" << run.GetNumber() << ") has ";
-            cerr << run.GetNoOfParam() << " params!" << endl;
-            cerr << "Inspect your db-file!" << endl;
+            cerr << "**ERROR** in " << errorMsg.toLatin1().data() << endl;
             cerr << "----" << endl;
             file.close();
             valid = false;
@@ -551,9 +545,11 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid)
 /**
  * @brief PParamDataHandler::ReadColumnParamFile
  * @param fln
+ * @param valid
+ * @param errorMsg
  * @return
  */
-PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &valid)
+PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &valid, QString &errorMsg)
 {
   PmuppCollection collection;
   PmuppRun run;
@@ -561,9 +557,10 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
 
   QFile file(fln);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    errorMsg = QString("couldn't open ")+fln;
     cerr << endl;
     cerr << "----" << endl;
-    cerr << "**ERROR** couldn't open " << fln.toLatin1().data() << endl;
+    cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
     cerr << "----" << endl;
     valid = false;
     return collection;
@@ -611,9 +608,10 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
     token = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
     // paranoia check
     if (token.size() != headerInfo.size()) {
+      errorMsg = QString("size mismatch between header and parameter int line: %1 (header=%2 / param=%3)").arg(lineNo).arg(headerInfo.size()).arg(token.size());
       cerr << endl;
       cerr << "----" << endl;
-      cerr << "**ERROR** size mismatch between header and parameter int line: " << lineNo << " (header=" << headerInfo.size() << " / param=" << token.size() << ")." << endl;
+      cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
       cerr << "----" << endl;
       valid = false;
       file.close();
@@ -625,9 +623,10 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
       else
         dval = token[i].toDouble(&ok);
       if (!ok) {
+        errorMsg = QString("unrecognized token ('%1') in line %2 (line number: %3)").arg(token[i].toLatin1().data()).arg(line.toLatin1().data()).arg(lineNo);
         cerr << endl;
         cerr << "----" << endl;
-        cerr << "**ERROR** unrecognized token ('" << token[i].toLatin1().data() << "') in line " << line.toLatin1().data()  << "(line number: " << lineNo << ")" << endl;
+        cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
         cerr << "----" << endl;
         valid = false;
         file.close();

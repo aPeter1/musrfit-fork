@@ -223,8 +223,9 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
       QString collName = QString("collName0");
       fParamDataHandler->NewCollection(collName);
     }
-    if (!fParamDataHandler->ReadParamFile(fln)) {
-      // parameter file(s) is/are not valid
+    QString errorMsg("");
+    if (!fParamDataHandler->ReadParamFile(fln, errorMsg)) {
+      QMessageBox::critical(this, "ERROR", errorMsg);
     } else {
       dataAtStartup = true; // delay to deal with the data sets until the GUI is ready to do so
     }
@@ -571,7 +572,10 @@ void PmuppGui::fileOpen()
     return;
   }
 
-  fParamDataHandler->ReadParamFile(list);
+  QString errorMsg("");
+  if (!fParamDataHandler->ReadParamFile(list, errorMsg)) {
+    QMessageBox::critical(this, "ERROR", errorMsg);
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -817,17 +821,21 @@ void PmuppGui::refresh()
   PmuppCollection coll;
   bool ok=false;
   if (pathName.endsWith(".db")) {
-    coll = fParamDataHandler->ReadDbFile(pathName, ok);
+    QString errorMsg("");
+    coll = fParamDataHandler->ReadDbFile(pathName, ok, errorMsg);
     if (!ok) {
       QMessageBox::critical(this, "ERROR - REFRESH",
-                            QString("Couldn't refresh %1\nFile corrupted?!").arg(fParamDataHandler->GetCollection(collIdx)->GetName()));
+                            QString("Couldn't refresh %1\nFile corrupted?!\n").arg(fParamDataHandler->GetCollection(collIdx)->GetName())+
+                            errorMsg);
       return;
     }
   } else if (pathName.endsWith(".dat")) {
-    coll = fParamDataHandler->ReadColumnParamFile(pathName, ok);
+    QString errorMsg("");
+    coll = fParamDataHandler->ReadColumnParamFile(pathName, ok, errorMsg);
     if (!ok) {
       QMessageBox::critical(this, "ERROR - REFRESH",
-                            QString("Couldn't refresh %1\nFile corrupted?!").arg(fParamDataHandler->GetCollection(collIdx)->GetName()));
+                            QString("Couldn't refresh %1\nFile corrupted?!\n").arg(fParamDataHandler->GetCollection(collIdx)->GetName())+
+                            errorMsg);
       return;
     }
   } else {
