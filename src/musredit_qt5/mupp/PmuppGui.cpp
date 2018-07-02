@@ -205,6 +205,7 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
 {
   QDateTime dt = QDateTime::currentDateTime();
   fDatime = dt.toTime_t();
+  fMuppInstance = -1;
 
   fMuppPlot = 0;
 
@@ -414,8 +415,12 @@ void PmuppGui::aboutToQuit()
 
   // clean up temporary plot files
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-  QString pathName = QString("%1/.musrfit/mupp/_mupp_%2.dat").arg(env.value("HOME")).arg(fDatime);
-  pathName = QString("%1/.musrfit/mupp/_mupp_ftok.dat").arg(env.value("HOME"));
+  if (fMuppInstance != -1) {
+    QString pathName = QString("%1/.musrfit/mupp/_mupp_%2.dat").arg(env.value("HOME")).arg(fDatime);
+    QFile::remove(pathName);
+    pathName = QString("%1/.musrfit/mupp/_mupp_ftok_%2.dat").arg(env.value("HOME")).arg(fMuppInstance);
+    QFile::remove(pathName);
+  }
 
   // needed for clean up and to save the cmd history
   writeCmdHistory();
@@ -584,7 +589,7 @@ void PmuppGui::fileOpen()
  */
 void PmuppGui::fileExit()
 {
-  qApp->quit();
+  aboutToQuit();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1616,13 +1621,16 @@ void PmuppGui::plot()
 
   file.close();
 
+  // get first free mupp instance
+  fMuppInstance = getFirstAvailableMuppInstance();
+
   // issue a system message to inform to ROOT parameter plotter (rpp) that new data are available
   key_t key;
   struct mbuf msg;
   int flags, msqid;
 
   // generate the ICP message queue key
-  QString tmpPathName = QString("%1/.musrfit/mupp/_mupp_ftok.dat").arg(env.value("HOME"));
+  QString tmpPathName = QString("%1/.musrfit/mupp/_mupp_ftok_%2.dat").arg(env.value("HOME")).arg(fMuppInstance);
   file.setFileName(tmpPathName);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     QMessageBox::critical(this, "ERROR", "Couldn't write necessary temporary file!");
@@ -1632,7 +1640,7 @@ void PmuppGui::plot()
   fout << QCoreApplication::applicationFilePath().toLatin1().data() << endl;
   file.close();
 
-  key = ftok(QCoreApplication::applicationFilePath().toLatin1().data(), 1);
+  key = ftok(QCoreApplication::applicationFilePath().toLatin1().data(), fMuppInstance);
   if (key == -1) {
     QMessageBox::critical(this, "ERROR", "Couldn't obtain necessary key to install the IPC message queue.");
     return;
@@ -1677,10 +1685,13 @@ void PmuppGui::startMuppPlot()
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
   QString cmd = QString("%1/bin/mupp_plot").arg(MUPP_PREFIX);
 #if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
-  cmd = QString("/Applications/mupp.app/Contents/MacOS/mupp_plot"); // as35 not yet ready
+  cmd = QString("/Applications/mupp.app/Contents/MacOS/mupp_plot");
 #endif
   QString workDir = QString("./");
   QStringList arg;
+
+  // feed the mupp instance
+  arg << QString("%1").arg(fMuppInstance);
 
   fMuppPlot = new QProcess(this);
   if (fMuppPlot == nullptr) {
@@ -1996,3 +2007,27 @@ void PmuppGui::selectCollection(QString cmd)
     }
   }
 }
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::getFirstAvailableMuppInstance
+ * @return
+ */
+uint PmuppGui::getFirstAvailableMuppInstance()
+{
+  // if fMuppInstance already set, i.e. != -1, do nothing
+  if (fMuppInstance != -1)
+    return fMuppInstance;
+
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  QString fln("");
+  uint i=0;
+  for (i=0; i<256; i++) {
+    fln = QString("%1/.musrfit/mupp/_mupp_ftok_%2.dat").arg(env.value("HOME")).arg(i);
+    if (!QFile::exists(fln))
+      break;
+  }
+
+  return i;
+}
+

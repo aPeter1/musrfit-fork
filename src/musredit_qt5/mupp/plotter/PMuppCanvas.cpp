@@ -88,7 +88,9 @@ PMuppCanvas::PMuppCanvas()
  */
 PMuppCanvas::PMuppCanvas(const Char_t *title, Int_t wtopx, Int_t wtopy,
                          Int_t ww, Int_t wh, const PIntVector markerSytleList,
-                         const PDoubleVector markerSizeList, const PIntVector colorList) :
+                         const PDoubleVector markerSizeList, const PIntVector colorList,
+                         const int mupp_instance) :
+  fMuppInstance(mupp_instance),
   fMarkerStyleList(markerSytleList),
   fMarkerSizeList(markerSizeList),
   fColorList(colorList)
@@ -303,7 +305,8 @@ void PMuppCanvas::CheckIPCMsgQueue()
       cerr << "**ERROR** couldn't get value of the environment variable HOME." << endl << endl;
       return;
     }
-    strncat(str, "/.musrfit/mupp/_mupp_ftok.dat", sizeof(str)-1);
+    memset(str, '\0', sizeof(str));
+    snprintf(str, sizeof(str), "%s/.musrfit/mupp/_mupp_ftok_%d.dat", getenv("HOME"), fMuppInstance);
     ifstream fin(str, ifstream::in);
     if (!fin.is_open()) {
       cerr << endl;
@@ -315,7 +318,7 @@ void PMuppCanvas::CheckIPCMsgQueue()
     fFtokName = str;
   }
 
-  key = ftok(fFtokName.Data(), 1);
+  key = ftok(fFtokName.Data(), fMuppInstance);
   flags = IPC_CREAT;
   msqid = msgget(key, flags | S_IRUSR | S_IWUSR);
   if (msqid == -1) {

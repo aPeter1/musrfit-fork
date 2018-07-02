@@ -129,6 +129,7 @@ private:
   bool fDarkToolBarIcon;
 
   uint fDatime;
+  uint fMuppInstance;
 
   PParamDataHandler *fParamDataHandler;
   QVector<PmuppXY> fXY;
@@ -181,6 +182,7 @@ private:
   void getMinMax(QVector<double> &data, double &min, double &max);
   QString substituteDefaultLabels(QString label);
   void selectCollection(QString cmd);
+  uint getFirstAvailableMuppInstance();
 
 private slots:
   void refresh();
