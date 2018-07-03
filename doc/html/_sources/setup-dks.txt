@@ -1,0 +1,315 @@
+:tocdepth: 3
+
+.. include:: <isogrk1.txt>
+.. index:: dks
+
+.. _setup-dks:
+
+Setting up ``musrfit`` / ``DKS``: High Speed Fitting with GPU's 
+===============================================================
+
+In the years 2016/2017 we explored ways to speed up current fitting frameworks, especially ``musrfit.`` 
+This allows now to analyze histogram sets of high field spectrometers like ``HAL-9500`` at PSI without 
+the *error-prone* RRF fitting (see U. Locans and A. Suter, 
+`musrfit - Real Time Parameter Fitting Using GPU <http://dx.doi.org/10.7566/JPSCP.21.011051>`_, and the 
+Memo from A. Suter, "Rotating Reference Frame Fits", in the ``musrfit`` source code). At the same time 
+it can help to speed-up elaborate global fits tremendously, and dealing properly with muonium. It also 
+allows Apple macOS users to speed up their fitting code on the CPU. Currently it is not straight forward 
+to get ``musrfit`` multi-threaded under macOS since Apple doesn't be default support ``OpenMP``. ``DKS`` 
+enables ``musrfit`` to utilize ``OpenCL`` instead which is present on macOS by default. 
+
+.. warning:: 
+
+  Before you run into the shop to buy a gamer graphic card or a Tesla card, make sure that you have an 
+  appropriate server with a sufficiently strong power supply! 
+  
+.. note::
+
+  However, the current ``musrfit/DKS`` version doesn't yet support all theory functions on the GPU. 
+  In case the theory function is not yet available for the GPU, ``musrfit`` will fall back to the CPU implementation. 
+  
+Conceptually the setup of ``musrfit/DKS`` is as following:
+
+#. install the latest hardware driver for your graphic card.
+#. install the GPU SDK which enables number crunching (``CUDA`` for NVIDIA, ``OpenCL`` for AMD)
+#. install ``DKS``
+#. install the ``musrfit`` version which is ``DKS`` ready   
+
+In the following the description for the installation of ``musrfit/DKS`` for the following systems will be discussed in some more detail:
+
+* NVIDIA Tesla K40c
+* AMD Graphic Card (Radeon R9 390X)
+* macOS in order to get ``OpenCL`` support 
+
+The usage of ``musrfit`` with GPU acceleration and ``OpenCL`` support is described in the 
+:ref:`User manual of the μSR data analysis software musrfit <user-manual>`. The additional 
+``musrfit/DKS`` are found :ref:`here <msr-commands-block-dks>`.
+
+.. index:: dks-setup-tesla
+
+Setting up ``musrfit/DKS`` for a Tesla K40c (NVIDIA) 
+----------------------------------------------------
+
+It is assumed that the Tesla K40c is already physically installed on your system. For now I only 
+will discuss to set it up for a Linux based system. In order to check that your operating systems 
+see the card, enter the following command in the terminal: 
+
+.. code-block:: bash
+
+  $ lspci | grep NVIDIA
+
+The response should look something like 
+
+::
+
+  05:00.0 3D controller: NVIDIA Corporation GK110BGL [Tesla K40c] (rev a1)
+  
+which means that the OS physically recognizes your card. 
+
+Driver Installation for the Tesla K40c 
+++++++++++++++++++++++++++++++++++++++
+
+Next, you will need to download and install the driver for your card. Select the proper operating system, 
+card, etc. from the `NVIDIA download center <http://www.nvidia.com/Download/index.aspx?lang=en-us>`_. At PSI 
+we are running currently Red Hat Enterprise Linux 7.x (RHEL) for which we will get a ``rpm`` (something like 
+``nvidia-diag-driver-local-repo-rhel7-375.66-1.x86_64.rpm``). Install it and make sure there is no conflict 
+with the nouveau driver of the system. 
+
+.. index:: cuda-install
+
+Installation of CUDA
+++++++++++++++++++++
+
+Download the `CUDA SDK <https://developer.nvidia.com/cuda-downloads>`_ form NVIDIA for your system. Again, 
+for the RHEL 7.x this is an ``rpm``. After the installation of the rpm you should reboot your machine. 
+Afterwards you are ready for the installation of ``DKS``. 
+
+.. index:: dks-install
+
+Installation of DKS
++++++++++++++++++++
+
+For the following list of commands the ``'$'`` will be given as the command prompt. *Do not enter it!* 
+Also some comments will be added starting with a ``'#'`` which can be omitted. They are only there to 
+explain what is going on. ``DKS`` stands for Dynamical Kernel Scheduler and provides a thin interface 
+allowing host applications to incorporate GPU's and other hardware accelerators.
+
+Details can be found in the papers listed :ref:`here <cite>`, or on the `DKS wiki page <https://gitlab.psi.ch/uldis_l/DKS/wikis/home>`_.
+
+In brief the installation should be something like this:
+
+.. code-block:: bash
+
+  # go to whatever directory you would like to clone/install DKS
+  # For macOS DKS will likely to got to $HOME/Applications to be consistent with the musrfit docu for macOS
+  $ cd $HOME/Apps
+  $ git clone https://gitlab.psi.ch/uldis_l/DKS.git
+  $ cd DKS
+  $ mkdir build
+  $ cd build
+  $ cmake ../ -DENABLE_MUSR=1 -DCMAKE_INSTALL_PREFIX=../exec
+  $ cmake --build ./ --clean-first
+  $ make install
+  
+Since ``DKS`` is installed in a non-standard path, a couple of additional small steps are required. 
+This will be different for Linux compared to macOS.
+
+For **Linux:**
+
+add the ``DKS`` library path to ``/etc/ld.so.conf.d/musrfit-x86_64.conf`` and execute as super user
+
+.. code-block:: bash
+
+  $ /sbin/ldconfig
+  
+For **macOS:**  
+
+add the ``DKS`` path to ``$HOME/.profile``:
+
+.. code-block:: bash
+
+  export DKS=$HOME/Applications/DKS/exec
+  export LD_LIBRARY_PATH=$DKS/lib:$LD_LIBRARY_PATH
+
+  launchctl setenv DKS $DKS
+  launchctl setenv LD_LIBRARY_PATH $LD_LIBRARY_PATH
+  
+  
+.. _musrfit-dks-install:  
+  
+Installation of musrfit for DKS 
++++++++++++++++++++++++++++++++
+ 
+Most of the installation steps are the same as described for ``musrfit`` without GPU support. 
+Here only the differences are explained. First checkout ``musrfit``, then you will need to 
+switch the working branch which is done by
+ 
+.. code-block:: bash
+ 
+ $ cd $HOME/Apps/musrfit
+ $ git checkout dks6
+ 
+Install via automake 
+^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+
+  Currently ``automake`` is still supported but soon will be replaced by ``cmake``. Only follow 
+  the ``automake`` procedure if you have good reasons. 
+
+The configure script for musrfit has now a couple of more tags/options, which are: 
+
+**- -enable-dks**
+  by default this is set to no, hence if you want to have GPU support you need to enable it. 
+**- -with-cuda**
+  with this tag you tell the configure script where it can find ``CUDA``
+**- -with-opencl**
+  with this tag you tell the configure script where it can find ``OpenCL`` 
+**- -with-dks**
+  with this tag you tell the configure script where it can find ``DKS`` 
+  
+For a typical setup on a RHEL system it could look like this   
+
+.. code-block:: bash
+
+  $ ./configure --enable-ASlibs --enable-BMWlibs --enable-NeXus --with-dks=$HOME/Apps/DKS/exec --enable-dks --prefix=$ROOTSYS
+  
+After  
+
+.. code-block:: bash
+
+  $ make
+  $ make install
+  
+and updating the shared library lookup table (*only* needed for Linux)
+
+.. code-block:: bash
+
+  $ /sbin/ldconfig # as superuser / root
+  
+you are done with the setup.   
+
+Install via cmake
+^^^^^^^^^^^^^^^^^
+
+There is on more configuration switch 
+
+**-Ddks=<value>**
+  it allows to enable/disable ``DKS`` support. The default is ``<value>=1``, *i.e.* enabled. To disable use ``<value>=0``. 
+  
+For a typical setup on a RHEL or macOS system it could look like this   
+
+.. code-block:: bash
+
+  $ cmake ../ -DCMAKE_INSTALL_PREFIX=$ROOTSYS -DASlibs=1 -DBMWlibs=1 -Dnexus=1
+
+After
+
+.. code-block:: bash
+
+  $ cmake --build ./ --clean-first -- -j8
+  $ make install
+  
+and updating the shared library lookup table (*only* needed for Linux)   
+
+.. code-block:: bash
+
+  $ /sbin/ldconfig # as superuser / root
+  
+you are done with the setup. 
+
+.. index:: dks-setup-amd-graphic-card
+
+Setting up ``musrfit/DKS`` for a AMD Graphic Card (Radeon R9 390X)
+------------------------------------------------------------------
+
+Driver Installation for an AMD Graphic Card, *e.g.* Radeon R9 390X 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+This will depend slightly on the AMD Card and operating system. Here I will summaries how it was done 
+on a RHEL (Linux) system using a Radeon R9 390X.
+
+It is assumed that the Radeon R9 390X is already physically installed on your system. For now I only 
+will discuss to set it up for a Linux based system. In order to check that your operating systems see 
+the card, enter the following command in the terminal:
+
+.. code-block:: bash
+
+  $ lspci | grep AMD
+  
+The response should look something like   
+
+::
+
+  84:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] Hawaii XT / Grenada XT [Radeon R9 290X/390X] (rev 80)
+  
+which means that the OS physically recognizes your card.   
+
+For RHEL7.x the AMDGPU-PRO driver should be used. It can be downloaded from `AMD <http://support.amd.com/en-us/kb-articles/Pages/AMDGPU-PRO-RedHat-Install.aspx>`_. Unpack the driver 
+
+.. code-block:: bash
+
+  $ tar -Jxvf amdgpu-pro-17.10-414273.tar.xz
+  $ cd amdgpu-pro-17.10-414273
+
+Install the driver as root
+
+.. code-block:: bash
+
+  $ ./amdgpu-pro-install --compute -y
+  
+Here I assume that the AMD graphic card is only used for computation. You need to add the following command 
+in order that the user **blabla** (change this to the appropriate user name) can access the GPU (otherwise 
+only root works):   
+
+.. code-block:: bash
+
+  $ /sbin/usermod -a -G video blabla
+  
+Reboot the machine. 
+
+AMD APP Software Development Kit (SDK) to enable ``OpenCL`` support
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The AMD APP Software Development Kit (SDK) is a complete development platform created by AMD to allow you to 
+quickly and easily develop applications accelerated by AMD APP technology. The SDK provides samples, documentation, 
+and other materials to quickly get you started leveraging accelerated compute using ``OpenCL`` or ``C++ AMP`` in your 
+``C/C++`` applications. 
+
+Download the AMD APP SDK 3.0 from `AMD-SDK <http://developer.amd.com/tools-and-sdks/opencl-zone/amd-accelerated-parallel-processing-app-sdk/>`_.
+
+Extract the installer
+
+.. code-block:: bash
+
+  $ tar -xvjf AMD-APP-SDKInstaller-v3.0.130.136-GA-linux64.tar.bz2
+
+Run the installer
+
+.. code-block:: bash
+
+  $ ./AMD-APP-SDK-v3.0.130.136-GA-linux64.sh
+
+This will install the AMD APP SDK to ``/opt/AMDAPPSDK-3.0/`` where you can find the ``OpenCL`` include 
+and library files, as well as documentation and sample code. The install guide for AMD OpenCL SDK can 
+be found at `AMD SDK Installation Notes <http://developer.amd.com/wordpress/media/2012/10/AMD_APP_SDK_InstallationNotes.pdf>`_.
+
+Installation of DKS and musrfit
++++++++++++++++++++++++++++++++
+ 
+To install ``DKS`` and ``musrfit`` follow the instructions :ref:`above <musrfit-dks-install>`.
+
+.. index:: dks-opencl-macOS
+
+Setting up ``musrfit/DKS`` for macOS for OpenCL support 
+-------------------------------------------------------
+
+Since Apple is not providing an out-of-the-box ``OpenMP`` support on their macOS compiler framework (Xcode), 
+typically ``musrfit`` is just running *single threaded*. Here ``DKS`` can help since it delivers ``OpenCL`` 
+support which is present on macOS. Hence, if you would like to run ``musrfit`` multi-threaded the easiest 
+way is to use ``DKS``. 
+
+Since there is no graphic card involved, you do not need any graphic card driver of additional SDK. 
+The only thing you need ``DKS`` and the proper ``musrfit`` version.
+
+The installation instruction for ``DKS/musrfit`` can be found :ref:`here <musrfit-dks-install>`. 

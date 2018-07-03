@@ -1,0 +1,442 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Documentation of user libs (user functions) &mdash; musrfit 1.4.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.4.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="musrfit 1.4.0 documentation" href="index.html" />
+    <link rel="next" title="Setting up musrfit on Different Platforms" href="setup-standard.html" />
+    <link rel="prev" title="User manual" href="user-manual.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="setup-standard.html" title="Setting up musrfit on Different Platforms"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="user-manual.html" title="User manual"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">musrfit 1.4.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="documentation-of-user-libs-user-functions">
+<span id="user-libs"></span><span id="index-0"></span><h1>Documentation of user libs (user functions)<a class="headerlink" href="#documentation-of-user-libs-user-functions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="meissner-profiles-vortex-lattice-related-functions-bmw-libs">
+<span id="bmw-libs"></span><span id="index-1"></span><h2>Meissner-Profiles / Vortex-Lattice related functions (BMW libs)<a class="headerlink" href="#meissner-profiles-vortex-lattice-related-functions-bmw-libs" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="libfitpofb">
+<span id="index-2"></span><h3>libFitPofB<a class="headerlink" href="#libfitpofb" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="introduction">
+<h4>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h4>
+<p><tt class="docutils literal"><span class="pre">libFitPofB</span></tt> is a collection of <tt class="docutils literal"><span class="pre">C++</span></tt> classes using the <tt class="docutils literal"><span class="pre">musrfit</span></tt> <a class="reference internal" href="user-manual.html#id20"><em>user-functions</em></a>
+interface in order to facilitate the usage in conjunction with <tt class="docutils literal"><span class="pre">musrfit</span></tt>. The classes contained in this
+library generally implement calculations of one-dimensional static magnetic field distributions
+<span class="math">\(p(B)\)</span> which lead to the muon-spin depolarization functions</p>
+<div class="math">
+\[{\cal P}(t) = \int p(B) \cos(\gamma_\mu B t + \varphi) dB,\]</div>
+<p>where <span class="math">\(\gamma_\mu = 2 \pi \times 135.54\)</span> MHz/T is the gyromagnetic ratio of the muon and <span class="math">\(\varphi\)</span>
+is the initial phase of the muon spins with respect to the positron detector. At the moment the only available
+implementations deal with field distributions measured in local isotropic superconductors, either by means of
+low-energy μSR (see <a class="reference external" href="https://www.psi.ch/smus/lem">https://www.psi.ch/smus/lem</a>) in the Meissner state or by bulk μSR in the mixed state.
+In the following the basic usage of the library in <tt class="docutils literal"><span class="pre">musrfit</span></tt> is explained—the calculations by themselves are only
+outlined. For further information please refer to the original literature and/or the source code of the implementation.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In order to supply certain information needed for the calculations but not suited to be stored in the <tt class="docutils literal"><span class="pre">musrfit</span></tt>
+msr files an <tt class="docutils literal"><span class="pre">XML</span></tt> configuration file in the working directory is used. For details, see below.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The implementations in this library heavily rely on <a class="reference external" href="http://fftw.org/">FFTW3</a>. In principle, it always checks what
+is the best way to do efficient Fourier transforms for a given machine before the transforms are actually done. If
+repeatedly Fourier transforms of the same (sizable) length should be done, it might be worth storing the once
+obtained information in an external file and just load it the next time this information is needed
+(<a class="reference external" href="http://fftw.org/fftw3_doc/Wisdom.html">wisdom handling</a>). In case this feature shall be used, a valid wisdom
+file has to be specified in the <tt class="docutils literal"><span class="pre">XML</span></tt> file.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The model functions described in the following do generally <em>not behave nicely</em> in conjunction with <tt class="docutils literal"><span class="pre">MINUIT</span></tt>
+function minimizations (or maximizations). The analysis process at the moment in most cases involves some
+tedious trial-and-error procedure, where the displayed MINUIT information as always deserves attention.
+This is especially true if small effects should be analyzed (<em>e.g.</em> small diamagnetic shifts in superconductors).
+The parameter uncertainty in many cases has to be estimated independently. Due to these limitations, also
+the use of the fit option of <tt class="docutils literal"><span class="pre">msr2data</span></tt> <em>cannot</em> be advised.</p>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If these classes still prove useful and results obtained through them are part of scientific publications,
+an acknowledgment of the use of the library is appreciated.</p>
+</div>
+</div>
+<div class="section" id="le-mgrsr">
+<h4>LE-μSR<a class="headerlink" href="#le-mgrsr" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="one-dimensional-london-model-for-the-meissner-state-of-isotropic-superconductors">
+<span id="index-3"></span><h5>One-dimensional London model for the Meissner state of isotropic superconductors<a class="headerlink" href="#one-dimensional-london-model-for-the-meissner-state-of-isotropic-superconductors" title="Permalink to this headline">¶</a></h5>
+<p>The models for analyzing LE-μSR data assume the magnetic induction <span class="math">\(B(z)\)</span> to vary only in the
+dimension parallel to the momentum of the incident muons. In such a case the magnetic field distribution is given by</p>
+<div class="math">
+\[p(B) = n(z) \left| \frac{dB(z)}{dz} \right|^{-1}\]</div>
+<p>where <span class="math">\(n(z)\)</span> is the muon implantation profile simulated by <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt>.</p>
+<p>Assuming an array of <em>N</em> isotropic local superconductors with a total thickness <em>d</em> in the Meissner state
+the magnetic induction is given by solving the 1D London equation</p>
+<div class="math">
+\[\frac{\partial^2}{\partial z^2}B_i(z) = \frac{1}{\lambda_i^2}B_i(z)\]</div>
+<p>for each layer <em>i</em> taking into account the boundary conditions (F. London, Superfluids: Macroscopic Theory of Superconductivity, Dover (1961), p. 34)</p>
+<div class="math">
+\[B_1(0) = B_N(d) = \mu_0H\]\[B_i(d_i) = B_{i+1}(d_i)\]\[\lambda_i^2B_i'(z)\Big\vert_{z=d_i} = \lambda_{i+1}^2B_{i+1}'(z)\Big\vert_{z=d_i},\]</div>
+<p>where the <span class="math">\(d_i\)</span> specify the interfaces between two adjacent layers and <span class="math">\(\lambda_i\)</span> is
+the magnetic field penetration depth in the constituent <span class="math">\(i\)</span>.</p>
+<p>The calculation of the field distribution has been set up for a superconducting half-space as well
+as superconducting thin films with up to three superconducting layers with different penetration depths.
+The muon-spin depolarization functions are calculated using the following lines in the <tt class="docutils literal"><span class="pre">THEORY</span></tt> block
+of a <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr file:</p>
+<p id="index-4"><strong>Superconducting half-space</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TLondon1DHS 1 2 3 4 5
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>phase (deg)</li>
+<li>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><em>XML startup</em></a> file (keV)</li>
+<li>applied field (G)</li>
+<li>thickness of the dead layer (nm)</li>
+<li>magnetic field penetration depth (nm)</li>
+</ol>
+<p id="index-5"><strong>Superconducting thin film (one layer)</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TLondon1D1L 1 2 3 4 5 6 [a b]
+</pre></div>
+</div>
+<p>The mandatory parameters are:</p>
+<ol class="arabic simple">
+<li>phase (deg)</li>
+<li>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><em>XML startup</em></a> file (keV)</li>
+<li>applied field (G)</li>
+<li>thickness of the dead layer (nm)</li>
+<li>thickness of the actually superconducting layer (nm)</li>
+<li>magnetic field penetration depth (nm)</li>
+</ol>
+<p>The optional parameters are:</p>
+<ol class="loweralpha simple">
+<li>fraction f<sub>1</sub> of muons in the thin film contributing to the signal (0 ≤ f<sub>1</sub> ≤ 1)</li>
+<li>fraction f<sub>s</sub> of muons in the substrate contributing to the signal (0 ≤ f<sub>s</sub> ≤ 1)</li>
+</ol>
+<p id="index-6"><strong>Superconducting thin-film bilayer heterostructure</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TLondon1D2L 1 2 3 4 5 6 7 8 [a b c]
+</pre></div>
+</div>
+<p>The mandatory parameters are:</p>
+<ol class="arabic simple">
+<li>phase (deg)</li>
+<li>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><em>XML startup</em></a> file (keV)</li>
+<li>applied field (G)</li>
+<li>thickness of the dead layer (nm)</li>
+<li>thickness of the actually superconducting first layer (nm)</li>
+<li>thickness of the actually superconducting second layer (nm)</li>
+<li>magnetic field penetration depth of the first layer (nm)</li>
+<li>magnetic field penetration depth of the second layer (nm)</li>
+</ol>
+<p>The optional parameters are:</p>
+<ol class="loweralpha simple">
+<li>fraction f<sub>1</sub> of muons in the dead and first layer contributing to the signal (0 ≤ f<sub>1</sub> ≤ 1)</li>
+<li>fraction f<sub>2</sub> of muons in the second layer contributing to the signal (0 ≤ f<sub>2</sub> ≤ 1)</li>
+<li>fraction f<sub>s</sub> of muons in the substrate contributing to the signal (0 ≤ f<sub>s</sub> ≤ 1)</li>
+</ol>
+<p id="index-7"><strong>Superconducting thin-film trilayer heterostructure</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TLondon1D3L 1 2 3 4 5 6 7 8 9 10 [a b c d]
+</pre></div>
+</div>
+<p>The mandatory parameters are:</p>
+<ol class="arabic simple">
+<li>phase (deg)</li>
+<li>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><em>XML startup</em></a> file (keV)</li>
+<li>applied field (G)</li>
+<li>thickness of the dead layer (nm)</li>
+<li>thickness of the actually superconducting first layer (nm)</li>
+<li>thickness of the actually superconducting second layer (nm)</li>
+<li>thickness of the actually superconducting third layer (nm)</li>
+<li>magnetic field penetration depth of the first layer (nm)</li>
+<li>magnetic field penetration depth of the second layer (nm)</li>
+<li>magnetic field penetration depth of the third layer (nm)</li>
+</ol>
+<p>The optional parameters are:</p>
+<ol class="loweralpha simple">
+<li>fraction f<sub>1</sub> of muons in the dead and first layer contributing to the signal (0 ≤ f<sub>1</sub> ≤ 1)</li>
+<li>fraction f<sub>2</sub> of muons in the second layer contributing to the signal (0 ≤ f<sub>2</sub> ≤ 1)</li>
+<li>fraction f<sub>3</sub> of muons in the third layer contributing to the signal (0 ≤ f<sub>3</sub> ≤ 1)</li>
+<li>fraction f<sub>s</sub> of muons in the substrate contributing to the signal (0 ≤ f<sub>s</sub> ≤ 1)</li>
+</ol>
+</div>
+</div>
+<div class="section" id="bulk-mgrsr">
+<h4>Bulk μSR<a class="headerlink" href="#bulk-mgrsr" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="field-distributions-in-the-mixed-state-of-isotropic-superconductors">
+<span id="index-8"></span><h5>Field distributions in the mixed state of isotropic superconductors<a class="headerlink" href="#field-distributions-in-the-mixed-state-of-isotropic-superconductors" title="Permalink to this headline">¶</a></h5>
+<p>When investigating superconductors in the mixed state by means of conventional μSR a
+two-dimensional flux-line lattice is probed randomly by the muons. The spatial field
+distributions within such an ordered lattice are modeled using the Fourier series</p>
+<div class="math">
+\[B(\mathbf{r}) = \langle B \rangle \sum\limits_{\mathbf{K}}B_{\mathbf{K}}\exp(-\imath\mathbf{K}\mathbf{r}),\]</div>
+<p>where <span class="math">\(\mathbf{r}=(x,y)\)</span>, <strong>K</strong> are the reciprocal lattice vectors of a two-dimensional
+vortex lattice and the <span class="math">\(B_{\mathbf{K}}\)</span> are the Fourier coefficients depending on the
+magnetic penetration depth <span class="math">\(\lambda\)</span> and the superconducting coherence length <span class="math">\(\xi\)</span>.
+The <span class="math">\(B_{\mathbf{K}}\)</span> for some specific models are as follows:</p>
+<p><strong>London model with Gaussian cutoff</strong> (E.H. Brandt, <a class="reference external" href="http://dx.doi.org/10.1007/BF00683568">J. Low Temp. Phys. 73, 355 (1988)</a>.)</p>
+<div class="math">
+\[B_{\mathbf{K}} = \frac{\exp\left({-K^2\xi^2/2}\right)}{1 + K^2\lambda^2}\]</div>
+<p><strong>Modified London model</strong> (T.M. Riseman <em>et al.</em>, <a class="reference external" href="http://dx.doi.org/10.1103/PhysRevB.52.10569">Phys. Rev. B 52, 10569 (1995)</a>.)</p>
+<div class="math">
+\[B_{\mathbf{K}} = \frac{\exp\left({-K^2\xi^2/2(1-b)}\right)}{1 + K^2\lambda^2/(1-b)},\]</div>
+<p>where <span class="math">\(b = \langle B \rangle / (\mu_0 H_{\rm c2})\)</span>.</p>
+<p><strong>Analytical Ginzburg-Landau model</strong> ( A. Yaouanc, P. Dalmas de Réotier and E.H. Brandt, <a class="reference external" href="http://dx.doi.org/10.1103/PhysRevB.55.11107">Phys. Rev. B 55, 11107 (1997)</a>)</p>
+<div class="math">
+\[B_{\mathbf{K}} = \frac{f_{\infty}K_1\left(\frac{\xi_v}{\lambda}\sqrt{f_{\infty}^2+\lambda^2K^2}\right)}{K_1\left(\frac{\xi_v}{\lambda}f_{\infty}\right)\sqrt{f_{\infty}^2+\lambda^2K^2}},\]</div>
+<p>where <span class="math">\(f_{\infty} = 1 - b^4,~\xi_v = \xi\left(\sqrt{2}-{3\xi}/\left({4\lambda}\right)\right)\sqrt{(1+b^4)(1-2b(1-b)^2)}\)</span> and
+<span class="math">\(K_1\)</span> is a modified Bessel function.</p>
+<p>Apart from the mentioned analytic models the <strong>numerical Ginzburg-Landau model</strong> (<a class="reference external" href="http://dx.doi.org/10.1103/PhysRevB.68.054506">E.H. Brandt, Phys. Rev. B 68, 054506 (2003).</a>) is available. In this case <span class="math">\(B(\mathbf{r})\)</span> is obtained by an iterative minimization of the free energy of the vortex lattice.</p>
+<p><strong>Concerning the applicability (e.g. field regions) of each of the mentioned models please refer to the original publications!</strong></p>
+<p>At the moment, the calculation of the field distribution has been implemented for <em>triangular</em> flux-line lattices.
+The number of grid lines in which the inter-vortex distance is divided for the calculations to be specified through
+the <a class="reference internal" href="#bmwlibs-xml"><em>XML startup</em></a>.
+The muon-spin depolarization functions finally are calculated using the following lines in the THEORY block of a <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr file:</p>
+<p id="index-9"><strong>2D triangular vortex lattice, London model with Gaussian cutoff</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TBulkTriVortexLondon 1 2 3 4
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>phase (deg)</li>
+<li>mean magnetic induction (G)</li>
+<li>magnetic penetration depth (nm)</li>
+<li>Ginzburg-Landau coherence length (nm)</li>
+</ol>
+<p id="index-10"><strong>2D triangular vortex lattice, modified London model</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TBulkTriVortexML 1 2 3 4
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>phase (deg)</li>
+<li>mean magnetic induction (G)</li>
+<li>magnetic penetration depth (nm)</li>
+<li>Ginzburg-Landau coherence length (nm)</li>
+</ol>
+<p id="index-11"><strong>2D triangular vortex lattice, analytic Ginzburg-Landau model</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TBulkTriVortexAGL 1 2 3 4
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>phase (deg)</li>
+<li>mean magnetic induction (G)</li>
+<li>magnetic penetration depth (nm)</li>
+<li>Ginzburg-Landau coherence length (nm)</li>
+</ol>
+<p id="index-12"><strong>2D triangular vortex lattice, numerical Ginzburg-Landau model</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TBulkTriVortexNGL 1 2 3 4
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>phase (deg)</li>
+<li>mean magnetic induction (G)</li>
+<li>magnetic penetration depth (nm)</li>
+<li>Ginzburg-Landau coherence length (nm)</li>
+</ol>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">In order to improve the convergence of <tt class="docutils literal"><span class="pre">MIGRAD</span></tt> it has proven useful to use the log-likelihood
+maximization instead of the <span class="math">\(\chi^2\)</span> minimization routines and to choose sufficiently large
+initial steps for the parameters. Calling <tt class="docutils literal"><span class="pre">MINOS</span></tt> in conjunction with these functions is futile.</p>
+</div>
+<p>Therefore, the <a class="reference internal" href="user-manual.html#msr-commands-block"><em>COMMANDS block</em></a> of the msr file could look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>COMMANDS
+STRATEGY 2
+MAX_LIKELIHOOD
+MIGRAD
+HESSE
+SAVE
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="the-xml-startup-file">
+<span id="bmwlibs-xml"></span><span id="index-13"></span><h4>The XML startup file<a class="headerlink" href="#the-xml-startup-file" title="Permalink to this headline">¶</a></h4>
+<p><tt class="docutils literal"><span class="pre">BMW_startup.xml</span></tt> is a configuration file located in the working directory. In this file some settings
+like the time and field resolution of the calculations as well as the present muon implantation profiles
+for a LE-μSR analysis have to be defined. The following XML tags are allowed to define settings:</p>
+<dl class="docutils">
+<dt><strong>&lt;debug&gt;ONE_OR_ZERO&lt;/debug&gt;</strong></dt>
+<dd>activate the debugging output of the settings read from the XML file by setting 1, deactivate it with 0.</dd>
+<dt><strong>&lt;wisdom&gt;PATH_TO_FILE&lt;/wisdom&gt;</strong></dt>
+<dd>specify the <tt class="docutils literal"><span class="pre">PATH_TO_FILE</span></tt> to an <a class="reference external" href="http://fftw.org/fftw3_doc/Wisdom.html#Wisdom">FFTW3 wisdom file</a>
+that should be used; if the <tt class="docutils literal"><span class="pre">PATH_TO_FILE</span></tt> is invalid, no <tt class="docutils literal"><span class="pre">FFTW3</span></tt> wisdom will be used.</dd>
+<dt><strong>&lt;delta_t&gt;ResT&lt;/delta_t&gt;</strong></dt>
+<dd>set the time resolution <tt class="docutils literal"><span class="pre">ResT</span></tt> for the calculated depolarization function in microseconds.</dd>
+<dt><strong>&lt;delta_B&gt;ResB&lt;/delta_B&gt;</strong></dt>
+<dd>set the field resolution <tt class="docutils literal"><span class="pre">ResB</span></tt> for the calculated field distribution in Gauss.</dd>
+<dt><strong>&lt;VortexLattice&gt;&lt;/VortexLattice&gt;</strong></dt>
+<dd><p class="first">set the parameters used for the calculation of the spatial field distribution of a vortex lattice.</p>
+<dl class="last docutils">
+<dt><strong>&lt;N_VortexGrid&gt;N&lt;/N_VortexGrid&gt;</strong></dt>
+<dd>specify the number of points <strong>N</strong> (in each of the two dimensions) for which the fields within the
+vortex lattice are calculated (inside a <strong>&lt;VortexLattice&gt;</strong> environment)</dd>
+</dl>
+</dd>
+<dt><strong>&lt;LEM&gt;&lt;/LEM&gt;</strong></dt>
+<dd><p class="first">set the parameters used for the calculation of LE-μSR field distributions</p>
+<dl class="last docutils">
+<dt><strong>&lt;data_path&gt;DATA_PATH_PREFIX&lt;/data_path&gt;</strong></dt>
+<dd>specify the <tt class="docutils literal"><span class="pre">DATA_PATH_PREFIX</span></tt> to the <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt> implantation profiles (inside a <strong>&lt;LEM&gt;</strong> environment)</dd>
+<dt><strong>&lt;N_theory&gt;N_THEORY&lt;/N_theory&gt;</strong></dt>
+<dd>specify the number of points <strong>N_THEORY</strong> for which <em>B(z)</em> is calculated (inside a <strong>&lt;LEM&gt;</strong> environment)
+The specification of this number is not needed if the calculation of the inverse of <em>B(z)</em> is implemented!</dd>
+<dt><strong>&lt;energy_list&gt;&lt;/energy_list&gt;</strong></dt>
+<dd><p class="first">set the energies for which <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt> implantation profiles are available (inside a <strong>&lt;LEM&gt;</strong> environment)</p>
+<dl class="last docutils">
+<dt><strong>&lt;energy_label&gt;LABEL&lt;/energy_label&gt;</strong></dt>
+<dd>specify the <strong>LABEL</strong> within the file name of a available <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt> <tt class="docutils literal"><span class="pre">RGE</span></tt> file (inside a <strong>&lt;energy_list&gt;</strong> environment)
+The expected name of the <tt class="docutils literal"><span class="pre">RGE</span></tt> file will be: <tt class="docutils literal"><span class="pre">DATA_PATH_PREFIX</span> <span class="pre">+</span> <span class="pre">LABEL</span> <span class="pre">+</span> <span class="pre">.rge</span></tt></dd>
+<dt><strong>&lt;energy&gt;E&lt;/energy&gt;</strong></dt>
+<dd>specify the muon energy <em>E</em> (in keV) belonging to the <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt> <tt class="docutils literal"><span class="pre">RGE</span></tt> file given above (inside a <strong>&lt;energy_list&gt;</strong> environment)</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>An example XML file looks as follows:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;BMW&gt;</span>
+  <span class="nt">&lt;debug&gt;</span>0<span class="nt">&lt;/debug&gt;</span>
+  <span class="nt">&lt;wisdom&gt;</span>/home/user/WordsOfWisdom.dat<span class="nt">&lt;/wisdom&gt;</span>
+  <span class="nt">&lt;delta_t&gt;</span>0.01<span class="nt">&lt;/delta_t&gt;</span>
+  <span class="nt">&lt;delta_B&gt;</span>0.5<span class="nt">&lt;/delta_B&gt;</span>
+  <span class="nt">&lt;VortexLattice&gt;</span>
+    <span class="nt">&lt;N_VortexGrid&gt;</span>1024<span class="nt">&lt;/N_VortexGrid&gt;</span>
+  <span class="nt">&lt;/VortexLattice&gt;</span>
+  <span class="nt">&lt;LEM&gt;</span>
+    <span class="nt">&lt;data_path&gt;</span>/home/user/TrimSP/some-sample-<span class="nt">&lt;/data_path&gt;</span>
+    <span class="nt">&lt;N_theory&gt;</span>5000<span class="nt">&lt;/N_theory&gt;</span>
+    <span class="nt">&lt;energy_list&gt;</span>
+      <span class="nt">&lt;energy_label&gt;</span>02_0<span class="nt">&lt;/energy_label&gt;</span>
+      <span class="nt">&lt;energy&gt;</span>2.0<span class="nt">&lt;/energy&gt;</span>
+      <span class="nt">&lt;energy_label&gt;</span>03_0<span class="nt">&lt;/energy_label&gt;</span>
+      <span class="nt">&lt;energy&gt;</span>3.0<span class="nt">&lt;/energy&gt;</span>
+      <span class="nt">&lt;energy_label&gt;</span>03_6<span class="nt">&lt;/energy_label&gt;</span>
+      <span class="nt">&lt;energy&gt;</span>3.6<span class="nt">&lt;/energy&gt;</span>
+      <span class="nt">&lt;energy_label&gt;</span>05_0<span class="nt">&lt;/energy_label&gt;</span>
+      <span class="nt">&lt;energy&gt;</span>5.0<span class="nt">&lt;/energy&gt;</span>
+      <span class="nt">&lt;energy_label&gt;</span>05_3<span class="nt">&lt;/energy_label&gt;</span>
+      <span class="nt">&lt;energy&gt;</span>5.3<span class="nt">&lt;/energy&gt;</span>
+    <span class="nt">&lt;/energy_list&gt;</span>
+  <span class="nt">&lt;/LEM&gt;</span>
+<span class="nt">&lt;/BMW&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="nonlocal-superconductivity-related-meissner-screening-functions-as-libs">
+<h2>Nonlocal superconductivity related Meissner screening functions (AS libs)<a class="headerlink" href="#nonlocal-superconductivity-related-meissner-screening-functions-as-libs" title="Permalink to this headline">¶</a></h2>
+<p>To be written yet ...</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Documentation of user libs (user functions)</a><ul>
+<li><a class="reference internal" href="#meissner-profiles-vortex-lattice-related-functions-bmw-libs">Meissner-Profiles / Vortex-Lattice related functions (BMW libs)</a><ul>
+<li><a class="reference internal" href="#libfitpofb">libFitPofB</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#nonlocal-superconductivity-related-meissner-screening-functions-as-libs">Nonlocal superconductivity related Meissner screening functions (AS libs)</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="user-manual.html"
+                        title="previous chapter">User manual</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="setup-standard.html"
+                        title="next chapter">Setting up <tt class="docutils literal"><span class="pre">musrfit</span></tt> on Different Platforms</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/user-libs.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="setup-standard.html" title="Setting up musrfit on Different Platforms"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="user-manual.html" title="User manual"
+             >previous</a> |</li>
+        <li><a href="index.html">musrfit 1.4.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Andreas Suter.
+      Last updated on Jul 03, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

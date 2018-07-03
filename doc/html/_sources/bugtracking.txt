@@ -1,0 +1,9 @@
+.. index:: bugtracking
+.. _bugtracking:
+
+Bugtracking
+===========
+
+For reporting bugs or requesting new features and improvements please use 
+the `bitbucket-repo <https://bitbucket.org/muonspin/musrfit/issues>`_ (preferred) 
+or send an e-mail to A. Suter at PSI.

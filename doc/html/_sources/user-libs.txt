@@ -1,0 +1,409 @@
+:tocdepth: 3
+
+.. include:: <isogrk1.txt>
+.. index:: user-libs
+
+.. _user-libs:
+
+Documentation of user libs (user functions) 
+===========================================
+
+.. index:: BMW-libs
+.. _BMW-libs:
+
+Meissner-Profiles / Vortex-Lattice related functions (BMW libs)
+---------------------------------------------------------------
+
+.. index:: libFitPofB
+
+libFitPofB
+++++++++++
+
+Introduction
+^^^^^^^^^^^^
+
+``libFitPofB`` is a collection of ``C++`` classes using the ``musrfit`` :ref:`user-functions <user-functions>` 
+interface in order to facilitate the usage in conjunction with ``musrfit``. The classes contained in this 
+library generally implement calculations of one-dimensional static magnetic field distributions 
+:math:`p(B)` which lead to the muon-spin depolarization functions 
+
+.. math::
+
+  {\cal P}(t) = \int p(B) \cos(\gamma_\mu B t + \varphi) dB,
+  
+where :math:`\gamma_\mu = 2 \pi \times 135.54` MHz/T is the gyromagnetic ratio of the muon and :math:`\varphi` 
+is the initial phase of the muon spins with respect to the positron detector. At the moment the only available 
+implementations deal with field distributions measured in local isotropic superconductors, either by means of 
+low-energy |mgr|\SR (see `<https://www.psi.ch/smus/lem>`_) in the Meissner state or by bulk |mgr|\SR in the mixed state. 
+In the following the basic usage of the library in ``musrfit`` is explained—the calculations by themselves are only 
+outlined. For further information please refer to the original literature and/or the source code of the implementation.
+
+.. note:: 
+
+  In order to supply certain information needed for the calculations but not suited to be stored in the ``musrfit`` 
+  msr files an ``XML`` configuration file in the working directory is used. For details, see below.
+  
+.. note:: 
+
+  The implementations in this library heavily rely on `FFTW3 <http://fftw.org/>`_. In principle, it always checks what 
+  is the best way to do efficient Fourier transforms for a given machine before the transforms are actually done. If 
+  repeatedly Fourier transforms of the same (sizable) length should be done, it might be worth storing the once 
+  obtained information in an external file and just load it the next time this information is needed 
+  (`wisdom handling <http://fftw.org/fftw3_doc/Wisdom.html>`_). In case this feature shall be used, a valid wisdom 
+  file has to be specified in the ``XML`` file. 
+  
+.. note::
+
+  The model functions described in the following do generally *not behave nicely* in conjunction with ``MINUIT`` 
+  function minimizations (or maximizations). The analysis process at the moment in most cases involves some 
+  tedious trial-and-error procedure, where the displayed MINUIT information as always deserves attention. 
+  This is especially true if small effects should be analyzed (*e.g.* small diamagnetic shifts in superconductors). 
+  The parameter uncertainty in many cases has to be estimated independently. Due to these limitations, also 
+  the use of the fit option of ``msr2data`` *cannot* be advised. 
+   
+.. note::
+
+  If these classes still prove useful and results obtained through them are part of scientific publications, 
+  an acknowledgment of the use of the library is appreciated.
+  
+LE-|mgr|\SR
+^^^^^^^^^^^
+
+.. index:: 1D-London-Meissner
+
+One-dimensional London model for the Meissner state of isotropic superconductors 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The models for analyzing LE-|mgr|\SR data assume the magnetic induction :math:`B(z)` to vary only in the 
+dimension parallel to the momentum of the incident muons. In such a case the magnetic field distribution is given by 
+
+.. math::
+
+  p(B) = n(z) \left| \frac{dB(z)}{dz} \right|^{-1}
+  
+where :math:`n(z)` is the muon implantation profile simulated by ``TRIM.SP``. 
+
+Assuming an array of *N* isotropic local superconductors with a total thickness *d* in the Meissner state 
+the magnetic induction is given by solving the 1D London equation 
+
+.. math::
+
+   \frac{\partial^2}{\partial z^2}B_i(z) = \frac{1}{\lambda_i^2}B_i(z) 
+   
+for each layer *i* taking into account the boundary conditions (F. London, Superfluids: Macroscopic Theory of Superconductivity, Dover (1961), p. 34)
+
+.. math:: 
+
+   B_1(0) = B_N(d) = \mu_0H
+   
+   B_i(d_i) = B_{i+1}(d_i)
+   
+   \lambda_i^2B_i'(z)\Big\vert_{z=d_i} = \lambda_{i+1}^2B_{i+1}'(z)\Big\vert_{z=d_i}, 
+   
+where the :math:`d_i` specify the interfaces between two adjacent layers and :math:`\lambda_i` is 
+the magnetic field penetration depth in the constituent :math:`i`.
+
+The calculation of the field distribution has been set up for a superconducting half-space as well 
+as superconducting thin films with up to three superconducting layers with different penetration depths. 
+The muon-spin depolarization functions are calculated using the following lines in the ``THEORY`` block 
+of a ``musrfit`` msr file: 
+
+.. index:: TLondon1DHS
+
+**Superconducting half-space**
+
+::
+
+  userFcn  libFitPofB TLondon1DHS 1 2 3 4 5
+
+The parameters are:
+
+#. phase (deg)
+#. muon implantation energy as specified in the :ref:`XML startup <BMWlibs-XML>` file (keV)
+#. applied field (G)
+#. thickness of the dead layer (nm)
+#. magnetic field penetration depth (nm) 
+
+.. index:: TLondon1D1L
+
+**Superconducting thin film (one layer)**
+
+:: 
+
+  userFcn  libFitPofB TLondon1D1L 1 2 3 4 5 6 [a b]
+  
+The mandatory parameters are:
+
+#. phase (deg)
+#. muon implantation energy as specified in the :ref:`XML startup <BMWlibs-XML>` file (keV)
+#. applied field (G)
+#. thickness of the dead layer (nm)
+#. thickness of the actually superconducting layer (nm)
+#. magnetic field penetration depth (nm)   
+
+The optional parameters are:
+
+a. fraction f\ :sub:`1` of muons in the thin film contributing to the signal (0 ≤ f\ :sub:`1` ≤ 1)
+b. fraction f\ :sub:`s` of muons in the substrate contributing to the signal (0 ≤ f\ :sub:`s` ≤ 1)
+
+.. index:: TLondon1D2L
+
+**Superconducting thin-film bilayer heterostructure**
+
+::
+
+  userFcn  libFitPofB TLondon1D2L 1 2 3 4 5 6 7 8 [a b c]
+       
+The mandatory parameters are:
+
+#. phase (deg)
+#. muon implantation energy as specified in the :ref:`XML startup <BMWlibs-XML>` file (keV)
+#. applied field (G)
+#. thickness of the dead layer (nm)
+#. thickness of the actually superconducting first layer (nm)
+#. thickness of the actually superconducting second layer (nm)
+#. magnetic field penetration depth of the first layer (nm)
+#. magnetic field penetration depth of the second layer (nm) 
+
+The optional parameters are:
+
+a. fraction f\ :sub:`1` of muons in the dead and first layer contributing to the signal (0 ≤ f\ :sub:`1` ≤ 1)
+b. fraction f\ :sub:`2` of muons in the second layer contributing to the signal (0 ≤ f\ :sub:`2` ≤ 1)
+c. fraction f\ :sub:`s` of muons in the substrate contributing to the signal (0 ≤ f\ :sub:`s` ≤ 1) 
+
+.. index:: TLondon1D3L
+
+**Superconducting thin-film trilayer heterostructure**
+
+::
+
+  userFcn  libFitPofB TLondon1D3L 1 2 3 4 5 6 7 8 9 10 [a b c d]
+
+The mandatory parameters are:
+
+#. phase (deg)
+#. muon implantation energy as specified in the :ref:`XML startup <BMWlibs-XML>` file (keV)
+#. applied field (G)
+#. thickness of the dead layer (nm)
+#. thickness of the actually superconducting first layer (nm)
+#. thickness of the actually superconducting second layer (nm)
+#. thickness of the actually superconducting third layer (nm)
+#. magnetic field penetration depth of the first layer (nm)
+#. magnetic field penetration depth of the second layer (nm)
+#. magnetic field penetration depth of the third layer (nm) 
+
+The optional parameters are:
+
+a. fraction f\ :sub:`1` of muons in the dead and first layer contributing to the signal (0 ≤ f\ :sub:`1` ≤ 1)
+b. fraction f\ :sub:`2` of muons in the second layer contributing to the signal (0 ≤ f\ :sub:`2` ≤ 1)
+c. fraction f\ :sub:`3` of muons in the third layer contributing to the signal (0 ≤ f\ :sub:`3` ≤ 1)
+d. fraction f\ :sub:`s` of muons in the substrate contributing to the signal (0 ≤ f\ :sub:`s` ≤ 1) 
+   
+Bulk |mgr|\SR
+^^^^^^^^^^^^^
+
+.. index:: Vortex-State-Isotropic
+
+Field distributions in the mixed state of isotropic superconductors 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+When investigating superconductors in the mixed state by means of conventional |mgr|\SR a 
+two-dimensional flux-line lattice is probed randomly by the muons. The spatial field 
+distributions within such an ordered lattice are modeled using the Fourier series
+
+.. math::
+
+   B(\mathbf{r}) = \langle B \rangle \sum\limits_{\mathbf{K}}B_{\mathbf{K}}\exp(-\imath\mathbf{K}\mathbf{r}), 
+   
+where :math:`\mathbf{r}=(x,y)`, **K** are the reciprocal lattice vectors of a two-dimensional 
+vortex lattice and the :math:`B_{\mathbf{K}}` are the Fourier coefficients depending on the 
+magnetic penetration depth :math:`\lambda` and the superconducting coherence length :math:`\xi`. 
+The :math:`B_{\mathbf{K}}` for some specific models are as follows:    
+
+**London model with Gaussian cutoff** (E.H. Brandt, `J. Low Temp. Phys. 73, 355 (1988) <http://dx.doi.org/10.1007/BF00683568>`_.)
+
+.. math::
+
+   B_{\mathbf{K}} = \frac{\exp\left({-K^2\xi^2/2}\right)}{1 + K^2\lambda^2}
+
+**Modified London model** (T.M. Riseman *et al.*, `Phys. Rev. B 52, 10569 (1995) <http://dx.doi.org/10.1103/PhysRevB.52.10569>`_.)   
+
+.. math::
+   
+  B_{\mathbf{K}} = \frac{\exp\left({-K^2\xi^2/2(1-b)}\right)}{1 + K^2\lambda^2/(1-b)},
+    
+where :math:`b = \langle B \rangle / (\mu_0 H_{\rm c2})`. 
+
+**Analytical Ginzburg-Landau model** ( A. Yaouanc, P. Dalmas de Réotier and E.H. Brandt, `Phys. Rev. B 55, 11107 (1997) <http://dx.doi.org/10.1103/PhysRevB.55.11107>`_)
+
+.. math::
+
+  B_{\mathbf{K}} = \frac{f_{\infty}K_1\left(\frac{\xi_v}{\lambda}\sqrt{f_{\infty}^2+\lambda^2K^2}\right)}{K_1\left(\frac{\xi_v}{\lambda}f_{\infty}\right)\sqrt{f_{\infty}^2+\lambda^2K^2}},
+  
+where :math:`f_{\infty} = 1 - b^4,~\xi_v = \xi\left(\sqrt{2}-{3\xi}/\left({4\lambda}\right)\right)\sqrt{(1+b^4)(1-2b(1-b)^2)}` and
+:math:`K_1` is a modified Bessel function.
+
+Apart from the mentioned analytic models the **numerical Ginzburg-Landau model** (`E.H. Brandt, Phys. Rev. B 68, 054506 (2003). <http://dx.doi.org/10.1103/PhysRevB.68.054506>`_) is available. In this case :math:`B(\mathbf{r})` is obtained by an iterative minimization of the free energy of the vortex lattice. 
+
+**Concerning the applicability (e.g. field regions) of each of the mentioned models please refer to the original publications!**
+
+At the moment, the calculation of the field distribution has been implemented for *triangular* flux-line lattices. 
+The number of grid lines in which the inter-vortex distance is divided for the calculations to be specified through 
+the :ref:`XML startup <BMWlibs-XML>`.
+The muon-spin depolarization functions finally are calculated using the following lines in the THEORY block of a ``musrfit`` msr file: 
+
+.. index:: Vortex-Gaussian-CutOff
+
+**2D triangular vortex lattice, London model with Gaussian cutoff** 
+
+::
+
+  userFcn  libFitPofB TBulkTriVortexLondon 1 2 3 4
+  
+The parameters are:
+
+#. phase (deg)
+#. mean magnetic induction (G)
+#. magnetic penetration depth (nm)
+#. Ginzburg-Landau coherence length (nm)   
+
+.. index:: Vortex-London-modified
+
+**2D triangular vortex lattice, modified London model**
+
+::
+
+  userFcn  libFitPofB TBulkTriVortexML 1 2 3 4
+  
+The parameters are:
+
+#. phase (deg)
+#. mean magnetic induction (G)
+#. magnetic penetration depth (nm)
+#. Ginzburg-Landau coherence length (nm)   
+
+.. index:: Vortex-Analytic-GL
+
+**2D triangular vortex lattice, analytic Ginzburg-Landau model** 
+
+::
+
+  userFcn  libFitPofB TBulkTriVortexAGL 1 2 3 4
+  
+The parameters are:
+
+#. phase (deg)
+#. mean magnetic induction (G)
+#. magnetic penetration depth (nm)
+#. Ginzburg-Landau coherence length (nm) 
+
+.. index:: Vortex-Numeric-GL
+
+**2D triangular vortex lattice, numerical Ginzburg-Landau model**
+
+::
+
+  userFcn  libFitPofB TBulkTriVortexNGL 1 2 3 4
+  
+The parameters are:
+
+#. phase (deg)
+#. mean magnetic induction (G)
+#. magnetic penetration depth (nm)
+#. Ginzburg-Landau coherence length (nm) 
+
+.. note::
+
+  In order to improve the convergence of ``MIGRAD`` it has proven useful to use the log-likelihood 
+  maximization instead of the :math:`\chi^2` minimization routines and to choose sufficiently large 
+  initial steps for the parameters. Calling ``MINOS`` in conjunction with these functions is futile.
+
+Therefore, the :ref:`COMMANDS block <msr-commands-block>` of the msr file could look like:   
+
+::
+
+  COMMANDS
+  STRATEGY 2
+  MAX_LIKELIHOOD
+  MIGRAD
+  HESSE
+  SAVE
+  
+.. index:: BMWlibs-XML
+.. _BMWlibs-XML:
+   
+The XML startup file
+^^^^^^^^^^^^^^^^^^^^
+
+``BMW_startup.xml`` is a configuration file located in the working directory. In this file some settings 
+like the time and field resolution of the calculations as well as the present muon implantation profiles 
+for a LE-|mgr|\SR analysis have to be defined. The following XML tags are allowed to define settings: 
+
+**<debug>ONE_OR_ZERO</debug>**
+  activate the debugging output of the settings read from the XML file by setting 1, deactivate it with 0.
+**<wisdom>PATH_TO_FILE</wisdom>**
+  specify the ``PATH_TO_FILE`` to an `FFTW3 wisdom file <http://fftw.org/fftw3_doc/Wisdom.html#Wisdom>`_ 
+  that should be used; if the ``PATH_TO_FILE`` is invalid, no ``FFTW3`` wisdom will be used.
+**<delta_t>ResT</delta_t>**
+  set the time resolution ``ResT`` for the calculated depolarization function in microseconds.
+**<delta_B>ResB</delta_B>**
+  set the field resolution ``ResB`` for the calculated field distribution in Gauss.
+**<VortexLattice></VortexLattice>**
+  set the parameters used for the calculation of the spatial field distribution of a vortex lattice.
+  
+  **<N_VortexGrid>N</N_VortexGrid>**
+    specify the number of points **N** (in each of the two dimensions) for which the fields within the 
+    vortex lattice are calculated (inside a **<VortexLattice>** environment) 
+    
+**<LEM></LEM>**     
+  set the parameters used for the calculation of LE-|mgr|\SR field distributions 
+  
+  **<data_path>DATA_PATH_PREFIX</data_path>**
+    specify the ``DATA_PATH_PREFIX`` to the ``TRIM.SP`` implantation profiles (inside a **<LEM>** environment)
+  **<N_theory>N_THEORY</N_theory>**
+    specify the number of points **N_THEORY** for which *B(z)* is calculated (inside a **<LEM>** environment)
+    The specification of this number is not needed if the calculation of the inverse of *B(z)* is implemented!
+  **<energy_list></energy_list>**
+    set the energies for which ``TRIM.SP`` implantation profiles are available (inside a **<LEM>** environment) 
+    
+    **<energy_label>LABEL</energy_label>**
+      specify the **LABEL** within the file name of a available ``TRIM.SP`` ``RGE`` file (inside a **<energy_list>** environment)
+      The expected name of the ``RGE`` file will be: ``DATA_PATH_PREFIX + LABEL + .rge`` 
+    **<energy>E</energy>**
+      specify the muon energy *E* (in keV) belonging to the ``TRIM.SP`` ``RGE`` file given above (inside a **<energy_list>** environment)   
+      
+An example XML file looks as follows:      
+
+.. code-block:: xml
+
+  <?xml version="1.0" encoding="UTF-8"?>
+  <BMW>
+    <debug>0</debug>
+    <wisdom>/home/user/WordsOfWisdom.dat</wisdom>
+    <delta_t>0.01</delta_t>
+    <delta_B>0.5</delta_B>
+    <VortexLattice>
+      <N_VortexGrid>1024</N_VortexGrid>
+    </VortexLattice>
+    <LEM>
+      <data_path>/home/user/TrimSP/some-sample-</data_path>
+      <N_theory>5000</N_theory>
+      <energy_list>
+        <energy_label>02_0</energy_label>
+        <energy>2.0</energy>
+        <energy_label>03_0</energy_label>
+        <energy>3.0</energy>
+        <energy_label>03_6</energy_label>
+        <energy>3.6</energy>
+        <energy_label>05_0</energy_label>
+        <energy>5.0</energy>
+        <energy_label>05_3</energy_label>
+        <energy>5.3</energy>
+      </energy_list>
+    </LEM>
+  </BMW>
+  
+Nonlocal superconductivity related Meissner screening functions (AS libs) 
+-------------------------------------------------------------------------
+
+To be written yet ...
