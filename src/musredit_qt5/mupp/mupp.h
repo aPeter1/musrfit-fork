@@ -35,6 +35,8 @@
 #include <sys/msg.h>
 #include <sys/stat.h>
 
+#define MAX_RECENT_FILES 5
+
 #define PMUPP_MAX_MTEXT 512
 
 struct mbuf {

@@ -109,6 +109,7 @@ public:
 public slots:
   void aboutToQuit();
   void fileOpen();
+  void fileOpenRecent();
   void fileExit();
 
   void toolDumpCollections();
@@ -138,6 +139,9 @@ private:
   QString fMacroName;
 
   QWidget     *fCentralWidget;
+
+  QMenu *fRecentFilesMenu;   ///< recent file menu
+  QAction *fRecentFilesAction[MAX_RECENT_FILES]; ///< array of the recent file actions
 
   QBoxLayout  *fBoxLayout_Main;     // top->bottom (0)
   QBoxLayout  *fBoxLayout_Top;      // left->right (1)
@@ -173,6 +177,8 @@ private:
   void setupHelpActions();
 
   void getTheme();
+
+  void fillRecentFiles();
 
   void readCmdHistory();
   void writeCmdHistory();

@@ -1,8 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <mupp xmlns="http://lmu.web.psi.ch/musrfit/user/MUSR/WebHome.html">
     <comment>
         Defines default settings for the mupp helper program for musrfit
     </comment>
+    <recent_files>
+    </recent_files>
     <root_settings>
         <marker_list>
             <!-- Root marker numbers -->

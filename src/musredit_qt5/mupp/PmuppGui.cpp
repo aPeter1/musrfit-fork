@@ -470,6 +470,15 @@ void PmuppGui::setupFileActions()
   }
   tb->addAction(a);
 
+  fRecentFilesMenu = menu->addMenu( tr("Recent Files") );
+  for (int i=0; i<MAX_RECENT_FILES; i++) {
+    fRecentFilesAction[i] = new QAction(fRecentFilesMenu);
+    fRecentFilesAction[i]->setVisible(false);
+    connect( fRecentFilesAction[i], SIGNAL(triggered()), this, SLOT(fileOpenRecent()));
+    fRecentFilesMenu->addAction(fRecentFilesAction[i]);
+  }
+  fillRecentFiles();
+
   a = new QAction( tr( "E&xit" ), this );
   a->setShortcut( tr("Ctrl+Q") );
   a->setStatusTip( tr("Exit Program") );
@@ -580,6 +589,34 @@ void PmuppGui::fileOpen()
   QString errorMsg("");
   if (!fParamDataHandler->ReadParamFile(list, errorMsg)) {
     QMessageBox::critical(this, "ERROR", errorMsg);
+    return;
+  }
+
+  // populate the recent files
+  if (msrPresent || dbPresent) {
+    for (int i=0; i<list.size(); i++) {
+      fAdmin->addRecentFile(list[i]); // keep it in admin
+      fillRecentFiles();              // update menu
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::fileOpenRecent
+ */
+void PmuppGui::fileOpenRecent()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+
+  if (action) {
+    QStringList fln;
+    fln << action->text();
+    QString errorMsg("");
+    if (!fParamDataHandler->ReadParamFile(fln, errorMsg)) {
+      QMessageBox::critical(this, "ERROR", errorMsg);
+      return;
+    }
   }
 }
 
@@ -724,6 +761,18 @@ void PmuppGui::getTheme()
     } else {
       fDarkToolBarIcon = true;
     }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>fill the recent file list in the menu.
+ */
+void PmuppGui::fillRecentFiles()
+{
+  for (int i=0; i<fAdmin->getNumRecentFiles(); i++) {
+    fRecentFilesAction[i]->setText(fAdmin->getRecentFile(i));
+    fRecentFilesAction[i]->setVisible(true);
   }
 }
 
