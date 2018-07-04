@@ -81,9 +81,26 @@ PModSelect::PModSelect(QWidget *parent) :
 
   setLayout(main);
 
+  connect(fAbsVal, SIGNAL(stateChanged(int)), this, SLOT(absoluteValueStateChanged(int)));
   connect(fScaleAutomatic, SIGNAL(pressed()), this, SLOT(scaleAuto()));
   connect(fScaleByFactor, SIGNAL(pressed()), this, SLOT(getFactor()));
-  connect(fCancel, SIGNAL(pressed()), this, SLOT(reject()));
+  connect(fCancel, SIGNAL(pressed()), this, SLOT(reject()));  
+}
+
+//-------------------------------------------------------------------------
+/**
+ * @brief PModSelect::absoluteValueStateChanged
+ * @param ival
+ */
+void PModSelect::absoluteValueStateChanged(int ival)
+{
+  if (ival == Qt::Unchecked) {
+    fFactorLabel->setText("Factor");
+    fScaleByFactor->setText("Scale by &Factor");
+  } else if (ival == Qt::Checked) {
+    fFactorLabel->setText("Value");
+    fScaleByFactor->setText("Set Abs. Value");
+  }
 }
 
 //-------------------------------------------------------------------------

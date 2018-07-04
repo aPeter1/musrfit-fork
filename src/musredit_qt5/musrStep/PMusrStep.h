@@ -60,6 +60,7 @@ class PModSelect : public QDialog
     void scale(bool automatic, double factor, bool absVal);
 
   private slots:
+    void absoluteValueStateChanged(int);
     void scaleAuto();
     void getFactor();
 
