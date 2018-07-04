@@ -43,7 +43,7 @@ class PAdmin;
 //---------------------------------------------------------------------------
 /**
  * <p>This structure is keeping informations necessary to handle musrfit
- * theory functions (see also <code>https://intranet.psi.ch/MUSR/MusrFit#4_3_The_THEORY_Block</code>).
+ * theory functions (see also <code>http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-theory-block</code>).
  */
 typedef struct {
   QString name;

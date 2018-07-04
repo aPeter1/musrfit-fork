@@ -12,149 +12,77 @@
 
 \mainpage musrfit - a framework to analyse muSR data.
 
-<p>This pages here are meant to explain the software structure of the musrfit framework. 
+<p>This pages here are meant to explain the software structure of the musrfit framework. Only the core-classes 
+are described, *i.e.* not the Qt GUI related stuff.
 
-<p>People merely intrested in the handling of the programs should check this link:
+<p>People merely interested in the handling of the programs should check this link:
 \htmlonly
-<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>
+<a href="http://lmu.web.psi.ch/musrfit/user/html/index.html">musrfit user manual</a>
 \endhtmlonly
 \latexonly
-musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html}
+musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/html/index.html}
 \endlatexonly 
 
 <p>People which would like to know how to install the musrfit framework, please check this link:
 \htmlonly
-<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html">How to setup musrfit on different platforms</a>
+<a href="http://lmu.web.psi.ch/musrfit/user/html/setup-standard.html">How to setup musrfit on different platforms</a>
 \endhtmlonly
 \latexonly
-How to setup musrfit on different platforms: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html}
+How to setup musrfit on different platforms: \texttt{http://lmu.web.psi.ch/musrfit/user/html/setup-standard.html}
 \endlatexonly
 
 //****************************************************************************************************
 \section overview Overview
 
-<p>The purpose of the musrfit framework is to provide software to analyze muSR spectra, in a very flexible and sound way. The musrfit framework is free software, published under the General Public License Version 2 or later. It is currently running under Linux, Mac OS X, and (with some more work) under Windows. The musrfit framework heavily relies on the \htmlonly <a href="http://root.cern.ch">ROOT</a>\endhtmlonly \latexonly ROOT: \texttt{http://root.cern.ch}\endlatexonly framework from CERN 
+<p>The purpose of the musrfit framework is to provide software to analyze muSR spectra, in a very flexible and sound way. 
+The musrfit framework is free software, published under the General Public License Version 2 or later. It is currently running 
+under Linux, Mac OS X, and (with some more work) under Windows. The musrfit framework heavily relies on the 
+\htmlonly <a href="http://root.cern.ch">ROOT</a>\endhtmlonly \latexonly ROOT: \texttt{http://root.cern.ch}\endlatexonly framework from CERN 
 
-<p>The musrfit framework provies the following programs: 
-- \ref musrfit Carries out fits based on a msr-file.
-- \ref musrview Is used show the data in a graphical representation.
-- \ref musrFT Is used to show Fourier transforms of data without the need of a theory (raw data Fourier transform).
-- \ref musrt0 Is used to set graphically t0's, background and data ranges off raw histogram data.
-- \ref musrparam Can be used to generate ascii output files with extracted fit-parameters (from msr-files) and independent additional variables like temperature, field, ... The ascii output files can than be used to plot parameters, e.g. by gnuplot.
-- \ref msr2data A program (originally written by Bastian M. Wojek). Its purpose is to process/generate multiple musrfit msr-files with the same parameters and summarize the fitting results either in a TRIUMF DB or a column ASCII file.
-- \ref msr2msr Old WKM like msr-files can be transformed into musrfit style msr-files with this little program.
-- \ref musrgui An editor to handle msr-files, calling musrfit, etc. from within the editor, based on Qt3.x. 
-               Only bug fixing will be done on this version, and if you have >= Qt4.6 available you should use musredit instead.
-- \ref musredit An editor to handle msr-files, calling musrfit, etc. from within a simple text editor, based 
-               on >= Qt4.6. 
-- \ref MuSRFit A graphical user interface based on PerlQt (written by Z. Salman) for an easy to use interface to the musrfit framework. Compared to the more general approach of writting msr-files, it has some limitations, though it might be easier for a first user of the musrfit framework.
-- \ref any2many Should be a "universal" muSR data-file-format converter.
-- \ref dump_header Is a small program to dump the header information of a muSR data file to the standard output.
-- \ref musrRootValidation This is a program to validate MusrRoot files.
-- \ref write_musrRoot_runHeader Is a little example program showing how to write MusrRoot files.
+<p>The musrfit framework provides the following programs: 
+- **musrfit**: carries out fits based on a msr-file.
+- **musrview**: is used show the data in a graphical representation.
+- **musrFT**: is used to show Fourier transforms of data without the need of a theory (raw data Fourier transform).
+- **musrt0**: is used to set graphically t0's, background and data ranges off raw histogram data.
+- **msr2data**: a program (originally written by Bastian M. Wojek). Its purpose is to process/generate multiple musrfit 
+     msr-files with the same parameters and summarize the fitting results either in a TRIUMF DB or a column ASCII file.
+- **msr2msr**: old WKM like msr-files can be transformed into musrfit style msr-files with this little program.
+- musrgui (obsolete): an editor to handle msr-files, calling musrfit, etc. from within the editor, based on Qt3.x. 
+     Only bug fixing will be done on this version, and if you have >= Qt4.6 available you should use musredit instead.
+- **musredit**: an editor to handle msr-files, calling musrfit, etc. from within a simple text editor, based on >= Qt4.6. 
+- **musrWiz** (beta): allows to create an initial msr-file by a step-by-step instruction wizard.
+- **musrStep**: allows to efficiently deal with initial step values of msr-files. Especially useful for msr-files dealing with many runs/detectors.
+- **mupp**: is the muSR parameter plotter. It allows to plot values in db- or dat-files (collections).
+- **MuSRFit**: a graphical user interface based on PerlQt (written by Z. Salman) for an easy to use interface to the musrfit framework. 
+     Compared to the more general approach of writing msr-files, it has some limitations, though it might be easier for a first user of the musrfit framework.
+- **any2many**: should be a "universal" muSR data-file-format converter.
+- **dump_header**: is a small program to dump the header information of a muSR data file to the standard output.
+- **musrRootValidation**: this is a program to validate MusrRoot files.
+- **write_musrRoot_runHeader**: Is a little example program showing how to write MusrRoot files.
 
 \section roadmap Road map and missing features
 
-<p>Support for NeXus files is underway and should be fully available from early 2012 on. 
+<p>Support for NeXus files is fully available from early 2012 on. 
 
 <p>The following features should eventually be implemented, but are still missing:
-- there are still issues with MUD files on 64bit systems which should eventually be fixed.
 - non-muSR: The plan is to add an option to fit/plot \f$f(x_1,\ldots,x_n)\f$ versus \f$g(x_1,\ldots,x_n)\f$, where \f$x_i\f$ is a given data set element.
 - as soon as ROOT will properly support MS Windows platforms, some better support for MS Windows will be added. Currently only the cygwin version will be supported.
-- check if it is possible to add FIR filtering for muSR data
 - add an interface to maxent
-- we will provide rpm's for various linux flavours.
+- we will provide rpm's for various linux flavors.
 
 \section shortComings Short comings of the current musrfit design
 
 <p>The musrfit framework has some shortcomings which will shortly discussed here:
 
--# musrfit is not thread save do to the current implementation of LF in PTheory. Perhaps this part should be redesigned at some point to resolve this problem.
--# Currently each msr-file run holds its one theory object. This is not very nice for costly user functions which will need to setup internal things for each run, even though resources could be shared.
+-# musrfit is not fully thread save do to the current implementation of LF in PTheory. Perhaps this part should be redesigned at some point to resolve this problem.
+-# Currently each msr-file run holds its one theory object. This is not very nice for costly user functions which will need to setup internal things for each run, 
+   even though resources could be shared.
 
 This two points are somewhat contradictory, and currently it is not clear which way to go. 
 
 \section bugs How to report bugs
 
-<p>Bugs, unexpected features, can be reported directly to me: \verbatim andreas.suter@psi.ch, \endverbatim or entered in the bug-tracking tool at bitbkucket \verbatim https://bitbucket.org/muonspin/musrfit/issues \endverbatim.
+<p>Bugs, unexpected features, can be reported directly to me: \verbatim andreas.suter@psi.ch, \endverbatim or entered in the bug-tracking tool at 
+bitbkucket \verbatim https://bitbucket.org/muonspin/musrfit/issues \endverbatim.
 
-//****************************************************************************************************
-\page musrfitPage
-\section musrfit musrfit
-
-<p>Here will eventually follow a more technical description of musrfit. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html} \endlatexonly
-
-//****************************************************************************************************
-\page musrviewPage
-\section musrview musrview
-
-<p>Here will eventually follow a more technical description of musrview. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html} \endlatexonly
-
-//****************************************************************************************************
-\page musrFTPage
-\section musrFT musrFT
-
-<p>Here will eventually follow a more technical description of musrFT. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html} \endlatexonly
-
-//****************************************************************************************************
-\page musrt0Page
-\section musrt0 musrt0
-
-<p>Here will eventually follow a more technical description of musrt0. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFit.html} \endlatexonly
-
-//****************************************************************************************************
-\page musrparamPage
-\section musrparam musrparam
-
-<p>Here will eventually follow a more technical description of musrparam. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
-
-//****************************************************************************************************
-\page msr2dataPage
-\section msr2data msr2data
-
-<p>Here will eventually follow a more technical description of musr2data. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
-
-//****************************************************************************************************
-\page msr2msrPage
-\section msr2msr msr2msr
-
-<p>Here will eventually follow a more technical description of msr2msr. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
-
-//****************************************************************************************************
-\page musrguiPage
-\section musrgui musrgui
-
-<p>Here will eventually follow a more technical description of musrgui. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
-
-//****************************************************************************************************
-\page musreditPage
-\section musredit musredit
-
-<p>Here will eventually follow a more technical description of musredit. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
-
-//****************************************************************************************************
-\page MuSRFitPage
-\section MuSRFit MuSRFit
-
-//****************************************************************************************************
-\page any2manyPage
-\section any2many any2many
-
-<p>Here will eventually follow a more technical description of any2many. If you looking for a user-manual like description, please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html">musrfit user manual</a>\endhtmlonly \latexonly musrfit user manual: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrFit.html} \endlatexonly
-
-//****************************************************************************************************
-\page dumpHeaderPage
-\section dump_header dump_header
-<p>This is a little helper program which reads the header information of a muSR data file and dumps most of the relevant information to the standard output.
-
-//****************************************************************************************************
-\page musrRootValidationPage
-\section musrRootValidation musrRootValidation
-<p>This program allows to validate a given (or supposedly given) MusrRoot file if it is consistent with the minimal required entries via XML Schema schemes.
-Please check \htmlonly<a href="http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrRoot.html">MusrRoot web-page</a>\endhtmlonly \latexonly MusrRoot web-page: \texttt{http://lmu.web.psi.ch/facilities/software/musrfit/user/MUSR/MusrRoot.html}\endlatexonly
-
-//****************************************************************************************************
-\page write_musrRoot_runHeader_Page
-\section write_musrRoot_runHeader write_musrRoot_runHeader
-<p>This is a little help program shows how to write a MusrRoot file.
 */
