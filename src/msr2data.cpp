@@ -162,8 +162,7 @@ void msr2data_syntax()
   cout << endl << "          collected form the msr-files 2046_tf_histo.msr and so on.";
   cout << endl;
   cout << endl << "    For further information please refer to";
-  cout << endl << "       http://lmu.web.psi.ch/musrfit/user/MUSR/Msr2Data.html";
-  cout << endl << "       https://intranet.psi.ch/MUSR/Msr2Data";
+  cout << endl << "       http://lmu.web.psi.ch/musrfit/user/html/msr2data.html#msr2data";
   cout << endl << endl;
 }
 
@@ -499,9 +498,9 @@ int msr2data_paramList(vector<string> &arg, vector<unsigned int> &paramList)
 /**
  * <p>msr2data is used to generate msr-files based on template msr-files, automatically fit these new msr-files,
  * collect fitting parameters, etc. For a detailed description see
- * \htmlonly <a href="https://intranet.psi.ch/MUSR/Msr2Data">musr2data online help</a>
+ * \htmlonly <a href="http://lmu.web.psi.ch/musrfit/user/html/msr2data.html#msr2data">musr2data online help</a>
  * \endhtmlonly
- * \latexonly msr2data online help: \texttt{https://intranet.psi.ch/MUSR/Msr2Data}
+ * \latexonly msr2data online help: \texttt{http://lmu.web.psi.ch/musrfit/user/html/msr2data.html#msr2data}
  * \endlatexonly
  *
  * \param argc number of arguments

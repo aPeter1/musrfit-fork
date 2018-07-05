@@ -7,26 +7,31 @@ root_generate_dictionary(
   PFourierCanvasDict 
   -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PFourierCanvas.h 
   LINKDEF ${MUSRFIT_INC}/PFourierCanvasLinkDef.h
+  MODULE PFourierCanvas
 )
 root_generate_dictionary(
   PMusrCanvasDict 
   -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PMusrCanvas.h 
   LINKDEF ${MUSRFIT_INC}/PMusrCanvasLinkDef.h
+  MODULE PMusrCanvas
 )
 root_generate_dictionary(
   PMusrT0Dict 
   -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PMusrT0.h 
   LINKDEF ${MUSRFIT_INC}/PMusrT0LinkDef.h
+  MODULE PMusrT0
 )
 root_generate_dictionary(
   PStartupHandlerDict 
   -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PStartupHandler.h 
   LINKDEF ${MUSRFIT_INC}/PStartupHandlerLinkDef.h
+  MODULE PStartupHandler
 )
 root_generate_dictionary(
   PUserFcnBaseDict 
   -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PUserFcnBase.h 
   LINKDEF ${MUSRFIT_INC}/PUserFcnBaseLinkDef.h
+  MODULE PUserFcnBase
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -140,16 +145,16 @@ install(TARGETS PMusr DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPFourierCanvasDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libPFourierCanvasDict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libPMusrCanvasDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libPMusrCanvasDict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libPMusrT0Dict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libPMusrT0Dict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandlerDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandlerDict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libPUserFcnBaseDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libPUserFcnBaseDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPFourierCanvas_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libPFourierCanvas.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPMusrCanvas_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libPMusrCanvas.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPMusrT0_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libPMusrT0.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPUserFcnBase_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libPUserFcnBase.rootmap
   DESTINATION lib
 )
 

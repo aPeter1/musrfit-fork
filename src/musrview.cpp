@@ -83,9 +83,9 @@ void musrview_syntax()
  * <p>The musrview program is used to show muSR fit results in graphical form.
  * From it also Fourier transforms, difference between data an theory can be formed.
  * For a detailed description/usage of the program, please see
- * \htmlonly <a href="https://intranet.psi.ch/MUSR/MusrFit">musrview online help</a>
+ * \htmlonly <a href="http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#musrview">musrview online help</a>
  * \endhtmlonly
- * \latexonly musrview online help: \texttt{https://intranet.psi.ch/MUSR/MusrFit}
+ * \latexonly musrview online help: \texttt{http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#musrview}
  * \endlatexonly
  *
  * <b>return:</b>

@@ -22,18 +22,18 @@
     <path_file_name>@DOCDIR@/examples/test-histo-PSI-BIN.msr</path_file_name>
   </recent_files>
   <help_section>
-    <musr_web_main>file://@DOCDIR@/html/user/MUSR/MusrFit.html</musr_web_main>
-    <musr_web_title>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheTitle</musr_web_title>
-    <musr_web_parameters>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheFitparameterBlock</musr_web_parameters>
-    <musr_web_theory>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheTheoryBlock</musr_web_theory>
-    <musr_web_functions>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheFunctionsBlock</musr_web_functions>
-    <musr_web_run>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheRunBlock</musr_web_run>
-    <musr_web_command>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheCommandsBlock</musr_web_command>
-    <musr_web_fourier>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheFourierBlock</musr_web_fourier>
-    <musr_web_plot>file://@DOCDIR@/html/user/MUSR/MusrFit.html#ThePlotBlock</musr_web_plot>
-    <musr_web_statistic>file://@DOCDIR@/html/user/MUSR/MusrFit.html#TheStatisticBlock</musr_web_statistic>
-    <musr_web_msr2data>file://@DOCDIR@/html/user/MUSR/Msr2Data.html</musr_web_msr2data>
-    <musr_web_musrFT>file://@DOCDIR@/html/user/MUSR/MusrFit.html#A_2.3_musrFT</musr_web_musrFT>
+    <musr_web_main>file://@DOCDIR@/html/index.html</musr_web_main>
+    <musr_web_title>file://@DOCDIR@/html/user-manual.html#the-title</musr_web_title>
+    <musr_web_parameters>file://@DOCDIR@/html/user-manual.html#the-fitparameter-block</musr_web_parameters>
+    <musr_web_theory>file://@DOCDIR@/html/user-manual.html#the-theory-block</musr_web_theory>
+    <musr_web_functions>file://@DOCDIR@/html/user-manual.html#the-functions-block</musr_web_functions>
+    <musr_web_run>file://@DOCDIR@/html/user-manual.html#the-run-block</musr_web_run>
+    <musr_web_command>file://@DOCDIR@/html/user-manual.html#the-commands-block</musr_web_command>
+    <musr_web_fourier>file://@DOCDIR@/html/user-manual.html#the-fourier-block</musr_web_fourier>
+    <musr_web_plot>file://@DOCDIR@/html/user-manual.html#the-plot-block</musr_web_plot>
+    <musr_web_statistic>file://@DOCDIR@/html/user-manual.html#the-statistic-block</musr_web_statistic>
+    <musr_web_msr2data>file://@DOCDIR@/html/msr2data.html</musr_web_msr2data>
+    <musr_web_musrFT>file://@DOCDIR@/html/user-manual.html#musrft</musr_web_musrFT>
   </help_section>
   <font_settings>
     <font_name>Monospace</font_name>

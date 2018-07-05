@@ -11,6 +11,7 @@ root_generate_dictionary(
   -I${BMW_TOOLS_INC}
   ZFRelaxation.h
   LINKDEF ZFRelaxationLinkDef.h
+  MODULE ZFRelaxation
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -63,8 +64,8 @@ install(TARGETS ZFRelaxation DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libZFRelaxationDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libZFRelaxationDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libZFRelaxation_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libZFRelaxation.rootmap
   DESTINATION lib
 )
 

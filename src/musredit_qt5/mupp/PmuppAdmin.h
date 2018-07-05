@@ -36,6 +36,8 @@
 #include <QPixmap>
 #include <QtXml>
 
+#include "mupp.h"
+
 class PmuppAdmin;
 
 //---------------------------------------------------------------------------
@@ -96,7 +98,7 @@ class PmuppAdminXMLParser : public QXmlDefaultHandler
     virtual ~PmuppAdminXMLParser() {}
 
   private:
-    enum EAdminKeyWords {eEmpty, eMarker, eColor};
+    enum EAdminKeyWords {eEmpty, eRecentFile, eMarker, eColor};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,
@@ -127,6 +129,10 @@ class PmuppAdmin : public QObject
     PmuppAdmin();
     virtual ~PmuppAdmin();
 
+    void    addRecentFile(const QString str);
+    int     getNumRecentFiles() { return fRecentFile.size(); }
+    QString getRecentFile(int idx);
+
     int getNoOfMarkers() { return fMarker.size(); }
     QVector<PmuppMarker> getMarkers() { return fMarker; }
     PmuppMarker getMarker(int idx);
@@ -142,9 +148,12 @@ class PmuppAdmin : public QObject
   private:
     friend class PmuppAdminXMLParser;
 
+    QVector<QString> fRecentFile; ///< keep vector of recent path-file names
+
     QVector<PmuppMarker> fMarker;
     QVector<PmuppColor> fColor;
 
+    void saveRecentFiles(); ///< save recent file list
     void createMuppStartupFile(); ///< create default mupp_startup.xml
 };
 

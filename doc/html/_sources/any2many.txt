@@ -1,0 +1,8 @@
+.. include:: <isogrk1.txt>
+.. index:: any2many
+
+any2many - a Universal |mgr|\SR-file-format converter
+=====================================================
+
+``any2many`` allows to convert most |mgr|\SR-file-formats from one to the other.
+For a detailed description see :ref:`here <any2many>`.

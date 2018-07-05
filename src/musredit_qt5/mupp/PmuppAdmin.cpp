@@ -108,7 +108,9 @@ bool PmuppAdminXMLParser::startElement( const QString&, const QString&,
                                         const QString& qName,
                                         const QXmlAttributes& )
 {
-  if (qName == "marker") {
+  if (qName == "path_file_name") {
+    fKeyWord = eRecentFile;
+  } else if (qName == "marker") {
     fKeyWord = eMarker;
   } else if (qName == "color") {
     fKeyWord = eColor;
@@ -148,6 +150,9 @@ bool PmuppAdminXMLParser::characters(const QString& str)
   QStringList tok;
 
   switch (fKeyWord) {
+    case eRecentFile:
+      fAdmin->addRecentFile(QString(str.toLatin1()).trimmed());
+      break;
     case eMarker:
       tok = str.split(",", QString::SkipEmptyParts);
 
@@ -330,7 +335,42 @@ PmuppAdmin::PmuppAdmin() : QObject()
  */
 PmuppAdmin::~PmuppAdmin()
 {
-  // nothing to be done for now
+  saveRecentFiles();
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Add recent path-file name to the internal ring-buffer.
+ *
+ * \param str recent path-file name to be added
+ */
+void PmuppAdmin::addRecentFile(const QString str)
+{
+  // check if file name is not already present
+  for (int i=0; i<fRecentFile.size(); i++) {
+    if (str == fRecentFile[i])
+      return;
+  }
+
+  fRecentFile.push_front(str);
+  if (fRecentFile.size() > MAX_RECENT_FILES)
+    fRecentFile.resize(MAX_RECENT_FILES);
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief PmuppAdmin::getRecentFile
+ * @param idx
+ * @return
+ */
+QString PmuppAdmin::getRecentFile(int idx)
+{
+  QString str("");
+
+  if ((idx >= 0) && (idx < fRecentFile.size()))
+    str = fRecentFile[idx];
+
+  return str;
 }
 
 //--------------------------------------------------------------------------
@@ -437,6 +477,76 @@ void PmuppAdmin::setColor(int r, int g, int b, QString name)
   color.setRGB(r,g,b);
 
   fColor.push_back(color);
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Merges the recent file ring buffer into mupp_startup.xml and saves it.
+ * If a local copy is present it will be saved there, otherwise the master file
+ * will be used.
+ */
+void PmuppAdmin::saveRecentFiles()
+{
+  // check if mupp_startup.xml is present in the current directory, and if yes, use this file to
+  // save the recent file names otherwise use the "master" mupp_startup.xml
+
+  QString str("");
+  QString fln = QString("./mupp_startup.xml");
+  if (!QFile::exists(fln)) {
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    fln = QString("%1/.musrfit/mupp/mupp_startup.xml").arg(env.value("HOME"));
+  }
+
+  if (QFile::exists(fln)) { // administration file present
+    QVector<QString> data;
+    QFile file(fln);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      cerr << endl << ">> PmuppAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << endl;
+      return;
+    }
+    QTextStream fin(&file);
+    while (!fin.atEnd()) {
+      data.push_back(fin.readLine());
+    }
+    file.close();
+
+    // remove <path_file_name> from data
+    for (QVector<QString>::iterator it = data.begin(); it != data.end(); ++it) {
+      if (it->contains("<path_file_name>")) {
+        it = data.erase(it);
+        --it;
+      }
+    }
+
+    // add recent files
+    int i;
+    for (i=0; i<data.size(); i++) {
+      if (data[i].contains("<recent_files>"))
+        break;
+    }
+
+    if (i == data.size()) {
+      cerr << endl << ">> PmuppAdmin::saveRecentFile: **ERROR** " << fln.toLatin1().data() << " seems to be corrupt." << endl;
+      return;
+    }
+    i++;
+    for (int j=0; j<fRecentFile.size(); j++) {
+      str = "    <path_file_name>" + fRecentFile[j] + "</path_file_name>";
+      data.insert(i++, str);
+    }
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      cerr << endl << ">> PmuppAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << endl;
+      return;
+    }
+    fin.setDevice(&file);
+    for (int i=0; i<data.size(); i++)
+      fin << data[i] << endl;
+    file.close();
+  } else {
+    QString msg("Failed to write mupp_startup.xml. Neither a local nor a global copy found.");
+    QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
+  }
 }
 
 //--------------------------------------------------------------------------

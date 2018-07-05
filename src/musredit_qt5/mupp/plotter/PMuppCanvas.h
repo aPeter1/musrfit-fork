@@ -74,7 +74,8 @@ public:
   PMuppCanvas(const Char_t* title,
               Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
               const PIntVector markerSytleList, const PDoubleVector markerSizeList,
-              const PIntVector colorList);
+              const PIntVector colorList,
+              const int mupp_instance);
   virtual ~PMuppCanvas();
 
   virtual Bool_t IsValid() { return fValid; }
@@ -89,6 +90,7 @@ public:
 
 private:
   Bool_t fValid;
+  Int_t fMuppInstance;
 
   TString fFtokName;
   TTimer *fCheckMsgQueue; ///< timer needed to check if a message in the IPC message queue is pending

@@ -14,23 +14,11 @@ DOCDIRS = examples \
           examples/BMWlibs \
           examples/BMWlibs/data \
           examples/BMWlibs/profiles \
-          html/user \
-          html/user/MUSR \
-          html/user/pub/Main/SmiliesPluginPSI \
-          html/user/pub/Main/WebPreferences \
-          html/user/pub/MUSR/LibFitPofB \
-          html/user/pub/MUSR/LibZFRelaxation \
-          html/user/pub/MUSR/Msr2Data \
-          html/user/pub/MUSR/MusrFit \
-          html/user/pub/MUSR/MusrGui \
-          html/user/pub/MUSR/QuickStart \
-          html/user/pub/MUSR/TutorialSingleHisto \
-          html/user/pub/System/DocumentGraphics \
-          html/user/pub/System/HeadlinesPlugin \
-          html/user/pub/System/PatternSkin \
-          html/user/pub/System/PatternSkinTheme2009 \
-          html/user/pub/System/PsiSkin \
-          html/user/pub/System/SkinTemplates
+          html/ \
+          html/_downloads \
+          html/_images \
+          html/_sources \
+          html/_static 
           #html/technical
 
 install-data-hook:

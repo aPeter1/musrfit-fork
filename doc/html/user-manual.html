@@ -1,0 +1,2169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>User manual &mdash; musrfit 1.4.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.4.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="musrfit 1.4.0 documentation" href="index.html" />
+    <link rel="next" title="Documentation of user libs (user functions)" href="user-libs.html" />
+    <link rel="prev" title="Tutorial for musrfit" href="tutorial.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="user-libs.html" title="Documentation of user libs (user functions)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial for musrfit"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">musrfit 1.4.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="user-manual">
+<span id="index-0"></span><span id="id1"></span><h1>User manual<a class="headerlink" href="#user-manual" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">musrfit</span></tt> is a software tool for analyzing time-differential μSR data. The program suite is <a class="reference external" href="http://www.gnu.org/philosophy/free-sw.html">free software</a> and licensed under the <a class="reference external" href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">GNU GPL version 2</a> or any later version (at your option). It is implemented in <tt class="docutils literal"><span class="pre">C++</span></tt>/ROOT and uses the <a class="reference external" href="http://seal.web.cern.ch/seal/MathLibs/Minuit2/html/index.html">MINUIT2</a> libraries developed at <a class="reference external" href="http://www.cern.ch/">CERN</a> for fitting data. Installation instructions for GNU/Linux, MS Windows, and macOS can be found under <a class="reference internal" href="setup-standard.html#musrfit-setup"><em>musrfit setup</em></a>. Recent changes of the program can be followed on the git, either <a class="reference external" href="https://bitbucket.org/muonspin/musrfit">bitbucket</a> or <a class="reference external" href="https://gitlab.psi.ch/nemu/musrfit">gitlab</a>.</p>
+</div>
+<div class="section" id="available-executables-configuration-files-and-their-basic-usage">
+<h2>Available Executables, Configuration Files and their Basic Usage<a class="headerlink" href="#available-executables-configuration-files-and-their-basic-usage" title="Permalink to this headline">¶</a></h2>
+<p>The philosophy is that users, based on their abilities or preferences, can work on the command line are in a more GUI based setting. Here, the command line based tools will be described. The GUI based parts are described in the <a class="reference internal" href="musredit.html#musredit-sec"><em>musredit</em></a>.</p>
+<div class="section" id="musrfit">
+<span id="index-1"></span><span id="id2"></span><h3>musrfit<a class="headerlink" href="#musrfit" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">musrfit</span></tt> is the actual fitting program. It defines the FCN routine passed to <tt class="docutils literal"><span class="pre">MINUIT2</span></tt> and performs <span class="math">\(\chi^2\)</span> or log-max-likelihood fitting. If called from within a shell it accepts several parameters:</p>
+<dl class="docutils">
+<dt><strong>&lt;msr-file&gt;</strong></dt>
+<dd>filename of the msr input file defining all the details needed for performing a fit to a specified set of data. This is the only mandatory parameter.</dd>
+<dt><strong>-k, - -keep-mn2-output</strong></dt>
+<dd>selects the option for keeping the output of <tt class="docutils literal"><span class="pre">MINUIT2</span></tt> including the correlation coefficients between different parameters and renaming the files <tt class="docutils literal"><span class="pre">MINUIT2.OUTPUT</span></tt> and <tt class="docutils literal"><span class="pre">MINUIT2.root</span></tt> to <tt class="docutils literal"><span class="pre">&lt;msr_file_without_extension&gt;-mn2.output</span></tt> and <tt class="docutils literal"><span class="pre">&lt;msr_file_without_extension&gt;-mn2.root</span></tt>, respectively, <em>e.g.</em> <tt class="docutils literal"><span class="pre">&lt;msr_file&gt;</span></tt> = <tt class="docutils literal"><span class="pre">8472.msr</span></tt> will result in <tt class="docutils literal"><span class="pre">8472-mn2.output</span></tt>, <tt class="docutils literal"><span class="pre">8472-mn2.root</span></tt>.</dd>
+<dt><strong>-c, - -chisq-only</strong></dt>
+<dd>Instead of fitting the model, <tt class="docutils literal"><span class="pre">musrfit</span></tt> calculates <span class="math">\(\chi^2\)</span> or max. log-likelihood, maxLH, only once and sends the result to the standard output if called with this option. This is <em>e.g.</em> useful for the adjustment of the initial values of the fit parameters.</dd>
+<dt><strong>-t, - -title-from-data-file</strong></dt>
+<dd>If this option is given <tt class="docutils literal"><span class="pre">musrfit</span></tt> will replace the title in the <tt class="docutils literal"><span class="pre">&lt;msr_file&gt;</span></tt> by the run title in the data file of the first run appearing in a RUN block. In case there is no run title in the data file no substitution is done.</dd>
+<dt><strong>-e, - -estimateN0</strong></dt>
+<dd>estimate <span class="math">\(N_0\)</span> for single histogram fits.</dd>
+<dt><strong>-p, - -per-run-block-chisq</strong></dt>
+<dd>will write per run block chisq/maxLH into the msr-file.</dd>
+<dt><strong>- -dump &lt;type&gt;</strong></dt>
+<dd>is writing a data file with the fit data and the theory; &lt;type&gt; can be ascii (data in columns) or root (data in ROOT histograms).</dd>
+<dt><strong>- -timeout &lt;timeout_tag&gt;</strong></dt>
+<dd>overwrites the predefined timeout of 3600 sec. &lt;timeout_tag&gt; <span class="math">\(\leq\)</span> 0 means the timeout facility is not enabled. &lt;timeout_tag&gt; &gt; 0, <em>e.g.</em> <tt class="docutils literal"><span class="pre">nn</span></tt> will set the timeout to <tt class="docutils literal"><span class="pre">nn</span></tt> (sec). If during a fit this timeout is reached, <tt class="docutils literal"><span class="pre">musrfit</span></tt> will terminate. This is used to prevent orphan <tt class="docutils literal"><span class="pre">musrfit</span></tt> processes to jam the system.</dd>
+<dt><strong>- -help</strong></dt>
+<dd>displays a small help notice in the shell explaining the basic usage of the program.</dd>
+<dt><strong>- -version</strong></dt>
+<dd>prints the version number of <tt class="docutils literal"><span class="pre">musrfit</span></tt></dd>
+</dl>
+<p>If called with a msr input file, <em>e.g.</em></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrfit <span class="m">8472</span>.msr
+</pre></div>
+</div>
+<p>the fit described in the input file will be executed and the results will be written to a mlog output file, in the example <tt class="docutils literal"><span class="pre">8472.mlog</span></tt>. When the fitting has terminated the msr file and the mlog file are swapped, so that the resultant parameter values can be found in the msr file and the mlog file contains a copy of the input file. The format of the mlog file is the same as that of the msr file. For a detailed description of the msr file format refer to the <a class="reference internal" href="#msr-file-format"><em>corresponding section</em></a>.</p>
+<p>Another example:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrfit -c -e 8472_tf_histo.msr
+</pre></div>
+</div>
+<p>This will calculate the chisq/maxLH of the run 8472 after estimating the <span class="math">\(N_0\)</span>.</p>
+</div>
+<div class="section" id="musrview">
+<span id="index-2"></span><span id="id3"></span><h3>musrview<a class="headerlink" href="#musrview" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">musrview</span></tt> is an interactive graphical user interface for the presentation of the analyzed data and the corresponding fits. If called from within a shell it accepts the following parameters:</p>
+<dl class="docutils">
+<dt><strong>&lt;msr_file&gt;</strong></dt>
+<dd>name of the msr input or output file to be displayed. This is the only mandatory parameter.</dd>
+<dt><strong>- -help</strong></dt>
+<dd>displays a small help notice in the shell explaining the basic usage of the program.</dd>
+<dt><strong>- -version</strong></dt>
+<dd>prints the version number of <tt class="docutils literal"><span class="pre">musrview</span></tt>.</dd>
+<dt><strong>-f, - -fourier</strong></dt>
+<dd>will directly present the Fourier transform of the &lt;msr_file&gt; with Fourier options as defined in the &lt;msr_file&gt;.</dd>
+<dt><strong>-a, - -avg</strong></dt>
+<dd>will directly present the averaged data/Fourier of the &lt;msr_file&gt;.</dd>
+<dt><strong>- -&lt;graphic_format_extension&gt;</strong></dt>
+<dd>will produce a graphics output file without starting a ROOT session. The filename is based on the name of the &lt;msr_file&gt;, <em>e.g.</em> 8472.msr will result in 8472_0.png.
+Supported values for <tt class="docutils literal"><span class="pre">&lt;graphic_format_extension&gt;</span></tt> are <em>eps</em>, <em>pdf</em>, <em>gif</em>, <em>jpg</em>, <em>png</em>, <em>svg</em>, <em>xpm</em>, and, <em>root</em>.</dd>
+<dt><strong>- -ascii</strong></dt>
+<dd>will generate an ascii dump of the data and theory as plotted.</dd>
+<dt><strong>- -timeout &lt;timeout&gt;</strong></dt>
+<dd>&lt;timeout&gt; given in seconds after which <tt class="docutils literal"><span class="pre">musrview</span></tt> terminates. If &lt;timeout&gt; <span class="math">\(\leq\)</span> 0, no timeout will take place. Default for &lt;timeout&gt; is 0.</dd>
+</dl>
+<p>If called with a msr file and the <tt class="docutils literal"><span class="pre">--&lt;graphic_format_extension&gt;</span></tt> option, <em>e.g.</em></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>$ musrview 8472.msr --jpg
+</pre></div>
+</div>
+<p>for each PLOT block in the the msr file a file <tt class="docutils literal"><span class="pre">8472_X.jpg</span></tt> is produced where <tt class="docutils literal"><span class="pre">X</span></tt> counts the PLOT blocks starting from zero.</p>
+<p>If called only with a msr file, <em>e.g.</em></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrview <span class="m">8472</span>.msr
+</pre></div>
+</div>
+<p>a ROOT canvas is drawn; it contains all experimental data and fits specified in the PLOT block of the msr file. For a description of the various plotting types refer to the <a class="reference internal" href="#msr-file-format"><em>corresponding section</em></a>.</p>
+<p>Another example:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrview 8472_tf_histo.msr -f -a
+</pre></div>
+</div>
+<p>will show the averaged Fourier transform of the data of run 8472.</p>
+<p>Within the drawn canvas all standard actions applicable to ROOT canvases might be performed. In the menu bar the Musrfit menu can be found. From there some musrfit-specific actions might be taken:</p>
+<dl class="docutils">
+<dt><strong>Fourier</strong></dt>
+<dd>performs the Fourier transformation of the <em>selected data</em> and shows the result.</dd>
+<dt><strong>Difference</strong></dt>
+<dd>shows the difference between the selected data and the fit.</dd>
+<dt><strong>Average</strong></dt>
+<dd>toggle between the current view and the averaged data view. Useful if the averaged Fourier power spectrum of lots of detectors shall be shown.</dd>
+<dt><strong>Export Data</strong></dt>
+<dd>saves the selected data in a simple multi-column ASCII file.</dd>
+</dl>
+<div class="section" id="musrview-key-shortcuts">
+<span id="index-3"></span><h4>musrview key-shortcuts<a class="headerlink" href="#musrview-key-shortcuts" title="Permalink to this headline">¶</a></h4>
+<p>Additionally, some functions can be accessed using <em>key-shortcuts</em>:</p>
+<dl class="docutils">
+<dt><strong>q</strong></dt>
+<dd>quits musrview.</dd>
+<dt><strong>d</strong></dt>
+<dd>shows the difference between the selected data and the fit.</dd>
+<dt><strong>f</strong></dt>
+<dd>performs the Fourier transformation of the selected data and shows the result.</dd>
+<dt><strong>a</strong></dt>
+<dd>show the average of the presented data, <em>e.g.</em> the averaged Fourier power spectra of various detectors.</dd>
+<dt><strong>u</strong></dt>
+<dd>reset the plotting range to the area given in the msr file (&#8220;un-zoom&#8221;).</dd>
+<dt><strong>c</strong></dt>
+<dd>toggles between normal and cross-hair cursor.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="musrft">
+<span id="index-4"></span><span id="id4"></span><h3>musrFT<a class="headerlink" href="#musrft" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">musrFT</span></tt> is an interactive graphical user interface for the presentation of Fourier transforms of <em>raw</em> μSR histograms. It&#8217;s purpose is to get a quick overview for high TF-field data, as found <em>e.g.</em> at the HAL-9500 instrument at PSI. It Fourier transforms the raw histogram data, i.e. <span class="math">\(N(t)\)</span> rather than <span class="math">\(A(t)\)</span>, and hence shows the lifetime contribution of the muon decay. This is no problem for large enough fields, but will be a <em>severe</em> problem at very low fields. <tt class="docutils literal"><span class="pre">musrFT</span></tt> is still in its early stage and should be considered a beta-version.</p>
+<p>If called from within a shell it accepts the following parameters:</p>
+<dl class="docutils">
+<dt><strong>Input Files</strong></dt>
+<dd><dl class="first last docutils">
+<dt><strong>&lt;msr_files&gt;</strong></dt>
+<dd>msr-file name(s). These msr-files are used for the Fourier transform. It can be a list of msr-files, <em>e.g.</em> <tt class="docutils literal"><span class="pre">musrFT</span> <span class="pre">3110.msr</span> <span class="pre">3111.msr</span></tt></dd>
+<dt><strong>-df, - -data-file &lt;data-file&gt;</strong></dt>
+<dd>This allows to feed only μSR data file(s) to perform the Fourier transform. Since the extended &lt;msr-file&gt; information are missing, they will need to be provided by to options, or <tt class="docutils literal"><span class="pre">musrFT</span></tt> tries to guess, based on <a class="reference internal" href="#musrfit-startup"><em>musrfit_startup.xml</em></a> settings.</dd>
+</dl>
+</dd>
+<dt><strong>Options</strong></dt>
+<dd><dl class="first last docutils">
+<dt><strong>- -help</strong></dt>
+<dd>display a help and exit.</dd>
+<dt><strong>- -version</strong></dt>
+<dd>output version information and exit.</dd>
+<dt><strong>-g, - -graphic-format &lt;graphic-format-extension&gt;</strong></dt>
+<dd>will produce a graphic-output-file without starting a root session. The name is based either on the &lt;msr-file&gt; or the &lt;data-file&gt;, <em>e.g.</em> <tt class="docutils literal"><span class="pre">3310.msr</span> <span class="pre">-&gt;</span> <span class="pre">3310_0.png</span></tt>. Supported graphic-format-extension: <em>eps</em>, <em>pdf</em>, <em>gif</em>, <em>jpg</em>, <em>png</em>, <em>svg</em>, <em>xpm</em>, and <em>root</em>.</dd>
+<dt><strong>- -dump &lt;fln&gt;</strong></dt>
+<dd>rather than starting a root session and showing Fourier graphs of the data, it will output the Fourier data in an ascii file &lt;fln&gt;.</dd>
+<dt><strong>-br, - -background-range &lt;start&gt; &lt;end&gt;</strong></dt>
+<dd>background interval used to estimate the background to be subtracted before the Fourier transform. &lt;start&gt;, &lt;end&gt; to be given in bins.</dd>
+<dt><strong>-bg, - -background</strong></dt>
+<dd>gives the background explicit for each histogram.</dd>
+<dt><strong>-fo, - -fourier-option &lt;fopt&gt;</strong></dt>
+<dd>&lt;fopt&gt; can be &#8216;<em>real</em>&#8216;, &#8216;<em>imag</em>&#8216;, &#8216;<em>real+imag</em>&#8216;, &#8216;<em>power</em>&#8216;, or &#8216;<em>phase</em>&#8216;. If this is not defined (neither on the command line nor in the <a class="reference internal" href="#musrfit-startup"><em>musrfit_startup.xml</em></a>) &#8216;<em>power</em>&#8216; will be used.</dd>
+<dt><strong>-ap, - -apodization &lt;val&gt;</strong></dt>
+<dd>&lt;val&gt; can be either &#8216;<em>none</em>&#8216;, &#8216;<em>weak</em>&#8216;, &#8216;<em>medium</em>&#8216;, &#8216;<em>strong</em>&#8216;. Default will be &#8216;<em>none</em>&#8216;.</dd>
+<dt><strong>-fp, - -fourier-power &lt;N&gt;</strong></dt>
+<dd>&lt;N&gt; being the Fourier power, i.e. <tt class="docutils literal"><span class="pre">2^&lt;N&gt;</span></tt> used for zero padding. Default is -1, i.e. <em>no</em> zero padding will be performed.</dd>
+<dt><strong>-u, - -units &lt;units&gt;</strong></dt>
+<dd>&lt;units&gt; is used to define the abscissa of the Fourier transform. One may choose between the fields (<em>Gauss</em>) or (<em>Tesla</em>), the frequency (<em>MHz</em>), and the angular-frequency domain (<em>Mc/s</em>). Default will be &#8216;<em>MHz</em>&#8216;.</dd>
+<dt><strong>-ph, - -phase &lt;val&gt;</strong></dt>
+<dd>defines the initial phase &lt;val&gt;. This only is of concern for &#8216;<em>real</em>&#8216;, &#8216;<em>imag</em>&#8216;, and &#8216;<em>real+imag</em>&#8216;. Default will be 0.0.</dd>
+<dt><strong>-fr, - -fourier-range &lt;start&gt; &lt;end&gt;</strong></dt>
+<dd>Fourier range. &lt;start&gt;, &lt;end&gt; are interpreted in the units given. Default will be -1.0 for both which means, take the full Fourier range.</dd>
+<dt><strong>-tr, - -time-range &lt;start&gt; &lt;end&gt;</strong></dt>
+<dd>time domain range to be used for Fourier transform. &lt;start&gt;, &lt;end&gt; are to be given in (μs). If nothing is provided, the full time range found in the data file(s) will be used.</dd>
+<dt><strong>- -histo &lt;list&gt;</strong></dt>
+<dd>give the &lt;list&gt; of histograms to be used for the Fourier transform. <em>E.g.</em> <tt class="docutils literal"><span class="pre">musrFT</span> <span class="pre">-df</span> <span class="pre">lem15_his_01234.root</span> <span class="pre">--histo</span> <span class="pre">1</span> <span class="pre">3</span></tt>, will only be needed together with the option <tt class="docutils literal"><span class="pre">--data-file</span></tt>. If multiple data files are given, &lt;list&gt; will apply to all data-files given. If <tt class="docutils literal"><span class="pre">--histo</span></tt> is not given, <em>all</em> histos of a data file will be used. &lt;list&gt; can be anything like: 2 3 6, or 2-17, or 1-6 9, etc.</dd>
+<dt><strong>-a, - -average</strong></dt>
+<dd>show the average of all <strong>ALL</strong> Fourier transformed data.</dd>
+<dt><strong>-ad, - -average-per-data-set</strong></dt>
+<dd>show the average of <strong>per-data-set</strong> Fourier transformed data.</dd>
+<dt><strong>- -t0 &lt;list&gt;</strong></dt>
+<dd>A list of t0&#8217;s can be provided. This in conjunction with <tt class="docutils literal"><span class="pre">--data-file</span></tt> and <tt class="docutils literal"><span class="pre">--fourier-option</span> <span class="pre">real</span></tt> allows to get the proper initial phase if t0&#8217;s are known. If a single t0 for multiple histos is given, it is assume, that this t0 is common to <em>all</em> histos. Example: <tt class="docutils literal"><span class="pre">musrFT</span> <span class="pre">-df</span> <span class="pre">lem15_his_01234.root</span> <span class="pre">-fo</span> <span class="pre">real</span> <span class="pre">--t0</span> <span class="pre">2750</span> <span class="pre">--histo</span> <span class="pre">1</span> <span class="pre">3</span></tt>.</dd>
+<dt><strong>-pa, - -packing &lt;N&gt;</strong></dt>
+<dd>if &lt;N&gt; (an integer), the time domain data will first be packed/rebinned by &lt;N&gt;.</dd>
+<dt><strong>- -title &lt;title&gt;</strong></dt>
+<dd>give a global title for the plot.</dd>
+<dt><strong>- -create-msr-file &lt;fln&gt;</strong></dt>
+<dd>creates a msr-file based on the command line options provided. This will help on the way to a full fitting model.</dd>
+<dt><strong>-lc, - -lifetimecorrection &lt;fudge&gt;</strong></dt>
+<dd>try to eliminate the muon life time decay. Only makes sense for low transverse fields. &lt;fudge&gt; is a tweaking factor (scaling factor for the estimated t0) and should be kept around 1.0.</dd>
+<dt><strong>- -timeout &lt;timeout&gt;</strong></dt>
+<dd>&lt;timeout&gt; given in seconds after which <tt class="docutils literal"><span class="pre">musrFT</span></tt> terminates. If &lt;timeout&gt; <span class="math">\(\leq\)</span> 0, no timeout will take place. Default &lt;timeout&gt; is 3600 sec.</dd>
+</dl>
+</dd>
+</dl>
+<p><strong>Example 1</strong></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrFT -df tdc_hifi_2014_00153.mdu --title <span class="s2">&quot;MnSi&quot;</span> -tr <span class="m">0</span> <span class="m">10</span> -fr <span class="m">7</span>.0 <span class="m">7</span>.6 -u Tesla --histo <span class="m">2</span>-17 -a
+</pre></div>
+</div>
+<p>will take time range from t=0..10 μs, will show the Fourier transform in units of Tesla from B=7.0..7.6 Tesla of the detectors 2-17. Rather than showing the 16 individual Fourier transforms, the average of all Fourier spectra will be shown. t0&#8217;s will be guessed by the maximum of the time domain histogram (assuming a prompt peak!!).</p>
+<p><strong>Example 2</strong></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrFT -df tdc_hifi_2014_00153.mdu -tr <span class="m">0</span> <span class="m">10</span> -fr <span class="m">7</span>.0 <span class="m">7</span>.6 -u Tesla --histo <span class="m">2</span>-17 --title <span class="s2">&quot;MnSi average, T=50K, B=7.5T&quot;</span> -a -g pdf
+</pre></div>
+</div>
+<p>as <strong>Example 1</strong> but rather than showing an interactive GUI, the output will be dumped into a pdf-file. The file name will be <tt class="docutils literal"><span class="pre">tdc_hifi_2014_00153.pdf</span></tt>.</p>
+<p><strong>Example 3</strong></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrFT -df tdc_hifi_2014_00153.mdu -tr <span class="m">0</span> <span class="m">10</span> -fr <span class="m">7</span>.0 <span class="m">7</span>.6 -u Tesla --histo <span class="m">2</span>-17 --title <span class="s2">&quot;MnSi average, T=50K, B=7.5T&quot;</span> -a --dump MnSi.dat
+</pre></div>
+</div>
+<p>as <strong>Example 1</strong> but rather than showing an interactive GUI, the output will be dumped into the ascii file <tt class="docutils literal"><span class="pre">MnSi.dat</span></tt>.</p>
+<p>Within the drawn canvas all standard actions applicable to ROOT canvases might be performed. In the menu bar the <tt class="docutils literal"><span class="pre">MusrFT</span></tt> menu can be found. From there some <tt class="docutils literal"><span class="pre">musrFT</span></tt>-specific actions might be taken</p>
+<dl class="docutils">
+<dt><strong>Fourier</strong></dt>
+<dd>allows to switch between different Fourier transform representations &#8216;<em>Power</em>&#8216;, &#8216;<em>Real</em>&#8216;, ...</dd>
+<dt><strong>Average</strong></dt>
+<dd>toggle between the current view and the averaged data view.</dd>
+<dt><strong>Average per Data Set</strong></dt>
+<dd>toggle between the current view and the per data set average view.</dd>
+<dt><strong>Export Data</strong></dt>
+<dd>saves the selected data in a simple multi-column ASCII file.</dd>
+</dl>
+<div class="section" id="musrft-key-shortcuts">
+<span id="index-5"></span><h4>musrFT key-shortcuts<a class="headerlink" href="#musrft-key-shortcuts" title="Permalink to this headline">¶</a></h4>
+<p>Additionally, some functions can be accessed using key-shortcuts:</p>
+<dl class="docutils">
+<dt><strong>q</strong></dt>
+<dd>quits musrFT.</dd>
+<dt><strong>a</strong></dt>
+<dd>toggle between average of the presented data and single Fourier histos, <em>e.g.</em> the averaged Fourier power spectra of various detectors.</dd>
+<dt><strong>d</strong></dt>
+<dd>toggle between average per data set and single Fourier histos, <em>e.g.</em> the averaged Fourier power spectra of various detectors for the different data sets given.</dd>
+<dt><strong>u</strong></dt>
+<dd>reset the plotting range to the area given in the msr-file or the form the command line (&#8220;unzoom&#8221;).</dd>
+<dt><strong>c</strong></dt>
+<dd>toggles between normal and crosshair cursor.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="musrt0">
+<span id="index-6"></span><span id="id5"></span><h3>musrt0<a class="headerlink" href="#musrt0" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">musrt0</span></tt> is a user interface allowing to determine t0 and the time windows of data and background needed to be specified in the RUN blocks of the msr file. It can be operated either as an interactive program or in a non-interactive mode. In the non-interactive mode it accepts the following parameters:</p>
+<dl class="docutils">
+<dt><strong>&lt;msr_file&gt;</strong></dt>
+<dd>name of an msr file.</dd>
+<dt><strong>-g, - -getT0FromPromptPeak [&lt;firstGoodBinOffset&gt;]</strong></dt>
+<dd>tries to estimate t0 from the prompt peak (maximum entry) in each histogram and writes the corresponding values to the t0 lines in the <a class="reference internal" href="#msr-run-block"><em>RUN blocks</em></a> of the msr file. If an optional number &lt;firstGoodBinOffset&gt; is given, the lower limit of the data range will be set to t0 + &lt;firstGoodBinOffset&gt;.</dd>
+<dt><strong>- -timeout &lt;timeout&gt;</strong></dt>
+<dd>&lt;timeout&gt; given in seconds after which musrview terminates. If &lt;timeout&gt; <span class="math">\(\leq\)</span> 0, no timeout will take place. Default for &lt;timeout&gt; is 0.</dd>
+<dt><strong>- -help</strong></dt>
+<dd>displays a small help notice in the shell explaining the basic usage of the program.</dd>
+<dt><strong>- -version</strong></dt>
+<dd>prints the version number of musrt0.</dd>
+</dl>
+<p>The interactive mode of <tt class="docutils literal"><span class="pre">musrt0</span></tt> is started if the program is called with a sole msr-file argument, <em>e.g.</em></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrt0 <span class="m">8472</span>.msr
+</pre></div>
+</div>
+<p>Then a ROOT canvas depicting the histogram of the data set mentioned first in the <a class="reference internal" href="#msr-run-block"><em>RUN blocks</em></a> block is drawn in different colors:</p>
+<img alt="_images/musrt0.png" src="_images/musrt0.png" />
+<p>The colors of the data points represent the choice of the time windows of data (blue) and background (red), as well as t0 (green line). In order to change these ranges the mouse cross-hair is moved to a channel of choice and one of the following keys is pressed:</p>
+<dl class="docutils">
+<dt><strong>q</strong></dt>
+<dd>close the currently open histogram and opens the next (see also below) .</dd>
+<dt><strong>Q</strong></dt>
+<dd>quit <tt class="docutils literal"><span class="pre">musrt0</span></tt> without writing into the msr file.</dd>
+<dt><strong>z</strong></dt>
+<dd>zoom into the region about the t0.</dd>
+<dt><strong>u</strong></dt>
+<dd>unzoom to the full range.</dd>
+<dt><strong>t</strong></dt>
+<dd>set t0 bin position.</dd>
+<dt><strong>T</strong></dt>
+<dd>automatically set t0, <em>i.e.</em> jump to the maximum of the histogram.</dd>
+<dt><strong>b</strong></dt>
+<dd>set the lower limit of the background range bin.</dd>
+<dt><strong>B</strong></dt>
+<dd>set the upper limit of the background range bin.</dd>
+<dt><strong>d</strong></dt>
+<dd>set the lower limit of the data range bin.</dd>
+<dt><strong>D</strong></dt>
+<dd>set the upper limit of the data range bin.</dd>
+</dl>
+<p>When all channels have been set correctly for the first histogram, pressing of the key <strong>q</strong> opens the subsequent histogram listed in a <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a> and the respective channels can be updated there. This procedure is repeated until all histograms given in the RUN blocks are processed.</p>
+<p>Using the key <strong>Q</strong>, <tt class="docutils literal"><span class="pre">musrt0</span></tt> can be interrupted. No changes to the msr file are applied in this case.</p>
+<p>Closing a window by clicking the X button (close icon) is equivalent to pressing <strong>Q</strong>, <em>i.e.</em> <tt class="docutils literal"><span class="pre">musrt0</span></tt> is simply terminated.</p>
+</div>
+<div class="section" id="msr2msr">
+<span id="index-7"></span><h3>msr2msr<a class="headerlink" href="#msr2msr" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">msr2msr</span></tt> is a small utility for converting existing WKM msr files into musrfit msr files. It accepts the following parameters:</p>
+<dl class="docutils">
+<dt><strong>&lt;msr_file_in&gt;</strong></dt>
+<dd>input WKM msr file (mandatory first parameter).</dd>
+<dt><strong>&lt;msr_file_out&gt;</strong></dt>
+<dd>converted output musrfit msr file (mandatory second parameter).</dd>
+<dt><strong>- -help</strong></dt>
+<dd>displays a small help notice in the shell explaining the basic usage of the program.</dd>
+</dl>
+<p>A typical example then looks like:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2msr <span class="m">8472</span>-WKM.msr <span class="m">8472</span>-musrfit.msr
+</pre></div>
+</div>
+<p>If the input file has already the <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr file structure, the output file will be just a copy of the input file.</p>
+</div>
+<div class="section" id="msr2data">
+<h3>msr2data<a class="headerlink" href="#msr2data" title="Permalink to this headline">¶</a></h3>
+<p>For details concerning <tt class="docutils literal"><span class="pre">msr2data</span></tt> see the section <a class="reference internal" href="msr2data.html#msr2data"><em>msr2data</em></a>.</p>
+</div>
+<div class="section" id="any2many">
+<span id="index-8"></span><span id="id6"></span><h3>any2many<a class="headerlink" href="#any2many" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">any2many</span></tt> is a μSR data file converter. Currently different facilities (PSI, TRIUMF, ISIS, J-PARC) are saving their μSR data files in different formats, or even worse some instruments are using other μSR data formats than others. The aim of <tt class="docutils literal"><span class="pre">any2many</span></tt> is that these files can be converted into each other. Of course only a subset of header information can be converted.</p>
+<p>Currently <tt class="docutils literal"><span class="pre">any2many</span></tt> can convert the following μSR data file formats:</p>
+<dl class="docutils">
+<dt><strong>input formats</strong></dt>
+<dd><em>MusrRoot</em>, <em>PSI-BIN</em> (PSI bulk), <em>ROOT</em> (PSI LEM), <em>MUD</em> (TRIUMF), <em>NeXus</em> IDF1 and <em>NeXus</em> IDF2 (ISIS), <em>PSI-MDU</em> (PSI bulk internal only), <em>WKM</em> (outdated ascii file format).</dd>
+<dt><strong>output formats</strong></dt>
+<dd><em>MusrRoot</em>, <em>PSI-BIN</em>, <em>ROOT</em>, <em>MUD</em>, <em>NeXus1-HDF4</em>, <em>NeXus1-HDF5</em>, <em>NeXus1-XML</em>, <em>NeXus2-HDF4</em>, <em>NeXus2-HDF5</em>, <em>NeXus2-XML</em>, <em>WKM</em>, <em>ASCII</em></dd>
+</dl>
+<p>Since the goal was to create a very flexible converter tool, it has ample of options which will listed below, followed by many examples showing how to use it. The options:</p>
+<dl class="docutils">
+<dt><strong>-f &lt;filenameList-input&gt;</strong></dt>
+<dd>where &lt;filenameList-input&gt; is a space separated list of file names (not starting with a &#8216;-&#8216;), <em>e.g.</em> <tt class="docutils literal"><span class="pre">2010/lem10_his_0111.root</span> <span class="pre">2010/lem10_his_0113.root</span></tt>.</dd>
+<dt><strong>-o &lt;outputFileName&gt;</strong></dt>
+<dd>this option allows to given an output-file-name for the converted file. This option only makes sense if &lt;filenameList-input&gt; is a single input-file-name!</dd>
+<dt><strong>-r &lt;runList-input&gt;</strong></dt>
+<dd>where &lt;runList-input&gt; is a list of run numbers separated by spaces of the form: &lt;run1&gt; &lt;run2&gt; &lt;run3&gt; etc., or a sequence of runs &lt;runStart&gt;-&lt;runEnd&gt;, <em>e.g.</em> 111-123. This option cannot be combined with -f and vice versa.</dd>
+<dt><strong>-t &lt;in-template&gt; &lt;out-template&gt;</strong></dt>
+<dd>where &lt;in-/out-template&gt; are templates to generate real file names from run numbers. The following template tags can be used: <tt class="docutils literal"><span class="pre">[yy]</span></tt> for year, and <tt class="docutils literal"><span class="pre">[rrrr]</span></tt> for the run number. If the run number tag is used, the number of &#8216;r&#8217; will give the number of digits used with leading zeros, <em>e.g.</em> <tt class="docutils literal"><span class="pre">[rrrrrr]</span></tt> and run 123 will result in 000123. Similarly <tt class="docutils literal"><span class="pre">[yyyy]</span></tt> will result in something like 1999, whereas <tt class="docutils literal"><span class="pre">[yy]</span></tt> into something like 99. For more details best check the examples below.</dd>
+<dt><strong>-c &lt;in-Format&gt; &lt;out-Format&gt;</strong></dt>
+<dd>this is used to tell <tt class="docutils literal"><span class="pre">any2many</span></tt> what is the input-file-format and into which output-file-format the data shall be converted. The possible input-/output-file-formats are listed above.</dd>
+<dt><strong>-h</strong></dt>
+<dd>This option is for MusrRoot input files only! Select the the histo groups to be exported. is a space separated list of the histo group, <em>e.g.</em> <tt class="docutils literal"><span class="pre">-h</span> <span class="pre">0,</span> <span class="pre">20</span></tt> will try to export the histo 0 (NPP) and 20 (PPC). A histo-group is defined via the RedGreen offset in the MusrRoot file format. It is used <em>e.g.</em> in red/green mode measurements. If this option is omitted in a conversion from MusrRoot to something, the first group will be exported only!</dd>
+<dt><strong>-p &lt;output-path&gt;</strong></dt>
+<dd>where &lt;output-path&gt; is the output path for the converted files. If no &lt;output-path&gt; is given, the current directory will be used, unless the option <strong>-s</strong> is used.</dd>
+<dt><strong>-y &lt;year&gt;</strong></dt>
+<dd>here a &lt;year&gt; in the form <tt class="docutils literal"><span class="pre">yy</span></tt> or <tt class="docutils literal"><span class="pre">yyyy</span></tt> can be given. If this is the case, any automatic file name generation which needs a year will use this given one.</dd>
+<dt><strong>-s</strong></dt>
+<dd>with this option the output data file will be sent to the stdout. It is intended to be used together with web applications.</dd>
+<dt><strong>-rebin &lt;n&gt;</strong></dt>
+<dd>where &lt;n&gt; is the number of bins to be packed/rebinned.</dd>
+<dt><strong>-z [g|b] &lt;compressed&gt;</strong></dt>
+<dd>where &lt;compressed&gt; is the output file name (without extension) of the compressed data collection, and &#8216;g&#8217; will result in <tt class="docutils literal"><span class="pre">.tar.gz</span></tt>, and &#8216;b&#8217; in <tt class="docutils literal"><span class="pre">.tar.bz2</span></tt> files.</dd>
+<dt><strong>&#8211;help</strong></dt>
+<dd>displays a help notice in the shell explaining the basic usage of the program.</dd>
+<dt><strong>&#8211;version</strong></dt>
+<dd>shows the current version of <tt class="docutils literal"><span class="pre">any2many</span></tt>.</dd>
+</dl>
+<p>If the template option <cite>-t</cite> is absent, the output file name will be generated according to the input data file name (not possible with &lt;runList-input&gt;), and the output data format.</p>
+<p>Here now a couple of examples which should help to understand the switches.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ any2many -f <span class="m">2010</span>/lem10_his_0123.root -c ROOT ASCII -rebin <span class="m">25</span>
+</pre></div>
+</div>
+<p>Will take the <em>LEM ROOT</em> file <tt class="docutils literal"><span class="pre">2010/lem10_his_0123.root</span></tt> rebin it by 25 and convert it to <em>ASCII</em>. The output file name will be <tt class="docutils literal"><span class="pre">lem10_his_0123.ascii</span></tt>, and the file will be saved in the current directory. The data in <tt class="docutils literal"><span class="pre">lem10_his_0123.ascii</span></tt> are written in columns.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ any2many -f <span class="m">2010</span>/lem10_his_0123.root -c ROOT NEXUS2-HDF5 -o <span class="m">2010</span>/lem10_his_0123_v2.nxs
+</pre></div>
+</div>
+<p>Will take the <em>LEM ROOT</em> file <tt class="docutils literal"><span class="pre">2010/lem10_his_0123.root</span></tt> and convert it to <em>NeXus</em> IDF V2. The output file name will be <tt class="docutils literal"><span class="pre">lem10_his_0123_v2.nxs</span></tt>, and will be saved in the current directory.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ any2many -r <span class="m">123</span> <span class="m">137</span> -c PSI-BIN MUD -t d<span class="o">[</span>yyyy<span class="o">]</span>/deltat_tdc_gps_<span class="o">[</span>rrrr<span class="o">]</span>.bin <span class="o">[</span>rrrrrr<span class="o">]</span>.msr -y <span class="m">2001</span>
+</pre></div>
+</div>
+<p>Will take the run 123 and 137, will generate the input file names: <tt class="docutils literal"><span class="pre">d2001/deltat_tdc_gps_0123.bin</span></tt> and <tt class="docutils literal"><span class="pre">d2001/deltat_tdc_gps_0137.bin</span></tt>, read these files, and convert them to the output files with names <tt class="docutils literal"><span class="pre">000123.msr`</span> <span class="pre">and</span> <span class="pre">`000137.msr</span></tt>, respectively.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ any2many -r <span class="m">100</span>-117 -c PSI-MDU ASCII -t d<span class="o">[</span>yyyy<span class="o">]</span>/deltat_tdc_alc_<span class="o">[</span>rrrr<span class="o">]</span>.mdu <span class="o">[</span>rrr<span class="o">]</span>.ascii -y <span class="m">2011</span> -s
+</pre></div>
+</div>
+<p>Will take the runs 100 through 117 and convert the <em>PSI-MDU</em> input files to <em>ASCII</em> output and instead of saving them into a file, they will be spit to the standard output.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ any2many -r <span class="m">100</span>-117 -c NEXUS ROOT -t d<span class="o">[</span>yyyy<span class="o">]</span>/psi_gps_<span class="o">[</span>rrrr<span class="o">]</span>.NXS psi_<span class="o">[</span>yyyy<span class="o">]</span>_gps_<span class="o">[</span>rrrr<span class="o">]</span>.root -z b psi_gps_run_100to117
+</pre></div>
+</div>
+<p>Will take the runs 100 through 117 and convert the <em>NeXus</em> input files to <em>ROOT</em> output. Afterwards these new files will be collected in a compressed archive <tt class="docutils literal"><span class="pre">psi_gps_run_100to117.tar.bz2</span></tt>.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ any2many -f <span class="m">2010</span>/lem10_his_0123.root <span class="m">2010</span>/lem10_his_0012.root -c ROOT ROOT -rebin <span class="m">25</span>
+</pre></div>
+</div>
+<p>Will read the two files <tt class="docutils literal"><span class="pre">2010/lem10_his_0123.root</span></tt> and <tt class="docutils literal"><span class="pre">2010/lem10_his_0012.root</span></tt>, rebin them with 25 and export them as <em>LEM ROOT</em> files with adding rebin25 to the name, <em>e.g.</em> <tt class="docutils literal"><span class="pre">2010/lem10_his_0123_rebin25.root</span></tt>.</p>
+</div>
+<div class="section" id="dump-header">
+<span id="index-9"></span><h3>dump_header<a class="headerlink" href="#dump-header" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">dump_header</span></tt> is a little program which tries to read a μSR data file and sends the relevant information (required header info, start of the histos, etc.) to the standard output. Currently the following μSR data file formats are supported: <em>MusrROOT</em>, <em>ROOT</em> (old LEM format), <em>PSI-BIN</em>, <em>PSI-MDU</em>, <em>NeXus</em> (IDF1 and IDF2), <em>MUD</em>, and <em>WKM</em>.</p>
+<dl class="docutils">
+<dt><strong>-rn, - -runNo &lt;runNo&gt;</strong></dt>
+<dd>run number of the header to be dumped.</dd>
+<dt><strong>-fn, - -fileName &lt;fileName&gt;</strong></dt>
+<dd>muSR data file name.</dd>
+<dt><strong>-ff, - -fileFormat &lt;fileFormat&gt;</strong></dt>
+<dd>where &lt;fileFormat&gt; is one of the above listed ones.</dd>
+<dt><strong>-y, - -year &lt;year&gt;</strong></dt>
+<dd>&lt;year&gt; has to be a 4 digit value, <em>e.g.</em> 2005, if provided it is used to generate the file name for the given &lt;runNo&gt;, otherwise the current year is used. If a file name is given, this option has no effect.</dd>
+<dt><strong>-s, &#8211;summary</strong></dt>
+<dd>this option is used for LE-μSR data sets only. It will, additionally to the header information, print the summary file content.</dd>
+<dt><strong>&#8211;psi-bulk &lt;opt&gt;</strong></dt>
+<dd>where &lt;opt&gt; consists of two items: (i) pta or tdc, (ii) the instrument name, <em>i.e.</em> gps, ltf, dolly, gpd, or hifi. This is needed in combination with the file formats <em>PSI-BIN</em> and <em>PSI-MDU</em> when providing a run number.</dd>
+<dt><strong>-h, &#8211;help</strong></dt>
+<dd>will show a short help.</dd>
+<dt><strong>-v, &#8211;version</strong></dt>
+<dd>will print the current version.</dd>
+</dl>
+<p>Examples:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ dump_header -fn tdc_hifi_2015_00123.mdu -y <span class="m">2015</span>
+</pre></div>
+</div>
+<p>will dump the header information for the run 123 of the HAL-9500 instrument of the year 2015.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ dump_header -rn <span class="m">123</span> -ff PSI-MDU --psi-bulk tdc hifi -y <span class="m">2015</span>
+</pre></div>
+</div>
+<p>the same as the previous example, except that the file name is constructed via the number and the additionally provided information.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ dump_header -rn <span class="m">3456</span> -s
+</pre></div>
+</div>
+<p>Will dump the LEM header information of run 3456 including the content of the run summary file.</p>
+</div>
+<div class="section" id="musrfit-startup-xml">
+<span id="musrfit-startup"></span><span id="index-10"></span><h3>musrfit_startup.xml<a class="headerlink" href="#musrfit-startup-xml" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">musrfit_startup.xml</span></tt> is a configuration file located at <tt class="docutils literal"><span class="pre">$HOME\.musrfit</span></tt>. In this file the following XML tags are allowed to define settings:</p>
+<dl class="docutils">
+<dt><strong>&lt;data_path&gt;PATH_TO_DATA&lt;/data_path&gt;</strong></dt>
+<dd>add the new path <tt class="docutils literal"><span class="pre">PATH_TO_DATA</span></tt> where <tt class="docutils literal"><span class="pre">musrfit</span></tt> and <tt class="docutils literal"><span class="pre">musrview</span></tt> will search for data files.</dd>
+<dt><strong>&lt;write_per_run_block_chisq&gt;y/n&lt;/write_per_run_block_chisq&gt;</strong></dt>
+<dd>if enabled <span class="math">\(\chi^2\)</span> for each <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a> will be written to the <a class="reference internal" href="#msr-statistic-block"><em>STATISTIC block</em></a> of the resulting msr file. Additionally,
+in case a <span class="math">\(\chi^2\)</span> single-histogram fit is done, also <a class="reference external" href="http://en.wikipedia.org/wiki/Pearson's_chi-square_test">Pearson&#8217;s</a> <span class="math">\(\chi^2\)</span> will be added.</dd>
+<dt><strong>&lt;fourier_settings&gt;&lt;/fourier_settings&gt;</strong></dt>
+<dd><p class="first">set the default parameters for the Fourier transform in <tt class="docutils literal"><span class="pre">musrview</span></tt>. For further details refer to the description of the <a class="reference internal" href="#msr-fourier-block"><em>FOURIER block</em></a> in the msr file.</p>
+<dl class="last docutils">
+<dt><strong>&lt;units&gt;UNITS&lt;/units&gt;</strong></dt>
+<dd>specify the units of the frequency or field-domain. Valid units are <em>Gauss</em>, <em>MHz</em> and <em>Mc/s</em> (inside a &lt;fourier_settings&gt; environment).</dd>
+<dt><strong>&lt;fourier_power&gt;n&lt;/fourier_power&gt;</strong></dt>
+<dd>specify the number of points <span class="math">\(2^n (n &lt; 21)\)</span> to be used for the Fourier transform (inside a &lt;fourier_settings&gt; environment).</dd>
+<dt><strong>&lt;apodization&gt;APOD&lt;/apodization&gt;</strong></dt>
+<dd>set the default apodization method. Valid apodizations are <em>none</em>, <em>weak</em>, <em>medium</em>, and <em>strong</em> (inside a &lt;fourier_settings&gt; environment).</dd>
+<dt><strong>&lt;plot&gt;PLOT&lt;/plot&gt;</strong></dt>
+<dd>specify which part of the Fourier transform is plotted by default. You can choose between <em>real</em>, <em>imag</em>, <em>real_and_imag</em>, <em>power</em>, and <em>phase</em> (inside a &lt;fourier_settings&gt; environment).</dd>
+<dt><strong>&lt;phase&gt;PH&lt;/phase&gt;</strong></dt>
+<dd>set the initial phase shift PH (in degrees) of the data to be Fourier transformed (inside a &lt;fourier_settings&gt; environment).</dd>
+<dt><strong>&lt;phase_increment&gt;PHINCR&lt;/phase_increment&gt;</strong></dt>
+<dd>change the default value of the phase increment (in degrees) used for the phase optimization to PHINCR (inside a &lt;fourier_settings&gt; environment).</dd>
+</dl>
+</dd>
+<dt><strong>&lt;root_settings&gt;&lt;/root_settings&gt;</strong></dt>
+<dd><p class="first">change the default ROOT settings.</p>
+<dl class="last docutils">
+<dt><strong>&lt;marker_list&gt;&lt;/marker_list&gt;</strong></dt>
+<dd><p class="first">specify the order in which <tt class="docutils literal"><span class="pre">musrview</span></tt> should use markers when plotting data (inside a &lt;root_settings&gt; environment).</p>
+<dl class="last docutils">
+<dt><strong>&lt;marker&gt;X&lt;/marker&gt;</strong></dt>
+<dd>use the ROOT marker number X (inside a &lt;marker_list&gt; environment).</dd>
+</dl>
+</dd>
+<dt><strong>&lt;color_list&gt;&lt;/color_list&gt;</strong></dt>
+<dd><p class="first">specify the order in which <tt class="docutils literal"><span class="pre">musrview</span></tt> should use colors when plotting data (inside a &lt;root_settings&gt; environment).</p>
+<dl class="last docutils">
+<dt><strong>&lt;color&gt;R,G,B&lt;/color&gt;</strong></dt>
+<dd>use the RGB coded color (inside a &lt;color_list&gt; environment).</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<p>An example would look like:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;musrfit</span> <span class="na">xmlns=</span><span class="s">&quot;https://intranet.psi.ch/MUSR/MusrFit&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;data_path&gt;</span>/mnt/data/nemu/his<span class="nt">&lt;/data_path&gt;</span>
+    <span class="nt">&lt;write_per_run_block_chisq&gt;</span>y<span class="nt">&lt;/write_per_run_block_chisq&gt;</span>
+    <span class="nt">&lt;fourier_settings&gt;</span>
+        <span class="nt">&lt;units&gt;</span>Gauss<span class="nt">&lt;/units&gt;</span>
+        <span class="nt">&lt;fourier_power&gt;</span>0<span class="nt">&lt;/fourier_power&gt;</span>
+        <span class="nt">&lt;apodization&gt;</span>none<span class="nt">&lt;/apodization&gt;</span>
+        <span class="nt">&lt;plot&gt;</span>real_and_imag<span class="nt">&lt;/plot&gt;</span>
+        <span class="nt">&lt;phase&gt;</span>0.0<span class="nt">&lt;/phase&gt;</span>
+        <span class="nt">&lt;phase_increment&gt;</span>1.0<span class="nt">&lt;/phase_increment&gt;</span>
+    <span class="nt">&lt;/fourier_settings&gt;</span>
+    <span class="nt">&lt;root_settings&gt;</span>
+        <span class="nt">&lt;marker_list&gt;</span>
+            <span class="c">&lt;!-- Root marker numbers --&gt;</span>
+            <span class="nt">&lt;marker&gt;</span>24<span class="nt">&lt;/marker&gt;</span>
+            <span class="nt">&lt;marker&gt;</span>25<span class="nt">&lt;/marker&gt;</span>
+            <span class="nt">&lt;marker&gt;</span>26<span class="nt">&lt;/marker&gt;</span>
+            <span class="nt">&lt;marker&gt;</span>27<span class="nt">&lt;/marker&gt;</span>
+        <span class="nt">&lt;/marker_list&gt;</span>
+        <span class="nt">&lt;color_list&gt;</span>
+            <span class="c">&lt;!-- Color as RGB coded string --&gt;</span>
+            <span class="nt">&lt;color&gt;</span>0,0,0<span class="nt">&lt;/color&gt;</span>
+            <span class="nt">&lt;color&gt;</span>255,0,0<span class="nt">&lt;/color&gt;</span>
+            <span class="nt">&lt;color&gt;</span>0,255,0<span class="nt">&lt;/color&gt;</span>
+            <span class="nt">&lt;color&gt;</span>0,0,255<span class="nt">&lt;/color&gt;</span>
+        <span class="nt">&lt;/color_list&gt;</span>
+    <span class="nt">&lt;/root_settings&gt;</span>
+<span class="nt">&lt;/musrfit&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="description-of-the-msr-file-format">
+<span id="msr-file-format"></span><span id="index-11"></span><h2>Description of the msr File Format<a class="headerlink" href="#description-of-the-msr-file-format" title="Permalink to this headline">¶</a></h2>
+<p>The programs are using an input file to control their action. This input file has the extension <tt class="docutils literal"><span class="pre">.msr</span></tt> (msr file). The msr file is built up from different blocks. Each block starts with a keyword and is, with the exception of the title, terminated by an empty line. Comments start with the character <tt class="docutils literal"><span class="pre">#</span></tt>. The various input blocks are described below.</p>
+<div class="section" id="the-title">
+<span id="msr-title-block"></span><span id="index-12"></span><h3>The Title<a class="headerlink" href="#the-title" title="Permalink to this headline">¶</a></h3>
+<p>The first line of the msr file is the title line. Unlike all the other input blocks, it does not start with a block keyword. It is just a simple text line, in which any information can be placed. The title text will be used in the graphical representation of the data as a headline.</p>
+</div>
+<div class="section" id="the-fitparameter-block">
+<span id="msr-fitparameter-block"></span><span id="index-13"></span><h3>The FITPARAMETER Block<a class="headerlink" href="#the-fitparameter-block" title="Permalink to this headline">¶</a></h3>
+<p>The FITPARAMETER block is used to define the fit parameters in a MINUIT typical style. There are various possible parameter definitions which are listed here:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>1. &lt;no&gt; &lt;name&gt; &lt;value&gt; &lt;step&gt;
+2. &lt;no&gt; &lt;name&gt; &lt;value&gt; &lt;step&gt; &lt;lower_boundary&gt; &lt;upper_boundary&gt;
+3. &lt;no&gt; &lt;name&gt; &lt;value&gt; &lt;step&gt; &lt;pos_error&gt; &lt;lower_boundary&gt; &lt;upper_boundary&gt;
+</pre></div>
+</div>
+<p>where &lt;no&gt; is the parameter number, &lt;name&gt; is the parameter name <a class="footnote-reference" href="#f1" id="id7">[1]</a>, &lt;value&gt; is the initial guess of the parameter, &lt;step&gt; the inital step width, &lt;lower/upper_boundary&gt; is the lower/upper boundary for the parameter <a class="footnote-reference" href="#f2" id="id8">[2]</a>.</p>
+<p>In the output file, &lt;value&gt; will be the MINUIT fit value, &lt;step&gt; will contain the error estimate (or the negative error estimate if MINOS was successfully used), &lt;pos_error&gt; will have the value <em>none</em> if MINOS has not been used, otherwise it will show the positive error estimate.</p>
+<p>A typical example looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>FITPARAMETER
+#       No   Name      Value     Step       Pos_Error    Boundaries
+        1   alpha     1          0.02       none         0       1.8
+        2   asy       0.1042     0.004713   none         0       0.33
+        3   phase     15         1.0        none
+        4   freq      0.9        0.0379     none
+        5   rate      0.03       0.00579    none
+</pre></div>
+</div>
+<p>There is also the possibility to constrain the parameters to semi-defined intervals (like par &gt; a or par &lt; b). The syntax is as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>FITPARAMETER
+#       No   Name      Value     Step       Pos_Error    Boundaries
+# Specify only a lower boundary for the parameter
+        1   Asy1      0.04501   -0.00208    0.00211      0       none
+
+# Specify only an upper boundary for the parameter
+        2   Rate1     0.14245   -0.02501    0.02279      none    10
+
+# Specify lower and upper boundaries for the parameter
+        3   Asy2      0.14501   -0.00208    0.00211      0       0.33
+
+# Do not specify boundaries at all
+        4   Field2    343.212   -2.27960    2.27885
+        5   Rate2     0.42045   -0.02501    0.02279      none    none
+</pre></div>
+</div>
+<p class="rubric">Notes</p>
+<table class="docutils footnote" frame="void" id="f1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id7">[1]</a></td><td>A standard string without whitespace.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="f2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id8">[2]</a></td><td>According to the MINUIT manual this should be avoided whenever possible!</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="the-theory-block">
+<span id="msr-theory-block"></span><span id="index-14"></span><h3>The THEORY Block<a class="headerlink" href="#the-theory-block" title="Permalink to this headline">¶</a></h3>
+<p>The THEORY block is used to define the fit function. There is a set of predefined functions available. It is also possible to use externally defined functions. How to use them will be explained afterwards, here only the predefined functions are described.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="4%" />
+<col width="2%" />
+<col width="14%" />
+<col width="77%" />
+<col width="2%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">abbr.</th>
+<th class="head">parameters</th>
+<th class="head">mathematical expression</th>
+<th class="head">notes</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>const</td>
+<td>c</td>
+<td>const(1)</td>
+<td>const</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>asymmetry</td>
+<td>a</td>
+<td>A(1)</td>
+<td><span class="math">\(A\)</span></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>simplExpo</td>
+<td>se</td>
+<td><span class="math">\(\lambda (\mu \mathrm{s}^{-1})\)</span></td>
+<td><span class="math">\(\exp(-\lambda t)\)</span></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>generExpo</td>
+<td>ge</td>
+<td><span class="math">\(\lambda (\mu \mathrm{s}^{-1}) \beta(1)\)</span></td>
+<td><span class="math">\(\exp\left[(-\lambda t)^\beta\right]\)</span></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>simpleGss</td>
+<td>sg</td>
+<td><span class="math">\(\sigma (\mu \mathrm{s}^{-1})\)</span></td>
+<td><span class="math">\(\exp\left[-\frac{1}{2} (\sigma t)^2\right]\)</span></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>statGssKT</td>
+<td>stg</td>
+<td><span class="math">\(\sigma (\mu \mathrm{s}^{-1})\)</span></td>
+<td><span class="math">\(\frac{1}{3} + \frac{2}{3} \left[ 1 - (\sigma t)^2\right] \exp\left[-\frac{1}{2} (\sigma t)^2\right]\)</span></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>statGssKTLF</td>
+<td>sgktlf</td>
+<td><span class="math">\(\nu\)</span> (MHz), <span class="math">\(\sigma (\mu \mathrm{s}^{-1})\)</span></td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(G_{\rm G}^{\rm LF}(t) = 1-\frac{2\sigma^2}{(2\pi\nu)^2} \left[ 1-\exp\left(- \frac{1}{2}\sigma^2t^2\right)\cos(2\pi\nu t)\right]\)</span></dt>
+<dd><span class="math">\(+ \frac{2\sigma^4}{(2\pi\nu)^3} \int_0^t \exp\left(- \frac{1}{2}\sigma^2\tau^2\right) \sigma(2\pi\nu\tau) d\tau\)</span></dd>
+</dl>
+</td>
+<td><a class="footnote-reference" href="#n1" id="id9">[3]</a></td>
+</tr>
+<tr class="row-odd"><td>dynGssKTLF</td>
+<td>dgktlf</td>
+<td><span class="math">\(\nu\)</span> (MHz), <span class="math">\(\sigma (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(\Gamma\)</span> (MHz)</td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\frac{1}{2\pi i} \int_{\gamma+i\infty}^{\gamma-i\infty} \frac{f_{\rm G}(s+\Gamma)}{1-\Gamma f_{\rm G}(s+\Gamma)} \exp(s t) ds\)</span>,</dt>
+<dd>where <span class="math">\(f_{\rm G}(s) = \int_0^\infty G_{\rm G}^{\rm LF}(t) \exp(-s t) dt\)</span></dd>
+</dl>
+</td>
+<td><a class="footnote-reference" href="#n2" id="id10">[4]</a></td>
+</tr>
+<tr class="row-even"><td>statExpKT</td>
+<td>sekt</td>
+<td><span class="math">\(\lambda (\mu \mathrm{s}^{-1})\)</span></td>
+<td><span class="math">\(\frac{1}{3} + \frac{2}{3} \left[ 1 - \lambda t\right] \exp(-\lambda t)\)</span></td>
+<td><a class="footnote-reference" href="#n3" id="id11">[5]</a></td>
+</tr>
+<tr class="row-odd"><td>statExpKTLF</td>
+<td>sektlf</td>
+<td><span class="math">\(\nu\)</span> (MHz), <span class="math">\(a (\mu \mathrm{s}^{-1})\)</span></td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(1 - \frac{a}{2\pi\nu} j_1(2\pi\nu t) \exp(-a t)\)</span></dt>
+<dd><span class="math">\(- \left(\frac{a}{2\pi\nu}\right)^2 \left[j_0(2\pi\nu t)\exp(-a t)-1\right]\)</span>
+<span class="math">\(- a \left[1+\left(\frac{a}{2\pi\nu}\right)^2\right] \int_0^t \exp(-a\tau) j_0(2\pi\nu\tau) d\tau = G_{\rm L}^{\rm LF}(t)\)</span></dd>
+</dl>
+</td>
+<td><a class="footnote-reference" href="#n4" id="id12">[6]</a></td>
+</tr>
+<tr class="row-even"><td>dynExpKTLF</td>
+<td>dektlf</td>
+<td><span class="math">\(\nu\)</span> (MHz), <span class="math">\(a (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(\Gamma\)</span> (MHz)</td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\frac{1}{2\pi i} \int_{\gamma+i\infty}^{\gamma-i\infty} \frac{f_{\rm L}(s+\Gamma)}{1-\Gamma f_{\rm L}(s+\Gamma)} \exp(s t) ds\)</span>,</dt>
+<dd>where <span class="math">\(f_{\rm L}(s) = \int_0^\infty G_{\rm L}^{\rm LF}(t) \exp(-s t) dt\)</span></dd>
+</dl>
+</td>
+<td><a class="footnote-reference" href="#n5" id="id13">[7]</a></td>
+</tr>
+<tr class="row-odd"><td>combiLGKT</td>
+<td>lgkt</td>
+<td><span class="math">\(\lambda (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(\sigma (\mu \mathrm{s}^{-1})\)</span></td>
+<td><span class="math">\(\frac{1}{3} + \frac{2}{3} (1 - \sigma^2 t^2 -\lambda t) \exp\left(-\frac{\sigma^2 t^2}{2}-\lambda t\right)\)</span></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>strKT</td>
+<td>skt</td>
+<td><span class="math">\(\sigma (\mu \mathrm{s}^{-1}),~\beta(1)\)</span></td>
+<td><span class="math">\(\frac{1}{3} + \frac{2}{3} \left[ 1 - (\sigma t)^\beta\right] \exp\left[-(\sigma t)^\beta / \beta \right]\)</span></td>
+<td><a class="footnote-reference" href="#n6" id="id14">[8]</a></td>
+</tr>
+<tr class="row-odd"><td>spinGlass</td>
+<td>spg</td>
+<td><span class="math">\(\lambda (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(\gamma (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(q (1)\)</span></td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\frac{1}{3} \exp\left(-\sqrt{\Omega t}\right) +\)</span></dt>
+<dd><span class="math">\(+ \frac{2}{3} \left(1 - \frac{q\lambda^2 t^2}{\sqrt{\Omega t+ q\lambda^2 t^2}}\right) \exp(-\sqrt{\Omega t + q \lambda^2 t^2})\)</span>,
+<span class="math">\(\Omega t = \frac{4 \lambda^2 (1-q) t}{\gamma}\)</span></dd>
+</dl>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>rdAnisoHf</td>
+<td>rahf</td>
+<td><span class="math">\(\nu\)</span> (MHz), <span class="math">\(\lambda (\mu \mathrm{s}^{-1})\)</span></td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\frac{1}{6} (1-\nu t/2) \exp(-\nu t/2) +\)</span></dt>
+<dd><span class="math">\(+ \frac{1}{3} (1 - \nu t/4) \exp(-\frac{\nu t + 2.44949 \lambda t}{4})\)</span></dd>
+</dl>
+</td>
+<td><a class="footnote-reference" href="#n7" id="id15">[9]</a></td>
+</tr>
+<tr class="row-odd"><td>TFieldCos</td>
+<td>tf</td>
+<td><span class="math">\(\varphi (^\circ), \nu\)</span> (MHz)</td>
+<td><span class="math">\(\cos\left(2\pi\nu t + \frac{\pi \varphi}{180}\right)\)</span></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>internFld</td>
+<td>if</td>
+<td><span class="math">\(\alpha (1), \varphi (^\circ)\)</span>, <span class="math">\(\nu\)</span> (MHz), <span class="math">\(\lambda_{\rm T} (\mu \mathrm{s}^{-1})\)</span>,<span class="math">\(\lambda_{\rm L} (\mu \mathrm{s}^{-1})\)</span></td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\alpha \cos\left(2\pi\nu t + \frac{\pi \varphi}{180}\right) \exp(\lambda_{\rm T}t) +\)</span></dt>
+<dd><span class="math">\(+ (1-\alpha) \exp(-\lambda_{\rm L} t)\)</span></dd>
+</dl>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>Bessel</td>
+<td>b</td>
+<td><span class="math">\(\varphi (^\circ), \nu\)</span> (MHz)</td>
+<td><span class="math">\(j_0\left(2\pi\nu t + \frac{\pi \varphi}{180}\right)\)</span></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>internbsl</td>
+<td>ib</td>
+<td><span class="math">\(\alpha (1), \varphi (^\circ)\)</span>, <span class="math">\(\nu\)</span> (MHz), <span class="math">\(\lambda_{\rm T} (\mu \mathrm{s}^{-1})\)</span>,<span class="math">\(\lambda_{\rm L} (\mu \mathrm{s}^{-1})\)</span></td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\alpha j_0\left(2\pi\nu t + \frac{\pi \varphi}{180}\right) \exp(\lambda_{\rm T}t) +\)</span></dt>
+<dd><span class="math">\(+ (1-\alpha) \exp(-\lambda_{\rm L} t)\)</span></dd>
+</dl>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>abragam</td>
+<td>ab</td>
+<td><span class="math">\(\sigma (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(\gamma\)</span> (MHz)</td>
+<td><span class="math">\(\exp\left[-\frac{\sigma^2}{\gamma^2} (e^{-\gamma t} - 1 + \gamma t)\right]\)</span></td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>skewedGss</td>
+<td>skg</td>
+<td><span class="math">\(\varphi (^\circ), \nu\)</span> (MHz) <span class="math">\(\sigma_{+} (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(\sigma_{-} (\mu \mathrm{s}^{-1})\)</span></td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\frac{\sigma_{-}}{\sigma_{+}+\sigma_{-}} \exp\left[\frac{\sigma_{-}^2 t^2}{2}\right] \left\{\cos(2\pi\nu t + \frac{\pi\varphi}{180}) + \sin(2\pi\nu t + \frac{\pi\varphi}{180}) \mathrm{Erfi}\left(\frac{\sigma_{-} t}{\sqrt{2}}\right)\right\} +\)</span></dt>
+<dd><span class="math">\(+ \frac{\sigma_{+}}{\sigma_{+}+\sigma_{-}} \exp\left[\frac{\sigma_{+}^2 t^2}{2}\right] \left\{\cos(2\pi\nu t + \frac{\pi\varphi}{180}) - \sin(2\pi\nu t + \frac{\pi\varphi}{180}) \mathrm{Erfi}\left(\frac{\sigma_{+} t}{\sqrt{2}}\right)\right\}\)</span></dd>
+</dl>
+</td>
+<td><a class="footnote-reference" href="#n8" id="id16">[10]</a></td>
+</tr>
+<tr class="row-odd"><td>staticNKZF</td>
+<td>snkzf</td>
+<td><span class="math">\(\Delta_0 (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(R_b = \Delta_{\rm GbG}/\Delta_0 (1)\)</span></td>
+<td><span class="math">\(\frac{1}{3} + \frac{2}{3}\left(\frac{1}{1+R_b^2\Delta_0^2 t^2}\right)^{3/2} \left(1 - \frac{\Delta_0^2 t^2}{1+R_b^2\Delta_0^2 t^2}\right) \exp\left[-\frac{\Delta_0^2 t^2}{2(1+R_b^2\Delta_0^2 t^2)}\right]\)</span></td>
+<td><a class="footnote-reference" href="#n9" id="id17">[11]</a></td>
+</tr>
+<tr class="row-even"><td>staticNKTF</td>
+<td>snktf</td>
+<td><span class="math">\(\varphi (^\circ), \nu\)</span> (MHz), <span class="math">\(\Delta_0 (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(R_b = \Delta_{\rm GbG}/\Delta_0 (1)\)</span></td>
+<td><span class="math">\(\sqrt{\frac{1}{1+R_b^2 \Delta_0^2 t^2}} \exp\left[-\frac{\Delta_0^2 t^2}{2(1+R_b^2 \Delta_0^2 t^2)}\right] \cos(2\pi\nu t + \varphi)\)</span></td>
+<td>see [11]</td>
+</tr>
+<tr class="row-odd"><td>dynamicNKZF</td>
+<td>dnkzf</td>
+<td><span class="math">\(\Delta_0 (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(R_b = \Delta_{\rm GbG}/\Delta_0 (1)\)</span>, <span class="math">\(\nu_c\)</span> (MHz)</td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\sqrt{\frac{1}{1+4 R_b^2 \Delta_0^2 \Theta(t)}} \exp\left[-\frac{2\Delta_0^2 \Theta(t)}{1+4 R_b^2 \Delta_0^2 \Theta(t)}\right]\)</span>,</dt>
+<dd><span class="math">\(\Theta(t) = \frac{\exp(-\nu_c t) -1 -\nu_c t}{\nu_c^2}\)</span></dd>
+</dl>
+</td>
+<td>see [11]</td>
+</tr>
+<tr class="row-even"><td>dynamicNKTF</td>
+<td>dnktf</td>
+<td><span class="math">\(\varphi (^\circ), \nu\)</span> (MHz), <span class="math">\(\Delta_0 (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(R_b = \Delta_{\rm GbG}/\Delta_0 (1)\)</span>, <span class="math">\(\nu_c\)</span> (MHz)</td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\sqrt{\frac{1}{1+2 R_b^2 \Delta_0^2 \Theta(t)}} \exp\left[-\frac{\Delta_0^2 \Theta(t)}{1+2 R_b^2 \Delta_0^2 \Theta(t)}\right] \cos(2\pi\nu t + \varphi)\)</span>,</dt>
+<dd><span class="math">\(\Theta(t) = \frac{\exp(-\nu_c t) -1 -\nu_c t}{\nu_c^2}\)</span></dd>
+</dl>
+</td>
+<td>see [11]</td>
+</tr>
+<tr class="row-odd"><td>muMinusExpTF</td>
+<td>mmsetf</td>
+<td><span class="math">\(N_0 (1), \tau (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(A (1), \lambda (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(\varphi (^\circ), \nu\)</span> (MHz)</td>
+<td><span class="math">\(N_0 \exp(-t/\tau) \left[ 1 + A \exp(-\lambda t) \cos(2 \pi \nu t + \varphi) \right]\)</span></td>
+<td><a class="footnote-reference" href="#n10" id="id18">[12]</a></td>
+</tr>
+<tr class="row-even"><td>polynom</td>
+<td>p</td>
+<td><span class="math">\(t_0 ([t]), a_0 (1)\)</span>, <span class="math">\(a_1 (t), \ldots, a_n (1)\)</span></td>
+<td><span class="math">\(\sum_{k=0}^n a_k (t-t_0)^k\)</span></td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Notes</p>
+<table class="docutils footnote" frame="void" id="n1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id9">[3]</a></td><td><a class="reference external" href="http://link.aps.org/doi/10.1103/PhysRevB.20.850">R.S. Hayano</a> <em>et al.</em>, Phys. Rev. B <strong>20</strong>, 850 (1979).  &#8211; <strong>not</strong> DKS ready.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id10">[4]</a></td><td>R.S. Hayano <em>et al.</em>, Phys. Rev. B <strong>20</strong>, 850 (1979).,
+<a class="reference external" href="http://dx.doi.org/10.1088/0953-8984/4/18/020">P. Dalmas de Réotier</a> and A. Yaouanc, J. Phys.: Condens. Matter <strong>4</strong>, 4533 (1992).,
+<a class="reference external" href="http://link.aps.org/doi/10.1103/PhysRevB.50.10039">A. Keren</a>, Phys. Rev. B <strong>50</strong>, 10039 (1994). &#8211; <strong>not</strong> DKS ready.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id11">[5]</a></td><td><a class="reference external" href="http://link.aps.org/doi/10.1103/PhysRevB.31.546">Y.J. Uemura</a> <em>et al.</em>, Phys. Rev. B <strong>31</strong>, 546 (1985). &#8211; <strong>not</strong> DKS ready.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id12">[6]</a></td><td>Y.J. Uemura <em>et al.</em>, Phys. Rev. B <strong>31</strong>, 546 (1985). &#8211; <strong>not</strong> DKS ready.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id13">[7]</a></td><td>R.S. Hayano <em>et al.</em>, Phys. Rev. B <strong>20</strong>, 850 (1979)., P. Dalmas de Réotier and A. Yaouanc, J. Phys.: Condens. Matter <strong>4</strong>, 4533 (1992). &#8211; <strong>not</strong> DKS ready.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n6" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id14">[8]</a></td><td><a class="reference external" href="http://dx.doi.org/10.1088/0953-8984/9/5/018">M.R. Crook</a> and R. Cywinski, J. Phys.: Condens. Matter <strong>9</strong> 1149 (1997).</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n7" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id15">[9]</a></td><td><a class="reference external" href="http://link.aps.org/doi/10.1103/PhysRevB.34.4467">R.E. Turner</a> and D.R. Harshman, Phys. Rev. B <strong>34</strong>, 4467 (1986).</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n8" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id16">[10]</a></td><td><a class="reference external" href="http://lmu.web.psi.ch/musrfit/memos/skewedGaussian.pdf">see memo</a> &#8211; <strong>not</strong> DKS ready.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id17">[11]</a></td><td><a class="reference external" href="http://link.aps.org/doi/10.1103/PhysRevB.56.2352">D.R. Noakes</a> and G.M. Kalvius, Phys. Rev. B <strong>56</strong>, 2352 (1997);
+A. Yaouanc and P. Dalmas de Réotier &#8220;Muon Spin Rotation, Relaxation, and Resonance&#8221; Oxford Scientific Publication;
+simplifying the original formulae by eliminating <span class="math">\(\Delta_{\rm eff}\)</span> via the identity
+<span class="math">\(\Delta_{\rm eff}^2 = (1+R_b^2)\Delta_0\)</span>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id18">[12]</a></td><td>This function is explicit for <span class="math">\(\mu^-\)</span>! Do not try to use it for <span class="math">\(\mu^+\)</span>!</td></tr>
+</tbody>
+</table>
+<div class="section" id="maps">
+<span id="msr-map-intro"></span><h4>Maps<a class="headerlink" href="#maps" title="Permalink to this headline">¶</a></h4>
+<p>There are two situations where the theory function needs an additional switch/map allowing a compact and flexible handling of the fit.</p>
+<ol class="arabic simple">
+<li>Typically your spectrometer has a couple of detectors. Hence, in a TF experiment all these detectors will have at least a different initial phase.
+Maps allow exactly to deal with this difficulty.</li>
+<li>In case different runs are fitted simultaneously, it is very often necessary that for a given theory function, some parameters are run-dependent.
+An example could be a temperature scan, where the parameters (asymmetry, depolarization rates, etc.) will depend on the temperature.</li>
+</ol>
+<p>In order to handle such situations, a mapping of parameters in the THEORY block is possible. That means, instead of a parameter number,
+the mapping of the parameter is given. The definition of the mapping block is part of the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a> and will be described there.
+For example</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>THEORY
+asymmetry 2
+simplExpo 3
+TFieldCos map1 5
+</pre></div>
+</div>
+<p>means that the phase parameter of <tt class="docutils literal"><span class="pre">TFieldCos</span></tt> will be mapped to <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>, and hence every detector will have its individual phase.</p>
+</div>
+<div class="section" id="functions">
+<h4>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h4>
+<p>Yet another useful feature is the possibility to define functions in the <a class="reference internal" href="#msr-functions-block"><em>FUNCTIONS block</em></a>.
+Within the <a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a> these functions can be addressed as funX, where &#8216;X&#8217; is the function number, <em>e.g.</em> fun2.
+Whereas the theory is operating on the parameters and the time, functions currently can <em>only</em> operate on the parameters.</p>
+</div>
+<div class="section" id="user-functions">
+<span id="msr-theory-block-user-functions"></span><h4>User Functions<a class="headerlink" href="#user-functions" title="Permalink to this headline">¶</a></h4>
+<p>In the case complicated and not predefined functions are needed to fit data, <tt class="docutils literal"><span class="pre">musrfit</span></tt> offers the possibility to implement external functions
+and introduce them to <tt class="docutils literal"><span class="pre">musrfit</span></tt> through the ROOT dictionary mechanism. The detailed rules these user-defined functions have to obey will be discussed
+in the according <a class="reference internal" href="#id20"><em>section</em></a>. Here only the syntax for the msr file is provided. To call a user function in the <a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a> the
+keyword <tt class="docutils literal"><span class="pre">userFcn</span></tt> is used. It is followed by the name of the shared library which holds the C++ class where the function is implemented and the name of
+the class. Finally, all parameters are given in the order needed by the class. Of course it is also possible to use mapped parameters or functions
+instead of specifying the parameters directly.</p>
+<p>A THEORY block including a user function may then look like</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>THEORY
+asymmetry 1
+userFcn libMyLibrary.so TMyFunction 2 3 4 map1 fun1
++
+...
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="the-functions-block">
+<span id="msr-functions-block"></span><span id="index-15"></span><h3>The FUNCTIONS Block<a class="headerlink" href="#the-functions-block" title="Permalink to this headline">¶</a></h3>
+<p>Here some auxiliary functions can be defined. These functions can currently <em>only</em> operate on the defined parameters. They can be used in the
+<a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a> and for one specific case in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>. Supported is the use of basic arithmetic:</p>
+<dl class="docutils">
+<dt><span class="math">\(+\)</span></dt>
+<dd>Addition</dd>
+<dt><span class="math">\(-\)</span></dt>
+<dd>Subtraction</dd>
+<dt><span class="math">\(*\)</span></dt>
+<dd>Multiplication</dd>
+<dt><span class="math">\(/\)</span></dt>
+<dd>Division</dd>
+<dt><span class="math">\(()\)</span></dt>
+<dd>The standard use of parentheses</dd>
+</dl>
+<p>The following functions are built-in and can be used in a function definition: <strong>cos(), sin(), tan(), acos(), asin(), atan(), cosh(), sinh(), tanh(),
+acosh(), asinh(), atanh(), exp(), log(), ln(), sqrt(), pow(base, exponent)</strong>.</p>
+<p>Furthermore, some constants are predefined and might also be used:</p>
+<ul class="simple">
+<li><strong>gamma_mu</strong> = <span class="math">\(\gamma_\mu/(2\pi) = 0.0135538817~\mathrm{MHz/G}\)</span></li>
+<li><strong>pi</strong> = <span class="math">\(\pi = 3.14159265358979323846\)</span></li>
+</ul>
+<p>The fit parameters are accessed either directly through parX, where &#8216;X&#8217; is the number of the parameter in the <a class="reference internal" href="#msr-fitparameter-block"><em>FITPARAMETER block</em></a>,
+<em>e.g.</em> <em>par5</em> or through a mapping with mapY, where &#8216;Y&#8217; specifies the mapping number in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a> as explained below.</p>
+<p>The defined functions are denoted as funX, where &#8216;X&#8217; is the function number, <em>i.e.</em> fun1, fun2, etc. and have to be placed separately on one
+line each. Afterwards they can be used in the <a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a>.</p>
+<p>It follows an example to illustrate the usage of functions in the <a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a>. The total asymmetry of a signal
+consisting of two parts should be a fit parameter. The fraction of each of the parts will then be expressed as a function of the total asymmetry.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>FITPARAMETER
+#       No   Name      Value     Step       Pos_Error    Boundaries
+        1   alpha     1          0.02       none         0       1.8
+        2   phase     15         1.0        none
+        3   asy       0.2542     0.004713   none         0       0.33
+        4   rate1     15         1.0        none         0       none
+        5   frac1     0.33       0.0379     none         0       1
+        6   rate2     0.13       0.00579    none         0       10
+
+###############################################################
+THEORY
+asymmetry   fun1
+simplExpo      4                   (rate)
++
+asymmetry   fun2
+simplExpo      6                   (rate)
+
+###############################################################
+FUNCTIONS
+fun1 = par3 * par5
+fun2 = par3 * ( 1.0 - par5 )
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-global-block">
+<span id="msr-global-block"></span><span id="index-16"></span><h3>The GLOBAL Block<a class="headerlink" href="#the-global-block" title="Permalink to this headline">¶</a></h3>
+<p>The GLOBAL block is used to collect data which otherwise need to be specified in every single run entry of the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>.
+Therefore, this block is only present to potentially shorten the msr file and to ease the handling for the user. The logic will by like that:</p>
+<ol class="arabic simple">
+<li>check if the property is found in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>.</li>
+<li>if <em>not</em> present in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>, check whether it is present in the GLOBAL block.</li>
+<li>if still not found, try the data file.</li>
+<li>if still not found, either try to estimate it, or fire an error message.</li>
+</ol>
+<p>This means that an entry present in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a> will overwrite a setting from the GLOBAL block.</p>
+<p>Currently the supported GLOBAL block entries are:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">fittype</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">data</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">t0</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">addt0</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">fit</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">rrf_freq</span></tt> for fittype 1, 3</li>
+<li><tt class="docutils literal"><span class="pre">rrf_packing</span></tt> for fittype 1, 3</li>
+<li><tt class="docutils literal"><span class="pre">rrf_phase</span></tt> for fittype 1, 3</li>
+<li><tt class="docutils literal"><span class="pre">packing</span></tt> for fittype 0, 2, 4</li>
+</ul>
+<p>For a detailed discussion of these entries see the section <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>.</p>
+<p>The single histo RRF fit and asymmetry RRF fit related entries (fittype 1 and 3 only) have the following syntax:</p>
+<dl class="docutils">
+<dt><strong>rrf_freq</strong></dt>
+<dd><p class="first">Defines the RRF frequency. The exact syntax is rrf_freq &lt;value&gt; &lt;unit&gt; where &lt;value&gt; is the value, and &lt;unit&gt; can be <em>MHz</em>, <em>Mc</em>, and <em>T</em>. An example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>rrf_freq 7.2 T
+</pre></div>
+</div>
+</dd>
+<dt><strong>rrf_packing</strong></dt>
+<dd><p class="first">for fittype 1 and fittype 3 rather than giving packing, rrf_packing &lt;pack&gt; has to be provided, <em>e.g.</em></p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>rrf_packing 150
+</pre></div>
+</div>
+</dd>
+<dt><strong>rrf_phase</strong></dt>
+<dd><p class="first">an optional additional RRF phase can be provided (if not provided, the RRF phase will be 0.0).
+Syntax: rrf_phase &lt;phase&gt;, where the value &lt;phase&gt; is given in degree. Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>rrf_phase 45
+</pre></div>
+</div>
+</dd>
+</dl>
+<p>An example snippet with, and without GLOBAL section.</p>
+<p>With GLOBAL block:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>...
+###############################################################
+GLOBAL
+fittype         0         (single histogram fit)
+fit             0.0005  10
+packing         5
+
+###############################################################
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+map             5    6    7    0    0    0    0    0    0    0    0
+norm            8
+backgr.fit      9
+forward         2
+data            20120   409500
+t0              20108.0
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+map            10   11   12    0    0    0    0    0    0    0    0
+norm            13
+backgr.fit      14
+forward         3
+data            20111   409500
+t0              20088.0
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+...
+</pre></div>
+</div>
+<p>Without GLOBAL block:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>...
+###############################################################
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+map             5    6    7    0    0    0    0    0    0    0    0
+norm            8
+backgr.fit      9
+forward         2
+data            20120   409500
+t0              20108.0
+fit             0.0005  10
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+map            10   11   12    0    0    0    0    0    0    0    0
+norm            13
+backgr.fit      14
+forward         3
+data            20111   409500
+t0              20088.0
+fit             0.0005  10
+packing         5
+#--------------------------------------------------------------
+RUN data/tdc_hifi_2014_00153 PIE3 PSI PSI-MDU   (name beamline institute data-file-format)
+fittype         0         (single histogram fit)
+... and many more detectors here ...
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-run-block">
+<span id="msr-run-block"></span><span id="index-17"></span><h3>The RUN Block<a class="headerlink" href="#the-run-block" title="Permalink to this headline">¶</a></h3>
+<p>The RUN block is used to collect the data needed for a particular run to be fitted. This includes the run name, fit type, data format, etc.
+The RUN block is slightly differently organized than the other blocks. The information is collected via labels followed by the information.
+Each run to be fitted has its <em>own</em> RUN block. A RUN block starts with a run-file line which has the structure</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>RUN &lt;run_file_name&gt; &lt;beamline&gt; &lt;facility&gt; &lt;file_format&gt;
+</pre></div>
+</div>
+<p>where</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="14%" />
+<col width="86%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">RUN-block tag</th>
+<th class="head">comment</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>&lt;run_file_name&gt;</td>
+<td>sub path and file name without extension</td>
+</tr>
+<tr class="row-odd"><td>&lt;beamline&gt;</td>
+<td>name of the beamline where the data were taken, <em>e.g.</em> MUE4. Used to generate a default path.</td>
+</tr>
+<tr class="row-even"><td>&lt;facility&gt;</td>
+<td>name of the facility where the data were recorded, <em>e.g.</em> PSI. Used to generate a default path.</td>
+</tr>
+<tr class="row-odd"><td>&lt;file_format&gt;</td>
+<td>file format: MUSR-ROOT, NEXUS, ROOT-NPP, ROOT-PPC, PSI-BIN, PSI-MDU, WKM, MUD, MDU-ASCII, ASCII, DB</td>
+</tr>
+</tbody>
+</table>
+<p>The tokens following the RUN statement are used to identify the run, the potential location where the run might be found,
+and the file format in which the run data has been saved. In order to understand the meaning of all the above tokens,
+a short digression is needed.</p>
+<p>Where is musrfit looking for data files? There is a specific order how this is done:</p>
+<ol class="arabic simple">
+<li>Check if the file is found in the current directory</li>
+<li>Check if the path (or multiple paths) was (were) given in the <a class="reference internal" href="#musrfit-startup"><em>XML startup file</em></a>.</li>
+<li>Check if there is a system variable <tt class="docutils literal"><span class="pre">MUSRFULLDATAPATH</span></tt>. This system variable can contain multiple search paths separated by colons, <em>e.g.</em></li>
+</ol>
+<blockquote>
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">MUSRFULLDATAPATH</span><span class="o">=</span>/mnt/data/nemu/wkm/:/mnt/data/nemu/his/:/afs/psi.ch/user/s/smith/
+</pre></div>
+</div>
+</div></blockquote>
+<ol class="arabic" start="4">
+<li><p class="first">Construct the search path from the <a class="reference internal" href="#msr-run-block"><em>RUN-block</em></a> information in the following way: Based on the RUN line in the RUN block, default paths will be generated, <em>e.g.</em> for</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>RUN 2007/lem07_his_2018 MUE4 PSI ROOT-NPP
+</pre></div>
+</div>
+<p>the generated search path will look like</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">musrFullDataPathToken</span><span class="o">/</span><span class="n">DATA</span><span class="o">/</span><span class="n">Facility</span><span class="o">/</span><span class="n">Beamline</span><span class="o">/</span><span class="n">runName</span><span class="o">.</span><span class="n">ext</span>
+</pre></div>
+</div>
+<p>where <tt class="docutils literal"><span class="pre">musrFullDataPathToken</span></tt> is extracted from the <tt class="docutils literal"><span class="pre">MUSRFULLDATAPATH</span></tt> token by token, for the above example this might lead to the path</p>
+</li>
+</ol>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span></span>/afs/psi.ch/user/s/smith/DATA/PSI/MUE4/2007/lem07_his_2018.root
+</pre></div>
+</div>
+</div></blockquote>
+<p>Here are some valid examples for the first line of a RUN block:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>RUN 2007/lem07_his_2018 MUE4 PSI ROOT-NPP
+RUN 2007/lem07_2018_rb1_npp MUE4 PSI WKM
+RUN d2007/deltat_pta_gps_2650 PIM3 PSI PSI-BIN
+RUN d2010/tdc/deltat_tdc_gpd_8472 MUE1 PSI PSI-BIN
+RUN beautiful-data MUE4 PSI DB
+</pre></div>
+</div>
+<p>After this short digression back to the RUN-block description.</p>
+<p>In order to describe the operations needed for fitting and plotting, quite some information are needed. These information are following the RUN statement and are listed below. Depending on the fit type these information vary and hence it is indicated for which fit/plot type the information is applicable</p>
+<span id="index-18"></span><dl class="docutils" id="msr-addrun">
+<dt><strong>ADDRUN &lt;run_file_name&gt; &lt;beamline&gt; &lt;facility&gt; &lt;file_format&gt;</strong> (optional)</dt>
+<dd><p class="first">If an ADDRUN is just following after a RUN statement, these runs will be added. More than one ADDRUN statements are possible, <em>i.e.</em> adding up as many runs as wished. It is also possible to add runs with different file formats. If the t0&#8217;s are given in the data files, the ADDRUN statement is all what is needed, otherwise just add the t0&#8217;s with the addt0 statement.</p>
+<p>For a <a class="reference internal" href="#single-histogram-fit"><em>Single Histogram Fit</em></a> or a <a class="reference internal" href="#negative-muon-musr-fit"><em>MuMinus Fit</em></a> it will be</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>addt0 t0AddRun1
+addt0 t0AddRun2
+etc.
+</pre></div>
+</div>
+<p>For an <a class="reference internal" href="#asymmetry-fit"><em>Asymmetry Fit</em></a> this reads</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>addt0 t0AddRun1Forward t0AddRun1Backward
+addt0 t0AddRun2Forward t0AddRun2Backward
+etc.
+</pre></div>
+</div>
+<p>How will the background and data ranges be handled in this situation? First, the ADDRUN&#8217;s will be shifted in time such that all the t0&#8217;s have the same channel/bin number. Subsequently, the runs will be added. The background/data range is applied to this summed up new histogram.</p>
+<p class="last">ADDRUN is <em>not</em> available for the fit type <a class="reference internal" href="#non-musr-fit"><em>Non-muSR Fit</em></a>.</p>
+</dd>
+</dl>
+<span id="index-19"></span><dl class="docutils" id="msr-fittype">
+<dt><strong>fittype</strong> (required if not already defined in the GLOBAL block)</dt>
+<dd><p class="first">This tag is used to indicate which type of fit is wished. The supported fit types are:</p>
+<dl class="docutils">
+<dt><strong>0</strong></dt>
+<dd>Single Histogram Fit</dd>
+<dt><strong>1</strong></dt>
+<dd>Single Histogram RRF Fit (only for online analysis)</dd>
+<dt><strong>2</strong></dt>
+<dd>Asymmetry Fit</dd>
+<dt><strong>3</strong></dt>
+<dd>Asymmetry RRF Fit (only for online analysis)</dd>
+<dt><strong>4</strong></dt>
+<dd>MuMinus Fit. This is a single histogram fit especially for negative muon μSR</dd>
+<dt><strong>8</strong></dt>
+<dd>Non-μSR Fit</dd>
+</dl>
+<p>The description of these fit types can be found in the <a class="reference internal" href="#fit-types"><em>corresponding section</em></a>. Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>fittype 0
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-20"></span><dl class="docutils" id="msr-alpha-beta">
+<dt><strong>alpha, beta</strong> (fit type 2, 3)</dt>
+<dd><p class="first">These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as <span class="math">\(\alpha = N_{0,b}/N_{0,f}\)</span> and <span class="math">\(\beta = A_{0,b}/A_{0,f}\)</span>. If the parameters are not specified in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>, for each one the value of 1 is assumed. Example for alpha with fit parameter number 1:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>alpha 1
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-21"></span><dl class="docutils" id="msr-norm">
+<dt><strong>norm</strong> (fit type 0)</dt>
+<dd><p class="first">Number of the fit parameter that represents the normalization constant <span class="math">\(N_0\)</span> of the histogram; the value of this parameter is given either per nanosecond or per bin (see <a class="reference internal" href="#msr-commands-block"><em>below</em></a>).
+It is possible to substitute the parameter number by a function here (and only here in a RUN block), for instance to relate <span class="math">\(N_0\)</span>&#8216;s of different histograms through an <span class="math">\(\alpha\)</span>
+parameter. Example for a <tt class="docutils literal"><span class="pre">norm</span></tt> defined by fit parameter number 12:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>norm 12
+</pre></div>
+</div>
+<p>Example for a <tt class="docutils literal"><span class="pre">norm</span></tt> defined via function number 3:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>norm fun3
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-22"></span><dl class="docutils" id="msr-backgr-fit">
+<dt><strong>backgr.fit</strong> (fit type 0)</dt>
+<dd>Parameter number specifying the constant background in a histogram. Its value is given either per nanosecond or per bin (see <a class="reference internal" href="#msr-commands-block"><em>below</em></a>). If this keyword is present,
+any information on a background line are ignored.</dd>
+</dl>
+<span id="index-23"></span><dl class="docutils" id="msr-lifetime">
+<dt><strong>lifetime</strong> (fit type 0)</dt>
+<dd>Fit parameter representing the lifetime of the muon. If it is not specified the value <span class="math">\(\tau_\mu=2.197019~ \mu\mathrm{s}\)</span> is used in the calculations.</dd>
+<dt><strong>lifetimecorrection</strong> (fit type 0) <em>obsolete</em></dt>
+<dd>Does not accept any arguments. If present, the output in <tt class="docutils literal"><span class="pre">musrview</span></tt> is corrected for the exponential decay of the muon. This item is <em>obsolete</em> in the RUN block
+and will be transferred to the <a class="reference internal" href="#msr-plot-block"><em>PLOT block</em></a>, which allows switching between histogram view and asymmetry view much quicker.</dd>
+</dl>
+<span id="index-24"></span><dl class="docutils" id="msr-map">
+<dt><strong>map</strong></dt>
+<dd>On this line the mapping of run-dependent parameters is done. Parameter numbers given here may be accessed through map1, map2, etc. in the
+<a class="reference internal" href="#msr-theory-block"><em>THEORY</em></a> and <a class="reference internal" href="#msr-functions-block"><em>FUNCTIONS</em></a> blocks (see also <a class="reference internal" href="#msr-map-intro"><em>maps</em></a>). The first ten maps
+are always present and have the value 0 if not used; however, the total number of maps is not restricted!</dd>
+</dl>
+<span id="index-25"></span><dl class="docutils" id="msr-forward">
+<dt><strong>forward</strong> (fit type 0, 1, 4)</dt>
+<dd><p class="first">Number of the histogram in the data file to be processed. If histograms shall be grouped, all the numbers which shall be grouped. Examples:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>forward 3       # no grouping, take histogram number 3
+forward 1 2     # group histogram number 1 and 2
+forward 1-10 12 # group histograms with numbers from 1 to 10 and additionally histogram 12
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-26"></span><dl class="docutils" id="msr-forward-backward">
+<dt><strong>forward, backward</strong> (fit types 2, 3)</dt>
+<dd><p class="first">Numbers of the histograms in the data file that should be taken to calculate the asymmetry. If histograms shall be grouped, all the numbers which shall be grouped. Examples:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span># build forward/backward asymmetry with histogram 1 and 3
+forward  1
+backward 3
+# build forward/backward asymmetry with groupings 1+2+3 and 7+8+9
+forward   1 2 3
+backward  7 8 9
+# build forward/backward asymmetry with groupings 1+2+3 and 7+8+9 (alternative notation)
+forward   1-3
+backward  7-9
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-27"></span><dl class="docutils" id="msr-backgr-fix">
+<dt><strong>backgr.fix</strong> (fit types 0, 1, 2, 3)</dt>
+<dd>A fixed constant background in counts per nanosecond or per bin (see <a class="reference internal" href="#msr-commands-block"><em>below</em></a>) may be given at this point.
+The background is specified for all histograms in the order <span class="math">\(B_f B_b [B_r B_l]\)</span>. If this keyword is present, <em>any</em> information on a <tt class="docutils literal"><span class="pre">background</span></tt> line is ignored.</dd>
+</dl>
+<span id="index-28"></span><dl class="docutils" id="msr-background-single-histo">
+<dt><strong>background</strong> (fit type 0, 1)</dt>
+<dd><p class="first">The numbers of the first and the last channel of an interval from which the constant background should be calculated are specified here.
+In case histograms are being grouped, the specified channels are interpreted with respect to the first histogram. Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>background  100  18000
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-29"></span><dl class="docutils" id="msr-background-asymmetry">
+<dt><strong>background</strong> (fit types 2, 3)</dt>
+<dd><p class="first">The numbers of the first and the last channel of an interval from which the constant background should be calculated are specified here.
+For all the histograms this is done together in the following order: <span class="math">\(k_{f,\rm first} k_{f,\rm last} k_{b,\rm first} k_{b, \rm last} [k_{r,\rm first} k_{r,\rm last} k_{l,\rm first} k_{l,\rm last}]\)</span>.
+In case histograms are being grouped, the specified channels are interpreted with respect to the first histograms. Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>background  61  184   57  145
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-30"></span><dl class="docutils" id="msr-data-single-histo">
+<dt><strong>data</strong> (fit type 0, 1, 4)</dt>
+<dd><p class="first">The numbers of the first and the last channel of an interval from which the data is taken are specified here.
+In case histograms are being grouped, the specified channels are interpreted with respect to the first histogram.
+Typically these channels are referred to as <tt class="docutils literal"><span class="pre">first</span> <span class="pre">good</span> <span class="pre">bin</span></tt> / <tt class="docutils literal"><span class="pre">last</span> <span class="pre">good</span> <span class="pre">bin</span></tt> (fgb/lgb). Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>data  165   7965
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-31"></span><dl class="docutils" id="msr-data-asymmetry">
+<dt><strong>data</strong> (fit type 2, 3)</dt>
+<dd><p class="first">The numbers of the first and the last channel of an interval from which the data is taken are specified here.
+Typically these channels are referred to as first good bin / last good bin (fgb/lgb). For all the histograms this is
+done together in the following order: <span class="math">\(k_{f,\rm first} k_{f,\rm last} k_{b,\rm first} k_{b, \rm last} [k_{r,\rm first} k_{r,\rm last} k_{l,\rm first} k_{l,\rm last}]\)</span>.
+In case histograms are being grouped, the specified channels are interpreted with respect to the first histograms. Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>data  207   7994    167   8009
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-32"></span><dl class="docutils" id="msr-t0-single-histo">
+<dt><strong>t0</strong> (fit type 0, 1, 4)</dt>
+<dd><p class="first">The number of the time-zero channel of the histogram. Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>t0 3419        # t0 channel = 3419
+t0 3419 3434   # t0 channels for groupings: forward f1 f2. 3419 t0 for f1, 3434 t0 for f2.
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-33"></span><dl class="docutils" id="msr-t0-asymmetry">
+<dt><strong>t0</strong> (fit type 2, 3)</dt>
+<dd><p class="first">The numbers of time-zero channels of the histograms in the order <span class="math">\(t_{0,f} t_{0,b}\)</span>. Example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>t0 3419 3418           # t0 channels: forward (3419), backward (3418)
+t0 3419 3418 3417 3416 # t0 channels (assuming forward f1 f2, backward b1 b2): forward (3419, f1), backward (3418, b1); forward (3417, f2), backward (3416, b2)
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-34"></span><dl class="docutils" id="msr-addt0-single-histo">
+<dt><strong>addt0</strong> (fit type 0, 1, 4)</dt>
+<dd>The number of the time-zero channel of the histogram. If grouping of histograms is present (see <a class="reference internal" href="#msr-forward"><em>forward</em></a>) the
+same syntax as for <a class="reference internal" href="#msr-t0-single-histo"><em>t0</em></a> applies. If one addt0 is given, the total number of addt0&#8217;s needs to be equal to
+the total number of <a class="reference internal" href="#msr-addrun"><em>ADDRUN</em></a>&#8216;s!</dd>
+</dl>
+<span id="index-35"></span><dl class="docutils" id="msr-addt0-asymmetry">
+<dt><strong>addt0</strong> (fit type 2, 3)</dt>
+<dd>The numbers of time-zero channels of the histograms in the order <span class="math">\(t_{0,f} t_{0,b} [t_{0,r} t_{0,l}]\)</span>.
+If grouping of histograms is present (see <a class="reference internal" href="#msr-forward-backward"><em>forward</em></a>) the same syntax as for <a class="reference internal" href="#msr-t0-asymmetry"><em>t0</em></a> applies.
+If one addt0 is given, the total number of addt0&#8217;s needs to be equal to the total number of <a class="reference internal" href="#msr-addrun"><em>ADDRUN</em></a>&#8216;s!</dd>
+</dl>
+<span id="index-36"></span><dl class="docutils" id="msr-xy-data">
+<dt><strong>xy-data</strong> (fit type 8)</dt>
+<dd>Specification of the data from an ASCII or DB file which should be used as <em>x</em> and <em>y</em> data (in this order).
+For a simple ASCII file the column numbers are used, in the case of a DB file one can either specify the variable
+numbers or the name of the variables as given in the DB header.</dd>
+</dl>
+<span id="index-37"></span><dl class="docutils" id="msr-fit">
+<dt><strong>fit</strong></dt>
+<dd><p class="first">The range of data that should be considered when the fitting is done. For the μSR fit types 0, 1, 2, 3, and 4 the
+starting and end times are given in micro-seconds. For the non-μSR fit type 8 the starting and end points of the
+fitting range are given in the units of the <em>x</em> data.</p>
+<p><strong>In case the fit range specified here is larger than the data range (in any direction), the data range will be used as fit range.</strong></p>
+<p>An example for a μSR fit:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>fit 0.1 8.5
+</pre></div>
+</div>
+<p>Which means that the fitting window will span from 0.1 to 8.5 micro-seconds.</p>
+<p>Another possibility for the μSR fits is to give the fit range in bins, rather than time. The syntax is then:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>fit fgb+&lt;n0&gt; lgb-&lt;n1&gt;,
+</pre></div>
+</div>
+<p>where <tt class="docutils literal"><span class="pre">fgb</span></tt> and <tt class="docutils literal"><span class="pre">lgb</span></tt> are label tags which refer to the &#8216;first good bin&#8217; and the &#8216;last good bin&#8217; defined
+either in the <a class="reference internal" href="#msr-data-single-histo"><em>data</em></a> tag of the run block, data file, are estimated based on T0.
+<tt class="docutils literal"><span class="pre">&lt;n0&gt;</span></tt> and <tt class="docutils literal"><span class="pre">&lt;n1&gt;</span></tt> are offsets (given in bins) allowing to change the fit window compared to the data window.
+An example:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span>fit fgb+150 lgb-1332
+</pre></div>
+</div>
+</dd>
+</dl>
+<span id="index-38"></span><dl class="docutils" id="msr-packing">
+<dt><strong>packing</strong></dt>
+<dd>Number of data channels to be binned together. For the non-μSR fit type 8 the binning is supposed to be 1.
+For the single histogram RRF fit (fittype 1) and asymmetry RRF fit (fittype 3) this parameter is meaningless.</dd>
+</dl>
+</div>
+<div class="section" id="the-commands-block">
+<span id="msr-commands-block"></span><span id="index-39"></span><h3>The COMMANDS Block<a class="headerlink" href="#the-commands-block" title="Permalink to this headline">¶</a></h3>
+<p>The COMMANDS block is used to specify the commands which are passed from <tt class="docutils literal"><span class="pre">musrfit</span></tt> to <tt class="docutils literal"><span class="pre">MINUIT2</span></tt>. The supported commands
+after the COMMANDS keyword are <strong>STRATEGY</strong>, <strong>MIGRAD</strong>, <strong>SIMPLEX</strong>, <strong>MINIMIZE</strong>, <strong>MINOS</strong>, <strong>HESSE</strong>, <strong>SAVE</strong>, and some
+additional commands described below, and for compatibility reasons <strong>SET BATCH</strong> and <strong>END RETURN</strong>. The last two commands may
+appear in the COMMANDS block but are simply ignored. A detailed description of all of these commands can be found in the
+<a class="reference external" href="http://seal.web.cern.ch/seal/documents/minuit/mnusersguide.pdf">MINUIT2 users guide</a>.</p>
+<p>A standard COMMANDS block then looks like this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">COMMANDS</span>
+<span class="n">MINIMIZE</span>
+<span class="n">MINOS</span>
+<span class="n">SAVE</span>
+</pre></div>
+</div>
+<p>Additional to the commands listed above also the command <strong>MAX_LIKELIHOOD</strong> is valid. This keyword can be placed anywhere in
+the block and switches from the default <span class="math">\(\chi^2\)</span> minimization to the log likelihood maximization which can be advantageous
+if one is dealing with low-statistics data.</p>
+<p>Furthermore, it is possible to call the <tt class="docutils literal"><span class="pre">MINUIT2</span></tt> methods <strong>SCAN</strong> and <strong>CONTOURS</strong> together with <strong>MNPLOT</strong>.
+Exemplary invocations are as follows:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>COMMANDS
+SCAN 7
+MNPLOT
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>COMMANDS
+MINIMIZE
+CONTOURS 8 9
+MNPLOT
+SAVE
+</pre></div>
+</div>
+<p>Sometimes it is necessary to guide <tt class="docutils literal"><span class="pre">MINUIT2</span></tt> to the global optimum. For this purpose it is useful to have the commands
+<strong>FIX &lt;list_of_param_to_be_fixed&gt;</strong>, <strong>RELEASE &lt;list_of_param_to_be_fixed&gt;</strong>, and <strong>RESTORE</strong> at hand. <strong>&lt;list_of_param_to_be_fixed&gt;</strong>
+is a list of the parameters to be fixed/released. It is a space- or comma-separated list of either parameter numbers and/or parameter names.
+<strong>RESTORE</strong> releases all the fixed parameters. A typical example could look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>COMMANDS
+FIX Freq1, Freq2
+MINIMIZE
+RESTORE
+MINIMIZE
+MINOS
+SAVE
+</pre></div>
+</div>
+<p>It is important to understand that before <strong>MINOS</strong> is called, all the fixed parameters need to be released and another minimizer
+command (<strong>MINIMIZE</strong>, <strong>MIGRAD</strong>, or <strong>SIMPLEX</strong>) needs to be in place, otherwise musrfit will assume that the still fixed parameters
+have to be handled as constant parameters, <em>i.e.</em> setting the &lt;step&gt; value of the parameter to zero.</p>
+<p>For even more complex fitting the additional command <strong>FIT_RANGE [RESET | t</strong><sub>start</sub> <strong>t</strong><sub>end</sub> <strong>| t</strong><sub>s1</sub> <strong>t</strong><sub>e1</sub>
+<strong>t</strong><sub>s2</sub> <strong>t</strong><sub>e2</sub> <strong>... t</strong><sub>sn</sub> <strong>t</strong><sub>en</sub> <strong>]</strong> is provided. It allows to change the fit range during different iterations.
+The command <strong>FIT_RANGE t</strong><sub>start</sub> <strong>t</strong><sub>end</sub> changes the current fit range for all the runs present in the msr file.
+<strong>FIT_RANGE RESET</strong> will restore to the original fit ranges as provided in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>. If for each run of the
+msr file an individual fit range should be used, the third option applies. Here <strong>n</strong> has to correspond to the number of runs in the RUN block.</p>
+<p>As for the run block, there is a 2<sup>nd</sup> flavor how the <strong>FIT_RANGE</strong> can be changed, namely giving the fit range in bins,
+<em>i.e.</em> <strong>FIT_RANGE [ RESET | fgb+&lt;n0&gt; lgb-&lt;n1&gt; | fgb+&lt;n00&gt; lgb-&lt;n01&gt; fgb+&lt;n10&gt; lgb-&lt;n11&gt; ... fgb+&lt;nN0&gt; lgb-&lt;nN1&gt; ]</strong> where <strong>N</strong> is the number of available run blocks.
+The idea is inline with the above syntax and the syntax describe for the fit range (fit) of the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>.</p>
+<p>A typical example could look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>COMMANDS
+FIT_RANGE 0.0 0.8
+MINIMIZE
+FIT_RANGE RESET
+MINIMIZE
+MINOS
+SAVE
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>COMMANDS
+FIT_RANGE fgb+15 lgb-1332 fgb+17 lgb-1330
+MINIMIZE
+FIT_RANGE RESET
+MINIMIZE
+MINOS
+SAVE
+</pre></div>
+</div>
+<p>The last accepted command in the COMMAND block is <strong>SCALE_N0_BKG TRUE | FALSE</strong>. This command is only used in conjunction with single-histogram fits.
+The default is <strong>SCALE_N0_BKG TRUE</strong> which will result in a scaling of <em>N(t)</em> such that it is given in ns<sup>-1</sup>, whereas with <strong>SCALE_N0_BKG FALSE</strong>
+<em>no scaling</em> is performed and <em>N(t)</em> will be given in bin<sup>-1</sup>. If the command is not present at all, it will be interpreted as if <strong>SCALE_N0_BKG TRUE</strong> was present.</p>
+<p>For &#8220;debug&#8221; purposes it is possible to force MINUIT2 to print out additional information. The COMMAND block command is <strong>PRINT_LEVEL &lt;n&gt;</strong>,
+where <strong>&lt;n&gt;</strong> can have the values 0,1,2, or 3. A typical example could look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>COMMANDS
+MIGRAD
+SAVE
+PRINT_LEVEL 2
+MINOS
+SAVE
+</pre></div>
+</div>
+<p>Here the MINOS command will print out lot of additional information to the standard output. Notice there are 2 SAVE commands here. This will write the result of
+MIGRAD to the MINUIT2.OUTPUT file and at the end append the MINOS results to this file.</p>
+<div class="section" id="dks-extensions-of-the-commands-block-enabling-gpu-and-general-opencl-support">
+<span id="msr-commands-block-dks"></span><span id="index-40"></span><h4>DKS extensions of the COMMANDS block enabling GPU and general OpenCL support<a class="headerlink" href="#dks-extensions-of-the-commands-block-enabling-gpu-and-general-opencl-support" title="Permalink to this headline">¶</a></h4>
+<p>In case you are running the musrfit / DKS version, there are a couple commands which allow you to control the way how the fit shall be performed. These commands are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="88%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Command</th>
+<th class="head">Purpose</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><strong>OpenMP</strong></td>
+<td>tries to run multi-threading via OpenMP if available</td>
+</tr>
+<tr class="row-odd"><td><strong>CUDA</strong></td>
+<td>tries to run the fit on a NVIDIA card as <em>e.g.</em> the Tesla K40c</td>
+</tr>
+<tr class="row-even"><td><strong>OpenCL-CPU</strong></td>
+<td>tries to run multi-threading via OpenCL on the CPU. This is useful for macOS</td>
+</tr>
+<tr class="row-odd"><td><strong>OpenCL-GPU</strong></td>
+<td>tries to run multi-threading via OpenCL on the GPU. This is used for AMD cards, but also works for NVIDIA</td>
+</tr>
+</tbody>
+</table>
+<p><strong>OpenMP</strong> is the default if none of these tags are found in the COMMANDS block.</p>
+<p>In case the defined THEORY is <em>not</em> ready to run on the accelerator, <tt class="docutils literal"><span class="pre">musrfit</span></tt> will fall back to the default behavior.
+In the <a class="reference internal" href="#msr-theory-block"><em>THEORY table</em></a> all the functions which are currently <em>not</em> GPU ready are labeled by &#8220;not DKS ready&#8221; in the reference column or corresponding footnote.</p>
+</div>
+</div>
+<div class="section" id="the-fourier-block">
+<span id="msr-fourier-block"></span><span id="index-41"></span><h3>The FOURIER Block<a class="headerlink" href="#the-fourier-block" title="Permalink to this headline">¶</a></h3>
+<p>If a Fourier transform is carried out the results are plotted within <tt class="docutils literal"><span class="pre">musrview</span></tt>. As input data the actual data <em>shown</em> in <tt class="docutils literal"><span class="pre">musrview</span></tt> is used,
+<em>i.e.</em> the currently time range shown in <tt class="docutils literal"><span class="pre">musrview</span></tt>! In the FOURIER block of the msr file all necessary parameters for calculating and presenting
+the Fourier transform of the data specified in the <a class="reference internal" href="#msr-plot-block"><em>PLOT block</em></a> is given. If the FOURIER block is not present in the msr file,
+either the parameters set in the <a class="reference internal" href="#musrfit-startup"><em>XML startup</em></a> file or the system defaults are taken when the Fourier transform is performed.
+The block starts with the <em>FOURIER</em> keyword and may contain the following entries on the successive lines:</p>
+<span id="index-42"></span><dl class="docutils" id="msr-fourier-block-units">
+<dt><strong>units</strong></dt>
+<dd>Here is specified in which domain the Fourier-transformed data is presented. One may choose between the fields (<em>Gauss</em>) or (<em>Tesla</em>), the frequency (<em>MHz</em>), and the angular-frequency domain (<em>Mc/s</em>).</dd>
+</dl>
+<span id="index-43"></span><dl class="docutils" id="msr-fourier-block-fourier-power">
+<dt><strong>fourier_power</strong></dt>
+<dd>It is possible (but not necessary) to set the number of data points used for the Fourier transform here. As argument the exponent <em>n&lt;21</em> of a power of 2 is accepted.
+The number of data points is then 2<sup>n</sup>. <strong>Attention:</strong> If the number of points given here is bigger than the actual number of available data points,
+the input data vector is filled with zeros until the number of requested points is reached (<em>zero padding</em>)!</dd>
+</dl>
+<span id="index-44"></span><dl class="docutils" id="msr-fourier-block-dc-corrected">
+<dt><strong>dc-corrected</strong></dt>
+<dd>a flag to remove a potential DC-offset of the signal. Allowed entries are <tt class="docutils literal"><span class="pre">dc-corrected</span> <span class="pre">true</span> <span class="pre">|</span> <span class="pre">1</span> <span class="pre">|</span> <span class="pre">false</span> <span class="pre">|</span> <span class="pre">0</span></tt>.</dd>
+</dl>
+<span id="index-45"></span><dl class="docutils" id="msr-fourier-block-apodization">
+<dt><strong>apodization</strong></dt>
+<dd><p class="first">Here is decided if the data should be apodized before the Fourier transform is performed and if yes, which apodization should be used (for further details about apodization of
+μSR data refer to the <a class="reference external" href="https://open.library.ubc.ca/cIRcle/collections/ubctheses/831/items/1.0085550">PhD thesis of T.M. Riseman (UBC)</a>). The argument to be put after the
+keyword is therefore one of the following: <strong>NONE, WEAK, MEDIUM</strong> or <strong>STRONG</strong>. If the data should be apodized, they are manipulated as follows: each data value is multiplied by the function</p>
+<div class="math">
+\[\sum_{k=0}^4 c_k \left(\frac{i}{n}\right)^{2k},\]</div>
+<p>where <em>i</em> is the data-point index and <em>n</em> is the total number of data points. The coefficients <em>c</em><sub>j</sub> for the different apodizations are given by:</p>
+<dl class="last docutils">
+<dt><strong>WEAK</strong></dt>
+<dd><span class="math">\(c_0 = 1.0,\, c_1 = -1.319391,\, c_2 = 0.703484,\, c_3=c_4=0.0\)</span></dd>
+<dt><strong>MEDIUM</strong></dt>
+<dd><span class="math">\(c_0 = 1.0,\, c_1 = -1.831292,\, c_2 = 0.983734,\, c_3=c_4=0.0\)</span></dd>
+<dt><strong>STRONG</strong></dt>
+<dd><span class="math">\(c_0 = 1.0,\, c_1 = -2.708894,\, c_2 = 2.953575,\, c_3=-1.599128,\, c_4=0.399782\)</span></dd>
+</dl>
+</dd>
+</dl>
+<span id="index-46"></span><dl class="docutils" id="msr-fourier-block-plot">
+<dt><strong>plot</strong></dt>
+<dd><p class="first">At this point it is possible to set the part of the Fourier-transformed data which should be plotted by default if the Fourier transform is done by pressing the <em>f</em>-key in <tt class="docutils literal"><span class="pre">musrview</span></tt>.
+The argument may be one of the following:</p>
+<dl class="last docutils">
+<dt><strong>real</strong></dt>
+<dd>The real part of the (complex) Fourier transform is plotted.</dd>
+<dt><strong>imag</strong></dt>
+<dd>The imaginary part of the Fourier transform is plotted.</dd>
+<dt><strong>real_and_imag</strong></dt>
+<dd>Both the real and the imaginary parts of the Fourier transform are shown.</dd>
+<dt><strong>power</strong></dt>
+<dd>The absolute value of the Fourier transform is depicted.</dd>
+<dt><strong>phase</strong></dt>
+<dd>The phase of the Fourier transform is plotted.</dd>
+</dl>
+</dd>
+</dl>
+<span id="index-47"></span><dl class="docutils" id="msr-fourier-block-phase">
+<dt><strong>phase</strong></dt>
+<dd>The initial phase of the input data is given here in degrees. Optionally the phase parameter from the <a class="reference internal" href="#msr-fitparameter-block"><em>FITPARAMETER block</em></a> can be given,
+<em>e.g.</em> par3, which would take the value of parameter number 3.</dd>
+</dl>
+<span id="index-48"></span><dl class="docutils" id="msr-fourier-block-range-for-phase-correction">
+<dt><strong>range_for_phase_correction</strong></dt>
+<dd>An interval in Fourier space given in units as define with the &#8216;units&#8217; tag, or the tag &#8216;all&#8217; in which case the range given under &#8216;range&#8217; will be used.
+The given interval will be used for an automatic phasing of the real Fourier transform. This will allow to add real Fourier spectra coherently.</dd>
+</dl>
+<span id="index-49"></span><dl class="docutils" id="msr-fourier-block-range">
+<dt><strong>range</strong></dt>
+<dd>The plotting range is set here. The interval is specified through its start and end points given in the <em>units</em> set after the <strong>units</strong> tag.</dd>
+</dl>
+<p>Altogether, a possible FOURIER block might look like that:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>FOURIER
+units Mc/s
+fourier_power 12
+apodization NONE
+plot real_and_imag
+phase 22.6   # par3
+range_for_phase_correction all
+range 0.0 17.03
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-plot-block">
+<span id="msr-plot-block"></span><span id="index-50"></span><h3>The PLOT Block<a class="headerlink" href="#the-plot-block" title="Permalink to this headline">¶</a></h3>
+<p>The PLOT block is intended to collect all the information needed for the graphical presentation of the data and fits using <tt class="docutils literal"><span class="pre">musrview</span></tt>.
+The PLOT keyword at the beginning of the block is followed by a number which indicates the plot type. The plot types have to match the <a class="reference internal" href="#fit-types"><em>fit types</em></a>.
+Additionally, it is possible to provide information using the following keywords:</p>
+<span id="index-51"></span><dl class="docutils" id="msr-plot-block-lifetimecorrection">
+<dt><strong>lifetimecorrection</strong></dt>
+<dd>Does not accept any arguments. If present, the output in <tt class="docutils literal"><span class="pre">musrview</span></tt> is corrected for the exponential decay of the muon. Only relevant for (type 0).</dd>
+</dl>
+<span id="index-52"></span><dl class="docutils" id="msr-plot-block-runs">
+<dt><strong>runs</strong></dt>
+<dd>The numbers of the runs to be plotted have to be put here. The runs are numbered according to their appearance in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>.
+The numbers is either a space separated list of numbers, an interval <em>e.g.</em> 1-16, or a combination of both.</dd>
+</dl>
+<span id="index-53"></span><dl class="docutils" id="msr-plot-block-range">
+<dt><strong>range</strong></dt>
+<dd><p class="first">Here it is possible to define the plotting range explicitly. Depending on the plot type the following settings are allowed where the times are given in
+micro-seconds and the <em>N</em> in counts (types 0-4) or in counts/nsec (type 0, 1):</p>
+<dl class="last docutils">
+<dt>fit type 0-4 <em>without</em> lifetimecorrection:</dt>
+<dd><em>t</em><sub>min</sub> <em>t</em><sub>max</sub> [ <em>N</em><sub>min</sub> <em>N</em><sub>max</sub> ]</dd>
+<dt>fit type 0-3 <em>with</em> lifetimecorrection:</dt>
+<dd><em>t</em><sub>min</sub> <em>t</em><sub>max</sub> [ <em>A</em><sub>min</sub> <em>A</em><sub>max</sub> ]</dd>
+<dt>fit type 8:</dt>
+<dd><em>x</em><sub>min</sub> <em>x</em><sub>max</sub> [ <em>y</em><sub>min</sub> <em>y</em><sub>max</sub> ]</dd>
+</dl>
+</dd>
+</dl>
+<span id="index-54"></span><dl class="docutils" id="msr-plot-block-sub-ranges">
+<dt><strong>sub_ranges</strong></dt>
+<dd><p class="first">Here it is possible to define the plotting range for each run individually. For the different plot types the command has the structure:</p>
+<dl class="last docutils">
+<dt>fit type 0-4 <em>without</em> lifetimecorrection:</dt>
+<dd><em>t</em><sup>1</sup><sub>min</sub>  <em>t</em><sup>1</sup><sub>max</sub> <em>t</em><sup>2</sup><sub>min</sub> <em>t</em><sup>2</sup><sub>max</sub> ... <em>t</em><sup>n</sup><sub>min</sub> <em>t</em><sup>n</sup><sub>max</sub> [ <em>N</em><sub>min</sub> <em>N</em> <sub>max</sub> ] (n = the number of runs to be plotted)</dd>
+<dt>fit type 0-3 <em>with</em> lifetimecorrection:</dt>
+<dd><em>t</em><sup>1</sup><sub>min</sub>  <em>t</em><sup>1</sup><sub>max</sub> <em>t</em><sup>2</sup><sub>min</sub> <em>t</em><sup>2</sup><sub>max</sub> ... <em>t</em><sup>n</sup><sub>min</sub> <em>t</em><sup>n</sup><sub>max</sub> [ <em>A</em><sub>min</sub> <em>A</em> <sub>max</sub> ] (n = the number of runs to be plotted)</dd>
+<dt>fit type 8:</dt>
+<dd><em>not yet implemented</em></dd>
+</dl>
+</dd>
+</dl>
+<span id="index-55"></span><dl class="docutils" id="msr-plot-block-use-fit-ranges">
+<dt><strong>use_fit_ranges</strong> [ <em>y</em><sub>min</sub> <em>y</em><sub>max</sub> ]</dt>
+<dd>The fit ranges of the individual runs are used to present the data. Optionally, an ordinate range can be provided.</dd>
+</dl>
+<span id="index-56"></span><dl class="docutils" id="msr-plot-block-view-packing">
+<dt><strong>view_packing</strong></dt>
+<dd>The data are presented in the packing given here rather than the binning used for the fit. <strong>WARNING:</strong> This is a global option and applies to all PLOT-blocks.</dd>
+</dl>
+<span id="index-57"></span><dl class="docutils" id="msr-plot-block-logx">
+<dt><strong>logx</strong></dt>
+<dd>Will present the time axis in a logarithmic scale. <em>So far no checking of negative and zero-valued data is performed, hence expect interesting output!</em></dd>
+</dl>
+<span id="index-58"></span><dl class="docutils" id="msr-plot-block-logy">
+<dt><strong>logy</strong></dt>
+<dd>Will present the axis of ordinates in a logarithmic scale. <em>So far no checking of negative and zero-valued data is performed, hence expect interesting output!</em></dd>
+</dl>
+<span id="index-59"></span><dl class="docutils" id="msr-plot-block-rrf-packing">
+<dt><strong>rrf_packing</strong> value</dt>
+<dd>In the rotating-reference-frame (RRF) representation, this will be the value for the packing. <strong>WARNING:</strong> For the time being, this is a global option and applies to all PLOT blocks.</dd>
+</dl>
+<span id="index-60"></span><dl class="docutils" id="msr-plot-block-rrf-freq">
+<dt><strong>rrf_freq</strong> value unit</dt>
+<dd>This entry provides the RRF &#8220;frequency&#8221; given by the value and the unit which can be: <em>kHz</em>, <em>MHz</em>, <em>Mc/s</em>, <em>G</em>, or <em>T</em>.</dd>
+</dl>
+<span id="index-61"></span><dl class="docutils" id="msr-plot-block-rrf-phase">
+<dt><strong>rrf_phase</strong> value</dt>
+<dd>A phase of the RRF can be provided, either as a value in degrees, or as a parX, <em>e.g.</em> par4, where &#8216;X&#8217; is supposed to be the phase parameter number in the <a class="reference internal" href="#msr-fitparameter-block"><em>FITPARAMETER block</em></a>.</dd>
+<dt><strong>Notes:</strong></dt>
+<dd><ul class="first last simple">
+<li>If no plot range is given at all, the fit range of the first run also serves as time window for the plot.</li>
+<li>In the case no information on the axis of ordinates is available, the plotting range is chosen so that all data can be presented.</li>
+<li>It is possible to define multiple PLOT blocks. Each PLOT block generates its own ROOT canvas.</li>
+</ul>
+</dd>
+</dl>
+<p>A typical PLOT block could look like</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>###############################################################
+PLOT 0   (single histo plot)
+lifetimecorrection
+runs    1-16
+range   0   9.07   -0.5   0.5
+</pre></div>
+</div>
+<p>A few comments concerning the rotating reference frame (rrf) plot option: the idea of the rrf is to transform a high frequency
+μSR spectrum into a low frequency spectrum. This is essentially done by multiplying the original asymmetry
+<span class="math">\(A(t)\)</span> by <span class="math">\(\cos(\omega_{\rm rrf} t + \phi_{\rm rrf})\)</span>. This leads to two frequency shifted copies of the original
+<span class="math">\(A(t)\)</span>, one shifted downwards in frequency by <span class="math">\(\omega_{\rm rrf}\)</span> (the wanted one) and one upwards (the unwanted one).
+In order to get rid of the upward shifted spectrum, the <strong>rrf_packing</strong> is used, we just over-bin the high frequency copy.
+The theory, however, is filtered via <a class="reference external" href="https://en.wikipedia.org/wiki/Kaiser_window">Kaiser filter</a>. Here a short example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>###############################################################
+PLOT 1   (single histo RRF plot)
+runs     1
+range    0   10   -0.3   0.3
+rrf_freq 13900 G
+rrf_packing 75
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-statistic-block">
+<span id="msr-statistic-block"></span><span id="index-62"></span><h3>The STATISTIC Block<a class="headerlink" href="#the-statistic-block" title="Permalink to this headline">¶</a></h3>
+<p>The STATISTIC block is the last block of a msr file. It contains some information on the fit: the date and time as well as
+the absolute and normalized values of <span class="math">\(\chi^2\)</span> and the number of degrees of freedom in the fit.
+If enabled in the <a class="reference internal" href="#musrfit-startup"><em>XML file</em></a> for <span class="math">\(\chi^2\)</span>-single-histogram fits also <a class="reference external" href="http://en.wikipedia.org/wiki/Pearson's_chi-square_test">Pearson&#8217;s</a>
+<span class="math">\(\chi^2\)</span> will be written to the STATISTIC block.</p>
+<p><em>These information only have a meaning if the fitting procedure has been executed at least once and the fit has converged!</em></p>
+</div>
+</div>
+<div class="section" id="fit-types">
+<span id="index-63"></span><span id="id19"></span><h2>Fit Types<a class="headerlink" href="#fit-types" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="single-histogram-fit-fit-type-0">
+<span id="single-histogram-fit"></span><span id="index-64"></span><h3>Single Histogram Fit (fit type 0)<a class="headerlink" href="#single-histogram-fit-fit-type-0" title="Permalink to this headline">¶</a></h3>
+<p>The single-histogram fit (fit type 0) is used to fit a function directly to the raw data using</p>
+<div class="math">
+\[N(t) = N_0 e^{-t/\tau_\mu} [ 1 + A(t) ] + N_{\rm bkg}\]</div>
+<dl class="docutils">
+<dt>The parameters are given by:</dt>
+<dd><ul class="first last simple">
+<li><span class="math">\(N(t)\)</span>: rebinned decay histograms</li>
+<li><span class="math">\(N_0\)</span>: normalization constant of the histogram (RUN block: <a class="reference internal" href="#msr-norm"><em>norm</em></a>)</li>
+<li><span class="math">\(\tau_\mu\)</span>: lifetime of the muon (RUN block: <a class="reference internal" href="#msr-lifetime"><em>lifetime</em></a>)</li>
+<li><span class="math">\(N_{\rm bkg}\)</span>: constant background (RUN block: <a class="reference internal" href="#msr-backgr-fit"><em>backgr.fit</em></a>, <a class="reference internal" href="#msr-backgr-fix"><em>backgr.fix</em></a>,  or <a class="reference internal" href="#msr-background-single-histo"><em>background</em></a>)</li>
+<li><span class="math">\(A(t)\)</span>: decay asymmetry/depolarization function as given in the <a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a>)</li>
+</ul>
+</dd>
+</dl>
+<p>In the plot type 0 without <tt class="docutils literal"><span class="pre">lifetimecorrection</span></tt> the rebinned histogram and the function <em>N(t)</em> written above are presented.
+If the option lifetimecorrection is <em>set</em> in the PLOT block the asymmetry is plotted:</p>
+<div class="math">
+\[A(t) = \frac{N(t) - N_{\rm bkg}}{N_0} e^{+t/\tau_\mu} - 1\]</div>
+</div>
+<div class="section" id="single-histogram-rrf-fit-fit-type-1">
+<span id="single-histogram-rrf-fit"></span><span id="index-65"></span><h3>Single Histogram RRF Fit (fit type 1)<a class="headerlink" href="#single-histogram-rrf-fit-fit-type-1" title="Permalink to this headline">¶</a></h3>
+<p>The single-histogram RRF fit (fit type 1) is used to fit the rotating reference frame asymmetry <span class="math">\(A_{\rm rrf}(t)\)</span> extracted from the raw data.
+The currently implemented version will fail at low fields/frequencies (for about &lt; 1 Tesla). The same is true, if multiple frequencies with large
+enough separation are present, <em>e.g.</em> when dealing with muonium. <span class="math">\(A_{\rm rrf}(t)\)</span> is estimated the following way (for more details see the
+RRF memo (&lt;musrfit&gt;/doc/memos/rrf/rrf-notes.pdf)):</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>define the background <span class="math">\(N_{\rm bkg}\)</span>, and subtract it from the raw histogram.</li>
+<li>calculate the property <span class="math">\(M(t) = [N(t)-N_{\rm bkg}] \exp(+t/\tau)\)</span>.</li>
+<li>estimate <span class="math">\(N_0\)</span>. This is the most tricky part. From this calculate <span class="math">\(A(t) = M(t)/N_0 -1\)</span>.</li>
+<li>now the RRF transformation takes place: <span class="math">\(A_{\rm rrf}(t) = 2 \cos(\omega_{\rm rrf} t + \phi_{\rm rrf}) A(t)\)</span>.
+In Fourier space this is leading to <span class="math">\([A(\omega-\omega_{\rm rrf})+A(\omega+\omega_{\rm rrf})]\)</span>.</li>
+<li>in order to get rid if the <span class="math">\(A(\omega+\omega_{\rm rrf})\)</span> component, <span class="math">\(A_{\rm rrf}(t)\)</span> is over-binned
+by the <a class="reference internal" href="#msr-plot-block-rrf-packing"><em>rrf_packing</em></a>. This results in a signal <span class="math">\(\langle A_{\rm rrf}(t) \rangle_{p}\)</span>
+which ideally is <span class="math">\(A(t)\)</span> shifted down in frequency by <span class="math">\(\omega_{\rm rrf}\)</span>.</li>
+</ol>
+</div></blockquote>
+<p>The single histogram RRF fit was introduced for online analysis <strong>only</strong>. It is leading to many uncontrolled effects like ghost lines due to imperfection
+of the <span class="math">\(N_0\)</span> estimate, line shape distortion due to dispersive filtering originating from the packing, back folding problems if
+<span class="math">\(\omega_{\rm rrf}\)</span> is not properly chosen, the error estimates on the fitted parameters is substantially worse, <em>etc.</em>
+<strong>In summary: if you not urgently need it: do not use it! There are better ways to deal with the analysis of high frequency data!</strong>
+For more details see the rrf-memo found in the source code under &lt;musrfit&gt;/doc/memo/rrf/rrf-notes.pdf or <a class="reference external" href="http://dx.doi.org/10.7566/JPSCP.21.011051">Musrfit–Real Time Parameter Fitting Using GPUs</a></p>
+</div>
+<div class="section" id="asymmetry-fit-fit-type-2">
+<span id="asymmetry-fit"></span><span id="index-66"></span><h3>Asymmetry Fit (fit type 2)<a class="headerlink" href="#asymmetry-fit-fit-type-2" title="Permalink to this headline">¶</a></h3>
+<p>For an asymmetry fit (fit type 2) two histograms are needed. These are given by the <a class="reference internal" href="#msr-forward-backward"><em>forward</em></a> and <a class="reference internal" href="#msr-forward-backward"><em>backward</em></a> keywords
+in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>. Additionally, the parameters <a class="reference internal" href="#msr-alpha-beta"><em>alpha</em></a> and <a class="reference internal" href="#msr-alpha-beta"><em>beta</em></a> which relate the detector
+efficiencies, solid angles and initial asymmetries of the two detectors can be supplied. The constant background for the two histograms is either given by
+<a class="reference internal" href="#msr-background-asymmetry"><em>background-determined intervals</em></a> or specified through <a class="reference internal" href="#msr-backgr-fix"><em>backgr.fix</em></a> in the <a class="reference internal" href="#msr-run-block"><em>RUN-block</em></a>.</p>
+<p>The experimental asymmetry <span class="math">\(a(k)\)</span> then is inferred from the two histograms:</p>
+<div class="math">
+\[a(k)=\frac{\left[N_{\mathrm{f}}(k)-B_{\mathrm{f}}\right]-\left[N_{\mathrm{b}}(k)-B_{\mathrm{b}}\right]}{\left[N_{\mathrm{f}}(k)-B_{\mathrm{f}}\right]+\left[N_{\mathrm{b}}(k)-B_{\mathrm{b}}\right]},\]</div>
+<p>with</p>
+<blockquote>
+<div><ul class="simple">
+<li><span class="math">\(N_{\mathrm{f}}(k)\)</span>: counts in the <strong>forward</strong> histogram channel <span class="math">\(k\)</span></li>
+<li><span class="math">\(N_{\mathrm{b}}(k)\)</span>: counts in the <strong>backward</strong> histogram channel <span class="math">\(k\)</span></li>
+<li>:math:` B_{mathrm{f}}`: constant background in the <strong>forward</strong> histogram (RUN block: <a class="reference internal" href="#msr-backgr-fix"><em>backgr.fix</em></a> or <a class="reference internal" href="#msr-background-asymmetry"><em>background</em></a>)</li>
+<li>:math:` B_{mathrm{b}}`: constant background in the <strong>backward</strong> histogram (RUN block: <a class="reference internal" href="#msr-backgr-fix"><em>backgr.fix</em></a> or <a class="reference internal" href="#msr-background-asymmetry"><em>background</em></a>)</li>
+</ul>
+</div></blockquote>
+<p>This theoretical asymmetry <span class="math">\(a(t)\)</span> is used to fit the function</p>
+<div class="math">
+\[a(t)=\frac{(\alpha\beta +1)A(t)-(\alpha -1)}{(\alpha +1)-(\alpha\beta -1)A(t)},\]</div>
+<p>where</p>
+<blockquote>
+<div><ul class="simple">
+<li><span class="math">\(\alpha\)</span>: accounts for the different detector efficiencies and solid angles (RUN block: <a class="reference internal" href="#msr-alpha-beta"><em>alpha</em></a>).</li>
+<li><span class="math">\(\beta\)</span>: accounts for the different detector asymmetries (RUN block: <a class="reference internal" href="#msr-alpha-beta"><em>beta</em></a>).</li>
+<li><span class="math">\(A(t)\)</span>: is the depolarization function as given in the <a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a>.</li>
+</ul>
+</div></blockquote>
+<p>For the graphical representation in plot type 2 the equation above is rearranged to get <span class="math">\(A(t)\)</span>:</p>
+<div class="math">
+\[A(t)=\frac{(\alpha -1)+(\alpha +1)a(t)}{(\alpha\beta +1)+(\alpha\beta -1)a(t)}=\frac{\alpha\left[N_{\mathrm{f}}(t)-B_{\mathrm{f}}\right]-\left[N_{\mathrm{b}}(t)-B_{\mathrm{b}}\right]}{\alpha\beta\left[N_{\mathrm{f}}(t)-B_{\mathrm{f}}\right]+\left[N_{\mathrm{b}}(t)-B_{\mathrm{b}}\right]}\]</div>
+<p>and plotted together with the function given in the THEORY block.</p>
+</div>
+<div class="section" id="asymmetry-rrf-fit-fit-type-3">
+<span id="asymmetry-rrf-fit"></span><span id="index-67"></span><h3>Asymmetry RRF Fit (fit type 3)<a class="headerlink" href="#asymmetry-rrf-fit-fit-type-3" title="Permalink to this headline">¶</a></h3>
+<p>For asymmetry RRF Fit (fit type 3) two histograms are needed. In a first step, the unbinned asymmetry is formed as described for the asymmetry fit.
+Afterwards the RRF transformation is carried out, <em>i.e.</em> point 4. and 5. as sketched in the single histogramm RRF fit. The same reservations as for
+the single histogram RRF fit apply: <strong>if you not urgently need it: do not use it! There are better ways to deal with the analysis of high frequency data!</strong></p>
+</div>
+<div class="section" id="negative-muon-mgrsr-fit-fit-type-4">
+<span id="negative-muon-musr-fit"></span><span id="index-68"></span><h3>Negative Muon μSR Fit (fit type 4)<a class="headerlink" href="#negative-muon-mgrsr-fit-fit-type-4" title="Permalink to this headline">¶</a></h3>
+<p>The negative muon μSR fit (fit type 4) is used for single histogram fits of MuMinus, <em>i.e.</em></p>
+<div class="math">
+\[N(t) = \sum_i N_i\,\mathrm{e}^{-t/\tau_i} \left[ 1 + A_i(t)\right] + N_{\rm bkg}(t)\]</div>
+<p>where <span class="math">\(i\)</span> runs over the different lifetime channels of <span class="math">\(\mu^{-}\)</span>, and</p>
+<blockquote>
+<div><ul class="simple">
+<li><span class="math">\(N_i\)</span>: counts of lifetime channel <span class="math">\(i\)</span></li>
+<li><span class="math">\(\tau_i\)</span>: lifetime of lifetime channel <span class="math">\(i\)</span></li>
+<li><span class="math">\(A_i(t)\)</span>: depolarization function of lifetime channel <span class="math">\(i\)</span></li>
+<li><span class="math">\(N_{\rm bkg}(t)\)</span>: <span class="math">\(N_{\rm bkg}(t)= N_{\rm bkg,0} + \sum_k N_{\rm bkg,k} \cos(k \omega_{\rm cyclotron} t)\)</span> the background</li>
+</ul>
+</div></blockquote>
+<p>Since MuMinus is quite generic, the full functional depends has to be written in the <a class="reference internal" href="#msr-theory-block"><em>THEORY Block</em></a>.</p>
+</div>
+<div class="section" id="non-mgrsr-fit-fit-type-8">
+<span id="non-musr-fit"></span><span id="index-69"></span><h3>Non-μSR Fit (fit type 8)<a class="headerlink" href="#non-mgrsr-fit-fit-type-8" title="Permalink to this headline">¶</a></h3>
+<p>In the case of a non-μSR fit (fit type 8) the fitting function is</p>
+<div class="math">
+\[y = f(x),\]</div>
+<p>where <span class="math">\(x, y\)</span> are given by <a class="reference internal" href="#msr-xy-data"><em>xy-data</em></a> in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>, and <span class="math">\(f(x)\)</span> is the function defined in the <a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a>.</p>
+<p>The same applies for the plot with plot type 8.</p>
+</div>
+</div>
+<div class="section" id="id20">
+<span id="index-70"></span><span id="id21"></span><h2>User Functions<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">musrfit</span></tt> offers the possibility to plug-in user-defined functions implemented in <tt class="docutils literal"><span class="pre">C++</span></tt> classes to the fitting and plotting routines.
+In order to do so, basically two things are needed:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>a shared library containing the compiled class with the defined function.</li>
+<li>a <a class="reference external" href="https://root.cern.ch/interacting-shared-libraries-rootcling">ROOT dictionary</a> that contains information about the functions in the shared library.</li>
+</ol>
+</div></blockquote>
+<p>There are two possible ways to implement user functions and both will be explained below:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>a user function <em>without</em> global user-function-object access</li>
+<li>a user function <em>with</em> global user-function-object access</li>
+</ol>
+</div></blockquote>
+<p>Since the first is simpler this will be explained using an explicit example, before it is discussed why the second option is needed and how it can be used.</p>
+<div class="section" id="user-function-without-global-user-function-object-access">
+<span id="user-functions-without-global-part"></span><span id="index-71"></span><h3>User Function without global user-function-object access<a class="headerlink" href="#user-function-without-global-user-function-object-access" title="Permalink to this headline">¶</a></h3>
+<p>In the following it is explained in detail how the implementation of a user function is done using the simple example of <span class="math">\(f_a(x) = \sin(a x)/(a x)\)</span>,
+where the parameter <span class="math">\(a\)</span> should be determined by the fit. Although not necessary for this simple example, the source code is split into two parts,
+namely a header file <tt class="docutils literal"><span class="pre">TMyFunction.h</span></tt> containing the class declaration and a second file <tt class="docutils literal"><span class="pre">TMyFunction.cpp</span></tt> including the function implementation
+(the name of these files is your choice!).</p>
+<p>To plug in the class to <tt class="docutils literal"><span class="pre">musrfit</span></tt>, it is necessary that the class derives from the base class <strong>PUserFcnBase</strong> defined in the header file <tt class="docutils literal"><span class="pre">PUserFcnBase.h</span></tt> (which is a part of <tt class="docutils literal"><span class="pre">musrfit</span></tt>).
+In this abstract base class a function operator is defined that takes two arguments: the point where the function should be evaluated and a reference to a vector with all parameters of the function.</p>
+<p>Therefore, the user&#8217;s header file could look like the following:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/***************************************************************************</span>
+
+<span class="cm">TMyFunction.h</span>
+
+<span class="cm">***************************************************************************/</span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;PUserFcnBase.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;cmath&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">TMyFunction</span> <span class="o">:</span> <span class="k">public</span> <span class="n">PUserFcnBase</span> <span class="p">{</span>
+
+<span class="k">public</span><span class="o">:</span>
+  <span class="c1">// default constructor and destructor</span>
+  <span class="n">TMyFunction</span><span class="p">(){}</span>
+  <span class="o">~</span><span class="n">TMyFunction</span><span class="p">(){}</span>
+
+  <span class="c1">// global user-function-access functions, here without any functionality</span>
+  <span class="n">Bool_t</span> <span class="n">NeedGlobalPart</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kt">void</span> <span class="n">SetGlobalPart</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">globalPart</span><span class="p">,</span> <span class="n">UInt_t</span> <span class="n">idx</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+  <span class="n">Bool_t</span> <span class="n">GlobalPartIsValid</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
+
+  <span class="c1">// function operator</span>
+  <span class="n">Double_t</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Double_t</span><span class="p">,</span> <span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">Double_t</span><span class="o">&gt;&amp;</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+  <span class="c1">// definition of the class for the ROOT dictionary</span>
+  <span class="n">ClassDef</span><span class="p">(</span><span class="n">TMyFunction</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>In the header file above the constructor (destructor) of the class is empty. This is not necessary, any code that should be executed when the
+<a class="reference internal" href="#msr-run-block"><em>RUN block</em></a> is read and the class object is created (destroyed) may be implemented in the constructor (destructor).
+Another peculiarity is the <tt class="docutils literal"><span class="pre">ClassDef</span></tt> statement at the end of the class definition. It is needed for the ROOT dictionary generation
+and has as arguments the class name and a revision number.</p>
+<p>Please also be aware of the const-ness of the operator(). For an introductory discussion on that topic look for example <a class="reference external" href="http://en.wikipedia.org/wiki/Const_correctness">Const_correctness</a> and the links herein.</p>
+<p>The actual implementation of the user function is done in the second source file. In this example it only contains the definition of the function operator() declared in the header file and might look like:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/***************************************************************************</span>
+
+<span class="cm">TMyFunction.cpp</span>
+
+<span class="cm">***************************************************************************/</span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;TMyFunction.h&quot;</span><span class="cp"></span>
+
+<span class="n">ClassImp</span><span class="p">(</span><span class="n">TMyFunction</span><span class="p">)</span>  <span class="c1">// for the ROOT dictionary</span>
+
+<span class="n">Double_t</span> <span class="n">TMyFunction</span><span class="o">::</span><span class="k">operator</span><span class="p">()(</span><span class="n">Double_t</span> <span class="n">x</span><span class="p">,</span> <span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">Double_t</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">par</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span>
+  <span class="n">assert</span><span class="p">(</span><span class="n">par</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="o">==</span><span class="mi">1</span><span class="p">);</span> <span class="c1">// make sure the number of parameters handed to the function is correct</span>
+
+  <span class="k">const</span> <span class="n">Double_t</span> <span class="n">eps</span> <span class="o">=</span> <span class="mf">1.0e-5</span><span class="p">;</span>
+  <span class="n">Double_t</span> <span class="nf">arg</span><span class="p">(</span><span class="n">par</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">arg</span> <span class="o">&lt;</span> <span class="n">eps</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mf">1.0</span><span class="p">;</span>
+  <span class="k">return</span> <span class="nf">sin</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span><span class="o">/</span><span class="n">arg</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Also this file contains a special statement for the ROOT dictionary generation (<tt class="docutils literal"><span class="pre">ClassImp</span></tt>), which is placed before the definition of the function.
+If functions of more than one class are defined in the file, the <tt class="docutils literal"><span class="pre">ClassImp</span></tt> statements for the other classes follow right after the first one.</p>
+<p>What is further needed for the <tt class="docutils literal"><span class="pre">ROOT</span></tt> dictionary is a so-called LinkDef file which again contains the class names of all classes that should be accessible
+through the dictionary and has the following structure, where the &#8220;LinkDef.h&#8221; (or &#8220;linkdef.h&#8221; or &#8220;Linkdef.h&#8221;) at the end of the file name is mandatory:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/***************************************************************************</span>
+
+<span class="cm">TMyLibraryLinkDef.h</span>
+
+<span class="cm">***************************************************************************/</span>
+
+<span class="cp">#ifdef __CINT__</span>
+
+<span class="cp">#pragma link off all globals;</span>
+<span class="cp">#pragma link off all classes;</span>
+<span class="cp">#pragma link off all functions;</span>
+
+<span class="cp">#pragma link C++ class TMyFunction+;</span>
+
+<span class="cp">#endif </span><span class="c1">//__CINT__</span>
+</pre></div>
+</div>
+<p>For compiling and linking it is wise to use a Makefile as for example the attached <a class="reference download internal" href="_downloads/Makefile.TMyLibrary"><tt class="xref download docutils literal"><span class="pre">Makefile.TMyLibrary</span></tt></a>. It assumes standard <tt class="docutils literal"><span class="pre">ROOT</span></tt> and <tt class="docutils literal"><span class="pre">musrfit</span></tt>
+installations and defines rules for the generation of the shared library <strong>libTMyLibrary.so</strong> including the class and the ROOT dictionary. In order
+to get the library built and installed on the standard ROOT path just call:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ make -f Makefile.TMyLibrary
+$ make -f Makefile.TMyLibrary install
+</pre></div>
+</div>
+<p>In case of a custom installation some paths in the Makefile might have to be adopted. For further information about the ROOT dictionary mechanism please
+refer to the <a class="reference external" href="https://root.cern.ch/interacting-shared-libraries-rootcling">documentation</a>.</p>
+<p>After installing the shared library the defined user function might be used in musrfit as described <a class="reference internal" href="#msr-theory-block-user-functions"><em>above</em></a>.</p>
+<p>Finally, please be aware of the <a class="reference internal" href="#user-function-important"><em>remark</em></a> at the end of this section.</p>
+</div>
+<div class="section" id="user-function-with-global-user-function-object-access">
+<span id="user-functions-with-global-part"></span><span id="index-72"></span><h3>User Function with global user-function-object access<a class="headerlink" href="#user-function-with-global-user-function-object-access" title="Permalink to this headline">¶</a></h3>
+<p>Before explaining how to use global objects within user functions, it will be shortly explained where is the problem and why this might be a sensible approach.
+In <tt class="docutils literal"><span class="pre">musrfit</span></tt> each <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a> (histogram, asymmetry, ...) is owning its own theory-function tree. An example is shown in the figure below.
+The bluish nodes are default musrfit functions, whereas the red nodes represent user functions (here labeled by <tt class="docutils literal"><span class="pre">uF1</span></tt> and <tt class="docutils literal"><span class="pre">uF2</span></tt>). Without global user-function
+object, these nodes are independent entities. This means if the msr file contains <em>n</em> run blocks, the user function <tt class="docutils literal"><span class="pre">uF1</span></tt> will be called <em>n</em> times for each step
+in the calculation. If the user function is performing CPU-demanding calculations this is rather inefficient.</p>
+<img src="_images/theory-tree-with-user-fcn.svg" /><p>Therefore, it is possible to associate to each user function (<tt class="docutils literal"><span class="pre">uFx</span></tt>) a global user-function object (<tt class="docutils literal"><span class="pre">g_uFx</span></tt>). The idea is the following: If <tt class="docutils literal"><span class="pre">uFx</span></tt> needs to
+perform very time-consuming calculations (<em>e.g.</em> calculate an Abrikosov vortex lattice or the nonlocal response of a superconductor in the Meissner state) this
+can be transferred to the global user-function object (<tt class="docutils literal"><span class="pre">g_uFx</span></tt>) and hence the time-consuming calculation is only performed once per cycle (compared to <em>n</em> times
+without <tt class="docutils literal"><span class="pre">g_uFx</span></tt>), thus speeding up the fit.</p>
+<p>After explaining the purpose of the global user-function-object approach, some explanations how to interface it follow here. Since the interface is very close to
+the <a class="reference internal" href="#user-functions-without-global-part"><em>user function without global objects</em></a>, only the additionally necessary overhead is explained here.</p>
+<p>The user&#8217;s header file could look like the following:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="cm">/***************************************************************************</span>
+
+<span class="cm">TMyFunction.h</span>
+
+<span class="cm">***************************************************************************/</span>
+
+<span class="cp">#include</span> <span class="cpf">&quot;PUserFcnBase.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;cmath&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;vector&gt;</span><span class="cp"></span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">TMyGlobalFunction</span> <span class="p">{</span>
+
+<span class="k">public</span><span class="o">:</span>
+  <span class="c1">// default constructor and destructor</span>
+  <span class="n">TMyGlobalFunction</span><span class="p">(){}</span>
+  <span class="o">~</span><span class="n">TMyGlobalFunction</span><span class="p">(){}</span>
+
+  <span class="n">Bool_t</span> <span class="n">IsValid</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">fValid</span><span class="p">;</span> <span class="p">}</span>
+
+  <span class="c1">// the following function will check if something needs to be calculated, which</span>
+  <span class="c1">// is the case if param != fPrevParam</span>
+  <span class="kt">void</span> <span class="n">CalcSomethingCPUExpensive</span><span class="p">(</span><span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">Double_t</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">param</span><span class="p">);</span>
+
+  <span class="c1">// this routine will return the calculated values, e.g. B(z,E) for TMyFunction::operator()()</span>
+  <span class="c1">// (...) here sketches only that some parameters are likley to be fed</span>
+  <span class="n">Double_t</span> <span class="nf">GetWhatIsNeeded</span><span class="p">(...);</span>
+
+<span class="k">private</span><span class="o">:</span>
+  <span class="n">Bool_t</span> <span class="n">fValid</span><span class="p">;</span>
+  <span class="n">vector</span><span class="o">&lt;</span><span class="n">Double_t</span><span class="o">&gt;</span> <span class="n">fPrevParam</span><span class="p">;</span>
+
+  <span class="c1">// definition of the class for the ROOT-dictionary</span>
+  <span class="n">ClassDef</span><span class="p">(</span><span class="n">TMyGlobalFunction</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">TMyFunction</span> <span class="o">:</span> <span class="k">public</span> <span class="n">PUserFcnBase</span> <span class="p">{</span>
+
+<span class="k">public</span><span class="o">:</span>
+  <span class="c1">// default constructor and destructor</span>
+  <span class="n">TMyFunction</span><span class="p">(){}</span>
+  <span class="o">~</span><span class="n">TMyFunction</span><span class="p">(){}</span>
+
+  <span class="c1">// global user-function-access functions, here with some functionality</span>
+  <span class="n">Bool_t</span> <span class="n">NeedGlobalPart</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
+  <span class="kt">void</span> <span class="n">SetGlobalPart</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">globalPart</span><span class="p">,</span> <span class="n">UInt_t</span> <span class="n">idx</span><span class="p">);</span>
+  <span class="n">Bool_t</span> <span class="nf">GlobalPartIsValid</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+
+  <span class="c1">// function operator</span>
+  <span class="n">Double_t</span> <span class="nf">operator</span><span class="p">()(</span><span class="n">Double_t</span><span class="p">,</span> <span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">Double_t</span><span class="o">&gt;&amp;</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+
+<span class="k">private</span><span class="o">:</span>
+  <span class="n">Bool_t</span> <span class="n">fValid</span><span class="p">;</span>
+  <span class="n">Bool_t</span> <span class="n">fInvokedGlobal</span><span class="p">;</span>
+  <span class="n">Int_t</span>  <span class="n">fIdxGlobal</span><span class="p">;</span>
+  <span class="n">TMyGlobalFunction</span> <span class="o">*</span> <span class="n">fGlobalUserFcn</span><span class="p">;</span>
+
+  <span class="c1">// definition of the class for the ROOT dictionary</span>
+  <span class="n">ClassDef</span><span class="p">(</span><span class="n">TMyFunction</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>Compared to the <a class="reference internal" href="#user-functions-without-global-part"><em>user function without global objects</em></a>, here the <tt class="docutils literal"><span class="pre">NeedGlobalPart()</span></tt> method returns true
+meaning that a global user-function object will be needed. Furthermore, the methods <tt class="docutils literal"><span class="pre">SetGlobalPart(vector&lt;void*&gt;</span> <span class="pre">&amp;globalPart,</span> <span class="pre">UInt_t</span> <span class="pre">idx)</span></tt> and
+<tt class="docutils literal"><span class="pre">GlobalPartIsValid()</span></tt> now need to be implemented. The method <tt class="docutils literal"><span class="pre">SetGlobalPart(vector&lt;void*&gt;</span> <span class="pre">&amp;globalPart,</span> <span class="pre">UInt_t</span> <span class="pre">idx)</span></tt> is used to link the
+<tt class="docutils literal"><span class="pre">fGlobalUserFcn</span></tt> to the global user object. This routine will look like:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="kt">void</span> <span class="n">TMyFunction</span><span class="o">::</span><span class="n">SetGlobalPart</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">void</span> <span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">globalPart</span><span class="p">,</span> <span class="n">UInt_t</span> <span class="n">idx</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">fIdxGlobal</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">Int_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">idx</span><span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">((</span><span class="n">Int_t</span><span class="p">)</span><span class="n">globalPart</span><span class="p">.</span><span class="n">size</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="n">fIdxGlobal</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// global user function not present, invoke it</span>
+    <span class="n">fGlobalUserFcn</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TMyGlobalFunction</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fGlobalUserFcn</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// global user function object couldn&#39;t be invoked -&gt; error</span>
+      <span class="n">fValid</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+      <span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;&gt;&gt; TMyFunction::SetGlobalPart(): **ERROR** Couldn&#39;t invoke global user function object, sorry ...&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>  <span class="c1">// global user function object could be invoked -&gt; resize to global user function vector and keep the pointer to the corresponding object</span>
+      <span class="n">globalPart</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="n">fIdxGlobal</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+      <span class="n">globalPart</span><span class="p">[</span><span class="n">fIdxGlobal</span><span class="p">]</span> <span class="o">=</span> <span class="k">dynamic_cast</span><span class="o">&lt;</span><span class="n">TMyGlobalFunction</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">fGlobalUserFcn</span><span class="p">);</span>
+      <span class="n">fValid</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+      <span class="n">fInvokedGlobal</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="c1">// global user function already present hence just retrieve a pointer to it</span>
+    <span class="n">fValid</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="n">fGlobalUserFcn</span> <span class="o">=</span> <span class="p">(</span><span class="n">TMyGlobalFunction</span><span class="o">*</span><span class="p">)</span><span class="n">globalPart</span><span class="p">[</span><span class="n">fIdxGlobal</span><span class="p">];</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>What it does is the following: it first checks if the object is already present in the global user-function-object vector and if not creates it. If it is already present,
+the pointer to the global object vector is just kept (see figure above).</p>
+<p>A sketch of the method <tt class="docutils literal"><span class="pre">operator()(Double_t,</span> <span class="pre">const</span> <span class="pre">vector&amp;)</span> <span class="pre">const</span></tt> will then look like (pseudo-code snippet):</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">Double_t</span> <span class="n">TMyFunction</span><span class="o">::</span><span class="k">operator</span><span class="p">()(</span><span class="n">Double_t</span> <span class="n">t</span><span class="p">,</span> <span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">Double_t</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">param</span><span class="p">)</span> <span class="k">const</span>
+<span class="p">{</span>
+  <span class="n">Double_t</span> <span class="n">result</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+
+  <span class="c1">// do something, checking, etc.</span>
+  <span class="p">...</span>
+
+  <span class="c1">// call the global user function object (which will calculate something</span>
+  <span class="c1">// if param has changed). Hence it will only be done once in a iteration,</span>
+  <span class="c1">// and therefore only once for all run blocks.</span>
+  <span class="n">fGlobalUserFcn</span><span class="o">-&gt;</span><span class="n">CalcSomethingCPUExpensive</span><span class="p">(</span><span class="n">param</span><span class="p">);</span>
+
+  <span class="c1">// extract the needed values from the global object</span>
+  <span class="n">value</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">=</span> <span class="n">fGlobalUserFcn</span><span class="o">-&gt;</span><span class="n">GetWhatIsNeeded</span><span class="p">(...);</span>
+
+  <span class="c1">// use &#39;value(s)&#39; to do some run block specific calculations (not/less CPU demanding)</span>
+  <span class="p">...</span>
+
+  <span class="k">return</span> <span class="n">result</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>This way the efficiency of the user function can be increased by almost a factor of <em>n</em> (where <em>n</em> is the number of <a class="reference internal" href="#msr-run-block"><em>RUN blocks</em></a>).</p>
+<div class="admonition note" id="user-function-important">
+<p class="first admonition-title">Note</p>
+<p class="last">If <tt class="docutils literal"><span class="pre">musrfit</span></tt> has been built with parallelization support (default for <tt class="docutils literal"><span class="pre">GCC</span></tt> &gt; 4.2) it should be taken care of the thread safety of the <strong>user-function operator()</strong>.
+During the function optimization of <tt class="docutils literal"><span class="pre">musrfit</span></tt> the operator() is called once for any given set of parameters in order to allow the safe execution of any calculation.
+Within the <a class="reference internal" href="#single-histogram-fit"><em>single-histogram</em></a> and <a class="reference internal" href="#asymmetry-fit"><em>asymmetry</em></a> fits the calculation of <span class="math">\(\chi^2\)</span> or the maximum log-likelihood is
+parallelized and the operator() is expected to evaluate to reasonable values for a fixed set of parameters (but changing <em>t</em>) beginning with the second function call.
+In case this cannot be ensured, the parallelization can be disabled by <em>&#8211;disable-omp</em> on the configure level of the program installation.</p>
+</div>
+</div>
+</div>
+<div class="section" id="technical-description-of-the-musrfit-framework">
+<span id="technical-musrfit"></span><span id="index-73"></span><h2>Technical Description of the musrfit framework<a class="headerlink" href="#technical-description-of-the-musrfit-framework" title="Permalink to this headline">¶</a></h2>
+<p>A technical description of the musrfit framework can be found on its own <a class="reference external" href="http://lmu.web.psi.ch/musrfit/technical/index.html">docu</a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">User manual</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#available-executables-configuration-files-and-their-basic-usage">Available Executables, Configuration Files and their Basic Usage</a><ul>
+<li><a class="reference internal" href="#musrfit">musrfit</a></li>
+<li><a class="reference internal" href="#musrview">musrview</a></li>
+<li><a class="reference internal" href="#musrft">musrFT</a></li>
+<li><a class="reference internal" href="#musrt0">musrt0</a></li>
+<li><a class="reference internal" href="#msr2msr">msr2msr</a></li>
+<li><a class="reference internal" href="#msr2data">msr2data</a></li>
+<li><a class="reference internal" href="#any2many">any2many</a></li>
+<li><a class="reference internal" href="#dump-header">dump_header</a></li>
+<li><a class="reference internal" href="#musrfit-startup-xml">musrfit_startup.xml</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#description-of-the-msr-file-format">Description of the msr File Format</a><ul>
+<li><a class="reference internal" href="#the-title">The Title</a></li>
+<li><a class="reference internal" href="#the-fitparameter-block">The FITPARAMETER Block</a></li>
+<li><a class="reference internal" href="#the-theory-block">The THEORY Block</a></li>
+<li><a class="reference internal" href="#the-functions-block">The FUNCTIONS Block</a></li>
+<li><a class="reference internal" href="#the-global-block">The GLOBAL Block</a></li>
+<li><a class="reference internal" href="#the-run-block">The RUN Block</a></li>
+<li><a class="reference internal" href="#the-commands-block">The COMMANDS Block</a></li>
+<li><a class="reference internal" href="#the-fourier-block">The FOURIER Block</a></li>
+<li><a class="reference internal" href="#the-plot-block">The PLOT Block</a></li>
+<li><a class="reference internal" href="#the-statistic-block">The STATISTIC Block</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fit-types">Fit Types</a><ul>
+<li><a class="reference internal" href="#single-histogram-fit-fit-type-0">Single Histogram Fit (fit type 0)</a></li>
+<li><a class="reference internal" href="#single-histogram-rrf-fit-fit-type-1">Single Histogram RRF Fit (fit type 1)</a></li>
+<li><a class="reference internal" href="#asymmetry-fit-fit-type-2">Asymmetry Fit (fit type 2)</a></li>
+<li><a class="reference internal" href="#asymmetry-rrf-fit-fit-type-3">Asymmetry RRF Fit (fit type 3)</a></li>
+<li><a class="reference internal" href="#negative-muon-mgrsr-fit-fit-type-4">Negative Muon μSR Fit (fit type 4)</a></li>
+<li><a class="reference internal" href="#non-mgrsr-fit-fit-type-8">Non-μSR Fit (fit type 8)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id20">User Functions</a><ul>
+<li><a class="reference internal" href="#user-function-without-global-user-function-object-access">User Function without global user-function-object access</a></li>
+<li><a class="reference internal" href="#user-function-with-global-user-function-object-access">User Function with global user-function-object access</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#technical-description-of-the-musrfit-framework">Technical Description of the musrfit framework</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="tutorial.html"
+                        title="previous chapter">Tutorial for <tt class="docutils literal"><span class="pre">musrfit</span></tt></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="user-libs.html"
+                        title="next chapter">Documentation of user libs (user functions)</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/user-manual.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="user-libs.html" title="Documentation of user libs (user functions)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="tutorial.html" title="Tutorial for musrfit"
+             >previous</a> |</li>
+        <li><a href="index.html">musrfit 1.4.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2018, Andreas Suter.
+      Last updated on Jul 03, 2018.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

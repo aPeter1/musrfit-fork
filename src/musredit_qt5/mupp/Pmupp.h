@@ -113,9 +113,9 @@ class PParamDataHandler : public QObject {
     int GetNoOfCollections() { return fCollection.size(); }
     void NewCollection(const QString name);
 
-    bool ReadParamFile(const QStringList fln);
-    PmuppCollection ReadDbFile(const QString fln, bool &valid);
-    PmuppCollection ReadColumnParamFile(const QString fln, bool &valid);
+    bool ReadParamFile(const QStringList fln, QString &errorMsg);
+    PmuppCollection ReadDbFile(const QString fln, bool &valid, QString &errorMsg);
+    PmuppCollection ReadColumnParamFile(const QString fln, bool &valid, QString &errorMsg);
 
     PmuppCollection GetCollection(const int idx, bool &valid);
     PmuppCollection GetCollection(const QString name, bool &valid);
@@ -140,7 +140,7 @@ class PParamDataHandler : public QObject {
     QProcess *fProc;
     QVector<PmuppCollection> fCollection;
 
-    bool analyzeFileList(const QStringList &fln, QString &collectionName, QStringList &arg, QString &workDir);
+    bool analyzeFileList(const QStringList &fln, QString &collectionName, QStringList &arg, QString &workDir, QString &errorMsg);
 
   private slots:
     void readFromStdOut();

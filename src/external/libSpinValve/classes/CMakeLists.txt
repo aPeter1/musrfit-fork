@@ -10,12 +10,14 @@ root_generate_dictionary(
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
   PSkewedLorentzian.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PSkewedLorentzianLinkDef.h
+  MODULE PSkewedLorentzian
 )
 root_generate_dictionary(
   PStartupHandler_SVDict 
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
   PStartupHandler_SV.h
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PStartupHandler_SVLinkDef.h
+  MODULE PStartupHandler_SV
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -57,10 +59,10 @@ install(TARGETS PSpinValve DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPSkewedLorentzianDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libPSkewedLorentzianDict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_SVDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_SVDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPSkewedLorentzian_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libPSkewedLorentzian.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_SV_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_SV.rootmap
   DESTINATION lib
 )
 

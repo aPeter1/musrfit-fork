@@ -9,6 +9,7 @@ root_generate_dictionary(
   -I${MUSRFIT_INC}
   BMWStartupHandler.h 
   LINKDEF BMWStartupHandlerLinkDef.h
+  MODULE BMWStartupHandler
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -53,8 +54,8 @@ install(TARGETS BMWtools DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libBMWStartupHandlerDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libBMWStartupHandlerDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libBMWStartupHandler_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libBMWStartupHandler.rootmap
   DESTINATION lib
 )
 

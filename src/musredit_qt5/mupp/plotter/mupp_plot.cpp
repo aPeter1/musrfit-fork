@@ -46,6 +46,14 @@ using namespace std;
  */
 int main(int argc, char *argv[])
 {
+  if (argc != 2) {
+    return -1;
+  }
+  int mupp_instance = (int)strtol(argv[1], NULL, 10);
+  if ((mupp_instance < 0) || (mupp_instance > 255)) {
+    return -2;
+  }
+
   // read startup file
   char startup_path_name[128];
   TSAXParser *saxParser = new TSAXParser();
@@ -93,7 +101,8 @@ int main(int argc, char *argv[])
   PMuppCanvas *muppCanvas = new PMuppCanvas("mupp", 10, 10, 600, 800,
                                             startupHandler->GetMarkerStyleList(),
                                             startupHandler->GetMarkerSizeList(),
-                                            startupHandler->GetColorList());
+                                            startupHandler->GetColorList(),
+                                            mupp_instance);
 
   if (muppCanvas != 0) {
     if (muppCanvas->IsValid()) {

@@ -422,9 +422,9 @@ void musrfit_dump_root(char *fileName, PRunListCollection *runList)
 /**
  * <p>The musrfit program is used to fit muSR data.
  * For a detailed description/usage of the program, please see
- * \htmlonly <a href="https://intranet.psi.ch/MUSR/MusrFit">musrfit online help</a>
+ * \htmlonly <a href="http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#musrfit">musrfit online help</a>
  * \endhtmlonly
- * \latexonly musrfit online help: \texttt{https://intranet.psi.ch/MUSR/MusrFit}
+ * \latexonly musrfit online help: \texttt{http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#musrfit}
  * \endlatexonly
  *
  * <b>return:</b>

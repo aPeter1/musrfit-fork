@@ -11,6 +11,7 @@ root_generate_dictionary(
   -I${BMW_TOOLS_INC}
   TGapIntegrals.h
   LINKDEF TGapIntegralsLinkDef.h
+  MODULE TGapIntegrals
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -56,8 +57,8 @@ install(TARGETS GapIntegrals DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTGapIntegralsDict_rdict.pcm
-        ${CMAKE_CURRENT_BINARY_DIR}/libTGapIntegralsDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libTGapIntegrals_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libTGapIntegrals.rootmap
   DESTINATION lib
 )
 

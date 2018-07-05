@@ -10,6 +10,7 @@ root_generate_dictionary(
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
   PPhotoMeissner.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PPhotoMeissnerLinkDef.h
+  MODULE PPhotoMeissner
 )
 root_generate_dictionary(
   PStartupHandler_PMDict 
@@ -17,6 +18,7 @@ root_generate_dictionary(
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
   PStartupHandler_PM.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PStartupHandler_PMLinkDef.h
+  MODULE PStartupHandler_PM
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -60,10 +62,10 @@ install(TARGETS PPhotoMeissner DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPPhotoMeissnerDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libPPhotoMeissnerDict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_PMDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_PMDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPPhotoMeissner_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libPPhotoMeissner.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_PM_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_PM.rootmap
   DESTINATION lib
 )
 

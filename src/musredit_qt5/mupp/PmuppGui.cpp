@@ -205,6 +205,7 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
 {
   QDateTime dt = QDateTime::currentDateTime();
   fDatime = dt.toTime_t();
+  fMuppInstance = -1;
 
   fMuppPlot = 0;
 
@@ -223,8 +224,9 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
       QString collName = QString("collName0");
       fParamDataHandler->NewCollection(collName);
     }
-    if (!fParamDataHandler->ReadParamFile(fln)) {
-      // parameter file(s) is/are not valid
+    QString errorMsg("");
+    if (!fParamDataHandler->ReadParamFile(fln, errorMsg)) {
+      QMessageBox::critical(this, "ERROR", errorMsg);
     } else {
       dataAtStartup = true; // delay to deal with the data sets until the GUI is ready to do so
     }
@@ -413,8 +415,12 @@ void PmuppGui::aboutToQuit()
 
   // clean up temporary plot files
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-  QString pathName = QString("%1/.musrfit/mupp/_mupp_%2.dat").arg(env.value("HOME")).arg(fDatime);
-  pathName = QString("%1/.musrfit/mupp/_mupp_ftok.dat").arg(env.value("HOME"));
+  if (fMuppInstance != -1) {
+    QString pathName = QString("%1/.musrfit/mupp/_mupp_%2.dat").arg(env.value("HOME")).arg(fDatime);
+    QFile::remove(pathName);
+    pathName = QString("%1/.musrfit/mupp/_mupp_ftok_%2.dat").arg(env.value("HOME")).arg(fMuppInstance);
+    QFile::remove(pathName);
+  }
 
   // needed for clean up and to save the cmd history
   writeCmdHistory();
@@ -463,6 +469,15 @@ void PmuppGui::setupFileActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( fileOpen() ) );
   }
   tb->addAction(a);
+
+  fRecentFilesMenu = menu->addMenu( tr("Recent Files") );
+  for (int i=0; i<MAX_RECENT_FILES; i++) {
+    fRecentFilesAction[i] = new QAction(fRecentFilesMenu);
+    fRecentFilesAction[i]->setVisible(false);
+    connect( fRecentFilesAction[i], SIGNAL(triggered()), this, SLOT(fileOpenRecent()));
+    fRecentFilesMenu->addAction(fRecentFilesAction[i]);
+  }
+  fillRecentFiles();
 
   a = new QAction( tr( "E&xit" ), this );
   a->setShortcut( tr("Ctrl+Q") );
@@ -571,7 +586,38 @@ void PmuppGui::fileOpen()
     return;
   }
 
-  fParamDataHandler->ReadParamFile(list);
+  QString errorMsg("");
+  if (!fParamDataHandler->ReadParamFile(list, errorMsg)) {
+    QMessageBox::critical(this, "ERROR", errorMsg);
+    return;
+  }
+
+  // populate the recent files
+  if (msrPresent || dbPresent) {
+    for (int i=0; i<list.size(); i++) {
+      fAdmin->addRecentFile(list[i]); // keep it in admin
+      fillRecentFiles();              // update menu
+    }
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::fileOpenRecent
+ */
+void PmuppGui::fileOpenRecent()
+{
+  QAction *action = qobject_cast<QAction *>(sender());
+
+  if (action) {
+    QStringList fln;
+    fln << action->text();
+    QString errorMsg("");
+    if (!fParamDataHandler->ReadParamFile(fln, errorMsg)) {
+      QMessageBox::critical(this, "ERROR", errorMsg);
+      return;
+    }
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -580,7 +626,7 @@ void PmuppGui::fileOpen()
  */
 void PmuppGui::fileExit()
 {
-  qApp->quit();
+  aboutToQuit();
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -720,6 +766,18 @@ void PmuppGui::getTheme()
 
 //----------------------------------------------------------------------------------------------------
 /**
+ * <p>fill the recent file list in the menu.
+ */
+void PmuppGui::fillRecentFiles()
+{
+  for (int i=0; i<fAdmin->getNumRecentFiles(); i++) {
+    fRecentFilesAction[i]->setText(fAdmin->getRecentFile(i));
+    fRecentFilesAction[i]->setVisible(true);
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
  * @brief PmuppGui::readCmdHistory
  */
 void PmuppGui::readCmdHistory()
@@ -817,17 +875,21 @@ void PmuppGui::refresh()
   PmuppCollection coll;
   bool ok=false;
   if (pathName.endsWith(".db")) {
-    coll = fParamDataHandler->ReadDbFile(pathName, ok);
+    QString errorMsg("");
+    coll = fParamDataHandler->ReadDbFile(pathName, ok, errorMsg);
     if (!ok) {
       QMessageBox::critical(this, "ERROR - REFRESH",
-                            QString("Couldn't refresh %1\nFile corrupted?!").arg(fParamDataHandler->GetCollection(collIdx)->GetName()));
+                            QString("Couldn't refresh %1\nFile corrupted?!\n").arg(fParamDataHandler->GetCollection(collIdx)->GetName())+
+                            errorMsg);
       return;
     }
   } else if (pathName.endsWith(".dat")) {
-    coll = fParamDataHandler->ReadColumnParamFile(pathName, ok);
+    QString errorMsg("");
+    coll = fParamDataHandler->ReadColumnParamFile(pathName, ok, errorMsg);
     if (!ok) {
       QMessageBox::critical(this, "ERROR - REFRESH",
-                            QString("Couldn't refresh %1\nFile corrupted?!").arg(fParamDataHandler->GetCollection(collIdx)->GetName()));
+                            QString("Couldn't refresh %1\nFile corrupted?!\n").arg(fParamDataHandler->GetCollection(collIdx)->GetName())+
+                            errorMsg);
       return;
     }
   } else {
@@ -1608,13 +1670,16 @@ void PmuppGui::plot()
 
   file.close();
 
+  // get first free mupp instance
+  fMuppInstance = getFirstAvailableMuppInstance();
+
   // issue a system message to inform to ROOT parameter plotter (rpp) that new data are available
   key_t key;
   struct mbuf msg;
   int flags, msqid;
 
   // generate the ICP message queue key
-  QString tmpPathName = QString("%1/.musrfit/mupp/_mupp_ftok.dat").arg(env.value("HOME"));
+  QString tmpPathName = QString("%1/.musrfit/mupp/_mupp_ftok_%2.dat").arg(env.value("HOME")).arg(fMuppInstance);
   file.setFileName(tmpPathName);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
     QMessageBox::critical(this, "ERROR", "Couldn't write necessary temporary file!");
@@ -1624,7 +1689,7 @@ void PmuppGui::plot()
   fout << QCoreApplication::applicationFilePath().toLatin1().data() << endl;
   file.close();
 
-  key = ftok(QCoreApplication::applicationFilePath().toLatin1().data(), 1);
+  key = ftok(QCoreApplication::applicationFilePath().toLatin1().data(), fMuppInstance);
   if (key == -1) {
     QMessageBox::critical(this, "ERROR", "Couldn't obtain necessary key to install the IPC message queue.");
     return;
@@ -1669,10 +1734,13 @@ void PmuppGui::startMuppPlot()
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
   QString cmd = QString("%1/bin/mupp_plot").arg(MUPP_PREFIX);
 #if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
-  cmd = QString("/Applications/mupp.app/Contents/MacOS/mupp_plot"); // as35 not yet ready
+  cmd = QString("/Applications/mupp.app/Contents/MacOS/mupp_plot");
 #endif
   QString workDir = QString("./");
   QStringList arg;
+
+  // feed the mupp instance
+  arg << QString("%1").arg(fMuppInstance);
 
   fMuppPlot = new QProcess(this);
   if (fMuppPlot == nullptr) {
@@ -1988,3 +2056,27 @@ void PmuppGui::selectCollection(QString cmd)
     }
   }
 }
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::getFirstAvailableMuppInstance
+ * @return
+ */
+uint PmuppGui::getFirstAvailableMuppInstance()
+{
+  // if fMuppInstance already set, i.e. != -1, do nothing
+  if (fMuppInstance != -1)
+    return fMuppInstance;
+
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+  QString fln("");
+  uint i=0;
+  for (i=0; i<256; i++) {
+    fln = QString("%1/.musrfit/mupp/_mupp_ftok_%2.dat").arg(env.value("HOME")).arg(i);
+    if (!QFile::exists(fln))
+      break;
+  }
+
+  return i;
+}
+

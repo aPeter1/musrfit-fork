@@ -109,6 +109,7 @@ public:
 public slots:
   void aboutToQuit();
   void fileOpen();
+  void fileOpenRecent();
   void fileExit();
 
   void toolDumpCollections();
@@ -129,6 +130,7 @@ private:
   bool fDarkToolBarIcon;
 
   uint fDatime;
+  uint fMuppInstance;
 
   PParamDataHandler *fParamDataHandler;
   QVector<PmuppXY> fXY;
@@ -137,6 +139,9 @@ private:
   QString fMacroName;
 
   QWidget     *fCentralWidget;
+
+  QMenu *fRecentFilesMenu;   ///< recent file menu
+  QAction *fRecentFilesAction[MAX_RECENT_FILES]; ///< array of the recent file actions
 
   QBoxLayout  *fBoxLayout_Main;     // top->bottom (0)
   QBoxLayout  *fBoxLayout_Top;      // left->right (1)
@@ -173,6 +178,8 @@ private:
 
   void getTheme();
 
+  void fillRecentFiles();
+
   void readCmdHistory();
   void writeCmdHistory();
 
@@ -181,6 +188,7 @@ private:
   void getMinMax(QVector<double> &data, double &min, double &max);
   QString substituteDefaultLabels(QString label);
   void selectCollection(QString cmd);
+  uint getFirstAvailableMuppInstance();
 
 private slots:
   void refresh();

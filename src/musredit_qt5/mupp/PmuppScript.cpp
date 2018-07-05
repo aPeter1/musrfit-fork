@@ -204,7 +204,8 @@ int PmuppScript::loadCollection(const QString str)
   QStringList flnList;
   flnList << fln;
 
-  fParamDataHandler->ReadParamFile(flnList);
+  QString errorMsg("");
+  fParamDataHandler->ReadParamFile(flnList, errorMsg);
 
   return 0;
 }

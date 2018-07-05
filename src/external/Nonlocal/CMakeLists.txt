@@ -9,9 +9,11 @@ root_generate_dictionary(
   -I${MUSRFIT_INC}
   PNL_PippardFitter.h 
   LINKDEF PNL_PippardFitterLinkDef.h
+  MODULE PNL_PippardFitter
 )
 root_generate_dictionary(
   PNL_StartupHandlerDict PNL_StartupHandler.h LINKDEF PNL_StartupHandlerLinkDef.h
+  MODULE PNL_StartupHandler
 )
 
 #--- create pkg-config info ---------------------------------------------------
@@ -53,10 +55,10 @@ install(TARGETS PNL_PippardFitter DESTINATION lib)
 
 #--- install root pcm's and rootmaps ------------------------------------------
 install(
-  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPNL_PippardFitterDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libPNL_PippardFitterDict.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libPNL_StartupHandlerDict_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libPNL_StartupHandlerDict.rootmap
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPNL_PippardFitter_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libPNL_PippardFitter.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPNL_StartupHandler_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libPNL_StartupHandler.rootmap
   DESTINATION lib
 )
 

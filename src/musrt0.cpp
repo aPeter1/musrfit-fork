@@ -198,9 +198,9 @@ Int_t musrt0_getMaxBin(const PDoubleVector *data)
 /**
  * <p>The musrt0 program is used to set graphically t0's, data- and background-ranges.
  * For a detailed description/usage of the program, please see
- * \htmlonly <a href="https://intranet.psi.ch/MUSR/MusrFit">musrt0 online help</a>
+ * \htmlonly <a href="http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#musrt0">musrt0 online help</a>
  * \endhtmlonly
- * \latexonly musrt0 online help: \texttt{https://intranet.psi.ch/MUSR/MusrFit}
+ * \latexonly musrt0 online help: \texttt{http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#musrt0}
  * \endlatexonly
  *
  * <b>return:</b>

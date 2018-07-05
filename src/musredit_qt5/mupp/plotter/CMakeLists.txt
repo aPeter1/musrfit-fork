@@ -32,6 +32,7 @@ root_generate_dictionary(
   -I${CMAKE_CURRENT_SOURCE_DIR}/..
   PMuppCanvas.h
   LINKDEF PMuppCanvasLinkDef.h
+  MODULE PMuppCanvas
 )
 root_generate_dictionary(
   PMuppStartupHandlerDict 
@@ -39,6 +40,7 @@ root_generate_dictionary(
   -I${CMAKE_CURRENT_SOURCE_DIR}/..
   PMuppStartupHandler.h
   LINKDEF PMuppStartupHandlerLinkDef.h
+  MODULE PMuppStartupHandler
 )
 
 #--- define all the dictonary cxx ---------------------------------------------

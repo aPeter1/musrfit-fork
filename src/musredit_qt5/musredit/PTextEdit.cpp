@@ -925,7 +925,7 @@ void PTextEdit::doConnections( PSubTextEdit *e )
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Start the dialog to enter a msr-file title. See also https://intranet.psi.ch/MUSR/MusrFit#4_1_The_Title
+ * <p>Start the dialog to enter a msr-file title. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-title
  */
 void PTextEdit::insertTitle()
 {
@@ -934,7 +934,7 @@ void PTextEdit::insertTitle()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Start the dialog to enter a msr-file fit-parameter block. See also https://intranet.psi.ch/MUSR/MusrFit#4_2_The_FITPARAMETER_Block
+ * <p>Start the dialog to enter a msr-file fit-parameter block. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-fitparameter-block
  */
 void PTextEdit::insertParameterBlock()
 {
@@ -943,7 +943,7 @@ void PTextEdit::insertParameterBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Start the dialog to enter a msr-file theory block. See also https://intranet.psi.ch/MUSR/MusrFit#4_3_The_THEORY_Block
+ * <p>Start the dialog to enter a msr-file theory block. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-theory-block
  */
 void PTextEdit::insertTheoryBlock()
 {
@@ -952,7 +952,7 @@ void PTextEdit::insertTheoryBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Insert a selected theory function. See also https://intranet.psi.ch/MUSR/MusrFit#4_3_The_THEORY_Block
+ * <p>Insert a selected theory function. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-theory-block
  *
  * \param a action of the selected theory function
  */
@@ -963,7 +963,7 @@ void PTextEdit::insertTheoryFunction(QAction *a)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Start the dialog to enter a msr-file function block. See also https://intranet.psi.ch/MUSR/MusrFit#4_4_The_FUNCTIONS_Block
+ * <p>Start the dialog to enter a msr-file function block. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-functions-block
  */
 void PTextEdit::insertFunctionBlock()
 {
@@ -972,7 +972,7 @@ void PTextEdit::insertFunctionBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Start the dialog to enter a msr-file asymmetry run block. See also https://intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block
+ * <p>Start the dialog to enter a msr-file asymmetry run block. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-run-block
  */
 void PTextEdit::insertAsymRunBlock()
 {
@@ -981,7 +981,7 @@ void PTextEdit::insertAsymRunBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Start the dialog to enter a msr-file single histogram run block. See also https://intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block
+ * <p>Start the dialog to enter a msr-file single histogram run block. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-run-block
  */
 void PTextEdit::insertSingleHistRunBlock()
 {
@@ -990,7 +990,7 @@ void PTextEdit::insertSingleHistRunBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Start the dialog to enter a msr-file nonMusr run block. See also https://intranet.psi.ch/MUSR/MusrFit#4_5_The_RUN_Block
+ * <p>Start the dialog to enter a msr-file nonMusr run block. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-run-block
  */
 void PTextEdit::insertNonMusrRunBlock()
 {
@@ -999,7 +999,7 @@ void PTextEdit::insertNonMusrRunBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Inserts a default command block. See also https://intranet.psi.ch/MUSR/MusrFit#4_6_The_COMMANDS_Block
+ * <p>Inserts a default command block. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-commands-block
  */
 void PTextEdit::insertCommandBlock()
 {
@@ -1008,7 +1008,7 @@ void PTextEdit::insertCommandBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Start the dialog to enter a msr-file Fourier block. See also https://intranet.psi.ch/MUSR/MusrFit#4_7_The_FOURIER_Block
+ * <p>Start the dialog to enter a msr-file Fourier block. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-fourier-block
  */
 void PTextEdit::insertFourierBlock()
 {
@@ -1017,7 +1017,7 @@ void PTextEdit::insertFourierBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Start the dialog to enter a msr-file plot block. See also https://intranet.psi.ch/MUSR/MusrFit#4_7_The_PLOT_Block
+ * <p>Start the dialog to enter a msr-file plot block. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-plot-block
  */
 void PTextEdit::insertPlotBlock()
 {
@@ -1026,7 +1026,7 @@ void PTextEdit::insertPlotBlock()
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Inserts a default statistics block. See also https://intranet.psi.ch/MUSR/MusrFit#4_9_The_STATISTIC_Block
+ * <p>Inserts a default statistics block. See also http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-statistic-block
  */
 void PTextEdit::insertStatisticBlock()
 {
