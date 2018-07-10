@@ -48,7 +48,8 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QVector<QString> 
   // Layout
   fVbox = new QVBoxLayout( this );
 //Qt.3x  fVbox->resize(800, 500);
-  fOutput = new QTextEdit();
+  fOutput = new QPlainTextEdit();
+  fOutput->setMaximumBlockCount(1000);
   fVbox->addWidget(fOutput);
   fOutput->setMinimumSize(800, 455);
   fOutput->setReadOnly(true);
@@ -125,7 +126,7 @@ void PFitOutputHandler::readFromStdOut()
 {
   // Read and process the data.
   // Bear in mind that the data might be output in chunks.
-  fOutput->append( fProc->readAllStandardOutput() );
+  fOutput->appendPlainText( fProc->readAllStandardOutput() );
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -136,7 +137,7 @@ void PFitOutputHandler::readFromStdErr()
 {
   // Read and process the data.
   // Bear in mind that the data might be output in chunks.
-  fOutput->append( fProc->readAllStandardError() );
+  fOutput->appendPlainText( fProc->readAllStandardError() );
 }
 
 //----------------------------------------------------------------------------------------------------
