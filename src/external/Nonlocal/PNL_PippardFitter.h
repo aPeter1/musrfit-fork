@@ -47,10 +47,11 @@ class PNL_PippardFitterGlobal
     virtual ~PNL_PippardFitterGlobal();
 
     Bool_t IsValid() { return fValid; }
+    virtual void SetTempExponent(const Double_t nn) { f_nn = nn; }
     virtual void CalculateField(const std::vector<Double_t> &param) const;
     virtual Int_t GetEnergyIndex(const Double_t energy) { return fRgeHandler->GetRgeEnergyIndex(energy); }
     virtual Double_t GetMuonStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->GetRgeValue(energyIndex, z); }
-    virtual Double_t GetMagneticField(const Double_t z) const;
+    virtual Double_t GetMagneticField(const Double_t z) const;    
 
   private:
     Bool_t fValid;
@@ -60,6 +61,7 @@ class PNL_PippardFitterGlobal
 
     mutable std::vector<Double_t> fPreviousParam;
 
+    Double_t f_nn;
     Double_t f_dx;           // dx = xiPT dq
     mutable Double_t f_dz;   // spatial step size
 
