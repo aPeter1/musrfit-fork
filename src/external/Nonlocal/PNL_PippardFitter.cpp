@@ -102,6 +102,8 @@ PNL_PippardFitterGlobal::PNL_PippardFitterGlobal()
   fFieldB = 0;
   fShift  = 0;
 
+  f_nn = 4.0;
+
   f_dx = 0.02;
 }
 
@@ -323,7 +325,7 @@ Double_t PNL_PippardFitterGlobal::DeltaBCS(const Double_t t) const
  */
 Double_t PNL_PippardFitterGlobal::LambdaL_T(const Double_t lambdaL, const Double_t t) const
 {
-  return lambdaL/sqrt(1.0-pow(t,4.0));
+  return lambdaL/sqrt(1.0-pow(t, f_nn));
 }
 
 //--------------------------------------------------------------------------
@@ -431,7 +433,11 @@ Bool_t PNL_PippardFitter::GlobalPartIsValid() const
 Double_t PNL_PippardFitter::operator()(Double_t t, const std::vector<Double_t> &param) const
 {
   // param: [0] energy, [1] temp, [2] thickness, [3] meanFreePath, [4] xi0, [5] lambdaL, [6] Bext, [7] phase, [8] dead-layer
-  assert(param.size() == 9);
+  //        optionally [9] nn, where nn is the exponent in lambda = lambda_L / sqrt(1-t^nn). Default is nn=4.
+  assert((param.size() == 9) || (param.size() == 10));
+
+  if (param.size() == 10) // nn given, hence set it
+    fPippardFitterGlobal->SetTempExponent(param[9]);
 
   // for negative time return polarization == 1
   if (t <= 0.0)
