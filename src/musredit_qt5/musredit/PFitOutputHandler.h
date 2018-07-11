@@ -34,7 +34,7 @@
 #include <QProcess>
 #include <QDialog>
 #include <QVBoxLayout>
-#include <QTextEdit>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QMessageBox>
 #include <QVector>
@@ -66,7 +66,7 @@ private:
     QProcess *fProc; ///< pointer to the musrfit process
 
     QVBoxLayout *fVbox; ///< pointer to the dialog layout manager
-    QTextEdit *fOutput; ///< the captured musrfit output is written (read only) into this text edit object.
+    QPlainTextEdit *fOutput; ///< the captured musrfit output is written (read only) into this text edit object.
     QPushButton *fQuitButton; ///< quit button, either to interrupt the fit or to close the dialog at the end of the fit.
 };
 
