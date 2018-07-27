@@ -25,7 +25,7 @@ Currently it allows the following things:
 
 For a more exhaustive user documentation see:
 
-  http://lmu.web.psi.ch/musrfit/user/MUSR/WebHome.html
+  http://lmu.web.psi.ch/musrfit/user/html/index.html
 
 ### Contact ###
 
