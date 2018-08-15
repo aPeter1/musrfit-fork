@@ -57,6 +57,7 @@ using namespace std;
 #define PRUN_ASYMMETRY        2
 #define PRUN_ASYMMETRY_RRF    3
 #define PRUN_MU_MINUS         4
+#define PRUN_ASYMMETRY_BNMR   5
 #define PRUN_NON_MUSR         8
 
 // muon life time in (us), see PRL99, 032001 (2007)
@@ -99,6 +100,7 @@ using namespace std;
 #define MSR_FITTYPE_ASYM             2
 #define MSR_FITTYPE_ASYM_RRF         3
 #define MSR_FITTYPE_MU_MINUS         4
+#define MSR_FITTYPE_BNMR             5
 #define MSR_FITTYPE_NON_MUSR         8
 
 //-------------------------------------------------------------
@@ -108,6 +110,7 @@ using namespace std;
 #define MSR_PLOT_ASYM             2
 #define MSR_PLOT_ASYM_RRF         3
 #define MSR_PLOT_MU_MINUS         4
+#define MSR_PLOT_BNMR             5
 #define MSR_PLOT_NON_MUSR         8
 
 //-------------------------------------------------------------

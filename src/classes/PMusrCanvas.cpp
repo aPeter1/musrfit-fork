@@ -742,6 +742,18 @@ void PMusrCanvas::UpdateDataTheoryPad()
         // handle data
         HandleDataSet(i, runNo, data);
         break;
+      case MSR_FITTYPE_BNMR:
+        data = fRunList->GetAsymmetryBNMR(runNo, PRunListCollection::kRunNo);
+        if (!data) { // something wrong
+          fValid = false;
+          // error message
+          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a beta-NMR asymmetry plot";
+          cerr << endl;
+          return;
+        }
+        // handle data
+        HandleDataSet(i, runNo, data);
+        break;
       case MSR_FITTYPE_NON_MUSR:
         data = fRunList->GetNonMusr(runNo, PRunListCollection::kRunNo);
         if (!data) { // something wrong
@@ -910,7 +922,8 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += grouping;
       tstr += TString(",");
     } else if ((runs[runNo].GetFitType() == MSR_FITTYPE_ASYM) ||
-               (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM_RRF)) {
+               (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM_RRF) ||
+	       (runs[runNo].GetFitType() == MSR_FITTYPE_BNMR)) {
       tstr += TString("h:");
       TString grouping;
       fMsrHandler->GetGroupingString(runNo, "forward", grouping);

@@ -76,6 +76,12 @@ PRunListCollection::~PRunListCollection()
   }
   fRunAsymmetryRRFList.clear();
 
+  for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++) {
+    fRunAsymmetryBNMRList[i]->CleanUp();
+    fRunAsymmetryBNMRList[i]->~PRunAsymmetryBNMR();
+  }
+  fRunAsymmetryBNMRList.clear();
+
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++) {
     fRunMuMinusList[i]->CleanUp();
     fRunMuMinusList[i]->~PRunMuMinus();
@@ -133,6 +139,11 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
       if (!fRunAsymmetryRRFList[fRunAsymmetryRRFList.size()-1]->IsValid())
         success = false;
       break;
+    case PRUN_ASYMMETRY_BNMR:
+      fRunAsymmetryBNMRList.push_back(new PRunAsymmetryBNMR(fMsrInfo, fData, runNo, tag));
+      if (!fRunAsymmetryBNMRList[fRunAsymmetryBNMRList.size()-1]->IsValid())
+        success = false;
+      break;
     case PRUN_MU_MINUS:
       fRunMuMinusList.push_back(new PRunMuMinus(fMsrInfo, fData, runNo, tag));
       if (!fRunMuMinusList[fRunMuMinusList.size()-1]->IsValid())
@@ -175,6 +186,8 @@ void PRunListCollection::SetFitRange(const TString fitRange)
     fRunAsymmetryList[i]->SetFitRangeBin(fitRange);
   for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
     fRunAsymmetryRRFList[i]->SetFitRangeBin(fitRange);
+  for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++)
+    fRunAsymmetryBNMRList[i]->SetFitRangeBin(fitRange);
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
     fRunMuMinusList[i]->SetFitRangeBin(fitRange);
   for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
@@ -201,6 +214,8 @@ void PRunListCollection::SetFitRange(const PDoublePairVector fitRange)
     fRunAsymmetryList[i]->SetFitRange(fitRange);
   for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
     fRunAsymmetryRRFList[i]->SetFitRange(fitRange);
+  for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++)
+    fRunAsymmetryBNMRList[i]->SetFitRange(fitRange);
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
     fRunMuMinusList[i]->SetFitRange(fitRange);
   for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
@@ -287,6 +302,27 @@ Double_t PRunListCollection::GetAsymmetryRRFChisq(const std::vector<Double_t>& p
 
   for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
     chisq += fRunAsymmetryRRFList[i]->CalcChiSquare(par);
+
+  return chisq;
+}
+
+//--------------------------------------------------------------------------
+// GetAsymmetryBNMRChisq (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Calculates chi-square of <em>all</em> asymmetry BNMR runs of a msr-file.
+ *
+ * <b>return:</b>
+ * - chi-square of all asymmetry BNMR runs of the msr-file
+ *
+ * \param par fit parameter vector
+ */
+Double_t PRunListCollection::GetAsymmetryBNMRChisq(const std::vector<Double_t>& par) const
+{
+  Double_t chisq = 0.0;
+
+  for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++)
+    chisq += fRunAsymmetryBNMRList[i]->CalcChiSquare(par);
 
   return chisq;
 }
@@ -380,6 +416,9 @@ Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Doubl
   case PRUN_ASYMMETRY_RRF:
     expectedChisq = fRunAsymmetryRRFList[subIdx]->CalcChiSquareExpected(par);
     break;
+  case PRUN_ASYMMETRY_BNMR:
+    expectedChisq = fRunAsymmetryBNMRList[subIdx]->CalcChiSquareExpected(par);
+    break;
   case PRUN_MU_MINUS:
     expectedChisq = fRunMuMinusList[subIdx]->CalcChiSquareExpected(par);
     break;
@@ -440,6 +479,9 @@ Double_t PRunListCollection::GetSingleRunChisq(const std::vector<Double_t>& par,
     break;
   case PRUN_ASYMMETRY_RRF:
     chisq = fRunAsymmetryRRFList[subIdx]->CalcChiSquare(par);
+    break;
+  case PRUN_ASYMMETRY_BNMR:
+    chisq = fRunAsymmetryBNMRList[subIdx]->CalcChiSquare(par);
     break;
   case PRUN_MU_MINUS:
     chisq = fRunMuMinusList[subIdx]->CalcChiSquare(par);
@@ -536,6 +578,28 @@ Double_t PRunListCollection::GetAsymmetryRRFMaximumLikelihood(const std::vector<
 
   for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
     mlh += fRunAsymmetryRRFList[i]->CalcChiSquare(par);
+
+  return mlh;
+}
+
+//--------------------------------------------------------------------------
+// GetAsymmetryBNMRMaximumLikelihood (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> Since it is not clear yet how to handle asymmetry fits with max likelihood
+ * the chi square will be used!
+ *
+ * <b>return:</b>
+ * - chi-square of all asymmetry BNMR runs of the msr-file
+ *
+ * \param par fit parameter vector
+ */
+Double_t PRunListCollection::GetAsymmetryBNMRMaximumLikelihood(const std::vector<Double_t>& par) const
+{
+  Double_t mlh = 0.0;
+
+  for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++)
+    mlh += fRunAsymmetryBNMRList[i]->CalcChiSquare(par);
 
   return mlh;
 }
@@ -721,6 +785,9 @@ UInt_t PRunListCollection::GetNoOfBinsFitted(const UInt_t idx) const
   case PRUN_ASYMMETRY_RRF:
     result = fRunAsymmetryRRFList[subIdx]->GetNoOfFitBins();
     break;
+  case PRUN_ASYMMETRY_BNMR:
+    result = fRunAsymmetryBNMRList[subIdx]->GetNoOfFitBins();
+    break;
   case PRUN_MU_MINUS:
     result = fRunMuMinusList[subIdx]->GetNoOfFitBins();
     break;
@@ -759,6 +826,9 @@ UInt_t PRunListCollection::GetTotalNoOfBinsFitted() const
 
   for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
     counts += fRunAsymmetryRRFList[i]->GetNoOfFitBins();
+
+  for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++)
+    counts += fRunAsymmetryBNMRList[i]->GetNoOfFitBins();
 
   for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
     counts += fRunMuMinusList[i]->GetNoOfFitBins();
@@ -899,6 +969,49 @@ PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
 }
 
 //--------------------------------------------------------------------------
+// GetAsymmetryBNMR (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get a processed asymmetry data set.
+ *
+ * <b>return:</b>
+ * - pointer to the run data set (processed data) if data set is found
+ * - null pointer otherwise
+ *
+ * \param index msr-file run index
+ * \param tag kIndex -> data at index, kRunNo -> data of given run no
+ */
+PRunData* PRunListCollection::GetAsymmetryBNMR(UInt_t index, EDataSwitch tag)
+{
+  PRunData *data = 0;
+
+  switch (tag) {
+    case kIndex: // called from musrfit when dumping the data
+      if (index > fRunAsymmetryList.size()) {
+        cerr << endl << ">> PRunListCollection::GetAsymmetryBNMR(): **ERROR** index = " << index << " out of bounds";
+        cerr << endl;
+        return 0;
+      }
+
+      fRunAsymmetryList[index]->CalcTheory();
+      data = fRunAsymmetryList[index]->GetData();
+      break;
+    case kRunNo: // called from PMusrCanvas
+      for (UInt_t i=0; i<fRunAsymmetryList.size(); i++) {
+        if (fRunAsymmetryList[i]->GetRunNo() == index) {
+          data = fRunAsymmetryList[i]->GetData();
+          break;
+        }
+      }
+      break;
+    default: // error
+      break;
+  }
+
+  return data;
+}
+
+//--------------------------------------------------------------------------
 // GetAsymmetryRRF (public)
 //--------------------------------------------------------------------------
 /**
@@ -930,6 +1043,49 @@ PRunData* PRunListCollection::GetAsymmetryRRF(UInt_t index, EDataSwitch tag)
       for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++) {
         if (fRunAsymmetryRRFList[i]->GetRunNo() == index) {
           data = fRunAsymmetryRRFList[i]->GetData();
+          break;
+        }
+      }
+      break;
+    default: // error
+      break;
+  }
+
+  return data;
+}
+
+//--------------------------------------------------------------------------
+// GetAsymmetryBNMR (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get a processed asymmetry BNMR data set.
+ *
+ * <b>return:</b>
+ * - pointer to the run data set (processed data) if data set is found
+ * - null pointer otherwise
+ *
+ * \param index msr-file run index
+ * \param tag kIndex -> data at index, kRunNo -> data of given run no
+ */
+PRunData* PRunListCollection::GetAsymmetryBNMR(UInt_t index, EDataSwitch tag)
+{
+  PRunData *data = 0;
+
+  switch (tag) {
+    case kIndex: // called from musrfit when dumping the data
+      if (index > fRunAsymmetryBNMRList.size()) {
+        cerr << endl << ">> PRunListCollection::GetAsymmetryBNMR(): **ERROR** index = " << index << " out of bounds";
+        cerr << endl;
+        return 0;
+      }
+
+      fRunAsymmetryBNMRList[index]->CalcTheory();
+      data = fRunAsymmetryBNMRList[index]->GetData();
+      break;
+    case kRunNo: // called from PMusrCanvas
+      for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++) {
+        if (fRunAsymmetryBNMRList[i]->GetRunNo() == index) {
+          data = fRunAsymmetryBNMRList[i]->GetData();
           break;
         }
       }
