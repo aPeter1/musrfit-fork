@@ -30,9 +30,6 @@
  ***************************************************************************/
 
 #include "TBNMR.h"
-#include "TF1.h"
-#include "Math/WrappedTF1.h"
-#include "Math/GaussIntegrator.h"
 
 #define tau_Li 1210
 #define gamma_Li 6.3018 // In units kHz/mT
@@ -65,6 +62,11 @@ double ExpRlx::operator()(double x, const vector<double> &par) const {
   return y;
 }
 
+
+//initialize Integrators
+TF1 SExpRlx::sexp1=TF1("sexp", "exp(-([0]-x)/[3])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20000.0);
+TF1 SExpRlx::sexp2=TF1("sexp", "exp(-([3]-x)/[4])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20000.0);
+
 double SExpRlx::operator()(double x, const vector<double> &par) const {
   assert(par.size()==3); // make sure the number of parameters handed to the function is correct
   
@@ -72,23 +74,14 @@ double SExpRlx::operator()(double x, const vector<double> &par) const {
   // par[1] is the relaxation rate
   // par[2] is the exponent
 
-  double y;
-
-
-  if ( x >= 0 && x <= par[0] ) { 
-    TF1 sexp("sexp", "exp(-([0]-x)/[3])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20000.0);
-    sexp.SetParameters(x, par[1], par[2],tau_Li);
-    sexp.SetNpx(1000);
-    y=sexp.Integral(0.0,x)/(1-exp(-x/tau_Li))/tau_Li;
+  if ( x >= 0 && x <= par[0] ) {
+    sexp1.SetParameters(x, par[1], par[2],tau_Li);
+    return sexp1.Integral(0.0,x)/(1-exp(-x/tau_Li))/tau_Li;
   } else if ( x > par[0] ) {
-    TF1 sexp("sexp", "exp(-([3]-x)/[4])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20000.0);
-    sexp.SetParameters(x, par[1], par[2], par[0],tau_Li);
-    sexp.SetNpx(1000);
-    y=sexp.Integral(0.0,par[0])/(1-exp(-par[0]/tau_Li))/tau_Li;
-  }  else {
-    y = 0;
+    sexp2.SetParameters(x, par[1], par[2], par[0],tau_Li);
+    return sexp2.Integral(0.0,par[0])/(1-exp(-par[0]/tau_Li))/tau_Li;
   }
-  return y;
+  return 0;
 }
 
 double MLRes::operator()(double x, const vector<double> &par) const {

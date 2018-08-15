@@ -31,6 +31,9 @@
 
 
 #include "PUserFcnBase.h"
+#include "TF1.h"
+#include "Math/WrappedTF1.h"
+#include "Math/GaussIntegrator.h"
 #include <cassert>
 #include <cmath>
 #include <vector>
@@ -63,7 +66,7 @@ class SExpRlx : public PUserFcnBase {
 
 public:
   // default constructor and destructor
-  SExpRlx(){}
+  SExpRlx(){sexp1.SetNpx(1000); sexp2.SetNpx(1000);}
   ~SExpRlx(){}
 
   Bool_t NeedGlobalPart() const { return false; }
@@ -72,6 +75,9 @@ public:
 
   // function operator
   double operator()(double, const vector<double>&) const;
+private:
+  static TF1 sexp1;
+  static TF1 sexp2;
 
   // definition of the class for the ROOT-dictionary
   ClassDef(SExpRlx,1)
