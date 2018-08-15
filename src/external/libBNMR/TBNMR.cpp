@@ -10,8 +10,8 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010 by Zaher Salman                                *
- *   zaher.salman@psi.ch                                                  *
+ *   Copyright (C) 2010 by Zaher Salman                                    *
+ *   zaher.salman@psi.ch                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -20,7 +20,7 @@
  *                                                                         *
  *   This program is distributed in the hope that it will be useful,       *
  *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         * 
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
@@ -109,11 +109,7 @@ double MLRes::operator()(double x, const vector<double> &par) const {
   // par[0] time of beam off
   // par[1] is the relaxation rate
   // par[2] is the exponent
-  double tau_p;
   double y;
-
-  tau_p = (tau_Li/(1.+par[1]*tau_Li));
-
 
   if ( x >= 0 && x <= par[0] ) { 
     TF1 sexp("sexp", "exp(-([0]-x)/[3])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 10000.0);
