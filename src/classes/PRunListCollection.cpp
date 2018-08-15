@@ -1055,49 +1055,6 @@ PRunData* PRunListCollection::GetAsymmetryRRF(UInt_t index, EDataSwitch tag)
 }
 
 //--------------------------------------------------------------------------
-// GetAsymmetryBNMR (public)
-//--------------------------------------------------------------------------
-/**
- * <p>Get a processed asymmetry BNMR data set.
- *
- * <b>return:</b>
- * - pointer to the run data set (processed data) if data set is found
- * - null pointer otherwise
- *
- * \param index msr-file run index
- * \param tag kIndex -> data at index, kRunNo -> data of given run no
- */
-PRunData* PRunListCollection::GetAsymmetryBNMR(UInt_t index, EDataSwitch tag)
-{
-  PRunData *data = 0;
-
-  switch (tag) {
-    case kIndex: // called from musrfit when dumping the data
-      if (index > fRunAsymmetryBNMRList.size()) {
-        cerr << endl << ">> PRunListCollection::GetAsymmetryBNMR(): **ERROR** index = " << index << " out of bounds";
-        cerr << endl;
-        return 0;
-      }
-
-      fRunAsymmetryBNMRList[index]->CalcTheory();
-      data = fRunAsymmetryBNMRList[index]->GetData();
-      break;
-    case kRunNo: // called from PMusrCanvas
-      for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++) {
-        if (fRunAsymmetryBNMRList[i]->GetRunNo() == index) {
-          data = fRunAsymmetryBNMRList[i]->GetData();
-          break;
-        }
-      }
-      break;
-    default: // error
-      break;
-  }
-
-  return data;
-}
-
-//--------------------------------------------------------------------------
 // GetMuMinus (public)
 //--------------------------------------------------------------------------
 /**

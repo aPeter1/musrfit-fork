@@ -65,6 +65,7 @@ add_library(PMusr SHARED
   PMusrT0Dict.cxx
   PPrepFourier.cpp
   PRunAsymmetry.cpp
+  PRunAsymmetryBNMR.cpp
   PRunAsymmetryRRF.cpp
   PRunBase.cpp
   PRunDataHandler.cpp

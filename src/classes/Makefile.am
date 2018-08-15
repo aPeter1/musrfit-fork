@@ -15,6 +15,7 @@ h_sources = \
   ../include/PMusrT0.h \
   ../include/PPrepFourier.h \
   ../include/PRunAsymmetry.h \
+  ../include/PRunAsymmetryBNMR.h \
   ../include/PRunAsymmetryRRF.h \
   ../include/PRunBase.h \
   ../include/PRunDataHandler.h \
@@ -61,6 +62,7 @@ cpp_sources = \
   PMusrT0.cpp \
   PPrepFourier.cpp \
   PRunAsymmetry.cpp \
+  PRunAsymmetryBNMR.cpp \
   PRunAsymmetryRRF.cpp \
   PRunBase.cpp \
   PRunDataHandler.cpp \
