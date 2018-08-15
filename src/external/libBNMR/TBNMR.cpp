@@ -39,20 +39,10 @@
 #define PI 3.14159265358979323846
 #define TWOPI 6.28318530717958647692
 
-ClassImp(TBNMR)  // for the ROOT-dictionary
-ClassImp(ExpRlx)
+ClassImp(ExpRlx)  // for the ROOT-dictionary
 ClassImp(SExpRlx)
 ClassImp(MLRes)
 
-double TBNMR::operator()(double x, const vector<double> &par) const {
-  assert(par.size()==1); // make sure the number of parameters handed to the function is correct
-  
-  double arg(par[0]*x);
-
-  if(!arg)
-    return 1.0;
-  return sin(arg)/arg;
-}
 
 double ExpRlx::operator()(double x, const vector<double> &par) const {
   assert(par.size()==2); // make sure the number of parameters handed to the function is correct
@@ -81,10 +71,8 @@ double SExpRlx::operator()(double x, const vector<double> &par) const {
   // par[0] time of beam off
   // par[1] is the relaxation rate
   // par[2] is the exponent
-  double tau_p;
-  double y;
 
-  tau_p = (tau_Li/(1.+par[1]*tau_Li));
+  double y;
 
 
   if ( x >= 0 && x <= par[0] ) { 

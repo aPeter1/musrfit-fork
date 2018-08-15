@@ -35,25 +35,11 @@
 #include <cmath>
 #include <vector>
 
+#ifndef LIBBNMRH
+#define LIBBNMRH
+
 using namespace std;
 
-class TBNMR : public PUserFcnBase {
-
-public:
-  // default constructor and destructor
-  TBNMR(){}
-  ~TBNMR(){}
-
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
-
-  // function operator
-  double operator()(double, const vector<double>&) const;
-
-  // definition of the class for the ROOT-dictionary
-  ClassDef(TBNMR,1)
-};
 
 class ExpRlx : public PUserFcnBase {
 
@@ -108,3 +94,5 @@ public:
   // definition of the class for the ROOT-dictionary
   ClassDef(MLRes,1)
 };
+
+#endif //LIBBNMRH
