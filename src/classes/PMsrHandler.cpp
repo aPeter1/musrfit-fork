@@ -640,6 +640,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             case MSR_FITTYPE_MU_MINUS:
               fout << std::left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << std::endl ;
               break;
+            case MSR_FITTYPE_BNMR:
+              fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
+              break;
             case MSR_FITTYPE_NON_MUSR:
               fout << std::left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << std::endl ;
               break;
@@ -803,6 +806,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             break;
           case MSR_FITTYPE_MU_MINUS:
             fout << std::left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << std::endl ;
+            break;
+          case MSR_FITTYPE_BNMR:
+            fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
             break;
           case MSR_FITTYPE_NON_MUSR:
             fout << std::left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << std::endl ;
@@ -1716,6 +1722,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, std::map<UInt_t, TString
       case MSR_FITTYPE_MU_MINUS:
         fout << std::left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << std::endl ;
         break;
+      case MSR_FITTYPE_BNMR:
+        fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
+        break;
       case MSR_FITTYPE_NON_MUSR:
         fout << std::left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << std::endl ;
         break;
@@ -1906,6 +1915,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, std::map<UInt_t, TString
         break;
       case MSR_FITTYPE_MU_MINUS:
         fout << std::left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << std::endl ;
+        break;
+      case MSR_FITTYPE_BNMR:
+        fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
         break;
       case MSR_FITTYPE_NON_MUSR:
         fout << std::left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << std::endl ;
@@ -2981,6 +2993,7 @@ Bool_t PMsrHandler::HandleGlobalEntry(PMsrLines &lines)
               (fittype == MSR_FITTYPE_ASYM) ||
               (fittype == MSR_FITTYPE_ASYM_RRF) ||
               (fittype == MSR_FITTYPE_MU_MINUS) ||
+              (fittype == MSR_FITTYPE_BNMR) ||
               (fittype == MSR_FITTYPE_NON_MUSR)) {
             global.SetFitType(fittype);
           } else {
@@ -3322,6 +3335,7 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
               (fittype == MSR_FITTYPE_ASYM) ||
               (fittype == MSR_FITTYPE_ASYM_RRF) ||
               (fittype == MSR_FITTYPE_MU_MINUS) ||
+              (fittype == MSR_FITTYPE_BNMR) ||
               (fittype == MSR_FITTYPE_NON_MUSR)) {
             param.SetFitType(fittype);
           } else {
@@ -6203,7 +6217,7 @@ Bool_t PMsrHandler::CheckHistoGrouping()
   Bool_t result = true;
 
   for (UInt_t i=0; i<fRuns.size(); i++) {
-    if (fRuns[i].GetFitType() == MSR_FITTYPE_ASYM) {
+    if (fRuns[i].GetFitType() == MSR_FITTYPE_ASYM || fRuns[i].GetFitType() == MSR_FITTYPE_BNMR) {
       if (fRuns[i].GetForwardHistoNoSize() != fRuns[i].GetBackwardHistoNoSize()) {
         std::cerr << std::endl << ">> PMsrHandler::CheckHistoGrouping: **ERROR** # of forward histos != # of backward histos.";
         std::cerr << std::endl << ">> Run #" << i+1;
