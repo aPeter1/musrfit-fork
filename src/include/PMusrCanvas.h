@@ -246,7 +246,7 @@ class PMusrCanvas : public TObject, public TQObject
     Bool_t fDifferenceView;   ///< tag showing that the shown data, fourier, are the difference between data and theory
     Int_t  fCurrentPlotView;  ///< tag showing what the current plot view is: data, fourier, ...
     Int_t  fPreviousPlotView; ///< tag showing the previous plot view
-    Int_t  fPlotType;         ///< plot type tag: -1 == undefined, MSR_PLOT_SINGLE_HISTO == single histogram, MSR_PLOT_ASYM == asymmetry, MSR_PLOT_MU_MINUS == mu minus (not yet implemented), MSR_PLOT_NON_MUSR == non-muSR
+    Int_t  fPlotType;         ///< plot type tag: -1 == undefined, MSR_PLOT_SINGLE_HISTO == single histogram, MSR_PLOT_ASYM == asymmetry, MSR_PLOT_BNMR == beta-NMR asymmetry, MSR_PLOT_MU_MINUS == mu minus (not yet implemented), MSR_PLOT_NON_MUSR == non-muSR
     Int_t  fPlotNumber;       ///< plot number
 
     Bool_t fXRangePresent, fYRangePresent; ///< flag indicating if x-/y-range is present
