@@ -1618,6 +1618,7 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
     case MSR_PLOT_SINGLE_HISTO:
     case MSR_PLOT_SINGLE_HISTO_RRF:
     case MSR_PLOT_ASYM:
+    case MSR_PLOT_BNMR:
     case MSR_PLOT_ASYM_RRF:
     case MSR_PLOT_MU_MINUS:
       if (fDifferenceView) { // difference view plot
@@ -2778,6 +2779,8 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   // make sure that for asymmetry the y-range is initialized reasonably
   if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM)
     dataSet.dataRange->SetYRange(-0.4, 0.4);
+  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_BNMR)
+    dataSet.dataRange->SetYRange(-0.4, 0.4);
   // extract necessary range information
   if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() == 0) &&
       !fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fUseFitRanges) { // no range information at all
@@ -2792,6 +2795,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
       fXmax = end;
     }
     if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM) ||
+        (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_BNMR) ||
         (fMsrHandler->GetMsrRunList()->at(runNo).IsLifetimeCorrected())) {
       fYRangePresent = true;
       fYmin = -0.4;
@@ -2840,6 +2844,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 
     // make sure that for asymmetry the y-range is initialized reasonably
     if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM) ||
+        (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_BNMR) ||
         (fMsrHandler->GetMsrRunList()->at(runNo).IsLifetimeCorrected())) {
       dataSet.dataRange->SetYRange(-0.4, 0.4);
     }
@@ -4714,6 +4719,9 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
         case MSR_PLOT_ASYM:
           yAxisTitle = "Asymmetry";
           break;
+        case MSR_PLOT_BNMR:
+          yAxisTitle = "Asymmetry";
+          break;
         case MSR_PLOT_MU_MINUS:
           yAxisTitle = "N(t) per bin";
           break;
@@ -6134,6 +6142,9 @@ void PMusrCanvas::PlotAverage(Bool_t unzoom)
           }
           break;
         case MSR_PLOT_ASYM:
+          yAxisTitle = "<asymmetry>";
+          break;
+        case MSR_PLOT_BNMR:
           yAxisTitle = "<asymmetry>";
           break;
         case MSR_PLOT_MU_MINUS:

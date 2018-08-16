@@ -24,7 +24,7 @@ fun1 = 0.5 * map1 * map2
 
 ###############################################################
 RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
-fittype         2         (asymmetry fit)
+fittype         5         (asymmetry fit)
 alpha           1
 forward         3 
 backward        4 
@@ -37,7 +37,7 @@ fit             0.5     8
 packing         5
 
 RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
-fittype         2         (asymmetry fit)
+fittype         5         (asymmetry fit)
 alpha           1
 forward         5 
 backward        6 
@@ -57,7 +57,7 @@ HESSE
 SAVE
 
 ###############################################################
-PLOT 2   (asymmetry plot)
+PLOT 5   (asymmetry plot)
 runs     1   2   
 use_fit_ranges
 view_packing 10
