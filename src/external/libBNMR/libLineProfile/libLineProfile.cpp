@@ -29,14 +29,14 @@ Double_t GaussianShape(Double_t x, Double_t position, Double_t width) {
     if(!width){ // width=0
         if(x==position) return 1.0;
         return 0.0;}
-    return exp(-0.5*pow((x-position)/width,2));
+    return exp(-2.7725887222397811*pow((x-position)/width,2));
 }
 
 Double_t LaplacianShape(Double_t x, Double_t position, Double_t width) {
     if(!width){ // width=0
         if(x==position) return 1.0;
         return 0.0;}
-    return exp(-abs(x-position)/width);
+    return exp(-1.3862943611198906*abs((x-position)/width));
 }
 
 Double_t LorentzianShape(Double_t x, Double_t position, Double_t width) {
@@ -45,7 +45,7 @@ Double_t LorentzianShape(Double_t x, Double_t position, Double_t width) {
         return 0.0;}
 
    // return 2/PI*(width/(4*pow(x-position,2)+pow(width,2)));//constant Area
-    return (width*width/(4*(x-position)*(x-position)+width*width));//constant Height
+    return (1/(4*(x-position)*(x-position)/width/width+1));//constant Height
 }
 
 
