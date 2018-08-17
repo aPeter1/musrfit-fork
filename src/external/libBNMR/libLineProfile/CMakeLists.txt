@@ -21,6 +21,7 @@ add_library(LineProfile SHARED
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   LineProfile BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
