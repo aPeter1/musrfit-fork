@@ -38,7 +38,6 @@
 
 ClassImp(ExpRlx)  // for the ROOT-dictionary
 ClassImp(SExpRlx)
-ClassImp(MLRes)
 
 
 double ExpRlx::operator()(double x, const vector<double> &par) const {
@@ -82,33 +81,5 @@ double SExpRlx::operator()(double x, const vector<double> &par) const {
     return sexp2.Integral(0.0,par[0])/(1-exp(-par[0]/tau_Li))/tau_Li;
   }
   return 0;
-}
-
-double MLRes::operator()(double x, const vector<double> &par) const {
-  assert(par.size()==3); // make sure the number of parameters handed to the function is correct
-  
-  // par[0] time of beam off
-  // par[1] is the relaxation rate
-  // par[2] is the exponent
-  double tau_p;
-  double y;
-
-  tau_p = (tau_Li/(1.+par[1]*tau_Li));
-
-
-  if ( x >= 0 && x <= par[0] ) { 
-    TF1 sexp("sexp", "exp(-([0]-x)/[3])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 10000.0);
-    sexp.SetParameters(x, par[1], par[2],tau_Li);
-    sexp.SetNpx(1000);
-    y=sexp.Integral(0.0,x)/(1-exp(-x/tau_Li))/tau_Li;
-  } else if ( x > par[0] ) {
-    TF1 sexp("sexp", "exp(-([3]-x)/[4])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 10000.0);
-    sexp.SetParameters(x, par[1], par[2], par[0],tau_Li);
-    sexp.SetNpx(1000);
-    y=sexp.Integral(0.0,par[0])/(1-exp(-par[0]/tau_Li))/tau_Li;
-  }  else {
-    y = 0;
-  }
-  return y;
 }
 
