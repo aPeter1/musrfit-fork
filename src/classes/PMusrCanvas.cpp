@@ -2770,9 +2770,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   size  = data->GetValue()->size();
   dataSet.dataRange->SetXRange(start, end); // full possible range
   // make sure that for asymmetry the y-range is initialized reasonably
-  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM)
-    dataSet.dataRange->SetYRange(-0.4, 0.4);
-  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_BNMR)
+  if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM) || (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_BNMR))
     dataSet.dataRange->SetYRange(-0.4, 0.4);
   // extract necessary range information
   if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() == 0) &&
