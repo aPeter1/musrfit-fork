@@ -987,19 +987,19 @@ PRunData* PRunListCollection::GetAsymmetryBNMR(UInt_t index, EDataSwitch tag)
 
   switch (tag) {
     case kIndex: // called from musrfit when dumping the data
-      if (index > fRunAsymmetryList.size()) {
+      if (index > fRunAsymmetryBNMRList.size()) {
         cerr << endl << ">> PRunListCollection::GetAsymmetryBNMR(): **ERROR** index = " << index << " out of bounds";
         cerr << endl;
         return 0;
       }
 
-      fRunAsymmetryList[index]->CalcTheory();
-      data = fRunAsymmetryList[index]->GetData();
+      fRunAsymmetryBNMRList[index]->CalcTheory();
+      data = fRunAsymmetryBNMRList[index]->GetData();
       break;
     case kRunNo: // called from PMusrCanvas
-      for (UInt_t i=0; i<fRunAsymmetryList.size(); i++) {
-        if (fRunAsymmetryList[i]->GetRunNo() == index) {
-          data = fRunAsymmetryList[i]->GetData();
+      for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++) {
+        if (fRunAsymmetryBNMRList[i]->GetRunNo() == index) {
+          data = fRunAsymmetryBNMRList[i]->GetData();
           break;
         }
       }
