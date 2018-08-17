@@ -81,14 +81,14 @@ The \texttt{libLineProfile} library currently contains the following functions:
 \begin{description}
  \item[LineGauss]
    \begin{equation}
-    A(f)=e^{-\frac{(f-f_0)^2}{2 \sigma^2}}
+    A(f)=e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}}
    \end{equation}
    Gaussian line shape around $f_0$ with width $\sigma$ and height~$1$.\\[1.5ex]
    \musrfit theory line: \verb?userFcn libLineProfile LineGauss 1 2?\\[1.5ex]
     Parameters: $f_0$, $\sigma$. 
  \item[LineLaplace]
    \begin{equation}
-    A(f)=e^{-\frac{|f-f_0|}{\sigma}}
+    A(f)=e^{-2\ln 2 \left|\frac{f-f_0}{\sigma}\right|}
    \end{equation}
    Laplaceian line shape around $f_0$ with width $\sigma$ and 
 height~$1$.\\[1.5ex]
