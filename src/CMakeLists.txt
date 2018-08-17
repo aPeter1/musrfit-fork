@@ -60,6 +60,7 @@ add_executable(dump_header git-revision.h dump_header.cpp)
 target_compile_options(dump_header BEFORE PRIVATE "-DHAVE_CONFIG_H")
 target_include_directories(dump_header 
   BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${NEXUS_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
@@ -77,6 +78,7 @@ add_executable(msr2data git-revision.h msr2data.cpp)
 target_compile_options(msr2data BEFORE PRIVATE "-DHAVE_CONFIG_H")
 target_include_directories(msr2data 
   BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
