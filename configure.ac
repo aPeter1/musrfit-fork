@@ -1288,6 +1288,7 @@ AC_CONFIG_FILES([Makefile \
                  src/external/libPhotoMeissner/classes/Makefile \
                  src/external/libGbGLF/Makefile \
                  src/external/libBNMR/Makefile \
+                 src/external/libBNMR/libLineProfile/Makefile \
                  src/musredit_qt5/Makefile \
                  src/musredit/Makefile \
                  src/musrgui/Makefile \

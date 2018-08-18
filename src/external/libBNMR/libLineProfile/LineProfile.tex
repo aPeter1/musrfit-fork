@@ -1,0 +1,190 @@
+\documentclass[twoside]{article}
+
+\usepackage[english]{babel}
+%\usepackage{a4}
+\usepackage{amssymb,amsmath,bm}
+\usepackage{graphicx,tabularx}
+\usepackage{fancyhdr}
+\usepackage{array}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{xspace}
+\usepackage{rotating}
+\usepackage{dcolumn}
+\usepackage{geometry}
+\usepackage{color}
+
+\geometry{a4paper,left=20mm,right=20mm,top=20mm,bottom=20mm}
+
+% \setlength{\topmargin}{10mm}
+% \setlength{\topmargin}{-13mm}
+% % \setlength{\oddsidemargin}{0.5cm}
+% % \setlength{\evensidemargin}{0cm}
+% \setlength{\oddsidemargin}{1cm}
+% \setlength{\evensidemargin}{1cm}
+% \setlength{\textwidth}{15cm}
+\setlength{\textheight}{23.8cm}
+
+\pagestyle{fancyplain}
+\addtolength{\headwidth}{0.6cm}
+\fancyhead{}%
+\fancyhead[RE,LO]{\bf \textsc{LineProfile}}%
+\fancyhead[LE,RO]{\thepage}
+\cfoot{--- J.~A.~Krieger -- \today~ ---}
+\rfoot{\includegraphics[width=2cm]{PSI-Logo_narrow.jpg}}
+
+\DeclareMathAlphabet{\bi}{OML}{cmm}{b}{it}
+
+\newcommand{\mean}[1]{\langle #1 \rangle}
+\newcommand{\lem}{LE-$\mu$SR\xspace}
+\newcommand{\lemhead}{LE-$\bm{\mu}$SR\xspace}
+\newcommand{\musr}{$\mu$SR\xspace}
+\newcommand{\musrhead}{$\bm{\mu}$SR\xspace}
+\newcommand{\trimsp}{\textsc{trim.sp}\xspace}
+\newcommand{\musrfithead}{MUSRFIT\xspace}
+\newcommand{\musrfit}{\textsc{musrfit}\xspace}
+\newcommand{\gapint}{\textsc{GapIntegrals}\xspace}
+\newcommand{\YBCO}{YBa$_{2}$Cu$_{3}$O$_{7-\delta}$\xspace}
+\newcommand{\YBCOhead}{YBa$_{\bm{2}}$Cu$_{\bm{3}}$O$_{\bm{7-\delta}}$\xspace}
+
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\newcolumntype{C}[1]{>{\centering\arraybackslash}p{#1}}
+
+\begin{document}
+% Header info --------------------------------------------------
+\thispagestyle{empty}
+\noindent
+\begin{tabular}{@{\hspace{-0.2cm}}l@{\hspace{6cm}}r}
+\noindent\includegraphics[width=3.4cm]{PSI-Logo_narrow.jpg} &
+  {\Huge\sf Memorandum}
+\end{tabular}
+%
+\vskip 1cm
+%
+\begin{tabular}{@{\hspace{-0.5cm}}ll@{\hspace{4cm}}ll}
+Date:    & \today       &     & \\[3ex]
+From:    & J.~A.~Krieger & \\
+E-Mail:  & \verb?jonas.krieger@psi.ch? &&
+\end{tabular}
+%
+\vskip 0.3cm
+\noindent\hrulefill
+\vskip 1cm
+%
+\section*{\musrfithead plug-in for simple $\beta$-NMR resonance line shapes}%
+This library contains useful functions to fit NMR and $\beta$-NMR line shapes. 
+The functional form of the powder averages was taken from 
+\href{http://dx.doi.org/10.1007/978-3-642-68756-3_2}{M. Mehring, Principles 
+of High Resolution NMR in Solids (Springer 1983)}.
+%
+The \texttt{libLineProfile} library currently contains the following functions:
+\begin{description}
+ \item[LineGauss]
+   \begin{equation}
+    A(f)=e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}}
+   \end{equation}
+   Gaussian line shape around $f_0$ with width $\sigma$ and height~$1$.\\[1.5ex]
+   \musrfit theory line: \verb?userFcn libLineProfile LineGauss 1 2?\\[1.5ex]
+    Parameters: $f_0$, $\sigma$. 
+ \item[LineLaplace]
+   \begin{equation}
+    A(f)=e^{-2\ln 2 \left|\frac{f-f_0}{\sigma}\right|}
+   \end{equation}
+   Laplaceian line shape around $f_0$ with width $\sigma$ and 
+height~$1$.\\[1.5ex]
+   \musrfit theory line: \verb?userFcn libLineProfile LineLaplace 1 2?
+\\[1.5ex]
+    Parameters: $f_0$, $\sigma$. 
+     \item[LineLorentzian]
+   \begin{equation}
+    A(f)= 
+\frac{\sigma^2}{4(f-f_0)^2+\sigma^2}
+   \end{equation}
+   Lorentzian line shape around $f_0$ with width $\sigma$ and 
+height~$1$.\\[1.5ex]
+   \musrfit theory line: \verb?userFcn libLineProfile LineLorentzian 1 2?
+\\[1.5ex]
+    Parameters: $f_0$, $\sigma$.
+    \item[LineSkewLorentzian]
+   \begin{equation}
+    A(f)=  \frac{\sigma*\sigma_a}{4(f-f_0)^2+\sigma_a^2}, \quad \sigma_a=\frac{2\sigma}{1+e^{a(f-f_0)}}
+   \end{equation}
+   Skewed Lorentzian line shape around $f_0$ with width $\sigma$, 
+height~$1$ and skewness parameter $a$.\\[1.5ex]
+   \musrfit theory line: \verb?userFcn libLineProfile LineSkewLorentzian 1 2 3?
+\\[1.5ex]
+    Parameters: $f_0$, $\sigma$, $a$. 
+        \item[LineSkewLorentzian2]
+   \begin{equation}
+    A(f)=  \left\{\begin{matrix}\frac{{\sigma_1}^2}{4{(f-f_0)}^2+{\sigma_1}^2},&f<f_0\\[9pt] \frac{{\sigma_2}^2}{4{(f-f_0)}^2+{\sigma_2}^2},&f>f_0\end{matrix}\right.
+   \end{equation}
+   Skewed Lorentzian line shape around $f_0$ with height~$1$ and  widths $\sigma_1$, 
+ and $\sigma_2$.\\[1.5ex]
+   \musrfit theory line: \verb?userFcn libLineProfile LineSkewLorentzian2 1 2 3?
+\\[1.5ex]
+    Parameters: $f_0$, $\sigma_1$, $\sigma_2$. 
+    
+    
+\item[PowderLineAxialLor]
+   \begin{equation}
+    A(f)= I_{\mathrm ax}(f)\circledast\left( \frac{\sigma^2}{4f^2+\sigma^2} \right)
+   \end{equation}
+   Powder average of a axially symmetric interaction, convoluted with a Lorentzian. 
+   \begin{equation}\label{eq:Iax}
+      I_{\mathrm ax}(f)=\left\{\begin{matrix} \frac{1}{2\sqrt{(f_\parallel-f_\perp)(f-f_\perp)}}& f\in(f_\perp,f_\parallel)\cup(f_\parallel,f_\perp)\\[6pt] 0 & \text{otherwise}\end{matrix} \right.
+   \end{equation}
+   The maximal height of the curve is normalized to $\sim$1.
+   \\[1.5ex]
+   \musrfit theory line: \verb?userFcn libLineProfile PowderLineAxialLor 1 2 3?
+\\[1.5ex]
+    Parameters: $f_\parallel$, $f_\perp$, $\sigma$. 
+      
+\item[PowderLineAxialGss]
+   \begin{equation}
+    A(f)= I_{\mathrm ax}(f)\circledast\left(e^{-\frac{4\ln 2 (f-f_0)^2}{ 
+\sigma^2}} \right)
+   \end{equation}
+   Powder average of a axially symmetric interaction (Eq.~\ref{eq:Iax}), convoluted with a Gaussian. The maximal height of the curve is normalized to $\sim$1.
+   \\[1.5ex]
+   \musrfit theory line: \verb?userFcn libLineProfile PowderLineAxialGss 1 2 3?
+\\[1.5ex]
+    Parameters: $f_\parallel$, $f_\perp$, $\sigma$. 
+
+\item[PowderLineAsymLor]
+   \begin{equation}
+    A(f)= I(f)\circledast\left( \frac{\sigma^2}{4f^2+\sigma^2} \right)
+   \end{equation}
+   Powder average of a asymmetric interaction, convoluted with a Lorentzian. 
+   Assume without loss of generality that $f_1<f_2<f_3$, then
+   \begin{align}\label{eq:Iasym}
+      I(f)&=\left\{\begin{matrix}
+        \frac{K(m)}{\pi\sqrt{(f-f_1)(f_3-f_2)}},& f_3\geq f>f_2 \\[9pt]
+        \frac{K(m)}{\pi\sqrt{(f_3-f)(f_2-f_1)}},& f_2>f\geq f_1\\[9pt]
+        0 & \text{otherwise}
+      \end{matrix} \right.  \\
+      m&=\left\{\begin{matrix}
+        \frac{(f_2-f_1)(f_3-f)}{(f_3-f_2)(f-f_1)},& f_3\geq f>f_2 \\[6pt]
+        \frac{(f-f_1)(f_3-f_2)}{(f_3-f)(f_2-f_1)},& f_2>f\geq f_1\\[6pt]
+      \end{matrix} \right.  \\\label{eq:Kofm}
+      K(m)&=\int_0^{\pi/2}\frac{\mathrm d\varphi}{\sqrt{1-m^2\sin^2{\varphi}}},
+   \end{align}
+   where $K(m)$ is the complete elliptic integral of the first kind.
+   Note that $f_1<f_2<f_3$ is not required by the code.
+   The maximal height of the curve is normalized to $\sim$1.
+   \\[1.5ex]
+   \musrfit theory line: \verb?userFcn libLineProfile PowderLineAsymLor 1 2 3 4?
+\\[1.5ex]
+    Parameters: $f_1$, $f_2$,$f_3$, $\sigma$. 
+
+\item[PowderLineAsymGss]
+   \begin{equation}
+    A(f)= I(f)\circledast\left(e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}} \right)
+   \end{equation}
+   Powder average of a asymmetric interaction {(Eq.~\ref{eq:Iasym}\,-\,\ref{eq:Kofm})}, convoluted with a Gaussian. 
+   The maximal height of the curve is normalized to $\sim$1.
+   \\[1.5ex]
+   \musrfit theory line: \verb?userFcn libLineProfile PowderLineAsymGss 1 2 3 4?
+\\[1.5ex]
+    Parameters: $f_1$, $f_2$,$f_3$, $\sigma$. 
+\end{description}
+\end{document}
