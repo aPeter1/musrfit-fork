@@ -24,7 +24,7 @@ fun1 = 0.5 * map1 * map2
 
 ###############################################################
 RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
-fittype         5         (asymmetry fit)
+fittype         5         (beta-NMR fit)
 alpha           1
 forward         3 
 backward        4 
@@ -37,7 +37,7 @@ fit             0.5     8
 packing         5
 
 RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
-fittype         5         (asymmetry fit)
+fittype         5         (beta-NMR fit)
 alpha           1
 forward         5 
 backward        6 
@@ -57,7 +57,7 @@ HESSE
 SAVE
 
 ###############################################################
-PLOT 5   (asymmetry plot)
+PLOT 5   (beta-NMR asymmetry plot)
 runs     1   2   
 use_fit_ranges
 view_packing 10
@@ -68,9 +68,9 @@ FOURIER
 units            MHz    # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
 fourier_power    12
 apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
-plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL
 phase            8
 #range            FRQMIN  FRQMAX
 ###############################################################
-STATISTIC --- 2015-04-14 11:00:19
+STATISTIC --- 2018-08-18 23:43:35
   chisq = 399.5, NDF = 290, chisq/NDF = 1.377736
