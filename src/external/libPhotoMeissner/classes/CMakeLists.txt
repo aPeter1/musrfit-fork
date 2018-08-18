@@ -4,8 +4,10 @@
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 
 root_generate_dictionary(
-  PPhotoMeissnerDict 
+  PPhotoMeissnerDict
   -I${FFTW3_INCLUDE_DIR} 
+  -I${GSL_INCLUDE_DIRS} 
+  -I${ROOT_INCLUDE_DIRS}
   -I${MUSRFIT_INC}
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
   PPhotoMeissner.h 
@@ -46,8 +48,10 @@ set_target_properties(PPhotoMeissner
 
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
-  PPhotoMeissner BEFORE PRIVATE 
+  PPhotoMeissner BEFORE PRIVATE
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${GSL_INCLUDE_DIRS}> 
+    $<BUILD_INTERFACE:${ROOT_INCLUDE_DIRS}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
 )
