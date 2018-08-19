@@ -68,10 +68,14 @@ class PRunAsymmetryBNMR : public PRunBase
     UInt_t fNoOfFitBins;  ///< number of bins to be be fitted
     Int_t fPacking;       ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
 
-    PDoubleVector fForward;     ///< forward histo data
-    PDoubleVector fForwardErr;  ///< forward histo errors
-    PDoubleVector fBackward;    ///< backward histo data
-    PDoubleVector fBackwardErr; ///< backward histo errors
+    PDoubleVector fForwardp;     ///< pos hel forward histo data
+    PDoubleVector fForwardpErr;  ///< pos hel forward histo errors
+    PDoubleVector fBackwardp;    ///< pos hel backward histo data
+    PDoubleVector fBackwardpErr; ///< pos hel backward histo errors
+    PDoubleVector fForwardm;     ///< neg hel forward histo data
+    PDoubleVector fForwardmErr;  ///< neg hel forward histo errors
+    PDoubleVector fBackwardm;    ///< neg hel backward histo data
+    PDoubleVector fBackwardmErr; ///< neg hel backward histo errors
 
     Int_t fGoodBins[4];   ///< keep first/last good bins. 0=fgb, 1=lgb (forward); 2=fgb, 3=lgb (backward)
 
