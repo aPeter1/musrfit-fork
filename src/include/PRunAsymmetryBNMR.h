@@ -61,7 +61,6 @@ class PRunAsymmetryBNMR : public PRunBase
     virtual Bool_t PrepareData();
     virtual Bool_t PrepareFitData();
     virtual Bool_t PrepareViewData(PRawRunData* runData, UInt_t histoNo[2]);
-    virtual Bool_t PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]);
 
   private:
     UInt_t fAlphaBetaTag; ///< \f$ 1 \to \alpha = \beta = 1\f$; \f$ 2 \to \alpha \neq 1, \beta = 1\f$; \f$ 3 \to \alpha = 1, \beta \neq 1\f$; \f$ 4 \to \alpha \neq 1, \beta \neq 1\f$.
