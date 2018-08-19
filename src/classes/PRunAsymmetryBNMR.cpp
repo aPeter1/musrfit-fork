@@ -164,10 +164,15 @@ PRunAsymmetryBNMR::PRunAsymmetryBNMR(PMsrHandler *msrInfo, PRunDataHandler *rawD
  */
 PRunAsymmetryBNMR::~PRunAsymmetryBNMR()
 {
-  fForward.clear();
-  fForwardErr.clear();
-  fBackward.clear();
-  fBackwardErr.clear();
+  fForwardp.clear();
+  fForwardpErr.clear();
+  fBackwardp.clear();
+  fBackwardpErr.clear();
+
+  fForwardm.clear();
+  fForwardmErr.clear();
+  fBackwardm.clear();
+  fBackwardmErr.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -595,32 +600,34 @@ Bool_t PRunAsymmetryBNMR::PrepareData()
   }
 
   // set forward/backward histo data of the first group
-  fForward.resize(forward[0].size());
-  fBackward.resize(backward[0].size());
-  for (UInt_t i=0; i<fForward.size(); i++) {
-    fForward[i]  = forward[0][i];
-    fBackward[i] = backward[0][i];
+  fForwardp.resize(forward[0].size());
+  fBackwardp.resize(backward[0].size());
+  for (UInt_t i=0; i<fForwardp.size(); i++) {
+    fForwardp[i]  = forward[0][i];
+    fBackwardp[i] = backward[0][i];
+    fForwardm[i]  = forward[1][i];
+    fBackwardm[i] = backward[1][i];
   }
 
-  // group histograms, add all the remaining forward histograms of the group
-  for (UInt_t i=1; i<forwardHistoNo.size(); i++) { // loop over the groupings
-    for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[i])->size(); j++) { // loop over the bin indices
-      // make sure that the index stays within proper range
-      if ((j+fT0s[2*i]-fT0s[0] >= 0) && (j+fT0s[2*i]-fT0s[0] < runData->GetDataBin(forwardHistoNo[i])->size())) {
-        fForward[j] += forward[i][j+(Int_t)fT0s[2*i]-(Int_t)fT0s[0]];
-      }
-    }
-  }
+  // // group histograms, add all the remaining forward histograms of the group
+  // for (UInt_t i=1; i<forwardHistoNo.size(); i++) { // loop over the groupings
+  //   for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[i])->size(); j++) { // loop over the bin indices
+  //     // make sure that the index stays within proper range
+  //     if ((j+fT0s[2*i]-fT0s[0] >= 0) && (j+fT0s[2*i]-fT0s[0] < runData->GetDataBin(forwardHistoNo[i])->size())) {
+  //       fForward[j] += forward[i][j+(Int_t)fT0s[2*i]-(Int_t)fT0s[0]];
+  //     }
+  //   }
+  // }
 
-  // group histograms, add all the remaining backward histograms of the group
-  for (UInt_t i=1; i<backwardHistoNo.size(); i++) { // loop over the groupings
-    for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[i])->size(); j++) { // loop over the bin indices
-      // make sure that the index stays within proper range
-      if ((j+fT0s[2*i+1]-fT0s[1] >= 0) && (j+fT0s[2*i+1]-fT0s[1] < runData->GetDataBin(backwardHistoNo[i])->size())) {
-        fBackward[j] += backward[i][j+(Int_t)fT0s[2*i+1]-(Int_t)fT0s[1]];
-      }
-    }
-  }
+  // // group histograms, add all the remaining backward histograms of the group
+  // for (UInt_t i=1; i<backwardHistoNo.size(); i++) { // loop over the groupings
+  //   for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[i])->size(); j++) { // loop over the bin indices
+  //     // make sure that the index stays within proper range
+  //     if ((j+fT0s[2*i+1]-fT0s[1] >= 0) && (j+fT0s[2*i+1]-fT0s[1] < runData->GetDataBin(backwardHistoNo[i])->size())) {
+  //       fBackward[j] += backward[i][j+(Int_t)fT0s[2*i+1]-(Int_t)fT0s[1]];
+  //     }
+  //   }
+  // }
 
   // subtract background from histogramms ------------------------------------------
   if (fRunInfo->GetBkgFix(0) == PMUSR_UNDEFINED) { // no fixed background given
@@ -663,10 +670,7 @@ Bool_t PRunAsymmetryBNMR::PrepareData()
       status = PrepareFitData();
       break;
     case kView:
-      if (fMsrInfo->GetMsrPlotList()->at(0).fRRFPacking == 0)
-        status = PrepareViewData(runData, histoNo);
-      else
-        status = PrepareRRFViewData(runData, histoNo);
+      status = PrepareViewData(runData, histoNo);
       break;
     default:
       status = false;
@@ -783,64 +787,90 @@ Bool_t PRunAsymmetryBNMR::SubtractEstimatedBkg()
   }
 
   // check if start is within histogram bounds
-  if ((start[0] < 0) || (start[0] >= fForward.size()) ||
-      (start[1] < 0) || (start[1] >= fBackward.size())) {
+  if ((start[0] < 0) || (start[0] >= fForwardp.size()) ||
+      (start[1] < 0) || (start[1] >= fBackwardp.size())) {
     cerr << endl << ">> PRunAsymmetryBNMR::SubtractEstimatedBkg(): **ERROR** background bin values out of bound!";
-    cerr << endl << ">> histo lengths (f/b)  = (" << fForward.size() << "/" << fBackward.size() << ").";
+    cerr << endl << ">> histo lengths (f/b)  = (" << fForwardp.size() << "/" << fBackwardp.size() << ").";
     cerr << endl << ">> background start (f/b) = (" << start[0] << "/" << start[1] << ").";
     return false;
   }
 
   // check if end is within histogram bounds
-  if ((end[0] < 0) || (end[0] >= fForward.size()) ||
-      (end[1] < 0) || (end[1] >= fBackward.size())) {
+  if ((end[0] < 0) || (end[0] >= fForwardp.size()) ||
+      (end[1] < 0) || (end[1] >= fBackwardp.size())) {
     cerr << endl << ">> PRunAsymmetryBNMR::SubtractEstimatedBkg(): **ERROR** background bin values out of bound!";
-    cerr << endl << ">> histo lengths (f/b)  = (" << fForward.size() << "/" << fBackward.size() << ").";
+    cerr << endl << ">> histo lengths (f/b)  = (" << fForwardp.size() << "/" << fBackwardp.size() << ").";
     cerr << endl << ">> background end (f/b) = (" << end[0] << "/" << end[1] << ").";
     return false;
   }
 
   // calculate background
-  Double_t bkg[2]    = {0.0, 0.0};
-  Double_t errBkg[2] = {0.0, 0.0};
+  Double_t bkgp[2]    = {0.0, 0.0};
+  Double_t errBkgp[2] = {0.0, 0.0};
+  Double_t bkgn[2]    = {0.0, 0.0};
+  Double_t errBkgn[2] = {0.0, 0.0};
 
   // forward
-  for (UInt_t i=start[0]; i<=end[0]; i++)
-    bkg[0] += fForward[i];
-  errBkg[0] = TMath::Sqrt(bkg[0])/(end[0] - start[0] + 1);
-  bkg[0] /= static_cast<Double_t>(end[0] - start[0] + 1);
-  cout << endl << ">> estimated forward histo background: " << bkg[0];
+  for (UInt_t i=start[0]; i<=end[0]; i++) {
+    bkgp[0] += fForwardp[i];
+    bkgm[0] += fForwardm[i];
+  }
+  errBkgp[0] = TMath::Sqrt(bkgp[0])/(end[0] - start[0] + 1);
+  bkgp[0] /= static_cast<Double_t>(end[0] - start[0] + 1);
+  cout << endl << ">> estimated pos hel forward histo background: " << bkgp[0];
+  errBkgm[0] = TMath::Sqrt(bkgp[0])/(end[0] - start[0] + 1);
+  bkgm[0] /= static_cast<Double_t>(end[0] - start[0] + 1);
+  cout << endl << ">> estimated neg hel forward histo background: " << bkgm[0];
 
   // backward
-  for (UInt_t i=start[1]; i<=end[1]; i++)
-    bkg[1] += fBackward[i];
-  errBkg[1] = TMath::Sqrt(bkg[1])/(end[1] - start[1] + 1);
-  bkg[1] /= static_cast<Double_t>(end[1] - start[1] + 1);
-  cout << endl << ">> estimated backward histo background: " << bkg[1] << endl;
+  for (UInt_t i=start[1]; i<=end[1]; i++) {
+    bkgp[1] += fBackwardp[i];
+    bkgm[1] += fBackwardm[i];
+  }
+  errBkgp[1] = TMath::Sqrt(bkgp[1])/(end[1] - start[1] + 1);
+  bkgp[1] /= static_cast<Double_t>(end[1] - start[1] + 1);
+  cout << endl << ">> estimated pos hel backward histo background: " << bkgp[1] << endl;
+  errBkgm[1] = TMath::Sqrt(bkgm[1])/(end[1] - start[1] + 1);
+  bkgm[1] /= static_cast<Double_t>(end[1] - start[1] + 1);
+  cout << endl << ">> estimated neg hel backward histo background: " << bkgm[1] << endl;
 
   // correct error for forward, backward
   Double_t errVal = 0.0;
-  for (UInt_t i=0; i<fForward.size(); i++) {
-    if (fForward[i] > 0.0)
-      errVal = TMath::Sqrt(fForward[i]+errBkg[0]*errBkg[0]);
+  for (UInt_t i=0; i<fForwardp.size(); i++) {
+    if (fForwardp[i] > 0.0)
+      errVal = TMath::Sqrt(fForwardp[i]+errBkgp[0]*errBkgp[0]);
     else
       errVal = 1.0;
-    fForwardErr.push_back(errVal);
-    if (fBackward[i] > 0.0)
-      errVal = TMath::Sqrt(fBackward[i]+errBkg[1]*errBkg[1]);
+    fForwardpErr.push_back(errVal);
+    if (fBackwardp[i] > 0.0)
+      errVal = TMath::Sqrt(fBackwardp[i]+errBkgp[1]*errBkgp[1]);
     else
       errVal = 1.0;
-    fBackwardErr.push_back(errVal);
+    fBackwardpErr.push_back(errVal);
+    if (fForwardm[i] > 0.0)
+      errVal = TMath::Sqrt(fForwardm[i]+errBkgm[0]*errBkgm[0]);
+    else
+      errVal = 1.0;
+    fForwardmErr.push_back(errVal);
+    if (fBackwardm[i] > 0.0)
+      errVal = TMath::Sqrt(fBackwardm[i]+errBkgm[1]*errBkgm[1]);
+    else
+      errVal = 1.0;
+    fBackwardmErr.push_back(errVal);
   }
 
   // subtract background from data
-  for (UInt_t i=0; i<fForward.size(); i++) {
-    fForward[i]  -= bkg[0];
-    fBackward[i] -= bkg[1];
+  for (UInt_t i=0; i<fForwardp.size(); i++) {
+    fForwardp[i]  -= bkgp[0];
+    fBackwardp[i] -= bkgp[1];
+    fForwardm[i]  -= bkgm[0];
+    fBackwardm[i] -= bkgm[1];
   }
 
-  fRunInfo->SetBkgEstimated(bkg[0], 0);
-  fRunInfo->SetBkgEstimated(bkg[1], 1);
+  fRunInfo->SetBkgEstimated(bkgp[0], 0);
+  fRunInfo->SetBkgEstimated(bkgp[1], 1);
+  fRunInfo->SetBkgEstimated(bkgm[0], 3);
+  fRunInfo->SetBkgEstimated(bkgm[1], 4);
 
   return true;
 }
@@ -865,96 +895,143 @@ Bool_t PRunAsymmetryBNMR::PrepareFitData()
   // first rebin the data, than calculate the asymmetry
 
   // everything looks fine, hence fill packed forward and backward histo
-  PRunData forwardPacked;
-  PRunData backwardPacked;
-  Double_t value = 0.0;
-  Double_t error = 0.0;
+  PRunData forwardpPacked;
+  PRunData backwardpPacked;
+  PRunData forwardmPacked;
+  PRunData backwarmpPacked;
+  Double_t valuep = 0.0;
+  Double_t errorp = 0.0;
+  Double_t valuem = 0.0;
+  Double_t errorm = 0.0;
   // forward
   for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
     if (fPacking == 1) {
-      forwardPacked.AppendValue(fForward[i]);
-      forwardPacked.AppendErrorValue(fForwardErr[i]);
+      forwardpPacked.AppendValue(fForwardp[i]);
+      forwardpPacked.AppendErrorValue(fForwardpErr[i]);
+      forwardmPacked.AppendValue(fForwardm[i]);
+      forwardmPacked.AppendErrorValue(fForwardmErr[i]);
     } else { // packed data, i.e. fPacking > 1
       if (((i-fGoodBins[0]) % fPacking == 0) && (i != fGoodBins[0])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
-        value /= fPacking;
-        forwardPacked.AppendValue(value);
-        if (value == 0.0)
-          forwardPacked.AppendErrorValue(1.0);
-        else
-          forwardPacked.AppendErrorValue(TMath::Sqrt(error)/fPacking);
-        value = 0.0;
-        error = 0.0;
+        valuep /= fPacking;
+        valuem /= fPacking;
+        forwardpPacked.AppendValue(valuep);
+        forwardmPacked.AppendValue(valuem);
+        if (valuep == 0.0) {
+	  forwardpPacked.AppendErrorValue(1.0);
+        } else {
+          forwardpPacked.AppendErrorValue(TMath::Sqrt(errorp)/fPacking);
+	}
+	if (valuem == 0.0) {
+	  forwardmPacked.AppendErrorValue(1.0);
+        } else {
+          forwardmPacked.AppendErrorValue(TMath::Sqrt(errorm)/fPacking);
+	}
+        valuep = 0.0;
+        errorp = 0.0;
+        valuem = 0.0;
+        errorm = 0.0;
       }
-      value += fForward[i];
-      error += fForwardErr[i]*fForwardErr[i];
+      valuep += fForwardp[i];
+      errorp += fForwardpErr[i]*fForwardpErr[i];
+      valuem += fForwardm[i];
+      errorm += fForwardmErr[i]*fForwardmErr[i];
     }
   }
   // backward
   for (Int_t i=fGoodBins[2]; i<fGoodBins[3]; i++) {
     if (fPacking == 1) {
-      backwardPacked.AppendValue(fBackward[i]);
-      backwardPacked.AppendErrorValue(fBackwardErr[i]);
+      backwardpPacked.AppendValue(fBackwardp[i]);
+      backwardpPacked.AppendErrorValue(fBackwardpErr[i]);
+      backwardmPacked.AppendValue(fBackwardm[i]);
+      backwardmPacked.AppendErrorValue(fBackwardmErr[i]);
     } else { // packed data, i.e. fPacking > 1
       if (((i-fGoodBins[2]) % fPacking == 0) && (i != fGoodBins[2])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
-        value /= fPacking;
-        backwardPacked.AppendValue(value);
-        if (value == 0.0)
-          backwardPacked.AppendErrorValue(1.0);
-        else
-          backwardPacked.AppendErrorValue(TMath::Sqrt(error)/fPacking);
-        value = 0.0;
-        error = 0.0;
+        valuep /= fPacking;
+        valuem /= fPacking;
+        backwardpPacked.AppendValue(valuep);
+        backwardmPacked.AppendValue(valuem);
+        if (valuep == 0.0) {
+          backwardpPacked.AppendErrorValue(1.0);
+	} else {
+          backwardpPacked.AppendErrorValue(TMath::Sqrt(errorp)/fPacking);
+	}
+	if (valuem == 0.0) {
+          backwardmPacked.AppendErrorValue(1.0);
+	} else {
+          backwardmPacked.AppendErrorValue(TMath::Sqrt(errorm)/fPacking);
+	}
+        valuep = 0.0;
+        errorp = 0.0;
+        valuem = 0.0;
+        errorm = 0.0;
       }
-      value += fBackward[i];
-      error += fBackwardErr[i]*fBackwardErr[i];
+      valuep += fBackwardp[i];
+      errorp += fBackwardpErr[i]*fBackwardpErr[i];
+      valuem += fBackwardm[i];
+      errorm += fBackwardmErr[i]*fBackwardmErr[i];
     }
   }
 
   // check if packed forward and backward hist have the same size, otherwise take the minimum size
-  UInt_t noOfBins = forwardPacked.GetValue()->size();
-  if (forwardPacked.GetValue()->size() != backwardPacked.GetValue()->size()) {
-    if (forwardPacked.GetValue()->size() > backwardPacked.GetValue()->size())
-      noOfBins = backwardPacked.GetValue()->size();
+  UInt_t noOfBins = forwardpPacked.GetValue()->size();
+  if (forwardpPacked.GetValue()->size() != backwardpPacked.GetValue()->size()) {
+    if (forwardpPacked.GetValue()->size() > backwardpPacked.GetValue()->size())
+      noOfBins = backwardpPacked.GetValue()->size();
   }
 
   // form asymmetry including error propagation
-  Double_t asym;
-  Double_t f, b, ef, eb;
+  Double_t asym,error;
+  Double_t fp, bp, efp, ebp;
+  Double_t fm, bm, efm, ebm;
   // fill data time start, and step
   // data start at data_start-t0 shifted by (pack-1)/2
   fData.SetDataTimeStart(fTimeResolution*((Double_t)fGoodBins[0]-fT0s[0]+(Double_t)(fPacking-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*(Double_t)fPacking);
   for (UInt_t i=0; i<noOfBins; i++) {
     // to make the formulae more readable
-    f  = forwardPacked.GetValue()->at(i);
-    b  = backwardPacked.GetValue()->at(i);
-    ef = forwardPacked.GetError()->at(i);
-    eb = backwardPacked.GetError()->at(i);
+    fp  = forwardpPacked.GetValue()->at(i);
+    bp  = backwardpPacked.GetValue()->at(i);
+    efp = forwardpPacked.GetError()->at(i);
+    ebp = backwardpPacked.GetError()->at(i);
+    fm  = forwardmPacked.GetValue()->at(i);
+    bm  = backwardmPacked.GetValue()->at(i);
+    efm = forwardmPacked.GetError()->at(i);
+    ebm = backwardmPacked.GetError()->at(i);
     // check that there are indeed bins
-    if (f+b != 0.0)
-      asym = (f-b) / (f+b);
+    if (fp+bp != 0.0)
+      asym = (fp-bp) / (fp+bp) - (fm-bm) / (fm+bm);
     else
       asym = 0.0;
     fData.AppendValue(asym);
     // calculate the error
-    if (f+b != 0.0)
-      error = 2.0/((f+b)*(f+b))*TMath::Sqrt(b*b*ef*ef+eb*eb*f*f);
+    if (fp+bp != 0.0)
+      errorp = 2.0/((fp+bp)*(fp+bp))*TMath::Sqrt(bp*bp*efp*efp+ebp*ebp*fp*fp);
     else
-      error = 1.0;
+      errorp = 1.0;
+    if (fm+bm != 0.0)
+      errorm = 2.0/((fm+bm)*(fm+bm))*TMath::Sqrt(bm*bm*efm*efm+ebm*ebm*fm*fm);
+    else
+      errorp = 1.0;
+
+    error = TMath::Sqrt(errorp*errorp+errorm*errorm);
     fData.AppendErrorValue(error);
   }
 
   CalcNoOfFitBins();
 
   // clean up
-  fForward.clear();
-  fForwardErr.clear();
-  fBackward.clear();
-  fBackwardErr.clear();
+  fForwardp.clear();
+  fForwardpErr.clear();
+  fBackwardp.clear();
+  fBackwardpErr.clear();
+  fForwardm.clear();
+  fForwardmErr.clear();
+  fBackwardm.clear();
+  fBackwardmErr.clear();
 
   return true;
 }
@@ -1065,67 +1142,100 @@ Bool_t PRunAsymmetryBNMR::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2
   }
 
   // everything looks fine, hence fill packed forward and backward histo
-  PRunData forwardPacked;
-  PRunData backwardPacked;
-  Double_t value = 0.0;
-  Double_t error = 0.0;
+  PRunData forwardpPacked;
+  PRunData backwardpPacked;
+  PRunData forwardmPacked;
+  PRunData backwardmPacked;
+  Double_t valuep = 0.0;
+  Double_t errorp = 0.0;
+  Double_t valuem = 0.0;
+  Double_t errorm = 0.0;
 
   // forward
   for (Int_t i=start[0]; i<end[0]; i++) {
     if (packing == 1) {
-      forwardPacked.AppendValue(fForward[i]);
-      forwardPacked.AppendErrorValue(fForwardErr[i]);
+      forwardpPacked.AppendValue(fForwardp[i]);
+      forwardpPacked.AppendErrorValue(fForwardpErr[i]);
+      forwardmPacked.AppendValue(fForwardm[i]);
+      forwardmPacked.AppendErrorValue(fForwardmErr[i]);
     } else { // packed data, i.e. packing > 1
       if (((i-start[0]) % packing == 0) && (i != start[0])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
-        value /= packing;
-        forwardPacked.AppendValue(value);
-        if (value == 0.0)
-          forwardPacked.AppendErrorValue(1.0);
-        else
-          forwardPacked.AppendErrorValue(TMath::Sqrt(error)/packing);
-        value = 0.0;
-        error = 0.0;
+        valuep /= packing;
+        forwardpPacked.AppendValue(valuep);
+        valuem /= packing;
+        forwardmPacked.AppendValue(valuem);
+        if (valuep == 0.0) {
+          forwardpPacked.AppendErrorValue(1.0);
+        } else {
+          forwardpPacked.AppendErrorValue(TMath::Sqrt(errorp)/packing);
+	}
+        if (valuem == 0.0) {
+          forwardmPacked.AppendErrorValue(1.0);
+        } else {
+          forwardmPacked.AppendErrorValue(TMath::Sqrt(errorm)/packing);
+	}
+        valuep = 0.0;
+        errorp = 0.0;
+        valuem = 0.0;
+        errorm = 0.0;
       }
-      value += fForward[i];
-      error += fForwardErr[i]*fForwardErr[i];
+      valuep += fForwardp[i];
+      errorp += fForwardpErr[i]*fForwardpErr[i];
+      valuem += fForwardm[i];
+      errorm += fForwardmErr[i]*fForwardmErr[i];
     }
   }
 
   // backward
   for (Int_t i=start[1]; i<end[1]; i++) {
     if (packing == 1) {
-      backwardPacked.AppendValue(fBackward[i]);
-      backwardPacked.AppendErrorValue(fBackwardErr[i]);
+      backwardpPacked.AppendValue(fBackwardp[i]);
+      backwardpPacked.AppendErrorValue(fBackwardpErr[i]);
+      backwardmPacked.AppendValue(fBackwardm[i]);
+      backwardmPacked.AppendErrorValue(fBackwardmErr[i]);
     } else { // packed data, i.e. packing > 1
       if (((i-start[1]) % packing == 0) && (i != start[1])) { // fill data
         // in order that after rebinning the fit does not need to be redone (important for plots)
         // the value is normalize to per bin
-        value /= packing;
-        backwardPacked.AppendValue(value);
-        if (value == 0.0)
-          backwardPacked.AppendErrorValue(1.0);
-        else
-          backwardPacked.AppendErrorValue(TMath::Sqrt(error)/packing);
-        value = 0.0;
-        error = 0.0;
+        valuep /= packing;
+        valuem /= packing;
+        backwardpPacked.AppendValue(valuep);
+        backwardmPacked.AppendValue(valuem);
+        if (valuep == 0.0) {
+          backwardpPacked.AppendErrorValue(1.0);
+        } else {
+          backwardpPacked.AppendErrorValue(TMath::Sqrt(errorp)/packing);
+	}
+        if (valuem == 0.0) {
+          backwardmPacked.AppendErrorValue(1.0);
+        } else {
+          backwardmPacked.AppendErrorValue(TMath::Sqrt(errorm)/packing);
+	}
+        valuep = 0.0;
+        errorp = 0.0;
+        valuem = 0.0;
+        errorm = 0.0;
       }
-      value += fBackward[i];
-      error += fBackwardErr[i]*fBackwardErr[i];
+      valuep += fBackwardp[i];
+      errorp += fBackwardpErr[i]*fBackwardpErr[i];
+      valuem += fBackwardm[i];
+      errorm += fBackwardmErr[i]*fBackwardmErr[i];
     }
   }
 
   // check if packed forward and backward hist have the same size, otherwise take the minimum size
-  UInt_t noOfBins = forwardPacked.GetValue()->size();
-  if (forwardPacked.GetValue()->size() != backwardPacked.GetValue()->size()) {
-    if (forwardPacked.GetValue()->size() > backwardPacked.GetValue()->size())
-      noOfBins = backwardPacked.GetValue()->size();
+  UInt_t noOfBins = forwardpPacked.GetValue()->size();
+  if (forwardpPacked.GetValue()->size() != backwardpPacked.GetValue()->size()) {
+    if (forwardpPacked.GetValue()->size() > backwardpPacked.GetValue()->size())
+      noOfBins = backwardpPacked.GetValue()->size();
   }
 
   // form asymmetry including error propagation
   Double_t asym;
-  Double_t f, b, ef, eb, alpha = 1.0, beta = 1.0;
+  Double_t fp, bp, efp, ebp, alpha = 1.0, beta = 1.0;
+  Double_t fm, bm, efm, ebm;
   // set data time start, and step
   // data start at data_start-t0
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start[0]-t0[0]+(Double_t)(packing-1)/2.0));
@@ -1153,33 +1263,46 @@ Bool_t PRunAsymmetryBNMR::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2
       break;
   }
 
-  for (UInt_t i=0; i<forwardPacked.GetValue()->size(); i++) {
+  for (UInt_t i=0; i<forwardpPacked.GetValue()->size(); i++) {
     // to make the formulae more readable
-    f  = forwardPacked.GetValue()->at(i);
-    b  = backwardPacked.GetValue()->at(i);
-    ef = forwardPacked.GetError()->at(i);
-    eb = backwardPacked.GetError()->at(i);
+    fp  = forwardpPacked.GetValue()->at(i);
+    bp  = backwardpPacked.GetValue()->at(i);
+    efp = forwardpPacked.GetError()->at(i);
+    ebp = backwardpPacked.GetError()->at(i);
+    fm  = forwardmPacked.GetValue()->at(i);
+    bm  = backwardmPacked.GetValue()->at(i);
+    efm = forwardmPacked.GetError()->at(i);
+    ebm = backwardmPacked.GetError()->at(i);
     // check that there are indeed bins
-    if (f+b != 0.0)
-      asym = (alpha*f-b) / (alpha*beta*f+b);
+    if (fp+bp != 0.0)
+      asym = (alpha*fp-bp) / (alpha*beta*fp+bp) - (alpha*fm-bm) / (alpha*beta*fm+bm);
     else
       asym = 0.0;
     fData.AppendValue(asym);
     // calculate the error
-    if (f+b != 0.0)
-      error = 2.0/((f+b)*(f+b))*TMath::Sqrt(b*b*ef*ef+eb*eb*f*f);
+    if (fp+bp != 0.0)
+      errorp = 2.0/((fp+bp)*(fp+bp))*TMath::Sqrt(bp*bp*efp*efp+ebp*ebp*fp*fp);
     else
-      error = 1.0;
+      errorp = 1.0;
+    if (fm+bm != 0.0)
+      errorm = 2.0/((fm+bm)*(fm+bm))*TMath::Sqrt(bm*bm*efm*efm+ebm*ebm*fm*fm);
+    else
+      errorm = 1.0;
+    error = TMath::Sqrt(errorp*errorp+errorm*errorm);
     fData.AppendErrorValue(error);
   }
 
   CalcNoOfFitBins();
 
   // clean up
-  fForward.clear();
-  fForwardErr.clear();
-  fBackward.clear();
-  fBackwardErr.clear();
+  fForwardp.clear();
+  fForwardpErr.clear();
+  fBackwardp.clear();
+  fBackwardpErr.clear();
+  fForwardm.clear();
+  fForwardmErr.clear();
+  fBackwardm.clear();
+  fBackwardmErr.clear();
 
   // fill theory vector for kView
   // calculate functions
@@ -1212,311 +1335,6 @@ Bool_t PRunAsymmetryBNMR::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2
   return true;
 }
 
-//--------------------------------------------------------------------------
-// PrepareRRFViewData (protected)
-//--------------------------------------------------------------------------
-/**
- * <p> Prepares the RRF data set for visual representation. This is done the following way:
- * -# make all necessary checks
- * -# build the asymmetry, \f$ A(t) \f$, WITHOUT packing.
- * -# \f$ A_R(t) = A(t) \cdot 2 \cos(\omega_R t + \phi_R) \f$
- * -# do the packing of \f$ A_R(t) \f$
- * -# calculate theory, \f$ T(t) \f$, as close as possible to the time resolution [compatible with the RRF frequency]
- * -# \f$ T_R(t) = T(t) \cdot 2 \cos(\omega_R t + \phi_R) \f$
- * -# do the packing of \f$ T_R(t) \f$
- * -# calculate the Kaiser FIR filter coefficients
- * -# filter \f$ T_R(t) \f$.
- *
- * \param runData raw run data needed to perform some crosschecks
- * \param histoNo array of the histo numbers form which to build the asymmetry
- */
-Bool_t PRunAsymmetryBNMR::PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2])
-{
-  // feed the parameter vector
-  std::vector<Double_t> par;
-  PMsrParamList *paramList = fMsrInfo->GetMsrParamList();
-  for (UInt_t i=0; i<paramList->size(); i++)
-    par.push_back((*paramList)[i].fValue);
-
-  // ------------------------------------------------------------
-  // 1. make all necessary checks
-  // ------------------------------------------------------------
-
-  // first get start data, end data, and t0
-  Int_t start[2] = {fGoodBins[0], fGoodBins[2]};
-  Int_t end[2] = {fGoodBins[1], fGoodBins[3]};
-  Int_t t0[2] = {(Int_t)fT0s[0], (Int_t)fT0s[1]};
-  UInt_t packing = fMsrInfo->GetMsrPlotList()->at(0).fRRFPacking;
-
-  // check if the data ranges and t0's between forward/backward are compatible
-  Int_t fgb[2];
-  if (start[0]-t0[0] != start[1]-t0[1]) { // wrong fgb aligning
-    if (abs(start[0]-t0[0]) > abs(start[1]-t0[1])) {
-      fgb[0] = start[0];
-      fgb[1] = t0[1] + start[0]-t0[0];
-      cerr << endl << ">> PRunAsymmetryBNMR::PrepareRRFViewData(): **WARNING** needed to shift backward fgb from ";
-      cerr << start[1] << " to " << fgb[1] << endl;
-    } else {
-      fgb[0] = t0[0] + start[1]-t0[1];
-      fgb[1] = start[1];
-      cerr << endl << ">> PRunAsymmetryBNMR::PrepareRRFViewData(): **WARNING** needed to shift forward fgb from ";
-      cerr << start[1] << " to " << fgb[0] << endl;
-    }
-  } else { // fgb aligning is correct
-    fgb[0] = start[0];
-    fgb[1] = start[1];
-  }
-
-  Int_t val = fgb[0]-packing*(fgb[0]/packing);
-  do {
-    if (fgb[1] - fgb[0] < 0)
-      val += packing;
-  } while (val + fgb[1] - fgb[0] < 0);
-
-  start[0] = val;
-  start[1] = val + fgb[1] - fgb[0];
-
-  // make sure that there are equal number of rebinned bins in forward and backward
-  UInt_t noOfBins0 = runData->GetDataBin(histoNo[0])->size()-start[0];
-  UInt_t noOfBins1 = runData->GetDataBin(histoNo[1])->size()-start[1];
-  if (noOfBins0 > noOfBins1)
-    noOfBins0 = noOfBins1;
-  end[0] = start[0] + noOfBins0;
-  end[1] = start[1] + noOfBins0;
-
-  // check if start, end, and t0 make any sense
-  // 1st check if start and end are in proper order
-  for (UInt_t i=0; i<2; i++) {
-    if (end[i] < start[i]) { // need to swap them
-      Int_t keep = end[i];
-      end[i] = start[i];
-      start[i] = keep;
-    }
-    // 2nd check if start is within proper bounds
-    if ((start[i] < 0) || (start[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetryBNMR::PrepareRRFViewData(): **ERROR** start data bin doesn't make any sense!";
-      cerr << endl;
-      return false;
-    }
-    // 3rd check if end is within proper bounds
-    if ((end[i] < 0) || (end[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetryBNMR::PrepareRRFViewData(): **ERROR** end data bin doesn't make any sense!";
-      cerr << endl;
-      return false;
-    }
-    // 4th check if t0 is within proper bounds
-    if ((t0[i] < 0) || (t0[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetryBNMR::PrepareRRFViewData(): **ERROR** t0 data bin doesn't make any sense!";
-      cerr << endl;
-      return false;
-    }
-  }
-
-  // ------------------------------------------------------------
-  // 2. build the asymmetry [A(t)] WITHOUT packing.
-  // ------------------------------------------------------------
-
-  PDoubleVector forward, forwardErr;
-  PDoubleVector backward, backwardErr;
-  Double_t error = 0.0;
-  // forward
-  for (Int_t i=start[0]; i<end[0]; i++) {
-    forward.push_back(fForward[i]);
-    forwardErr.push_back(fForwardErr[i]);
-  }
-  // backward
-  for (Int_t i=start[1]; i<end[1]; i++) {
-    backward.push_back(fBackward[i]);
-    backwardErr.push_back(fBackwardErr[i]);
-  }
-
-  // check if packed forward and backward hist have the same size, otherwise take the minimum size
-  UInt_t noOfBins = forward.size();
-  if (forward.size() != backward.size()) {
-    if (forward.size() > backward.size())
-      noOfBins = backward.size();
-  }
-
-  // form asymmetry including error propagation
-  PDoubleVector asymmetry, asymmetryErr;
-  Double_t asym;
-  Double_t f, b, ef, eb, alpha = 1.0, beta = 1.0;
-
-  // get the proper alpha and beta
-  switch (fAlphaBetaTag) {
-    case 1: // alpha == 1, beta == 1
-      alpha = 1.0;
-      beta  = 1.0;
-      break;
-    case 2: // alpha != 1, beta == 1
-      alpha = par[fRunInfo->GetAlphaParamNo()-1];
-      beta  = 1.0;
-      break;
-    case 3: // alpha == 1, beta != 1
-      alpha = 1.0;
-      beta  = par[fRunInfo->GetBetaParamNo()-1];
-      break;
-    case 4: // alpha != 1, beta != 1
-      alpha = par[fRunInfo->GetAlphaParamNo()-1];
-      beta  = par[fRunInfo->GetBetaParamNo()-1];
-      break;
-    default:
-      break;
-  }
-
-  for (UInt_t i=0; i<noOfBins; i++) {
-    // to make the formulae more readable
-    f  = forward[i];
-    b  = backward[i];
-    ef = forwardErr[i];
-    eb = backwardErr[i];
-    // check that there are indeed bins
-    if (f+b != 0.0)
-      asym = (alpha*f-b) / (alpha*beta*f+b);
-    else
-      asym = 0.0;
-    asymmetry.push_back(asym);
-    // calculate the error
-    if (f+b != 0.0)
-      error = 2.0/((f+b)*(f+b))*TMath::Sqrt(b*b*ef*ef+eb*eb*f*f);
-    else
-      error = 1.0;
-    asymmetryErr.push_back(error);
-  }
-
-  // clean up
-  fForward.clear();
-  fForwardErr.clear();
-  fBackward.clear();
-  fBackwardErr.clear();
-
-
-  // ------------------------------------------------------------
-  // 3. A_R(t) = A(t) * 2 cos(w_R t + phi_R)
-  // ------------------------------------------------------------
-
-  // check which units shall be used
-  Double_t gammaRRF = 0.0, wRRF = 0.0, phaseRRF = 0.0;
-  Double_t time;
-
-  switch (fMsrInfo->GetMsrPlotList()->at(0).fRRFUnit) {
-    case RRF_UNIT_kHz:
-      gammaRRF = TMath::TwoPi()*1.0e-3;
-      break;
-    case RRF_UNIT_MHz:
-      gammaRRF = TMath::TwoPi();
-      break;
-    case RRF_UNIT_Mcs:
-      gammaRRF = 1.0;
-      break;
-    case RRF_UNIT_G:
-      gammaRRF = GAMMA_BAR_MUON*TMath::TwoPi();
-      break;
-    case RRF_UNIT_T:
-      gammaRRF = GAMMA_BAR_MUON*TMath::TwoPi()*1.0e4;
-      break;
-    default:
-      gammaRRF = TMath::TwoPi();
-      break;
-  }
-  wRRF = gammaRRF * fMsrInfo->GetMsrPlotList()->at(0).fRRFFreq;
-  phaseRRF = fMsrInfo->GetMsrPlotList()->at(0).fRRFPhase / 180.0 * TMath::Pi();
-
-  for (UInt_t i=0; i<asymmetry.size(); i++) {
-    time = fTimeResolution*(static_cast<Double_t>(start[0])-t0[0]+static_cast<Double_t>(i));
-    asymmetry[i] *= 2.0*TMath::Cos(wRRF*time+phaseRRF);
-  }
-
-  // ------------------------------------------------------------
-  // 4. do the packing of A_R(t)
-  // ------------------------------------------------------------
-  Double_t value = 0.0;
-  error = 0.0;
-  for (UInt_t i=0; i<asymmetry.size(); i++) {
-    if ((i % packing == 0) && (i != 0)) {
-      value /= packing;
-      fData.AppendValue(value);
-      fData.AppendErrorValue(TMath::Sqrt(error)/packing);
-
-      value = 0.0;
-      error = 0.0;
-    }
-    value += asymmetry[i];
-    error += asymmetryErr[i]*asymmetryErr[i];
-  }
-
-  // set data time start, and step
-  // data start at data_start-t0
-  fData.SetDataTimeStart(fTimeResolution*(start[0]-t0[0]+static_cast<Double_t>(packing-1)/2.0));
-  fData.SetDataTimeStep(fTimeResolution*static_cast<Double_t>(packing));
-
-  // ------------------------------------------------------------
-  // 5. calculate theory [T(t)] as close as possible to the time resolution [compatible with the RRF frequency]
-  // 6. T_R(t) = T(t) * 2 cos(w_R t + phi_R)
-  // ------------------------------------------------------------
-  UInt_t rebinRRF = static_cast<UInt_t>((TMath::Pi()/2.0/wRRF)/fTimeResolution); // RRF time resolution / data time resolution
-  fData.SetTheoryTimeStart(fData.GetDataTimeStart());
-  fData.SetTheoryTimeStep(TMath::Pi()/2.0/wRRF/rebinRRF); // = theory time resolution as close as possible to the data time resolution compatible with wRRF
-
-  // calculate functions
-  for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
-  }
-
-  Double_t theoryValue;
-  for (UInt_t i=0; i<asymmetry.size(); i++) {
-    time = fData.GetTheoryTimeStart() + static_cast<Double_t>(i)*fData.GetTheoryTimeStep();
-    theoryValue = fTheory->Func(time, par, fFuncValues);
-    theoryValue *= 2.0*TMath::Cos(wRRF * time + phaseRRF);
-
-    if (fabs(theoryValue) > 10.0) { // dirty hack needs to be fixed!!
-      theoryValue = 0.0;
-    }
-
-    fData.AppendTheoryValue(theoryValue);
-  }
-
-  // ------------------------------------------------------------
-  // 7. do the packing of T_R(t)
-  // ------------------------------------------------------------
-
-  PDoubleVector theo;
-  Double_t dval = 0.0;
-  for (UInt_t i=0; i<fData.GetTheory()->size(); i++) {
-    if ((i % rebinRRF == 0) && (i != 0)) {
-      theo.push_back(dval/rebinRRF);
-      dval = 0.0;
-    }
-    dval += fData.GetTheory()->at(i);
-  }
-  fData.ReplaceTheory(theo);
-  theo.clear();
-
-  // set the theory time start and step size
-  fData.SetTheoryTimeStart(fData.GetTheoryTimeStart()+static_cast<Double_t>(rebinRRF-1)*fData.GetTheoryTimeStep()/2.0);
-  fData.SetTheoryTimeStep(rebinRRF*fData.GetTheoryTimeStep());
-
-  // ------------------------------------------------------------
-  // 8. calculate the Kaiser FIR filter coefficients
-  // ------------------------------------------------------------
-  CalculateKaiserFilterCoeff(wRRF, 60.0, 0.2); // w_c = wRRF, A = -20 log_10(delta), Delta w / w_c = (w_s - w_p) / (2 w_c)
-
-  // ------------------------------------------------------------
-  // 9. filter T_R(t)
-  // ------------------------------------------------------------
-  FilterTheo();
-
-  // clean up
-  par.clear();
-  forward.clear();
-  forwardErr.clear();
-  backward.clear();
-  backwardErr.clear();
-  asymmetry.clear();
-  asymmetryErr.clear();
-
-  return true;
-}
 
 //--------------------------------------------------------------------------
 // GetProperT0 (private)
