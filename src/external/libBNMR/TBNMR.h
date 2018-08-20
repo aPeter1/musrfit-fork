@@ -41,6 +41,10 @@
 #ifndef LIBBNMRH
 #define LIBBNMRH
 
+#define tau_Li 1.210     // In seconds 
+#define PI 3.14159265358979323846
+#define TWOPI 6.28318530717958647692
+
 using namespace std;
 
 
@@ -66,7 +70,7 @@ class SExpRlx : public PUserFcnBase {
 
 public:
   // default constructor and destructor
-  SExpRlx(){sexp1.SetNpx(1000); sexp2.SetNpx(1000);}
+  SExpRlx(){}
   ~SExpRlx(){}
 
   Bool_t NeedGlobalPart() const { return false; }
@@ -75,9 +79,6 @@ public:
 
   // function operator
   double operator()(double, const vector<double>&) const;
-private:
-  static TF1 sexp1;
-  static TF1 sexp2;
 
   // definition of the class for the ROOT-dictionary
   ClassDef(SExpRlx,1)

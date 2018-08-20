@@ -31,55 +31,45 @@
 
 #include "TBNMR.h"
 
-#define tau_Li 1210
-#define gamma_Li 6.3018 // In units kHz/mT
-#define PI 3.14159265358979323846
-#define TWOPI 6.28318530717958647692
-
 ClassImp(ExpRlx)  // for the ROOT-dictionary
 ClassImp(SExpRlx)
-
 
 double ExpRlx::operator()(double x, const vector<double> &par) const {
   assert(par.size()==2); // make sure the number of parameters handed to the function is correct
 
-  // par[0] time of beam off
-  // par[1] is the relaxation rate
+  // par[0] time of beam on (pulse length) in seconds
+  // par[1] is the relaxation rate in 1/s
   double tau_p;
-  double y;
-
   tau_p = (tau_Li/(1.+par[1]*tau_Li));
-	       
+
+  // x should be in seconds, otherwise it should be rescaled here
   if ( x <= par[0] && x >= 0) {
-    y=(tau_p/tau_Li)*(1-exp(-x/tau_p))/(1-exp(-x/tau_Li));
+    return (tau_p/tau_Li)*(1-exp(-x/tau_p))/(1-exp(-x/tau_Li));
   } else if ( x > par[0] ){
-    y=(tau_p/tau_Li)*(1-exp(-par[0]/tau_p))/(1-exp(-par[0]/tau_Li))*exp(-par[1]*(x-par[0]));
-  }  else {
-    y = 0;
-  }
-
-  return y;
+    return (tau_p/tau_Li)*(1-exp(-par[0]/tau_p))/(1-exp(-par[0]/tau_Li))*exp(-par[1]*(x-par[0]));
+  }  
+  return 0;
 }
-
-
-//initialize Integrators
-TF1 SExpRlx::sexp1=TF1("sexp", "exp(-([0]-x)/[3])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20000.0);
-TF1 SExpRlx::sexp2=TF1("sexp", "exp(-([3]-x)/[4])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20000.0);
 
 double SExpRlx::operator()(double x, const vector<double> &par) const {
   assert(par.size()==3); // make sure the number of parameters handed to the function is correct
   
-  // par[0] time of beam off
-  // par[1] is the relaxation rate
+  // par[0] beam of beam on (pulse length) in seconds 
+  // par[1] is the relaxation rate in 1/s
   // par[2] is the exponent
 
+  // x should be in seconds, otherwise it should be rescaled here
   if ( x >= 0 && x <= par[0] ) {
+    TF1 sexp1("sexp1", "exp(-([0]-x)/[3])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20.0);
     sexp1.SetParameters(x, par[1], par[2],tau_Li);
+    sexp1.SetNpx(1000);
     return sexp1.Integral(0.0,x)/(1-exp(-x/tau_Li))/tau_Li;
   } else if ( x > par[0] ) {
+    TF1 sexp2("sexp2", "exp(-([3]-x)/[4])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20.0);
     sexp2.SetParameters(x, par[1], par[2], par[0],tau_Li);
+    sexp2.SetNpx(1000);
     return sexp2.Integral(0.0,par[0])/(1-exp(-par[0]/tau_Li))/tau_Li;
-  }
+  }  
   return 0;
 }
 
