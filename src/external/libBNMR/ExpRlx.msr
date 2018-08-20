@@ -1,0 +1,53 @@
+LaAlO3,  SLR, 30G, 150K, Bias=23 kV, Ix=0A, Iy=+3A, aligned, beam on=1s
+###############################################################
+FITPARAMETER
+###############################################################
+#     No     Name       Value    Err     Min  Max                  
+        1 Alpha       1         0           none        
+        2 Asy         0.05992   0.00063     none        0       0.2     
+        3 T           1         0           none        
+        4 Rlx         1.143     0.023       none        0       100     
+
+###############################################################
+THEORY
+###############################################################
+asymmetry      2
+userFcn  .libs/libBNMR.so ExpRlx 3 4
+
+###############################################################
+RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
+fittype         5         (beta-NMR fit)
+alpha           1
+forward         3 5 
+backward        4 6 
+data            11      1000    11      1000    
+background      1       9       1       9          # estimated bkg: 8.0000 / 9.6250
+t0              10.0    10.0    10.0    10.0    
+map             0    0    0    0    0    0    0    0    0    0
+fit             0.2     9      
+packing         5
+
+###############################################################
+COMMANDS
+MINIMIZE
+HESSE
+SAVE
+
+###############################################################
+PLOT 5   (beta-NMR asymmetry plot)
+runs     1   
+use_fit_ranges
+view_packing 10
+
+
+###############################################################
+FOURIER
+units            MHz    # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
+fourier_power    12
+apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL
+phase            8
+#range            FRQMIN  FRQMAX
+###############################################################
+STATISTIC --- 2018-08-20 22:02:02
+  chisq = 419.1, NDF = 173, chisq/NDF = 2.422357
