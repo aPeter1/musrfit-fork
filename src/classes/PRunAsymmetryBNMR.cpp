@@ -539,11 +539,11 @@ Bool_t PRunAsymmetryBNMR::PrepareData()
     return false;
   }
 
-  // keep the time resolution in (us)
+  // keep the time resolution in (ms)
   // possibility to rescale for betaNMR
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
   cout.precision(10);
-  cout << endl << ">> PRunAsymmetryBNMR::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
+  cout << endl << ">> PRunAsymmetryBNMR::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ms)" << endl;
 
   // get all the proper t0's and addt0's for the current RUN block
   if (!GetProperT0(runData, globalBlock, forwardHistoNo, backwardHistoNo)) {
@@ -602,32 +602,14 @@ Bool_t PRunAsymmetryBNMR::PrepareData()
   // set forward/backward histo data of the first group
   fForwardp.resize(forward[0].size());
   fBackwardp.resize(backward[0].size());
+  fForwardm.resize(forward[0].size());
+  fBackwardm.resize(backward[0].size());
   for (UInt_t i=0; i<fForwardp.size(); i++) {
     fForwardp[i]  = forward[0][i];
     fBackwardp[i] = backward[0][i];
     fForwardm[i]  = forward[1][i];
     fBackwardm[i] = backward[1][i];
   }
-
-  // // group histograms, add all the remaining forward histograms of the group
-  // for (UInt_t i=1; i<forwardHistoNo.size(); i++) { // loop over the groupings
-  //   for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[i])->size(); j++) { // loop over the bin indices
-  //     // make sure that the index stays within proper range
-  //     if ((j+fT0s[2*i]-fT0s[0] >= 0) && (j+fT0s[2*i]-fT0s[0] < runData->GetDataBin(forwardHistoNo[i])->size())) {
-  //       fForward[j] += forward[i][j+(Int_t)fT0s[2*i]-(Int_t)fT0s[0]];
-  //     }
-  //   }
-  // }
-
-  // // group histograms, add all the remaining backward histograms of the group
-  // for (UInt_t i=1; i<backwardHistoNo.size(); i++) { // loop over the groupings
-  //   for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[i])->size(); j++) { // loop over the bin indices
-  //     // make sure that the index stays within proper range
-  //     if ((j+fT0s[2*i+1]-fT0s[1] >= 0) && (j+fT0s[2*i+1]-fT0s[1] < runData->GetDataBin(backwardHistoNo[i])->size())) {
-  //       fBackward[j] += backward[i][j+(Int_t)fT0s[2*i+1]-(Int_t)fT0s[1]];
-  //     }
-  //   }
-  // }
 
   // subtract background from histogramms ------------------------------------------
   if (fRunInfo->GetBkgFix(0) == PMUSR_UNDEFINED) { // no fixed background given
@@ -706,22 +688,40 @@ Bool_t PRunAsymmetryBNMR::PrepareData()
 Bool_t PRunAsymmetryBNMR::SubtractFixBkg()
 {
   Double_t dval;
-  for (UInt_t i=0; i<fForward.size(); i++) {
+
+  // Order in RunInfo structure Fp, Fm, Bp, Bm
+  for (UInt_t i=0; i<fForwardp.size(); i++) {
     // keep the error, and make sure that the bin is NOT empty
-    if (fForward[i] != 0.0)
-      dval = TMath::Sqrt(fForward[i]);
+    if (fForwardp[i] != 0.0)
+      dval = TMath::Sqrt(fForwardp[i]);
     else
       dval = 1.0;
-    fForwardErr.push_back(dval);
-    fForward[i] -= fRunInfo->GetBkgFix(0);
+    fForwardpErr.push_back(dval);
+    fForwardp[i] -= fRunInfo->GetBkgFix(0);
 
     // keep the error, and make sure that the bin is NOT empty
-    if (fBackward[i] != 0.0)
-      dval = TMath::Sqrt(fBackward[i]);
+    if (fForwardm[i] != 0.0)
+      dval = TMath::Sqrt(fForwardm[i]);
     else
       dval = 1.0;
-    fBackwardErr.push_back(dval);
-    fBackward[i] -= fRunInfo->GetBkgFix(1);
+    fForwardmErr.push_back(dval);
+    fForwardm[i] -= fRunInfo->GetBkgFix(1);
+
+    // keep the error, and make sure that the bin is NOT empty
+    if (fBackwardp[i] != 0.0)
+      dval = TMath::Sqrt(fBackwardp[i]);
+    else
+      dval = 1.0;
+    fBackwardpErr.push_back(dval);
+    fBackwardp[i] -= fRunInfo->GetBkgFix(2);
+
+    // keep the error, and make sure that the bin is NOT empty
+    if (fBackwardm[i] != 0.0)
+      dval = TMath::Sqrt(fBackwardm[i]);
+    else
+      dval = 1.0;
+    fBackwardmErr.push_back(dval);
+    fBackwardm[i] -= fRunInfo->GetBkgFix(3);
   }
 
   return true;
@@ -807,8 +807,8 @@ Bool_t PRunAsymmetryBNMR::SubtractEstimatedBkg()
   // calculate background
   Double_t bkgp[2]    = {0.0, 0.0};
   Double_t errBkgp[2] = {0.0, 0.0};
-  Double_t bkgn[2]    = {0.0, 0.0};
-  Double_t errBkgn[2] = {0.0, 0.0};
+  Double_t bkgm[2]    = {0.0, 0.0};
+  Double_t errBkgm[2] = {0.0, 0.0};
 
   // forward
   for (UInt_t i=start[0]; i<=end[0]; i++) {
@@ -898,7 +898,7 @@ Bool_t PRunAsymmetryBNMR::PrepareFitData()
   PRunData forwardpPacked;
   PRunData backwardpPacked;
   PRunData forwardmPacked;
-  PRunData backwarmpPacked;
+  PRunData backwardmPacked;
   Double_t valuep = 0.0;
   Double_t errorp = 0.0;
   Double_t valuem = 0.0;
@@ -1150,6 +1150,8 @@ Bool_t PRunAsymmetryBNMR::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2
   Double_t errorp = 0.0;
   Double_t valuem = 0.0;
   Double_t errorm = 0.0;
+  Double_t value = 0.0;
+  Double_t error = 0.0;
 
   // forward
   for (Int_t i=start[0]; i<end[0]; i++) {
