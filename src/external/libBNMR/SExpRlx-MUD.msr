@@ -5,10 +5,10 @@ FITPARAMETER
 ###############################################################
 #     No     Name       Value    Err     Min  Max                  
         1 Alpha       1         0           none        
-        2 Asy         0.108     0.011       none        0       0.2     
+        2 Asy         0.1152    0.0099      none        0       0.2     
         3 T           1         0           none        
-        4 Rlx         3.63      0.89        none        0       15000   
-        5 Beta        0.452     0.039       none        0.3     2       
+        4 Rlx         4.19      0.91        none        0       15000   
+        5 Beta        0.432     0.032       none        0.3     2       
 
 ###############################################################
 THEORY
@@ -27,12 +27,12 @@ fittype         5         (beta-NMR fit)
 alpha           1
 forward         3 5 
 backward        4 6 
-data            11      800     11      800     
+data            11      1000     11      1000     
 #backgr.fix 0
 background      1       9       1       9          # estimated bkg: 8.0000 / 9.6250
 t0              10.0    10.0    10.0    10.0    
 map             0    0    0    0    0    0    0    0    0    0
-fit             0.5     8      
+fit             0.2     10     
 packing         5
 
 ###############################################################
@@ -57,5 +57,5 @@ plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_RE
 phase            8
 #range            FRQMIN  FRQMAX
 ###############################################################
-STATISTIC --- 2018-08-20 17:48:41
-  chisq = 177.2, NDF = 144, chisq/NDF = 1.230711
+STATISTIC --- 2018-08-20 19:54:17
+  chisq = 181.6, NDF = 150, chisq/NDF = 1.210991
