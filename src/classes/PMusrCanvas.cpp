@@ -4690,7 +4690,8 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
       // set x-axis label
       PMsrRunList runs = *fMsrHandler->GetMsrRunList();
       TString setup = fRunList->GetSetup(*runs[0].GetRunName());
-      if (strcmp(setup, "TRIUMF/BNQR") || strcmp(setup, "TRIUMF/BNMR")) {
+      // For BNMR/BNQR runs use seconds
+      if (fPlotType == MSR_PLOT_BNMR) {
 	fHistoFrame->GetXaxis()->SetTitle("time (s)");
       } else {
 	fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
@@ -4984,7 +4985,8 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
     // set x-axis label
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     TString setup = fRunList->GetSetup(*runs[0].GetRunName());
-    if (strcmp(setup, "TRIUMF/BNQR") || strcmp(setup, "TRIUMF/BNMR")) {
+    // For BNMR/BNQR runs use seconds
+    if (fPlotType == MSR_PLOT_BNMR) {
       fHistoFrame->GetXaxis()->SetTitle("time (s)");
     } else {
     fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
@@ -6105,7 +6107,8 @@ void PMusrCanvas::PlotAverage(Bool_t unzoom)
   if (fCurrentPlotView == PV_DATA) {
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
     TString setup = fRunList->GetSetup(*runs[0].GetRunName());
-    if (strcmp(setup, "TRIUMF/BNQR") || strcmp(setup, "TRIUMF/BNMR")) {
+    // For BNMR/BNQR runs use seconds
+    if (fPlotType == MSR_PLOT_BNMR) {
       xAxisTitle = TString("time (s)");
     } else {
     xAxisTitle = TString("time (#mus)");
