@@ -88,9 +88,9 @@ sub CreateMSRUni {
     my @FitTypes = ();
 
     foreach ($All{"FitType1"},$All{"FitType2"},$All{"FitType3"}) {
-	if ($_ ne "None") {
-	    @FitTypes=(@FitTypes,$_);
-	}
+        if ($_ ne "None") {
+            @FitTypes=(@FitTypes,$_);
+        }
     }
 
     my @Hists = split( /,/, $All{"LRBF"} );
@@ -672,12 +672,12 @@ sub CreateTheory {
 		  "statExpKTLF", "Frq Aa",
 		  "dynExpKTLF",  "Frq Aa Lam",
 		  "combiLGKT",   "Del Sgm",
-		  "spinGlass",   "Lam gam q",
-		  "rdAnisoHf",   "Frq Lam",
-		  "TFieldCos",   "Phi Frq",
-		  "internFld",   "Alp Phi Frq LamT LamL",
-		  "Bessel",      "Phi Frq",
-		  "internBsl",   "Alp Phi Frq LamT LamL",
+                  "spinGlass",   "Lam gam q",
+                  "rdAnisoHf",   "Frq Lam",
+                  "TFieldCos",   "Phi Frq",
+                  "internFld",   "Alp Phi Frq LamT LamL",
+                  "Bessel",      "Phi Frq",
+                  "internBsl",   "Alp Phi Frq LamT LamL",
 		  "abragam",     "Sgm gam",
 		  "Meissner",    "Phi Energy Field DeadLayer Lambda",
 		  "skewedGss",   "Phi Frq Sgmm Sgmp"
@@ -731,13 +731,13 @@ sub CreateTheory {
 	    $T_Block    = $T_Block . "\n" . "simplExpo " . $THEORY{'simplExpo'};
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'simplExpo'} );
 	    $T_Block    = $T_Block . "\n" . "TFieldCos " . $THEORY{'TFieldCos'};
-	    $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
-	}
-	
-	# Oscillationg gaussian
-	elsif ( $FitType eq "GaussianCos" ) {
-	    $T_Block    = $T_Block . "\n" . "simpleGss " . $THEORY{'simpleGss'};
-	    $Parameters = join( $SPACE, $Parameters, $THEORY{'simpleGss'} );
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
+        }
+        
+        # Oscillationg gaussian
+        elsif ( $FitType eq "GaussianCos" ) {
+            $T_Block    = $T_Block . "\n" . "simpleGss " . $THEORY{'simpleGss'};
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'simpleGss'} );
 	    $T_Block    = $T_Block . "\n" . "TFieldCos " . $THEORY{'TFieldCos'};
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
 	    }
@@ -747,18 +747,18 @@ sub CreateTheory {
 	    $T_Block    = $T_Block . "\n" . "generExpo " . $THEORY{'generExpo'};
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'generExpo'} );
 	    $T_Block    = $T_Block . "\n" . "TFieldCos " . $THEORY{'TFieldCos'};
-	    $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
-	}
-	
-	# Oscillationg Gaussian
-	elsif ( $FitType eq "GaussianCos" ) {
-	    $T_Block    = $T_Block . "\n" . "simpelGss " . $THEORY{'simpelGss'};
-	    $Parameters = join( $SPACE, $Parameters, $THEORY{'simpleGss'} );
-	    $T_Block    = $T_Block . "\n" . "TFieldCos " . $THEORY{'TFieldCos'};
-	    $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
-	    }
-	
-	# Static Lorentzian KT
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
+        }
+        
+        # Oscillationg Gaussian
+        elsif ( $FitType eq "GaussianCos" ) {
+            $T_Block    = $T_Block . "\n" . "simpelGss " . $THEORY{'simpelGss'};
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'simpleGss'} );
+            $T_Block    = $T_Block . "\n" . "TFieldCos " . $THEORY{'TFieldCos'};
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
+            }
+        
+        # Static Lorentzian KT
 	elsif ( $FitType eq "SLKT" ) {
 	    $T_Block = $T_Block . "\n" . "statExpKT " . $THEORY{'statExpKT'};
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'statExpKT'} );
@@ -1049,7 +1049,7 @@ sub PrepParamTable {
 
     my @FitTypes =();
     foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
+        if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
     }
 # Get theory block to determine the size of the table 
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
@@ -1241,7 +1241,7 @@ sub ExportParams {
 
     my @FitTypes =();
     foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-	if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
+        if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
     }
     # Get theory block to determine the size of the table
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
