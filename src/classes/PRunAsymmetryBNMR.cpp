@@ -903,8 +903,15 @@ Bool_t PRunAsymmetryBNMR::PrepareFitData()
   Double_t errorp = 0.0;
   Double_t valuem = 0.0;
   Double_t errorm = 0.0;
+
+  Double_t SumF[2]    = {0.0, 0.0};
+  Double_t SumB[2]    = {0.0, 0.0};
+  Double_t alphaest   = 1;
+  
   // forward
   for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
+    SumF[0] += fForwardp[i];
+    SumF[1] += fForwardm[i];    
     if (fPacking == 1) {
       forwardpPacked.AppendValue(fForwardp[i]);
       forwardpPacked.AppendErrorValue(fForwardpErr[i]);
@@ -939,8 +946,11 @@ Bool_t PRunAsymmetryBNMR::PrepareFitData()
       errorm += fForwardmErr[i]*fForwardmErr[i];
     }
   }
+
   // backward
   for (Int_t i=fGoodBins[2]; i<fGoodBins[3]; i++) {
+    SumB[0] += fBackwardp[i];
+    SumB[1] += fBackwardm[i];    
     if (fPacking == 1) {
       backwardpPacked.AppendValue(fBackwardp[i]);
       backwardpPacked.AppendErrorValue(fBackwardpErr[i]);
@@ -976,6 +986,10 @@ Bool_t PRunAsymmetryBNMR::PrepareFitData()
     }
   }
 
+  // Spit out estimated alpha value from total counts (Bp+Bm)/(Fp+Fm)
+  alphaest = (SumB[0]+SumB[1])/(SumF[0]+SumF[1]);
+  cout << endl << ">> PRunAsymmetryBNMR::PrepareFitData(): alpha estimate=" << alphaest << endl;  
+  
   // check if packed forward and backward hist have the same size, otherwise take the minimum size
   UInt_t noOfBins = forwardpPacked.GetValue()->size();
   if (forwardpPacked.GetValue()->size() != backwardpPacked.GetValue()->size()) {
