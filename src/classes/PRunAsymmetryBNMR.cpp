@@ -222,19 +222,19 @@ Double_t PRunAsymmetryBNMR::CalcChiSquare(const std::vector<Double_t>& par)
         break;
       case 2: // alpha != 1, beta == 1
         a = par[fRunInfo->GetAlphaParamNo()-1];
-        f = fTheory->Func(time, par, fFuncValues);
-        asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0));
+        f = fTheory->Func(time, par, fFuncValues)/2;
+        asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0)) - (-f*(a+1.0)-(a-1.0))/((a+1.0)+f*(a-1.0));
         break;
       case 3: // alpha == 1, beta != 1
         b = par[fRunInfo->GetBetaParamNo()-1];
-        f = fTheory->Func(time, par, fFuncValues);
-        asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0));
+        f = fTheory->Func(time, par, fFuncValues)/2;
+        asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0))-f*(b+1.0)/(2.0+f*(b-1.0));
         break;
       case 4: // alpha != 1, beta != 1
         a = par[fRunInfo->GetAlphaParamNo()-1];
         b = par[fRunInfo->GetBetaParamNo()-1];
-        f = fTheory->Func(time, par, fFuncValues);
-        asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0));
+        f = fTheory->Func(time, par, fFuncValues)/2;
+        asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
         break;
       default:
         asymFcnValue = 0.0;
@@ -1276,7 +1276,7 @@ Bool_t PRunAsymmetryBNMR::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2
     efm = forwardmPacked.GetError()->at(i);
     ebm = backwardmPacked.GetError()->at(i);
     // check that there are indeed bins
-    if (fp+bp != 0.0)
+    if (fp+bp != 0.0) 
       asym = (alpha*fp-bp) / (alpha*beta*fp+bp) - (alpha*fm-bm) / (alpha*beta*fm+bm);
     else
       asym = 0.0;

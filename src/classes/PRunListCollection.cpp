@@ -972,7 +972,7 @@ PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
 // GetAsymmetryBNMR (public)
 //--------------------------------------------------------------------------
 /**
- * <p>Get a processed asymmetry data set.
+ * <p>Get a processed asymmetry from beta-NMR data set.
  *
  * <b>return:</b>
  * - pointer to the run data set (processed data) if data set is found
