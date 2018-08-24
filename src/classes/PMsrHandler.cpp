@@ -5881,12 +5881,12 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
         break;
       case PRUN_ASYMMETRY_BNMR:
         // check alpha
-        if ((fRuns[i].GetAlphaParamNo() == -1) && !fFourierOnly) {
-          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          cerr << endl << ">>   alpha parameter number missing which is needed for an asymmetry fit.";
-          cerr << endl << ">>   Consider to check the manual ;-)" << endl;
-          return false;
-        }
+        // if ((fRuns[i].GetAlphaParamNo() == -1) && !fFourierOnly) {
+        //   cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+        //   cerr << endl << ">>   alpha parameter number missing which is needed for an asymmetry fit.";
+        //   cerr << endl << ">>   Consider to check the manual ;-)" << endl;
+        //   return false;
+        // }
         // check that there is a forward parameter number
         if (fRuns[i].GetForwardHistoNo() == -1) {
           cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;

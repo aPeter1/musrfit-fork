@@ -105,26 +105,25 @@ PRunAsymmetryBNMR::PRunAsymmetryBNMR(PMsrHandler *msrInfo, PRunDataHandler *rawD
   PMsrParamList *param = msrInfo->GetMsrParamList();
 
   // check if alpha is given
+  Bool_t alphaFixedToOne = false;
   if (fRunInfo->GetAlphaParamNo() == -1) { // no alpha given
-    cerr << endl << ">> PRunAsymmetryBNMR::PRunAsymmetryBNMR(): **ERROR** no alpha parameter given! This is needed for an asymmetry fit!";
-    cerr << endl;
-    fValid = false;
-    return;
-  }
-  // check if alpha parameter is within proper bounds
-  if ((fRunInfo->GetAlphaParamNo() < 0) || (fRunInfo->GetAlphaParamNo() > (Int_t)param->size())) {
+    //    cerr << endl << ">> PRunAsymmetryBNMR::PRunAsymmetryBNMR(): **ERROR** no alpha parameter given! This is needed for an asymmetry fit!";
+    //    cerr << endl;
+    //    fValid = false;
+    //    return;
+    alphaFixedToOne = true;
+  } else if ((fRunInfo->GetAlphaParamNo() < 0) || (fRunInfo->GetAlphaParamNo() > (Int_t)param->size())) {  // check if alpha parameter is within proper bounds
     cerr << endl << ">> PRunAsymmetryBNMR::PRunAsymmetryBNMR(): **ERROR** alpha parameter no = " << fRunInfo->GetAlphaParamNo();
     cerr << endl << ">> This is out of bound, since there are only " << param->size() << " parameters.";
     cerr << endl;
     fValid = false;
     return;
+  } else {  // check if alpha is fixed
+    if (((*param)[fRunInfo->GetAlphaParamNo()-1].fStep == 0.0) &&
+	((*param)[fRunInfo->GetAlphaParamNo()-1].fValue == 1.0))
+      alphaFixedToOne = true;
   }
-  // check if alpha is fixed
-  Bool_t alphaFixedToOne = false;
-  if (((*param)[fRunInfo->GetAlphaParamNo()-1].fStep == 0.0) &&
-      ((*param)[fRunInfo->GetAlphaParamNo()-1].fValue == 1.0))
-    alphaFixedToOne = true;
-
+  
   // check if beta is given
   Bool_t betaFixedToOne = false;
   if (fRunInfo->GetBetaParamNo() == -1) { // no beta given hence assuming beta == 1
@@ -222,18 +221,18 @@ Double_t PRunAsymmetryBNMR::CalcChiSquare(const std::vector<Double_t>& par)
         break;
       case 2: // alpha != 1, beta == 1
         a = par[fRunInfo->GetAlphaParamNo()-1];
-        f = fTheory->Func(time, par, fFuncValues)/2;
+        f = fTheory->Func(time, par, fFuncValues)/2.0;
         asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0)) - (-f*(a+1.0)-(a-1.0))/((a+1.0)+f*(a-1.0));
         break;
       case 3: // alpha == 1, beta != 1
         b = par[fRunInfo->GetBetaParamNo()-1];
-        f = fTheory->Func(time, par, fFuncValues)/2;
+        f = fTheory->Func(time, par, fFuncValues)/2.0;
         asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0))-f*(b+1.0)/(2.0+f*(b-1.0));
         break;
       case 4: // alpha != 1, beta != 1
         a = par[fRunInfo->GetAlphaParamNo()-1];
         b = par[fRunInfo->GetBetaParamNo()-1];
-        f = fTheory->Func(time, par, fFuncValues)/2;
+        f = fTheory->Func(time, par, fFuncValues)/2.0;
         asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
         break;
       default:
