@@ -370,6 +370,233 @@ The expected name of the <tt class="docutils literal"><span class="pre">RGE</spa
 <h2>Nonlocal superconductivity related Meissner screening functions (AS libs)<a class="headerlink" href="#nonlocal-superconductivity-related-meissner-screening-functions-as-libs" title="Permalink to this headline">¶</a></h2>
 <p>To be written yet ...</p>
 </div>
+<div class="section" id="functions-to-analyze-bgr-nmr-data-bnmr-libs">
+<span id="bnmr-libs"></span><span id="index-14"></span><h2>Functions to analyze β-NMR data (BNMR libs)<a class="headerlink" href="#functions-to-analyze-bgr-nmr-data-bnmr-libs" title="Permalink to this headline">¶</a></h2>
+<p>This is a collection of <tt class="docutils literal"><span class="pre">C++</span></tt> classes using the <tt class="docutils literal"><span class="pre">musrfit</span></tt> <a class="reference internal" href="user-manual.html#id20"><em>user-functions</em></a>
+interface in order to facilitate the usage in conjunction with <tt class="docutils literal"><span class="pre">musrfit</span></tt>. It consists of two libraries:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">libBNMR</span></tt> contains functions to fit spin lattice relaxation (SLR) data.</li>
+<li><tt class="docutils literal"><span class="pre">libLineProfile</span></tt> contains functions to fit resonance lineshapes.</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Currently it is recommended to read in the data in ASCII format as a non-μSR fit  <a class="reference internal" href="user-manual.html#non-musr-fit"><em>(fit type 8)</em></a>.</p>
+</div>
+<div class="section" id="libbnmr">
+<span id="index-15"></span><h3>libBNMR<a class="headerlink" href="#libbnmr" title="Permalink to this headline">¶</a></h3>
+<p>In β-NMR the SLR is usually measured by implanting a pulse of <span class="math">\(^8\)</span>Li with a length <span class="math">\(t_0\)</span> into the sample.
+The asymmetry is measured both during the pulse and afterwards. For a a general spin relaxation function <span class="math">\(f(t)\)</span> the time evolution of the asymmetry is then given by [<a class="reference external" href="http://dx.doi.org/10.1103/PhysRevLett.96.147601">Z. Salman, et al., PRL 96, 147601 (2006)</a>]:</p>
+<div class="math" id="slr">
+<span id="index-16"></span>\[\begin{split}P(t) = \left\{\begin{matrix}
+\frac{\int_0^t e^{-(t-t')/\tau_{\mathrm{Li}}}f(t-t')dt'}{\int_0^t e^{-t'/\tau_{\mathrm{Li}}}dt' }       &amp;  t\leq t_0\\[6pt]
+\frac{\int_0^{t_0}e^{-(t_0-t')/\tau_{\mathrm{Li}}}f(t-t')dt'}{\int_0^{t_0}e^{-t'/\tau_{\mathrm{Li}}}dt'}    &amp;  t&gt; t_0,
+\end{matrix}\right.\end{split}\]</div>
+<p>where <span class="math">\(\tau_{\mathrm{Li}}=1.21\)</span>s is the <span class="math">\(^8\)</span>Li lifetime.</p>
+<div class="section" id="functions">
+<h4>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h4>
+<p>The <tt class="docutils literal"><span class="pre">libLineProfile</span></tt> library currently contains the following functions:</p>
+<p id="index-17"><strong>Exponential relaxation</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn libBNMR ExpRlx 1 2
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>pulse length <span class="math">\(t_0\)</span> (ms)</li>
+<li>relaxation rate <span class="math">\(\sigma\)</span> (ms<span class="math">\(^{-1}\)</span>)</li>
+</ol>
+<p>This function implements <span class="math">\(f(t)=e^{-\sigma t}\)</span>.</p>
+<p id="index-18"><strong>Stretched exponential relaxation</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn libBNMR SExpRlx 1 2 3
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>pulse length <span class="math">\(t_0\)</span> (ms)</li>
+<li>relaxation rate <span class="math">\(\sigma\)</span> (ms<span class="math">\(^{-1}\)</span>)</li>
+<li>stretching exponent <span class="math">\(\beta\)</span></li>
+</ol>
+<p>This function implements <span class="math">\(f(t)=e^{-(\sigma t)^{\beta}}\)</span>.</p>
+</div>
+</div>
+<div class="section" id="liblineprofile">
+<span id="index-19"></span><h3>libLineProfile<a class="headerlink" href="#liblineprofile" title="Permalink to this headline">¶</a></h3>
+<p>In addition to some simple line shapes <tt class="docutils literal"><span class="pre">libLineProfile</span></tt> contains functions to fit chemical shift anisotropies in the powder average.
+Their functional form can be found in  <a class="reference external" href="http://dx.doi.org/10.1007/978-3-642-68756-3_2">M. Mehring, Principles of High Resolution NMR in Solids (Springer 1983)</a>.</p>
+<p>For an axially symmetric interaction it is given by:</p>
+<div class="math" id="iax">
+<span id="index-20"></span>\[\begin{split}I_{\mathrm ax}(f)=\left\{\begin{matrix} \frac{1}{2\sqrt{(f_\parallel-f_\perp)(f-f_\perp)}}&amp; f\in(f_\perp,f_\parallel)\cup(f_\parallel,f_\perp)\\[6pt] 0 &amp; \text{otherwise}\end{matrix} \right.\end{split}\]</div>
+<p>where <span class="math">\(f_\parallel\)</span> and <span class="math">\(f_\perp\)</span> are the frequencies that would be observed if the field is oriented paralell or perpendicular to the symmetry axis, respectively.</p>
+<div class="line-block">
+<div class="line">In case of a completely anisotropic interaction, the powder average can be described by the frequencies along the three principle axis <span class="math">\(f_1,f_2,f_3\)</span>.</div>
+<div class="line">Assume without loss of generality that <span class="math">\(f_1&lt;f_2&lt;f_3\)</span>, then</div>
+</div>
+<div class="math" id="ianiso">
+<span id="index-21"></span>\[\begin{split}I(f)&amp;=\left\{\begin{matrix}
+  \frac{K(m)}{\pi\sqrt{(f-f_1)(f_3-f_2)}},&amp; f_3\geq f&gt;f_2 \\[9pt]
+  \frac{K(m)}{\pi\sqrt{(f_3-f)(f_2-f_1)}},&amp; f_2&gt;f\geq f_1\\[9pt]
+  0 &amp; \text{otherwise}
+\end{matrix} \right.  \\
+  \\
+m&amp;=\left\{\begin{matrix}
+  \frac{(f_2-f_1)(f_3-f)}{(f_3-f_2)(f-f_1)},&amp; f_3\geq f&gt;f_2 \\[6pt]
+  \frac{(f-f_1)(f_3-f_2)}{(f_3-f)(f_2-f_1)},&amp; f_2&gt;f\geq f_1\\[6pt]
+\end{matrix} \right.  \\
+  \\
+K(m)&amp;=\int_0^{\pi/2}\frac{\mathrm d\varphi}{\sqrt{1-m^2\sin^2{\varphi}}},\end{split}\]</div>
+<p><span class="math">\(K(m)\)</span> is the complete elliptic integral of the first kind.</p>
+<div class="section" id="id1">
+<h4>Functions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
+<p>The <tt class="docutils literal"><span class="pre">libLineProfile</span></tt> library currently contains the following functions:</p>
+<p id="index-22"><strong>Gaussian</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile LineGauss 1 2
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>center of the line <span class="math">\(f_0\)</span></li>
+<li>FWHM of the line <span class="math">\(\sigma\)</span></li>
+</ol>
+<div class="line-block">
+<div class="line">The height of the peak is 1.</div>
+<div class="line">The functional form is given by</div>
+</div>
+<div class="math">
+\[A(f)=e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}}\]</div>
+<p id="index-23"><strong>Lorentzian</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile LineLorentzian 1 2
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>center of the line <span class="math">\(f_0\)</span></li>
+<li>FWHM of the line <span class="math">\(w\)</span></li>
+</ol>
+<div class="line-block">
+<div class="line">The height of the peak is 1.</div>
+<div class="line">The functional form is given by</div>
+</div>
+<div class="math">
+\[A(f)= \frac{w^2}{4(f-f_0)^2+w^2}\]</div>
+<p id="index-24"><strong>Laplacian</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile LineLaplace 1 2
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>center of the line <span class="math">\(f_0\)</span></li>
+<li>FWHM of the line <span class="math">\(w\)</span></li>
+</ol>
+<div class="line-block">
+<div class="line">The height of the peak is 1.</div>
+<div class="line">The functional form is given by</div>
+</div>
+<div class="math">
+\[A(f)=e^{-2\ln 2 \left|\frac{f-f_0}{w}\right|}\]</div>
+<p id="index-25"><strong>Skewed Lorentzian</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile LineSkewLorentzian 1 2 3
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>center of the line <span class="math">\(f_0\)</span></li>
+<li>width of the line <span class="math">\(w\)</span></li>
+<li>skewness parameter <span class="math">\(a\)</span></li>
+</ol>
+<div class="line-block">
+<div class="line">The height of the peak is 1.</div>
+<div class="line">The functional form is given by</div>
+</div>
+<div class="math">
+\[A(f)=  \frac{w w_a}{4(f-f_0)^2+w_a^2}, \quad w_a=\frac{2w}{1+e^{a(f-f_0)}}\]</div>
+<p id="index-26"><strong>Skewed Lorentzian 2</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile LineSkewLorentzian2 1 2 3
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>center of the line <span class="math">\(f_0\)</span></li>
+<li>width left of the center <span class="math">\(w_1\)</span></li>
+<li>width right of the center <span class="math">\(w_2\)</span></li>
+</ol>
+<div class="line-block">
+<div class="line">The height of the peak is 1.</div>
+<div class="line">The functional form is given by</div>
+</div>
+<div class="math">
+\[\begin{split}A(f)=  \left\{\begin{matrix}\frac{{w_1}^2}{4{(f-f_0)}^2+{w_1}^2},&amp;f\leq f_0\\[9pt] \frac{{w_2}^2}{4{(f-f_0)}^2+{w_2}^2},&amp;f&gt;f_0\end{matrix}\right.\end{split}\]</div>
+<p id="index-27"><strong>Powder average of an axially symmetric interaction convoluted with a Lorentzian</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile PowderLineAxialLor 1 2 3
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>frequency for the field oriented paralell to the symmetry axis <span class="math">\(f_\parallel\)</span></li>
+<li>frequency for the field oriented perpendicular to the symmetry axis <span class="math">\(f_\parallel\)</span></li>
+<li>FWHM of the Lorentzian <span class="math">\(w\)</span></li>
+</ol>
+<div class="line-block">
+<div class="line">The height of the peak is <span class="math">\(\sim\)</span>1.</div>
+<div class="line">The functional form is given by</div>
+</div>
+<div class="math">
+\[A(f)= I_{\mathrm ax}(f)\circledast\left( \frac{w^2}{4f^2+w^2} \right)\]</div>
+<p>with <span class="math">\(I_{\mathrm ax}(f)\)</span> defined <a class="reference internal" href="#iax"><em>above</em></a>.</p>
+<p id="index-28"><strong>Powder average of an axially symmetric interaction convoluted with a Gaussian</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile PowderLineAxialGss 1 2 3
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li>frequency for the field oriented paralell to the symmetry axis <span class="math">\(f_\parallel\)</span></li>
+<li>frequency for the field oriented perpendicular to the symmetry axis <span class="math">\(f_\parallel\)</span></li>
+<li>FWHM of the Gaussian <span class="math">\(\sigma\)</span></li>
+</ol>
+<div class="line-block">
+<div class="line">The height of the peak is <span class="math">\(\sim\)</span>1.</div>
+<div class="line">The functional form is given by</div>
+</div>
+<div class="math">
+\[A(f)= I_{\mathrm ax}(f)\circledast\left( e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}} \right)\]</div>
+<p>with <span class="math">\(I_{\mathrm ax}(f)\)</span> defined <a class="reference internal" href="#iax"><em>above</em></a>.</p>
+<p id="index-29"><strong>Powder average of an anisotropic interaction convoluted with a Lorentzian</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile PowderLineAsymLor 1 2 3 4
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li><span class="math">\(f_1\)</span></li>
+<li><span class="math">\(f_1\)</span></li>
+<li><span class="math">\(f_3\)</span> frequencies along the principal axes</li>
+<li>FWHM of the Lorentzian <span class="math">\(w\)</span></li>
+</ol>
+<div class="line-block">
+<div class="line">The height of the peak is <span class="math">\(\sim\)</span>1.</div>
+<div class="line">The functional form is given by</div>
+</div>
+<div class="math">
+\[A(f)= I(f)\circledast\left( \frac{w^2}{4f^2+w^2} \right)\]</div>
+<p>with <span class="math">\(I(f)\)</span> defined <a class="reference internal" href="#ianiso"><em>above</em></a>. Note that <span class="math">\(f_1&lt;f_2&lt;f_3\)</span> is not required by the code.</p>
+<p id="index-30"><strong>Powder average of an anisotropic interaction convoluted with a Gaussian</strong></p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile PowderLineAsymGss 1 2 3 4
+</pre></div>
+</div>
+<p>The parameters are:</p>
+<ol class="arabic simple">
+<li><span class="math">\(f_1\)</span></li>
+<li><span class="math">\(f_1\)</span></li>
+<li><span class="math">\(f_3\)</span> frequencies along the principal axes</li>
+<li>FWHM of the Gaussian <span class="math">\(\sigma\)</span></li>
+</ol>
+<div class="line-block">
+<div class="line">The height of the peak is <span class="math">\(\sim\)</span>1.</div>
+<div class="line">The functional form is given by</div>
+</div>
+<div class="math">
+\[A(f)= I(f)\circledast\left( e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}} \right)\]</div>
+<p>with <span class="math">\(I(f)\)</span> defined <a class="reference internal" href="#ianiso"><em>above</em></a>. Note that <span class="math">\(f_1&lt;f_2&lt;f_3\)</span> is not required by the code.</p>
+</div>
+</div>
+</div>
 </div>
 
 
@@ -386,6 +613,11 @@ The expected name of the <tt class="docutils literal"><span class="pre">RGE</spa
 </ul>
 </li>
 <li><a class="reference internal" href="#nonlocal-superconductivity-related-meissner-screening-functions-as-libs">Nonlocal superconductivity related Meissner screening functions (AS libs)</a></li>
+<li><a class="reference internal" href="#functions-to-analyze-bgr-nmr-data-bnmr-libs">Functions to analyze β-NMR data (BNMR libs)</a><ul>
+<li><a class="reference internal" href="#libbnmr">libBNMR</a></li>
+<li><a class="reference internal" href="#liblineprofile">libLineProfile</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -435,7 +667,7 @@ The expected name of the <tt class="docutils literal"><span class="pre">RGE</spa
     </div>
     <div class="footer">
         &copy; Copyright 2018, Andreas Suter.
-      Last updated on Jul 03, 2018.
+      Last updated on Aug 23, 2018.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>

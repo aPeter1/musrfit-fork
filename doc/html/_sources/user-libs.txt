@@ -407,3 +407,341 @@ Nonlocal superconductivity related Meissner screening functions (AS libs)
 -------------------------------------------------------------------------
 
 To be written yet ...
+  
+.. index:: BNMR-libs
+.. _BNMR-libs:
+
+Functions to analyze |bgr|-NMR data (BNMR libs) 
+-------------------------------------------------------------------------
+
+This is a collection of ``C++`` classes using the ``musrfit`` :ref:`user-functions <user-functions>` 
+interface in order to facilitate the usage in conjunction with ``musrfit``. It consists of two libraries: 
+
+* ``libBNMR`` contains functions to fit spin lattice relaxation (SLR) data.
+* ``libLineProfile`` contains functions to fit resonance lineshapes.
+
+
+.. note:: 
+
+  Currently it is recommended to read in the data in ASCII format as a non-|mgr|\SR fit  :ref:`(fit type 8) <non-musr-fit>`.
+
+.. index:: libBNMR
+
+libBNMR
+++++++++++
+
+In |bgr|-NMR the SLR is usually measured by implanting a pulse of :math:`^8`\ Li with a length :math:`t_0` into the sample. 
+The asymmetry is measured both during the pulse and afterwards. For a a general spin relaxation function :math:`f(t)` the time evolution of the asymmetry is then given by [`Z. Salman, et al., PRL 96, 147601 (2006) <http://dx.doi.org/10.1103/PhysRevLett.96.147601>`_]: 
+
+
+
+.. index:: SLR
+.. _SLR:
+
+.. math::  
+   P(t) = \left\{\begin{matrix}
+  \frac{\int_0^t e^{-(t-t')/\tau_{\mathrm{Li}}}f(t-t')dt'}{\int_0^t e^{-t'/\tau_{\mathrm{Li}}}dt' }       &  t\leq t_0\\[6pt]
+  \frac{\int_0^{t_0}e^{-(t_0-t')/\tau_{\mathrm{Li}}}f(t-t')dt'}{\int_0^{t_0}e^{-t'/\tau_{\mathrm{Li}}}dt'}    &  t> t_0,
+  \end{matrix}\right.
+
+where :math:`\tau_{\mathrm{Li}}=1.21`\ s is the :math:`^8`\ Li lifetime.
+
+
+Functions
+^^^^^^^^^^^^
+The ``libLineProfile`` library currently contains the following functions:
+
+
+
+
+.. index:: ExpRlx
+
+**Exponential relaxation**
+
+::
+
+  userFcn libBNMR ExpRlx 1 2
+
+The parameters are:
+
+#. pulse length :math:`t_0` (ms)
+#. relaxation rate :math:`\sigma` (ms\ :math:`^{-1}`\ )
+
+This function implements :math:`f(t)=e^{-\sigma t}`.
+
+.. index:: SExpRlx
+
+**Stretched exponential relaxation**
+
+::
+
+  userFcn libBNMR SExpRlx 1 2 3
+
+The parameters are:
+
+#. pulse length :math:`t_0` (ms)
+#. relaxation rate :math:`\sigma` (ms\ :math:`^{-1}`\ )
+#. stretching exponent :math:`\beta`
+
+This function implements :math:`f(t)=e^{-(\sigma t)^{\beta}}`.
+
+
+  
+.. index:: libLineProfile
+
+libLineProfile
++++++++++++++++++
+In addition to some simple line shapes ``libLineProfile`` contains functions to fit chemical shift anisotropies in the powder average.
+Their functional form can be found in  `M. Mehring, Principles of High Resolution NMR in Solids (Springer 1983) <http://dx.doi.org/10.1007/978-3-642-68756-3_2>`_.
+
+For an axially symmetric interaction it is given by:
+
+.. index:: Iax
+.. _Iax:
+
+.. math::
+
+      I_{\mathrm ax}(f)=\left\{\begin{matrix} \frac{1}{2\sqrt{(f_\parallel-f_\perp)(f-f_\perp)}}& f\in(f_\perp,f_\parallel)\cup(f_\parallel,f_\perp)\\[6pt] 0 & \text{otherwise}\end{matrix} \right.
+
+where :math:`f_\parallel` and :math:`f_\perp` are the frequencies that would be observed if the field is oriented paralell or perpendicular to the symmetry axis, respectively.
+
+
+| In case of a completely anisotropic interaction, the powder average can be described by the frequencies along the three principle axis :math:`f_1,f_2,f_3`.
+| Assume without loss of generality that :math:`f_1<f_2<f_3`, then
+
+.. index:: Ianiso
+.. _Ianiso:
+
+.. math::  
+      I(f)&=\left\{\begin{matrix}
+        \frac{K(m)}{\pi\sqrt{(f-f_1)(f_3-f_2)}},& f_3\geq f>f_2 \\[9pt]
+        \frac{K(m)}{\pi\sqrt{(f_3-f)(f_2-f_1)}},& f_2>f\geq f_1\\[9pt]
+        0 & \text{otherwise}
+      \end{matrix} \right.  \\
+ 	\\
+      m&=\left\{\begin{matrix}
+        \frac{(f_2-f_1)(f_3-f)}{(f_3-f_2)(f-f_1)},& f_3\geq f>f_2 \\[6pt]
+        \frac{(f-f_1)(f_3-f_2)}{(f_3-f)(f_2-f_1)},& f_2>f\geq f_1\\[6pt]
+      \end{matrix} \right.  \\
+ 	\\
+      K(m)&=\int_0^{\pi/2}\frac{\mathrm d\varphi}{\sqrt{1-m^2\sin^2{\varphi}}},
+
+
+:math:`K(m)` is the complete elliptic integral of the first kind.
+
+
+
+Functions
+^^^^^^^^^^^^
+The ``libLineProfile`` library currently contains the following functions:
+
+
+
+
+.. index:: LineGauss
+
+**Gaussian**
+
+::
+
+  userFcn  libLineProfile LineGauss 1 2
+
+The parameters are:
+
+#. center of the line :math:`f_0`
+#. FWHM of the line :math:`\sigma`
+
+| The height of the peak is 1.
+| The functional form is given by
+
+.. math::
+   A(f)=e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}}
+
+
+.. index:: LineLorentzian
+
+**Lorentzian**
+
+::
+
+  userFcn  libLineProfile LineLorentzian 1 2
+
+The parameters are:
+
+#. center of the line :math:`f_0`
+#. FWHM of the line :math:`w`
+
+| The height of the peak is 1. 
+| The functional form is given by
+
+.. math::
+    A(f)= \frac{w^2}{4(f-f_0)^2+w^2}
+
+
+.. index:: LineLaplace
+
+**Laplacian**
+
+::
+
+  userFcn  libLineProfile LineLaplace 1 2
+
+The parameters are:
+
+#. center of the line :math:`f_0`
+#. FWHM of the line :math:`w`
+
+| The height of the peak is 1. 
+| The functional form is given by
+
+.. math::
+ A(f)=e^{-2\ln 2 \left|\frac{f-f_0}{w}\right|}
+
+
+
+.. index:: LineSkewLorentzian
+
+**Skewed Lorentzian**
+
+::
+
+  userFcn  libLineProfile LineSkewLorentzian 1 2 3
+
+The parameters are:
+
+#. center of the line :math:`f_0`
+#. width of the line :math:`w`
+#. skewness parameter :math:`a`
+
+| The height of the peak is 1. 
+| The functional form is given by
+
+.. math::
+    A(f)=  \frac{w w_a}{4(f-f_0)^2+w_a^2}, \quad w_a=\frac{2w}{1+e^{a(f-f_0)}}
+
+
+
+.. index:: LineSkewLorentzian2
+
+**Skewed Lorentzian 2**
+
+::
+
+  userFcn  libLineProfile LineSkewLorentzian2 1 2 3
+
+The parameters are:
+
+#. center of the line :math:`f_0`
+#. width left of the center :math:`w_1`
+#. width right of the center :math:`w_2`
+
+| The height of the peak is 1. 
+| The functional form is given by
+
+.. math::
+    A(f)=  \left\{\begin{matrix}\frac{{w_1}^2}{4{(f-f_0)}^2+{w_1}^2},&f\leq f_0\\[9pt] \frac{{w_2}^2}{4{(f-f_0)}^2+{w_2}^2},&f>f_0\end{matrix}\right.
+
+
+
+.. index:: PowderLineAxialLor
+
+
+**Powder average of an axially symmetric interaction convoluted with a Lorentzian**
+
+::
+
+  userFcn  libLineProfile PowderLineAxialLor 1 2 3
+
+The parameters are:
+
+#.  frequency for the field oriented paralell to the symmetry axis :math:`f_\parallel`
+#.  frequency for the field oriented perpendicular to the symmetry axis :math:`f_\parallel`
+#.  FWHM of the Lorentzian :math:`w`
+
+| The height of the peak is :math:`\sim`\ 1. 
+| The functional form is given by
+
+.. math::
+    A(f)= I_{\mathrm ax}(f)\circledast\left( \frac{w^2}{4f^2+w^2} \right)
+
+with :math:`I_{\mathrm ax}(f)` defined :ref:`above <Iax>`.
+
+    
+
+.. index:: PowderLineAxialGss
+
+
+**Powder average of an axially symmetric interaction convoluted with a Gaussian**
+
+::
+
+  userFcn  libLineProfile PowderLineAxialGss 1 2 3
+
+The parameters are:
+
+#.  frequency for the field oriented paralell to the symmetry axis :math:`f_\parallel`
+#.  frequency for the field oriented perpendicular to the symmetry axis :math:`f_\parallel`
+#. FWHM of the Gaussian :math:`\sigma`
+
+| The height of the peak is :math:`\sim`\ 1. 
+| The functional form is given by
+
+.. math::
+    A(f)= I_{\mathrm ax}(f)\circledast\left( e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}} \right)
+
+with :math:`I_{\mathrm ax}(f)` defined :ref:`above <Iax>`.
+
+  
+
+.. index:: PowderLineAsymLor
+
+
+**Powder average of an anisotropic interaction convoluted with a Lorentzian**
+
+::
+
+  userFcn  libLineProfile PowderLineAsymLor 1 2 3 4
+
+The parameters are:
+
+#.   :math:`f_1`
+#.   :math:`f_1`
+#.   :math:`f_3` frequencies along the principal axes
+#. FWHM of the Lorentzian :math:`w`
+
+| The height of the peak is :math:`\sim`\ 1. 
+| The functional form is given by
+
+.. math::
+    A(f)= I(f)\circledast\left( \frac{w^2}{4f^2+w^2} \right)
+
+with :math:`I(f)` defined :ref:`above <Ianiso>`. Note that :math:`f_1<f_2<f_3` is not required by the code.
+  
+    
+    
+.. index:: PowderLineAsymGss
+
+
+**Powder average of an anisotropic interaction convoluted with a Gaussian**
+
+::
+
+  userFcn  libLineProfile PowderLineAsymGss 1 2 3 4
+
+The parameters are:
+
+#.   :math:`f_1`
+#.   :math:`f_1`
+#.   :math:`f_3` frequencies along the principal axes
+#. FWHM of the Gaussian :math:`\sigma`
+
+| The height of the peak is :math:`\sim`\ 1. 
+| The functional form is given by
+
+.. math::
+    A(f)= I(f)\circledast\left( e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}} \right)
+
+with :math:`I(f)` defined :ref:`above <Ianiso>`. Note that :math:`f_1<f_2<f_3` is not required by the code.
+
+
+
