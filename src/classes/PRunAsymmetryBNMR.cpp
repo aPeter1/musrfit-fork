@@ -860,10 +860,10 @@ Bool_t PRunAsymmetryBNMR::SubtractEstimatedBkg()
   }
   errBkgp[1] = TMath::Sqrt(bkgp[1])/(end[1] - start[1] + 1);
   bkgp[1] /= static_cast<Double_t>(end[1] - start[1] + 1);
-  cout << endl << ">> estimated pos hel backward histo background: " << bkgp[1] << endl;
+  cout << endl << ">> estimated pos hel backward histo background: " << bkgp[1];
   errBkgm[1] = TMath::Sqrt(bkgm[1])/(end[1] - start[1] + 1);
   bkgm[1] /= static_cast<Double_t>(end[1] - start[1] + 1);
-  cout << endl << ">> estimated neg hel backward histo background: " << bkgm[1] << endl;
+  cout << endl << ">> estimated neg hel backward histo background: " << bkgm[1];
 
   // correct error for forward, backward
   Double_t errVal = 0.0;
@@ -903,11 +903,9 @@ Bool_t PRunAsymmetryBNMR::SubtractEstimatedBkg()
   fRunInfo->SetBkgEstimated(bkgm[0], 3);
   fRunInfo->SetBkgEstimated(bkgm[1], 4);
 
-  cout << "I am here 1 " << endl;
   // Get estimate for alpha once
   Double_t alpha;
   alpha = EstimateAlpha();
-  cout << "I am here 2 " << alpha << endl;
   fRunInfo->SetEstimatedAlpha(alpha);
 
   
