@@ -87,6 +87,7 @@ class PRunAsymmetryBNMR : public PRunBase
     virtual Bool_t GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalBlock, PUIntVector &forwardHisto, PUIntVector &backwardHistoNo);
     virtual Bool_t GetProperDataRange(PRawRunData* runData, UInt_t histoNo[2]);
     virtual void GetProperFitRange(PMsrGlobalBlock *globalBlock);
+    virtual Double_t EstimateAlpha();
 };
 
 #endif // _PRUNASYMMETRYBNMR_H_

@@ -106,12 +106,13 @@ PRunAsymmetryBNMR::PRunAsymmetryBNMR(PMsrHandler *msrInfo, PRunDataHandler *rawD
 
   // check if alpha is given
   Bool_t alphaFixedToOne = false;
+  Bool_t alphaSetDefault = false;
   if (fRunInfo->GetAlphaParamNo() == -1) { // no alpha given
     //    cerr << endl << ">> PRunAsymmetryBNMR::PRunAsymmetryBNMR(): **ERROR** no alpha parameter given! This is needed for an asymmetry fit!";
     //    cerr << endl;
     //    fValid = false;
     //    return;
-    alphaFixedToOne = true;
+    alphaSetDefault = true;
   } else if ((fRunInfo->GetAlphaParamNo() < 0) || (fRunInfo->GetAlphaParamNo() > (Int_t)param->size())) {  // check if alpha parameter is within proper bounds
     cerr << endl << ">> PRunAsymmetryBNMR::PRunAsymmetryBNMR(): **ERROR** alpha parameter no = " << fRunInfo->GetAlphaParamNo();
     cerr << endl << ">> This is out of bound, since there are only " << param->size() << " parameters.";
@@ -141,12 +142,16 @@ PRunAsymmetryBNMR::PRunAsymmetryBNMR(PMsrHandler *msrInfo, PRunDataHandler *rawD
   }
 
   // set fAlphaBetaTag
-  if (alphaFixedToOne && betaFixedToOne)       // alpha == 1, beta == 1
+  if (alphaFixedToOne && betaFixedToOne)                          // alpha == 1, beta == 1
     fAlphaBetaTag = 1;
-  else if (!alphaFixedToOne && betaFixedToOne) // alpha != 1, beta == 1
+  else if (!alphaFixedToOne && betaFixedToOne & !alphaSetDefault) // alpha != 1, beta == 1
     fAlphaBetaTag = 2;
-  else if (alphaFixedToOne && !betaFixedToOne) // alpha == 1, beta != 1
+  else if (alphaFixedToOne && !betaFixedToOne)                    // alpha == 1, beta != 1
     fAlphaBetaTag = 3;
+  else if (!alphaFixedToOne && betaFixedToOne & alphaSetDefault)  // alpha ??, beta == 1
+    fAlphaBetaTag = 5;
+  else if (!alphaFixedToOne && !betaFixedToOne & alphaSetDefault) // alpha ??, beta != 1
+    fAlphaBetaTag = 6;
   else
     fAlphaBetaTag = 4;
 
@@ -198,7 +203,7 @@ Double_t PRunAsymmetryBNMR::CalcChiSquare(const std::vector<Double_t>& par)
   }
 
   // calculate chi square
-  Double_t time(1.0);
+  Double_t time(1.0),alphaest;
   Int_t i;
 
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
@@ -206,6 +211,7 @@ Double_t PRunAsymmetryBNMR::CalcChiSquare(const std::vector<Double_t>& par)
   // for a given set of parameters---which should be done outside of the parallelized loop.
   // For all other functions it means a tiny and acceptable overhead.
   asymFcnValue = fTheory->Func(time, par, fFuncValues);
+  alphaest = fRunInfo->GetEstimatedAlpha();
 
   #ifdef HAVE_GOMP
   Int_t chunk = (fEndTimeBin - fStartTimeBin)/omp_get_num_procs();
@@ -231,6 +237,17 @@ Double_t PRunAsymmetryBNMR::CalcChiSquare(const std::vector<Double_t>& par)
         break;
       case 4: // alpha != 1, beta != 1
         a = par[fRunInfo->GetAlphaParamNo()-1];
+        b = par[fRunInfo->GetBetaParamNo()-1];
+        f = fTheory->Func(time, par, fFuncValues)/2.0;
+        asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
+        break;
+      case 5: // alpha ?? , beta == 1
+        a = alphaest;
+        f = fTheory->Func(time, par, fFuncValues)/2.0;
+        asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0)) - (-f*(a+1.0)-(a-1.0))/((a+1.0)+f*(a-1.0));
+        break;
+      case 6: // alpha ??, beta != 1
+        a = alphaest;
         b = par[fRunInfo->GetBetaParamNo()-1];
         f = fTheory->Func(time, par, fFuncValues)/2.0;
         asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
@@ -425,8 +442,12 @@ void PRunAsymmetryBNMR::CalcTheory()
 
   // calculate asymmetry
   Double_t asymFcnValue = 0.0;
-  Double_t a, b, f;
+  Double_t a, b, f, alphaest;
   Double_t time;
+
+  // Get estimated alpha
+  alphaest = fRunInfo->GetEstimatedAlpha();
+
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
     time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
     switch (fAlphaBetaTag) {
@@ -436,18 +457,29 @@ void PRunAsymmetryBNMR::CalcTheory()
       case 2: // alpha != 1, beta == 1
         a = par[fRunInfo->GetAlphaParamNo()-1];
         f = fTheory->Func(time, par, fFuncValues);
-        asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0));
+        asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0)) - (-f*(a+1.0)-(a-1.0))/((a+1.0)+f*(a-1.0));
         break;
       case 3: // alpha == 1, beta != 1
         b = par[fRunInfo->GetBetaParamNo()-1];
         f = fTheory->Func(time, par, fFuncValues);
-        asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0));
+        asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0))-f*(b+1.0)/(2.0+f*(b-1.0));
         break;
       case 4: // alpha != 1, beta != 1
         a = par[fRunInfo->GetAlphaParamNo()-1];
         b = par[fRunInfo->GetBetaParamNo()-1];
         f = fTheory->Func(time, par, fFuncValues);
-        asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0));
+        asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
+        break;
+      case 5: // alpha ?? , beta == 1
+        a = alphaest;
+        f = fTheory->Func(time, par, fFuncValues);
+        asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0)) - (-f*(a+1.0)-(a-1.0))/((a+1.0)+f*(a-1.0));
+        break;
+      case 6: // alpha ??, beta != 1
+        a = alphaest;
+        b = par[fRunInfo->GetBetaParamNo()-1];
+        f = fTheory->Func(time, par, fFuncValues);
+        asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
         break;
       default:
         asymFcnValue = 0.0;
@@ -871,6 +903,14 @@ Bool_t PRunAsymmetryBNMR::SubtractEstimatedBkg()
   fRunInfo->SetBkgEstimated(bkgm[0], 3);
   fRunInfo->SetBkgEstimated(bkgm[1], 4);
 
+  cout << "I am here 1 " << endl;
+  // Get estimate for alpha once
+  Double_t alpha;
+  alpha = EstimateAlpha();
+  cout << "I am here 2 " << alpha << endl;
+  fRunInfo->SetEstimatedAlpha(alpha);
+
+  
   return true;
 }
 
@@ -903,14 +943,8 @@ Bool_t PRunAsymmetryBNMR::PrepareFitData()
   Double_t valuem = 0.0;
   Double_t errorm = 0.0;
 
-  Double_t SumF[2]    = {0.0, 0.0};
-  Double_t SumB[2]    = {0.0, 0.0};
-  Double_t alphaest   = 1;
-  
   // forward
   for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
-    SumF[0] += fForwardp[i];
-    SumF[1] += fForwardm[i];    
     if (fPacking == 1) {
       forwardpPacked.AppendValue(fForwardp[i]);
       forwardpPacked.AppendErrorValue(fForwardpErr[i]);
@@ -948,8 +982,6 @@ Bool_t PRunAsymmetryBNMR::PrepareFitData()
 
   // backward
   for (Int_t i=fGoodBins[2]; i<fGoodBins[3]; i++) {
-    SumB[0] += fBackwardp[i];
-    SumB[1] += fBackwardm[i];    
     if (fPacking == 1) {
       backwardpPacked.AppendValue(fBackwardp[i]);
       backwardpPacked.AppendErrorValue(fBackwardpErr[i]);
@@ -985,10 +1017,6 @@ Bool_t PRunAsymmetryBNMR::PrepareFitData()
     }
   }
 
-  // Spit out estimated alpha value from total counts (Bp+Bm)/(Fp+Fm)
-  alphaest = (SumB[0]+SumB[1])/(SumF[0]+SumF[1]);
-  cout << endl << ">> PRunAsymmetryBNMR::PrepareFitData(): alpha estimate=" << alphaest << endl;  
-  
   // check if packed forward and backward hist have the same size, otherwise take the minimum size
   UInt_t noOfBins = forwardpPacked.GetValue()->size();
   if (forwardpPacked.GetValue()->size() != backwardpPacked.GetValue()->size()) {
@@ -1249,13 +1277,16 @@ Bool_t PRunAsymmetryBNMR::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2
 
   // form asymmetry including error propagation
   Double_t asym;
-  Double_t fp, bp, efp, ebp, alpha = 1.0, beta = 1.0;
+  Double_t fp, bp, efp, ebp, alpha, beta = 1.0;
   Double_t fm, bm, efm, ebm;
   // set data time start, and step
   // data start at data_start-t0
   fData.SetDataTimeStart(fTimeResolution*((Double_t)start[0]-t0[0]+(Double_t)(packing-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*(Double_t)packing);
 
+  // Get estimate for alpha once
+  alpha = EstimateAlpha();
+      
   // get the proper alpha and beta
   switch (fAlphaBetaTag) {
     case 1: // alpha == 1, beta == 1
@@ -1272,6 +1303,14 @@ Bool_t PRunAsymmetryBNMR::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2
       break;
     case 4: // alpha != 1, beta != 1
       alpha = par[fRunInfo->GetAlphaParamNo()-1];
+      beta  = par[fRunInfo->GetBetaParamNo()-1];
+      break;
+    case 5: // alpha ?? , beta == 1
+      // use estimated value
+      beta  = 1.0;
+      break;
+    case 6: // alpha ??, beta != 1
+      // use estimated value
       beta  = par[fRunInfo->GetBetaParamNo()-1];
       break;
     default:
@@ -1700,4 +1739,44 @@ void PRunAsymmetryBNMR::GetProperFitRange(PMsrGlobalBlock *globalBlock)
     cerr << ">> PRunSingleHisto::GetProperFitRange(): **WARNING** Couldn't get fit start/end time!" << endl;
     cerr << ">>    Will set it to fgb/lgb which given in time is: " << fFitStartTime << "..." << fFitEndTime << " (usec)" << endl;
   }
+}
+
+
+//--------------------------------------------------------------------------
+// EstimateAlpha (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get an estimate for alpha from the forward and backward histograms
+ *
+ * \param globalBlock pointer to the GLOBAL block information form the msr-file.
+ */
+Double_t PRunAsymmetryBNMR::EstimateAlpha()
+{
+
+  Double_t SumF[2]    = {0.0, 0.0};
+  Double_t SumB[2]    = {0.0, 0.0};
+  Double_t alpha      = 1;
+  
+
+  // forward
+  for (Int_t i=0; i<fForwardp.size(); i++) {
+    SumF[0] += fForwardp[i];
+    SumF[1] += fForwardm[i];
+  }
+
+  // backward
+  for (Int_t i=0; i<fBackwardp.size(); i++) {
+    SumB[0] += fBackwardp[i];
+    SumB[1] += fBackwardm[i];    
+  }  
+
+  // Spit out estimated alpha value from total counts (Bp+Bm)/(Fp+Fm)
+  if ( (SumF[0]+SumF[1]) == 0) {
+    alpha = 1;
+  } else {
+    alpha = (SumB[0]+SumB[1])/(SumF[0]+SumF[1]);
+  }
+  cout << endl << ">> PRunAsymmetryBNMR::EstimateAlpha(): alpha estimate=" << alpha << endl;
+
+  return alpha;
 }
