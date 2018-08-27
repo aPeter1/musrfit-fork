@@ -49,6 +49,7 @@ add_executable(any2many git-revision.h any2many.cpp)
 target_compile_options(any2many BEFORE PRIVATE "-DHAVE_CONFIG_H")
 target_include_directories(any2many 
   BEFORE PRIVATE
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
@@ -93,6 +94,7 @@ add_executable(musrfit git-revision.h musrfit.cpp)
 target_compile_options(musrfit BEFORE PRIVATE "-DHAVE_CONFIG_H")
 target_include_directories(musrfit 
   BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
@@ -104,6 +106,7 @@ add_executable(musrFT git-revision.h musrFT.cpp)
 target_compile_options(musrFT BEFORE PRIVATE "-DHAVE_CONFIG_H")
 target_include_directories(musrFT 
   BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
@@ -127,6 +130,7 @@ add_executable(musrt0 git-revision.h musrt0.cpp)
 target_compile_options(musrt0 BEFORE PRIVATE "-DHAVE_CONFIG_H")
 target_include_directories(musrt0 
   BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
@@ -138,6 +142,7 @@ add_executable(musrview git-revision.h musrview.cpp)
 target_compile_options(musrview BEFORE PRIVATE "-DHAVE_CONFIG_H")
 target_include_directories(musrview 
   BEFORE PRIVATE
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
