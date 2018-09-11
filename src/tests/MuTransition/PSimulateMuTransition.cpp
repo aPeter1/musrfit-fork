@@ -172,6 +172,8 @@ void PSimulateMuTransition::PrintSettings() const
   cout << endl << "Muonium fraction state34              = " << fMuFractionState34;
   cout << endl << "Muonium fraction state23              = " << fMuFractionState23;
   cout << endl << "Muonium fraction state14              = " << fMuFractionState14;
+  cout << endl << "Muonium fraction state13              = " << fMuFractionState13;
+  cout << endl << "Muonium fraction state24              = " << fMuFractionState24;
   cout << endl << "Number of particles to simulate       = " << fNmuons;
   cout << endl << "Print progress on screen frequency    = " << fNshowProgress;
   cout << endl << "Initial muon spin phase (degree)      = " << fInitialPhase;

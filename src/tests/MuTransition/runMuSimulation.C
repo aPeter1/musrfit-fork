@@ -89,6 +89,11 @@ void runMuSimulation()
   Double_t Asym          = 0.27;   //muon decay asymmetry
   Int_t    debugFlag     = 0;      //print debug information on screen
   
+  TTimeStamp *timeStampStart = new TTimeStamp();
+  cout << endl << "Simulation started on:" << endl;
+  timeStampStart->Print("l);
+  cout << endl;
+  
   histogramFileName  = TString("0");
   histogramFileName += runNo;
   histogramFileName += TString(".root");
@@ -97,6 +102,8 @@ void runMuSimulation()
   runTitle  = TString("0");
   runTitle += runNo;
   runTitle += TString(titleStr);
+  
+  cout << runTitle << endl << endl;
 
   PSimulateMuTransition *simulateMuTransition = new PSimulateMuTransition();
   if (!simulateMuTransition->IsValid()){
@@ -249,6 +256,11 @@ void runMuSimulation()
   gRunHeader->Write();
   fout->Close();
   cout << "Histograms written to " << histogramFileName.Data() << endl;
+  
+  cout << endl << "Simulation stopped on:" << endl;
+  TTimeStamp *timeStampEnd = new TTimeStamp();
+  timeStampEnd->Print("l");
+  cout << endl;
 
 //   delete fout;
 //   delete header;
