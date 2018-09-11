@@ -100,10 +100,13 @@ PSimulateMuTransition::PSimulateMuTransition(UInt_t seed)
   }
 
   fNmuons           = 100;   // number of muons to simulate
+  fNshowProgress    = 100;   // print progress on screen every fNshowProgress events
   fMuPrecFreq34     = 4463.; // vacuum Mu hyperfine coupling constant
   fMuPrecFreq12     = 0.;    // Mu precession frequency of a 12 transition
   fMuPrecFreq23     = 0.;    // Mu precession frequency of a 23 transition
   fMuPrecFreq14     = 0.;    // Mu precession frequency of a 14 transition
+  fMuPrecFreq13     = 0.;    // Mu precession frequency of a 13 transition
+  fMuPrecFreq24     = 0.;    // Mu precession frequency of a 24 transition
   fMuonPrecFreq     = 0.;    // muon precession frequency
   fBfield           = 0.01;  // magnetic field (T)
   fCaptureRate      = 0.01;  // Mu+ capture rate (MHz)
@@ -118,6 +121,9 @@ PSimulateMuTransition::PSimulateMuTransition(UInt_t seed)
   fMuFractionState34 = 0.25;
   fMuFractionState23 = 0.25;
   fMuFractionState14 = 0.25;
+  fMuFractionState13 = 0.;
+  fMuFractionState24 = 0.;
+  
   fDebugFlag        = kFALSE;
 }
 
@@ -147,6 +153,8 @@ void PSimulateMuTransition::PrintSettings() const
   cout << endl << "Mu0 precession frequency 34 (MHz)  = " << fMuPrecFreq34;
   cout << endl << "Mu0 precession frequency 23 (MHz)  = " << fMuPrecFreq23;
   cout << endl << "Mu0 precession frequency 14 (MHz)  = " << fMuPrecFreq14;
+  cout << endl << "Mu0 precession frequency 13 (MHz)  = " << fMuPrecFreq13;
+  cout << endl << "Mu0 precession frequency 24 (MHz)  = " << fMuPrecFreq24;
   cout << endl << "Mu+ precession frequency    (MHz)  = " << fMuonGyroRatio * fBfield;
   cout << endl << "B field (T)                           = " << fBfield;
   cout << endl << "Mu+ electron capture rate (MHz)       = " << fCaptureRate;
@@ -165,6 +173,7 @@ void PSimulateMuTransition::PrintSettings() const
   cout << endl << "Muonium fraction state23              = " << fMuFractionState23;
   cout << endl << "Muonium fraction state14              = " << fMuFractionState14;
   cout << endl << "Number of particles to simulate       = " << fNmuons;
+  cout << endl << "Print progress on screen frequency    = " << fNshowProgress;
   cout << endl << "Initial muon spin phase (degree)      = " << fInitialPhase;
   cout << endl << "Debug flag                            = " << fDebugFlag;
   cout << endl << endl;
@@ -224,7 +233,7 @@ void PSimulateMuTransition::Run(TH1F *histoForward, TH1F *histoBackward)
     else
       histoBackward->Fill(fMuonDecayTime*1000., 1. - fAsymmetry*TMath::Cos(fMuonPhase));
 
-    if ( (i%100000) == 0) cout << "number of events processed: " << i << endl;
+    if ( (i%fNshowProgress) == 0) cout << "number of events processed: " << i << endl;
   }
   cout << "number of events processed: " << i << endl;
   return;
@@ -291,11 +300,14 @@ TComplex PSimulateMuTransition::GTFunction(const Double_t &time, const TString c
     complexPol = TComplex::Exp(-TComplex::I()*twoPi*fMuonPrecFreq*time);
   else{
     complexPol = 
-     (fMuFractionState12 * TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq12*time) +
+     (fMuFractionState12 * TComplex::Exp(+TComplex::I()*twoPi*fMuPrecFreq12*time) +
       fMuFractionState34 * TComplex::Exp(-TComplex::I()*twoPi*fMuPrecFreq34*time))
       +
-     (fMuFractionState23 * TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq23*time) +
-      fMuFractionState14 * TComplex::Exp(TComplex::I()*twoPi*fMuPrecFreq14*time));  
+     (fMuFractionState23 * TComplex::Exp(+TComplex::I()*twoPi*fMuPrecFreq23*time) +
+      fMuFractionState14 * TComplex::Exp(+TComplex::I()*twoPi*fMuPrecFreq14*time))
+      +
+     (fMuFractionState13 * TComplex::Exp(+TComplex::I()*twoPi*fMuPrecFreq13*time) +
+      fMuFractionState24 * TComplex::Exp(+TComplex::I()*twoPi*fMuPrecFreq24*time));  
   } 
     
   return complexPol;
@@ -354,9 +366,6 @@ Double_t PSimulateMuTransition::GTSpinFlip(const Double_t &time)
  *        after ionization process is given by Px(t_i+1)*Px(t_i).
  *     4) get the next electron capture time, continue until t_d is reached.
  *
- * <p> For isotropic muonium, TF:
- *     nu_12 and nu_34 with equal probabilities, probability for both states fMuFractionState12
- *     ni_23 and nu_14 with equal probabilities, probability for both states fMuFractionState23
  *
  * <p>Calculates Mu0 polarization in x direction during cyclic charge exchange.
  * See M. Senba, J.Phys. B23, 1545 (1990), equations (9), (11)
