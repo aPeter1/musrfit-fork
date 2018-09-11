@@ -27,10 +27,11 @@ my $SUMM_DIR="/afs/psi.ch/project/nemu/data/summ/";
 my %DBDIR=("LEM","/afs/psi.ch/project/nemu/data/log/",
 	"GPS","/afs/psi.ch/project/bulkmusr/olddata/list/",
 	"Dolly","/afs/psi.ch/project/bulkmusr/olddata/list/",
-	"GPD","/afs/psi.ch/project/bulkmusr/olddata/list/",
-	"ALC","/afs/psi.ch/project/bulkmusr/olddata/list/",
-	"HAL","/afs/psi.ch/project/bulkmusr/olddata/list/",
-	"LTF","/afs/psi.ch/project/bulkmusr/olddata/list/");
+        "GPD","/afs/psi.ch/project/bulkmusr/olddata/list/",
+        "ALC","/afs/psi.ch/project/bulkmusr/olddata/list/",
+        "HAL","/afs/psi.ch/project/bulkmusr/olddata/list/",
+        "LTF","/afs/psi.ch/project/bulkmusr/olddata/list/",
+        "ALL","/afs/psi.ch/project/bulkmusr/olddata/list/");
 
 # Information available since
 my %MinYears=("LEM","2001",
@@ -56,7 +57,7 @@ sub CreateMSRUni {
 #
 # Input in %All
 # Required:
-#  $All{"FitType1/2/3"} - Function types, 3 components
+#  $All{"FitTypei"}     - Function types, i components
 #  $All{"LRBF"}         - Histograms, comma separated
 #  $All{"Tis"}           
 #  $All{"Tfs"}
@@ -86,10 +87,11 @@ sub CreateMSRUni {
     my $DEBUG = "";
     # Start with empty array
     my @FitTypes = ();
-
-    foreach ($All{"FitType1"},$All{"FitType2"},$All{"FitType3"}) {
-        if ($_ ne "None") {
-            @FitTypes=(@FitTypes,$_);
+    # loop over fitTypes
+    if (!defined($All{"numComps"})) {$All{"numComps"}=3;}
+    for (my $i=1;$i<=$All{"numComps"};$i++) {
+        if ( defined($All{"FitType$i"}) &&$All{"FitType$i"} ne "None" ) {
+            push( @FitTypes, $All{"FitType$i"} );           
         }
     }
 
@@ -123,8 +125,8 @@ sub CreateMSRUni {
     # replaced by Func_T_Block
     my $FUNCTIONS_Block = $EMPTY;
     if ($All{"FunctionsBlock"} ne $EMPTY) {
-	$FUNCTIONS_Block = "FUNCTIONS\n###############################################################\n".$All{"FunctionsBlock"}."\n";
-	$Full_T_Block=$All{"Func_T_Block"};
+        $FUNCTIONS_Block = "FUNCTIONS\n###############################################################\n".$All{"FunctionsBlock"}."\n";
+        $Full_T_Block=$All{"Func_T_Block"};
 	# remove all _N to end (may fail with large number of parameters)
 	$Full_T_Block =~ s/_\d\b//g;
     }
@@ -661,12 +663,13 @@ sub CreateTheory {
     
     # Start from this theory line for the different fitting functions
     my %THEORY = (
-		  "asymmetry",   "Asy",
-		  "simplExpo",   "Lam",
-		  "generExpo",   "Lam Bet",
-		  "simpleGss",   "Sgm",
-		  "statGssKT",   "Sgm",
-		  "statGssKTLF", "Frqg Sgm",
+                  "asymmetry",   "Asy",
+                  "simplExpo",   "Lam",
+                  "generExpo",   "Lam Bet",
+                  "abragam",     "Del Lam",
+                  "simpleGss",   "Sgm",
+                  "statGssKT",   "Sgm",
+                  "statGssKTLF", "Frqg Sgm",
 		  "dynGssKTLF",  "Frql Sgm Lam",
 		  "statExpKT",   "Lam",
 		  "statExpKTLF", "Frq Aa",
@@ -675,13 +678,13 @@ sub CreateTheory {
                   "spinGlass",   "Lam gam q",
                   "rdAnisoHf",   "Frq Lam",
                   "TFieldCos",   "Phi Frq",
+                  "Bessel",      "Phi Frq",
                   "internFld",   "Alp Phi Frq LamT LamL",
                   "Bessel",      "Phi Frq",
                   "internBsl",   "Alp Phi Frq LamT LamL",
-		  "abragam",     "Sgm gam",
-		  "Meissner",    "Phi Energy Field DeadLayer Lambda",
-		  "skewedGss",   "Phi Frq Sgmm Sgmp"
-		  );
+                  "Meissner",    "Phi Energy Field DeadLayer Lambda",
+                  "skewedGss",   "Phi Frq Sgmm Sgmp"
+                  );
 
 #######################################################################
     # Generate the full THEORY block
@@ -734,7 +737,7 @@ sub CreateTheory {
             $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
         }
         
-        # Oscillationg gaussian
+        # Oscillationg Gaussian
         elsif ( $FitType eq "GaussianCos" ) {
             $T_Block    = $T_Block . "\n" . "simpleGss " . $THEORY{'simpleGss'};
             $Parameters = join( $SPACE, $Parameters, $THEORY{'simpleGss'} );
@@ -750,12 +753,28 @@ sub CreateTheory {
             $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
         }
         
-        # Oscillationg Gaussian
-        elsif ( $FitType eq "GaussianCos" ) {
-            $T_Block    = $T_Block . "\n" . "simpelGss " . $THEORY{'simpelGss'};
-            $Parameters = join( $SPACE, $Parameters, $THEORY{'simpleGss'} );
+        # Oscillationg Abragam function
+        elsif ( $FitType eq "AbragamCos" ) {
+            $T_Block    = $T_Block . "\n" . "abragam " . $THEORY{'abragam'};
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'abragam'} );
             $T_Block    = $T_Block . "\n" . "TFieldCos " . $THEORY{'TFieldCos'};
             $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
+        }
+        
+        # Oscillationg Bessel Gaussian
+        elsif ( $FitType eq "GaussianBessel" ) {
+            $T_Block    = $T_Block . "\n" . "simpleGss " . $THEORY{'simpleGss'};
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'simpleGss'} );
+            $T_Block    = $T_Block . "\n" . "Bessel " . $THEORY{'Bessel'};
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'Bessel'} );
+            }
+        
+        # Oscillationg Bessel Exponential
+        elsif ( $FitType eq "ExponentialBessel" ) {
+            $T_Block    = $T_Block . "\n" . "simplExpo " . $THEORY{'simplExpo'};
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'simplExpo'} );
+            $T_Block    = $T_Block . "\n" . "Bessel " . $THEORY{'Bessel'};
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'Bessel'} );
             }
         
         # Static Lorentzian KT
@@ -1005,8 +1024,16 @@ sub T0BgData {
 	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
    }
     elsif ($BeamLine eq "GPS") {
-	my $HistParams=$GPS{$Hists[0]};
-	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+        my $HistParams=$GPS{$Hists[0]};
+        ($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+    } 
+    elsif ($BeamLine eq "GPD") {
+        my $HistParams=$GPD{$Hists[0]};
+        ($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+    } 
+    else {
+        my $HistParams=$GPS{$Hists[0]};
+        ($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
     } 
     return $RV{$Name};
 
@@ -1047,10 +1074,15 @@ sub PrepParamTable {
     }
     my @Hists = split( /,/, $All{"LRBF"} );
 
-    my @FitTypes =();
-    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-        if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
+    my @FitTypes = ();
+    # loop over fitTypes
+    if (!defined($All{"numComps"})) {$All{"numComps"}=3;}
+    for (my $i=1;$i<=$All{"numComps"};$i++) {
+        if ( defined($All{"FitType$i"}) &&$All{"FitType$i"} ne "None" ) {
+            push( @FitTypes, $All{"FitType$i"} );           
+        }
     }
+
 # Get theory block to determine the size of the table 
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
 # For now the line below does not work. Why?    
@@ -1239,10 +1271,15 @@ sub ExportParams {
     }
     my @Hists = split( /,/, $All{"LRBF"} );
 
-    my @FitTypes =();
-    foreach my $FitType ($All{"FitType1"}, $All{"FitType2"}, $All{"FitType3"}) {
-        if ( $FitType ne "None" ) { push( @FitTypes, $FitType ); }
+    my @FitTypes = ();
+    # loop over fitTypes
+    if (!defined($All{"numComps"})) {$All{"numComps"}=3;}
+    for (my $i=1;$i<=$All{"numComps"};$i++) {
+        if ( defined($All{"FitType$i"}) &&$All{"FitType$i"} ne "None" ) {
+            push( @FitTypes, $All{"FitType$i"} );           
+        }
     }
+
     # Get theory block to determine the size of the table
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
     # For now the line below does not work. Why?    
