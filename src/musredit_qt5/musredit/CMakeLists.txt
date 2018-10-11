@@ -80,6 +80,26 @@ qt5_wrap_ui(out_ui ${musredit_ui})
 # add qt/rcc
 qt5_add_resources(musredit_rcc musredit.qrc)
 
+# remove generated files from automoc and autouic
+set_property(SOURCE ui_PFindDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PReplaceDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PReplaceConfirmationDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PMusrEditAbout.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PPrefsDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PGetMusrFTOptionsDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PGetTitleBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PGetParameterBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PGetTheoryBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PGetFunctionsBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PGetAsymmetryRunBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PGetSingleHistoRunBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PGetNonMusrRunBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PGetFourierBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PGetPlotBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PMsr2DataDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE ui_PChangeDefaultPathsDialog.h PROPERTY SKIP_AUTOMOC ON)
+set_property(SOURCE qrc_musredit.cpp PROPERTY SKIP_AUTOMOC ON)
+
 set(macosx_icon icons/musredit.icns)
 if (APPLE)
   add_executable(musredit MACOSX_BUNDLE
