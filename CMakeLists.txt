@@ -29,7 +29,6 @@ endif()
 #--- perform some checks and generate the config.h ----------------------------
 
 #--- the next three lines are needed that the math functions are found --------
-cmake_policy(SET CMP0075 NEW)
 set(CMAKE_REQUIRED_INCLUDES math.h)
 set(CMAKE_REQUIRED_LIBRARIES m) 
 
