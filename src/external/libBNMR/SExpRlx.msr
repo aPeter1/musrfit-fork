@@ -3,8 +3,8 @@ LaAlO3,  SLR, 30G, 150K, Bias=23 kV, Ix=0A, Iy=+3A, aligned, beam on=1s
 FITPARAMETER
 ###############################################################
 #     No     Name       Value    Err     Min  Max                  
-        1 Alpha       1         0           none        
-        2 Asy         0.1148    0.0096      none        0       0.2     
+        1 Alpha       0.9       1.0         none        
+        2 Asy         0.115     0.011       none        0       0.2     
         3 T           1         0           none        
         4 Rlx         4.16      0.88        none        0       100     
         5 Beta        0.433     0.031       none        0.3     2       
@@ -13,7 +13,7 @@ FITPARAMETER
 THEORY
 ###############################################################
 asymmetry      2
-userFcn  .libs/libBNMR.so SExpRlx 3 4 5
+userFcn  libBNMR SExpRlx 3 4 5
 
 ###############################################################
 RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
@@ -50,5 +50,5 @@ plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_RE
 phase            8
 #range            FRQMIN  FRQMAX
 ###############################################################
-STATISTIC --- 2018-08-20 21:59:14
-  chisq = 210.2, NDF = 172, chisq/NDF = 1.222196
+STATISTIC --- 2018-08-24 16:52:40
+  chisq = 210.2, NDF = 171, chisq/NDF = 1.229343
