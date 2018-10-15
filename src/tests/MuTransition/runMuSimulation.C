@@ -63,32 +63,47 @@ void runMuSimulation()
   Double_t T            = 300.;   //temperature
   Double_t EA           = 100; //activation energy (meV)  
   Double_t spinFlipRate = 0.01; //if spinFlipRate > 0.001 only spin-flip processes will be simulated
-  Double_t capRate      = 0.0001;//*sqrt(T/200.); //assume that capture rate varies as sqrt(T), capRate = sigma*v*p , v ~ sqrt(T)  
+  Double_t capRate      = 0.001;//*sqrt(T/200.); //assume that capture rate varies as sqrt(T), capRate = sigma*v*p , v ~ sqrt(T) 
+  Double_t preFac       = 6.7e7;
   Double_t ionRate;  //assume Arrhenius behaviour ionRate = preFac*exp(-EA/kT)
-  ionRate           = 0.1; //2.9e7 * exp(-EA/(0.08625*T)); // Ge: 2.9*10^7MHz "attempt" frequency; 1K = 0.08625 meV 
-  Double_t B        = 106.5; //field in G
-  Double_t Bvar     = 0.;   //field variance
-  Double_t Freq12   = 40.433;  //Mu freq of the 12 transition
-  Double_t Freq34   = 59.567; //Mu freq of the 34 transition
-  Double_t Freq23   = 256.245;  //Mu freq of the 23 transition
-  Double_t Freq14   = 356.245; //Mu freq of the 14 transition
-  Double_t MuFrac   = 1.0;  //total Mu fraction
-  Double_t MuFrac12 = 0.487;  //weight of transition 12
-  Double_t MuFrac34 = 0.487;  //weight of transition 34
-  Double_t MuFrac23 = 0.013;  //weight of transition 23
-  Double_t MuFrac14 = 0.013;  //weight of transition 14
-  Int_t    Nmuons   = 5e6;  //number of muons
-  Double_t Asym     = 0.27; //muon decay asymmetry
-  Int_t    debugFlag = 0; //print debug information on screen
+  ionRate               = 0.001; //preFac * exp(-EA/(0.08625*T)); // Ge: 2.9*10^7MHz "attempt" frequency; 1K = 0.08625 meV 
+  Double_t B            = 100.0; //field in G
+  Double_t Bvar         = 0.;   //field variance
+  Double_t Freq12       = 40.023;  //Mu freq of the 12 transition
+  Double_t Freq34       = 59.977;  //Mu freq of the 34 transition
+  Double_t Freq23       = 238.549; //Mu freq of the 23 transition
+  Double_t Freq14       = 338.549; //Mu freq of the 14 transition
+  Double_t Freq13       = 278.571; //Mu freq of the 23 transition
+  Double_t Freq24       = 325.165; //Mu freq of the 14 transition
+
+  Double_t MuFrac       = 1.0;     //total Mu fraction
+  Double_t MuFrac12     = 0.486;   //weight of transition 12
+  Double_t MuFrac34     = 0.486;   //weight of transition 34
+  Double_t MuFrac23     = 0.014;   //weight of transition 23
+  Double_t MuFrac14     = 0.014;   //weight of transition 14
+  Double_t MuFrac13     = 0.0;     //weight of transition 13
+  Double_t MuFrac24     = 0.0;     //weight of transition 24
+
+  Int_t    Nmuons        = 5e6;    //number of muons
+  Int_t    NshowProgress = 1e4;    //frequency to show progress on screen
+  Double_t Asym          = 0.27;   //muon decay asymmetry
+  Int_t    debugFlag     = 0;      //print debug information on screen
+  
+  TTimeStamp *timeStampStart = new TTimeStamp();
+  cout << endl << "Simulation started on:" << endl;
+  timeStampStart->Print("l);
+  cout << endl;
   
   histogramFileName  = TString("0");
   histogramFileName += runNo;
   histogramFileName += TString(".root");
 
-  sprintf(titleStr,"- complexMuPol, A0 100MHz, Mu-frac %3.2f, Mu12 %6.2f MHz(%3.2f), Mu23 %6.2f MHz(%3.2f), ionRate %8.3f MHz, capRate %6.3f MHz, SF rate %6.3f MHz, %5.1f G", MuFrac, Freq12, MuFrac12/2, Freq23, MuFrac23/2, ionRate, capRate, spinFlipRate, B);
+  sprintf(titleStr,"- complexMuPol, A0 100MHz, Mu-frac %3.2f, Mu12 %6.2f MHz(%3.2f), Mu23 %6.2f MHz(%3.2f), ionRate %8.3f MHz, capRate %6.3f MHz, SF rate %6.3f MHz, %5.1f G", MuFrac, Freq12, MuFrac12, Freq23, MuFrac23, ionRate, capRate, spinFlipRate, B);
   runTitle  = TString("0");
   runTitle += runNo;
   runTitle += TString(titleStr);
+  
+  cout << runTitle << endl << endl;
 
   PSimulateMuTransition *simulateMuTransition = new PSimulateMuTransition();
   if (!simulateMuTransition->IsValid()){
@@ -99,15 +114,20 @@ void runMuSimulation()
   simulateMuTransition->SetMuPrecFreq34(Freq34);       // MHz
   simulateMuTransition->SetMuPrecFreq23(Freq23);       // MHz
   simulateMuTransition->SetMuPrecFreq14(Freq14);       // MHz
+  simulateMuTransition->SetMuPrecFreq13(Freq13);       // MHz
+  simulateMuTransition->SetMuPrecFreq24(Freq24);       // MHz
   simulateMuTransition->SetMuFraction(MuFrac);         // initial Mu fraction
   simulateMuTransition->SetMuFractionState12(MuFrac12); 
   simulateMuTransition->SetMuFractionState34(MuFrac34); 
   simulateMuTransition->SetMuFractionState23(MuFrac23); 
-  simulateMuTransition->SetMuFractionState14(MuFrac14); 
+  simulateMuTransition->SetMuFractionState14(MuFrac14);
+  simulateMuTransition->SetMuFractionState13(MuFrac13); 
+  simulateMuTransition->SetMuFractionState24(MuFrac24); 
   simulateMuTransition->SetBfield(B/10000.);           // Tesla
   simulateMuTransition->SetCaptureRate(capRate);       // MHz
   simulateMuTransition->SetIonizationRate(ionRate);    // MHz
   simulateMuTransition->SetSpinFlipRate(spinFlipRate); // MHz
+  simulateMuTransition->SetNshowProgress(NshowProgress);
   simulateMuTransition->SetNmuons(Nmuons);
   simulateMuTransition->SetDecayAsymmetry(Asym);
   simulateMuTransition->SetDebugFlag(debugFlag); // to print time and phase during charge-changing cycle
@@ -179,12 +199,18 @@ void runMuSimulation()
   header->Set("Simulation/Mu0 Precession frequency 34", Freq34);
   header->Set("Simulation/Mu0 Precession frequency 23", Freq23);
   header->Set("Simulation/Mu0 Precession frequency 14", Freq14);
+  header->Set("Simulation/Mu0 Precession frequency 13", Freq13);
+  header->Set("Simulation/Mu0 Precession frequency 24", Freq24);
   header->Set("Simulation/Mu0 Fraction", MuFrac);
   header->Set("Simulation/Mu0 Fraction 12", MuFrac12);
   header->Set("Simulation/Mu0 Fraction 34", MuFrac34);
   header->Set("Simulation/Mu0 Fraction 23", MuFrac23);
   header->Set("Simulation/Mu0 Fraction 14", MuFrac14);
-  header->Set("Simulation/muon Capture Rate", capRate);
+  header->Set("Simulation/Mu0 Fraction 13", MuFrac13);
+  header->Set("Simulation/Mu0 Fraction 24", MuFrac24);
+  header->Set("Simulation/Mu0 Activation Energy", EA);
+  header->Set("Simulation/Mu0 Activation PreFactor", preFac);
+  header->Set("Simulation/Mux Capture Rate", capRate);
   header->Set("Simulation/Mu0 Ionization Rate", ionRate);
   header->Set("Simulation/Mu0 Spin Flip Rate", spinFlipRate);
   header->Set("Simulation/Number of Muons", Nmuons);
@@ -206,7 +232,7 @@ void runMuSimulation()
     histo[i] = new TH1F(str, str, 18001, -0.5, 18000.5);
   }
 
-  for (i=0; i<NDECAYHISTS; i++)
+  for (UInt_t i=0; i<NDECAYHISTS; i++)
     decayAnaModule->Add(histo[i]);
   
   // run simulation
@@ -230,6 +256,11 @@ void runMuSimulation()
   gRunHeader->Write();
   fout->Close();
   cout << "Histograms written to " << histogramFileName.Data() << endl;
+  
+  cout << endl << "Simulation stopped on:" << endl;
+  TTimeStamp *timeStampEnd = new TTimeStamp();
+  timeStampEnd->Print("l");
+  cout << endl;
 
 //   delete fout;
 //   delete header;

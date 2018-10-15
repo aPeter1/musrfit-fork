@@ -47,13 +47,16 @@ class PSimulateMuTransition : public TObject
     virtual ~PSimulateMuTransition();
 
     virtual void PrintSettings() const;
-    virtual void SetNmuons(Int_t value)        { fNmuons = value; }       //!< number of muons
-    virtual void SetDebugFlag(Bool_t value)    { fDebugFlag = value; }    //!< debug flag
-    virtual void SetBfield(Double_t value)     { fBfield = value; }       //!< sets magnetic field (T)
+    virtual void SetNmuons(Int_t value)        { fNmuons = value; }         //!< number of muons
+    virtual void SetNshowProgress(Int_t value) { fNshowProgress = value; }  //!< frequency of output on screen how many muons have been processed 
+    virtual void SetDebugFlag(Bool_t value)    { fDebugFlag = value; }      //!< debug flag
+    virtual void SetBfield(Double_t value)     { fBfield = value; }         //!< sets magnetic field (T)
     virtual void SetMuPrecFreq12(Double_t value) { fMuPrecFreq12 = value; } //!< sets Mu transition frequency (MHz)
     virtual void SetMuPrecFreq34(Double_t value) { fMuPrecFreq34 = value; } //!< sets Mu transition frequency (MHz)
     virtual void SetMuPrecFreq23(Double_t value) { fMuPrecFreq23 = value; } //!< sets Mu transition frequency (MHz)
     virtual void SetMuPrecFreq14(Double_t value) { fMuPrecFreq14 = value; } //!< sets Mu transition frequency (MHz)
+    virtual void SetMuPrecFreq13(Double_t value) { fMuPrecFreq13 = value; } //!< sets Mu transition frequency (MHz)
+    virtual void SetMuPrecFreq24(Double_t value) { fMuPrecFreq24 = value; } //!< sets Mu transition frequency (MHz)
     virtual void SetCaptureRate(Double_t value){ fCaptureRate = value; }  //!< sets Mu+ electron capture rate (MHz)
     virtual void SetIonizationRate(Double_t value){ fIonizationRate = value; } //!< sets Mu0 ionization rate (MHz)
     virtual void SetSpinFlipRate(Double_t value){ fSpinFlipRate = value; }     //!< sets Mu0 spin flip rate (MHz)
@@ -63,6 +66,8 @@ class PSimulateMuTransition : public TObject
     virtual void SetMuFractionState34(Double_t value){ fMuFractionState34 = value; }  
     virtual void SetMuFractionState23(Double_t value){ fMuFractionState23 = value; }  
     virtual void SetMuFractionState14(Double_t value){ fMuFractionState14 = value; }  
+    virtual void SetMuFractionState13(Double_t value){ fMuFractionState13 = value; }  
+    virtual void SetMuFractionState24(Double_t value){ fMuFractionState24 = value; }  
 
     virtual Bool_t IsValid() { return fValid; }
     virtual void   SetSeed(UInt_t seed);
@@ -81,6 +86,8 @@ class PSimulateMuTransition : public TObject
     Double_t  fMuPrecFreq34;    //!< Mu transition frequency 34 (MHz)
     Double_t  fMuPrecFreq23;    //!< Mu transition frequency 23 (MHz)
     Double_t  fMuPrecFreq14;    //!< Mu transition frequency 14 (MHz)
+    Double_t  fMuPrecFreq13;    //!< Mu transition frequency 13 (MHz)
+    Double_t  fMuPrecFreq24;    //!< Mu transition frequency 24 (MHz)
     Double_t  fMuonPrecFreq;    //!< muon precession frequency (MHz)
     Double_t  fCaptureRate;     //!< Mu+ electron capture rate (MHz)
     Double_t  fIonizationRate;  //!< Mu0 ionization rate (MHz)
@@ -94,8 +101,11 @@ class PSimulateMuTransition : public TObject
     Double_t  fMuFractionState34; //!< fraction of Mu in state 34
     Double_t  fMuFractionState23; //!< fraction of Mu in state 23
     Double_t  fMuFractionState14; //!< fraction of Mu in state 14
-    Int_t     fNmuons;          //!< number of muons to simulate
-    Bool_t    fDebugFlag;       //!< debug flag
+    Double_t  fMuFractionState13; //!< fraction of Mu in state 13
+    Double_t  fMuFractionState24; //!< fraction of Mu in state 24
+    Int_t     fNmuons;            //!< number of muons to simulate
+    Int_t     fNshowProgress;     //!< output on screen how many muons have been processed 
+    Bool_t    fDebugFlag;         //!< debug flag
 
     virtual Double_t NextEventTime(const Double_t &EventRate);
 //     virtual Double_t PrecessionPhase(const Double_t &time, const TString chargeState);

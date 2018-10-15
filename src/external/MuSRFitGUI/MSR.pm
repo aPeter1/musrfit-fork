@@ -27,10 +27,11 @@ my $SUMM_DIR="/afs/psi.ch/project/nemu/data/summ/";
 my %DBDIR=("LEM","/afs/psi.ch/project/nemu/data/log/",
 	"GPS","/afs/psi.ch/project/bulkmusr/olddata/list/",
 	"Dolly","/afs/psi.ch/project/bulkmusr/olddata/list/",
-	"GPD","/afs/psi.ch/project/bulkmusr/olddata/list/",
-	"ALC","/afs/psi.ch/project/bulkmusr/olddata/list/",
-	"HAL","/afs/psi.ch/project/bulkmusr/olddata/list/",
-	"LTF","/afs/psi.ch/project/bulkmusr/olddata/list/");
+        "GPD","/afs/psi.ch/project/bulkmusr/olddata/list/",
+        "ALC","/afs/psi.ch/project/bulkmusr/olddata/list/",
+        "HAL","/afs/psi.ch/project/bulkmusr/olddata/list/",
+        "LTF","/afs/psi.ch/project/bulkmusr/olddata/list/",
+        "ALL","/afs/psi.ch/project/bulkmusr/olddata/list/");
 
 # Information available since
 my %MinYears=("LEM","2001",
@@ -662,12 +663,13 @@ sub CreateTheory {
     
     # Start from this theory line for the different fitting functions
     my %THEORY = (
-		  "asymmetry",   "Asy",
-		  "simplExpo",   "Lam",
-		  "generExpo",   "Lam Bet",
-		  "simpleGss",   "Sgm",
-		  "statGssKT",   "Sgm",
-		  "statGssKTLF", "Frqg Sgm",
+                  "asymmetry",   "Asy",
+                  "simplExpo",   "Lam",
+                  "generExpo",   "Lam Bet",
+                  "abragam",     "Del Lam",
+                  "simpleGss",   "Sgm",
+                  "statGssKT",   "Sgm",
+                  "statGssKTLF", "Frqg Sgm",
 		  "dynGssKTLF",  "Frql Sgm Lam",
 		  "statExpKT",   "Lam",
 		  "statExpKTLF", "Frq Aa",
@@ -749,6 +751,14 @@ sub CreateTheory {
 	    $T_Block    = $T_Block . "\n" . "generExpo " . $THEORY{'generExpo'};
 	    $Parameters = join( $SPACE, $Parameters, $THEORY{'generExpo'} );
 	    $T_Block    = $T_Block . "\n" . "TFieldCos " . $THEORY{'TFieldCos'};
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
+        }
+        
+        # Oscillationg Abragam function
+        elsif ( $FitType eq "AbragamCos" ) {
+            $T_Block    = $T_Block . "\n" . "abragam " . $THEORY{'abragam'};
+            $Parameters = join( $SPACE, $Parameters, $THEORY{'abragam'} );
+            $T_Block    = $T_Block . "\n" . "TFieldCos " . $THEORY{'TFieldCos'};
             $Parameters = join( $SPACE, $Parameters, $THEORY{'TFieldCos'} );
         }
         
@@ -1015,8 +1025,16 @@ sub T0BgData {
 	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
    }
     elsif ($BeamLine eq "GPS") {
-	my $HistParams=$GPS{$Hists[0]};
-	($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+        my $HistParams=$GPS{$Hists[0]};
+        ($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+    } 
+    elsif ($BeamLine eq "GPD") {
+        my $HistParams=$GPD{$Hists[0]};
+        ($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
+    } 
+    else {
+        my $HistParams=$GPS{$Hists[0]};
+        ($RV{"t0"},$RV{"Bg1"},$RV{"Bg2"},$RV{"Data1"},$RV{"Data2"})=split(/,/,$HistParams);
     } 
     return $RV{$Name};
 
@@ -1262,6 +1280,7 @@ sub ExportParams {
             push( @FitTypes, $All{"FitType$i"} );           
         }
     }
+
     # Get theory block to determine the size of the table
     my ($Full_T_Block,$Paramcomp_ref)= MSR::CreateTheory(@FitTypes);
     # For now the line below does not work. Why?    
