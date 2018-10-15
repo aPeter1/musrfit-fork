@@ -682,10 +682,9 @@ sub CreateTheory {
                   "internFld",   "Alp Phi Frq LamT LamL",
                   "Bessel",      "Phi Frq",
                   "internBsl",   "Alp Phi Frq LamT LamL",
-		  "abragam",     "Sgm gam",
-		  "Meissner",    "Phi Energy Field DeadLayer Lambda",
-		  "skewedGss",   "Phi Frq Sgmm Sgmp"
-		  );
+                  "Meissner",    "Phi Energy Field DeadLayer Lambda",
+                  "skewedGss",   "Phi Frq Sgmm Sgmp"
+                  );
 
 #######################################################################
     # Generate the full THEORY block
