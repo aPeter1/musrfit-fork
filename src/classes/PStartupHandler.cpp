@@ -192,7 +192,6 @@ void PStartupHandler::OnStartDocument()
   fFourierDefaults.fFourierPower = 0;
   fFourierDefaults.fApodization = FOURIER_APOD_NONE;
   fFourierDefaults.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;
-  fFourierDefaults.fPhase = 0.0;
   fFourierDefaults.fRangeForPhaseCorrection[0] = -1.0;
   fFourierDefaults.fRangeForPhaseCorrection[1] = -1.0;
   fFourierDefaults.fPlotRange[0] = -1.0;
@@ -412,7 +411,7 @@ void PStartupHandler::OnCharacters(const Char_t *str)
     case ePhase:
       tstr = TString(str);
       if (tstr.IsFloat()) {
-        fFourierDefaults.fPhase = tstr.Atof();
+        fFourierDefaults.fPhase.push_back(tstr.Atof());
       } else {
         cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase, will ignore it.";
         cerr << endl;

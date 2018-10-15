@@ -152,7 +152,6 @@ PMusrCanvas::PMusrCanvas()
   InitFourier();
   InitAverage();
 
-  fCurrentFourierPhase = fFourier.fPhaseIncrement;
   fCurrentFourierPhaseText = 0;
 
   fRRFText = 0;
@@ -205,7 +204,6 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 
-  fCurrentFourierPhase = 0.0;
   fCurrentFourierPhaseText = 0;
 
   fRRFText = 0;
@@ -262,7 +260,6 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 
-  fCurrentFourierPhase = 0.0;
   fCurrentFourierPhaseText = 0;
 
   fRRFText = 0;
@@ -321,10 +318,6 @@ PMusrCanvas::~PMusrCanvas()
     for (UInt_t i=0; i<fNonMusrData.size(); i++)
       CleanupDataSet(fNonMusrData[i]);
     fNonMusrData.clear();
-  }
-  if (fCurrentFourierPhaseText) {
-    delete fCurrentFourierPhaseText;
-    fCurrentFourierPhaseText = 0;
   }
   if (fMultiGraphLegend) {
     fMultiGraphLegend->Clear();
@@ -394,9 +387,8 @@ void PMusrCanvas::SetMsrHandler(PMsrHandler *msrHandler)
     if (fMsrHandler->GetMsrFourierList()->fPlotTag != FOURIER_PLOT_NOT_GIVEN) {
       fFourier.fPlotTag = fMsrHandler->GetMsrFourierList()->fPlotTag;
     }
-    if (fMsrHandler->GetMsrFourierList()->fPhase != -999.0) {
-      fFourier.fPhase = fMsrHandler->GetMsrFourierList()->fPhase;
-    }
+    fFourier.fPhase = fMsrHandler->GetMsrFourierList()->fPhase;
+
     if ((fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[0] != -1.0) &&
         (fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[1] != -1.0)) {
       fFourier.fRangeForPhaseCorrection[0] = fMsrHandler->GetMsrFourierList()->fRangeForPhaseCorrection[0];
@@ -2312,7 +2304,8 @@ void PMusrCanvas::InitFourier()
   fFourier.fFourierPower = 0;                      // no zero padding
   fFourier.fApodization = FOURIER_APOD_NONE;       // no apodization
   fFourier.fPlotTag = FOURIER_PLOT_REAL_AND_IMAG;  // initial plot tag, plot real and imaginary part
-  fFourier.fPhase = 0.0;                           // fourier phase 0°
+  fFourier.fPhaseParamNo.clear();
+  fFourier.fPhase.clear();
   for (UInt_t i=0; i<2; i++) {
     fFourier.fRangeForPhaseCorrection[i] = -1.0;   // frequency range for phase correction, default: {-1, -1} = NOT GIVEN
     fFourier.fPlotRange[i] = -1.0;                 // fourier plot range, default: {-1, -1} = NOT GIVEN
@@ -3464,13 +3457,20 @@ void PMusrCanvas::HandleFourier()
     }
 
     // apply global phase if present
-    if (fFourier.fPhase != 0.0) {
-      const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
-      const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
+    if (fFourier.fPhase.size() != 0.0) {
+      double cp;
+      double sp;
 
       fCurrentFourierPhase = fFourier.fPhase;
 
       for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
+        if (fFourier.fPhase.size() == 1) {
+          cp = TMath::Cos(fFourier.fPhase[0]/180.0*TMath::Pi());
+          sp = TMath::Sin(fFourier.fPhase[0]/180.0*TMath::Pi());
+        } else {
+          cp = TMath::Cos(fFourier.fPhase[i]/180.0*TMath::Pi());
+          sp = TMath::Sin(fFourier.fPhase[i]/180.0*TMath::Pi());
+        }
         if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
           for (Int_t j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
             // calculate new fourier data set value
@@ -3567,16 +3567,23 @@ void PMusrCanvas::HandleDifferenceFourier()
       fData[i].diffFourierTag = 1; // d-f
     }
 
-    // apply global phase
-    if (fFourier.fPhase != 0.0) {
+    // apply phase
+    if (fFourier.fPhase.size() != 0.0) {
       double re, im;
-      const double cp = TMath::Cos(fFourier.fPhase/180.0*TMath::Pi());
-      const double sp = TMath::Sin(fFourier.fPhase/180.0*TMath::Pi());
+      double cp;
+      double sp;
 
       fCurrentFourierPhase = fFourier.fPhase;
 
       for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
         if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
+          if (fFourier.fPhase.size() == 1) {
+            cp = TMath::Cos(fFourier.fPhase[0]/180.0*TMath::Pi());
+            sp = TMath::Sin(fFourier.fPhase[0]/180.0*TMath::Pi());
+          } else {
+            cp = TMath::Cos(fFourier.fPhase[i]/180.0*TMath::Pi());
+            sp = TMath::Sin(fFourier.fPhase[i]/180.0*TMath::Pi());
+          }
           for (Int_t j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
             // calculate new fourier data set value
             re = fData[i].diffFourierRe->GetBinContent(j) * cp + fData[i].diffFourierIm->GetBinContent(j) * sp;
@@ -6040,7 +6047,10 @@ void PMusrCanvas::PlotFourierPhaseValue(Bool_t unzoom)
 
   // plot Fourier phase
   str = TString("phase = ");
-  str += fCurrentFourierPhase;
+  str += fCurrentFourierPhase[0];
+  if (fFourier.fPhase.size() > 1) { // if more than one phase is present, do NOT plot phase info
+    str = TString("");
+  }
   x = 0.7;
   y = 0.85;
   fCurrentFourierPhaseText = new TLatex();
@@ -6292,7 +6302,8 @@ void PMusrCanvas::IncrementFourierPhase()
   const double cp = TMath::Cos(fFourier.fPhaseIncrement/180.0*TMath::Pi());
   const double sp = TMath::Sin(fFourier.fPhaseIncrement/180.0*TMath::Pi());
 
-  fCurrentFourierPhase += fFourier.fPhaseIncrement;
+  for (UInt_t i=0; i<fCurrentFourierPhase.size(); i++)
+    fCurrentFourierPhase[i] += fFourier.fPhaseIncrement;
   PlotFourierPhaseValue();
 
   for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
@@ -6344,7 +6355,8 @@ void PMusrCanvas::DecrementFourierPhase()
   const double cp = TMath::Cos(fFourier.fPhaseIncrement/180.0*TMath::Pi());
   const double sp = TMath::Sin(fFourier.fPhaseIncrement/180.0*TMath::Pi());
 
-  fCurrentFourierPhase -= fFourier.fPhaseIncrement;
+  for (UInt_t i=0; i<fCurrentFourierPhase.size(); i++)
+    fCurrentFourierPhase[i] -= fFourier.fPhaseIncrement;
   PlotFourierPhaseValue();
 
   for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
