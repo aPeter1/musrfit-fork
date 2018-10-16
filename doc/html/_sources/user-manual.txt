@@ -1486,8 +1486,49 @@ The block starts with the *FOURIER* keyword and may contain the following entrie
 .. _msr-fourier-block-phase:
 
 **phase**
-  The initial phase of the input data is given here in degrees. Optionally the phase parameter from the :ref:`FITPARAMETER block <msr-fitparameter-block>` can be given, 
-  *e.g.* par3, which would take the value of parameter number 3. 
+  If a real Fourier shall be plotted, it is necessary to adopt the phases of the different detectors. The number of potentially provided phases can be either **one**, which means that this phase will be applied to *all* Fourier spectra, 
+  or the number of phases have to correspond to the number of runs in the plot block.
+  
+  Currently there are three options:
+  
+  #. The phases for each run/detector are given explicitly, *i.e.* 
+  
+     .. code-block:: bash
+     
+        phase val0 sep val1 sep ... sep valN
+        
+     where ``val0``, ``val1``, etc. are explicitly given phases (*i.e.* doubles), and ``sep`` is one of the following allowed separators: ``space``, ``,``, ``;``, or ``tab``.
+     For example
+     
+     .. code-block:: bash
+     
+        phase   -3.2, 175.9
+        
+  #. The phases for each run/detector are given as phase parameter from the :ref:`FITPARAMETER block <msr-fitparameter-block>`, *e.g.* par3, which would 
+     take the value of parameter number 3. More explicitly
+     
+     .. code-block:: bash
+     
+        phase parX0 sep parX1 sep ... sep parXN
+        
+     where the same rules applies as for explicit phase values. An example could look like this
+     
+     .. code-block:: bash
+     
+        phase par7, par12, par17, par22, par27, par32, par37, par42, par47, par52, par57, par62, par67, par72, par77, par82
+  
+  #. Often the phases in the parameter block follow a clear list structure. This allows to write the Fourier phase parameters in a more compact form
+  
+     .. code-block:: none
+     
+        phase par(X0, offset, #param)
+        
+     with ``X0`` the first phase parameter index, ``offset`` being the offset to the next phase parameter, and ``#param`` being the number of phase parameters to be used.
+     This means that the previous example can be compacted to
+     
+     .. code-block:: none
+     
+        phase par(7, 5, 16)
   
 .. index:: fourier-block-range_for_phase_correction
 .. _msr-fourier-block-range_for_phase_correction:
@@ -1511,8 +1552,7 @@ Altogether, a possible FOURIER block might look like that:
   fourier_power 12
   apodization NONE
   plot real_and_imag
-  phase 22.6   # par3
-  range_for_phase_correction all
+  phase par5, par8
   range 0.0 17.03
   
 .. index:: msr-plot-block
