@@ -1025,12 +1025,11 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     }
 
     // FOURIER block - in case a parameter is used for the phase
-    tempPar = fMsrHandler->GetMsrFourierList()->fPhaseParamNo;
-    if (tempPar > 0) {
+    if (fMsrHandler->GetMsrFourierList()->fPhaseParamNo.size() > 0) {
       // go through the whole parameter list ...
       for (unsigned int k(0); k < msrParamList->size(); ++k) {
         if (tempPar == msrParamList->at(k).fNo) {
-          fMsrHandler->GetMsrFourierList()->fPhaseParamNo = k + 1;
+          fMsrHandler->GetMsrFourierList()->fPhaseParamNo.push_back(k + 1);
           break;
         }
       }

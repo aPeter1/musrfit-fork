@@ -28,7 +28,7 @@ endif()
 
 #--- perform some checks and generate the config.h ----------------------------
 
-#--- the next three lines are needed that the math functions are found --------
+#--- the next two lines are needed that the math functions are found ----------
 set(CMAKE_REQUIRED_INCLUDES math.h)
 set(CMAKE_REQUIRED_LIBRARIES m) 
 
