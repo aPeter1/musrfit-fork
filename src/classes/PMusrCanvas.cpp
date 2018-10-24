@@ -28,6 +28,7 @@
  ***************************************************************************/
 
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 using namespace std;
 
@@ -2199,10 +2200,10 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
       // write data/theory
       for (UInt_t j=0; j<dumpVector.size()-1; j++) {
         if (i<dumpVector[j].dataX.size()) {
-          fout << dumpVector[j].dataX[i] << ", ";
-          fout << dumpVector[j].data[i] << ", ";
+          fout << setprecision(9) << dumpVector[j].dataX[i] << ", ";
+          fout << setprecision(9) << dumpVector[j].data[i] << ", ";
           if (dumpVector[j].dataErr.size() > 0)
-            fout << dumpVector[j].dataErr[i] << ", ";
+            fout << setprecision(9) << dumpVector[j].dataErr[i] << ", ";
         } else {
           if (dumpVector[j].dataErr.size() > 0)
             fout << " , , , ";
@@ -2212,8 +2213,8 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
       }
       // write last data/theory entry
       if (i<dumpVector[dumpVector.size()-1].dataX.size()) {
-        fout << dumpVector[dumpVector.size()-1].dataX[i] << ", ";
-        fout << dumpVector[dumpVector.size()-1].data[i];
+        fout << setprecision(9) << dumpVector[dumpVector.size()-1].dataX[i] << ", ";
+        fout << setprecision(9) << dumpVector[dumpVector.size()-1].data[i];
       } else {
         fout << " , ";
       }
