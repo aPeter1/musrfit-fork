@@ -2,9 +2,10 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+
 root_generate_dictionary(
   PMagProximityFitterDict 
-  -I${FFTW3_INCLUDE}
+  -I${FFTW3_INCLUDE_DIR}
   -I${MUSRFIT_INC}
   PMagProximityFitter.h 
   LINKDEF PMagProximityFitterLinkDef.h
