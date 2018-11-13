@@ -4036,6 +4036,8 @@ Bool_t PMsrHandler::ParseFourierPhaseParVector(PMsrFourierStructure &fourier, co
       }
       sstr.Remove(0, rmNoOf); // remove 'par' of 'parR' part. Rest should be an integer
       if (sstr.IsDigit()) {
+        if (rmNoOf == 4) // parR
+          fourier.fPhaseRef = sstr.Atoi();
         fourier.fPhaseParamNo.push_back(sstr.Atoi());
       } else {
         cerr << ">> PMsrHandler::ParseFourierPhaseParVector: **ERROR** found token '" << ostr->GetString() << "' which is not parX with X an integer." << endl;
