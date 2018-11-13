@@ -1575,6 +1575,15 @@ take the value of parameter number 3. More explicitly</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>phase par7, par12, par17, par22, par27, par32, par37, par42, par47, par52, par57, par62, par67, par72, par77, par82
 </pre></div>
 </div>
+<p>One might prefer to express the phases in respect to a reference counter, <em>e.g.</em> the forward counter is the reference counter phase (fcp) whereas
+the backward counter phase (bcp) is expressed as bcp = fcp + relative_bcp. If the fitting is done along these lines, the phases in the Fourier
+block can be expressed the following way</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>phase parRX0 sep parX1 sep ... sep parXN
+</pre></div>
+</div>
+<p>which means that <tt class="docutils literal"><span class="pre">X0</span></tt> is the reference phase, and all the other phases are relative phases in respect to <tt class="docutils literal"><span class="pre">X0</span></tt>, <em>i.e.</em> the absolut phase of
+<tt class="docutils literal"><span class="pre">Xj</span></tt> would be the summ of the values of <tt class="docutils literal"><span class="pre">parX0</span></tt> and <tt class="docutils literal"><span class="pre">parXj</span></tt> etc. The reference phase in the list is marked by <tt class="docutils literal"><span class="pre">parR</span></tt> rather than <tt class="docutils literal"><span class="pre">par</span></tt>.
+Obviously only <em>one</em> reference phase can be defined!</p>
 </li>
 <li><p class="first">Often the phases in the parameter block follow a clear list structure. This allows to write the Fourier phase parameters in a more compact form</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>phase par(X0, offset, #param)
@@ -1583,6 +1592,11 @@ take the value of parameter number 3. More explicitly</p>
 <p>with <tt class="docutils literal"><span class="pre">X0</span></tt> the first phase parameter index, <tt class="docutils literal"><span class="pre">offset</span></tt> being the offset to the next phase parameter, and <tt class="docutils literal"><span class="pre">#param</span></tt> being the number of phase parameters to be used.
 This means that the previous example can be compacted to</p>
 <div class="highlight-none"><div class="highlight"><pre><span></span>phase par(7, 5, 16)
+</pre></div>
+</div>
+<p>As in the phase parameter list examples before, also here a reference phase with relative phases might be wished. Differently to the phase parameter
+list example, the first parameter number will be the reference phase. The compact notation here is</p>
+<div class="highlight-none"><div class="highlight"><pre><span></span>phase parR(X0, offest, #param)
 </pre></div>
 </div>
 </li>
@@ -2195,7 +2209,7 @@ In case this cannot be ensured, the parallelization can be disabled by <em>&#821
     </div>
     <div class="footer">
         &copy; Copyright 2018, Andreas Suter.
-      Last updated on Oct 15, 2018.
+      Last updated on Nov 13, 2018.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
