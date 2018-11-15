@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2018 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -737,6 +737,7 @@ typedef struct {
   Int_t  fFourierPower;        ///< i.e. zero padding up to 2^fFourierPower, default = 0 which means NO zero padding
   Int_t  fApodization;         ///< tag indicating the kind of apodization wished, 0=no appodization (default), 1=weak, 2=medium, 3=strong (for details see the docu)
   Int_t  fPlotTag;             ///< tag used for initial plot. 0=real, 1=imaginary, 2=real & imaginary (default), 3=power, 4=phase
+  Int_t  fPhaseRef;            ///< phase reference for relative phase(s)
   PIntVector  fPhaseParamNo;   ///< parameter number(s) if used instead of a phase value
   PDoubleVector fPhase;        ///< phase(s)
   Double_t fRangeForPhaseCorrection[2]; ///< field/frequency range for automatic phase correction

@@ -1516,6 +1516,18 @@ The block starts with the *FOURIER* keyword and may contain the following entrie
      .. code-block:: bash
      
         phase par7, par12, par17, par22, par27, par32, par37, par42, par47, par52, par57, par62, par67, par72, par77, par82
+        
+     One might prefer to express the phases in respect to a reference counter, *e.g.* the forward counter is the reference counter phase (fcp) whereas
+     the backward counter phase (bcp) is expressed as bcp = fcp + relative_bcp. If the fitting is done along these lines, the phases in the Fourier
+     block can be expressed the following way
+     
+     .. code-block:: bash
+     
+        phase parRX0 sep parX1 sep ... sep parXN
+        
+     which means that ``X0`` is the reference phase, and all the other phases are relative phases in respect to ``X0``, *i.e.* the absolut phase of
+     ``Xj`` would be the summ of the values of ``parX0`` and ``parXj`` etc. The reference phase in the list is marked by ``parR`` rather than ``par``.
+     Obviously only *one* reference phase can be defined!
   
   #. Often the phases in the parameter block follow a clear list structure. This allows to write the Fourier phase parameters in a more compact form
   
@@ -1529,6 +1541,13 @@ The block starts with the *FOURIER* keyword and may contain the following entrie
      .. code-block:: none
      
         phase par(7, 5, 16)
+        
+     As in the phase parameter list examples before, also here a reference phase with relative phases might be wished. Differently to the phase parameter
+     list example, the first parameter number will be the reference phase. The compact notation here is
+     
+     .. code-block:: none
+     
+        phase parR(X0, offest, #param)
   
 .. index:: fourier-block-range_for_phase_correction
 .. _msr-fourier-block-range_for_phase_correction:

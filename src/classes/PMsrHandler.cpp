@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2018 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -3876,6 +3876,7 @@ void PMsrHandler::InitFourierParameterStructure(PMsrFourierStructure &fourier)
   fourier.fDCCorrected = false;                   // dc-corrected FFT, default: false
   fourier.fApodization = FOURIER_APOD_NOT_GIVEN;  // apodization, default: NOT GIVEN
   fourier.fPlotTag = FOURIER_PLOT_NOT_GIVEN;      // initial plot tag, default: NOT GIVEN
+  fourier.fPhaseRef = -1;                         // initial phase reference -1 means: use absolute phases
   fourier.fPhaseParamNo.clear();                  // initial phase parameter no vector is empty
   fourier.fPhase.clear();                         // initial phase vector is empty
   for (UInt_t i=0; i<2; i++) {
@@ -3967,8 +3968,10 @@ Bool_t PMsrHandler::ParseFourierPhaseValueVector(PMsrFourierStructure &fourier, 
 //--------------------------------------------------------------------------
 /**
  * <p> examines if str has the form 'phase parX0 [sep parX1 ... sep parXN]'.
- * If this form is found, fill in parX0 ... parXN to fFourier.fPhaseParamNo
- * and furthermore fill fFourier.fPhase accordingly.
+ * Also allowed is that instead of parXn only one of the parameters could have the
+ * form parRn which markes a reference phase for relative phase fittings.
+ * If this form is found, fill in parX0 ... parXN to fourier.fPhaseParamNo, and
+ * in case a parR is present, set the fourier.fPhaseRef accordingly.
  *
  * @param fourier msr-file Fourier structure
  * @param str string to be analyzed
@@ -3979,6 +3982,7 @@ Bool_t PMsrHandler::ParseFourierPhaseValueVector(PMsrFourierStructure &fourier, 
 Bool_t PMsrHandler::ParseFourierPhaseParVector(PMsrFourierStructure &fourier, const TString &str, Bool_t &error)
 {
   Bool_t result = true;
+  Int_t refCount = 0;
 
   TObjArray *tok = str.Tokenize(" ,;\t");
   if (tok == 0) {
@@ -4004,6 +4008,10 @@ Bool_t PMsrHandler::ParseFourierPhaseParVector(PMsrFourierStructure &fourier, co
       break;
     }
 
+    if (sstr.BeginsWith("parR")) {
+      refCount++;
+    }
+
     // rule out par(X, offset, #Param) syntax
     if (sstr.BeginsWith("par(")) {
       result = false;
@@ -4011,13 +4019,25 @@ Bool_t PMsrHandler::ParseFourierPhaseParVector(PMsrFourierStructure &fourier, co
     }
   }
 
+  if (refCount > 1) {
+    cerr << ">> PMsrHandler::ParseFourierPhaseParVector: **ERROR** found multiple parR's! Only one reference phase is accepted." << endl;
+    result = false;
+  }
+
   // check that token has the form parX, where X is an int
+  Int_t rmNoOf = 3;
   if (result != false) {
     for (Int_t i=1; i<tok->GetEntries(); i++) {
       TObjString *ostr = dynamic_cast<TObjString*>(tok->At(i));
       sstr = ostr->GetString();
-      sstr.Remove(0, 3); // remove 'par' part. Rest should be an integer
+      rmNoOf = 3;
+      if (sstr.BeginsWith("parR")) {
+        rmNoOf++;
+      }
+      sstr.Remove(0, rmNoOf); // remove 'par' of 'parR' part. Rest should be an integer
       if (sstr.IsDigit()) {
+        if (rmNoOf == 4) // parR
+          fourier.fPhaseRef = sstr.Atoi();
         fourier.fPhaseParamNo.push_back(sstr.Atoi());
       } else {
         cerr << ">> PMsrHandler::ParseFourierPhaseParVector: **ERROR** found token '" << ostr->GetString() << "' which is not parX with X an integer." << endl;
@@ -4046,9 +4066,9 @@ Bool_t PMsrHandler::ParseFourierPhaseParVector(PMsrFourierStructure &fourier, co
 // ParseFourierPhaseParIterVector (private)
 //--------------------------------------------------------------------------
 /**
- * <p> examines if str has the form 'phase par(X0, offset, #params)'.
- * If this form is found, fill in parX0 ... parXN to fFourier.fPhaseParamNo
- * and furthermore fill fFourier.fPhase accordingly.
+ * <p> examines if str has the form 'phase par(X0, offset, #params)' or 'phase parR(X0, offset,  #params)'.
+ * If this form is found, fill in parX0 ... parXN to fourier.fPhaseParamNo, and
+ * in case of 'parR' also set the fourier.fPhaseRef accordingly.
  *
  * @param fourier msr-file Fourier structure
  * @param str string to be analyzed
@@ -4065,12 +4085,18 @@ Bool_t PMsrHandler::ParseFourierPhaseParIterVector(PMsrFourierStructure &fourier
   wstr = wstr.Strip(TString::kLeading, ' ');
 
   // remove 'par(' from string if present, otherwise and error is issued
-  if (!wstr.BeginsWith("par(")) {
-    cout << ">> PMsrHandler::ParseFourierPhaseParIterVector: **ERROR** token should start with 'par(', found: '" << wstr << "' -> ERROR" << endl;
+  if (!wstr.BeginsWith("par(") && !wstr.BeginsWith("parR(")) {
+    cout << ">> PMsrHandler::ParseFourierPhaseParIterVector: **ERROR** token should start with 'par(' or 'parR(', found: '" << wstr << "' -> ERROR" << endl;
     error = true;
     return false;
   }
-  wstr.Remove(0, 4);
+  Int_t noOf = 4; // number of characters to be removed
+  Bool_t relativePhase = false; // relative phase handling wished
+  if (wstr.BeginsWith("parR(")) {
+    noOf += 1;
+    relativePhase = true;
+  }
+  wstr.Remove(0, noOf);
 
   // remove trailing white spaces
   wstr = wstr.Strip(TString::kTrailing, ' ');
@@ -4132,6 +4158,12 @@ Bool_t PMsrHandler::ParseFourierPhaseParIterVector(PMsrFourierStructure &fourier
     delete tok;
     return false;
   }
+
+  // set the reference phase parameter number for 'parR'
+  if (relativePhase)
+    fourier.fPhaseRef = x0;
+  else
+    fourier.fPhaseRef = -1;
 
   for (Int_t i=0; i<noParam; i++)
     fourier.fPhaseParamNo.push_back(x0 + i*offset);
@@ -4335,11 +4367,16 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
         }
 
         // if parameter vector is given -> fill corresponding phase values
+        Double_t phaseRef = 0.0;
         if (fourier.fPhaseParamNo.size() > 0) {
+          // check if a relative parameter phase number is set
+          if (fourier.fPhaseRef != -1) {
+            phaseRef = fParam[fourier.fPhaseRef-1].fValue;
+          }
           fourier.fPhase.clear();
           UInt_t idx;
           for (UInt_t i=0; i<fourier.fPhaseParamNo.size(); i++) {
-            fourier.fPhase.push_back(fParam[fourier.fPhaseParamNo[i]-1].fValue);
+            fourier.fPhase.push_back(fParam[fourier.fPhaseParamNo[i]-1].fValue+phaseRef);
           }
         }
       }
@@ -6534,14 +6571,21 @@ void PMsrHandler::MakeDetectorGroupingString(TString str, PIntVector &group, TSt
 TString PMsrHandler::BeautifyFourierPhaseParameterString()
 {
   TString str("??");
+  TString formatStr("par%d, par%d");
 
   if (fFourier.fPhaseParamNo.size() == 0)
     return str;
 
+  Int_t phaseRef = fFourier.fPhaseRef;
+
   if (fFourier.fPhaseParamNo.size() == 1) {
     str = TString::Format("par%d", fFourier.fPhaseParamNo[0]);
   } else if (fFourier.fPhaseParamNo.size() == 2) {
-    str = TString::Format("par%d, par%d", fFourier.fPhaseParamNo[0], fFourier.fPhaseParamNo[1]);
+    if (phaseRef == fFourier.fPhaseParamNo[0])
+      formatStr = "parR%d, par%d";
+    if (phaseRef == fFourier.fPhaseParamNo[1])
+      formatStr = "par%d, parR%d";
+    str = TString::Format(formatStr, fFourier.fPhaseParamNo[0], fFourier.fPhaseParamNo[1]);
   } else {
     Bool_t phaseIter = true;
 
@@ -6555,15 +6599,27 @@ TString PMsrHandler::BeautifyFourierPhaseParameterString()
     }
 
     if (phaseIter) {
-      str = TString::Format("par(%d, %d, %d)", fFourier.fPhaseParamNo[0], offset, fFourier.fPhaseParamNo.size());
+      if (phaseRef != -1) {
+        str = TString::Format("parR(%d, %d, %d)", fFourier.fPhaseParamNo[0], offset, fFourier.fPhaseParamNo.size());
+      } else {
+        str = TString::Format("par(%d, %d, %d)", fFourier.fPhaseParamNo[0], offset, fFourier.fPhaseParamNo.size());
+      }
     } else {
       str = TString("");
       for (Int_t i=0; i<fFourier.fPhaseParamNo.size()-1; i++) {
-        str += "par";
+        if (phaseRef == fFourier.fPhaseParamNo[i]) {
+          str += "parR";
+        } else {
+          str += "par";
+        }
         str += fFourier.fPhaseParamNo[i];
         str += ", ";
       }
-      str += "par";
+      if (phaseRef == fFourier.fPhaseParamNo[fFourier.fPhaseParamNo.size()-1]) {
+        str += "parR";
+      } else {
+        str += "par";
+      }
       str += fFourier.fPhaseParamNo[fFourier.fPhaseParamNo.size()-1];
     }
   }
