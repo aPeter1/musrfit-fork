@@ -4,18 +4,18 @@
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 
 root_generate_dictionary(
-  libLineProfileDict 
+  LineProfileDict 
   -I${FFTW3_INCLUDE_DIR} 
   -I${MUSRFIT_INC}
-  libLineProfile.h 
-  LINKDEF libLineProfileLinkDef.h
-  MODULE libLineProfile
+  LineProfile.h 
+  LINKDEF LineProfileLinkDef.h
+  MODULE LineProfile
 )
 
 #--- lib creation -------------------------------------------------------------
 add_library(LineProfile SHARED
-  libLineProfile.cpp
-  libLineProfileDict.cxx
+  LineProfile.cpp
+  LineProfileDict.cxx
 )
 
 #--- make sure that the include directory is found ----------------------------
@@ -48,7 +48,7 @@ install(
 #--- install libLineProfile header ---------------------------------------------------
 install( 
   FILES 
-    libLineProfile.h
+    LineProfile.h
   DESTINATION 
     include
 )

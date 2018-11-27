@@ -1,19 +1,19 @@
 ## Process this file with automake to create Makefile.in
 
 h_sources = \
-  libLineProfile.h 
+  LineProfile.h 
 
 h_linkdef = \
-  libLineProfile.h
+  LineProfile.h
 
 dict_h_sources = \
-  libLineProfileDict.h
+  LineProfileDict.h
 
 cpp_sources = \
-  libLineProfile.cpp
+  LineProfile.cpp
 
 dict_cpp_sources = \
-  libLineProfileDict.cpp
+  LineProfileDict.cpp
 
 include_HEADERS = $(h_sources)
 noinst_HEADERS = $(h_linkdef) $(dict_h_sources)
