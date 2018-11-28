@@ -5,16 +5,20 @@ find_package(Qt5WebEngine QUIET)
 find_package(Qt5WebKit QUIET)
 
 set(qt_libs Qt5::Core Qt5::Widgets Qt5::Network Qt5::Xml Qt5::Svg Qt5::PrintSupport)
+set(Qt5NoWeb 0)
 if (Qt5WebEngine_FOUND)
   message("-- Qt5WebEngine is present.")
   find_package(Qt5WebEngineWidgets QUIET CONFIG REQUIRED)
   set(qt_libs ${qt_libs} Qt5::WebEngine Qt5::WebEngineWidgets)
+  # unset a potentially found Qt5Webkit
+  unset(Qt5WebKit_FOUND)
 elseif (Qt5WebKit_FOUND)
   message("-- Qt5WebKit is present.")
   find_package(Qt5WebKitWidgets QUIET CONFIG REQUIRED)
   set(qt_libs ${qt_libs} Qt5::WebKit Qt5::WebKitWidgets)
 else (Qt5WebEngine_FOUND)
   message("-- Neither Qt5WebEngine nor Qt5WebKit found.")
+  set(Qt5NoWeb 1)
 endif (Qt5WebEngine_FOUND)
 
 set(musredit_src
@@ -116,12 +120,28 @@ else (APPLE)
   )
 endif (APPLE)
 
+# set necessary tags depending if QtWebEngine, QtWebKit, 
+# or none of both are given
+if (Qt5WebKit_FOUND)
+  target_compile_options(musredit
+    BEFORE PRIVATE 
+    -DHAVE_QT_WEB_KIT
+  )
+endif (Qt5WebKit_FOUND)
+
 if (Qt5WebEngine_FOUND)
   target_compile_options(musredit
     BEFORE PRIVATE 
     -DHAVE_QT_WEB_ENGINE
   )
 endif (Qt5WebEngine_FOUND)
+
+if (Qt5NoWeb)
+  target_compile_options(musredit
+    BEFORE PRIVATE 
+    -DHAVE_QT_NO_WEB
+  )
+endif (Qt5NoWeb)
 
 target_include_directories(musredit
   BEFORE PRIVATE
