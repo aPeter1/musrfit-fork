@@ -4374,9 +4374,11 @@ Bool_t PMsrHandler::HandleFourierEntry(PMsrLines &lines)
             phaseRef = fParam[fourier.fPhaseRef-1].fValue;
           }
           fourier.fPhase.clear();
-          UInt_t idx;
           for (UInt_t i=0; i<fourier.fPhaseParamNo.size(); i++) {
-            fourier.fPhase.push_back(fParam[fourier.fPhaseParamNo[i]-1].fValue+phaseRef);
+            if (fourier.fPhaseRef == fourier.fPhaseParamNo[i]) // reference phase
+              fourier.fPhase.push_back(fParam[fourier.fPhaseParamNo[i]-1].fValue);
+            else
+              fourier.fPhase.push_back(fParam[fourier.fPhaseParamNo[i]-1].fValue+phaseRef);
           }
         }
       }
