@@ -1278,8 +1278,8 @@ Bool_t PRunAsymmetryRRF::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *glob
       }
 
       // fill in the T0's from the msr-file (if present)
-      for (Int_t j=0; j<fRunInfo->GetAddT0BinSize(i); j++) {
-        fAddT0s[i-1][j] = fRunInfo->GetAddT0Bin(i, j);
+      for (Int_t j=0; j<fRunInfo->GetAddT0BinSize(i-1); j++) {
+        fAddT0s[i-1][j] = fRunInfo->GetAddT0Bin(i-1, j);
       }
 
       // fill in the T0's from the data file, if not already present in the msr-file
