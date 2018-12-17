@@ -302,6 +302,17 @@ void PChangeDefaultPathsDialog::saveDefaultPathList()
   }
   fileIn.close();
 
+  // check if there is any data_path is present in the musrfit_startup.xml
+  bool dataPathPresent = false;
+  QString str;
+  for (int i=0; i<fileContent.count(); i++) {
+    str = fileContent[i];
+    if (str.trimmed().startsWith("<data_path>")) {
+      dataPathPresent = true;
+      break;
+    }
+  }
+
   // write the new musrfit_startup.xml
   QFile fileOut(fDefaultPath->getPrefPathName());
   if (!fileOut.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -309,11 +320,15 @@ void PChangeDefaultPathsDialog::saveDefaultPathList()
     return;
   }
   QTextStream out(&fileOut);
-  QString str;
   bool first = true;
   for (int i=0; i<fileContent.count(); i++) {
     str = fileContent[i];
     if (!str.trimmed().startsWith("<data_path>")) {
+      // if not data_path was present, add the new data_paths just before the end of the musrfit_start.xml close tag
+      if ((dataPathPresent == false) && (str.trimmed().startsWith("</musrfit>"))) {
+        for (int j=0; j<fSearchPath_listWidget->count(); j++)
+          out << "    <data_path>" << fSearchPath_listWidget->item(j)->text() << "</data_path>" << endl;
+      }
       out << fileContent[i] << endl;
     } else {
       if (first) {
