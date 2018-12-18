@@ -25,6 +25,9 @@ set(CMAKE_AUTOUIC OFF)
 # add qt/rcc
 qt5_add_resources(musrWiz_rcc musrWiz.qrc)
 
+# remove generated files from automoc and autouic
+set_property(SOURCE qrc_musrWiz.cpp PROPERTY SKIP_AUTOMOC ON)
+
 set(macosx_icon icons/musrWiz.icns)
 if (APPLE)
   add_executable(musrWiz MACOSX_BUNDLE

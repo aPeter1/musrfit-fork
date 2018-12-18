@@ -1025,12 +1025,11 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     }
 
     // FOURIER block - in case a parameter is used for the phase
-    tempPar = fMsrHandler->GetMsrFourierList()->fPhaseParamNo;
-    if (tempPar > 0) {
+    if (fMsrHandler->GetMsrFourierList()->fPhaseParamNo.size() > 0) {
       // go through the whole parameter list ...
       for (unsigned int k(0); k < msrParamList->size(); ++k) {
         if (tempPar == msrParamList->at(k).fNo) {
-          fMsrHandler->GetMsrFourierList()->fPhaseParamNo = k + 1;
+          fMsrHandler->GetMsrFourierList()->fPhaseParamNo.push_back(k + 1);
           break;
         }
       }
@@ -2199,7 +2198,8 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
             WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, outFile.width(), db);
             outFile << ", ";
           } else {
-            outFile << (*msrParamList)[i].fValue << ", ";
+            WriteValue(outFile, (*msrParamList)[i].fValue, fabs((*msrParamList)[i].fStep), outFile.width(), db);
+            outFile << ", ";
           }
           if ((*msrParamList)[i].fPosErrorPresent) {
             WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, outFile.width(), db);
@@ -2417,7 +2417,7 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
           if ((*msrParamList)[i].fPosErrorPresent)
             WriteValue(outFile, (*msrParamList)[i].fValue, (*msrParamList)[i].fPosError, maxlength, db);
           else
-            WriteValue(outFile, (*msrParamList)[i].fValue, maxlength);
+            WriteValue(outFile, (*msrParamList)[i].fValue, fabs((*msrParamList)[i].fStep), maxlength, db);
 
           if ((*msrParamList)[i].fPosErrorPresent)
             WriteValue(outFile, (*msrParamList)[i].fPosError, (*msrParamList)[i].fPosError, maxlength, db);

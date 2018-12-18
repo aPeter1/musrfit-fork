@@ -30,8 +30,12 @@
 #include <QtWidgets>
 #ifdef HAVE_QT_WEB_ENGINE
 #include <QWebEngineView>
-#else
+#endif
+#ifdef HAVE_QT_WEB_KIT
 #include <QtWebKitWidgets>
+#endif
+#ifdef HAVE_QT_NO_WEB
+#include <QPlainTextEdit>
 #endif
 #include <QNetworkProxyFactory>
 
@@ -61,14 +65,24 @@ PHelp::PHelp(const QString &url, const bool isDarkTheme) :
 
 #ifdef HAVE_QT_WEB_ENGINE
   fView = new QWebEngineView(this);
-#else
+#endif
+#ifdef HAVE_QT_WEB_KIT
   fView = new QWebView(this);
 #endif
+#ifdef HAVE_QT_NO_WEB
+  fView = new QPlainTextEdit(this);
+#endif
+#ifndef HAVE_QT_NO_WEB
   fView->load(QUrl(url));
   connect(fView, SIGNAL(loadFinished(bool)), SLOT(adjustLocation()));
   connect(fView, SIGNAL(titleChanged(QString)), SLOT(adjustTitle()));
   connect(fView, SIGNAL(loadProgress(int)), SLOT(setProgress(int)));
   connect(fView, SIGNAL(loadFinished(bool)), SLOT(finishLoading(bool)));
+#else
+  fView->setPlainText("Within the current setup there is NO Help available.");
+  fView->appendPlainText("The necessary Qt web libs where not found when setting up musredit.");
+  fView->setReadOnly(true);
+#endif
 
   fLocationEdit = new QLineEdit(this);
   fLocationEdit->setSizePolicy(QSizePolicy::Expanding, fLocationEdit->sizePolicy().verticalPolicy());
@@ -80,12 +94,13 @@ PHelp::PHelp(const QString &url, const bool isDarkTheme) :
   toolBar->addAction(fView->pageAction(QWebEnginePage::Forward));
   toolBar->addAction(fView->pageAction(QWebEnginePage::Reload));
   toolBar->addAction(fView->pageAction(QWebEnginePage::Stop));
-#else
+#endif
+#ifdef HAVE_QT_WEB_KIT
   toolBar->addAction(fView->pageAction(QWebPage::Back));
   toolBar->addAction(fView->pageAction(QWebPage::Forward));
   toolBar->addAction(fView->pageAction(QWebPage::Reload));
   toolBar->addAction(fView->pageAction(QWebPage::Stop));
-#endif
+#endif  
   toolBar->addWidget(fLocationEdit);
 
   QMenu *exitMenu = menuBar()->addMenu(tr("&File"));
@@ -127,7 +142,9 @@ void PHelp::done()
  */
 void PHelp::adjustLocation()
 {
+#ifndef HAVE_QT_NO_WEB
   fLocationEdit->setText(fView->url().toString());
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -138,8 +155,10 @@ void PHelp::adjustLocation()
 void PHelp::changeLocation()
 {
   QUrl url = QUrl(fLocationEdit->text());
+#ifndef HAVE_QT_NO_WEB
   fView->load(url);
   fView->setFocus();
+#endif
 }
 
 //---------------------------------------------------------------------------
@@ -149,10 +168,12 @@ void PHelp::changeLocation()
  */
 void PHelp::adjustTitle()
 {
+#ifndef HAVE_QT_NO_WEB
   if (fProgress <= 0 || fProgress >= 100)
-    setWindowTitle(fView->title());
+    setWindowTitle(fView->title());  
   else
     setWindowTitle(QString("%1 (%2%)").arg(fView->title()).arg(fProgress));
+#endif
 }
 
 //---------------------------------------------------------------------------

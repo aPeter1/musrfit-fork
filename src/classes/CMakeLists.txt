@@ -11,13 +11,13 @@ root_generate_dictionary(
 )
 root_generate_dictionary(
   PMusrCanvasDict 
-  -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PMusrCanvas.h 
+  -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PMusrCanvas.h 
   LINKDEF ${MUSRFIT_INC}/PMusrCanvasLinkDef.h
   MODULE PMusrCanvas
 )
 root_generate_dictionary(
   PMusrT0Dict 
-  -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PMusrT0.h 
+  -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PMusrT0.h 
   LINKDEF ${MUSRFIT_INC}/PMusrT0LinkDef.h
   MODULE PMusrT0
 )
@@ -81,6 +81,7 @@ add_library(PMusr SHARED
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PMusr BEFORE PRIVATE
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${NEXUS_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${MUSRFIT_INC}>

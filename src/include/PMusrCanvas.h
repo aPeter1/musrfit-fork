@@ -252,7 +252,7 @@ class PMusrCanvas : public TObject, public TQObject
     Bool_t fXRangePresent, fYRangePresent; ///< flag indicating if x-/y-range is present
     Double_t fXmin, fXmax, fYmin, fYmax;   ///< data/theory frame range
 
-    Double_t fCurrentFourierPhase;    ///< holds the current Fourier phase
+    PDoubleVector fCurrentFourierPhase; ///< holds the current Fourier phase(s)
     TLatex *fCurrentFourierPhaseText; ///< used in Re/Im Fourier to show the current phase in the pad
     TString *fRRFText;      ///< RRF information
     TLatex  *fRRFLatexText; ///< used to display RRF info

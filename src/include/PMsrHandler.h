@@ -146,6 +146,10 @@ class PMsrHandler
     virtual void FillParameterInUse(PMsrLines &theory, PMsrLines &funcs, PMsrLines &run);
 
     virtual void InitFourierParameterStructure(PMsrFourierStructure &fourier);
+    virtual void RemoveComment(const TString &str, TString &truncStr);
+    virtual Bool_t ParseFourierPhaseValueVector(PMsrFourierStructure &fourier, const TString &str, Bool_t &error);
+    virtual Bool_t ParseFourierPhaseParVector(PMsrFourierStructure &fourier, const TString &str, Bool_t &error);
+    virtual Bool_t ParseFourierPhaseParIterVector(PMsrFourierStructure &fourier, const TString &str, Bool_t &error);
 
     virtual Bool_t FilterNumber(TString str, const Char_t *filter, Int_t offset, Int_t &no);
 
@@ -153,6 +157,7 @@ class PMsrHandler
     virtual UInt_t LastSignificant(Double_t dval, UInt_t precLimit=6);
 
     virtual void MakeDetectorGroupingString(TString str, PIntVector &group, TString &result, Bool_t includeDetector = true);
+    virtual TString BeautifyFourierPhaseParameterString();
 
     virtual void CheckLegacyLifetimecorrection();
 };
