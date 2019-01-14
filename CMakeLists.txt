@@ -326,7 +326,7 @@ set (CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CPackOptions.cmake")
 #set (CPACK_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
 #set (CPACK_SOURCE_GENERATOR TGZ) # not use ZIP on UNIX as problem with symlinks
 if (UNIX)
-#  set (CPACK_GENERATOR ${CPACK_GENERATOR};RPM)
+  set (CPACK_GENERATOR ${CPACK_GENERATOR};RPM)
 endif ()
 # Include of CPack must always be last
 include(CPack)
