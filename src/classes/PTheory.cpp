@@ -2115,14 +2115,14 @@ Double_t PTheory::InternalFieldGK(register Double_t t, const PDoubleVector& para
     tt = t-val[5];
 
   Double_t result = 0.0;
-  Double_t nu_t = val[1]*tt;
+  Double_t w_t = TWO_PI*val[1]*tt;
   Double_t rateLF = TMath::Power(val[3]*tt, val[4]);
   Double_t rate2 = val[2]*val[2]*tt*tt; // (sigma t)^2
 
   if (val[1] < 0.01) { // internal field frequency is approaching zero
     result = (1.0-val[0])*TMath::Exp(-rateLF) + val[0]*(1.0-rate2)*TMath::Exp(-0.5*rate2);
   } else {
-    result = (1.0-val[0])*TMath::Exp(-rateLF) + val[0]*(TMath::Cos(nu_t)-val[2]*val[2]*tt/val[1]*TMath::Sin(nu_t))*TMath::Exp(-0.5*rate2);
+    result = (1.0-val[0])*TMath::Exp(-rateLF) + val[0]*(TMath::Cos(w_t)-val[2]*val[2]*tt/(TWO_PI*val[1])*TMath::Sin(w_t))*TMath::Exp(-0.5*rate2);
   }
 
   return result;
@@ -2167,14 +2167,14 @@ Double_t PTheory::InternalFieldLL(register Double_t t, const PDoubleVector& para
     tt = t-val[5];
 
   Double_t result = 0.0;
-  Double_t nu_t = val[1]*tt;
+  Double_t w_t = TWO_PI*val[1]*tt;
   Double_t rateLF = TMath::Power(val[3]*tt, val[4]);
   Double_t a_t = val[2]*tt; // a t
 
   if (val[1] < 0.01) { // internal field frequency is approaching zero
     result = (1.0-val[0])*TMath::Exp(-rateLF) + val[0]*(1.0-a_t)*TMath::Exp(-a_t);
   } else {
-    result = (1.0-val[0])*TMath::Exp(-rateLF) + val[0]*(TMath::Cos(nu_t)-val[3]/val[1]*TMath::Sin(nu_t))*TMath::Exp(-a_t);
+    result = (1.0-val[0])*TMath::Exp(-rateLF) + val[0]*(TMath::Cos(w_t)-val[3]/(TWO_PI*val[1])*TMath::Sin(w_t))*TMath::Exp(-a_t);
   }
 
   return result;
