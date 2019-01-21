@@ -656,33 +656,39 @@ spinGlass    spg     :math:`\lambda (\mu \mathrm{s}^{-1})`, \        :math:`\fra
 rdAnisoHf    rahf    :math:`\nu` (MHz), \                            :math:`\frac{1}{6} (1-\nu t/2) \exp(-\nu t/2) +`                                                                                                                                                                                                             [#n7]_
                      :math:`\lambda (\mu \mathrm{s}^{-1})`              :math:`+ \frac{1}{3} (1 - \nu t/4) \exp(-\frac{\nu t + 2.44949 \lambda t}{4})`
 TFieldCos    tf      :math:`\varphi (^\circ), \nu` (MHz)             :math:`\cos\left(2\pi\nu t + \frac{\pi \varphi}{180}\right)`
-internFld    if      :math:`\alpha (1), \varphi (^\circ)`, \         :math:`\alpha \cos\left(2\pi\nu t + \frac{\pi \varphi}{180}\right) \exp(\lambda_{\rm T}t) +`
+internFld    if      :math:`\alpha (1), \varphi (^\circ)`, \         :math:`\alpha \cos\left(2\pi\nu t + \frac{\pi \varphi}{180}\right) \exp(-\lambda_{\rm T}t) +`
                      :math:`\nu` (MHz), \                               :math:`+ (1-\alpha) \exp(-\lambda_{\rm L} t)`
                      :math:`\lambda_{\rm T} (\mu \mathrm{s}^{-1})`,\
                      :math:`\lambda_{\rm L} (\mu \mathrm{s}^{-1})`
 Bessel       b       :math:`\varphi (^\circ), \nu` (MHz)             :math:`j_0\left(2\pi\nu t + \frac{\pi \varphi}{180}\right)`
-internbsl    ib      :math:`\alpha (1), \varphi (^\circ)`, \         :math:`\alpha j_0\left(2\pi\nu t + \frac{\pi \varphi}{180}\right) \exp(\lambda_{\rm T}t) +`
+internbsl    ib      :math:`\alpha (1), \varphi (^\circ)`, \         :math:`\alpha j_0\left(2\pi\nu t + \frac{\pi \varphi}{180}\right) \exp(-\lambda_{\rm T}t) +`
                      :math:`\nu` (MHz), \                               :math:`+ (1-\alpha) \exp(-\lambda_{\rm L} t)`
                      :math:`\lambda_{\rm T} (\mu \mathrm{s}^{-1})`,\
                      :math:`\lambda_{\rm L} (\mu \mathrm{s}^{-1})`
+internFldGK  ifgk    :math:`\alpha (1), \nu` (MHz), \                :math:`\alpha\left[\cos(2\pi\nu t)-\frac{\sigma^2 t}{2\pi\nu}\sin(2\pi\nu t)\right]\exp(-\sigma^2 t^2/2)+`                     
+                     :math:`\sigma (\mu \mathrm{s}^{-1})`, \            :math:`+ (1-\alpha) \exp(-(\lambda t)^\beta)`                                                                                                                                                                                                             [#n8]_
+                     :math:`\lambda (\mu\mathrm{s}^{-1}), \beta (1)` 
+internFldLL  ifll    :math:`\alpha (1), \nu` (MHz), \                :math:`\alpha\left[\cos(2\pi\nu t)-\frac{a}{2\pi\nu}\sin(2\pi\nu t)\right]\exp(-a t)+`
+                     :math:`a (\mu \mathrm{s}^{-1})`, \                 :math:`+ (1-\alpha) \exp(-(\lambda t)^\beta)`                                                                                                                                                                                                                  [#n9]_
+                     :math:`\lambda (\mu\mathrm{s}^{-1}), \beta (1)`
 abragam      ab      :math:`\sigma (\mu \mathrm{s}^{-1})`, \         :math:`\exp\left[-\frac{\sigma^2}{\gamma^2} (e^{-\gamma t} - 1 + \gamma t)\right]`
                      :math:`\gamma` (MHz)
-skewedGss    skg     :math:`\varphi (^\circ), \nu` (MHz) \           :math:`\frac{\sigma_{-}}{\sigma_{+}+\sigma_{-}} \exp\left[\frac{\sigma_{-}^2 t^2}{2}\right] \left\{\cos(2\pi\nu t + \frac{\pi\varphi}{180}) + \sin(2\pi\nu t + \frac{\pi\varphi}{180}) \mathrm{Erfi}\left(\frac{\sigma_{-} t}{\sqrt{2}}\right)\right\} +`    [#n8]_
+skewedGss    skg     :math:`\varphi (^\circ), \nu` (MHz) \           :math:`\frac{\sigma_{-}}{\sigma_{+}+\sigma_{-}} \exp\left[\frac{\sigma_{-}^2 t^2}{2}\right] \left\{\cos(2\pi\nu t + \frac{\pi\varphi}{180}) + \sin(2\pi\nu t + \frac{\pi\varphi}{180}) \mathrm{Erfi}\left(\frac{\sigma_{-} t}{\sqrt{2}}\right)\right\} +`    [#n10]_
                      :math:`\sigma_{+} (\mu \mathrm{s}^{-1})`, \        :math:`+ \frac{\sigma_{+}}{\sigma_{+}+\sigma_{-}} \exp\left[\frac{\sigma_{+}^2 t^2}{2}\right] \left\{\cos(2\pi\nu t + \frac{\pi\varphi}{180}) - \sin(2\pi\nu t + \frac{\pi\varphi}{180}) \mathrm{Erfi}\left(\frac{\sigma_{+} t}{\sqrt{2}}\right)\right\}`
                      :math:`\sigma_{-} (\mu \mathrm{s}^{-1})`
-staticNKZF   snkzf   :math:`\Delta_0 (\mu \mathrm{s}^{-1})`, \       :math:`\frac{1}{3} + \frac{2}{3}\left(\frac{1}{1+R_b^2\Delta_0^2 t^2}\right)^{3/2} \left(1 - \frac{\Delta_0^2 t^2}{1+R_b^2\Delta_0^2 t^2}\right) \exp\left[-\frac{\Delta_0^2 t^2}{2(1+R_b^2\Delta_0^2 t^2)}\right]`                                          [#n9]_
+staticNKZF   snkzf   :math:`\Delta_0 (\mu \mathrm{s}^{-1})`, \       :math:`\frac{1}{3} + \frac{2}{3}\left(\frac{1}{1+R_b^2\Delta_0^2 t^2}\right)^{3/2} \left(1 - \frac{\Delta_0^2 t^2}{1+R_b^2\Delta_0^2 t^2}\right) \exp\left[-\frac{\Delta_0^2 t^2}{2(1+R_b^2\Delta_0^2 t^2)}\right]`                                          [#n11]_
                      :math:`R_b = \Delta_{\rm GbG}/\Delta_0 (1)`
-staticNKTF   snktf   :math:`\varphi (^\circ), \nu` (MHz), \          :math:`\sqrt{\frac{1}{1+R_b^2 \Delta_0^2 t^2}} \exp\left[-\frac{\Delta_0^2 t^2}{2(1+R_b^2 \Delta_0^2 t^2)}\right] \cos(2\pi\nu t + \varphi)`                                                                                                                 see [11]
+staticNKTF   snktf   :math:`\varphi (^\circ), \nu` (MHz), \          :math:`\sqrt{\frac{1}{1+R_b^2 \Delta_0^2 t^2}} \exp\left[-\frac{\Delta_0^2 t^2}{2(1+R_b^2 \Delta_0^2 t^2)}\right] \cos(2\pi\nu t + \varphi)`                                                                                                                 see [13]
                      :math:`\Delta_0 (\mu \mathrm{s}^{-1})`, \
                      :math:`R_b = \Delta_{\rm GbG}/\Delta_0 (1)`     
-dynamicNKZF  dnkzf   :math:`\Delta_0 (\mu \mathrm{s}^{-1})`, \       :math:`\sqrt{\frac{1}{1+4 R_b^2 \Delta_0^2 \Theta(t)}} \exp\left[-\frac{2\Delta_0^2 \Theta(t)}{1+4 R_b^2 \Delta_0^2 \Theta(t)}\right]`,                                                                                                                      see [11]   
+dynamicNKZF  dnkzf   :math:`\Delta_0 (\mu \mathrm{s}^{-1})`, \       :math:`\sqrt{\frac{1}{1+4 R_b^2 \Delta_0^2 \Theta(t)}} \exp\left[-\frac{2\Delta_0^2 \Theta(t)}{1+4 R_b^2 \Delta_0^2 \Theta(t)}\right]`,                                                                                                                      see [13]   
                      :math:`R_b = \Delta_{\rm GbG}/\Delta_0 (1)`, \     :math:`\Theta(t) = \frac{\exp(-\nu_c t) -1 -\nu_c t}{\nu_c^2}`
                      :math:`\nu_c` (MHz)
-dynamicNKTF  dnktf   :math:`\varphi (^\circ), \nu` (MHz), \          :math:`\sqrt{\frac{1}{1+2 R_b^2 \Delta_0^2 \Theta(t)}} \exp\left[-\frac{\Delta_0^2 \Theta(t)}{1+2 R_b^2 \Delta_0^2 \Theta(t)}\right] \cos(2\pi\nu t + \varphi)`,                                                                                             see [11]   
+dynamicNKTF  dnktf   :math:`\varphi (^\circ), \nu` (MHz), \          :math:`\sqrt{\frac{1}{1+2 R_b^2 \Delta_0^2 \Theta(t)}} \exp\left[-\frac{\Delta_0^2 \Theta(t)}{1+2 R_b^2 \Delta_0^2 \Theta(t)}\right] \cos(2\pi\nu t + \varphi)`,                                                                                             see [13]   
                      :math:`\Delta_0 (\mu \mathrm{s}^{-1})`, \          :math:`\Theta(t) = \frac{\exp(-\nu_c t) -1 -\nu_c t}{\nu_c^2}`
                      :math:`R_b = \Delta_{\rm GbG}/\Delta_0 (1)`, \
                      :math:`\nu_c` (MHz)
-muMinusExpTF mmsetf  :math:`N_0 (1), \tau (\mu \mathrm{s}^{-1})`, \  :math:`N_0 \exp(-t/\tau) \left[ 1 + A \exp(-\lambda t) \cos(2 \pi \nu t + \varphi) \right]`                                                                                                                                                                  [#n10]_
+muMinusExpTF mmsetf  :math:`N_0 (1), \tau (\mu \mathrm{s}^{-1})`, \  :math:`N_0 \exp(-t/\tau) \left[ 1 + A \exp(-\lambda t) \cos(2 \pi \nu t + \varphi) \right]`                                                                                                                                                                  [#n12]_
                      :math:`A (1), \lambda (\mu \mathrm{s}^{-1})`, \
                      :math:`\varphi (^\circ), \nu` (MHz)
 polynom      p       :math:`t_0 ([t]), a_0 (1)`, \                   :math:`\sum_{k=0}^n a_k (t-t_0)^k`
@@ -700,12 +706,16 @@ polynom      p       :math:`t_0 ([t]), a_0 (1)`, \                   :math:`\sum
 .. [#n5] R.S. Hayano *et al.*, Phys. Rev. B **20**, 850 (1979)., P. Dalmas de Réotier and A. Yaouanc, J. Phys.: Condens. Matter **4**, 4533 (1992). -- **not** DKS ready.
 .. [#n6] `M.R. Crook <http://dx.doi.org/10.1088/0953-8984/9/5/018>`_ and R. Cywinski, J. Phys.: Condens. Matter **9** 1149 (1997).
 .. [#n7] `R.E. Turner <http://link.aps.org/doi/10.1103/PhysRevB.34.4467>`_ and D.R. Harshman, Phys. Rev. B **34**, 4467 (1986). 
-.. [#n8] `see memo <http://lmu.web.psi.ch/musrfit/memos/skewedGaussian.pdf>`_ -- **not** DKS ready.
-.. [#n9] `D.R. Noakes <http://link.aps.org/doi/10.1103/PhysRevB.56.2352>`_ and G.M. Kalvius, Phys. Rev. B **56**, 2352 (1997); 
+.. [#n8] `E.I. Kornilov <https://doi.org/10.1016/0375-9601(91)90959-C>`_ and V.Yu. Pomjakushin, Physics Letters A **153**, 364, (1991).
+         In the original work, :math:`\alpha=2/3,\, \lambda=0,\, \beta=1`. If you find values strongly deviating from these values you should question your analysis approach.
+.. [#n9] `M.I. Larkin <https://doi.org/10.1016/S0921-4526(00)00337-9>`_ *et al.*, Physica B: Condensed Matter **289-290**, 153 (2000).
+         In the original work, :math:`\alpha=2/3,\, \lambda=0,\, \beta=1`. If you find values strongly deviating from these values you should question your analysis approach.
+.. [#n10] `see memo <http://lmu.web.psi.ch/musrfit/memos/skewedGaussian.pdf>`_ -- **not** DKS ready.
+.. [#n11] `D.R. Noakes <http://link.aps.org/doi/10.1103/PhysRevB.56.2352>`_ and G.M. Kalvius, Phys. Rev. B **56**, 2352 (1997); 
          A. Yaouanc and P. Dalmas de Réotier "Muon Spin Rotation, Relaxation, and Resonance" Oxford Scientific Publication; 
          simplifying the original formulae by eliminating :math:`\Delta_{\rm eff}` via the identity 
          :math:`\Delta_{\rm eff}^2 = (1+R_b^2)\Delta_0`.
-.. [#n10] This function is explicit for :math:`\mu^-`! Do not try to use it for :math:`\mu^+`!         
+.. [#n12] This function is explicit for :math:`\mu^-`! Do not try to use it for :math:`\mu^+`!         
 
 .. _msr-map-intro:
 
