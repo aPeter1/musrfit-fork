@@ -1,0 +1,101 @@
+Name:           musrfit-root6
+Version:        1.4
+Release:        1%{?dist}
+Summary:        musrfit - muSR data analysis package
+
+License:        GPLv2
+URL:            http://lmu.web.psi.ch/musrfit/user/html/index.html
+Source0:        https://gitlab.psi.ch/nemu/musrfit/repository/%{name}-%{version}.tar.gz
+
+BuildRequires:  cmake
+BuildRequires:  libtool
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  hdf-devel hdf5-devel
+BuildRequires:  mxml-devel
+BuildRequires:  fftw3-devel
+BuildRequires:  boost-devel
+BuildRequires:  gsl-devel
+BuildRequires:  libxml2-devel
+BuildRequires:  root
+BuildRequires:  root-io-xml
+BuildRequires:  root-mathmore
+BuildRequires:  root-minuit2
+BuildRequires:  qt5-qtbase-devel qt5-qtsvg-devel qt5-qtwebkit-devel
+BuildRequires:  nexus
+Requires:       hdf hdf5
+Requires:       mxml
+Requires:       fftw3
+Requires:       gsl
+Requires:       boost-devel
+Requires:       libxml2
+Requires:       root
+Requires:       root-io-xml
+Requires:       root-mathmore
+Requires:       root-minuit2
+Requires:       qt5-qtbase qt5-qtsvg qt5-qtwebkit
+Requires:       nexus
+
+%description
+This is a data analysis package to analyze time differential muSR and beta-NMR data. Currently it allows the following things:
+- setting up most commonly used fitting functions for muSR and beta-NMR
+- fitting data, including global fits
+- showing the fit results and the residuals
+- showing the Fourier transform of the data
+- extracting easily the fitting parameters to be used in other programs (gnuplot, qtiplot/origin, ...)
+- allows to generate fitting input files for follow-up runs
+- allows to generate global fitting input files based on a single run template
+- allows to implement more sophisticated user functions (e.g. GL vortex lattice, Meissner screening including low-energy muon stopping profiles)
+
+Currently supported platforms:
+- Linux
+- Mac OS X
+- Windows - not really, only for the very brave ones
+
+
+%prep
+%setup -q -n %{name}-%{version}
+
+
+%build
+##æs35 ./autogen.sh
+# DOCDIR is needed to be set here. BMWlibs still makes troubles
+%cmake -DASlibs=1 -DBMWlbis=1 -Dnexus=1 DOCDIR=$RPM_BUILD_ROOT/usr/share/doc/musrfit
+%cmake --build ./ --clean-first -- -j8
+##æs35 %configure --enable-ASlibs --enable-BMWlibs --enable-NeXus DOCDIR=$RPM_BUILD_ROOT/usr/share/doc/musrfit
+##æs35 %make_build
+
+
+%install
+# INSTALL_ROOT is needed for Qt applications
+rm -rf $RPM_BUILD_ROOT
+%make_install INSTALL_ROOT=%{buildroot}
+
+%files
+%_prefix/bin/any2many
+%_prefix/bin/dump_header
+%_prefix/bin/msr2data
+%_prefix/bin/msr2msr
+%_prefix/bin/mupp
+%_prefix/bin/mupp_plot
+%_prefix/bin/musredit
+%_prefix/bin/musrfit
+%_prefix/bin/musrFT
+%_prefix/bin/musrRootValidation
+%_prefix/bin/musrStep
+%_prefix/bin/musrt0
+%_prefix/bin/musrview
+%_prefix/bin/musrWiz
+%_prefix/bin/write_musrRoot_runHeader
+%_prefix/include/*
+%_prefix/lib64/*
+%license COPYING
+%doc %_prefix/share/doc/musrfit
+
+
+
+%changelog
+* Thu Dec 20 2018 Andreas Suter <andreas.suter@psi.ch> - 1.4-1
+- adopted to cmake 
+* Wed Oct 25 2017 Andreas Suter <andreas.suter@psi.ch> - 1.2-1
+- first spec file for musrfit-root6
