@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>User manual &mdash; musrfit 1.4.0 documentation</title>
+    <title>User manual &mdash; musrfit 1.4.1 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.4.0',
+        VERSION:     '1.4.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="musrfit 1.4.0 documentation" href="index.html" />
+    <link rel="top" title="musrfit 1.4.1 documentation" href="index.html" />
     <link rel="next" title="Documentation of user libs (user functions)" href="user-libs.html" />
     <link rel="prev" title="Tutorial for musrfit" href="tutorial.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="tutorial.html" title="Tutorial for musrfit"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">musrfit 1.4.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.4.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -584,7 +584,7 @@ in case a <span class="math">\(\chi^2\)</span> single-histogram fit is done, als
 <col width="2%" />
 <col width="14%" />
 <col width="77%" />
-<col width="2%" />
+<col width="3%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">name</th>
@@ -721,7 +721,7 @@ in case a <span class="math">\(\chi^2\)</span> single-histogram fit is done, als
 <td>if</td>
 <td><span class="math">\(\alpha (1), \varphi (^\circ)\)</span>, <span class="math">\(\nu\)</span> (MHz), <span class="math">\(\lambda_{\rm T} (\mu \mathrm{s}^{-1})\)</span>,<span class="math">\(\lambda_{\rm L} (\mu \mathrm{s}^{-1})\)</span></td>
 <td><dl class="first last docutils">
-<dt><span class="math">\(\alpha \cos\left(2\pi\nu t + \frac{\pi \varphi}{180}\right) \exp(\lambda_{\rm T}t) +\)</span></dt>
+<dt><span class="math">\(\alpha \cos\left(2\pi\nu t + \frac{\pi \varphi}{180}\right) \exp(-\lambda_{\rm T}t) +\)</span></dt>
 <dd><span class="math">\(+ (1-\alpha) \exp(-\lambda_{\rm L} t)\)</span></dd>
 </dl>
 </td>
@@ -737,11 +737,31 @@ in case a <span class="math">\(\chi^2\)</span> single-histogram fit is done, als
 <td>ib</td>
 <td><span class="math">\(\alpha (1), \varphi (^\circ)\)</span>, <span class="math">\(\nu\)</span> (MHz), <span class="math">\(\lambda_{\rm T} (\mu \mathrm{s}^{-1})\)</span>,<span class="math">\(\lambda_{\rm L} (\mu \mathrm{s}^{-1})\)</span></td>
 <td><dl class="first last docutils">
-<dt><span class="math">\(\alpha j_0\left(2\pi\nu t + \frac{\pi \varphi}{180}\right) \exp(\lambda_{\rm T}t) +\)</span></dt>
+<dt><span class="math">\(\alpha j_0\left(2\pi\nu t + \frac{\pi \varphi}{180}\right) \exp(-\lambda_{\rm T}t) +\)</span></dt>
 <dd><span class="math">\(+ (1-\alpha) \exp(-\lambda_{\rm L} t)\)</span></dd>
 </dl>
 </td>
 <td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>internFldGK</td>
+<td>ifgk</td>
+<td><span class="math">\(\alpha (1), \nu\)</span> (MHz), <span class="math">\(\sigma (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(\lambda (\mu\mathrm{s}^{-1}), \beta (1)\)</span></td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\alpha\left[\cos(2\pi\nu t)-\frac{\sigma^2 t}{2\pi\nu}\sin(2\pi\nu t)\right]\exp(-\sigma^2 t^2/2)+\)</span></dt>
+<dd><span class="math">\(+ (1-\alpha) \exp(-(\lambda t)^\beta)\)</span></dd>
+</dl>
+</td>
+<td><a class="footnote-reference" href="#n8" id="id16">[10]</a></td>
+</tr>
+<tr class="row-even"><td>internFldLL</td>
+<td>ifll</td>
+<td><span class="math">\(\alpha (1), \nu\)</span> (MHz), <span class="math">\(a (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(\lambda (\mu\mathrm{s}^{-1}), \beta (1)\)</span></td>
+<td><dl class="first last docutils">
+<dt><span class="math">\(\alpha\left[\cos(2\pi\nu t)-\frac{a}{2\pi\nu}\sin(2\pi\nu t)\right]\exp(-a t)+\)</span></dt>
+<dd><span class="math">\(+ (1-\alpha) \exp(-(\lambda t)^\beta)\)</span></dd>
+</dl>
+</td>
+<td><a class="footnote-reference" href="#n9" id="id17">[11]</a></td>
 </tr>
 <tr class="row-odd"><td>abragam</td>
 <td>ab</td>
@@ -757,19 +777,19 @@ in case a <span class="math">\(\chi^2\)</span> single-histogram fit is done, als
 <dd><span class="math">\(+ \frac{\sigma_{+}}{\sigma_{+}+\sigma_{-}} \exp\left[\frac{\sigma_{+}^2 t^2}{2}\right] \left\{\cos(2\pi\nu t + \frac{\pi\varphi}{180}) - \sin(2\pi\nu t + \frac{\pi\varphi}{180}) \mathrm{Erfi}\left(\frac{\sigma_{+} t}{\sqrt{2}}\right)\right\}\)</span></dd>
 </dl>
 </td>
-<td><a class="footnote-reference" href="#n8" id="id16">[10]</a></td>
+<td><a class="footnote-reference" href="#n10" id="id18">[12]</a></td>
 </tr>
 <tr class="row-odd"><td>staticNKZF</td>
 <td>snkzf</td>
 <td><span class="math">\(\Delta_0 (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(R_b = \Delta_{\rm GbG}/\Delta_0 (1)\)</span></td>
 <td><span class="math">\(\frac{1}{3} + \frac{2}{3}\left(\frac{1}{1+R_b^2\Delta_0^2 t^2}\right)^{3/2} \left(1 - \frac{\Delta_0^2 t^2}{1+R_b^2\Delta_0^2 t^2}\right) \exp\left[-\frac{\Delta_0^2 t^2}{2(1+R_b^2\Delta_0^2 t^2)}\right]\)</span></td>
-<td><a class="footnote-reference" href="#n9" id="id17">[11]</a></td>
+<td><a class="footnote-reference" href="#n11" id="id19">[13]</a></td>
 </tr>
 <tr class="row-even"><td>staticNKTF</td>
 <td>snktf</td>
 <td><span class="math">\(\varphi (^\circ), \nu\)</span> (MHz), <span class="math">\(\Delta_0 (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(R_b = \Delta_{\rm GbG}/\Delta_0 (1)\)</span></td>
 <td><span class="math">\(\sqrt{\frac{1}{1+R_b^2 \Delta_0^2 t^2}} \exp\left[-\frac{\Delta_0^2 t^2}{2(1+R_b^2 \Delta_0^2 t^2)}\right] \cos(2\pi\nu t + \varphi)\)</span></td>
-<td>see [11]</td>
+<td>see [13]</td>
 </tr>
 <tr class="row-odd"><td>dynamicNKZF</td>
 <td>dnkzf</td>
@@ -779,7 +799,7 @@ in case a <span class="math">\(\chi^2\)</span> single-histogram fit is done, als
 <dd><span class="math">\(\Theta(t) = \frac{\exp(-\nu_c t) -1 -\nu_c t}{\nu_c^2}\)</span></dd>
 </dl>
 </td>
-<td>see [11]</td>
+<td>see [13]</td>
 </tr>
 <tr class="row-even"><td>dynamicNKTF</td>
 <td>dnktf</td>
@@ -789,13 +809,13 @@ in case a <span class="math">\(\chi^2\)</span> single-histogram fit is done, als
 <dd><span class="math">\(\Theta(t) = \frac{\exp(-\nu_c t) -1 -\nu_c t}{\nu_c^2}\)</span></dd>
 </dl>
 </td>
-<td>see [11]</td>
+<td>see [13]</td>
 </tr>
 <tr class="row-odd"><td>muMinusExpTF</td>
 <td>mmsetf</td>
 <td><span class="math">\(N_0 (1), \tau (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(A (1), \lambda (\mu \mathrm{s}^{-1})\)</span>, <span class="math">\(\varphi (^\circ), \nu\)</span> (MHz)</td>
 <td><span class="math">\(N_0 \exp(-t/\tau) \left[ 1 + A \exp(-\lambda t) \cos(2 \pi \nu t + \varphi) \right]\)</span></td>
-<td><a class="footnote-reference" href="#n10" id="id18">[12]</a></td>
+<td><a class="footnote-reference" href="#n12" id="id20">[14]</a></td>
 </tr>
 <tr class="row-even"><td>polynom</td>
 <td>p</td>
@@ -853,22 +873,36 @@ in case a <span class="math">\(\chi^2\)</span> single-histogram fit is done, als
 <table class="docutils footnote" frame="void" id="n8" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id16">[10]</a></td><td><a class="reference external" href="http://lmu.web.psi.ch/musrfit/memos/skewedGaussian.pdf">see memo</a> &#8211; <strong>not</strong> DKS ready.</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id16">[10]</a></td><td><a class="reference external" href="https://doi.org/10.1016/0375-9601(91)90959-C">E.I. Kornilov</a> and V.Yu. Pomjakushin, Physics Letters A <strong>153</strong>, 364, (1991).
+In the original work, <span class="math">\(\alpha=2/3,\, \lambda=0,\, \beta=1\)</span>. If you find values strongly deviating from these values you should question your analysis approach.</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="n9" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id17">[11]</a></td><td><a class="reference external" href="http://link.aps.org/doi/10.1103/PhysRevB.56.2352">D.R. Noakes</a> and G.M. Kalvius, Phys. Rev. B <strong>56</strong>, 2352 (1997);
-A. Yaouanc and P. Dalmas de Réotier &#8220;Muon Spin Rotation, Relaxation, and Resonance&#8221; Oxford Scientific Publication;
-simplifying the original formulae by eliminating <span class="math">\(\Delta_{\rm eff}\)</span> via the identity
-<span class="math">\(\Delta_{\rm eff}^2 = (1+R_b^2)\Delta_0\)</span>.</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id17">[11]</a></td><td><a class="reference external" href="https://doi.org/10.1016/S0921-4526(00)00337-9">M.I. Larkin</a> <em>et al.</em>, Physica B: Condensed Matter <strong>289-290</strong>, 153 (2000).
+In the original work, <span class="math">\(\alpha=2/3,\, \lambda=0,\, \beta=1\)</span>. If you find values strongly deviating from these values you should question your analysis approach.</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="n10" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id18">[12]</a></td><td>This function is explicit for <span class="math">\(\mu^-\)</span>! Do not try to use it for <span class="math">\(\mu^+\)</span>!</td></tr>
+<tr><td class="label"><a class="fn-backref" href="#id18">[12]</a></td><td><a class="reference external" href="http://lmu.web.psi.ch/musrfit/memos/skewedGaussian.pdf">see memo</a> &#8211; <strong>not</strong> DKS ready.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n11" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id19">[13]</a></td><td><a class="reference external" href="http://link.aps.org/doi/10.1103/PhysRevB.56.2352">D.R. Noakes</a> and G.M. Kalvius, Phys. Rev. B <strong>56</strong>, 2352 (1997);
+A. Yaouanc and P. Dalmas de Réotier &#8220;Muon Spin Rotation, Relaxation, and Resonance&#8221; Oxford Scientific Publication;
+simplifying the original formulae by eliminating <span class="math">\(\Delta_{\rm eff}\)</span> via the identity
+<span class="math">\(\Delta_{\rm eff}^2 = (1+R_b^2)\Delta_0\)</span>.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="n12" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id20">[14]</a></td><td>This function is explicit for <span class="math">\(\mu^-\)</span>! Do not try to use it for <span class="math">\(\mu^+\)</span>!</td></tr>
 </tbody>
 </table>
 <div class="section" id="maps">
@@ -901,7 +935,7 @@ Whereas the theory is operating on the parameters and the time, functions curren
 <span id="msr-theory-block-user-functions"></span><h4>User Functions<a class="headerlink" href="#user-functions" title="Permalink to this headline">¶</a></h4>
 <p>In the case complicated and not predefined functions are needed to fit data, <tt class="docutils literal"><span class="pre">musrfit</span></tt> offers the possibility to implement external functions
 and introduce them to <tt class="docutils literal"><span class="pre">musrfit</span></tt> through the ROOT dictionary mechanism. The detailed rules these user-defined functions have to obey will be discussed
-in the according <a class="reference internal" href="#id20"><em>section</em></a>. Here only the syntax for the msr file is provided. To call a user function in the <a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a> the
+in the according <a class="reference internal" href="#id22"><em>section</em></a>. Here only the syntax for the msr file is provided. To call a user function in the <a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a> the
 keyword <tt class="docutils literal"><span class="pre">userFcn</span></tt> is used. It is followed by the name of the shared library which holds the C++ class where the function is implemented and the name of
 the class. Finally, all parameters are given in the order needed by the class. Of course it is also possible to use mapped parameters or functions
 instead of specifying the parameters directly.</p>
@@ -1732,7 +1766,7 @@ If enabled in the <a class="reference internal" href="#musrfit-startup"><em>XML 
 </div>
 </div>
 <div class="section" id="fit-types">
-<span id="index-63"></span><span id="id19"></span><h2>Fit Types<a class="headerlink" href="#fit-types" title="Permalink to this headline">¶</a></h2>
+<span id="index-63"></span><span id="id21"></span><h2>Fit Types<a class="headerlink" href="#fit-types" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="single-histogram-fit-fit-type-0">
 <span id="single-histogram-fit"></span><span id="index-64"></span><h3>Single Histogram Fit (fit type 0)<a class="headerlink" href="#single-histogram-fit-fit-type-0" title="Permalink to this headline">¶</a></h3>
 <p>The single-histogram fit (fit type 0) is used to fit a function directly to the raw data using</p>
@@ -1843,8 +1877,8 @@ the single histogram RRF fit apply: <strong>if you not urgently need it: do not 
 <p>The same applies for the plot with plot type 8.</p>
 </div>
 </div>
-<div class="section" id="id20">
-<span id="index-70"></span><span id="id21"></span><h2>User Functions<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id22">
+<span id="index-70"></span><span id="id23"></span><h2>User Functions<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">musrfit</span></tt> offers the possibility to plug-in user-defined functions implemented in <tt class="docutils literal"><span class="pre">C++</span></tt> classes to the fitting and plotting routines.
 In order to do so, basically two things are needed:</p>
 <blockquote>
@@ -2154,7 +2188,7 @@ In case this cannot be ensured, the parallelization can be disabled by <em>&#821
 <li><a class="reference internal" href="#non-mgrsr-fit-fit-type-8">Non-μSR Fit (fit type 8)</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#id20">User Functions</a><ul>
+<li><a class="reference internal" href="#id22">User Functions</a><ul>
 <li><a class="reference internal" href="#user-function-without-global-user-function-object-access">User Function without global user-function-object access</a></li>
 <li><a class="reference internal" href="#user-function-with-global-user-function-object-access">User Function with global user-function-object access</a></li>
 </ul>
@@ -2204,12 +2238,12 @@ In case this cannot be ensured, the parallelization can be disabled by <em>&#821
         <li class="right" >
           <a href="tutorial.html" title="Tutorial for musrfit"
              >previous</a> |</li>
-        <li><a href="index.html">musrfit 1.4.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.4.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2018, Andreas Suter.
-      Last updated on Nov 13, 2018.
+      Last updated on Jan 21, 2019.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>

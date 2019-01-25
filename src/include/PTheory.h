@@ -193,10 +193,10 @@ static PTheoDataBase fgTheoDataBase[THEORY_MAX] = {
    "internFld", "if", "(fraction phase frequency Trate Lrate)", "(fraction phase frequency Trate Lrate tshift)"},
 
   {THEORY_INTERNAL_FIELD_KORNILOV, THEORY_PARAM_INTERNAL_FIELD_KORNILOV, false,
-   "internFldGK", "ifgk", "(fraction frequency Trate Lrate beta)", "(fraction frequency Trate Lrate beta tshift)"},
+   "internFldGK", "ifgk", "(fraction frequency sigma lambda beta)", "(fraction frequency sigma lambda beta tshift)"},
 
   {THEORY_INTERNAL_FIELD_LARKIN, THEORY_PARAM_INTERNAL_FIELD_LARKIN, false,
-   "internFldLL", "ifll", "(fraction frequency Trate Lrate)", "(fraction frequency Trate Lrate tshift)"},
+   "internFldLL", "ifll", "(fraction frequency sigma lambda beta)", "(fraction frequency sigma lambda beta tshift)"},
 
   {THEORY_BESSEL, THEORY_PARAM_BESSEL, false,
    "bessel", "b", "(phase frequency)", "(phase frequency tshift)"},

@@ -9,11 +9,13 @@ packagesExist(Qt5WebEngine) {
 isEmpty( HAVE_QT_WEB_ENGINE ) {
   packagesExist(QtWebKit) {
     message("QtWebKit found")
+    DEFINES += HAVE_QT_WEB_KIT
     HAVE_QT_WEB_ENGINE = 0   
   }
   # Mac calls it Qt5WebKit, hence
   packagesExist(Qt5WebKit) {
     message("Qt5WebKit found")
+    DEFINES += HAVE_QT_WEB_KIT
     HAVE_QT_WEB_ENGINE = 0   
   }
 }
