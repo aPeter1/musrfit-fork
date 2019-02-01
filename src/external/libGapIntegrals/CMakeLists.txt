@@ -3,14 +3,17 @@
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 set(BMW_TOOLS_INC ${CMAKE_SOURCE_DIR}/src/external/BMWtools)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
 
 root_generate_dictionary(
   TGapIntegralsDict 
   -I${FFTW3_INCLUDE_DIR} 
   -I${MUSRFIT_INC}
   -I${BMW_TOOLS_INC}
+  -I${PREFIX_INC}
   TGapIntegrals.h
   LINKDEF TGapIntegralsLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE TGapIntegrals
 )
 

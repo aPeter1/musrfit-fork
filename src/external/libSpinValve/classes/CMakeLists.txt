@@ -2,21 +2,26 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
 
 root_generate_dictionary(
   PSkewedLorentzianDict 
   -I${FFTW3_INCLUDE_DIR} 
   -I${MUSRFIT_INC}
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
+  -I${PREFIX_INC}
   PSkewedLorentzian.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PSkewedLorentzianLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PSkewedLorentzian
 )
 root_generate_dictionary(
   PStartupHandler_SVDict 
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
+  -I${PREFIX_INC}
   PStartupHandler_SV.h
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PStartupHandler_SVLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PStartupHandler_SV
 )
 

@@ -5,13 +5,13 @@ add_subdirectory(libLineProfile)
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
 
 root_generate_dictionary(
   TBNMRDict 
-  -I${FFTW3_INCLUDE_DIR} 
-  -I${MUSRFIT_INC}
-  TBNMR.h 
+  -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} TBNMR.h 
   LINKDEF TBNMRLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE TBNMR
 )
 
