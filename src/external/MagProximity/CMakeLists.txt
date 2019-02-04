@@ -8,6 +8,7 @@ root_generate_dictionary(
   PMagProximityFitterDict 
   -I${FFTW3_INCLUDE_DIR}
   -I${MUSRFIT_INC}
+  -I${CMAKE_CURRENT_SOURCE_DIR}
   -I${PREFIX_INC}
   PMagProximityFitter.h 
   LINKDEF PMagProximityFitterLinkDef.h
@@ -17,6 +18,7 @@ root_generate_dictionary(
 root_generate_dictionary(
   PMPStartupHandlerDict 
   -I${MUSRFIT_INC}
+  -I${CMAKE_CURRENT_SOURCE_DIR}
   -I${PREFIX_INC}
   PMPStartupHandler.h 
   LINKDEF PMPStartupHandlerLinkDef.h
