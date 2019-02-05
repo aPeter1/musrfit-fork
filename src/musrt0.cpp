@@ -57,7 +57,7 @@ using namespace std;
 void musrt0_syntax()
 {
   cout << endl << "usage: musrt0 <msr-file> [{--getT0FromPromptPeak | -g} [<firstGoodBinOffset>]]";
-  cout << endl << "       [--timeout <timeout>] | --version | --help";
+  cout << endl << "       [--timeout <timeout>] | --show-dynamic-path | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       --getT0FromPromptPeak, -g with <firstGoodBinOffset>:";
   cout << endl << "         will, in non-interactive mode estimate the t0's from the prompt peak";
@@ -72,6 +72,7 @@ void musrt0_syntax()
   cout << endl << "                          180 sec if not already done so.";
   cout << endl << "       'musrt0' or 'musrt0 --help' will show this help";
   cout << endl << "       'musrt0 --version' will print the musrt0 version";
+  cout << endl << "       'musrt0 --show-dynamic-path' dumps the dynamic search paths and exit.";
   cout << endl << endl;
 }
 
@@ -228,6 +229,11 @@ Int_t main(Int_t argc, Char_t *argv[])
     return PMUSR_SUCCESS;
   }
 
+  // add default shared library path /usr/local/lib if not already persent
+  const char *dsp = gSystem->GetDynamicPath();
+  if (strstr(dsp, "/usr/local/lib") == NULL)
+    gSystem->AddDynamicPath("/usr/local/lib");
+
   memset(filename, '\0', sizeof(filename));
   for (int i=1; i<argc; i++) {
     if (!strcmp(argv[i], "--version")) {
@@ -238,8 +244,12 @@ Int_t main(Int_t argc, Char_t *argv[])
 #endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--help")) {
-      show_syntax = true;
-      break;
+      musrt0_syntax();
+      return PMUSR_SUCCESS;
+    } else if (!strcmp(argv[i], "--show-dynamic-path")) {
+      cout << endl << "musrt0: internal dynamic search paths for shared libraries/root dictionaries:";
+      cout << endl << "  '" << gSystem->GetDynamicPath() << "'" << endl << endl;
+      return PMUSR_SUCCESS;
     } else if (strstr(argv[i], ".msr")) { // check for filename
       if (strlen(filename) == 0) {
         strcpy(filename, argv[i]);
