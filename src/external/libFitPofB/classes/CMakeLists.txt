@@ -4,6 +4,7 @@
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 set(BMW_TOOLS_INC ${CMAKE_SOURCE_DIR}/src/external/BMWtools)
 set(POFB_INC ${CMAKE_SOURCE_DIR}/src/external/libFitPofB/include)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
 
 root_generate_dictionary(
   TLondon1DDict 
@@ -12,8 +13,10 @@ root_generate_dictionary(
   -I${BMW_TOOLS_INC}
   -I${POFB_INC}
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
+  -I${PREFIX_INC}
   TLondon1D.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/TLondon1DLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE TLondon1D
 )
 root_generate_dictionary(
@@ -23,8 +26,10 @@ root_generate_dictionary(
   -I${BMW_TOOLS_INC}
   -I${POFB_INC}
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
+  -I${PREFIX_INC}
   TVortex.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/TVortexLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE TVortex
 )
 root_generate_dictionary(
@@ -34,8 +39,10 @@ root_generate_dictionary(
   -I${BMW_TOOLS_INC}
   -I${POFB_INC}
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
+  -I${PREFIX_INC}
   TSkewedGss.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/TSkewedGssLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE TSkewedGss
 )
 

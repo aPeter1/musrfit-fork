@@ -2,17 +2,29 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+set(NONLOCAL_INC ${CMAKE_SOURCE_DIR}/src/external/Nonlocal)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
 
 root_generate_dictionary(
   PNL_PippardFitterDict 
   -I${FFTW3_INCLUDE_DIR} 
-  -I${MUSRFIT_INC}
+  -I${MUSRFIT_INC} 
+  -I${NONLOCAL_INC} 
+  -I${CMAKE_CURRENT_SOURCE_DIR}
+  -I${PREFIX_INC} 
   PNL_PippardFitter.h 
   LINKDEF PNL_PippardFitterLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PNL_PippardFitter
 )
 root_generate_dictionary(
-  PNL_StartupHandlerDict PNL_StartupHandler.h LINKDEF PNL_StartupHandlerLinkDef.h
+  PNL_StartupHandlerDict 
+  -I${NONLOCAL_INC} 
+  -I${CMAKE_CURRENT_SOURCE_DIR}
+  -I${PREFIX_INC} 
+  PNL_StartupHandler.h 
+  LINKDEF PNL_StartupHandlerLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PNL_StartupHandler
 )
 
@@ -38,7 +50,7 @@ target_include_directories(
   PNL_PippardFitter BEFORE PRIVATE 
     $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
 )
 
 #--- set target properties, e.g. version --------------------------------------
@@ -64,7 +76,8 @@ install(
 
 #--- install PNL_PippardFitter header -----------------------------------------
 install(
-  FILES 
+  FILES
+    PNonlocal.h 
     PNL_PippardFitter.h 
     PNL_RgeHandler.h
     PNL_StartupHandler.h

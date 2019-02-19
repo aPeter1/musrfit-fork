@@ -3093,8 +3093,31 @@ void PTextEdit::getTheme()
   fDarkToolBarIcon = false; // needed for ubuntu dark since there the menu icons are dark, however the toolbar icons are plain!
 
   QString str = QIcon::themeName();
+  qDebug() << "debug> theme name=" << str << endl;
 
-  qDebug() << "debug> str=" << str << endl;
+  if (str.isEmpty()) { // this is ugly and eventually needs to be fixed in a more coherent way
+    str = QProcessEnvironment::systemEnvironment().value("HOME", QString("??"));
+    str += "/.kde4/share/config/kdeglobals";
+    if (QFile::exists(str)) {
+      QFile fln(str);
+      fln.open(QIODevice::ReadOnly | QIODevice::Text);
+      QTextStream fin(&fln);
+      QString line("");
+      bool done = false;
+      while (!fin.atEnd() && !done) {
+        line = fin.readLine();
+        if (line.contains("ColorScheme")) {
+          if (line.contains("dark", Qt::CaseInsensitive)) {
+            fDarkTheme = true;
+            fDarkToolBarIcon = true;
+          }
+          done = true;
+        }
+      }
+      fln.close();
+    }
+    return;
+  }
 
   if (str.contains("dark", Qt::CaseInsensitive)) {
     fDarkTheme = true;

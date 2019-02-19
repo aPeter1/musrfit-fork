@@ -1,12 +1,21 @@
 # -TLemRunHeader library ------------------------------------------------------
 
 #--- generate necessary dictionaries ------------------------------------------
+set(TLEMRUNHEADER_INC ${CMAKE_SOURCE_DIR}/src/external/TLemRunHeader)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+
 root_generate_dictionary(
-  TLemRunHeaderDict TLemRunHeader.h LINKDEF TLemRunHeaderLinkDef.h
+  TLemRunHeaderDict 
+  -I${TLEMRUNHEADER_INC} -I${PREFIX_INC} TLemRunHeader.h 
+  LINKDEF TLemRunHeaderLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE TLemRunHeader
 )
 root_generate_dictionary(
-  TLemStatsDict TLemStats.h LINKDEF TLemStatsLinkDef.h
+  TLemStatsDict 
+  -I${TLEMRUNHEADER_INC} -I${PREFIX_INC} TLemStats.h 
+  LINKDEF TLemStatsLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE TLemStats 
 )
 

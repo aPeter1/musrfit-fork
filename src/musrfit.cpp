@@ -90,12 +90,13 @@ void musrfit_syntax()
   cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [-t, --title-from-data-file]";
   cout << endl << "                            [-e, --estimateN0] [-p, --per-run-block-chisq]";
   cout << endl << "                            [--dump <type>] [--timeout <timeout_tag>] |";
-  cout << endl << "                            --nexus-support | --version | --help";
+  cout << endl << "                            --nexus-support | --show-dynamic-path | --version | --help";
   cout << endl << "       <msr-file>: msr input file";
   cout << endl << "       'musrfit <msr-file>' will execute musrfit";
   cout << endl << "       'musrfit' or 'musrfit --help' will show this help";
   cout << endl << "       'musrfit --version' will print the musrfit version";
   cout << endl << "       'musrfit --nexus-support' will print if NeXus support is available.";
+  cout << endl << "       'musrfit --show-dynamic-path' will print the internal dynamic library search paths.";
   cout << endl << "       -k, --keep-mn2-output: will rename the files MINUIT2.OUTPUT and ";
   cout << endl << "              MINUIT2.root to <msr-file>-mn2.output and <msr-file>-mn2.root,";
   cout << endl << "              respectively,";
@@ -456,6 +457,11 @@ int main(int argc, char *argv[])
     return PMUSR_WRONG_STARTUP_SYNTAX;
   }
 
+  // add default shared library path /usr/local/lib if not already persent
+  const char *dsp = gSystem->GetDynamicPath();
+  if (strstr(dsp, "/usr/local/lib") == NULL)
+    gSystem->AddDynamicPath("/usr/local/lib");
+
   if (argc == 2) {
     if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
@@ -468,8 +474,12 @@ int main(int argc, char *argv[])
 #ifdef PNEXUS_ENABLED
       cout << endl << ">> musrfit: NeXus support enabled." << endl << endl;
 #else
-      cout << endl << ">> musrfit: NeXus support NOT enabled." << endl << endl;
+      cout << endl << "musrfit: NeXus support NOT enabled." << endl << endl;
 #endif
+      return PMUSR_SUCCESS;
+    } else if (!strcmp(argv[1], "--show-dynamic-path")) {
+      cout << endl << "musrfit: internal dynamic search paths for shared libraries/root dictionaries:";
+      cout << endl << "  '" << gSystem->GetDynamicPath() << "'" << endl << endl;
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[1], "--help")) {
       show_syntax = true;

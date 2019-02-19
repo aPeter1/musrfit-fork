@@ -2,35 +2,41 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
 
 root_generate_dictionary(
   PFourierCanvasDict 
-  -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PFourierCanvas.h 
+  -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} PFourierCanvas.h 
   LINKDEF ${MUSRFIT_INC}/PFourierCanvasLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PFourierCanvas
 )
 root_generate_dictionary(
   PMusrCanvasDict 
-  -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PMusrCanvas.h 
+  -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} PMusrCanvas.h 
   LINKDEF ${MUSRFIT_INC}/PMusrCanvasLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PMusrCanvas
 )
 root_generate_dictionary(
   PMusrT0Dict 
-  -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PMusrT0.h 
+  -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} PMusrT0.h 
   LINKDEF ${MUSRFIT_INC}/PMusrT0LinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PMusrT0
 )
 root_generate_dictionary(
   PStartupHandlerDict 
-  -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PStartupHandler.h 
+  -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} PStartupHandler.h 
   LINKDEF ${MUSRFIT_INC}/PStartupHandlerLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PStartupHandler
 )
 root_generate_dictionary(
   PUserFcnBaseDict 
-  -I${FFTW3_INCLUDE_DIR} ${MUSRFIT_INC}/PUserFcnBase.h 
+  -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} PUserFcnBase.h 
   LINKDEF ${MUSRFIT_INC}/PUserFcnBaseLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PUserFcnBase
 )
 
@@ -160,15 +166,31 @@ install(
 )
 
 #--- install headers ----------------------------------------------------------
-#--- only install headers needed for classes with dictionary
 install(
-  FILES ${MUSRFIT_INC}/PFourierCanvas.h
+  FILES ${MUSRFIT_INC}/PFitterFcn.h
+        ${MUSRFIT_INC}/PFitter.h
+        ${MUSRFIT_INC}/PFourierCanvas.h
         ${MUSRFIT_INC}/PFourier.h 
+        ${MUSRFIT_INC}/PFunctionGrammar.h
+        ${MUSRFIT_INC}/PFunction.h
+        ${MUSRFIT_INC}/PFunctionHandler.h
+        ${MUSRFIT_INC}/PMsr2Data.h
+        ${MUSRFIT_INC}/PMsrHandler.h
         ${MUSRFIT_INC}/PMusrCanvas.h
         ${MUSRFIT_INC}/PMusr.h
         ${MUSRFIT_INC}/PMusrT0.h
+        ${MUSRFIT_INC}/PPrepFourier.h
+        ${MUSRFIT_INC}/PRunAsymmetry.h
+        ${MUSRFIT_INC}/PRunAsymmetryRRF.h
+        ${MUSRFIT_INC}/PRunBase.h
+        ${MUSRFIT_INC}/PRunDataHandler.h
         ${MUSRFIT_INC}/PRunListCollection.h
+        ${MUSRFIT_INC}/PRunMuMinus.h
+        ${MUSRFIT_INC}/PRunNonMusr.h
+        ${MUSRFIT_INC}/PRunSingleHisto.h
+        ${MUSRFIT_INC}/PRunSingleHistoRRF.h
         ${MUSRFIT_INC}/PStartupHandler.h
+        ${MUSRFIT_INC}/PTheory.h
         ${MUSRFIT_INC}/PUserFcnBase.h
   DESTINATION include
 )
