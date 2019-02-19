@@ -2,6 +2,7 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
 
 root_generate_dictionary(
   PPhotoMeissnerDict
@@ -10,16 +11,20 @@ root_generate_dictionary(
   -I${ROOT_INCLUDE_DIRS}
   -I${MUSRFIT_INC}
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
+  -I${PREFIX_INC}
   PPhotoMeissner.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PPhotoMeissnerLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PPhotoMeissner
 )
 root_generate_dictionary(
   PStartupHandler_PMDict 
   -I${MUSRFIT_INC}
   -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
+  -I${PREFIX_INC}
   PStartupHandler_PM.h 
   LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PStartupHandler_PMLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PStartupHandler_PM
 )
 

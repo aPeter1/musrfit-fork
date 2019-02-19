@@ -62,6 +62,7 @@ void musrview_syntax()
   cout << endl << "       Options:";
   cout << endl << "       --help    : display this help and exit.";
   cout << endl << "       --version : output version information and exit.";
+  cout << endl << "       --show-dynamic-path : dumps the dynamic search paths and exit.";
   cout << endl << "       -f, --fourier: will directly present the Fourier transform of the <msr-file>.";
   cout << endl << "       -a, --avg: will directly present the averaged data/Fourier of the <msr-file>.";
   cout << endl << "       --<graphic-format-extension>: ";
@@ -111,6 +112,11 @@ int main(int argc, char *argv[])
 
   memset(fileName, '\0', sizeof(fileName));
 
+  // add default shared library path /usr/local/lib if not already persent
+  const char *dsp = gSystem->GetDynamicPath();
+  if (strstr(dsp, "/usr/local/lib") == NULL)
+    gSystem->AddDynamicPath("/usr/local/lib");
+
   // check input arguments
   if (argc == 1) {
     musrview_syntax();
@@ -131,6 +137,10 @@ int main(int argc, char *argv[])
 #else
       cout << endl << "musrview git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
 #endif
+      return PMUSR_SUCCESS;
+    } else if (!strcmp(argv[i], "--show-dynamic-path")) {
+      cout << endl << "musrview: internal dynamic search paths for shared libraries/root dictionaries:";
+      cout << endl << "  '" << gSystem->GetDynamicPath() << "'" << endl << endl;
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--help")) {
       show_syntax = true;

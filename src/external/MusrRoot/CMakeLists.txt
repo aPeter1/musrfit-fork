@@ -1,8 +1,14 @@
 # - TMusrRunHeader library ----------------------------------------------------
 
 #--- generate necessary dictionaries ------------------------------------------
+set(MUSRROOT_INC ${CMAKE_SOURCE_DIR}/src/external/MusrRoot)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+
 root_generate_dictionary(
-  TMusrRunHeaderDict TMusrRunHeader.h LINKDEF TMusrRunHeaderLinkDef.h
+  TMusrRunHeaderDict 
+  -I${MUSRROOT_INC} -I${PREFIX_INC} TMusrRunHeader.h 
+  LINKDEF TMusrRunHeaderLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE TMusrRunHeader
 )
 

@@ -25,21 +25,27 @@ set ( PLOT_DIR
   ${CMAKE_CURRENT_BINARY_DIR}
 )
 
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+
 #--- generate necessary dictionaries ------------------------------------------
 root_generate_dictionary(
   PMuppCanvasDict 
   -I${CMAKE_CURRENT_SOURCE_DIR}
   -I${CMAKE_CURRENT_SOURCE_DIR}/..
+  -I${PREFIX_INC}
   PMuppCanvas.h
   LINKDEF PMuppCanvasLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PMuppCanvas
 )
 root_generate_dictionary(
   PMuppStartupHandlerDict 
   -I${CMAKE_CURRENT_SOURCE_DIR}
   -I${CMAKE_CURRENT_SOURCE_DIR}/..
+  -I${PREFIX_INC}
   PMuppStartupHandler.h
   LINKDEF PMuppStartupHandlerLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE PMuppStartupHandler
 )
 
@@ -71,3 +77,21 @@ if (APPLE)
 else (APPLE)
   install(TARGETS mupp_plot DESTINATION bin)
 endif (APPLE)
+
+#--- install root pcm's and rootmaps ------------------------------------------
+install(
+  FILES ${CMAKE_CURRENT_BINARY_DIR}/libPMuppCanvas_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libPMuppCanvas.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPMuppStartupHandler_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libPMuppStartupHandler.rootmap
+  DESTINATION lib
+)
+
+#--- install headers ----------------------------------------------------------
+install(
+  FILES ${CMAKE_CURRENT_SOURCE_DIR}/../mupp.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/mupp_plot.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/PMuppCanvas.h
+        ${CMAKE_CURRENT_SOURCE_DIR}/PMuppStartupHandler.h
+  DESTINATION include
+)

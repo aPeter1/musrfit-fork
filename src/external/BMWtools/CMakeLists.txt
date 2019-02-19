@@ -3,12 +3,13 @@
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 set(CUBA_INC ${CMAKE_SOURCE_DIR}/src/external/libCuba/src)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
 
 root_generate_dictionary(
   BMWStartupHandlerDict 
-  -I${MUSRFIT_INC}
-  BMWStartupHandler.h 
+  -I${MUSRFIT_INC} -I${PREFIX_INC} BMWStartupHandler.h 
   LINKDEF BMWStartupHandlerLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE BMWStartupHandler
 )
 

@@ -4,15 +4,13 @@
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 set(BMW_TOOLS_INC ${CMAKE_SOURCE_DIR}/src/external/BMWtools)
 set(POFB_INC ${CMAKE_SOURCE_DIR}/src/external/libFitPofB/include)
+set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
 
 root_generate_dictionary(
   TCalcMeanFieldsLEMDict 
-  -I${FFTW3_INCLUDE_DIR} 
-  -I${MUSRFIT_INC}
-  -I${BMW_TOOLS_INC}
-  -I${POFB_INC}
-  TCalcMeanFieldsLEM.h
+  -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${BMW_TOOLS_INC} -I${POFB_INC} -I${PREFIX_INC} TCalcMeanFieldsLEM.h
   LINKDEF TCalcMeanFieldsLEMLinkDef.h
+  OPTIONS -inlineInputHeader
   MODULE TCalcMeanFieldsLEM
 )
 
