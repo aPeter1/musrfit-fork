@@ -4,7 +4,7 @@
 
 Installation of the musrfit-plugin "libGapIntegrals"
 
-* Configure musrfit with the option --enable-BMWlibs and the plugin will be built.
+* Configure musrfit with the option -DBMWlibs=1 and the plugin will be built.
 
 * The plugin classes can be accessed inside THEORY blocks of musrfit msr files via:
 
