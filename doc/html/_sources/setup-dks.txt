@@ -149,46 +149,6 @@ switch the working branch which is done by
  $ cd $HOME/Apps/musrfit
  $ git checkout dks6
  
-Install via automake 
-^^^^^^^^^^^^^^^^^^^^
-
-.. note::
-
-  Currently ``automake`` is still supported but soon will be replaced by ``cmake``. Only follow 
-  the ``automake`` procedure if you have good reasons. 
-
-The configure script for musrfit has now a couple of more tags/options, which are: 
-
-**- -enable-dks**
-  by default this is set to no, hence if you want to have GPU support you need to enable it. 
-**- -with-cuda**
-  with this tag you tell the configure script where it can find ``CUDA``
-**- -with-opencl**
-  with this tag you tell the configure script where it can find ``OpenCL`` 
-**- -with-dks**
-  with this tag you tell the configure script where it can find ``DKS`` 
-  
-For a typical setup on a RHEL system it could look like this   
-
-.. code-block:: bash
-
-  $ ./configure --enable-ASlibs --enable-BMWlibs --enable-NeXus --with-dks=$HOME/Apps/DKS/exec --enable-dks --prefix=$ROOTSYS
-  
-After  
-
-.. code-block:: bash
-
-  $ make
-  $ make install
-  
-and updating the shared library lookup table (*only* needed for Linux)
-
-.. code-block:: bash
-
-  $ /sbin/ldconfig # as superuser / root
-  
-you are done with the setup.   
-
 Install via cmake
 ^^^^^^^^^^^^^^^^^
 
@@ -201,7 +161,7 @@ For a typical setup on a RHEL or macOS system it could look like this
 
 .. code-block:: bash
 
-  $ cmake ../ -DCMAKE_INSTALL_PREFIX=$ROOTSYS -DASlibs=1 -DBMWlibs=1 -Dnexus=1
+  $ cmake ../ -DCMAKE_INSTALL_PREFIX=$ROOTSYS -DASlibs=1 -DBMWlibs=1 -Dnexus=1 -Ddks=1
 
 After
 
