@@ -8,6 +8,7 @@ set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
 root_generate_dictionary(
   PGbGLFDict 
   -I${GBGLF_INC} 
+  -I${MUSRFIT_INC}
   -I${CMAKE_CURRENT_SOURCE_DIR}
   -I${PREFIX_INC} 
   PGbGLF.h 
