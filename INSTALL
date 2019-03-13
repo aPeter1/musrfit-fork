@@ -6,7 +6,7 @@ In the following it is assumed that the system variable ROOTSYS is already
 defined and points to the installation directory of CERN/ROOT.
 
 #----------------------------------
-# Install using cmake tool chain
+# Install via cmake tool chain
 #----------------------------------
 
 cmake minimal required version is 3.6.
