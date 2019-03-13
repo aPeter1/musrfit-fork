@@ -8,7 +8,7 @@ Implementation of a userFcn-interface to Gaussian and Lorentzian static and dyna
 At the moment this is a simple alternative implementation to the functions provided by musrfit itself.
 Mostly, this effort should be regarded as a design study which is not really indended for production use.
 
-If musrfit has been configured with --enable-BMWlibs the functions can be called as:
+If musrfit has been configured with -DBMWlibs=1 the functions can be called as:
 
 userFcn  libLFRelaxation TLFStatGssKT 1 2       (frequency rate)
 userFcn  libLFRelaxation TLFStatExpKT 1 2       (frequency rate)

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Setting up musrfit / DKS: High Speed Fitting with GPU’s &mdash; musrfit 1.4.1 documentation</title>
+    <title>Setting up musrfit / DKS: High Speed Fitting with GPU’s &mdash; musrfit 1.4.2 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.4.1',
+        VERSION:     '1.4.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="musrfit 1.4.1 documentation" href="index.html" />
+    <link rel="top" title="musrfit 1.4.2 documentation" href="index.html" />
     <link rel="next" title="musredit: the GUI Based Interface to musrfit" href="musredit.html" />
     <link rel="prev" title="Setting up musrfit on Different Platforms" href="setup-standard.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="setup-standard.html" title="Setting up musrfit on Different Platforms"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">musrfit 1.4.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.4.2 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -160,39 +160,6 @@ switch the working branch which is done by</p>
 $ git checkout dks6
 </pre></div>
 </div>
-<div class="section" id="install-via-automake">
-<h4>Install via automake<a class="headerlink" href="#install-via-automake" title="Permalink to this headline">¶</a></h4>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Currently <tt class="docutils literal"><span class="pre">automake</span></tt> is still supported but soon will be replaced by <tt class="docutils literal"><span class="pre">cmake</span></tt>. Only follow
-the <tt class="docutils literal"><span class="pre">automake</span></tt> procedure if you have good reasons.</p>
-</div>
-<p>The configure script for musrfit has now a couple of more tags/options, which are:</p>
-<dl class="docutils">
-<dt><strong>- -enable-dks</strong></dt>
-<dd>by default this is set to no, hence if you want to have GPU support you need to enable it.</dd>
-<dt><strong>- -with-cuda</strong></dt>
-<dd>with this tag you tell the configure script where it can find <tt class="docutils literal"><span class="pre">CUDA</span></tt></dd>
-<dt><strong>- -with-opencl</strong></dt>
-<dd>with this tag you tell the configure script where it can find <tt class="docutils literal"><span class="pre">OpenCL</span></tt></dd>
-<dt><strong>- -with-dks</strong></dt>
-<dd>with this tag you tell the configure script where it can find <tt class="docutils literal"><span class="pre">DKS</span></tt></dd>
-</dl>
-<p>For a typical setup on a RHEL system it could look like this</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ ./configure --enable-ASlibs --enable-BMWlibs --enable-NeXus --with-dks<span class="o">=</span><span class="nv">$HOME</span>/Apps/DKS/exec --enable-dks --prefix<span class="o">=</span><span class="nv">$ROOTSYS</span>
-</pre></div>
-</div>
-<p>After</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ make
-$ make install
-</pre></div>
-</div>
-<p>and updating the shared library lookup table (<em>only</em> needed for Linux)</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ /sbin/ldconfig <span class="c1"># as superuser / root</span>
-</pre></div>
-</div>
-<p>you are done with the setup.</p>
-</div>
 <div class="section" id="install-via-cmake">
 <h4>Install via cmake<a class="headerlink" href="#install-via-cmake" title="Permalink to this headline">¶</a></h4>
 <p>There is on more configuration switch</p>
@@ -201,7 +168,7 @@ $ make install
 <dd>it allows to enable/disable <tt class="docutils literal"><span class="pre">DKS</span></tt> support. The default is <tt class="docutils literal"><span class="pre">&lt;value&gt;=1</span></tt>, <em>i.e.</em> enabled. To disable use <tt class="docutils literal"><span class="pre">&lt;value&gt;=0</span></tt>.</dd>
 </dl>
 <p>For a typical setup on a RHEL or macOS system it could look like this</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ cmake ../ -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$ROOTSYS</span> -DASlibs<span class="o">=</span><span class="m">1</span> -DBMWlibs<span class="o">=</span><span class="m">1</span> -Dnexus<span class="o">=</span><span class="m">1</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ cmake ../ -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$ROOTSYS</span> -DASlibs<span class="o">=</span><span class="m">1</span> -DBMWlibs<span class="o">=</span><span class="m">1</span> -Dnexus<span class="o">=</span><span class="m">1</span> -Ddks<span class="o">=</span><span class="m">1</span>
 </pre></div>
 </div>
 <p>After</p>
@@ -354,12 +321,12 @@ The only thing you need <tt class="docutils literal"><span class="pre">DKS</span
         <li class="right" >
           <a href="setup-standard.html" title="Setting up musrfit on Different Platforms"
              >previous</a> |</li>
-        <li><a href="index.html">musrfit 1.4.1 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.4.2 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2018, Andreas Suter.
-      Last updated on Jan 21, 2019.
+      Last updated on Mar 08, 2019.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
