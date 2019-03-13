@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------
 
 In the following it is assumed that the system variable ROOTSYS is already
-defined and defined and pointing to the place where CERN/ROOT is installed.
+defined and pointing to the place where CERN/ROOT is installed.
 
 #----------------------------------
 # Install via cmake tool chain
