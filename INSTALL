@@ -43,6 +43,8 @@ If all goes well, you should be good to go ;-)
 # Install using cmake tool chain
 #----------------------------------
 
+In the following it is assumed that the system variable ROOTSYS is already defined and pointing to the place where CERN/ROOT is installed.
+
 cmake minimal required version is 3.6.
 
 musrfit supports only out-of-source cmake build! Hence, go to the musrfit
