@@ -2,48 +2,12 @@
 # INSTALL
 #---------------------------------------------------------------------
 
-There are currently two ways to build musrfit,
-
-1) using automake tool chain (this will be phased out until 2019)
-2) using cmake tool chain (this will be the default starting from now)
-
 In what follows we assume that the system variable ROOTSYS is already
 defined and points to the installation directory of CERN/ROOT.
 
 #----------------------------------
-# Install using automake tool chain
-#----------------------------------
-
-To get it built:
-
-   sh autogen.sh
-   ./configure --prefix=$ROOTSYS             (or where ever musrfit should be installed)
-   make
-   make install                              (as superuser -- maybe)
-   /sbin/ldconfig                            (as superuser)   
-
-configure comes with a couple of options. For details execute
-
-  ./configure --help
-
-or check under http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html
-for a detailed description.
-
-For example, to include NeXus support and BNMRlibs,
-
-   sh autogen.sh
-   ./configure --enable-NeXus --enable-BNMRlibs --prefix=$ROOTSYS 
-   make 
-   make install                              (as superuser -- maybe)
-   /sbin/ldconfig                            (as superuser)
-   
-If all goes well, you should be good to go ;-)
-
-#----------------------------------
 # Install using cmake tool chain
 #----------------------------------
-
-In the following it is assumed that the system variable ROOTSYS is already defined and pointing to the place where CERN/ROOT is installed.
 
 cmake minimal required version is 3.6.
 
