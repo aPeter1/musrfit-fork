@@ -2,7 +2,7 @@
 # INSTALL
 #---------------------------------------------------------------------
 
-In what follows we assume that the system variable ROOTSYS is already
+In the following it is assumed that the system variable ROOTSYS is already
 defined and points to the installation directory of CERN/ROOT.
 
 #----------------------------------
