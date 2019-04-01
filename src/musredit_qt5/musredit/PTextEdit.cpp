@@ -1368,8 +1368,13 @@ void PTextEdit::filePrint()
  */
 void PTextEdit::fileClose(const bool check)
 {
+  // first check if there is any tab present
+  if (fTabWidget->count()==0) // no tabs present
+    return;
+
   // check if the has modification
   int idx = fTabWidget->currentIndex();
+
   if ((fTabWidget->tabText(idx).indexOf("*")>0) && check) {
     int result = QMessageBox::warning(this, "**WARNING**", 
                    "Do you really want to close this file.\nChanges will be lost",
