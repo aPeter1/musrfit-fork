@@ -38,6 +38,7 @@
 #include <QString>
 #include <QVector>
 #include <QProcess>
+#include <QFileInfo>
 
 #include <QtDebug>
 
@@ -186,6 +187,7 @@ private:
   void getTheme();
   void fillRecentFiles();
   QStringList getRunList(QString runListStr, bool &ok);
+  bool fileAlreadyOpen(QFileInfo &finfo, int &idx);
 };
 
 
