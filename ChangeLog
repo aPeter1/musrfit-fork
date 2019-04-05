@@ -12,6 +12,12 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.4.2, 2019/03/08
+=============================
+
+The tool chain support for automake is removed. Only the cmake tool chain is
+supported from now one. 
+
 Release of V1.2.0, 2017/10/26
 =============================
 

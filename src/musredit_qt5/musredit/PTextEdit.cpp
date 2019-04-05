@@ -1061,9 +1061,9 @@ void PTextEdit::fileOpen()
                         tr( "msr-Files (*.msr);;msr-Files (*.msr *.mlog);;All Files (*)" ));
 
   QStringList::Iterator it = flns.begin();
-  QFileInfo finfo1, finfo2;
-  QString tabFln;
+  QFileInfo finfo1;
   bool alreadyOpen = false;
+  int idx;
 
   // if flns are present, keep the corresponding directory
   if (flns.size() > 0) {
@@ -1071,23 +1071,17 @@ void PTextEdit::fileOpen()
     fLastDirInUse = finfo1.absoluteFilePath();
   }
 
-  while( it != flns.end() ) {
+  while( it != flns.end() ) {    
     // check if the file is not already open
     finfo1.setFile(*it);
-    for (int i=0; i<fTabWidget->count(); i++) {
-      tabFln = *fFilenames.find( dynamic_cast<PSubTextEdit*>(fTabWidget->widget(i)));
-      finfo2.setFile(tabFln);
-      if (finfo1.absoluteFilePath() == finfo2.absoluteFilePath()) {
-        alreadyOpen = true;
-        fTabWidget->setCurrentIndex(i);
-        break;
-      }
-    }
+    alreadyOpen = fileAlreadyOpen(finfo1, idx);
 
-    if (!alreadyOpen)
+    if (!alreadyOpen) {
       load(*it);
-    else
+    } else {
+      fTabWidget->setCurrentIndex(idx);
       fileReload();
+    }
 
     ++it;
   }
@@ -1368,8 +1362,13 @@ void PTextEdit::filePrint()
  */
 void PTextEdit::fileClose(const bool check)
 {
+  // first check if there is any tab present
+  if (fTabWidget->count()==0) // no tabs present
+    return;
+
   // check if the has modification
   int idx = fTabWidget->currentIndex();
+
   if ((fTabWidget->tabText(idx).indexOf("*")>0) && check) {
     int result = QMessageBox::warning(this, "**WARNING**", 
                    "Do you really want to close this file.\nChanges will be lost",
@@ -2053,7 +2052,6 @@ void PTextEdit::musrMsr2Data()
   }
 
   if (dlg->exec() == QDialog::Accepted) {
-    QString first, last;
     QString runList;
     QString runListFileName;
     QFileInfo fi;
@@ -2246,6 +2244,9 @@ void PTextEdit::musrMsr2Data()
       QString fln;
       QFile *file;
       QTextStream *stream;
+      QFileInfo finfo;
+      bool alreadOpen=false;
+      int idx=0;
 
       if (!fMsr2DataParam->global) { // standard fits
         switch(dlg->getRunTag()) {
@@ -2264,7 +2265,14 @@ void PTextEdit::musrMsr2Data()
               if (fTabWidget->count() != 0) {
                 workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
               }
-              load(workDir + "/" + fln);
+              finfo.setFile(workDir + "/" + fln);
+              alreadOpen = fileAlreadyOpen(finfo, idx);
+              if (!alreadOpen) {
+                load(workDir + "/" + fln);
+              } else {
+                fTabWidget->setCurrentIndex(idx);
+                fileReload();
+              }
             }
             break;
           case 1: // run list file
@@ -2290,7 +2298,14 @@ void PTextEdit::musrMsr2Data()
                 if (fTabWidget->count() != 0) {
                   workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
                 }
-                load(workDir + "/" + fln);
+                finfo.setFile(workDir + "/" + fln);
+                alreadOpen = fileAlreadyOpen(finfo, idx);
+                if (!alreadOpen) {
+                  load(workDir + "/" + fln);
+                } else {
+                  fTabWidget->setCurrentIndex(idx);
+                  fileReload();
+                }
               }
             }
 
@@ -3190,6 +3205,32 @@ QStringList PTextEdit::getRunList(QString runListStr, bool &ok)
       }
     } else { // keep it
       result << tok[i];
+    }
+  }
+
+  return result;
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * @brief PTextEdit::fileAlreadyOpen
+ * @param finfo
+ * @param idx
+ * @return
+ */
+bool PTextEdit::fileAlreadyOpen(QFileInfo &finfo, int &idx)
+{
+  bool result = false;
+  QFileInfo finfo2;
+  QString tabFln;
+
+  for (int i=0; i<fTabWidget->count(); i++) {
+    tabFln = *fFilenames.find( dynamic_cast<PSubTextEdit*>(fTabWidget->widget(i)));
+    finfo2.setFile(tabFln);
+    if (finfo.absoluteFilePath() == finfo2.absoluteFilePath()) {
+      result = true;
+      idx = i;
+      break;
     }
   }
 

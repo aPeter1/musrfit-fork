@@ -23,11 +23,9 @@ it can also be set up under **MS Windows** (cygwin, only for the *very brave*, p
   In case musrfit should be installed according to the description found on this page, the user is strongly encouraged to *read completely* each section dealing with the 
   present installation step *before* starting the installation process!
 
-Apart from `GCC, the GNU Compiler Collection <http://gcc.gnu.org/>`_ (``gcc``, ``g++``), the GNU build tools `autoconf <http://www.gnu.org/software/autoconf/>`_, 
-`automake <http://www.gnu.org/software/automake/>`_, and `libtool <http://www.gnu.org/software/libtool/>`_ are needed, if you want to build musrfit via the automake toolchain. 
-The ``automake`` toolchain will eventually  be droped in upcoming releases. 
-If you plan to use the cmake toolchain (preferred way), `cmake <https://cmake.org/>`_. Furthermore the helper tool `pkg-config <http://pkg-config.freedesktop.org/wiki/>`_ is 
-needed and musrfit requires the installation of a few open-source libraries and programs including their header packages:  
+Apart from `GCC, the GNU Compiler Collection <http://gcc.gnu.org/>`_ (``gcc``, ``g++``), the build tool `cmake <https://cmake.org/>`_ is needed. Furthermore the helper 
+tool `pkg-config <http://pkg-config.freedesktop.org/wiki/>`_ needs to be in place, and musrfit requires the installation of a few open-source libraries and programs including 
+their header packages:  
 
 .. index:: boost-c++
 
@@ -94,14 +92,15 @@ Before the installation procedure will be described, please note the following r
 
 **GNU/Linux**
   No serious problems are currently known. Tested distributions: `RHEL <https://www.redhat.com/de/technologies/linux-platforms/enterprise-linux>`_, `Fedora <https://getfedora.org/>`_,
-  `Debian <https://www.debian.org/>`_, `Ubuntu <https://www.ubuntu.com/>`_, `Mint <https://linuxmint.com/>`_, `openSUSE <https://en.opensuse.org/Main_Page>`_.
+  `Debian <https://www.debian.org/>`_, `Ubuntu <https://www.ubuntu.com/>`_, `Mint <https://linuxmint.com/>`_, `openSUSE <https://en.opensuse.org/Main_Page>`_, 
+  `manjaro <https://de.manjaro.org/>`_, and `antergos <https://antergos.com/>`_.
 **Mac OS X/macOS**
   No serious problems are currently known for macOS ≥ 10.6.
 **MS Windows**
   Native *MS Windows* support is currently not available. Potential ways to get ``musrfit`` running are:
   
   * via installation of Linux via the Microsoft App store for Windows 10.
-  * via installation of the virtual machine on which you install Linux.
+  * via installation of the virtual machine on which you install Linux (probably the easiest for most Windows users).
   * via `cygwin`_. 
   
 .. _cygwin: https://www.cygwin.com/  
@@ -173,9 +172,18 @@ Installation of NeXus requirements (optional)
 
 *Only* if ``musrfit`` should support reading/writing data files in the ``NeXus`` format the further required 
 software has to be set up. The required libraries and header files could either be available through the user's 
-GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. *E.g.* on 
-Red Hat-like systems binary packages for ``MXML``, ``HDF4``, and ``HDF5`` might be called ``mxml``, ``mxml-devel``, 
-``hdf``, ``hdf-devel``, ``hdf5``, ``hdf5-devel``, on Debian-like systems ``libmxml1``, ``libmxml-dev``, ``libhdf4-dev``, ``libhdf5-dev``. 
+GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. The necessary
+packages to build ``NeXus`` are ``MXML``, (``HDF4``), and ``HDF5``. This means, for a rpm-package based distro try something like:
+
+  .. code-block:: bash
+  
+    $ yum install mxml-devel hdf-devel hdf5-devel
+    
+and on a deb-package based distro try something like:
+
+  .. code-block:: bash
+  
+    $ apt-get install libmxml-dev libhdf4-dev libhdf5-dev
 
 .. note::
 
@@ -213,10 +221,8 @@ A brief instruction how to get ``NeXus`` compiled from source (lines starting wi
 ROOT
 ^^^^
 
-ROOT 5.34/xx is supported as legacy version *only*! **The default now will be ROOT 6.xx/yy!**
-
 The ROOT framework may or may not be part of the GNU/Linux distribution. Some distributions are packing ROOT in a 
-manner incompatible with the way it is needed for ``musrfit``, though the situation is improving. If you are 
+manner incompatible with the way it is needed by ``musrfit``, though the situation is improving. If you are 
 experienced enough you can try the packed ROOT version. Often ROOT is split in many sub-packages. Install the 
 necessary ones (guess from the description below). **One Warning:** if the ROOT packages are upgraded after a 
 yum update (apt-get update; apt-get upgrade) you might need to recompile ``musrfit``. *If you are not sure about 
@@ -247,12 +253,12 @@ be added starting with a '#' which can be omitted. They are only there to explai
   $ # creat the Apps directory if not already present
   $ mkdir Apps
   $ cd Apps
-  $ git clone http://root.cern.ch/git/root.git
+  $ git clone http://github.com/root-project/root.git
   $ cd root
   $ git tag -l
-  $ # git tag -l will list all available tags. In the next command choose the tag v6-14-00 
+  $ # git tag -l will list all available tags. In the next command choose the tag v6-16-00 
   $ # or the latest official release number
-  $ git checkout -b v6-14-00 v6-14-00
+  $ git checkout -b v6-16-00 v6-16-00
   $ # now ROOT is ready to be configured. Below you will find the minimal ROOT configuration needed.
   $ # since we are using cmake build now, first we will need to create the build directory.
   $ mkdir root_build
@@ -299,7 +305,7 @@ If an update of ROOT is needed, simple do the following:
 musrfit
 +++++++
 
-When all required software has been set up with the ``musrfit`` installation can be proceeded. First, the most 
+When all required software has been set up you can proceed with the ``musrfit`` installatio. First, the most 
 recent source code should be downloaded. The preferred way of doing so is to clone the ``musrfit`` repository via git. 
 Assuming the code should be located in ``$HOME/Apps`` this is achieved most easily calling from the terminal 
 
@@ -307,8 +313,7 @@ Assuming the code should be located in ``$HOME/Apps`` this is achieved most easi
 
   $ cd $HOME/Apps
   $ git clone https://bitbucket.org/muonspin/musrfit.git
-  $ # Only if legacy ROOT 5.xx.yy is used include the next line
-  $ cd musrfit; git checkout root5
+  $ cd musrfit
 
 or  
   
@@ -316,8 +321,7 @@ or
 
   $ cd $HOME/Apps
   $ git clone git://gitlab.psi.ch/nemu/musrfit.git
-  $ # Only if legacy ROOT 5.xx.yy is used include the next line
-  $ cd musrfit; git checkout root5
+  $ cd musrfit
 
 .. note::  
   
@@ -331,24 +335,6 @@ or
 
   $ cd $HOME/Apps/musrfit
   $ git pull
-  
-Now, depending whether you follow the ``automake`` or ``cmake`` tool chain you do   
-
-**automake toolchain:**
-  
-.. code-block:: bash
-
-  $ make uninstall
-  $ make clean
-  $ make
-  $ make install
-
-or
-
-**cmake toolchain:**
-
-.. code-block:: bash
-
   $ cd build
   $ xargs rm < install_manifest.txt
   $ cmake --build ./ --clean-first
@@ -358,61 +344,6 @@ or
   
 As an alternative (if git is not available), the source code can also be downloaded from the following web-page: `musrfit at bitbucket`_
   
-.. index:: musrfit-build-automake-linux    
-
-musrfit build with automake 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-After the source-code extraction the ``autogen.sh`` script is called to prepare the build environment. 
-If it has been executed successfully the ``configure`` script should be ready to collect all the information needed 
-to create the Makefiles. If ``musrfit`` should support ``NeXus`` data files this has to be enabled by specifying the 
-``--enable-NeXus`` switch when calling configure. For an overview of all available options just call ``./configure --help``. 
-Besides the standard options there are a few special options which should be mentioned here: 
-
-**- -prefix**
-  Specify the installation prefix, *e.g.* ``$ROOTSYS`` if already defined (by default: ``/usr/local``).
-**- -with-rootsys**
-  Specify the top of the ``ROOT`` installation directory, *e.g.* ``$ROOTSYS`` if already defined.
-**- -with-fftw3**
-  Specify the prefix of the ``FFTW3`` installation. *e.g.* ``/usr/local`` or ``/usr``. 
-**- -with-gsl**
-  Set the prefix of the ``GSL`` installation, *e.g.* ``/usr/local`` or ``/usr``.   
-**- -with-boostinc**
-  Set the path to the header files of the ``Boost`` installation, *e.g.* ``/usr/local/include`` or ``/usr/include``.
-**- -with-hdf4**
-  Set the prefix of the ``HDF4`` installation, *e.g.* ``/usr/local`` (only useful in conjunction with the ``NeXus`` support). 
-**- -with-hdf5**
-  Set the prefix of the ``HDF5`` installation, *e.g.* ``/usr`` (only useful in conjunction with the ``NeXus`` support). 
-**- -with-nexus**
-  Set the prefix of the ``NeXus`` installation, *e.g.* ``/usr/local`` (only useful in conjunction with the ``NeXus`` support). 
-**- -with-qt3**
-  Set the prefix of the ``Qt3`` installation, *e.g.* ``/usr/lib/qt-3.3`` (only useful in conjunction with building ``musrgui``). 
-**- -with-qt4**
-  Set the prefix of the ``Qt4`` installation, *e.g.* ``/usr/lib/qt47`` (only useful in conjunction with building ``musredit``). 
-**- -with-qt5**
-  Set the prefix of the ``Qt5`` installation, *e.g.* ``/usr/lib64`` (only useful in conjunction with building ``musredit``). 
-**- -enable-NeXus**
-  Enable the support of ``NeXus`` data files (requires the ``HDF4``, ``HDF5`` and ``NeXus`` libraries to be installed). 
-**- -disable-editor**
-  Disable the integrated building of ``musredit``/``musrgui``. 
-**- -disable-omp**
-  Switches off the `OpenMP <http://en.wikipedia.org/wiki/OpenMP>`_ features of ``musrfit`` (parallelization of the :math:`\chi^2` calculation when compiled with GCC ≥ 4.2). 
-
-Normally it should not be necessary to make use of any of the options except for specifying the installation path with ``--prefix``. The 
-other paths should be detected automatically. If this does not work for some reason the configure script will terminate and ask for the 
-information. When the configure script has been called successfully everything is ready for building the ``musrfit`` libraries and executables. 
-A standard installation sequence (without ``NeXus`` support) might then look like (In case the normal user has no write permissions to the 
-``$ROOTSYS`` and the installation path the "make install" commands have to be executed as superuser.): 
-
-.. code-block:: bash
-
-  $ cd $HOME/Apps/musrfit
-  $ sh autogen.sh
-  $ ./configure --prefix=$ROOTSYS
-  $ make
-  $ make install
-  $ /sbin/ldconfig     # (as superuser)
-
 .. index:: musrfit-build-cmake-linux    
 
 musrfit build with cmake 
@@ -484,8 +415,7 @@ musredit
 ++++++++
 
 In the latest version of ``musrfit`` the configure script tries to determine automatically the highest available ``Qt`` version. 
-In case this is found, the editor ``musredit`` is built already together with ``musrfit``. If not, one can try to call 
-the configure script with the **- -with-qt5** option (``automake``). ``cmake`` will determine everthing automatically.  
+In case this is found, the editor ``musredit`` is built already together with ``musrfit``.
 To install this editor separately, *i.e.* by "hand" do
 
 .. code-block:: bash
@@ -739,61 +669,7 @@ If the repository had been checked out already before, one can update the local 
 
 As an alternative (if git is not available), the source code can also be downloaded from the following 
 web-page: `musrfit at bitbucket`_.
-  
-.. index:: musrfit-build-automake-windows  
-
-musrfit build with automake 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-After the source-code extraction the ``autogen.sh`` script is called to prepare the build environment. 
-If it has been executed successfully the ``configure`` script should be ready to collect all the information 
-needed to create the Makefiles. If ``musrfit`` should support ``NeXus`` data files this has to be enabled by 
-specifying the ``--enable-static --enable-NeXus`` switches when calling configure. For an overview of all 
-available options just call ``./configure --help``. Besides the standard options there are a few special 
-options which should be mentioned here: 
-
-**- -prefix**
-  Specify the installation prefix, *e.g.* ``/opt/root-system`` (by default: ``/usr/local``) 
-**- -with-rootsys**
-  Specify the top of the ``ROOT`` installation directory, *e.g.* ``/opt/root-system`` 
-**- -with-fftw3**
-  Specify the prefix of the ``FFTW3`` installation. *e.g.* ``/usr/local`` or ``/usr`` 
-**- -with-gsl**
-  Set the prefix of the ``GSL`` installation, *e.g.* ``/usr/local`` or ``/usr`` 
-**- -with-boostinc**
-  Set the path to the header files of the ``Boost`` installation, *e.g.* ``/usr/local/include`` or ``/usr/include`` 
-**- -with-hdf4**
-  Set the prefix of the ``HDF4`` installation, *e.g.* ``/usr/local`` (only useful in conjunction with the ``NeXus`` support) 
-**- -with-hdf5**
-  Set the prefix of the ``HDF5`` installation, *e.g.* ``/usr`` (only useful in conjunction with the ``NeXus`` support) 
-**- -with-nexus**
-  Set the prefix of the ``NeXus`` installation, *e.g.* ``/usr/local`` (only useful in conjunction with the ``NeXus`` support) 
-**- -with-qt3**
-  Set the prefix of the ``Qt3`` installation, *e.g.* ``/usr/lib/qt-3.3`` (only useful in conjunction with building ``musrgui``) 
-**- -with-qt4**
-  Set the prefix of the ``Qt4`` installation, *e.g.* ``/usr/lib/qt47`` (only useful in conjunction with building ``musredit``) 
-**- -with-qt5**
-  Set the prefix of the ``Qt5`` installation, *e.g.* ``/usr/lib/qt56`` (only useful in conjunction with building ``musredit``) 
-**- -enable-NeXus**
-  Enable the support of ``NeXus`` data files (requires the ``HDF4``, ``HDF5`` and ``NeXus`` libraries to be installed). 
-**- -disable-editor**
-  Disable the integrated building of ``musredit``/``musrgui``. 
-**- -disable-omp**
-  Switches off the ``OpenMP`` features of ``musrfit`` (parallelization of the :math:`\chi^2` calculation when compiled with ``GCC`` ≥ 4.2) 
-
-Normally it should not be necessary to make use of any of the options except for specifying the installation path with ``--prefix``. 
-The other paths should be detected automatically. If this does not work for some reason the ``configure`` script will terminate and 
-ask for the information. When the ``configure`` script has been called successfully everything is ready for building the ``musrfit`` 
-libraries and executables. A standard installation sequence (without ``NeXus`` support) might then look like:   
-
-.. code-block:: bash
-
-  $ cd musrfit
-  $ sh autogen.sh
-  $ ./configure --prefix=$ROOTSYS
-  $ make
-  $ make install
-  
+   
 .. index:: musrfit-build-cmake-windows  
 
 musrfit build with cmake 
@@ -847,8 +723,7 @@ musredit
 
 In the latest version of ``musrfit`` the configure script tries to determine automatically if 
 Qt4.5 or higher is set up on the machine. In case this is found, the editor ``musredit`` is built 
-readily with ``musrfit``. If not, one can either try to call the ``configure`` script with the 
-``--with-qt4`` option or install this editor separately, *.e.g.*:
+readily with ``musrfit``. If not, try the following:
 
 .. code-block:: bash
 
@@ -945,7 +820,7 @@ with OS X (on the installation DVD/CDs) should be installed:
      
 **X11**
   The X-window system is automatically installed on 10.5 Leopard and 10.6 Snow Leopard. For some other versions you also 
-  will need to install `XQuartz <http://xquartz.macosforge.org/trac>`. If ``ROOT`` runs without ``XQuartz`` *do not*
+  will need to install `XQuartz <http://xquartz.macosforge.org/trac>`_. If ``ROOT`` runs without ``XQuartz`` *do not*
   install it.
   
 After installing the ``Xcode`` tools go to the `MacPorts install page <http://www.macports.org/install.php>`_, download 
@@ -1034,7 +909,7 @@ Only ``NeXus`` Version ≥ 4.4 is support!) this can be achieved for example by:
 ROOT
 ^^^^
 
-ROOT 5.34/xx is supported as legacy version only! **The default now will be ROOT 6.xx/yy!**
+**The default ROOT version is based on ROOT 6.xx/yy!**
 
 ROOT installed via package installer 
 """"""""""""""""""""""""""""""""""""
@@ -1042,16 +917,16 @@ ROOT installed via package installer
 The lazy way to get ``ROOT`` installed is via package installer. If your macOS is directly supported 
 by the ``ROOT`` people you can download the package installer from the ``ROOT`` `download page <https://root.cern.ch/downloading-root>`_. 
 Choose the latest ``ROOT`` release and download you macOS version dmg-file, *e.g.* for macOS 10.13 (High Sierra) 
-it is at the time of writting ``root_v6.14.00.macosx64-10.13-clang91.dmg``. After the installation 
+it is at the time of writting ``root_v6.16.00.macosx64-10.13-clang91.dmg``. After the installation 
 ``ROOT`` will be installed under ``/Application`` as owner root. In order to ease your life for the 
 steps to follow and assuming you are the only guy working on your Mac, you could change the owner and group of the ``ROOT`` directory: 
 
 .. code-block:: bash
 
   $ cd /Applications
-  $ sudo chown -R <username> root_v6.14.00
-  $ sudo chgrp -R staff root_v6.14.00
-  $ sudo ln -s root_v6.14.00 root
+  $ sudo chown -R <username> root_v6.16.00
+  $ sudo chgrp -R staff root_v6.16.00
+  $ sudo ln -s root_v6.16.00 root
 
 ROOT installed from source 
 """"""""""""""""""""""""""
@@ -1068,12 +943,12 @@ comments will be added starting with a '#' which can be omitted. They are only t
 .. code-block:: bash
 
   $ cd $HOME/Applications
-  $ git clone http://root.cern.ch/git/root.git
+  $ git clone http://github.com/root-project/root.git
   $ cd root
   $ git tag -l
   $ # git tag -l will list all available tags. In the next command choose the tag v6-10-xx
-  $ # where xx is the highest listed number, e.g. v6-14-00
-  $ git checkout -b v6-14-00 v6-14-00
+  $ # where xx is the highest listed number, e.g. v6-16-00
+  $ git checkout -b v6-16-00 v6-16-00
   $ # now ROOT is ready to be configured. Below you will find the minimal ROOT configuration needed.
   $ # We will use the cmake out-of-source approach here.
   $ mkdir root_build
@@ -1158,7 +1033,7 @@ Before proceeding with the usage of the `Fink`_ system first a few useful tools 
      
 **X11**
   The X-window system is automatically installed on 10.5 Leopard and 10.6 Snow Leopard. For some other versions you also 
-  will need to install `XQuartz <http://xquartz.macosforge.org/trac>`. If ``ROOT`` runs without ``XQuartz`` *do not*
+  will need to install `XQuartz <http://xquartz.macosforge.org/trac>`_. If ``ROOT`` runs without ``XQuartz`` *do not*
   install it.
 
 After installing the ``Xcode`` tools go to the `Fink download page <http://www.finkproject.org/download/index.php?phpLang=en>`_, 
@@ -1256,7 +1131,7 @@ this can be achieved for example by:
 ROOT
 ^^^^
 
-ROOT 5.34/xx is supported as legacy version only and will likely to be dropped in 2018. **The default now is ROOT 6.xx/yy!**
+**The default ROOT version is based on ROOT 6.xx/yy!**
 
 ROOT installed via package installer 
 """"""""""""""""""""""""""""""""""""
@@ -1264,16 +1139,16 @@ ROOT installed via package installer
 The lazy way to get ``ROOT`` installed is via package installer. If your macOS is directly supported 
 by the ``ROOT`` people you can download the package installer from the ``ROOT`` `download page <https://root.cern.ch/downloading-root>`_. 
 Choose the latest ``ROOT`` release and download you macOS version dmg-file, *e.g.* for macOS 10.13 (High Sierra) 
-it is at the time of writting ``root_v6.14.00.macosx64-10.13-clang91.dmg``. After the installation 
+it is at the time of writting ``root_v6.16.00.macosx64-10.13-clang91.dmg``. After the installation 
 ``ROOT`` will be installed under ``/Application`` as owner root. In order to ease your life for the 
 steps to follow and assuming you are the only guy working on your Mac, you could change the owner and group of the ``ROOT`` directory: 
 
 .. code-block:: bash
 
   $ cd /Applications
-  $ sudo chown -R <username> root_v6.14.00
-  $ sudo chgrp -R staff root_v6.14.00
-  $ sudo ln -s root_v6.14.00 root
+  $ sudo chown -R <username> root_v6.16.00
+  $ sudo chgrp -R staff root_v6.16.00
+  $ sudo ln -s root_v6.16.00 root
   
 ROOT installed from source
 """"""""""""""""""""""""""
@@ -1290,12 +1165,12 @@ comments will be added starting with a '#' which can be omitted. They are only t
 .. code-block:: bash
 
   $ cd $HOME/Applications
-  $ git clone http://root.cern.ch/git/root.git
+  $ git clone http://github.com/root-project/root.git
   $ cd root
   $ git tag -l
   $ # git tag -l will list all available tags. In the next command choose the tag v6-10-xx
-  $ # where xx is the highest listed number, e.g. v6-14-00
-  $ git checkout -b v6-14-00 v6-14-00
+  $ # where xx is the highest listed number, e.g. v6-16-00
+  $ git checkout -b v6-16-00 v6-16-00
   $ # now ROOT is ready to be configured. Below you will find the minimal ROOT configuration needed.
   $ # We will use the cmake out-of-source approach here.
   $ mkdir root_build
@@ -1374,8 +1249,7 @@ in ``~/Applications/musrfit`` this is achieved most easily calling from the term
 
   $ cd ~/Applications
   $ git clone https://bitbucket.org/muonspin/musrfit.git 
-  $ # Only if legacy ROOT 5.xx.yy is used include the next line 
-  $ cd musrfit; git checkout root5 
+  $ cd musrfit
 
 or 
 
@@ -1383,8 +1257,7 @@ or
 
   $ cd ~/Applications
   $ git clone git://gitlab.psi.ch/nemu/musrfit.git  
-  $ # Only if legacy ROOT 5.xx.yy is used include the next line 
-  $ cd musrfit; git checkout root5 
+  $ cd musrfit
 
 If a local repository clone is already present, one can update it using: 
 
@@ -1395,63 +1268,7 @@ If a local repository clone is already present, one can update it using:
   
 As an alternative (*if git is not available*), the source code can also be downloaded from the following 
 web-page: `musrfit at bitbucket`_.   
-  
-.. index:: musrfit-build-automake-macos
-
-musrfit build with automake
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-After the source-code extraction the ``autogen.sh`` script is called to prepare the build environment. 
-If it has been executed successfully the ``configure`` script should be ready to collect all the information needed 
-to create the Makefiles. If ``musrfit`` should support ``NeXus`` data files this has to be enabled by specifying the 
-``--enable-NeXus`` switch when calling configure. For an overview of all available options just call ``./configure --help``. 
-Besides the standard options there are a few special options which should be mentioned here: 
-
-**- -prefix**
-  Specify the installation prefix, *e.g.* ``$ROOTSYS`` if already defined (by default: ``/usr/local``).
-**- -with-rootsys**
-  Specify the top of the ``ROOT`` installation directory, *e.g.* ``$ROOTSYS`` if already defined.
-**- -with-fftw3**
-  Specify the prefix of the ``FFTW3`` installation. *e.g.* ``/usr/local`` or ``/usr``. 
-**- -with-gsl**
-  Set the prefix of the ``GSL`` installation, *e.g.* ``/usr/local`` or ``/usr``.   
-**- -with-boostinc**
-  Set the path to the header files of the ``Boost`` installation, *e.g.* ``/usr/local/include`` or ``/usr/include``.
-**- -with-hdf4**
-  Set the prefix of the ``HDF4`` installation, *e.g.* ``/usr/local`` (only useful in conjunction with the ``NeXus`` support). 
-**- -with-hdf5**
-  Set the prefix of the ``HDF5`` installation, *e.g.* ``/usr`` (only useful in conjunction with the ``NeXus`` support). 
-**- -with-nexus**
-  Set the prefix of the ``NeXus`` installation, *e.g.* ``/usr/local`` (only useful in conjunction with the ``NeXus`` support). 
-**- -with-qt3**
-  Set the prefix of the ``Qt3`` installation, *e.g.* ``/usr/lib/qt-3.3`` (only useful in conjunction with building ``musrgui``). 
-**- -with-qt4**
-  Set the prefix of the ``Qt4`` installation, *e.g.* ``/usr/lib/qt47`` (only useful in conjunction with building ``musredit``). 
-**- -with-qt5**
-  Set the prefix of the ``Qt5`` installation, *e.g.* ``/usr/lib64`` (only useful in conjunction with building ``musredit``). 
-**- -enable-NeXus**
-  Enable the support of ``NeXus`` data files (requires the ``HDF4``, ``HDF5`` and ``NeXus`` libraries to be installed). 
-**- -disable-editor**
-  Disable the integrated building of ``musredit``/``musrgui``. 
-**- -disable-omp**
-  Switches off the `OpenMP <http://en.wikipedia.org/wiki/OpenMP>`_ features of ``musrfit`` (parallelization of the :math:`\chi^2` calculation when compiled with GCC ≥ 4.2). 
-
-Normally it should not be necessary to make use of any of the options except for specifying the installation path with ``--prefix``. The 
-other paths should be detected automatically. If this does not work for some reason the configure script will terminate and ask for the 
-information. When the configure script has been called successfully everything is ready for building the ``musrfit`` libraries and executables. 
-A standard installation sequence (without ``NeXus`` support) might then look like (In case the normal user has no write permissions to the 
-``$ROOTSYS`` and the installation path the "make install" commands have to be executed as superuser.): 
-
-.. code-block:: bash
-
-  $ cd $HOME/Apps/musrfit
-  $ sh autogen.sh
-  $ ./configure --prefix=$ROOTSYS
-  $ make
-  $ make install
-  $ /sbin/ldconfig     # (as superuser)
-
-  
+   
 .. index:: musrfit-build-cmake-macos
 
 musrfit build with cmake
@@ -1521,8 +1338,7 @@ musredit
 
 In the latest version of ``musrfit`` the configure script tries to determine automatically the highest 
 available Qt version. In case this is found, the editor ``musredit`` is built already together with ``musrfit``. 
-If not, one can try to call the configure script with the **--with-qt5** option (``automake``). ``cmake`` will 
-determine everthing automatically. To install this editor separately, *i.e.* by “hand” do
+If not, try the following:
 
 .. code-block:: bash
 

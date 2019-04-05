@@ -9,8 +9,6 @@ Andreas Suter <andreas.suter@psi.ch>
 
 Bastian M. Wojek
   msr2data; initial testing; full initial documentation; BMWlibs;
-  unified building process on Linux, MacOSX and Windows (Cygwin)
-  through autotools
 
 #---------------------------------------------------------------------
 # this is the end ...

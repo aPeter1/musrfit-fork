@@ -3,6 +3,7 @@ if (ASlibs)
   add_subdirectory(MagProximity)
   add_subdirectory(libPhotoMeissner)
   add_subdirectory(libSpinValve)
+  add_subdirectory(libGbGLF)
 endif (ASlibs)
 
 if (BMWlibs)
