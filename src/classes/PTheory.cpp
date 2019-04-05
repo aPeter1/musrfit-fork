@@ -390,7 +390,7 @@ Bool_t PTheory::IsValid()
  * \param paramValues vector with the parameters
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::Func(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::Func(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   if (fMul) {
     if (fAdd) { // fMul != 0 && fAdd != 0
@@ -1166,7 +1166,7 @@ Double_t PTheory::Asymmetry(const PDoubleVector& paramValues, const PDoubleVecto
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::SimpleExp(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::SimpleExp(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: lambda [tshift]
 
@@ -1206,7 +1206,7 @@ Double_t PTheory::SimpleExp(register Double_t t, const PDoubleVector& paramValue
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::GeneralExp(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::GeneralExp(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: lambda beta [tshift]
 
@@ -1254,7 +1254,7 @@ Double_t PTheory::GeneralExp(register Double_t t, const PDoubleVector& paramValu
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::SimpleGauss(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::SimpleGauss(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: sigma [tshift]
 
@@ -1294,7 +1294,7 @@ Double_t PTheory::SimpleGauss(register Double_t t, const PDoubleVector& paramVal
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::StaticGaussKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::StaticGaussKT(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: sigma [tshift]
 
@@ -1336,7 +1336,7 @@ Double_t PTheory::StaticGaussKT(register Double_t t, const PDoubleVector& paramV
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::StaticGaussKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::StaticGaussKTLF(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
 
   // expected parameters: frequency damping [tshift]
@@ -1425,7 +1425,7 @@ Double_t PTheory::StaticGaussKTLF(register Double_t t, const PDoubleVector& para
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::DynamicGaussKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::DynamicGaussKTLF(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: frequency damping hopping [tshift]
 
@@ -1523,7 +1523,7 @@ Double_t PTheory::DynamicGaussKTLF(register Double_t t, const PDoubleVector& par
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::StaticLorentzKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::StaticLorentzKT(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: lambda [tshift]
 
@@ -1566,7 +1566,7 @@ Double_t PTheory::StaticLorentzKT(register Double_t t, const PDoubleVector& para
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::StaticLorentzKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::StaticLorentzKTLF(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: frequency damping [tshift]
 
@@ -1663,7 +1663,7 @@ Double_t PTheory::StaticLorentzKTLF(register Double_t t, const PDoubleVector& pa
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::DynamicLorentzKTLF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::DynamicLorentzKTLF(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: frequency damping hopping [tshift]
 
@@ -1773,7 +1773,7 @@ Double_t PTheory::DynamicLorentzKTLF(register Double_t t, const PDoubleVector& p
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::CombiLGKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::CombiLGKT(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: lambdaL lambdaG [tshift]
 
@@ -1819,7 +1819,7 @@ Double_t PTheory::CombiLGKT(register Double_t t, const PDoubleVector& paramValue
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::StrKT(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::StrKT(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: sigma beta [tshift]
 
@@ -1868,7 +1868,7 @@ Double_t PTheory::StrKT(register Double_t t, const PDoubleVector& paramValues, c
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::SpinGlass(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::SpinGlass(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: lambda gamma q [tshift]
 
@@ -1919,7 +1919,7 @@ Double_t PTheory::SpinGlass(register Double_t t, const PDoubleVector& paramValue
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::RandomAnisotropicHyperfine(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::RandomAnisotropicHyperfine(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: nu lambda [tshift]
 
@@ -1964,7 +1964,7 @@ Double_t PTheory::RandomAnisotropicHyperfine(register Double_t t, const PDoubleV
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::Abragam(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::Abragam(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: sigma gamma [tshift]
 
@@ -2008,7 +2008,7 @@ Double_t PTheory::Abragam(register Double_t t, const PDoubleVector& paramValues,
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::TFCos(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::TFCos(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: phase frequency [tshift]
 
@@ -2049,7 +2049,7 @@ Double_t PTheory::TFCos(register Double_t t, const PDoubleVector& paramValues, c
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::InternalField(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::InternalField(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: fraction phase frequency rateT rateL [tshift]
 
@@ -2091,7 +2091,7 @@ Double_t PTheory::InternalField(register Double_t t, const PDoubleVector& paramV
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::InternalFieldGK(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::InternalFieldGK(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: [0]:fraction [1]:frequency [2]:sigma [3]:lambda [4]:beta [[5]:tshift]
 
@@ -2143,7 +2143,7 @@ Double_t PTheory::InternalFieldGK(register Double_t t, const PDoubleVector& para
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::InternalFieldLL(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::InternalFieldLL(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: [0]:fraction [1]:frequency [2]:a [3]:lambda [4]:beta [[5]:tshift]
 
@@ -2195,7 +2195,7 @@ Double_t PTheory::InternalFieldLL(register Double_t t, const PDoubleVector& para
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::Bessel(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::Bessel(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: phase frequency [tshift]
 
@@ -2236,7 +2236,7 @@ Double_t PTheory::Bessel(register Double_t t, const PDoubleVector& paramValues, 
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::InternalBessel(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::InternalBessel(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: fraction phase frequency rateT rateL [tshift]
 
@@ -2285,7 +2285,7 @@ Double_t PTheory::InternalBessel(register Double_t t, const PDoubleVector& param
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::SkewedGauss(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::SkewedGauss(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: phase frequency sigma- sigma+ [tshift]
 
@@ -2352,7 +2352,7 @@ Double_t PTheory::SkewedGauss(register Double_t t, const PDoubleVector& paramVal
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::StaticNKZF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::StaticNKZF(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected paramters: damping_D0 [0], R_b tshift [1]
 
@@ -2407,7 +2407,7 @@ Double_t PTheory::StaticNKZF(register Double_t t, const PDoubleVector& paramValu
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::StaticNKTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::StaticNKTF(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected paramters: phase [0], frequency [1], damping_D0 [2], R_b [3],  [tshift [4]]
 
@@ -2463,7 +2463,7 @@ Double_t PTheory::StaticNKTF(register Double_t t, const PDoubleVector& paramValu
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::DynamicNKZF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::DynamicNKZF(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected paramters: damping_D0 [0], R_b [1], nu_c [2], [tshift [3]]
 
@@ -2524,7 +2524,7 @@ Double_t PTheory::DynamicNKZF(register Double_t t, const PDoubleVector& paramVal
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::DynamicNKTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::DynamicNKTF(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected paramters: phase [0], frequency [1], damping_D0 [2], R_b [3], nu_c [4], [tshift [5]]
 
@@ -2578,7 +2578,7 @@ Double_t PTheory::DynamicNKTF(register Double_t t, const PDoubleVector& paramVal
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::Polynom(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::Polynom(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: tshift p0 p1 p2 ...
 
@@ -2615,7 +2615,7 @@ Double_t PTheory::Polynom(register Double_t t, const PDoubleVector& paramValues,
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::UserFcn(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::UserFcn(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // check if FUNCTIONS are used
   for (UInt_t i=0; i<fUserParam.size(); i++) {
@@ -2973,7 +2973,7 @@ Double_t PTheory::GetDynKTLFValue(const Double_t t) const
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::MuMinusExpTF(register Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
+Double_t PTheory::MuMinusExpTF(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
 {
   // expected parameters: N0 tau A lambda phase frequency [tshift]
 
