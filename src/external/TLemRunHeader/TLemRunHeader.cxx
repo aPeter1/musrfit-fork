@@ -4,9 +4,6 @@
 // 18/06/2006
 //
 //
-#include <iostream>
-using namespace std;
-
 #include "TLemRunHeader.h"
 
 ClassImp(TLemRunHeader)

@@ -33,7 +33,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include "PNL_RgeHandler.h"
 
@@ -145,7 +144,7 @@ Double_t PNL_RgeHandler::GetRgeValue(const Double_t energy, const Double_t dist)
  */
 Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList)
 {
-  ifstream fin;
+  std::ifstream fin;
   PNL_RgeData data;
   TString tstr;
   char line[512];
@@ -154,11 +153,11 @@ Bool_t PNL_RgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const P
 
   for (UInt_t i=0; i<rgeDataPathList.size(); i++) {
     // open rge-file for reading
-    fin.open(rgeDataPathList[i].Data(), iostream::in);
+    fin.open(rgeDataPathList[i].Data(), std::iostream::in);
     if (!fin.is_open()) {
-      cout << endl << "PNL_RgeHandler::LoadRgeData **ERROR**";
-      cout << endl << "  Could not open file " << rgeDataPathList[i].Data();
-      cout << endl;
+      std::cout << std::endl << "PNL_RgeHandler::LoadRgeData **ERROR**";
+      std::cout << std::endl << "  Could not open file " << rgeDataPathList[i].Data();
+      std::cout << std::endl;
       return false;
     }
 

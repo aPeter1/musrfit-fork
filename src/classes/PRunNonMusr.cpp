@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -46,7 +46,7 @@ PRunNonMusr::PRunNonMusr() : PRunBase()
 
   fHandleTag = kEmpty;
 
-  fRawRunData = 0;
+  fRawRunData = nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -65,8 +65,8 @@ PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t 
   // get the proper run
   fRawRunData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
   if (!fRawRunData) { // couldn't get run
-    cerr << endl << "PRunNonMusr::PRunNonMusr(): **ERROR** Couldn't get raw run  data!";
-    cerr << endl;
+    std::cerr << std::endl << "PRunNonMusr::PRunNonMusr(): **ERROR** Couldn't get raw run  data!";
+    std::cerr << std::endl;
     fValid = false;
   }
 
@@ -130,7 +130,7 @@ Double_t PRunNonMusr::CalcChiSquare(const std::vector<Double_t>& par)
  */
 Double_t PRunNonMusr::CalcChiSquareExpected(const std::vector<Double_t>& par)
 {
-  cout << endl << "PRunNonMusr::CalcChiSquareExpected(): not implemented yet ..." << endl;
+  std::cout << std::endl << "PRunNonMusr::CalcChiSquareExpected(): not implemented yet ..." << std::endl;
 
   return 0.0;
 }
@@ -148,7 +148,7 @@ Double_t PRunNonMusr::CalcChiSquareExpected(const std::vector<Double_t>& par)
  */
 Double_t PRunNonMusr::CalcMaxLikelihood(const std::vector<Double_t>& par)
 {
-  cout << endl << "PRunNonMusr::CalcMaxLikelihood(): not implemented yet ..." << endl;
+  std::cout << std::endl << "PRunNonMusr::CalcMaxLikelihood(): not implemented yet ..." << std::endl;
 
   return 1.0;
 }
@@ -199,7 +199,7 @@ Bool_t PRunNonMusr::PrepareData()
   Bool_t success = true;
 
   if (fRunInfo->GetRunNameSize() > 1) { // ADDRUN present which is not supported for NonMusr
-    cerr << endl << ">> PRunNonMusr::PrepareData(): **WARNING** ADDRUN NOT SUPPORTED FOR THIS FIT TYPE, WILL IGNORE IT." << endl;
+    std::cerr << std::endl << ">> PRunNonMusr::PrepareData(): **WARNING** ADDRUN NOT SUPPORTED FOR THIS FIT TYPE, WILL IGNORE IT." << std::endl;
   }
 
   // get packing info
@@ -208,7 +208,7 @@ Bool_t PRunNonMusr::PrepareData()
     fPacking = fMsrInfo->GetMsrGlobal()->GetPacking();
   }
   if (fPacking == -1) { // packing NOT present, in neither the RUN block, nor in the GLOBAL block
-    cerr << endl << ">> PRunNonMusr::PrepareData(): **ERROR** couldn't find any packing information." << endl;
+    std::cerr << std::endl << ">> PRunNonMusr::PrepareData(): **ERROR** couldn't find any packing information." << std::endl;
     return false;
   }
 
@@ -491,8 +491,8 @@ UInt_t PRunNonMusr::GetXIndex()
   }
 
   if (!found) {
-    cerr << endl << "PRunNonMusr::GetXIndex(): **ERROR** Couldn't obtain x-data index!";
-    cerr << endl;
+    std::cerr << std::endl << "PRunNonMusr::GetXIndex(): **ERROR** Couldn't obtain x-data index!";
+    std::cerr << std::endl;
     assert(0);
   }
 
@@ -532,8 +532,8 @@ UInt_t PRunNonMusr::GetYIndex()
   }
 
   if (!found) {
-    cerr << endl << "PRunNonMusr::GetYIndex(): **ERROR** Couldn't obtain y-data index!";
-    cerr << endl;
+    std::cerr << std::endl << "PRunNonMusr::GetYIndex(): **ERROR** Couldn't obtain y-data index!";
+    std::cerr << std::endl;
     assert(0);
   }
 

@@ -32,7 +32,6 @@
 
 #include <cstdlib>
 #include <iostream>
-using namespace std;
 
 #include <cassert>
 
@@ -245,8 +244,8 @@ void BMWStartupHandler::OnComment(const char *str)
  */
 void BMWStartupHandler::OnWarning(const char *str)
 {
-  cerr << endl << "BMWStartupHandler::OnWarning: BMWStartupHandler **WARNING** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "BMWStartupHandler::OnWarning: BMWStartupHandler **WARNING** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -259,8 +258,8 @@ void BMWStartupHandler::OnWarning(const char *str)
  */
 void BMWStartupHandler::OnError(const char *str)
 {
-  cerr << endl << "BMWStartupHandler::OnError: BMWStartupHandler **ERROR** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "BMWStartupHandler::OnError: BMWStartupHandler **ERROR** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -273,8 +272,8 @@ void BMWStartupHandler::OnError(const char *str)
  */
 void BMWStartupHandler::OnFatalError(const char *str)
 {
-  cerr << endl << "BMWStartupHandler::OnFatalError: BMWStartupHandler **FATAL ERROR** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "BMWStartupHandler::OnFatalError: BMWStartupHandler **FATAL ERROR** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -305,107 +304,107 @@ void BMWStartupHandler::CheckLists()
   if(fLF) {
     // check if delta_t_LF is given, if not set default
     if(fDebug)
-      cout << endl << "BMWStartupHandler::CheckLists: check specified LF time resolution for the Laplace transform ... " << endl;
+      std::cout << std::endl << "BMWStartupHandler::CheckLists: check specified LF time resolution for the Laplace transform ... " << std::endl;
     if(!fDeltatLF) {
-      cout << "BMWStartupHandler::CheckLists: You did not specify the LF time resolution. Setting the default (0.04 ns)." << endl;
+      std::cout << "BMWStartupHandler::CheckLists: You did not specify the LF time resolution. Setting the default (0.04 ns)." << std::endl;
       fDeltatLF = 0.00004;
     } else {
       if(fDebug)
-        cout << fDeltatLF << " us" << endl;
+        std::cout << fDeltatLF << " us" << std::endl;
     }
 
     // check if N_LF is given, if not set default
     if(fDebug)
-      cout << endl << "BMWStartupHandler::CheckLists: check length of the Laplace transform ..." << endl;
+      std::cout << std::endl << "BMWStartupHandler::CheckLists: check length of the Laplace transform ..." << std::endl;
     if (!fNStepsLF) {
-      cout << "BMWStartupHandler::CheckLists: You did not specify the length of the Laplace transform. Setting the default (524288)." << endl;
+      std::cout << "BMWStartupHandler::CheckLists: You did not specify the length of the Laplace transform. Setting the default (524288)." << std::endl;
       fNStepsLF = 524288;
     } else {
       if(fDebug)
-        cout << fNStepsLF << endl;
+        std::cout << fNStepsLF << std::endl;
     }
   } else {
     // check if delta_t is given, if not set default
     if(fDebug)
-      cout << endl << "BMWStartupHandler::CheckLists: check specified time resolution ... " << endl;
+      std::cout << std::endl << "BMWStartupHandler::CheckLists: check specified time resolution ... " << std::endl;
     if(!fDeltat) {
-      cout << "BMWStartupHandler::CheckLists: You did not specify the time resolution. Setting the default (10 ns)." << endl;
+      std::cout << "BMWStartupHandler::CheckLists: You did not specify the time resolution. Setting the default (10 ns)." << std::endl;
       fDeltat = 0.01;
     } else {
       if(fDebug)
-        cout << fDeltat << " us" << endl;
+        std::cout << fDeltat << " us" << std::endl;
     }
 
     // check if delta_B is given, if not set default
     if(fDebug)
-      cout << endl << "BMWStartupHandler::CheckLists: check specified field resolution ..." << endl;
+      std::cout << std::endl << "BMWStartupHandler::CheckLists: check specified field resolution ..." << std::endl;
     if(!fDeltaB) {
-      cout << "BMWStartupHandler::CheckLists: You did not specify the field resolution. Setting the default (0.1 G)." << endl;
+      std::cout << "BMWStartupHandler::CheckLists: You did not specify the field resolution. Setting the default (0.1 G)." << std::endl;
       fDeltaB = 0.1;
     } else {
       if(fDebug)
-        cout << fDeltaB << " G" << endl;
+        std::cout << fDeltaB << " G" << std::endl;
     }
   }
 
   // check if any wisdom-file is specified
   if(fDebug)
-    cout << endl << "BMWStartupHandler::CheckLists: check wisdom file ..." << endl;
+    std::cout << std::endl << "BMWStartupHandler::CheckLists: check wisdom file ..." << std::endl;
   if (!fWisdomFile.size()) {
-    cout << "BMWStartupHandler::CheckLists: You did not specify a wisdom file. No FFTW plans will be loaded or saved." << endl;
+    std::cout << "BMWStartupHandler::CheckLists: You did not specify a wisdom file. No FFTW plans will be loaded or saved." << std::endl;
     fWisdomFile = "";
   } else {
     if(fDebug)
-      cout << fWisdomFile << endl;
+      std::cout << fWisdomFile << std::endl;
   }
 
   // check if any float-wisdom-file is specified
   if(fDebug)
-    cout << endl << "BMWStartupHandler::CheckLists: check float-wisdom file ..." << endl;
+    std::cout << std::endl << "BMWStartupHandler::CheckLists: check float-wisdom file ..." << std::endl;
   if (!fWisdomFile.size()) {
-    cout << "BMWStartupHandler::CheckLists: You did not specify a float-wisdom file. No FFTW plans will be loaded or saved." << endl;
+    std::cout << "BMWStartupHandler::CheckLists: You did not specify a float-wisdom file. No FFTW plans will be loaded or saved." << std::endl;
     fWisdomFileFloat = "";
   } else {
     if(fDebug)
-      cout << fWisdomFileFloat << endl;
+      std::cout << fWisdomFileFloat << std::endl;
   }
 
   if (fLEM) {
 
     // check if any data path is given
     if(fDebug)
-      cout << endl << "BMWStartupHandler::CheckLists: check data path ..." << endl;
+      std::cout << std::endl << "BMWStartupHandler::CheckLists: check data path ..." << std::endl;
     if (fDataPath.empty()) {
-      cerr << "BMWStartupHandler::CheckLists: This is not going to work, you have to set a valid data path where to find the rge-files in the xml-file!" << endl;
+      std::cerr << "BMWStartupHandler::CheckLists: This is not going to work, you have to set a valid data path where to find the rge-files in the xml-file!" << std::endl;
       assert(!fDataPath.empty());
     } else {
       if(fDebug)
-        cout << fDataPath << endl;
+        std::cout << fDataPath << std::endl;
     }
 
     // check if any energies are given
     if(fDebug)
-      cout << endl << "BMWStartupHandler::CheckLists: check energy list ..." << endl;
+      std::cout << std::endl << "BMWStartupHandler::CheckLists: check energy list ..." << std::endl;
     if (fEnergyList.size() != fEnergyLabelList.size()) {
-      cerr << "BMWStartupHandler::CheckLists: The number of energies and energy labels are different! Please fix it!" << endl \
-           << "BMWStartupHandler::CheckLists: The program will be terminated now!" << endl;
+      std::cerr << "BMWStartupHandler::CheckLists: The number of energies and energy labels are different! Please fix it!" << std::endl \
+           << "BMWStartupHandler::CheckLists: The program will be terminated now!" << std::endl;
       assert(fEnergyList.size() == fEnergyLabelList.size());
     }
     if (fEnergyList.empty()) {
-      cerr << "BMWStartupHandler::CheckLists: Energy list empty!" << endl \
-           << "BMWStartupHandler::CheckLists: Trying to use the standard energies: 0.0 to 35.0 keV in 0.1 keV steps" << endl;
+      std::cerr << "BMWStartupHandler::CheckLists: Energy list empty!" << std::endl \
+           << "BMWStartupHandler::CheckLists: Trying to use the standard energies: 0.0 to 35.0 keV in 0.1 keV steps" << std::endl;
       for (double x(0.0); x<= 35.0; x+=0.1) {
         fEnergyList.push_back(x);
       }
     }
     if (fEnergyLabelList.empty()) {
-      cerr << "BMWStartupHandler::CheckLists: Energy label list empty!" << endl \
-           << "BMWStartupHandler::CheckLists: Trying to use the specified energies as labels in the format %02.1f..." << endl \
-           << "BMWStartupHandler::CheckLists: Most probably this will go wrong and should therefore be fixed in the xml-file!" << endl;
+      std::cerr << "BMWStartupHandler::CheckLists: Energy label list empty!" << std::endl \
+           << "BMWStartupHandler::CheckLists: Trying to use the specified energies as labels in the format %02.1f..." << std::endl \
+           << "BMWStartupHandler::CheckLists: Most probably this will go wrong and should therefore be fixed in the xml-file!" << std::endl;
       char eChar[5];
       for(unsigned int i(0); i<fEnergyList.size(); i++) {
         sprintf(eChar, "%02.1f", fEnergyList[i]);
-        fEnergyLabelList.push_back(string(eChar));
+        fEnergyLabelList.push_back(std::string(eChar));
       }
     }
 
@@ -416,33 +415,33 @@ void BMWStartupHandler::CheckLists()
     }
 
     if(fDebug) {
-      cout << "Energies and Labels:" << endl;
-      for ( map<double, string>::const_iterator iter(fEnergies.begin()); iter != fEnergies.end(); ++iter )
-        cout << iter->first << " " << iter->second << endl;
+      std::cout << "Energies and Labels:" << std::endl;
+      for ( std::map<double, std::string>::const_iterator iter(fEnergies.begin()); iter != fEnergies.end(); ++iter )
+        std::cout << iter->first << " " << iter->second << std::endl;
     }
 
     // check if any number of steps for the theory function is specified
     if(fDebug)
-      cout << endl << "BMWStartupHandler::CheckLists: check number of steps for theory ..." << endl;
+      std::cout << std::endl << "BMWStartupHandler::CheckLists: check number of steps for theory ..." << std::endl;
     if (!fNSteps) {
-      cout << "BMWStartupHandler::CheckLists: You did not specify the number of steps for the theory. Setting the default (3000)." << endl;
+      std::cout << "BMWStartupHandler::CheckLists: You did not specify the number of steps for the theory. Setting the default (3000)." << std::endl;
       fNSteps = 3000;
     } else {
       if(fDebug)
-        cout << fNSteps << endl;
+        std::cout << fNSteps << std::endl;
     }
   }
 
   if (fVortex) {
     // check if any number of steps for the theory function is specified
     if(fDebug)
-      cout << endl << "BMWStartupHandler::CheckLists: check number of steps for Vortex grid ..." << endl;
+      std::cout << std::endl << "BMWStartupHandler::CheckLists: check number of steps for Vortex grid ..." << std::endl;
     if (!fGridSteps) {
-      cout << "BMWStartupHandler::CheckLists: You did not specify the number of steps for the grid. Setting the default (256)." << endl;
+      std::cout << "BMWStartupHandler::CheckLists: You did not specify the number of steps for the grid. Setting the default (256)." << std::endl;
       fGridSteps = 256;
     } else {
       if(fDebug)
-        cout << fGridSteps << endl;
+        std::cout << fGridSteps << std::endl;
     }
   }
 }

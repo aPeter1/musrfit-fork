@@ -44,20 +44,20 @@ public:
   ~TSkewedGss();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
-  mutable vector<double> fPar; ///< parameters of the model
+  mutable std::vector<double> fPar; ///< parameters of the model
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
   mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
   mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
-  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
-  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
-  string fWisdom; ///< file name of the FFTW wisdom file
+  mutable std::vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  mutable std::vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  std::string fWisdom; ///< file name of the FFTW wisdom file
 
   ClassDef(TSkewedGss,1)
 };

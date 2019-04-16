@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -37,7 +37,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include <TString.h>
 #include <TSAXParser.h>
@@ -53,85 +52,85 @@ using namespace std;
  */
 void any2many_syntax()
 {
-  cout << endl << "usage: any2many [--help]   : will show this help.";
-  cout << endl << "       any2many --version  : will show the git version.";
-  cout << endl << "       any2many -f <filenameList-input> | -r <runList-input>";
-  cout << endl << "                -c <convert-options> [-p <output-path>] [-y <year>]";
-  cout << endl << "                [-o <outputFileName> | -t <in-template> <out-template>] [-s]";
-  cout << endl << "                [-rebin <n>] [-z <compressed>]";
-  cout << endl << "          -f <filenameList-input> : where <filenameList-input> is space";
-  cout << endl << "                separeted a list of file names (not starting with a '-'),";
-  cout << endl << "                e.g. 2010/lem10_his_0111.root 2010/lem10_his_0112.root";
-  cout << endl << "          -o <outputFileName> : this option only makes sense, if <filenameList-input>";
-  cout << endl << "                is a single input file name!";
-  cout << endl << "          -r <runList-input> : where <runList-input> is a list of run numbers";
-  cout << endl << "                separated by spaces ' ' of the form:  <run1>  <run2>  <run3>";
-  cout << endl << "                etc., or a sequence of runs <runStart>-<runEnd>, e.g. 111-222";
-  cout << endl << "          -t <in-template> <out-template> : ";
-  cout << endl << "             <in-/out-template> : template file name. Needed for run-lists in";
-  cout << endl << "                order to generate the proper file names. The following template";
-  cout << endl << "                tags can be used: [yy] for year, and [rrrr] for the run number.";
-  cout << endl << "                If the run number tag is used, the number of 'r' will give the";
-  cout << endl << "                number of digits used with leading zeros, e.g. [rrrrrr] and run";
-  cout << endl << "                number 123 will result in 000123. The same is true for the";
-  cout << endl << "                year, i.e. [yyyy] will result in something like 1999.";
-  cout << endl << "          -c <convert-options> : <inFormat> <outFormat>";
-  cout << endl << "             <inFormat>  : input data file format. Supported formats are:";
-  cout << endl << "                MusrRoot, PSI-BIN, ROOT (LEM), MUD, NeXus, PSI-MDU, WKM";
-  cout << endl << "             <outFormat> : ouput data file format. Supported formats are:";
-  cout << endl << "                PSI-BIN, MusrRoot, ROOT, MUD, NeXus1-HDF4, NeXus1-HDF5, NeXus1-XML,";
-  cout << endl << "                NeXus2-HDF4, NeXus2-HDF5, NeXus2-XML, WKM, ASCII";
-  cout << endl << "                Comment: ROOT is superseeded by MusrRoot. If there is not a very good";
-  cout << endl << "                reason, avoid it!";
-  cout << endl << "          -h <histo-group-list> : This option is for MusrRoot input files only!";
-  cout << endl << "                Select the the histo groups to be exported. <histo-group-list> is a space";
-  cout << endl << "                separated list of the histo group, e.g. -h 0, 20 will try to export the histo";
-  cout << endl << "                0 (NPP) and 20 (PPC).";
-  cout << endl << "          -p <output-path> : where <output-path> is the output path for the";
-  cout << endl << "               converted files. If nothing is given, the current directory";
-  cout << endl << "               will be used, unless the option '-s' is used.";
-  cout << endl << "          -y <year> : if the option -y is used, here a year in the form 'yy' or 'yyyy' can";
-  cout << endl << "                be given, if this is the case, any automatic file name";
-  cout << endl << "                generation needs a year, this number will be used.";
-  cout << endl << "          -s : with this option the output data file will be sent to the stdout.";
-  cout << endl << "          -rebin <n> : where <n> is the number of bins to be packed";
-  cout << endl << "          -z [g|b] <compressed> : where <compressed> is the output file name";
-  cout << endl << "                (without extension) of the compressed data collection, and";
-  cout << endl << "                'g' will result in .tar.gz, and 'b' in .tar.bz2 files.";
-  cout << endl;
-  cout << endl << "          If the template option '-t' is absent, the output file name will be";
-  cout << endl << "          generated according to the input data file name, and the output data";
-  cout << endl << "          format.";
-  cout << endl;
-  cout << endl << "examples:" << endl;
-  cout << endl << "  any2many -f 2010/lem10_his_0123.root -c ROOT ASCII -rebin 25";
-  cout << endl << "      Will take the LEM ROOT file '2010/lem10_his_0123.root' rebin it with 25";
-  cout << endl << "      and convert it to ASCII. The output file name will be";
-  cout << endl << "      lem10_his_0123.ascii, and the file will be saved in the current directory." << endl;
-  cout << endl << "  any2many -f 2010/lem10_his_0123.root -c MusrRoot NEXUS2-HDF5 -o 2010/lem10_his_0123_v2.nxs";
-  cout << endl << "      Will take the MusrRoot file '2010/lem10_his_0123.root' ";
-  cout << endl << "      and convert it to NeXus IDF V2. The output file name will be";
-  cout << endl << "      lem10_his_0123_v2.nxs, and the file will be saved in the current directory." << endl;
-  cout << endl << "  any2many -r 123 137 -c PSI-BIN MUD -t d[yyyy]/deltat_tdc_gps_[rrrr].bin \\";
-  cout << endl << "      [rrrrrr].msr -y 2001";
-  cout << endl << "      Will take the run 123 and 137, will generate the input file names:";
-  cout << endl << "      d2001/deltat_tdc_gps_0123.bin and d2001/deltat_tdc_gps_0137.bin, and";
-  cout << endl << "      output file names 000123.msr and 000137.msr" << endl;
-  cout << endl << "  any2many -r 100-117 -c PSI-MDU ASCII -t d[yyyy]/deltat_tdc_alc_[rrrr].mdu \\";
-  cout << endl << "      [rrr].ascii -y 2011 -s";
-  cout << endl << "      Will take the runs 100 through 117 and convert the PSI-MDU input files to";
-  cout << endl << "      ASCII output and instead of saving them into a file, they will be spit to";
-  cout << endl << "      the standard output." << endl;
-  cout << endl << "  any2many -r 100-117 -c NEXUS MusrRoot -t d[yyyy]/psi_gps_[rrrr].NXS \\";
-  cout << endl << "      psi_[yyyy]_gps_[rrrr].root -z b psi_gps_run_100to117";
-  cout << endl << "      Will take the runs 100 through 117 and convert the NEXUS input files";
-  cout << endl << "      to MusrRoot output. Afterwards these new files will be collected in a";
-  cout << endl << "      compressed archive psi_gps_run_100to117.tar.bz2." << endl;
-  cout << endl << "  any2many -f 2010/lem10_his_0123.root 2010/lem10_his_0012.root -c MusrRoot MusrRoot -rebin 25";
-  cout << endl << "      Will read the two files '2010/lem10_his_0123.root' and '2010/lem10_his_0012.root',";
-  cout << endl << "      rebin them with 25 and export them as LEM ROOT files with adding rebin25 to the";
-  cout << endl << "      name, e.g. 2010/lem10_his_0123_rebin25.root";
-  cout << endl << endl;
+  std::cout << std::endl << "usage: any2many [--help]   : will show this help.";
+  std::cout << std::endl << "       any2many --version  : will show the git version.";
+  std::cout << std::endl << "       any2many -f <filenameList-input> | -r <runList-input>";
+  std::cout << std::endl << "                -c <convert-options> [-p <output-path>] [-y <year>]";
+  std::cout << std::endl << "                [-o <outputFileName> | -t <in-template> <out-template>] [-s]";
+  std::cout << std::endl << "                [-rebin <n>] [-z <compressed>]";
+  std::cout << std::endl << "          -f <filenameList-input> : where <filenameList-input> is space";
+  std::cout << std::endl << "                separeted a list of file names (not starting with a '-'),";
+  std::cout << std::endl << "                e.g. 2010/lem10_his_0111.root 2010/lem10_his_0112.root";
+  std::cout << std::endl << "          -o <outputFileName> : this option only makes sense, if <filenameList-input>";
+  std::cout << std::endl << "                is a single input file name!";
+  std::cout << std::endl << "          -r <runList-input> : where <runList-input> is a list of run numbers";
+  std::cout << std::endl << "                separated by spaces ' ' of the form:  <run1>  <run2>  <run3>";
+  std::cout << std::endl << "                etc., or a sequence of runs <runStart>-<runEnd>, e.g. 111-222";
+  std::cout << std::endl << "          -t <in-template> <out-template> : ";
+  std::cout << std::endl << "             <in-/out-template> : template file name. Needed for run-lists in";
+  std::cout << std::endl << "                order to generate the proper file names. The following template";
+  std::cout << std::endl << "                tags can be used: [yy] for year, and [rrrr] for the run number.";
+  std::cout << std::endl << "                If the run number tag is used, the number of 'r' will give the";
+  std::cout << std::endl << "                number of digits used with leading zeros, e.g. [rrrrrr] and run";
+  std::cout << std::endl << "                number 123 will result in 000123. The same is true for the";
+  std::cout << std::endl << "                year, i.e. [yyyy] will result in something like 1999.";
+  std::cout << std::endl << "          -c <convert-options> : <inFormat> <outFormat>";
+  std::cout << std::endl << "             <inFormat>  : input data file format. Supported formats are:";
+  std::cout << std::endl << "                MusrRoot, PSI-BIN, ROOT (LEM), MUD, NeXus, PSI-MDU, WKM";
+  std::cout << std::endl << "             <outFormat> : ouput data file format. Supported formats are:";
+  std::cout << std::endl << "                PSI-BIN, MusrRoot, ROOT, MUD, NeXus1-HDF4, NeXus1-HDF5, NeXus1-XML,";
+  std::cout << std::endl << "                NeXus2-HDF4, NeXus2-HDF5, NeXus2-XML, WKM, ASCII";
+  std::cout << std::endl << "                Comment: ROOT is superseeded by MusrRoot. If there is not a very good";
+  std::cout << std::endl << "                reason, avoid it!";
+  std::cout << std::endl << "          -h <histo-group-list> : This option is for MusrRoot input files only!";
+  std::cout << std::endl << "                Select the the histo groups to be exported. <histo-group-list> is a space";
+  std::cout << std::endl << "                separated list of the histo group, e.g. -h 0, 20 will try to export the histo";
+  std::cout << std::endl << "                0 (NPP) and 20 (PPC).";
+  std::cout << std::endl << "          -p <output-path> : where <output-path> is the output path for the";
+  std::cout << std::endl << "               converted files. If nothing is given, the current directory";
+  std::cout << std::endl << "               will be used, unless the option '-s' is used.";
+  std::cout << std::endl << "          -y <year> : if the option -y is used, here a year in the form 'yy' or 'yyyy' can";
+  std::cout << std::endl << "                be given, if this is the case, any automatic file name";
+  std::cout << std::endl << "                generation needs a year, this number will be used.";
+  std::cout << std::endl << "          -s : with this option the output data file will be sent to the stdout.";
+  std::cout << std::endl << "          -rebin <n> : where <n> is the number of bins to be packed";
+  std::cout << std::endl << "          -z [g|b] <compressed> : where <compressed> is the output file name";
+  std::cout << std::endl << "                (without extension) of the compressed data collection, and";
+  std::cout << std::endl << "                'g' will result in .tar.gz, and 'b' in .tar.bz2 files.";
+  std::cout << std::endl;
+  std::cout << std::endl << "          If the template option '-t' is absent, the output file name will be";
+  std::cout << std::endl << "          generated according to the input data file name, and the output data";
+  std::cout << std::endl << "          format.";
+  std::cout << std::endl;
+  std::cout << std::endl << "examples:" << std::endl;
+  std::cout << std::endl << "  any2many -f 2010/lem10_his_0123.root -c ROOT ASCII -rebin 25";
+  std::cout << std::endl << "      Will take the LEM ROOT file '2010/lem10_his_0123.root' rebin it with 25";
+  std::cout << std::endl << "      and convert it to ASCII. The output file name will be";
+  std::cout << std::endl << "      lem10_his_0123.ascii, and the file will be saved in the current directory." << std::endl;
+  std::cout << std::endl << "  any2many -f 2010/lem10_his_0123.root -c MusrRoot NEXUS2-HDF5 -o 2010/lem10_his_0123_v2.nxs";
+  std::cout << std::endl << "      Will take the MusrRoot file '2010/lem10_his_0123.root' ";
+  std::cout << std::endl << "      and convert it to NeXus IDF V2. The output file name will be";
+  std::cout << std::endl << "      lem10_his_0123_v2.nxs, and the file will be saved in the current directory." << std::endl;
+  std::cout << std::endl << "  any2many -r 123 137 -c PSI-BIN MUD -t d[yyyy]/deltat_tdc_gps_[rrrr].bin \\";
+  std::cout << std::endl << "      [rrrrrr].msr -y 2001";
+  std::cout << std::endl << "      Will take the run 123 and 137, will generate the input file names:";
+  std::cout << std::endl << "      d2001/deltat_tdc_gps_0123.bin and d2001/deltat_tdc_gps_0137.bin, and";
+  std::cout << std::endl << "      output file names 000123.msr and 000137.msr" << std::endl;
+  std::cout << std::endl << "  any2many -r 100-117 -c PSI-MDU ASCII -t d[yyyy]/deltat_tdc_alc_[rrrr].mdu \\";
+  std::cout << std::endl << "      [rrr].ascii -y 2011 -s";
+  std::cout << std::endl << "      Will take the runs 100 through 117 and convert the PSI-MDU input files to";
+  std::cout << std::endl << "      ASCII output and instead of saving them into a file, they will be spit to";
+  std::cout << std::endl << "      the standard output." << std::endl;
+  std::cout << std::endl << "  any2many -r 100-117 -c NEXUS MusrRoot -t d[yyyy]/psi_gps_[rrrr].NXS \\";
+  std::cout << std::endl << "      psi_[yyyy]_gps_[rrrr].root -z b psi_gps_run_100to117";
+  std::cout << std::endl << "      Will take the runs 100 through 117 and convert the NEXUS input files";
+  std::cout << std::endl << "      to MusrRoot output. Afterwards these new files will be collected in a";
+  std::cout << std::endl << "      compressed archive psi_gps_run_100to117.tar.bz2." << std::endl;
+  std::cout << std::endl << "  any2many -f 2010/lem10_his_0123.root 2010/lem10_his_0012.root -c MusrRoot MusrRoot -rebin 25";
+  std::cout << std::endl << "      Will read the two files '2010/lem10_his_0123.root' and '2010/lem10_his_0012.root',";
+  std::cout << std::endl << "      rebin them with 25 and export them as LEM ROOT files with adding rebin25 to the";
+  std::cout << std::endl << "      name, e.g. 2010/lem10_his_0123_rebin25.root";
+  std::cout << std::endl << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -198,9 +197,9 @@ int main(int argc, char *argv[])
       any2many_syntax();
     else if (strstr(argv[1], "--v")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "any2many version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "any2many version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #else
-      cout << endl << "any2many git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "any2many git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #endif
     } else {
       any2many_syntax();
@@ -219,7 +218,7 @@ int main(int argc, char *argv[])
       if (i+1 < argc) {
         // check that date if it is either of the form 'yy' or 'yyyy'
         if ((strlen(argv[i+1]) != 2) && (strlen(argv[i+1]) != 4)) {
-          cerr << endl << ">> any2many **ERROR** found in option '-y' the argument '" << argv[i+1] << "' which is neither of the form 'yy' nor 'yyyy'." << endl;
+          std::cerr << std::endl << ">> any2many **ERROR** found in option '-y' the argument '" << argv[i+1] << "' which is neither of the form 'yy' nor 'yyyy'." << std::endl;
           show_syntax = true;
           break;
         }
@@ -229,7 +228,7 @@ int main(int argc, char *argv[])
           info.year = argv[i+1];
           i++;
         } else {
-          cerr << endl << ">> any2many **ERROR** found in option '-y' the argument '" << argv[i+1] << "' which is not a number." << endl;
+          std::cerr << std::endl << ">> any2many **ERROR** found in option '-y' the argument '" << argv[i+1] << "' which is not a number." << std::endl;
           show_syntax = true;
           break;
         }
@@ -255,7 +254,7 @@ int main(int argc, char *argv[])
         if (j >= argc) // make sure that counter is still in range
           break;
       } else {
-        cerr << endl << ">> any2many **ERROR** found input option '-f' without any arguments" << endl;
+        std::cerr << std::endl << ">> any2many **ERROR** found input option '-f' without any arguments" << std::endl;
         show_syntax = true;
         break;
       }
@@ -264,7 +263,7 @@ int main(int argc, char *argv[])
         outputFileName = argv[i+1];
         i++;
       } else {
-        cerr << endl << ">> any2many **ERROR** found output file name option '-o' without any arguments" << endl;
+        std::cerr << std::endl << ">> any2many **ERROR** found output file name option '-o' without any arguments" << std::endl;
         show_syntax = true;
         break;
       }
@@ -299,20 +298,20 @@ int main(int argc, char *argv[])
             break;
         }
       } else {
-        cerr << endl << ">> any2many **ERROR** found input option '-r' without any arguments" << endl;
+        std::cerr << std::endl << ">> any2many **ERROR** found input option '-r' without any arguments" << std::endl;
         show_syntax = true;
         break;
       }
 
       // check if any valid input option was found
       if (info.runList.size() == 0) {
-        cerr << endl << ">> any2many **ERROR** found input option '-r' without any valid arguments" << endl;
+        std::cerr << std::endl << ">> any2many **ERROR** found input option '-r' without any valid arguments" << std::endl;
         show_syntax = true;
         break;
       }
     } else if (!strcmp(argv[i], "-c")) { // set convert option tag
       bool found = false;
-      string sval;
+      std::string sval;
       if (i+2 < argc) {
         sval = argv[i+1];
         found = false;
@@ -324,7 +323,7 @@ int main(int argc, char *argv[])
           }
         }
         if (!found) {
-          cerr << endl << ">> any2many **ERROR** found unkown input data file format option '" << sval << "'" << endl;
+          std::cerr << std::endl << ">> any2many **ERROR** found unkown input data file format option '" << sval << "'" << std::endl;
           show_syntax = true;
           break;
         }
@@ -338,13 +337,13 @@ int main(int argc, char *argv[])
           }
         }
         if (!found) {
-          cerr << endl << ">> any2many **ERROR** found unkown output data file format option '" << sval << "'" << endl;
+          std::cerr << std::endl << ">> any2many **ERROR** found unkown output data file format option '" << sval << "'" << std::endl;
           show_syntax = true;
           break;
         }
         i += 2; // shift argument position
       } else {
-        cerr << endl << ">> any2many **ERROR** found option '-c' with missing arguments" << endl;
+        std::cerr << std::endl << ">> any2many **ERROR** found option '-c' with missing arguments" << std::endl;
         show_syntax = true;
         break;
       }
@@ -370,7 +369,7 @@ int main(int argc, char *argv[])
           info.outPath += "/";
         i++;
       } else {
-        cerr << endl << ">> any2many **ERROR** found output option '-p' without any argument." << endl;
+        std::cerr << std::endl << ">> any2many **ERROR** found output option '-p' without any argument." << std::endl;
         show_syntax = true;
         break;
       }
@@ -381,19 +380,19 @@ int main(int argc, char *argv[])
           info.rebin = ival;
           i++;
         } else {
-          cerr << endl << ">> any2many **ERROR** found in option '-rebin " << argv[i+1] << "' which doesn't make any sense." << endl;
+          std::cerr << std::endl << ">> any2many **ERROR** found in option '-rebin " << argv[i+1] << "' which doesn't make any sense." << std::endl;
           show_syntax = true;
           break;
         }
       } else {
-        cerr << endl << ">> any2many **ERROR** found output option '-rebin' without any argument." << endl;
+        std::cerr << std::endl << ">> any2many **ERROR** found output option '-rebin' without any argument." << std::endl;
         show_syntax = true;
         break;
       }
     } else if (!strcmp(argv[i], "-t")) { // filter out the input/output file template
       if (i+2 < argc) {
         if ((argv[i+1][0] == '-') || (argv[i+2][0] == '-')) {
-          cerr << endl << ">> any2many **ERROR** found invalid template in option '-t'" << endl;
+          std::cerr << std::endl << ">> any2many **ERROR** found invalid template in option '-t'" << std::endl;
           show_syntax = true;
           break;
         }
@@ -401,14 +400,14 @@ int main(int argc, char *argv[])
         info.outTemplate = argv[i+2];
         i += 2; // shift argument position
       } else {
-        cerr << endl << ">> any2many **ERROR** found option '-t' with missing arguments" << endl;
+        std::cerr << std::endl << ">> any2many **ERROR** found option '-t' with missing arguments" << std::endl;
         show_syntax = true;
         break;
       }
     } else if (!strcmp(argv[i], "-z")) { // filter out if compression is whished
       if (i+2 < argc) {
         if ((argv[i+1][0] == '-') || (argv[i+2][0] == '-')) {
-          cerr << endl << ">> any2many **ERROR** found invalid template in option '-t'" << endl;
+          std::cerr << std::endl << ">> any2many **ERROR** found invalid template in option '-t'" << std::endl;
           show_syntax = true;
           break;
         }
@@ -417,19 +416,19 @@ int main(int argc, char *argv[])
         } else if (argv[i+1][0] == 'b') {
           info.compressionTag = 2;
         } else {
-          cerr << endl << ">> any2many **ERROR** found in option '-z' compression tag '" << argv[i+1] << "' which is not supported." << endl;
+          std::cerr << std::endl << ">> any2many **ERROR** found in option '-z' compression tag '" << argv[i+1] << "' which is not supported." << std::endl;
           show_syntax = true;
           break;
         }
         info.compressFileName = argv[i+2];
         i += 2; // shift argument position
       } else {
-        cerr << endl << ">> any2many **ERROR** found option '-z' with missing arguments" << endl;
+        std::cerr << std::endl << ">> any2many **ERROR** found option '-z' with missing arguments" << std::endl;
         show_syntax = true;
         break;
       }
     } else { // unrecognized command
-      cerr << endl << ">> any2many **ERROR** found unrecognized option " << argv[i] << endl;
+      std::cerr << std::endl << ">> any2many **ERROR** found unrecognized option " << argv[i] << std::endl;
       show_syntax = true;
       break;
     }
@@ -437,13 +436,13 @@ int main(int argc, char *argv[])
 
   // make sure that either a filenameList or a runList has been provided
   if ((info.inFileName.size()==0) && (info.runList.size()==0)) {
-    cerr << endl << ">> any2many **ERROR** neither a input filename list, nor a run list was given." << endl;
+    std::cerr << std::endl << ">> any2many **ERROR** neither a input filename list, nor a run list was given." << std::endl;
     show_syntax = true;
   }
 
   // make sure that in/out formats are given
   if ((info.inFormat.Length() == 0) || (info.outFormat.Length() == 0)) {
-    cerr << endl << ">> any2many **ERROR** conversion information is missing." << endl;
+    std::cerr << std::endl << ">> any2many **ERROR** conversion information is missing." << std::endl;
     show_syntax = true;
   }
 
@@ -460,11 +459,11 @@ int main(int argc, char *argv[])
       if ((info.inTemplate.Length() == 0) && (info.outTemplate.Length() == 0)) {
         info.outFileName = outputFileName;
       } else {
-        cerr << endl << ">> any2many **ERROR** found option '-o' cannot be combined with option '-t'." << endl;
+        std::cerr << std::endl << ">> any2many **ERROR** found option '-o' cannot be combined with option '-t'." << std::endl;
         show_syntax = true;
       }
     } else {
-      cerr << endl << ">> any2many **ERROR** found option '-o' with multiple input file names, which doesn't make any sense." << endl;
+      std::cerr << std::endl << ">> any2many **ERROR** found option '-o' with multiple input file names, which doesn't make any sense." << std::endl;
       show_syntax = true;
     }
   }
@@ -477,8 +476,8 @@ int main(int argc, char *argv[])
 
   if (!info.inFormat.CompareTo(info.outFormat, TString::kIgnoreCase) && (info.rebin == 1)) {
     info.runList.clear();
-    cout << endl << ">> any2many **ERROR** input data format == output data format, only allowed if rebin != 1.";
-    cout << endl << "            will ignore the request." << endl << endl;
+    std::cerr << std::endl << ">> any2many **ERROR** input data format == output data format, only allowed if rebin != 1.";
+    std::cerr << std::endl << "            will ignore the request." << std::endl << std::endl;
     return PMUSR_SUCCESS;
   }
 
@@ -487,16 +486,16 @@ int main(int argc, char *argv[])
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << ">> any2many **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
-    cerr << endl;
+    std::cerr << std::endl << ">> any2many **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    std::cerr << std::endl;
     // clean up
     if (saxParser) {
       delete saxParser;
-      saxParser = 0;
+      saxParser = nullptr;
     }
     if (startupHandler) {
       delete startupHandler;
-      startupHandler = 0;
+      startupHandler = nullptr;
     }
   } else {
     strcpy(startup_path_name, startupHandler->GetStartupFilePath().Data());
@@ -507,16 +506,16 @@ int main(int argc, char *argv[])
     status = parseXmlFile(saxParser, startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << ">> any2many **WARNING** Reading/parsing musrfit_startup.xml failed.";
-      cerr << endl;
+      std::cerr << std::endl << ">> any2many **WARNING** Reading/parsing musrfit_startup.xml failed.";
+      std::cerr << std::endl;
       // clean up
       if (saxParser) {
         delete saxParser;
-        saxParser = 0;
+        saxParser = nullptr;
       }
       if (startupHandler) {
         delete startupHandler;
-        startupHandler = 0;
+        startupHandler = nullptr;
       }
     }
   }
@@ -534,22 +533,22 @@ int main(int argc, char *argv[])
   // check if it has been successfull
   bool success = dataHandler->IsAllDataAvailable();
   if (!success) {
-    cout << endl << ">> any2many **ERROR** Couldn't read all data files, will quit ..." << endl;
+    std::cerr << std::endl << ">> any2many **ERROR** Couldn't read all data files, will quit ..." << std::endl;
   }
 
   // clean up
   info.runList.clear();
   if (saxParser) {
     delete saxParser;
-    saxParser = 0;
+    saxParser = nullptr;
   }
   if (startupHandler) {
     delete startupHandler;
-    startupHandler = 0;
+    startupHandler = nullptr;
   }
   if (dataHandler) {
     delete dataHandler;
-    dataHandler = 0;
+    dataHandler = nullptr;
   }
 
   return PMUSR_SUCCESS;

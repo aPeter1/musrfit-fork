@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 #define _PRUNBASE_H_
 
 #include <vector>
-using namespace std;
 
 #include <TString.h>
 
@@ -51,8 +50,8 @@ class PRunBase
     PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
     virtual ~PRunBase();
 
-    virtual Double_t CalcChiSquare(const vector<Double_t>& par) = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
-    virtual Double_t CalcMaxLikelihood(const vector<Double_t>& par) = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
+    virtual Double_t CalcChiSquare(const std::vector<Double_t>& par) = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
+    virtual Double_t CalcMaxLikelihood(const std::vector<Double_t>& par) = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
     virtual void SetFitRange(PDoublePairVector fitRange);
 
     virtual void CalcTheory() = 0; ///< pure virtual, i.e. needs to be implemented by the deriving class!!
@@ -75,7 +74,7 @@ class PRunBase
     PRunData fData;             ///< data to be fitted, viewed, i.e. binned data
     Double_t fTimeResolution;   ///< time resolution in (us)
     PDoubleVector fT0s;         ///< all t0 bins of a run! The derived classes will handle it.
-    vector<PDoubleVector> fAddT0s; ///< all t0 bins of all addrun's of a run! The derived classes will handle it.
+    std::vector<PDoubleVector> fAddT0s; ///< all t0 bins of all addrun's of a run! The derived classes will handle it.
 
     Double_t fFitStartTime;     ///< fit start time
     Double_t fFitEndTime;       ///< fit end time

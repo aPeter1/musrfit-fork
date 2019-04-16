@@ -11,7 +11,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter, Bastian M. Wojek            *
+ *   Copyright (C) 2007-2019 by Andreas Suter, Bastian M. Wojek            *
  *                                                                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -67,12 +67,12 @@ class BMWStartupHandler : public TQObject {
 
     virtual void CheckLists();
 
-    virtual const string GetDataPath() const { return fDataPath; } ///< returns the path to TRIM.SP files
-    virtual map<double, string> GetEnergies() const { return fEnergies; } ///< returns energies and file labels of available TRIM.SP files 
+    virtual const std::string GetDataPath() const { return fDataPath; } ///< returns the path to TRIM.SP files
+    virtual std::map<double, std::string> GetEnergies() const { return fEnergies; } ///< returns energies and file labels of available TRIM.SP files
     virtual const double GetDeltat() const { return fDeltat; } ///< returns the time resolution of P(t) when using Fourier transforms
     virtual const double GetDeltaB() const { return fDeltaB; } ///< returns the field resolution of p(B) when using Fourier transforms
-    virtual const string GetWisdomFile() const { return fWisdomFile; } ///< returns the path to the FFTW3 double-wisdom file
-    virtual const string GetWisdomFileFloat() const { return fWisdomFileFloat; } ///< returns the path to the FFTW3 float-wisdom file
+    virtual const std::string GetWisdomFile() const { return fWisdomFile; } ///< returns the path to the FFTW3 double-wisdom file
+    virtual const std::string GetWisdomFileFloat() const { return fWisdomFileFloat; } ///< returns the path to the FFTW3 float-wisdom file
     virtual const unsigned int GetNSteps() const { return fNSteps; } ///< returns the number of steps in one-dimensional theory functions
     virtual const unsigned int GetGridSteps() const { return fGridSteps; } ///< returns the number of steps in each direction when calculating two-dimensional spatial field distributions
     virtual const double GetDeltatLF() const { return fDeltatLF; } ///< returns the time resolution of P(t) when using Laplace transforms for the calculation of LF-relaxation functions
@@ -90,14 +90,14 @@ class BMWStartupHandler : public TQObject {
     bool            fLEM;             ///< low-energy muSR flag
     bool            fVortex;          ///< vortex-lattice flag
     bool            fLF;              ///< longitudinal-field flag
-    string          fDataPath;        ///< path to TRIM.SP files
-    vector<string>  fEnergyLabelList; ///< file labels of the TRIM.SP files
-    vector<double>  fEnergyList;      ///< muon implantation energies of the TRIM.SP files
-    map<double, string> fEnergies;    ///< muon implantation energies and file labels of the TRIM.SP files
+    std::string     fDataPath;        ///< path to TRIM.SP files
+    std::vector<std::string> fEnergyLabelList; ///< file labels of the TRIM.SP files
+    std::vector<double> fEnergyList;  ///< muon implantation energies of the TRIM.SP files
+    std::map<double, std::string> fEnergies;   ///< muon implantation energies and file labels of the TRIM.SP files
     double          fDeltat;          ///< time resolution of P(t) when using Fourier transforms
     double          fDeltaB;          ///< field resolution of p(B) when using Fourier transforms
-    string          fWisdomFile;      ///< FFTW3 double-wisdom file
-    string          fWisdomFileFloat; ///< FFTW3 float-wisdom file
+    std::string     fWisdomFile;      ///< FFTW3 double-wisdom file
+    std::string     fWisdomFileFloat; ///< FFTW3 float-wisdom file
     unsigned int    fNSteps;          ///< number of steps in one-dimensional theory functions
     unsigned int    fGridSteps;       ///< number of steps in each direction when calculating two-dimensional spatial field distributions
     double          fDeltatLF;        ///< time resolution of P(t) when using Laplace transforms for the calculation of LF-relaxation functions

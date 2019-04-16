@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 #include <ctime>
 #include <iostream>
 #include <iomanip>
-using namespace std;
 
 #include "TMusrRunHeader.h"
 
@@ -275,14 +274,14 @@ void TMusrRunHeader::Init(TString fileName)
   Set("RunInfo/No of Histos", 0);
   prop.Set("Time Resolution", 0.0, "ns");
   Set("RunInfo/Time Resolution", prop);
-  vector<int> ivec;
+  std::vector<int> ivec;
   ivec.push_back(0);
   Set("RunInfo/RedGreen Offsets", ivec);
 
   Set("DetectorInfo/Detector001/Name", "n/a");
   Set("DetectorInfo/Detector001/Histo Number", 0);
   Set("DetectorInfo/Detector001/Histo Length", 0);
-  Set("DetectorInfo/Detector001/Time Zero Bin", (Double_t)0.0);
+  Set("DetectorInfo/Detector001/Time Zero Bin", static_cast<Double_t>(0.0));
   Set("DetectorInfo/Detector001/First Good Bin", 0);
   Set("DetectorInfo/Detector001/Last Good Bin", 0);
 
@@ -341,8 +340,8 @@ Bool_t TMusrRunHeader::FillFolder(TFolder *folder)
   Ssiz_t pos=0;
   bool found=false;
 
-  if (folder == 0) {
-    cerr << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** folder == 0!!" << endl;
+  if (folder == nullptr) {
+    std::cerr << std::endl << ">> TMusrRunHeader::FillFolder(): **ERROR** folder == 0!!" << std::endl;
     return false;
   }
 
@@ -361,14 +360,14 @@ Bool_t TMusrRunHeader::FillFolder(TFolder *folder)
     path=fPathNameOrder[i];
     pos = path.Last('/');
     if (pos == -1) {
-      cerr << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** somethig is wrong with the path=" << path << " !!" << endl;
+      std::cerr << std::endl << ">> TMusrRunHeader::FillFolder(): **ERROR** somethig is wrong with the path=" << path << " !!" << std::endl;
       return false;
     }
     path.Remove(pos); // remove the value from the path
 
-    oarray = (TObjArray*)FindObject(folder, path);
+    oarray = dynamic_cast<TObjArray*>(FindObject(folder, path));
     if (!oarray) {
-      cerr << endl << ">> TMusrRunHeader::FillFolder(): **ERROR** couldn't create header structure!!" << endl;
+      std::cerr << std::endl << ">> TMusrRunHeader::FillFolder(): **ERROR** couldn't create header structure!!" << std::endl;
       return false;
     }
 
@@ -378,7 +377,7 @@ Bool_t TMusrRunHeader::FillFolder(TFolder *folder)
     str = GetFirst(name, ':'); // get the first part of the encoded string, i.e. <nnn> - <name>
     found = false;
     for (Int_t j=0; j<oarray->GetEntriesFast(); j++) {
-      p_ostr = (TObjString*) oarray->At(j);
+      p_ostr = dynamic_cast<TObjString*>(oarray->At(j));
       if (p_ostr->GetString().BeginsWith(str)) { // present hence replace
         oarray->AddAt(ostr.Clone(), j);
         found = true;
@@ -563,7 +562,7 @@ void TMusrRunHeader::Set(TString pathName, TString value)
   for (i=0; i<fStringObj.size(); i++) {
     if (!fStringObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       if (!fQuiet)
-        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+        std::cerr << std::endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << std::endl;
       fStringObj[i].SetType("TString");
       fStringObj[i].SetValue(value);
       break;
@@ -597,7 +596,7 @@ void TMusrRunHeader::Set(TString pathName, Int_t value)
   for (i=0; i<fIntObj.size(); i++) {
     if (!fIntObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       if (!fQuiet)
-        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+        std::cerr << std::endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << std::endl;
       fIntObj[i].SetType("Int_t");
       fIntObj[i].SetValue(value);
       break;
@@ -631,7 +630,7 @@ void TMusrRunHeader::Set(TString pathName, Double_t value)
   for (i=0; i<fDoubleObj.size(); i++) {
     if (!fDoubleObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       if (!fQuiet)
-        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+        std::cerr << std::endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << std::endl;
       fDoubleObj[i].SetType("Double_t");
       fDoubleObj[i].SetValue(value);
       break;
@@ -665,7 +664,7 @@ void TMusrRunHeader::Set(TString pathName, TMusrRunPhysicalQuantity value)
   for (i=0; i<fMusrRunPhysQuantityObj.size(); i++) {
     if (!fMusrRunPhysQuantityObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       if (!fQuiet)
-        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+        std::cerr << std::endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << std::endl;
       fMusrRunPhysQuantityObj[i].SetType("TMusrRunHeader");
       fMusrRunPhysQuantityObj[i].SetValue(value);
       break;
@@ -699,7 +698,7 @@ void TMusrRunHeader::Set(TString pathName, TStringVector value)
   for (i=0; i<fStringVectorObj.size(); i++) {
     if (!fStringVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       if (!fQuiet)
-        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+        std::cerr << std::endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << std::endl;
       fStringVectorObj[i].SetType("TStringVector");
       fStringVectorObj[i].SetValue(value);
       break;
@@ -733,7 +732,7 @@ void TMusrRunHeader::Set(TString pathName, TIntVector value)
   for (i=0; i<fIntVectorObj.size(); i++) {
     if (!fIntVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       if (!fQuiet)
-        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+        std::cerr << std::endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << std::endl;
       fIntVectorObj[i].SetType("TIntVector");
       fIntVectorObj[i].SetValue(value);
       break;
@@ -767,7 +766,7 @@ void TMusrRunHeader::Set(TString pathName, TDoubleVector value)
   for (i=0; i<fDoubleVectorObj.size(); i++) {
     if (!fDoubleVectorObj[i].GetPathName().CompareTo(pathName, TString::kIgnoreCase)) {
       if (!fQuiet)
-        cerr << endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << endl;
+        std::cerr << std::endl << ">> **WARNING** " << pathName.Data() << " already exists, will replace it." << std::endl;
       fDoubleVectorObj[i].SetType("TDoubleVector");
       fDoubleVectorObj[i].SetValue(value);
       break;
@@ -803,7 +802,7 @@ Bool_t TMusrRunHeader::ExtractAll(TFolder *folder)
   // clean up all internal structures - just in case this is called multiple times
   CleanUp();
 
-  while ((entry = (TObjArray*)next())) {
+  while ((entry = dynamic_cast<TObjArray*>(next()))) {
     ExtractHeaderInformation(entry, entry->GetName());
   }
   return true;
@@ -821,8 +820,8 @@ Bool_t TMusrRunHeader::ExtractAll(TFolder *folder)
 Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)
 {
   TString label(""), path(""), pathName(""), str(""), strValue(""), type("");
-  TObjString *ostr = 0;
-  TObjArray *tokens = 0;
+  TObjString *ostr = nullptr;
+  TObjArray *tokens = nullptr;
   Ssiz_t idx1;
   Int_t  intValue;
   Double_t dval;
@@ -833,7 +832,7 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
     str = TString(headerInfo->At(i)->ClassName());
     if (str == "TObjArray") { // sub tree
       path = requestedPath + "/" + TString(headerInfo->At(i)->GetName());
-      ExtractHeaderInformation((TObjArray*)headerInfo->At(i), path);
+      ExtractHeaderInformation(dynamic_cast<TObjArray*>(headerInfo->At(i)), path);
     } else { // handle all the rest, i.e. already data
 
       ostr = dynamic_cast<TObjString*>(headerInfo->At(i));
@@ -869,8 +868,8 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
 
         // 1st get the description if present
         tokens = strValue.Tokenize(";");
-        if (tokens == 0) {
-          cerr << endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << endl;
+        if (tokens == nullptr) {
+          std::cerr << std::endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << std::endl;
           return false;
         }
 
@@ -892,7 +891,7 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
 
         if (tokens) {
           delete tokens;
-          tokens = 0;
+          tokens = nullptr;
         }
 
         // 2nd collect all the other properties, this is easier when first a potential description is removed
@@ -911,8 +910,8 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
         }
 
         tokens = strValue.Tokenize(" +;");
-        if (tokens == 0) {
-          cerr << endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << endl;
+        if (tokens == nullptr) {
+          std::cerr << std::endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << std::endl;
           return false;
         }
 
@@ -965,15 +964,15 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
 
         if (tokens) {
           delete tokens;
-          tokens = 0;
+          tokens = nullptr;
         }
 
         Set(pathName, prop);
       } else if (type == "TStringVector") {
         TStringVector svec;
         tokens = strValue.Tokenize(";");
-        if (tokens == 0) {
-          cerr << endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << endl;
+        if (tokens == nullptr) {
+          std::cerr << std::endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << std::endl;
           return false;
         }
         for (Int_t i=0; i<tokens->GetEntries(); i++) {
@@ -984,14 +983,14 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
         }
         if (tokens) {
           delete tokens;
-          tokens = 0;
+          tokens = nullptr;
         }
         Set(pathName, svec);
       } else if (type == "TIntVector") {
         TIntVector ivec;
         tokens = strValue.Tokenize(";");
-        if (tokens == 0) {
-          cerr << endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << endl;
+        if (tokens == nullptr) {
+          std::cerr << std::endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << std::endl;
           return false;
         }
         for (Int_t i=0; i<tokens->GetEntries(); i++) {
@@ -1000,14 +999,14 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
         }
         if (tokens) {
           delete tokens;
-          tokens = 0;
+          tokens = nullptr;
         }
         Set(pathName, ivec);
       } else if (type == "TDoubleVector") {
         TDoubleVector dvec;
         tokens = strValue.Tokenize(";");
-        if (tokens == 0) {
-          cerr << endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << endl;
+        if (tokens == nullptr) {
+          std::cerr << std::endl << ">> **ERROR** Couldn't tokenize entry in Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString requestedPath)" << std::endl;
           return false;
         }
         for (Int_t i=0; i<tokens->GetEntries(); i++) {
@@ -1016,7 +1015,7 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
         }
         if (tokens) {
           delete tokens;
-          tokens = 0;
+          tokens = nullptr;
         }
         Set(pathName, dvec);
       }
@@ -1034,9 +1033,9 @@ Bool_t TMusrRunHeader::ExtractHeaderInformation(TObjArray *headerInfo, TString r
  */
 void TMusrRunHeader::DumpHeader()
 {
-  cout << endl << "***************************************";
-  cout << endl << "header info of file : " << fFileName;
-  cout << endl << "***************************************";
+  std::cout << std::endl << "***************************************";
+  std::cout << std::endl << "header info of file : " << fFileName;
+  std::cout << std::endl << "***************************************";
 
   TString str(""), tstr(""), fmt(""), path(""), name(""), currentPath("");
   TMusrRunPhysicalQuantity prop;
@@ -1046,7 +1045,7 @@ void TMusrRunHeader::DumpHeader()
     SplitPathName(fPathNameOrder[i], path, name);
     if (path != currentPath) {
       currentPath = path;
-      cout << endl << currentPath;
+      std::cout << std::endl << currentPath;
     }
 
     // go through all objects and try to find it
@@ -1055,7 +1054,7 @@ void TMusrRunHeader::DumpHeader()
       if (fStringObj[j].GetPathName() == fPathNameOrder[i]) { // found correct object
         SplitPathName(fStringObj[j].GetPathName(), path, name);
         str.Form("  %03d - %s: %s -@%d", i, name.Data(), fStringObj[j].GetValue().Data(), MRH_TSTRING);
-        cout << endl << str;
+        std::cout << std::endl << str;
       }
     }
     // 2nd check Int_t
@@ -1063,7 +1062,7 @@ void TMusrRunHeader::DumpHeader()
       if (fIntObj[j].GetPathName() == fPathNameOrder[i]) { // found correct object
         SplitPathName(fIntObj[j].GetPathName(), path, name);
         str.Form("  %03d - %s: %d -@%d", i, name.Data(), fIntObj[j].GetValue(), MRH_INT);
-        cout << endl << str;
+        std::cout << std::endl << str;
       }
     }
     // 3rd check Double_t
@@ -1072,7 +1071,7 @@ void TMusrRunHeader::DumpHeader()
         SplitPathName(fDoubleObj[j].GetPathName(), path, name);
         fmt.Form("  %%03d - %%s: %%.%dlf -@%%d", MRH_DOUBLE_PREC);
         str.Form(fmt, i, name.Data(), fDoubleObj[j].GetValue(), MRH_DOUBLE);
-        cout << endl << str;
+        std::cout << std::endl << str;
       }
     }
     // 4th check TMusrRunPhysicalQuantity
@@ -1125,7 +1124,7 @@ void TMusrRunHeader::DumpHeader()
           }
         }
         str.Form("  %03d - %s -@%d", i, tstr.Data(), MRH_TMUSR_RUN_PHYSICAL_QUANTITY);
-        cout << endl << str;
+        std::cout << std::endl << str;
       }
     }
     // 5th check TStringVector
@@ -1139,7 +1138,7 @@ void TMusrRunHeader::DumpHeader()
         str += vstr[vstr.size()-1];
         str += " -@";
         str += MRH_TSTRING_VECTOR;
-        cout << endl << str;
+        std::cout << std::endl << str;
       }
     }
     // 6th check TIntVector
@@ -1155,7 +1154,7 @@ void TMusrRunHeader::DumpHeader()
         str += vint[vint.size()-1];
         str += " -@";
         str += MRH_INT_VECTOR;
-        cout << endl << str;
+        std::cout << std::endl << str;
       }
     }
     // 7th check TDoubleVector
@@ -1175,12 +1174,12 @@ void TMusrRunHeader::DumpHeader()
         str += subStr;
         str += " -@";
         str += MRH_DOUBLE_VECTOR;
-        cout << endl << str;
+        std::cout << std::endl << str;
       }
     }
   }
 
-  cout << endl;
+  std::cout << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -1303,8 +1302,8 @@ TString TMusrRunHeader::GetLabel(TString str)
   Ssiz_t idx2 = str.First(':');
   if ((idx1 == -1) || (idx2 == -1)) {
     if (!fQuiet) {
-      cerr << endl << ">> TMusrRunHeader::GetLabel(): **WARNING** str='" << str << "', seems not correctly encoded.";
-      cerr << endl << ">>   Will omit it." << endl;
+      std::cerr << std::endl << ">> TMusrRunHeader::GetLabel(): **WARNING** str='" << str << "', seems not correctly encoded.";
+      std::cerr << std::endl << ">>   Will omit it." << std::endl;
     }
     return label;
   }
@@ -1335,8 +1334,8 @@ TString TMusrRunHeader::GetStrValue(TString str)
   Ssiz_t idx2 = str.Last('-');
   if ((idx1 == -1) || (idx2 == -1)) {
     if (!fQuiet) {
-      cerr << endl << ">> TMusrRunHeader::GetStrValue(): **WARNING** str='" << str << "', seems not correctly encoded.";
-      cerr << endl << ">>   Will omit it." << endl;
+      std::cerr << std::endl << ">> TMusrRunHeader::GetStrValue(): **WARNING** str='" << str << "', seems not correctly encoded.";
+      std::cerr << std::endl << ">>   Will omit it." << std::endl;
     }
     return strValue;
   }
@@ -1366,8 +1365,8 @@ TString TMusrRunHeader::GetType(TString str)
 
   if (pos == -1) { // i.e. NOT found
     if (!fQuiet) {
-      cerr << endl << ">> TMusrRunHeader::GetType(): **WARNING** str=" << str << " seems to be an invalid MusrROOT run header string.";
-      cerr << endl << ">>   Will omit it." << endl;
+      std::cerr << std::endl << ">> TMusrRunHeader::GetType(): **WARNING** str=" << str << " seems to be an invalid MusrROOT run header string.";
+      std::cerr << std::endl << ">>   Will omit it." << std::endl;
     }
     return result;
   }
@@ -1377,7 +1376,7 @@ TString TMusrRunHeader::GetType(TString str)
   typeStr.Remove(0, pos+1);
   Int_t typeVal;
   if (!typeStr.IsDigit()) {
-    cerr << endl << ">> TMusrRunHeader::GetType(): **ERROR** typeStr=" << typeStr << " is not supported." << endl;
+    std::cerr << std::endl << ">> TMusrRunHeader::GetType(): **ERROR** typeStr=" << typeStr << " is not supported." << std::endl;
     return result;
   }
 
@@ -1406,7 +1405,7 @@ TString TMusrRunHeader::GetType(TString str)
     result = "TDoubleVector";
     break;
   default:
-    cerr << endl << ">> TMusrRunHeader::GetType(): **ERROR** found unsupport type encoded with: " << typeVal << "." << endl;
+    std::cerr << std::endl << ">> TMusrRunHeader::GetType(): **ERROR** found unsupport type encoded with: " << typeVal << "." << std::endl;
     break;
   }
 
@@ -1437,23 +1436,23 @@ bool TMusrRunHeader::UpdateFolder(TObject *treeObj, TString path)
 
   // remove the first path element
   if (!RemoveFirst(path, '/')) {
-    cerr << endl << ">> TMusrRunHeader::UpdateFolder(): **ERROR** couldn't tokenize path!!" << endl;
+    std::cerr << std::endl << ">> TMusrRunHeader::UpdateFolder(): **ERROR** couldn't tokenize path!!" << std::endl;
     return false;
   }
 
   if (!obj) { // required object not present, create it
     TObjArray *oarray = new TObjArray();
     if (!oarray) {
-      cerr << endl << ">> TMusrRunHeader::UpdateFolder(): **ERROR** couldn't create header structure!!" << endl;
+      std::cerr << std::endl << ">> TMusrRunHeader::UpdateFolder(): **ERROR** couldn't create header structure!!" << std::endl;
       return false;
     }
     // set the name of the new TObjArray
     oarray->SetName(str);
 
     if (!strcmp(treeObj->ClassName(), "TFolder"))
-      ((TFolder*)treeObj)->Add(oarray);
+      (dynamic_cast<TFolder*>(treeObj))->Add(oarray);
     else // it is a TObjArray
-      ((TObjArray*)treeObj)->AddLast(oarray);
+      (dynamic_cast<TObjArray*>(treeObj))->AddLast(oarray);
 
     return UpdateFolder(oarray, path);
   } else { // object present, hence check rest of the path
@@ -1477,7 +1476,7 @@ bool TMusrRunHeader::UpdateFolder(TObject *treeObj, TString path)
 TObject* TMusrRunHeader::FindObject(TObject *treeObj, TString path)
 {
   Ssiz_t pos;
-  TObject *obj=0;
+  TObject *obj=nullptr;
 
   // make sure that treeObj is either TFolder or TObjArray
   if (strcmp(treeObj->ClassName(), "TFolder") && strcmp(treeObj->ClassName(), "TObjArray"))

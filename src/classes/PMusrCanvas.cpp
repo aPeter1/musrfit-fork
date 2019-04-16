@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -30,7 +30,6 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-using namespace std;
 
 #include <TColor.h>
 #include <TRandom.h>
@@ -43,7 +42,7 @@ using namespace std;
 
 static const char *gFiletypes[] = { "Data files", "*.dat",
                                     "All files",  "*",
-                                    0,            0 };
+                                    nullptr, nullptr };
 
 ClassImp(PMusrCanvasPlotRange)
 
@@ -76,7 +75,7 @@ PMusrCanvasPlotRange::PMusrCanvasPlotRange()
 void PMusrCanvasPlotRange::SetXRange(Double_t xmin, Double_t xmax)
 {
   if (xmin > xmax) {
-    cerr << endl << ">> PMusrCanvasPlotRange::SetXRange(): **WARNING** xmin > xmax, will swap them." << endl;
+    std::cerr << std::endl << ">> PMusrCanvasPlotRange::SetXRange(): **WARNING** xmin > xmax, will swap them." << std::endl;
     fXmin = xmax;
     fXmax = xmin;
   } else {
@@ -98,7 +97,7 @@ void PMusrCanvasPlotRange::SetXRange(Double_t xmin, Double_t xmax)
 void PMusrCanvasPlotRange::SetYRange(Double_t ymin, Double_t ymax)
 {
   if (ymin > ymax) {
-    cerr << endl << ">> PMusrCanvasPlotRange::SetYRange(): **WARNING** ymin > ymax, will swap them." << endl;
+    std::cerr << std::endl << ">> PMusrCanvasPlotRange::SetYRange(): **WARNING** ymin > ymax, will swap them." << std::endl;
     fYmin = ymax;
     fYmax = ymin;
   } else {
@@ -120,7 +119,7 @@ ClassImpQ(PMusrCanvas)
 PMusrCanvas::PMusrCanvas()
 {
   fTimeout = 0;
-  fTimeoutTimer = 0;
+  fTimeoutTimer = nullptr;
 
   fScaleN0AndBkg = true;
   fValid = false;
@@ -131,32 +130,32 @@ PMusrCanvas::PMusrCanvas()
   fPlotType = -1;
   fPlotNumber = -1;
 
-  fImp   = 0;
-  fBar   = 0;
-  fPopupMain    = 0;
-  fPopupFourier = 0;
+  fImp   = nullptr;
+  fBar   = nullptr;
+  fPopupMain    = nullptr;
+  fPopupFourier = nullptr;
 
-  fStyle               = 0;
-  fMainCanvas          = 0;
-  fTitlePad            = 0;
-  fDataTheoryPad       = 0;
-  fParameterPad        = 0;
-  fTheoryPad           = 0;
-  fInfoPad             = 0;
-  fMultiGraphLegend    = 0;
+  fStyle            = nullptr;
+  fMainCanvas       = nullptr;
+  fTitlePad         = nullptr;
+  fDataTheoryPad    = nullptr;
+  fParameterPad     = nullptr;
+  fTheoryPad        = nullptr;
+  fInfoPad          = nullptr;
+  fMultiGraphLegend = nullptr;
 
-  fHistoFrame     = 0;
+  fHistoFrame     = nullptr;
 
-  fMultiGraphData = 0;
-  fMultiGraphDiff = 0;
+  fMultiGraphData = nullptr;
+  fMultiGraphDiff = nullptr;
 
   InitFourier();
   InitAverage();
 
-  fCurrentFourierPhaseText = 0;
+  fCurrentFourierPhaseText = nullptr;
 
-  fRRFText = 0;
-  fRRFLatexText = 0;
+  fRRFText      = nullptr;
+  fRRFLatexText = nullptr;
 
   fXRangePresent = false;
   fYRangePresent = false;
@@ -192,23 +191,23 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
     fBatchMode(batch), fPlotNumber(number)
 {
   fTimeout = 0;
-  fTimeoutTimer = 0;
+  fTimeoutTimer = nullptr;
   fAveragedView = false;
 
-  fMultiGraphData = 0;
-  fMultiGraphDiff = 0;
+  fMultiGraphData = nullptr;
+  fMultiGraphDiff = nullptr;
 
-  fHistoFrame     = 0;
+  fHistoFrame     = nullptr;
 
   InitFourier();
   InitAverage();
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 
-  fCurrentFourierPhaseText = 0;
+  fCurrentFourierPhaseText = nullptr;
 
-  fRRFText = 0;
-  fRRFLatexText = 0;
+  fRRFText      = nullptr;
+  fRRFLatexText = nullptr;
 
   fXRangePresent = false;
   fYRangePresent = false;
@@ -250,21 +249,21 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
      fMarkerList(markerList), fColorList(colorList)
 {
   fTimeout = 0;
-  fTimeoutTimer = 0;
+  fTimeoutTimer = nullptr;
 
-  fMultiGraphData = 0;
-  fMultiGraphDiff = 0;
+  fMultiGraphData = nullptr;
+  fMultiGraphDiff = nullptr;
 
-  fHistoFrame     = 0;
+  fHistoFrame     = nullptr;
 
   InitAverage();
   CreateStyle();
   InitMusrCanvas(title, wtopx, wtopy, ww, wh);
 
-  fCurrentFourierPhaseText = 0;
+  fCurrentFourierPhaseText = nullptr;
 
-  fRRFText = 0;
-  fRRFLatexText = 0;
+  fRRFText      = nullptr;
+  fRRFLatexText = nullptr;
 
   fXRangePresent = false;
   fYRangePresent = false;
@@ -287,28 +286,28 @@ PMusrCanvas::~PMusrCanvas()
   // cleanup
   if (fTimeoutTimer) {
     delete fTimeoutTimer;
-    fTimeoutTimer = 0;
+    fTimeoutTimer = nullptr;
   }
   if (fCurrentFourierPhaseText) {
     delete fCurrentFourierPhaseText;
-    fCurrentFourierPhaseText = 0;
+    fCurrentFourierPhaseText = nullptr;
   }
   if (fRRFLatexText) {
     delete fRRFLatexText;
-    fRRFLatexText = 0;
+    fRRFLatexText = nullptr;
   }
   if (fRRFText) {
     delete fRRFText;
-    fRRFText = 0;
+    fRRFText = nullptr;
   }
   if (fStyle) {
     delete fStyle;
-    fStyle = 0;
+    fStyle = nullptr;
   }
   if (fTitlePad) {
     fTitlePad->Clear();
     delete fTitlePad;
-    fTitlePad = 0;
+    fTitlePad = nullptr;
   }
   if (fData.size() > 0) {
     for (UInt_t i=0; i<fData.size(); i++)
@@ -323,38 +322,38 @@ PMusrCanvas::~PMusrCanvas()
   if (fMultiGraphLegend) {
     fMultiGraphLegend->Clear();
     delete fMultiGraphLegend;
-    fMultiGraphLegend = 0;
+    fMultiGraphLegend = nullptr;
   }
   if (fMultiGraphData) {
     delete fMultiGraphData;
-    fMultiGraphData = 0;
+    fMultiGraphData = nullptr;
   }
   if (fMultiGraphDiff) {
     delete fMultiGraphDiff;
-    fMultiGraphDiff = 0;
+    fMultiGraphDiff = nullptr;
   }
   if (fDataTheoryPad) {
     delete fDataTheoryPad;
-    fDataTheoryPad = 0;
+    fDataTheoryPad = nullptr;
   }
   if (fParameterPad) {
     fParameterPad->Clear();
     delete fParameterPad;
-    fParameterPad = 0;
+    fParameterPad = nullptr;
   }
   if (fTheoryPad) {
     fTheoryPad->Clear();
     delete fTheoryPad;
-    fTheoryPad = 0;
+    fTheoryPad = nullptr;
   }
   if (fInfoPad) {
     fInfoPad->Clear();
     delete fInfoPad;
-    fInfoPad = 0;
+    fInfoPad = nullptr;
   }
   if (fMainCanvas) {
     delete fMainCanvas;
-    fMainCanvas = 0;
+    fMainCanvas = nullptr;
   }
 }
 
@@ -493,7 +492,7 @@ void PMusrCanvas::SetTimeout(Int_t timeout)
 
   if (fTimeoutTimer) {
     delete fTimeoutTimer;
-    fTimeoutTimer = 0;
+    fTimeoutTimer = nullptr;
   }
   fTimeoutTimer = new TTimer();
 
@@ -646,8 +645,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
     // first check that plot number is smaller than the maximal number of runs
     if ((Int_t)plotInfo.fRuns[i] > (Int_t)runs.size()) {
       fValid = false;
-      cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** run plot number " << (Int_t)plotInfo.fRuns[i] << " is larger than the number of runs " << runs.size();
-      cerr << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** run plot number " << (Int_t)plotInfo.fRuns[i] << " is larger than the number of runs " << runs.size();
+      std::cerr << std::endl;
       return;
     }
     // check that the plottype and the fittype do correspond
@@ -657,10 +656,10 @@ void PMusrCanvas::UpdateDataTheoryPad()
     }
     if (fitType == -1) {
       fValid = false;
-      cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** plottype = " << fPlotType;
-      cerr << ", fittype = " << runs[runNo].GetFitType() << "(RUN block)/";
-      cerr << "fittype = " << globalBlock->GetFitType() << "(GLOBAL block). However, they have to correspond!";
-      cerr << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** plottype = " << fPlotType;
+      std::cerr << ", fittype = " << runs[runNo].GetFitType() << "(RUN block)/";
+      std::cerr << "fittype = " << globalBlock->GetFitType() << "(GLOBAL block). However, they have to correspond!";
+      std::cerr << std::endl;
       return;
     }
   }
@@ -668,7 +667,7 @@ void PMusrCanvas::UpdateDataTheoryPad()
   PRunData *data;
   for (UInt_t i=0; i<plotInfo.fRuns.size(); i++) {
     // get run data and create a histogram
-    data = 0;
+    data = nullptr;
     runNo = (UInt_t)plotInfo.fRuns[i]-1;
     // get data depending on the fittype
     if (runs[runNo].GetFitType() != -1) { // fit type found in RUN block, hence overwrite the GLOBAL block
@@ -680,8 +679,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a single histogram plot";
-          cerr << endl;
+          std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a single histogram plot";
+          std::cerr << std::endl;
           return;
         }
         // handle data
@@ -692,8 +691,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a single histogram RRF plot";
-          cerr << endl;
+          std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a single histogram RRF plot";
+          std::cerr << std::endl;
           return;
         }
         // handle data
@@ -704,8 +703,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a asymmetry plot";
-          cerr << endl;
+          std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a asymmetry plot";
+          std::cerr << std::endl;
           return;
         }
         // handle data
@@ -716,8 +715,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a asymmetry RRF plot";
-          cerr << endl;
+          std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a asymmetry RRF plot";
+          std::cerr << std::endl;
           return;
         }
         // handle data
@@ -728,8 +727,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a mu minus single histogram plot";
-          cerr << endl;
+          std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a mu minus single histogram plot";
+          std::cerr << std::endl;
           return;
         }
         // handle data
@@ -740,8 +739,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a none musr data plot";
-          cerr << endl;
+          std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a none musr data plot";
+          std::cerr << std::endl;
           return;
         }
         // handle data
@@ -760,8 +759,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
       default:
         fValid = false;
         // error message
-        cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** wrong plottype tag?!";
-        cerr << endl;
+        std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** wrong plottype tag?!";
+        std::cerr << std::endl;
         return;
         break;
     }
@@ -1021,12 +1020,12 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
   static eKeySwitch lastKeySwitch = kNotRelevant;
 
   if ((lastKeySwitch == kFourierDiff) && (x == 'f')) {
-    cout << "**INFO** f-d-f doesn't make any sense, will ignore 'f' ..." << endl;
+    std::cout << "**INFO** f-d-f doesn't make any sense, will ignore 'f' ..." << std::endl;
     return;
   }
 
   if ((lastKeySwitch == kDiffFourier) && (x == 'd')) {
-    cout << "**INFO** d-f-d doesn't make any sense, will ignore 'd' ..." << endl;
+    std::cout << "**INFO** d-f-d doesn't make any sense, will ignore 'd' ..." << std::endl;
     return;
   }
 
@@ -1157,7 +1156,7 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
       else if ((fCurrentPlotView != PV_DATA) && !fDifferenceView && !fAveragedView)
         relevantKeySwitch = kFourier;
     } else { // with only 1 data set, it doesn't make any sense to average!
-      cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << endl;
+      std::cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << std::endl;
       return;
     }
   } else if (x == 'c') {
@@ -1367,8 +1366,8 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
     fPreviousPlotView = fCurrentPlotView;
     fCurrentPlotView = PV_FOURIER_PHASE_OPT_REAL;
     // make sure that phase opt. real indeed exists
-    if (fData[0].dataFourierPhaseOptReal == 0) {
-      if (fData[0].dataFourierRe == 0)
+    if (fData[0].dataFourierPhaseOptReal == nullptr) {
+      if (fData[0].dataFourierRe == nullptr)
         HandleFourier();
       else
         CalcPhaseOptReFT();
@@ -1463,7 +1462,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
         CleanupAverage();
       }
     } else {
-      cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << endl;
+      std::cout << "**INFO** averaging of a single data set doesn't make any sense, will ignore 'a' ..." << std::endl;
       return;
     }
   } else if (id == P_MENU_ID_EXPORT_DATA+P_MENU_PLOT_OFFSET*fPlotNumber) {
@@ -1500,7 +1499,7 @@ void PMusrCanvas::HandleMenuPopup(Int_t id)
  */
 void PMusrCanvas::LastCanvasClosed()
 {
-//  cerr << ">> in last canvas closed check. gROOT->GetListOfCanvases()->GetEntries()=" << gROOT->GetListOfCanvases()->GetEntries() << endl;
+//  std::cerr << ">> in last canvas closed check. gROOT->GetListOfCanvases()->GetEntries()=" << gROOT->GetListOfCanvases()->GetEntries() << std::endl;
   if (gROOT->GetListOfCanvases()->IsEmpty()) {
     Done(0);
   }
@@ -1514,7 +1513,7 @@ void PMusrCanvas::LastCanvasClosed()
  */
 void PMusrCanvas::WindowClosed()
 {
-//  cerr << ">> fMainCanvas->GetName()=" << fMainCanvas->GetName() << endl;
+//  std::cerr << ">> fMainCanvas->GetName()=" << fMainCanvas->GetName() << std::endl;
   gROOT->GetListOfCanvases()->Remove(fMainCanvas);
   LastCanvasClosed();
 }
@@ -1530,7 +1529,7 @@ void PMusrCanvas::WindowClosed()
  */
 void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
 {
-  cout << endl << ">> SaveGraphicsAndQuit: will dump the canvas into a graphics output file (" << graphicsFormat << ") ..."<< endl;
+  std::cout << std::endl << ">> SaveGraphicsAndQuit: will dump the canvas into a graphics output file (" << graphicsFormat << ") ..."<< std::endl;
 
   TString str(fileName);
   Int_t idx = -1;
@@ -1547,7 +1546,7 @@ void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
   }
 
   if (idx == -1) {
-    cerr << endl << ">> PMusrCanvas::SaveGraphicsAndQuit(): **ERROR** fileName (" << fileName << ") is invalid." << endl;
+    std::cerr << std::endl << ">> PMusrCanvas::SaveGraphicsAndQuit(): **ERROR** fileName (" << fileName << ") is invalid." << std::endl;
     return;
   }
 
@@ -1561,7 +1560,7 @@ void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
   sprintf(ext, ".%s", graphicsFormat);
   str.Replace(idx, size, ext, strlen(ext));
 
-  cout << endl << ">> SaveGraphicsAndQuit: " << str.Data() << endl;
+  std::cout << std::endl << ">> SaveGraphicsAndQuit: " << str.Data() << std::endl;
 
   fMainCanvas->SaveAs(str.Data());
 
@@ -1579,8 +1578,8 @@ void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
  */
 void PMusrCanvas::ExportData(const Char_t *fileName)
 {
-  if (fileName == 0) { // path file name NOT provided, generate a default path file name
-    cerr << endl << ">> PMusrCanvas::ExportData(): **ERROR** NO path file name provided. Will do nothing." << endl;
+  if (fileName == nullptr) { // path file name NOT provided, generate a default path file name
+    std::cerr << std::endl << ">> PMusrCanvas::ExportData(): **ERROR** NO path file name provided. Will do nothing." << std::endl;
     return;
   }
 
@@ -1953,12 +1952,12 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
   }
 
   // open file
-  ofstream fout;
+  std::ofstream fout;
 
   // open output data-file
-  fout.open(fileName, iostream::out);
+  fout.open(fileName, std::iostream::out);
   if (!fout.is_open()) {
-    cerr << endl << ">> PMusrCanvas::ExportData(): **ERROR** couldn't open file " << fileName << " for writing." << endl;
+    std::cerr << std::endl << ">> PMusrCanvas::ExportData(): **ERROR** couldn't open file " << fileName << " for writing." << std::endl;
     return;
   }
 
@@ -1975,44 +1974,44 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
     switch (fCurrentPlotView) {
       case PV_DATA:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% x, diff, errDiff" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% x, diff, errDiff" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size()-1; i++) {
             fout << "x" << i << " , diff" << i << ", errDiff" << i << ", ";
           }
-          fout << "x" << dumpVector.size()-1 << " , diff" << dumpVector.size()-1 << ", errDiff" << dumpVector.size()-1 << endl;
+          fout << "x" << dumpVector.size()-1 << " , diff" << dumpVector.size()-1 << ", errDiff" << dumpVector.size()-1 << std::endl;
         }
         break;
       case PV_FOURIER_REAL:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% x, F_diffRe" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% x, F_diffRe" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size()-1; i++) {
             fout << "freq" << i << ", F_diffRe" << i << ", ";
           }
-          fout << "freq" << dumpVector.size()-1 << ", F_diffRe" << dumpVector.size()-1 << endl;
+          fout << "freq" << dumpVector.size()-1 << ", F_diffRe" << dumpVector.size()-1 << std::endl;
         }
         break;
       case PV_FOURIER_IMAG:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% x, F_diffIm" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% x, F_diffIm" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size()-1; i++) {
             fout << "freq" << i << ", F_diffIm" << i << ", ";
           }
-          fout << "freq" << dumpVector.size()-1 << ", F_diffIm" << dumpVector.size()-1 << endl;
+          fout << "freq" << dumpVector.size()-1 << ", F_diffIm" << dumpVector.size()-1 << std::endl;
         }
         break;
       case PV_FOURIER_REAL_AND_IMAG:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% x, F_diffRe, F_diffIm" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% x, F_diffRe, F_diffIm" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size()/2; i++) {
@@ -2021,31 +2020,31 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
           for (UInt_t i=0; i<dumpVector.size()/2-1; i++) {
             fout << "freq" << i << ", F_diffIm" << i << ", ";
           }
-          fout << "freq" << dumpVector.size()/2-1 << ", F_diffIm" << dumpVector.size()/2-1 << endl;
+          fout << "freq" << dumpVector.size()/2-1 << ", F_diffIm" << dumpVector.size()/2-1 << std::endl;
         }
         break;
       case PV_FOURIER_PWR:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% x, F_diffPwr" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% x, F_diffPwr" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size()-1; i++) {
             fout << "freq" << i << ", F_diffPwr" << i << ", ";
           }
-          fout << "freq" << dumpVector.size()-1 << ", F_diffPwr" << dumpVector.size()-1 << endl;
+          fout << "freq" << dumpVector.size()-1 << ", F_diffPwr" << dumpVector.size()-1 << std::endl;
         }
         break;
       case PV_FOURIER_PHASE:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% x, F_diffPhase" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% x, F_diffPhase" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size()-1; i++) {
             fout << "freq" << i << ", F_diffPhase" << i << ", ";
           }
-          fout << "freq" << dumpVector.size()-1 << ", F_diffPhase" << dumpVector.size()-1 << endl;
+          fout << "freq" << dumpVector.size()-1 << ", F_diffPhase" << dumpVector.size()-1 << std::endl;
         }
         break;
       default:
@@ -2080,15 +2079,15 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
         else
           fout << ", ";
       }
-      fout << endl;
+      fout << std::endl;
     }
   } else { // no difference view
     // write header
     switch (fCurrentPlotView) {
       case PV_DATA:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% xData, data, errData, xTheory, theory" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% xData, data, errData, xTheory, theory" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size(); i++) {
@@ -2096,7 +2095,7 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
               fout << "xData" << i/2 << " , data" << i/2 << ", errData" << i/2 << ", ";
             else
               if (i == dumpVector.size()-1)
-                fout << "xTheory" << (i-1)/2 << " , theory" << (i-1)/2 << endl;
+                fout << "xTheory" << (i-1)/2 << " , theory" << (i-1)/2 << std::endl;
               else
                 fout << "xTheory" << (i-1)/2 << " , theory" << (i-1)/2 << ", ";
           }
@@ -2104,8 +2103,8 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
         break;
       case PV_FOURIER_REAL:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% freq, F_Re, freqTheo, F_theoRe" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% freq, F_Re, freqTheo, F_theoRe" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size(); i++) {
@@ -2113,7 +2112,7 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
               fout << "freq" << i/2 << ", F_Re" << i/2 << ", ";
             else
               if (i == dumpVector.size()-1)
-                fout << "freqTheo" << (i-1)/2 << ", F_theoRe" << (i-1)/2 << endl;
+                fout << "freqTheo" << (i-1)/2 << ", F_theoRe" << (i-1)/2 << std::endl;
               else
                 fout << "freqTheo" << (i-1)/2 << ", F_theoRe" << (i-1)/2 << ", ";
           }
@@ -2121,8 +2120,8 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
         break;
       case PV_FOURIER_IMAG:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% freq, F_Im, freqTheo, F_theoIm" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% freq, F_Im, freqTheo, F_theoIm" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size(); i++) {
@@ -2130,7 +2129,7 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
               fout << "freq" << i/2 << ", F_Im" << i/2 << ", ";
             else
               if (i == dumpVector.size()-1)
-                fout << "freqTheo" << (i-1)/2 << ", F_theoIm" << (i-1)/2 << endl;
+                fout << "freqTheo" << (i-1)/2 << ", F_theoIm" << (i-1)/2 << std::endl;
               else
                 fout << "freqTheo" << (i-1)/2 << ", F_theoIm" << (i-1)/2 << ", ";
           }
@@ -2138,8 +2137,8 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
         break;
       case PV_FOURIER_REAL_AND_IMAG:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% freq, F_Re, freqTheo, F_theoRe, freq, F_Im, freqTheo, F_theoIm" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% freq, F_Re, freqTheo, F_theoRe, freq, F_Im, freqTheo, F_theoIm" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size(); i++) {
@@ -2151,7 +2150,7 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
               fout << "freq" << (i-2)/4 << ", F_Im" << (i-2)/4 << ", ";
             else
               if (i == dumpVector.size()-1)
-                fout << "freqTheo" << (i-3)/4 << ", F_theoIm" << (i-3)/4 << endl;
+                fout << "freqTheo" << (i-3)/4 << ", F_theoIm" << (i-3)/4 << std::endl;
               else
                 fout << "freqTheo" << (i-3)/4 << ", F_theoIm" << (i-3)/4 << ", ";
           }
@@ -2159,8 +2158,8 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
         break;
       case PV_FOURIER_PWR:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% freq, F_Pwr, freqTheo, F_theoPwr" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% freq, F_Pwr, freqTheo, F_theoPwr" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size(); i++) {
@@ -2168,7 +2167,7 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
               fout << "freq" << i/2 << ", F_Pwr" << i/2 << ", ";
             else
               if (i == dumpVector.size()-1)
-                fout << "freqTheo" << (i-1)/2 << ", F_theoPwr" << (i-1)/2 << endl;
+                fout << "freqTheo" << (i-1)/2 << ", F_theoPwr" << (i-1)/2 << std::endl;
               else
                 fout << "freqTheo" << (i-1)/2 << ", F_theoPwr" << (i-1)/2 << ", ";
           }
@@ -2176,8 +2175,8 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
         break;
       case PV_FOURIER_PHASE:
         if (fAveragedView) {
-          fout << "% from averaged view" << endl;
-          fout << "% freq, F_Phase, freqTheo, F_theoPhase" << endl;
+          fout << "% from averaged view" << std::endl;
+          fout << "% freq, F_Phase, freqTheo, F_theoPhase" << std::endl;
         } else {
           fout << "% ";
           for (UInt_t i=0; i<dumpVector.size(); i++) {
@@ -2185,7 +2184,7 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
               fout << "freq" << i/2 << ", F_Phase" << i/2 << ", ";
             else
               if (i == dumpVector.size()-1)
-                fout << "freqTheo" << (i-1)/2 << ", F_theoPhase" << (i-1)/2 << endl;
+                fout << "freqTheo" << (i-1)/2 << ", F_theoPhase" << (i-1)/2 << std::endl;
               else
                 fout << "freqTheo" << (i-1)/2 << ", F_theoPhase" << (i-1)/2 << ", ";
           }
@@ -2200,10 +2199,10 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
       // write data/theory
       for (UInt_t j=0; j<dumpVector.size()-1; j++) {
         if (i<dumpVector[j].dataX.size()) {
-          fout << setprecision(9) << dumpVector[j].dataX[i] << ", ";
-          fout << setprecision(9) << dumpVector[j].data[i] << ", ";
+          fout << std::setprecision(9) << dumpVector[j].dataX[i] << ", ";
+          fout << std::setprecision(9) << dumpVector[j].data[i] << ", ";
           if (dumpVector[j].dataErr.size() > 0)
-            fout << setprecision(9) << dumpVector[j].dataErr[i] << ", ";
+            fout << std::setprecision(9) << dumpVector[j].dataErr[i] << ", ";
         } else {
           if (dumpVector[j].dataErr.size() > 0)
             fout << " , , , ";
@@ -2213,12 +2212,12 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
       }
       // write last data/theory entry
       if (i<dumpVector[dumpVector.size()-1].dataX.size()) {
-        fout << setprecision(9) << dumpVector[dumpVector.size()-1].dataX[i] << ", ";
-        fout << setprecision(9) << dumpVector[dumpVector.size()-1].data[i];
+        fout << std::setprecision(9) << dumpVector[dumpVector.size()-1].dataX[i] << ", ";
+        fout << std::setprecision(9) << dumpVector[dumpVector.size()-1].data[i];
       } else {
         fout << " , ";
       }
-      fout << endl;
+      fout << std::endl;
     }
   }
 
@@ -2233,7 +2232,7 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
   }
   dumpVector.clear();
 
-  cout << endl << ">> Data windows saved in ascii format ..." << endl;
+  std::cout << std::endl << ">> Data windows saved in ascii format ..." << std::endl;
   //  if (asciiOutput) {
   //    if (fPlotNumber == static_cast<Int_t>(fMsrHandler->GetMsrPlotList()->size()) - 1)
   //      Done(0);
@@ -2322,25 +2321,25 @@ void PMusrCanvas::InitFourier()
  */
 void PMusrCanvas::InitAverage()
 {
-  fDataAvg.data = 0;
-  fDataAvg.dataFourierRe = 0;
-  fDataAvg.dataFourierIm = 0;
-  fDataAvg.dataFourierPwr = 0;
-  fDataAvg.dataFourierPhase = 0;
-  fDataAvg.dataFourierPhaseOptReal = 0;
-  fDataAvg.theory = 0;
-  fDataAvg.theoryFourierRe = 0;
-  fDataAvg.theoryFourierIm = 0;
-  fDataAvg.theoryFourierPwr = 0;
-  fDataAvg.theoryFourierPhase = 0;
-  fDataAvg.theoryFourierPhaseOptReal = 0;
-  fDataAvg.diff = 0;
-  fDataAvg.diffFourierRe = 0;
-  fDataAvg.diffFourierIm = 0;
-  fDataAvg.diffFourierPwr = 0;
-  fDataAvg.diffFourierPhase = 0;
-  fDataAvg.diffFourierPhaseOptReal = 0;
-  fDataAvg.dataRange = 0;
+  fDataAvg.data = nullptr;
+  fDataAvg.dataFourierRe = nullptr;
+  fDataAvg.dataFourierIm = nullptr;
+  fDataAvg.dataFourierPwr = nullptr;
+  fDataAvg.dataFourierPhase = nullptr;
+  fDataAvg.dataFourierPhaseOptReal = nullptr;
+  fDataAvg.theory = nullptr;
+  fDataAvg.theoryFourierRe = nullptr;
+  fDataAvg.theoryFourierIm = nullptr;
+  fDataAvg.theoryFourierPwr = nullptr;
+  fDataAvg.theoryFourierPhase = nullptr;
+  fDataAvg.theoryFourierPhaseOptReal = nullptr;
+  fDataAvg.diff = nullptr;
+  fDataAvg.diffFourierRe = nullptr;
+  fDataAvg.diffFourierIm = nullptr;
+  fDataAvg.diffFourierPwr = nullptr;
+  fDataAvg.diffFourierPhase = nullptr;
+  fDataAvg.diffFourierPhaseOptReal = nullptr;
+  fDataAvg.dataRange = nullptr;
   fDataAvg.diffFourierTag = 0;
 }
 
@@ -2366,26 +2365,26 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   fPreviousPlotView = PV_DATA;
   fPlotType = -1;
 
-  fImp   = 0;
-  fBar   = 0;
-  fPopupMain    = 0;
-  fPopupFourier = 0;
+  fImp   = nullptr;
+  fBar   = nullptr;
+  fPopupMain    = nullptr;
+  fPopupFourier = nullptr;
 
-  fMainCanvas          = 0;
-  fTitlePad            = 0;
-  fDataTheoryPad       = 0;
-  fParameterPad        = 0;
-  fTheoryPad           = 0;
-  fInfoPad             = 0;
-  fMultiGraphLegend    = 0;
+  fMainCanvas          = nullptr;
+  fTitlePad            = nullptr;
+  fDataTheoryPad       = nullptr;
+  fParameterPad        = nullptr;
+  fTheoryPad           = nullptr;
+  fInfoPad             = nullptr;
+  fMultiGraphLegend    = nullptr;
 
   // invoke canvas
   TString canvasName = TString("fMainCanvas");
   canvasName += fPlotNumber;
   fMainCanvas = new TCanvas(canvasName.Data(), title, wtopx, wtopy, ww, wh);
-  if (fMainCanvas == 0) {
-    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke " << canvasName.Data();
-    cerr << endl;
+  if (fMainCanvas == nullptr) {
+    std::cerr << std::endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke " << canvasName.Data();
+    std::cerr << std::endl;
     return;
   }
 
@@ -2433,9 +2432,9 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   // divide the canvas into 4 pads
   // title pad
   fTitlePad = new TPaveText(0.0, YTITLE, 1.0, 1.0, "NDC");
-  if (fTitlePad == 0) {
-    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fTitlePad";
-    cerr << endl;
+  if (fTitlePad == nullptr) {
+    std::cerr << std::endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fTitlePad";
+    std::cerr << std::endl;
     return;
   }
   fTitlePad->SetFillColor(TColor::GetColor(255,255,255));
@@ -2445,9 +2444,9 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
 
   // data/theory pad
   fDataTheoryPad = new TPad("dataTheoryPad", "dataTheoryPad", 0.0, YINFO, XTHEO, YTITLE);
-  if (fDataTheoryPad == 0) {
-    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fDataTheoryPad";
-    cerr << endl;
+  if (fDataTheoryPad == nullptr) {
+    std::cerr << std::endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fDataTheoryPad";
+    std::cerr << std::endl;
     return;
   }
   fDataTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
@@ -2455,9 +2454,9 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
 
   // parameter pad
   fParameterPad = new TPaveText(XTHEO, 0.5, 1.0, YTITLE, "NDC");
-  if (fParameterPad == 0) {
-    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fParameterPad";
-    cerr << endl;
+  if (fParameterPad == nullptr) {
+    std::cerr << std::endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fParameterPad";
+    std::cerr << std::endl;
     return;
   }
   fParameterPad->SetFillColor(TColor::GetColor(255,255,255));
@@ -2466,9 +2465,9 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
 
   // theory pad
   fTheoryPad = new TPaveText(XTHEO, 0.1, 1.0, 0.5, "NDC");
-  if (fTheoryPad == 0) {
-    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fTheoryPad";
-    cerr << endl;
+  if (fTheoryPad == nullptr) {
+    std::cerr << std::endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fTheoryPad";
+    std::cerr << std::endl;
     return;
   }
   fTheoryPad->SetFillColor(TColor::GetColor(255,255,255));
@@ -2478,9 +2477,9 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
 
   // info pad
   fInfoPad = new TLegend(0.0, 0.0, 1.0, YINFO, "NDC");
-  if (fInfoPad == 0) {
-    cerr << endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fInfoPad";
-    cerr << endl;
+  if (fInfoPad == nullptr) {
+    std::cerr << std::endl << ">> PMusrCanvas::PMusrCanvas(): **PANIC ERROR** Couldn't invoke fInfoPad";
+    std::cerr << std::endl;
     return;
   }
   fInfoPad->SetFillColor(TColor::GetColor(255,255,255));
@@ -2506,25 +2505,25 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
  */
 void PMusrCanvas::InitDataSet(PMusrCanvasDataSet &dataSet)
 {
-  dataSet.data = 0;
-  dataSet.dataFourierRe = 0;
-  dataSet.dataFourierIm = 0;
-  dataSet.dataFourierPwr = 0;
-  dataSet.dataFourierPhase = 0;
-  dataSet.dataFourierPhaseOptReal = 0;
-  dataSet.theory = 0;
-  dataSet.theoryFourierRe = 0;
-  dataSet.theoryFourierIm = 0;
-  dataSet.theoryFourierPwr = 0;
-  dataSet.theoryFourierPhase = 0;
-  dataSet.theoryFourierPhaseOptReal = 0;
-  dataSet.diff = 0;
-  dataSet.diffFourierRe = 0;
-  dataSet.diffFourierIm = 0;
-  dataSet.diffFourierPwr = 0;
-  dataSet.diffFourierPhase = 0;
-  dataSet.diffFourierPhaseOptReal = 0;
-  dataSet.dataRange = 0;
+  dataSet.data = nullptr;
+  dataSet.dataFourierRe = nullptr;
+  dataSet.dataFourierIm = nullptr;
+  dataSet.dataFourierPwr = nullptr;
+  dataSet.dataFourierPhase = nullptr;
+  dataSet.dataFourierPhaseOptReal = nullptr;
+  dataSet.theory = nullptr;
+  dataSet.theoryFourierRe = nullptr;
+  dataSet.theoryFourierIm = nullptr;
+  dataSet.theoryFourierPwr = nullptr;
+  dataSet.theoryFourierPhase = nullptr;
+  dataSet.theoryFourierPhaseOptReal = nullptr;
+  dataSet.diff = nullptr;
+  dataSet.diffFourierRe = nullptr;
+  dataSet.diffFourierIm = nullptr;
+  dataSet.diffFourierPwr = nullptr;
+  dataSet.diffFourierPhase = nullptr;
+  dataSet.diffFourierPhaseOptReal = nullptr;
+  dataSet.dataRange = nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -2537,22 +2536,22 @@ void PMusrCanvas::InitDataSet(PMusrCanvasDataSet &dataSet)
  */
 void PMusrCanvas::InitDataSet(PMusrCanvasNonMusrDataSet &dataSet)
 {
-  dataSet.data = 0;
-  dataSet.dataFourierRe = 0;
-  dataSet.dataFourierIm = 0;
-  dataSet.dataFourierPwr = 0;
-  dataSet.dataFourierPhase = 0;
-  dataSet.theory = 0;
-  dataSet.theoryFourierRe = 0;
-  dataSet.theoryFourierIm = 0;
-  dataSet.theoryFourierPwr = 0;
-  dataSet.theoryFourierPhase = 0;
-  dataSet.diff = 0;
-  dataSet.diffFourierRe = 0;
-  dataSet.diffFourierIm = 0;
-  dataSet.diffFourierPwr = 0;
-  dataSet.diffFourierPhase = 0;
-  dataSet.dataRange = 0;
+  dataSet.data = nullptr;
+  dataSet.dataFourierRe = nullptr;
+  dataSet.dataFourierIm = nullptr;
+  dataSet.dataFourierPwr = nullptr;
+  dataSet.dataFourierPhase = nullptr;
+  dataSet.theory = nullptr;
+  dataSet.theoryFourierRe = nullptr;
+  dataSet.theoryFourierIm = nullptr;
+  dataSet.theoryFourierPwr = nullptr;
+  dataSet.theoryFourierPhase = nullptr;
+  dataSet.diff = nullptr;
+  dataSet.diffFourierRe = nullptr;
+  dataSet.diffFourierIm = nullptr;
+  dataSet.diffFourierPwr = nullptr;
+  dataSet.diffFourierPhase = nullptr;
+  dataSet.dataRange = nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -2567,79 +2566,79 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasDataSet &dataSet)
 {
   if (dataSet.data) {
     delete dataSet.data;
-    dataSet.data = 0;
+    dataSet.data = nullptr;
   }
   if (dataSet.dataFourierRe) {
     delete dataSet.dataFourierRe;
-    dataSet.dataFourierRe = 0;
+    dataSet.dataFourierRe = nullptr;
   }
   if (dataSet.dataFourierIm) {
     delete dataSet.dataFourierIm;
-    dataSet.dataFourierIm = 0;
+    dataSet.dataFourierIm = nullptr;
   }
   if (dataSet.dataFourierPwr) {
     delete dataSet.dataFourierPwr;
-    dataSet.dataFourierPwr = 0;
+    dataSet.dataFourierPwr = nullptr;
   }
   if (dataSet.dataFourierPhase) {
     delete dataSet.dataFourierPhase;
-    dataSet.dataFourierPhase = 0;
+    dataSet.dataFourierPhase = nullptr;
   }
   if (dataSet.dataFourierPhaseOptReal) {
     delete dataSet.dataFourierPhaseOptReal;
-    dataSet.dataFourierPhaseOptReal = 0;
+    dataSet.dataFourierPhaseOptReal = nullptr;
   }
   if (dataSet.theory) {
     delete dataSet.theory;
-    dataSet.theory = 0;
+    dataSet.theory = nullptr;
   }
   if (dataSet.theoryFourierRe) {
     delete dataSet.theoryFourierRe;
-    dataSet.theoryFourierRe = 0;
+    dataSet.theoryFourierRe = nullptr;
   }
   if (dataSet.theoryFourierIm) {
     delete dataSet.theoryFourierIm;
-    dataSet.theoryFourierIm = 0;
+    dataSet.theoryFourierIm = nullptr;
   }
   if (dataSet.theoryFourierPwr) {
     delete dataSet.theoryFourierPwr;
-    dataSet.theoryFourierPwr = 0;
+    dataSet.theoryFourierPwr = nullptr;
   }
   if (dataSet.theoryFourierPhase) {
     delete dataSet.theoryFourierPhase;
-    dataSet.theoryFourierPhase = 0;
+    dataSet.theoryFourierPhase = nullptr;
   }
   if (dataSet.theoryFourierPhaseOptReal) {
     delete dataSet.theoryFourierPhaseOptReal;
-    dataSet.theoryFourierPhaseOptReal = 0;
+    dataSet.theoryFourierPhaseOptReal = nullptr;
   }
   if (dataSet.diff) {
     delete dataSet.diff;
-    dataSet.diff = 0;
+    dataSet.diff = nullptr;
   }
   if (dataSet.diffFourierRe) {
     delete dataSet.diffFourierRe;
-    dataSet.diffFourierRe = 0;
+    dataSet.diffFourierRe = nullptr;
   }
   if (dataSet.diffFourierIm) {
     delete dataSet.diffFourierIm;
-    dataSet.diffFourierIm = 0;
+    dataSet.diffFourierIm = nullptr;
   }
   if (dataSet.diffFourierPwr) {
     delete dataSet.diffFourierPwr;
-    dataSet.diffFourierPwr = 0;
+    dataSet.diffFourierPwr = nullptr;
   }
   if (dataSet.diffFourierPhase) {
     delete dataSet.diffFourierPhase;
-    dataSet.diffFourierPhase = 0;
+    dataSet.diffFourierPhase = nullptr;
   }
   if (dataSet.diffFourierPhaseOptReal) {
     delete dataSet.diffFourierPhaseOptReal;
-    dataSet.diffFourierPhaseOptReal = 0;
+    dataSet.diffFourierPhaseOptReal = nullptr;
   }
   if (dataSet.dataRange) {
     delete dataSet.dataRange;
-    dataSet.dataRange = 0;
+    dataSet.dataRange = nullptr;
   }
 }
 
@@ -2655,67 +2654,67 @@ void PMusrCanvas::CleanupDataSet(PMusrCanvasNonMusrDataSet &dataSet)
 {
   if (dataSet.data) {
     delete dataSet.data;
-    dataSet.data = 0;
+    dataSet.data = nullptr;
   }
   if (dataSet.dataFourierRe) {
     delete dataSet.dataFourierRe;
-    dataSet.dataFourierRe = 0;
+    dataSet.dataFourierRe = nullptr;
   }
   if (dataSet.dataFourierIm) {
     delete dataSet.dataFourierIm;
-    dataSet.dataFourierIm = 0;
+    dataSet.dataFourierIm = nullptr;
   }
   if (dataSet.dataFourierPwr) {
     delete dataSet.dataFourierPwr;
-    dataSet.dataFourierPwr = 0;
+    dataSet.dataFourierPwr = nullptr;
   }
   if (dataSet.dataFourierPhase) {
     delete dataSet.dataFourierPhase;
-    dataSet.dataFourierPhase = 0;
+    dataSet.dataFourierPhase = nullptr;
   }
   if (dataSet.theory) {
     delete dataSet.theory;
-    dataSet.theory = 0;
+    dataSet.theory = nullptr;
   }
   if (dataSet.theoryFourierRe) {
     delete dataSet.theoryFourierRe;
-    dataSet.theoryFourierRe = 0;
+    dataSet.theoryFourierRe = nullptr;
   }
   if (dataSet.theoryFourierIm) {
     delete dataSet.theoryFourierIm;
-    dataSet.theoryFourierIm = 0;
+    dataSet.theoryFourierIm = nullptr;
   }
   if (dataSet.theoryFourierPwr) {
     delete dataSet.theoryFourierPwr;
-    dataSet.theoryFourierPwr = 0;
+    dataSet.theoryFourierPwr = nullptr;
   }
   if (dataSet.theoryFourierPhase) {
     delete dataSet.theoryFourierPhase;
-    dataSet.theoryFourierPhase = 0;
+    dataSet.theoryFourierPhase = nullptr;
   }
   if (dataSet.diff) {
     delete dataSet.diff;
-    dataSet.diff = 0;
+    dataSet.diff = nullptr;
   }
   if (dataSet.diffFourierRe) {
     delete dataSet.diffFourierRe;
-    dataSet.diffFourierRe = 0;
+    dataSet.diffFourierRe = nullptr;
   }
   if (dataSet.diffFourierIm) {
     delete dataSet.diffFourierIm;
-    dataSet.diffFourierIm = 0;
+    dataSet.diffFourierIm = nullptr;
   }
   if (dataSet.diffFourierPwr) {
     delete dataSet.diffFourierPwr;
-    dataSet.diffFourierPwr = 0;
+    dataSet.diffFourierPwr = nullptr;
   }
   if (dataSet.diffFourierPhase) {
     delete dataSet.diffFourierPhase;
-    dataSet.diffFourierPhase = 0;
+    dataSet.diffFourierPhase = nullptr;
   }
   if (dataSet.dataRange) {
     delete dataSet.dataRange;
-    dataSet.dataRange = 0;
+    dataSet.dataRange = nullptr;
   }
 }
 
@@ -2749,7 +2748,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   // dataHisto -------------------------------------------------------------
   // create histo specific infos
   name  = *fMsrHandler->GetMsrRunList()->at(runNo).GetRunName() + "_DataRunNo";
-  name += (Int_t)runNo;
+  name += static_cast<Int_t>(runNo);
   name += "_";
   name += fPlotNumber;
   start = data->GetDataTimeStart() - data->GetDataTimeStep()/2.0;
@@ -2899,10 +2898,10 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     Double_t dval = (startFitRange - data->GetDataTimeStart())/data->GetDataTimeStep();
     if (dval < 0.0) { // make sure that startBin >= 0
       startBin = 0;
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data < 0 for 'use_fit_range', will set it to 0" << std::endl << std::endl;
     } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that startBin <= length of data vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'use_fit_range',";
-      cerr << endl << ">> will set it to data vector size" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'use_fit_range',";
+      std::cerr << std::endl << ">> will set it to data vector size" << std::endl << std::endl;
       startBin = data->GetValue()->size();
     } else {
       startBin = (UInt_t)dval;
@@ -2915,10 +2914,10 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     dval = (endFitRange - data->GetDataTimeStart())/data->GetDataTimeStep();
     if (dval < 0.0) { // make sure that endBin >= 0
       endBin = 0;
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data < 0 for 'use_fit_range', will set it to 0" << std::endl << std::endl;
     } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that endBin <= length of data vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'use_fit_range',";
-      cerr << endl << ">> will set it to data vector size" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'use_fit_range',";
+      std::cerr << std::endl << ">> will set it to data vector size" << std::endl << std::endl;
       endBin = data->GetValue()->size();
     } else {
       endBin   = (UInt_t)dval;
@@ -2930,10 +2929,10 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     Double_t dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep();
     if (dval < 0.0) { // make sure that startBin >= 0
       startBin = 0;
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data < 0 for 'sub_ranges', will set it to 0" << std::endl << std::endl;
     } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that startBin <= length of data vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'sub_ranges',";
-      cerr << endl << ">> will set it to data vector size" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'sub_ranges',";
+      std::cerr << std::endl << ">> will set it to data vector size" << std::endl << std::endl;
       startBin = data->GetValue()->size();
     } else {
       startBin = (UInt_t)dval;
@@ -2942,10 +2941,10 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] - data->GetDataTimeStart())/data->GetDataTimeStep();
     if (dval < 0.0) { // make sure that endBin >= 0
       endBin = 0;
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data < 0 for 'sub_ranges', will set it to 0" << std::endl << std::endl;
     } else if (dval >= (Double_t)data->GetValue()->size()) { // make sure that endtBin <= length of data vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'sub_ranges',";
-      cerr << endl << ">> will set it to data vector size" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin data=" << (UInt_t)dval << " >= data vector size=" << data->GetValue()->size() << " for 'sub_ranges',";
+      std::cerr << std::endl << ">> will set it to data vector size" << std::endl << std::endl;
       endBin = data->GetValue()->size();
     } else {
       endBin   = (UInt_t)dval;
@@ -3031,10 +3030,10 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     Double_t dval = (startFitRange - data->GetDataTimeStart())/data->GetTheoryTimeStep();
     if (dval < 0.0) { // make sure that startBin >= 0
       startBin = 0;
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory < 0 for 'use_fit_range', will set it to 0" << std::endl << std::endl;
     } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that startBin <= length of theory vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'use_fit_range',";
-      cerr << endl << ">> will set it to theory vector size" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'use_fit_range',";
+      std::cerr << std::endl << ">> will set it to theory vector size" << std::endl << std::endl;
       startBin = data->GetTheory()->size();
     } else {
       startBin = (UInt_t)dval;
@@ -3047,10 +3046,10 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     dval = (endFitRange - data->GetDataTimeStart())/data->GetTheoryTimeStep();
     if (dval < 0.0) { // make sure that endBin >= 0
       endBin = 0;
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory < 0 for 'use_fit_range', will set it to 0" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory < 0 for 'use_fit_range', will set it to 0" << std::endl << std::endl;
     } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that endBin <= length of theory vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'use_fit_range',";
-      cerr << endl << ">> will set it to theory vector size" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'use_fit_range',";
+      std::cerr << std::endl << ">> will set it to theory vector size" << std::endl << std::endl;
       endBin = data->GetTheory()->size();
     } else {
       endBin   = (UInt_t)dval;
@@ -3065,10 +3064,10 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     Double_t dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin[runNo] -data->GetDataTimeStart())/data->GetTheoryTimeStep();
     if (dval < 0.0) { // make sure that startBin >= 0
       startBin = 0;
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory < 0 for 'sub_ranges', will set it to 0" << std::endl << std::endl;
     } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that startBin <= length of theory vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'sub_ranges',";
-      cerr << endl << ">> will set it to theory vector size" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found startBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'sub_ranges',";
+      std::cerr << std::endl << ">> will set it to theory vector size" << std::endl << std::endl;
       startBin = data->GetTheory()->size();
     } else {
       startBin = (UInt_t)dval;
@@ -3077,10 +3076,10 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
     dval = (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmax[runNo] -data->GetDataTimeStart())/data->GetTheoryTimeStep();
     if (dval < 0.0) { // make sure that endBin >= 0
       endBin = 0;
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory < 0 for 'sub_ranges', will set it to 0" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory < 0 for 'sub_ranges', will set it to 0" << std::endl << std::endl;
     } else if (dval >= (Double_t)data->GetTheory()->size()) { // make sure that endtBin <= length of theory vector
-      cerr << endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'sub_ranges',";
-      cerr << endl << ">> will set it to theory vector size" << endl << endl;
+      std::cerr << std::endl << ">> PMusrCanvas::HandleDataSet(): **WARNING** found endBin theory=" << (UInt_t)dval << " >= theory vector size=" << data->GetTheory()->size() << " for 'sub_ranges',";
+      std::cerr << std::endl << ">> will set it to theory vector size" << std::endl << std::endl;
       endBin = data->GetTheory()->size();
     } else {
       endBin   = (UInt_t)dval;
@@ -3284,7 +3283,7 @@ void PMusrCanvas::HandleNonMusrDataSet(UInt_t plotNo, UInt_t runNo, PRunData *da
 void PMusrCanvas::HandleDifference()
 {
   // check if it is necessary to calculate diff data
-  if ((fPlotType != MSR_PLOT_NON_MUSR) && (fData[0].diff == 0)) {
+  if ((fPlotType != MSR_PLOT_NON_MUSR) && (fData[0].diff == nullptr)) {
     TH1F *diffHisto;
     TString name;
     // loop over all histos
@@ -3318,13 +3317,13 @@ void PMusrCanvas::HandleDifference()
         fData[i].diff->SetBinError(j, value);
       }
     }
-  } else if ((fPlotType == MSR_PLOT_NON_MUSR) && (fNonMusrData[0].diff == 0)) {
+  } else if ((fPlotType == MSR_PLOT_NON_MUSR) && (fNonMusrData[0].diff == nullptr)) {
     TGraphErrors *diffHisto;
     TString name;
     // loop over all histos
     for (UInt_t i=0; i<fNonMusrData.size(); i++) {
       // make sure data exists
-      assert(fNonMusrData[i].data != 0);
+      assert(fNonMusrData[i].data != nullptr);
 
       // create difference histos
       diffHisto = new TGraphErrors(fNonMusrData[i].data->GetN());
@@ -3376,7 +3375,7 @@ void PMusrCanvas::HandleFourier()
     return;
 
   // check if fourier needs to be calculated
-  if (fData[0].dataFourierRe == 0) {
+  if (fData[0].dataFourierRe == nullptr) {
     Int_t bin;
     double startTime = fXmin;
     double endTime = fXmax;
@@ -3390,7 +3389,7 @@ void PMusrCanvas::HandleFourier()
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].data, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, fFourier.fFourierPower);
       if (!fourierData.IsValid()) {
-        cerr << endl << ">> PMusrCanvas::HandleFourier(): **SEVERE ERROR** couldn't invoke PFourier to calculate the Fourier data ..." << endl;
+        std::cerr << std::endl << ">> PMusrCanvas::HandleFourier(): **SEVERE ERROR** couldn't invoke PFourier to calculate the Fourier data ..." << std::endl;
         return;
       }
       fourierData.Transform(fFourier.fApodization);
@@ -3431,7 +3430,7 @@ void PMusrCanvas::HandleFourier()
       Int_t powerPad = (Int_t)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
       PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, powerPad);
       if (!fourierTheory.IsValid()) {
-        cerr << endl << ">> PMusrCanvas::HandleFourier(): **SEVERE ERROR** couldn't invoke PFourier to calculate the Fourier theory ..." << endl;
+        std::cerr << std::endl << ">> PMusrCanvas::HandleFourier(): **SEVERE ERROR** couldn't invoke PFourier to calculate the Fourier theory ..." << std::endl;
         return;
       }
       fourierTheory.Transform(fFourier.fApodization);
@@ -3472,7 +3471,7 @@ void PMusrCanvas::HandleFourier()
           cp = TMath::Cos(fFourier.fPhase[i]/180.0*TMath::Pi());
           sp = TMath::Sin(fFourier.fPhase[i]/180.0*TMath::Pi());
         }
-        if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
+        if ((fData[i].dataFourierRe != nullptr) && (fData[i].dataFourierIm != nullptr)) {
           for (Int_t j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
             // calculate new fourier data set value
             re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
@@ -3482,7 +3481,7 @@ void PMusrCanvas::HandleFourier()
             fData[i].dataFourierIm->SetBinContent(j, im);
           }
         }
-        if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
+        if ((fData[i].theoryFourierRe != nullptr) && (fData[i].theoryFourierIm != nullptr)) {
           for (Int_t j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
             // calculate new fourier data set value
             re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
@@ -3512,9 +3511,9 @@ void PMusrCanvas::HandleDifferenceFourier()
     return;
 
   // check if fourier needs to be calculated
-  if (fData[0].diffFourierRe == 0) {
+  if (fData[0].diffFourierRe == nullptr) {
     // check if difference has been already calcualted, if not do it
-    if (fData[0].diff == 0)
+    if (fData[0].diff == nullptr)
       HandleDifference();
 
     // get time from the current fHistoFrame
@@ -3528,7 +3527,7 @@ void PMusrCanvas::HandleDifferenceFourier()
       // calculate fourier transform of the data
       PFourier fourierData(fData[i].diff, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, fFourier.fFourierPower);
       if (!fourierData.IsValid()) {
-        cerr << endl << ">> PMusrCanvas::HandleFourier(): **SEVERE ERROR** couldn't invoke PFourier to calculate the Fourier diff ..." << endl;
+        std::cerr << std::endl << ">> PMusrCanvas::HandleFourier(): **SEVERE ERROR** couldn't invoke PFourier to calculate the Fourier diff ..." << std::endl;
         return;
       }
       fourierData.Transform(fFourier.fApodization);
@@ -3577,7 +3576,7 @@ void PMusrCanvas::HandleDifferenceFourier()
       fCurrentFourierPhase = fFourier.fPhase;
 
       for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
-        if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
+        if ((fData[i].diffFourierRe != nullptr) && (fData[i].diffFourierIm != nullptr)) {
           if (fFourier.fPhase.size() == 1) {
             cp = TMath::Cos(fFourier.fPhase[0]/180.0*TMath::Pi());
             sp = TMath::Sin(fFourier.fPhase[0]/180.0*TMath::Pi());
@@ -3614,7 +3613,7 @@ void PMusrCanvas::HandleFourierDifference()
     return;
 
   // check if fourier needs to be calculated
-  if (fData[0].diffFourierRe == 0) {
+  if (fData[0].diffFourierRe == nullptr) {
     // calculate all the Fourier differences
     Double_t dval, dvalx;
     TString name;
@@ -3720,115 +3719,115 @@ void PMusrCanvas::HandleAverage()
     return;
 
   // in case there is still some average left over, cleanup first
-  if (fDataAvg.data != 0) {
+  if (fDataAvg.data != nullptr) {
     CleanupAverage();
   }
 
   // create all the needed average data sets
   TString name("");
-  if (fData[0].data != 0) {
+  if (fData[0].data != nullptr) {
     name = TString(fData[0].data->GetTitle()) + "_avg";
     fDataAvg.data = new TH1F(name, name, fData[0].data->GetNbinsX(),
                              fData[0].data->GetXaxis()->GetXmin(),
                              fData[0].data->GetXaxis()->GetXmax());
   }
-  if (fData[0].dataFourierRe != 0) {
+  if (fData[0].dataFourierRe != nullptr) {
     name = TString(fData[0].dataFourierRe->GetTitle()) + "_avg";
     fDataAvg.dataFourierRe = new TH1F(name, name, fData[0].dataFourierRe->GetNbinsX(),
                                       fData[0].dataFourierRe->GetXaxis()->GetXmin(),
                                       fData[0].dataFourierRe->GetXaxis()->GetXmax());
   }
-  if (fData[0].dataFourierIm != 0) {
+  if (fData[0].dataFourierIm != nullptr) {
     name = TString(fData[0].dataFourierIm->GetTitle()) + "_avg";
     fDataAvg.dataFourierIm = new TH1F(name, name, fData[0].dataFourierIm->GetNbinsX(),
                                       fData[0].dataFourierIm->GetXaxis()->GetXmin(),
                                       fData[0].dataFourierIm->GetXaxis()->GetXmax());
   }
-  if (fData[0].dataFourierPwr != 0) {
+  if (fData[0].dataFourierPwr != nullptr) {
     name = TString(fData[0].dataFourierPwr->GetTitle()) + "_avg";
     fDataAvg.dataFourierPwr = new TH1F(name, name, fData[0].dataFourierPwr->GetNbinsX(),
                                        fData[0].dataFourierPwr->GetXaxis()->GetXmin(),
                                        fData[0].dataFourierPwr->GetXaxis()->GetXmax());
   }
-  if (fData[0].dataFourierPhase != 0) {
+  if (fData[0].dataFourierPhase != nullptr) {
     name = TString(fData[0].dataFourierPhase->GetTitle()) + "_avg";
     fDataAvg.dataFourierPhase = new TH1F(name, name, fData[0].dataFourierPhase->GetNbinsX(),
                                          fData[0].dataFourierPhase->GetXaxis()->GetXmin(),
                                          fData[0].dataFourierPhase->GetXaxis()->GetXmax());
   }
-  if (fData[0].dataFourierPhaseOptReal != 0) {
+  if (fData[0].dataFourierPhaseOptReal != nullptr) {
     name = TString(fData[0].dataFourierPhaseOptReal->GetTitle()) + "_avg";
     fDataAvg.dataFourierPhaseOptReal = new TH1F(name, name, fData[0].dataFourierPhaseOptReal->GetNbinsX(),
                                          fData[0].dataFourierPhaseOptReal->GetXaxis()->GetXmin(),
                                          fData[0].dataFourierPhaseOptReal->GetXaxis()->GetXmax());
   }
-  if (fData[0].theory != 0) {
+  if (fData[0].theory != nullptr) {
     name = TString(fData[0].theory->GetTitle()) + "_avg";
     fDataAvg.theory = new TH1F(name, name, fData[0].theory->GetNbinsX(),
                              fData[0].theory->GetXaxis()->GetXmin(),
                              fData[0].theory->GetXaxis()->GetXmax());
   }
-  if (fData[0].theoryFourierRe != 0) {
+  if (fData[0].theoryFourierRe != nullptr) {
     name = TString(fData[0].theoryFourierRe->GetTitle()) + "_avg";
     fDataAvg.theoryFourierRe = new TH1F(name, name, fData[0].theoryFourierRe->GetNbinsX(),
                                         fData[0].theoryFourierRe->GetXaxis()->GetXmin(),
                                         fData[0].theoryFourierRe->GetXaxis()->GetXmax());
   }
-  if (fData[0].theoryFourierIm != 0) {
+  if (fData[0].theoryFourierIm != nullptr) {
     name = TString(fData[0].theoryFourierIm->GetTitle()) + "_avg";
     fDataAvg.theoryFourierIm = new TH1F(name, name, fData[0].theoryFourierIm->GetNbinsX(),
                                         fData[0].theoryFourierIm->GetXaxis()->GetXmin(),
                                         fData[0].theoryFourierIm->GetXaxis()->GetXmax());
   }
-  if (fData[0].theoryFourierPwr != 0) {
+  if (fData[0].theoryFourierPwr != nullptr) {
     name = TString(fData[0].theoryFourierPwr->GetTitle()) + "_avg";
     fDataAvg.theoryFourierPwr = new TH1F(name, name, fData[0].theoryFourierPwr->GetNbinsX(),
                                          fData[0].theoryFourierPwr->GetXaxis()->GetXmin(),
                                          fData[0].theoryFourierPwr->GetXaxis()->GetXmax());
   }
-  if (fData[0].theoryFourierPhase != 0) {
+  if (fData[0].theoryFourierPhase != nullptr) {
     name = TString(fData[0].theoryFourierPhase->GetTitle()) + "_avg";
     fDataAvg.theoryFourierPhase = new TH1F(name, name, fData[0].theoryFourierPhase->GetNbinsX(),
                                            fData[0].theoryFourierPhase->GetXaxis()->GetXmin(),
                                            fData[0].theoryFourierPhase->GetXaxis()->GetXmax());
   }
-  if (fData[0].theoryFourierPhaseOptReal != 0) {
+  if (fData[0].theoryFourierPhaseOptReal != nullptr) {
     name = TString(fData[0].theoryFourierPhaseOptReal->GetTitle()) + "_avg";
     fDataAvg.theoryFourierPhaseOptReal = new TH1F(name, name, fData[0].theoryFourierPhaseOptReal->GetNbinsX(),
                                            fData[0].theoryFourierPhaseOptReal->GetXaxis()->GetXmin(),
                                            fData[0].theoryFourierPhaseOptReal->GetXaxis()->GetXmax());
   }
-  if (fData[0].diff != 0) {
+  if (fData[0].diff != nullptr) {
     name = TString(fData[0].diff->GetTitle()) + "_avg";
     fDataAvg.diff = new TH1F(name, name, fData[0].diff->GetNbinsX(),
                              fData[0].diff->GetXaxis()->GetXmin(),
                              fData[0].diff->GetXaxis()->GetXmax());
   }
-  if (fData[0].diffFourierRe != 0) {
+  if (fData[0].diffFourierRe != nullptr) {
     name = TString(fData[0].diffFourierRe->GetTitle()) + "_avg";
     fDataAvg.diff = new TH1F(name, name, fData[0].diffFourierRe->GetNbinsX(),
                              fData[0].diffFourierRe->GetXaxis()->GetXmin(),
                              fData[0].diffFourierRe->GetXaxis()->GetXmax());
   }
-  if (fData[0].diffFourierIm != 0) {
+  if (fData[0].diffFourierIm != nullptr) {
     name = TString(fData[0].diffFourierIm->GetTitle()) + "_avg";
     fDataAvg.diffFourierIm = new TH1F(name, name, fData[0].diffFourierIm->GetNbinsX(),
                                      fData[0].diffFourierIm->GetXaxis()->GetXmin(),
                                      fData[0].diffFourierIm->GetXaxis()->GetXmax());
   }
-  if (fData[0].diffFourierPwr != 0) {
+  if (fData[0].diffFourierPwr != nullptr) {
     name = TString(fData[0].diffFourierPwr->GetTitle()) + "_avg";
     fDataAvg.diffFourierPwr = new TH1F(name, name, fData[0].diffFourierPwr->GetNbinsX(),
                                        fData[0].diffFourierPwr->GetXaxis()->GetXmin(),
                                        fData[0].diffFourierPwr->GetXaxis()->GetXmax());
   }
-  if (fData[0].diffFourierPhase != 0) {
+  if (fData[0].diffFourierPhase != nullptr) {
     name = TString(fData[0].diffFourierPhase->GetTitle()) + "_avg";
     fDataAvg.diffFourierPhase = new TH1F(name, name, fData[0].diffFourierPhase->GetNbinsX(),
                                          fData[0].diffFourierPhase->GetXaxis()->GetXmin(),
                                          fData[0].diffFourierPhase->GetXaxis()->GetXmax());
   }
-  if (fData[0].diffFourierPhaseOptReal != 0) {
+  if (fData[0].diffFourierPhaseOptReal != nullptr) {
     name = TString(fData[0].diffFourierPhaseOptReal->GetTitle()) + "_avg";
     fDataAvg.diffFourierPhaseOptReal = new TH1F(name, name, fData[0].diffFourierPhaseOptReal->GetNbinsX(),
                                          fData[0].diffFourierPhaseOptReal->GetXaxis()->GetXmin(),
@@ -3837,7 +3836,7 @@ void PMusrCanvas::HandleAverage()
 
   // calculate all the average data sets
   double dval;
-  if (fDataAvg.data != 0) {
+  if (fDataAvg.data != nullptr) {
     for (Int_t i=0; i<fData[0].data->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3851,7 +3850,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.data->SetMarkerSize(fData[0].data->GetMarkerSize());
     fDataAvg.data->SetMarkerStyle(fData[0].data->GetMarkerStyle());
   }
-  if (fDataAvg.dataFourierRe != 0) {
+  if (fDataAvg.dataFourierRe != nullptr) {
     for (Int_t i=0; i<fData[0].dataFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3865,7 +3864,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.dataFourierRe->SetMarkerSize(fData[0].dataFourierRe->GetMarkerSize());
     fDataAvg.dataFourierRe->SetMarkerStyle(fData[0].dataFourierRe->GetMarkerStyle());
   }
-  if (fDataAvg.dataFourierIm != 0) {
+  if (fDataAvg.dataFourierIm != nullptr) {
     for (Int_t i=0; i<fData[0].dataFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3879,7 +3878,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.dataFourierIm->SetMarkerSize(fData[0].dataFourierIm->GetMarkerSize());
     fDataAvg.dataFourierIm->SetMarkerStyle(fData[0].dataFourierIm->GetMarkerStyle());
   }
-  if (fDataAvg.dataFourierPwr != 0) {
+  if (fDataAvg.dataFourierPwr != nullptr) {
     for (Int_t i=0; i<fData[0].dataFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3893,7 +3892,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.dataFourierPwr->SetMarkerSize(fData[0].dataFourierPwr->GetMarkerSize());
     fDataAvg.dataFourierPwr->SetMarkerStyle(fData[0].dataFourierPwr->GetMarkerStyle());
   }
-  if (fDataAvg.dataFourierPhase != 0) {
+  if (fDataAvg.dataFourierPhase != nullptr) {
     for (Int_t i=0; i<fData[0].dataFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3907,7 +3906,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.dataFourierPhase->SetMarkerSize(fData[0].dataFourierPhase->GetMarkerSize());
     fDataAvg.dataFourierPhase->SetMarkerStyle(fData[0].dataFourierPhase->GetMarkerStyle());
   }
-  if (fDataAvg.dataFourierPhaseOptReal != 0) {
+  if (fDataAvg.dataFourierPhaseOptReal != nullptr) {
     for (Int_t i=0; i<fData[0].dataFourierPhaseOptReal->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3921,7 +3920,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.dataFourierPhaseOptReal->SetMarkerSize(fData[0].dataFourierPhaseOptReal->GetMarkerSize());
     fDataAvg.dataFourierPhaseOptReal->SetMarkerStyle(fData[0].dataFourierPhaseOptReal->GetMarkerStyle());
   }
-  if (fDataAvg.theory != 0) {
+  if (fDataAvg.theory != nullptr) {
     for (Int_t i=0; i<fData[0].theory->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3931,7 +3930,7 @@ void PMusrCanvas::HandleAverage()
     }
     fDataAvg.theory->SetLineColor(fData[0].theory->GetLineColor());
   }
-  if (fDataAvg.theoryFourierRe != 0) {
+  if (fDataAvg.theoryFourierRe != nullptr) {
     for (Int_t i=0; i<fData[0].theoryFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3945,7 +3944,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.theoryFourierRe->SetMarkerSize(fData[0].theoryFourierRe->GetMarkerSize());
     fDataAvg.theoryFourierRe->SetMarkerStyle(fData[0].theoryFourierRe->GetMarkerStyle());
   }
-  if (fDataAvg.theoryFourierIm != 0) {
+  if (fDataAvg.theoryFourierIm != nullptr) {
     for (Int_t i=0; i<fData[0].theoryFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3959,7 +3958,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.theoryFourierIm->SetMarkerSize(fData[0].theoryFourierIm->GetMarkerSize());
     fDataAvg.theoryFourierIm->SetMarkerStyle(fData[0].theoryFourierIm->GetMarkerStyle());
   }
-  if (fDataAvg.theoryFourierPwr != 0) {
+  if (fDataAvg.theoryFourierPwr != nullptr) {
     for (Int_t i=0; i<fData[0].theoryFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3973,7 +3972,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.theoryFourierPwr->SetMarkerSize(fData[0].theoryFourierPwr->GetMarkerSize());
     fDataAvg.theoryFourierPwr->SetMarkerStyle(fData[0].theoryFourierPwr->GetMarkerStyle());
   }
-  if (fDataAvg.theoryFourierPhase != 0) {
+  if (fDataAvg.theoryFourierPhase != nullptr) {
     for (Int_t i=0; i<fData[0].theoryFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -3987,7 +3986,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.theoryFourierPhase->SetMarkerSize(fData[0].theoryFourierPhase->GetMarkerSize());
     fDataAvg.theoryFourierPhase->SetMarkerStyle(fData[0].theoryFourierPhase->GetMarkerStyle());
   }
-  if (fDataAvg.theoryFourierPhaseOptReal != 0) {
+  if (fDataAvg.theoryFourierPhaseOptReal != nullptr) {
     for (Int_t i=0; i<fData[0].theoryFourierPhaseOptReal->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -4001,7 +4000,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.theoryFourierPhaseOptReal->SetMarkerSize(fData[0].theoryFourierPhaseOptReal->GetMarkerSize());
     fDataAvg.theoryFourierPhaseOptReal->SetMarkerStyle(fData[0].theoryFourierPhaseOptReal->GetMarkerStyle());
   }
-  if (fDataAvg.diff != 0) {
+  if (fDataAvg.diff != nullptr) {
     for (Int_t i=0; i<fData[0].diff->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -4015,7 +4014,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.diff->SetMarkerSize(fData[0].diff->GetMarkerSize());
     fDataAvg.diff->SetMarkerStyle(fData[0].diff->GetMarkerStyle());
   }
-  if (fDataAvg.diffFourierRe != 0) {
+  if (fDataAvg.diffFourierRe != nullptr) {
     for (Int_t i=0; i<fData[0].diffFourierRe->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -4029,7 +4028,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.diffFourierRe->SetMarkerSize(fData[0].diffFourierRe->GetMarkerSize());
     fDataAvg.diffFourierRe->SetMarkerStyle(fData[0].diffFourierRe->GetMarkerStyle());
   }
-  if (fDataAvg.diffFourierIm != 0) {
+  if (fDataAvg.diffFourierIm != nullptr) {
     for (Int_t i=0; i<fData[0].diffFourierIm->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -4043,7 +4042,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.diffFourierIm->SetMarkerSize(fData[0].diffFourierIm->GetMarkerSize());
     fDataAvg.diffFourierIm->SetMarkerStyle(fData[0].diffFourierIm->GetMarkerStyle());
   }
-  if (fDataAvg.diffFourierPwr != 0) {
+  if (fDataAvg.diffFourierPwr != nullptr) {
     for (Int_t i=0; i<fData[0].diffFourierPwr->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -4057,7 +4056,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.diffFourierPwr->SetMarkerSize(fData[0].diffFourierPwr->GetMarkerSize());
     fDataAvg.diffFourierPwr->SetMarkerStyle(fData[0].diffFourierPwr->GetMarkerStyle());
   }
-  if (fDataAvg.diffFourierPhase != 0) {
+  if (fDataAvg.diffFourierPhase != nullptr) {
     for (Int_t i=0; i<fData[0].diffFourierPhase->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -4071,7 +4070,7 @@ void PMusrCanvas::HandleAverage()
     fDataAvg.diffFourierPhase->SetMarkerSize(fData[0].dataFourierPhase->GetMarkerSize());
     fDataAvg.diffFourierPhase->SetMarkerStyle(fData[0].dataFourierPhase->GetMarkerStyle());
   }
-  if (fDataAvg.diffFourierPhaseOptReal != 0) {
+  if (fDataAvg.diffFourierPhaseOptReal != nullptr) {
     for (Int_t i=0; i<fData[0].diffFourierPhaseOptReal->GetNbinsX(); i++) {
       dval = 0.0;
       for (UInt_t j=0; j<fData.size(); j++) {
@@ -4096,9 +4095,9 @@ void PMusrCanvas::HandleAverage()
 void PMusrCanvas::CleanupDifference()
 {
   for (UInt_t i=0; i<fData.size(); i++) {
-    if (fData[i].diff != 0) {
+    if (fData[i].diff != nullptr) {
       delete fData[i].diff;
-      fData[i].diff = 0;
+      fData[i].diff = nullptr;
     }
   }
 }
@@ -4112,45 +4111,45 @@ void PMusrCanvas::CleanupDifference()
 void PMusrCanvas::CleanupFourier()
 {
   for (UInt_t i=0; i<fData.size(); i++) {
-    if (fData[i].dataFourierRe != 0) {
+    if (fData[i].dataFourierRe != nullptr) {
       delete fData[i].dataFourierRe;
-      fData[i].dataFourierRe = 0;
+      fData[i].dataFourierRe = nullptr;
     }
-    if (fData[i].dataFourierIm != 0) {
+    if (fData[i].dataFourierIm != nullptr) {
       delete fData[i].dataFourierIm;
-      fData[i].dataFourierIm = 0;
+      fData[i].dataFourierIm = nullptr;
     }
-    if (fData[i].dataFourierPwr != 0) {
+    if (fData[i].dataFourierPwr != nullptr) {
       delete fData[i].dataFourierPwr;
-      fData[i].dataFourierPwr = 0;
+      fData[i].dataFourierPwr = nullptr;
     }
-    if (fData[i].dataFourierPhase != 0) {
+    if (fData[i].dataFourierPhase != nullptr) {
       delete fData[i].dataFourierPhase;
-      fData[i].dataFourierPhase = 0;
+      fData[i].dataFourierPhase = nullptr;
     }
-    if (fData[i].dataFourierPhaseOptReal != 0) {
+    if (fData[i].dataFourierPhaseOptReal != nullptr) {
       delete fData[i].dataFourierPhaseOptReal;
-      fData[i].dataFourierPhaseOptReal = 0;
+      fData[i].dataFourierPhaseOptReal = nullptr;
     }
-    if (fData[i].theoryFourierRe != 0) {
+    if (fData[i].theoryFourierRe != nullptr) {
       delete fData[i].theoryFourierRe;
-      fData[i].theoryFourierRe = 0;
+      fData[i].theoryFourierRe = nullptr;
     }
-    if (fData[i].theoryFourierIm != 0) {
+    if (fData[i].theoryFourierIm != nullptr) {
       delete fData[i].theoryFourierIm;
-      fData[i].theoryFourierIm = 0;
+      fData[i].theoryFourierIm = nullptr;
     }
-    if (fData[i].theoryFourierPwr != 0) {
+    if (fData[i].theoryFourierPwr != nullptr) {
       delete fData[i].theoryFourierPwr;
-      fData[i].theoryFourierPwr = 0;
+      fData[i].theoryFourierPwr = nullptr;
     }
-    if (fData[i].theoryFourierPhase != 0) {
+    if (fData[i].theoryFourierPhase != nullptr) {
       delete fData[i].theoryFourierPhase;
-      fData[i].theoryFourierPhase = 0;
+      fData[i].theoryFourierPhase = nullptr;
     }
-    if (fData[i].theoryFourierPhaseOptReal != 0) {
+    if (fData[i].theoryFourierPhaseOptReal != nullptr) {
       delete fData[i].theoryFourierPhaseOptReal;
-      fData[i].theoryFourierPhaseOptReal = 0;
+      fData[i].theoryFourierPhaseOptReal = nullptr;
     }
   }
 }
@@ -4164,25 +4163,25 @@ void PMusrCanvas::CleanupFourier()
 void PMusrCanvas::CleanupFourierDifference()
 {
   for (UInt_t i=0; i<fData.size(); i++) {
-    if (fData[i].diffFourierRe != 0) {
+    if (fData[i].diffFourierRe != nullptr) {
       delete fData[i].diffFourierRe;
-      fData[i].diffFourierRe = 0;
+      fData[i].diffFourierRe = nullptr;
     }
-    if (fData[i].diffFourierIm != 0) {
+    if (fData[i].diffFourierIm != nullptr) {
       delete fData[i].diffFourierIm;
-      fData[i].diffFourierIm = 0;
+      fData[i].diffFourierIm = nullptr;
     }
-    if (fData[i].diffFourierPwr != 0) {
+    if (fData[i].diffFourierPwr != nullptr) {
       delete fData[i].diffFourierPwr;
-      fData[i].diffFourierPwr = 0;
+      fData[i].diffFourierPwr = nullptr;
     }
-    if (fData[i].diffFourierPhase != 0) {
+    if (fData[i].diffFourierPhase != nullptr) {
       delete fData[i].diffFourierPhase;
-      fData[i].diffFourierPhase = 0;
+      fData[i].diffFourierPhase = nullptr;
     }
-    if (fData[i].diffFourierPhaseOptReal != 0) {
+    if (fData[i].diffFourierPhaseOptReal != nullptr) {
       delete fData[i].diffFourierPhaseOptReal;
-      fData[i].diffFourierPhaseOptReal = 0;
+      fData[i].diffFourierPhaseOptReal = nullptr;
     }
   }
 }
@@ -4195,77 +4194,77 @@ void PMusrCanvas::CleanupFourierDifference()
  */
 void PMusrCanvas::CleanupAverage()
 {
-  if (fDataAvg.data != 0) {
+  if (fDataAvg.data != nullptr) {
     delete fDataAvg.data;
-    fDataAvg.data = 0;
+    fDataAvg.data = nullptr;
   }
-  if (fDataAvg.dataFourierRe != 0) {
+  if (fDataAvg.dataFourierRe != nullptr) {
     delete fDataAvg.dataFourierRe;
-    fDataAvg.dataFourierRe = 0;
+    fDataAvg.dataFourierRe = nullptr;
   }
-  if (fDataAvg.dataFourierIm != 0) {
+  if (fDataAvg.dataFourierIm != nullptr) {
     delete fDataAvg.dataFourierIm;
-    fDataAvg.dataFourierIm = 0;
+    fDataAvg.dataFourierIm = nullptr;
   }
-  if (fDataAvg.dataFourierPwr != 0) {
+  if (fDataAvg.dataFourierPwr != nullptr) {
     delete fDataAvg.dataFourierPwr;
-    fDataAvg.dataFourierPwr = 0;
+    fDataAvg.dataFourierPwr = nullptr;
   }
-  if (fDataAvg.dataFourierPhase != 0) {
+  if (fDataAvg.dataFourierPhase != nullptr) {
     delete fDataAvg.dataFourierPhase;
-    fDataAvg.dataFourierPhase = 0;
+    fDataAvg.dataFourierPhase = nullptr;
   }
-  if (fDataAvg.dataFourierPhaseOptReal != 0) {
+  if (fDataAvg.dataFourierPhaseOptReal != nullptr) {
     delete fDataAvg.dataFourierPhaseOptReal;
-    fDataAvg.dataFourierPhaseOptReal = 0;
+    fDataAvg.dataFourierPhaseOptReal = nullptr;
   }
-  if (fDataAvg.theory != 0) {
+  if (fDataAvg.theory != nullptr) {
     delete fDataAvg.theory;
-    fDataAvg.theory = 0;
+    fDataAvg.theory = nullptr;
   }
-  if (fDataAvg.theoryFourierRe != 0) {
+  if (fDataAvg.theoryFourierRe != nullptr) {
     delete fDataAvg.theoryFourierRe;
-    fDataAvg.theoryFourierRe = 0;
+    fDataAvg.theoryFourierRe = nullptr;
   }
-  if (fDataAvg.theoryFourierIm != 0) {
+  if (fDataAvg.theoryFourierIm != nullptr) {
     delete fDataAvg.theoryFourierIm;
-    fDataAvg.theoryFourierIm = 0;
+    fDataAvg.theoryFourierIm = nullptr;
   }
-  if (fDataAvg.theoryFourierPwr != 0) {
+  if (fDataAvg.theoryFourierPwr != nullptr) {
     delete fDataAvg.theoryFourierPwr;
-    fDataAvg.theoryFourierPwr = 0;
+    fDataAvg.theoryFourierPwr = nullptr;
   }
-  if (fDataAvg.theoryFourierPhase != 0) {
+  if (fDataAvg.theoryFourierPhase != nullptr) {
     delete fDataAvg.theoryFourierPhase;
-    fDataAvg.theoryFourierPhase = 0;
+    fDataAvg.theoryFourierPhase = nullptr;
   }
-  if (fDataAvg.theoryFourierPhaseOptReal != 0) {
+  if (fDataAvg.theoryFourierPhaseOptReal != nullptr) {
     delete fDataAvg.theoryFourierPhaseOptReal;
-    fDataAvg.theoryFourierPhaseOptReal = 0;
+    fDataAvg.theoryFourierPhaseOptReal = nullptr;
   }
-  if (fDataAvg.diff != 0) {
+  if (fDataAvg.diff != nullptr) {
     delete fDataAvg.diff;
-    fDataAvg.diff = 0;
+    fDataAvg.diff = nullptr;
   }
-  if (fDataAvg.diffFourierRe != 0) {
+  if (fDataAvg.diffFourierRe != nullptr) {
     delete fDataAvg.diffFourierRe;
-    fDataAvg.diffFourierRe = 0;
+    fDataAvg.diffFourierRe = nullptr;
   }
-  if (fDataAvg.diffFourierIm != 0) {
+  if (fDataAvg.diffFourierIm != nullptr) {
     delete fDataAvg.diffFourierIm;
-    fDataAvg.diffFourierIm = 0;
+    fDataAvg.diffFourierIm = nullptr;
   }
-  if (fDataAvg.diffFourierPwr != 0) {
+  if (fDataAvg.diffFourierPwr != nullptr) {
     delete fDataAvg.diffFourierPwr;
-    fDataAvg.diffFourierPwr = 0;
+    fDataAvg.diffFourierPwr = nullptr;
   }
-  if (fDataAvg.diffFourierPhase != 0) {
+  if (fDataAvg.diffFourierPhase != nullptr) {
     delete fDataAvg.diffFourierPhase;
-    fDataAvg.diffFourierPhase = 0;
+    fDataAvg.diffFourierPhase = nullptr;
   }
-  if (fDataAvg.diffFourierPhaseOptReal != 0) {
+  if (fDataAvg.diffFourierPhaseOptReal != nullptr) {
     delete fDataAvg.diffFourierPhaseOptReal;
-    fDataAvg.diffFourierPhaseOptReal = 0;
+    fDataAvg.diffFourierPhaseOptReal = nullptr;
   }
 }
 
@@ -4420,7 +4419,7 @@ Int_t PMusrCanvas::FindBin(const Double_t x, TGraphErrors *graph)
  */
 Double_t PMusrCanvas::GetMaximum(TH1F* histo, Double_t xmin, Double_t xmax)
 {
-  if (histo == 0)
+  if (histo == nullptr)
     return 0.0;
 
   Int_t start=0, end=0;
@@ -4463,7 +4462,7 @@ Double_t PMusrCanvas::GetMaximum(TH1F* histo, Double_t xmin, Double_t xmax)
  */
 Double_t PMusrCanvas::GetMinimum(TH1F* histo, Double_t xmin, Double_t xmax)
 {
-  if (histo == 0)
+  if (histo == nullptr)
     return 0.0;
 
   Int_t start=0, end=0;
@@ -4506,7 +4505,7 @@ Double_t PMusrCanvas::GetMinimum(TH1F* histo, Double_t xmin, Double_t xmax)
  */
 Double_t PMusrCanvas::GetMaximum(TGraphErrors* graph, Double_t xmin, Double_t xmax)
 {
-  if (graph == 0)
+  if (graph == nullptr)
     return 0.0;
 
   Double_t x, y;
@@ -4546,7 +4545,7 @@ Double_t PMusrCanvas::GetMaximum(TGraphErrors* graph, Double_t xmin, Double_t xm
  */
 Double_t PMusrCanvas::GetMinimum(TGraphErrors* graph, Double_t xmin, Double_t xmax)
 {
-  if (graph == 0)
+  if (graph == nullptr)
     return 0.0;
 
   Double_t x, y;
@@ -4606,7 +4605,7 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       // get the histo frame x/y range boundaries
@@ -4722,7 +4721,7 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
     }
 
     // check if RRF and if yes show a label
-    if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+    if ((fRRFText != nullptr) && (fRRFLatexText != nullptr)) {
       fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
     }
   } else { // fPlotType == MSR_PLOT_NO_MUSR
@@ -4741,11 +4740,11 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
     // cleanup if previous fMultiGraphData is present
     if (fMultiGraphData) {
       delete fMultiGraphData;
-      fMultiGraphData = 0;
+      fMultiGraphData = nullptr;
     }
     if (fMultiGraphDiff) {
       delete fMultiGraphDiff;
-      fMultiGraphDiff = 0;
+      fMultiGraphDiff = nullptr;
     }
 
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
@@ -4804,7 +4803,7 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
 
       // create fMultiGraphData, and add all data and theory
       fMultiGraphData = new TMultiGraph();
-      assert(fMultiGraphData != 0);
+      assert(fMultiGraphData != nullptr);
 
       // add all data to fMultiGraphData
       for (UInt_t i=0; i<fNonMusrData.size(); i++) {
@@ -4849,7 +4848,7 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
           delete fMultiGraphLegend;
         }
         fMultiGraphLegend = new TLegend(0.8, 0.8, 1.0, 1.0);
-        assert(fMultiGraphLegend != 0);
+        assert(fMultiGraphLegend != nullptr);
         PStringVector legendLabel;
         for (UInt_t i=0; i<plotInfo.fRuns.size(); i++) {
            runNo = (UInt_t)plotInfo.fRuns[i]-1;
@@ -4916,7 +4915,7 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
     // delete old fHistoFrame if present
     if (fHistoFrame) {
       delete fHistoFrame;
-      fHistoFrame = 0;
+      fHistoFrame = nullptr;
     }
 
     Double_t dataXmin=0.0, dataXmax=0.0, dataYmin=0.0, dataYmax=0.0, dd=0.0;
@@ -4986,7 +4985,7 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
 
 
     // check if RRF and if yes show a label
-    if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+    if ((fRRFText != nullptr) && (fRRFLatexText != nullptr)) {
       fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
     }
   } else { // fPlotType == MSR_PLOT_NON_MUSR
@@ -5005,11 +5004,11 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
     // clean up previous fMultiGraphDiff
     if (fMultiGraphDiff) {
       delete fMultiGraphDiff;
-      fMultiGraphDiff = 0;
+      fMultiGraphDiff = nullptr;
     }
     if (fMultiGraphData) {
       delete fMultiGraphData;
-      fMultiGraphData = 0;
+      fMultiGraphData = nullptr;
     }
 
     PMsrRunList runs = *fMsrHandler->GetMsrRunList();
@@ -5019,7 +5018,7 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
 
     // if fMultiGraphDiff is not present create it and add the diff data
     fMultiGraphDiff = new TMultiGraph();
-    assert(fMultiGraphDiff != 0);
+    assert(fMultiGraphDiff != nullptr);
 
     // get the histo frame x/y range boundaries
     Double_t dataXmin=0.0, dataXmax=0.0, dataYmin=0.0, dataYmax=0.0;
@@ -5167,7 +5166,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -5247,7 +5246,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -5340,7 +5339,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -5426,7 +5425,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 0.95*ymin, xmax, 1.05*ymax);
@@ -5504,7 +5503,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -5581,7 +5580,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
     // delete old fHistoFrame if present
     if (fHistoFrame) {
       delete fHistoFrame;
-      fHistoFrame = 0;
+      fHistoFrame = nullptr;
     }
 
     fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -5625,7 +5624,7 @@ void PMusrCanvas::PlotFourier(Bool_t unzoom)
   }
 
   // check if RRF and if yes show a label
-  if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+  if ((fRRFText != nullptr) && (fRRFLatexText != nullptr)) {
     fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
   }
 
@@ -5702,7 +5701,7 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -5757,7 +5756,7 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -5820,7 +5819,7 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -5878,7 +5877,7 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 0.95*ymin, xmax, 1.05*ymax);
@@ -5931,7 +5930,7 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -5986,7 +5985,7 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
       // delete old fHistoFrame if present
       if (fHistoFrame) {
         delete fHistoFrame;
-        fHistoFrame = 0;
+        fHistoFrame = nullptr;
       }
 
       fHistoFrame = fDataTheoryPad->DrawFrame(xmin, 1.05*ymin, xmax, 1.05*ymax);
@@ -6017,7 +6016,7 @@ void PMusrCanvas::PlotFourierDifference(Bool_t unzoom)
    }
 
   // check if RRF and if yes show a label
-  if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+  if ((fRRFText != nullptr) && (fRRFLatexText != nullptr)) {
     fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
   }
 
@@ -6040,7 +6039,7 @@ void PMusrCanvas::PlotFourierPhaseValue(Bool_t unzoom)
   // check if phase TLatex object is present
   if (fCurrentFourierPhaseText) {
     delete fCurrentFourierPhaseText;
-    fCurrentFourierPhaseText = 0;
+    fCurrentFourierPhaseText = nullptr;
   }
 
   double x, y;
@@ -6203,7 +6202,7 @@ void PMusrCanvas::PlotAverage(Bool_t unzoom)
   // delete old fHistoFrame if present
   if (fHistoFrame) {
     delete fHistoFrame;
-    fHistoFrame = 0;
+    fHistoFrame = nullptr;
   }
 
   fHistoFrame = fDataTheoryPad->DrawFrame(xmin, ymin, xmax, ymax);
@@ -6278,7 +6277,7 @@ void PMusrCanvas::PlotAverage(Bool_t unzoom)
   }
 
   // check if RRF and if yes show a label
-  if ((fRRFText != 0) && (fRRFLatexText != 0)) {
+  if ((fRRFText != nullptr) && (fRRFLatexText != nullptr)) {
     fRRFLatexText->DrawLatex(0.1, 0.92, fRRFText->Data());
   }
 
@@ -6308,7 +6307,7 @@ void PMusrCanvas::IncrementFourierPhase()
   PlotFourierPhaseValue();
 
   for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
-    if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
+    if ((fData[i].dataFourierRe != nullptr) && (fData[i].dataFourierIm != nullptr)) {
       for (Int_t j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
         re = fData[i].dataFourierRe->GetBinContent(j) * cp + fData[i].dataFourierIm->GetBinContent(j) * sp;
@@ -6318,7 +6317,7 @@ void PMusrCanvas::IncrementFourierPhase()
         fData[i].dataFourierIm->SetBinContent(j, im);
       }
     }
-    if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
+    if ((fData[i].theoryFourierRe != nullptr) && (fData[i].theoryFourierIm != nullptr)) {
       for (Int_t j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
         re = fData[i].theoryFourierRe->GetBinContent(j) * cp + fData[i].theoryFourierIm->GetBinContent(j) * sp;
@@ -6328,7 +6327,7 @@ void PMusrCanvas::IncrementFourierPhase()
         fData[i].theoryFourierIm->SetBinContent(j, im);
       }
     }
-    if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
+    if ((fData[i].diffFourierRe != nullptr) && (fData[i].diffFourierIm != nullptr)) {
       for (Int_t j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier diff data set
         // calculate new fourier diff data set value
         re = fData[i].diffFourierRe->GetBinContent(j) * cp + fData[i].diffFourierIm->GetBinContent(j) * sp;
@@ -6361,7 +6360,7 @@ void PMusrCanvas::DecrementFourierPhase()
   PlotFourierPhaseValue();
 
   for (UInt_t i=0; i<fData.size(); i++) { // loop over all data sets
-    if ((fData[i].dataFourierRe != 0) && (fData[i].dataFourierIm != 0)) {
+    if ((fData[i].dataFourierRe != nullptr) && (fData[i].dataFourierIm != nullptr)) {
       for (Int_t j=0; j<fData[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
         re = fData[i].dataFourierRe->GetBinContent(j) * cp - fData[i].dataFourierIm->GetBinContent(j) * sp;
@@ -6371,7 +6370,7 @@ void PMusrCanvas::DecrementFourierPhase()
         fData[i].dataFourierIm->SetBinContent(j, im);
       }
     }
-    if ((fData[i].theoryFourierRe != 0) && (fData[i].theoryFourierIm != 0)) {
+    if ((fData[i].theoryFourierRe != nullptr) && (fData[i].theoryFourierIm != nullptr)) {
       for (Int_t j=0; j<fData[i].theoryFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
         re = fData[i].theoryFourierRe->GetBinContent(j) * cp - fData[i].theoryFourierIm->GetBinContent(j) * sp;
@@ -6381,7 +6380,7 @@ void PMusrCanvas::DecrementFourierPhase()
         fData[i].theoryFourierIm->SetBinContent(j, im);
       }
     }
-    if ((fData[i].diffFourierRe != 0) && (fData[i].diffFourierIm != 0)) {
+    if ((fData[i].diffFourierRe != nullptr) && (fData[i].diffFourierIm != nullptr)) {
       for (Int_t j=0; j<fData[i].diffFourierRe->GetNbinsX(); j++) { // loop over a fourier diff data set
         // calculate new fourier diff data set value
         re = fData[i].diffFourierRe->GetBinContent(j) * cp - fData[i].diffFourierIm->GetBinContent(j) * sp;
@@ -6415,13 +6414,13 @@ Bool_t PMusrCanvas::IsScaleN0AndBkg()
   PMsrLines *cmd = fMsrHandler->GetMsrCommands();
   for (UInt_t i=0; i<cmd->size(); i++) {
     if (cmd->at(i).fLine.Contains("SCALE_N0_BKG", TString::kIgnoreCase)) {
-      TObjArray *tokens = 0;
-      TObjString *ostr = 0;
+      TObjArray *tokens = nullptr;
+      TObjString *ostr = nullptr;
       TString str;
       tokens = cmd->at(i).fLine.Tokenize(" \t");
       if (tokens->GetEntries() != 2) {
-        cerr << endl << ">> PRunSingleHisto::IsScaleN0AndBkg(): **WARNING** Found uncorrect 'SCALE_N0_BKG' command, will ignore it.";
-        cerr << endl << ">> Allowed commands: SCALE_N0_BKG TRUE | FALSE" << endl;
+        std::cerr << std::endl << ">> PRunSingleHisto::IsScaleN0AndBkg(): **WARNING** Found uncorrect 'SCALE_N0_BKG' command, will ignore it.";
+        std::cerr << std::endl << ">> Allowed commands: SCALE_N0_BKG TRUE | FALSE" << std::endl;
         return willScale;
       }
       ostr = dynamic_cast<TObjString*>(tokens->At(1));
@@ -6534,7 +6533,7 @@ UInt_t PMusrCanvas::GetNeededAccuracy(PMsrParamStructure param)
  */
 Double_t PMusrCanvas::GetInterpolatedValue(TH1F* histo, Double_t xVal)
 {
-  if (histo == 0)
+  if (histo == nullptr)
     return 0.0;
 
   Int_t idx = histo->FindBin(xVal);

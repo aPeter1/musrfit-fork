@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include <TColor.h>
 #include <TRandom.h>
@@ -106,7 +105,7 @@ void PMusrT0Data::InitData()
 PRawRunData* PMusrT0Data::GetRawRunData(Int_t idx)
 {
   if ((idx < 0) || (idx >= static_cast<Int_t>(fRawRunData.size())))
-    return 0;
+    return nullptr;
 
   return fRawRunData[idx];
 }
@@ -246,19 +245,19 @@ ClassImpQ(PMusrT0)
 PMusrT0::PMusrT0()
 {
   fTimeout = 0;
-  fTimeoutTimer = 0;
+  fTimeoutTimer = nullptr;
 
   fValid = false;
 
   fStatus = 0; // default is quit locally
 
-  fMainCanvas = 0;
+  fMainCanvas = nullptr;
 
-  fHisto = 0;
-  fData  = 0;
-  fBkg   = 0;
+  fHisto = nullptr;
+  fData  = nullptr;
+  fBkg   = nullptr;
 
-  fToDoInfo = 0;
+  fToDoInfo = nullptr;
 
   fDataAndBkgEnabled = false;
   fT0Enabled         = false;
@@ -269,12 +268,12 @@ PMusrT0::PMusrT0()
   fBkgRange[0]  = 0;
   fBkgRange[1]  = 0;
 
-  fT0Line        = 0;
-  fT0DataLine    = 0;
-  fFirstBkgLine  = 0;
-  fLastBkgLine   = 0;
-  fFirstDataLine = 0;
-  fLastDataLine  = 0;
+  fT0Line        = nullptr;
+  fT0DataLine    = nullptr;
+  fFirstBkgLine  = nullptr;
+  fLastBkgLine   = nullptr;
+  fFirstDataLine = nullptr;
+  fLastDataLine  = nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -288,19 +287,19 @@ PMusrT0::PMusrT0()
 PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 {
   fTimeout = 0;
-  fTimeoutTimer = 0;
+  fTimeoutTimer = nullptr;
 
   fValid = true;
 
   fStatus = 0; // default is quit locally
 
-  fMainCanvas = 0;
+  fMainCanvas = nullptr;
 
-  fHisto = 0;
-  fData  = 0;
-  fBkg   = 0;
+  fHisto = nullptr;
+  fData  = nullptr;
+  fBkg   = nullptr;
 
-  fToDoInfo = 0;
+  fToDoInfo = nullptr;
 
   fDataAndBkgEnabled = false;
   fT0Enabled         = false;
@@ -311,12 +310,12 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
   fBkgRange[0]  = 0;
   fBkgRange[1]  = 0;
 
-  fT0Line        = 0;
-  fT0DataLine    = 0;
-  fFirstBkgLine  = 0;
-  fLastBkgLine   = 0;
-  fFirstDataLine = 0;
-  fLastDataLine  = 0;
+  fT0Line        = nullptr;
+  fT0DataLine    = nullptr;
+  fFirstBkgLine  = nullptr;
+  fLastBkgLine   = nullptr;
+  fFirstDataLine = nullptr;
+  fLastDataLine  = nullptr;
 
   // feed necessary objects
   TString str;
@@ -334,14 +333,14 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 
     // feed raw data histo
     PRawRunData *rawRunData = fMusrT0Data.GetRawRunData(fMusrT0Data.GetAddRunIdx());
-    if (rawRunData == 0) {
+    if (rawRunData == nullptr) {
       fValid = false;
       return;
     }
     Int_t histoNo = fMusrT0Data.GetHistoNo(fMusrT0Data.GetHistoNoIdx());
     if (!rawRunData->IsPresent(histoNo)) {
-      cerr << endl << ">> PMusrT0::PMusrT0: **ERROR** found histogram number " << histoNo+1 << " which is NOT present in the data file.";
-      cerr << endl << ">> Please try to fix this first ..." << endl;
+      std::cerr << std::endl << ">> PMusrT0::PMusrT0: **ERROR** found histogram number " << histoNo+1 << " which is NOT present in the data file.";
+      std::cerr << std::endl << ">> Please try to fix this first ..." << std::endl;
       fValid = false;
       return;
     }
@@ -373,7 +372,7 @@ PMusrT0::PMusrT0(PMusrT0Data &data) : fMusrT0Data(data)
 
     // feed raw data histo
     PRawRunData *rawRunData = fMusrT0Data.GetRawRunData(0);
-    if (rawRunData == 0) {
+    if (rawRunData == nullptr) {
       fValid = false;
       return;
     }
@@ -574,51 +573,51 @@ PMusrT0::~PMusrT0()
 {
   if (fTimeoutTimer) {
     delete fTimeoutTimer;
-    fTimeoutTimer = 0;
+    fTimeoutTimer = nullptr;
   }
   if (fHisto) {
     delete fHisto;
-    fHisto = 0;
+    fHisto = nullptr;
   }
   if (fData) {
     delete fData;
-    fData = 0;
+    fData = nullptr;
   }
   if (fBkg) {
     delete fBkg;
-    fBkg = 0;
+    fBkg = nullptr;
   }
   if (fToDoInfo) {
     delete fToDoInfo;
-    fToDoInfo = 0;
+    fToDoInfo = nullptr;
   }
   if (fT0Line) {
     delete fT0Line;
-    fT0Line = 0;
+    fT0Line = nullptr;
   }
   if (fT0DataLine) {
     delete fT0DataLine;
-    fT0DataLine = 0;
+    fT0DataLine = nullptr;
   }
   if (fFirstBkgLine) {
     delete fFirstBkgLine;
-    fFirstBkgLine = 0;
+    fFirstBkgLine = nullptr;
   }
   if (fLastBkgLine) {
     delete fLastBkgLine;
-    fLastBkgLine = 0;
+    fLastBkgLine = nullptr;
   }
   if (fFirstDataLine) {
     delete fFirstDataLine;
-    fFirstDataLine = 0;
+    fFirstDataLine = nullptr;
   }
   if (fLastDataLine) {
     delete fLastDataLine;
-    fLastDataLine = 0;
+    fLastDataLine = nullptr;
   }
   if (fMainCanvas && (fStatus != 2)) {
     delete fMainCanvas;
-    fMainCanvas = 0;
+    fMainCanvas = nullptr;
   }
 }
 
@@ -727,7 +726,7 @@ void PMusrT0::SetTimeout(Int_t timeout)
 
   if (fTimeoutTimer) {
     delete fTimeoutTimer;
-    fTimeoutTimer = 0;
+    fTimeoutTimer = nullptr;
   }
   fTimeoutTimer = new TTimer();
 
@@ -858,26 +857,26 @@ void PMusrT0::InitDataAndBkg()
   Double_t max = fHisto->GetMaximum();
 
   // data lines
-  fFirstDataLine = new TLine((Double_t)fDataRange[0], 0.0, (Double_t)fDataRange[0], max);
+  fFirstDataLine = new TLine(static_cast<Double_t>(fDataRange[0]), 0.0, static_cast<Double_t>(fDataRange[0]), max);
   fFirstDataLine->SetLineStyle(3); // doted
   fFirstDataLine->SetLineColor(TColor::GetColor(0,0,255)); // blue
   fFirstDataLine->SetLineWidth(2);
   fFirstDataLine->Draw();
 
-  fLastDataLine = new TLine((Double_t)fDataRange[1], 0.0, (Double_t)fDataRange[1], max);
+  fLastDataLine = new TLine(static_cast<Double_t>(fDataRange[1]), 0.0, static_cast<Double_t>(fDataRange[1]), max);
   fLastDataLine->SetLineStyle(3); // doted
   fLastDataLine->SetLineColor(TColor::GetColor(0,0,255)); // blue
   fLastDataLine->SetLineWidth(2);
   fLastDataLine->Draw();
 
   // bkg lines
-  fFirstBkgLine = new TLine((Double_t)fBkgRange[0], 0.0, (Double_t)fBkgRange[0], max);
+  fFirstBkgLine = new TLine(static_cast<Double_t>(fBkgRange[0]), 0.0, static_cast<Double_t>(fBkgRange[0]), max);
   fFirstBkgLine->SetLineStyle(6); // _..._...
   fFirstBkgLine->SetLineColor(TColor::GetColor(255,0,0)); // red
   fFirstBkgLine->SetLineWidth(2);
   fFirstBkgLine->Draw();
 
-  fLastBkgLine = new TLine((Double_t)fBkgRange[1], 0.0, (Double_t)fBkgRange[1], max);
+  fLastBkgLine = new TLine(static_cast<Double_t>(fBkgRange[1]), 0.0, static_cast<Double_t>(fBkgRange[1]), max);
   fLastBkgLine->SetLineStyle(6); // _..._...
   fLastBkgLine->SetLineColor(TColor::GetColor(255,0,0)); // red
   fLastBkgLine->SetLineWidth(2);
@@ -899,7 +898,7 @@ void PMusrT0::ShowDataFileT0Channel()
   Double_t max = fHisto->GetMaximum();
 
   if (!fT0DataLine) {
-    fT0DataLine = new TLine((Double_t)t0Bin, 0.0, (Double_t)t0Bin, max);
+    fT0DataLine = new TLine(static_cast<Double_t>(t0Bin), 0.0, static_cast<Double_t>(t0Bin), max);
     fT0DataLine->SetLineStyle(1); // solid
     fT0DataLine->SetLineColor(kOrange-3);
     fT0DataLine->SetLineWidth(2);
@@ -919,7 +918,7 @@ void PMusrT0::HideDataFileT0Channel()
 {
   if (fT0DataLine) {
     delete fT0DataLine;
-    fT0DataLine = 0;
+    fT0DataLine = nullptr;
   }
   fMainCanvas->Update();
 }
@@ -941,7 +940,7 @@ void PMusrT0::SetT0Channel()
   // get binx to set t0 corresponding to fPx
   Int_t binx = fHisto->GetXaxis()->FindFixBin(x) - 1;
 
-  cout << endl << ">> PMusrT0::SetT0Channel(): t0 = " << binx << endl;
+  std::cout << std::endl << ">> PMusrT0::SetT0Channel(): t0 = " << binx << std::endl;
 
   // set t0 bin in msr-Handler
   UInt_t idx;
@@ -998,7 +997,7 @@ void PMusrT0::SetEstimatedT0Channel()
 
   Double_t x = fHisto->GetXaxis()->GetBinCenter(fT0Estimated)+1.0; // +1.0 needed since the first bin == 1 not 0.
 
-  cout << endl << ">> PMusrT0::SetEstimatedT0Channel(): estimated t0 = " << fT0Estimated << endl;
+  std::cout << std::endl << ">> PMusrT0::SetEstimatedT0Channel(): estimated t0 = " << fT0Estimated << std::endl;
 
   // shift line to the proper position
   fT0Line->SetX1(x);
@@ -1025,7 +1024,7 @@ void PMusrT0::SetDataFirstChannel()
   // get binx to set the data first channel corresponding to fPx
   fDataRange[0] = fHisto->GetXaxis()->FindFixBin(x) - 1;
 
-  cout << endl << ">> PMusrT0::SetDataFirstChannel(): fDataRange[0] = " << fDataRange[0] << endl;
+  std::cout << std::endl << ">> PMusrT0::SetDataFirstChannel(): fDataRange[0] = " << fDataRange[0] << std::endl;
 
   // set the data first bin in msr-Handler
   UInt_t idx = 0;
@@ -1039,7 +1038,7 @@ void PMusrT0::SetDataFirstChannel()
 
   // recreate data histo
   delete fData;
-  fData = 0;
+  fData = nullptr;
 
   // refill data histo
   Int_t noOfBins = fDataRange[1]-fDataRange[0]+1;
@@ -1075,7 +1074,7 @@ void PMusrT0::SetDataLastChannel()
   // get binx to set the data last channel corresponding to fPx
   fDataRange[1] = fHisto->GetXaxis()->FindFixBin(x) - 1;
 
-  cout << endl << ">> PMusrT0::SetDataLastChannel(): fDataRange[1] = " << fDataRange[1] << endl;
+  std::cout << std::endl << ">> PMusrT0::SetDataLastChannel(): fDataRange[1] = " << fDataRange[1] << std::endl;
 
   // set the data first bin in msr-Handler
   UInt_t idx = 1;
@@ -1089,7 +1088,7 @@ void PMusrT0::SetDataLastChannel()
 
   // recreate data histo
   delete fData;
-  fData = 0;
+  fData = nullptr;
 
   // refill data histo
   Int_t noOfBins = fDataRange[1]-fDataRange[0]+1;
@@ -1125,7 +1124,7 @@ void PMusrT0::SetBkgFirstChannel()
   // get binx to set the background first channel corresponding to fPx
   fBkgRange[0] = fHisto->GetXaxis()->FindFixBin(x) - 1;
 
-  cout << endl << ">> PMusrT0::SetBkgFirstChannel(): fBkgRange[0] = " << fBkgRange[0] << endl;
+  std::cout << std::endl << ">> PMusrT0::SetBkgFirstChannel(): fBkgRange[0] = " << fBkgRange[0] << std::endl;
 
   // set the background first bin in msr-Handler
   UInt_t idx = 0;
@@ -1139,7 +1138,7 @@ void PMusrT0::SetBkgFirstChannel()
 
   // recreate data histo
   delete fBkg;
-  fBkg = 0;
+  fBkg = nullptr;
 
   // refill data histo
   Int_t noOfBins = fBkgRange[1]-fBkgRange[0]+1;
@@ -1175,7 +1174,7 @@ void PMusrT0::SetBkgLastChannel()
   // get binx to set the background last channel corresponding to fPx
   fBkgRange[1] = fHisto->GetXaxis()->FindFixBin(x) - 1;
 
-  cout << endl << ">> PMusrT0::SetBkgLastChannel(): fBkgRange[1] = " << fBkgRange[1] << endl;
+  std::cout << std::endl << ">> PMusrT0::SetBkgLastChannel(): fBkgRange[1] = " << fBkgRange[1] << std::endl;
 
   // set the background first bin in msr-Handler
   UInt_t idx = 1;
@@ -1189,7 +1188,7 @@ void PMusrT0::SetBkgLastChannel()
 
   // recreate data histo
   delete fBkg;
-  fBkg = 0;
+  fBkg = nullptr;
 
   // refill data histo
   Int_t noOfBins = fBkgRange[1]-fBkgRange[0]+1;

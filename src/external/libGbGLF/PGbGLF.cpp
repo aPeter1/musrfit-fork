@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -34,7 +34,6 @@
 #include <cassert>
 #include <iostream>
 #include <cmath>
-using namespace std;
 
 #include "PMusr.h"
 #include "PGbGLF.h"
@@ -87,7 +86,7 @@ Double_t PGbGLF::operator()(Double_t t, const std::vector<Double_t> &par) const
     do {
       sumM = 0.0;
       for (Int_t i=0; i<n-1; i++) {
-        tt = ((Double_t)i + 0.5) * dt;
+        tt = (static_cast<Double_t>(i) + 0.5) * dt;
         sumM += pz_GbG_2(tt, par);
       }
       sumM *= dt;

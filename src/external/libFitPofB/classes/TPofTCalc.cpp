@@ -66,12 +66,12 @@
 // Parameters: phase, dt, dB
 //------------------
 
-TPofTCalc::TPofTCalc (const TPofBCalc *PofB, const string &wisdom, const vector<double> &par) : fWisdom(wisdom) {
+TPofTCalc::TPofTCalc (const TPofBCalc *PofB, const std::string &wisdom, const std::vector<double> &par) : fWisdom(wisdom) {
 
 #if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftw_init_threads());
   if (!init_threads)
-    cout << "TPofTCalc::TPofTCalc: Couldn't initialize multiple FFTW-threads ..." << endl;
+    std::cout << "TPofTCalc::TPofTCalc: Couldn't initialize multiple FFTW-threads ..." << std::endl;
   else
     fftw_plan_with_nthreads(omp_get_num_procs());
 #endif
@@ -144,7 +144,7 @@ TPofTCalc::~TPofTCalc() {
     FILE *wordsOfWisdomW;
     wordsOfWisdomW = fopen(fWisdom.c_str(), "w");
     if (wordsOfWisdomW == NULL) {
-      cout << "TPofTCalc::~TPofTCalc(): Could not open file ... No wisdom is exported..." << endl;
+      std::cout << "TPofTCalc::~TPofTCalc(): Could not open file ... No wisdom is exported..." << std::endl;
     } else {
       fftw_export_wisdom_to_file(wordsOfWisdomW);
       fclose(wordsOfWisdomW);
@@ -180,7 +180,7 @@ void TPofTCalc::DoFFT() {
 // Parameters: phase, dt, dB
 //---------------------
 
-void TPofTCalc::CalcPol(const vector<double> &par) {
+void TPofTCalc::CalcPol(const std::vector<double> &par) {
 
   double sinph(sin(par[0]*PI/180.0)), cosph(cos(par[0]*PI/180.0));
   int i;
@@ -206,7 +206,7 @@ double TPofTCalc::Eval(double t) const {
   if (i < fNFFT/2){
     return fPT[i]+(fPT[i+1]-fPT[i])/(fT[i+1]-fT[i])*(t-fT[i]);
   }
-  cout << "TPofTCalc::Eval: No data for the time " << t << " us available! Returning -999.0 ..." << endl;
+  std::cout << "TPofTCalc::Eval: No data for the time " << t << " us available! Returning -999.0 ..." << std::endl;
   return -999.0;
 }
 
@@ -217,7 +217,7 @@ double TPofTCalc::Eval(double t) const {
 // Parameters: output filename, par(dt, dB, timeres, channels, asyms, phases, t0s, N0s, bgs) optPar(field, energy)
 //---------------------
 
-void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> &par, const vector<double> *optPar = 0) {
+void TPofTCalc::FakeData(const string &rootOutputFileName, const std::vector<double> &par, const std::vector<double> *optPar = 0) {
 
   //determine the number of histograms to be built
   unsigned int numHist(0);
@@ -225,18 +225,18 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     numHist=(par.size()-4)/5;
 
   if(!numHist){
-    cout << "TPofTCalc::FakeData: The number of parameters for the histogram creation is not correct. Do nothing." << endl;
+    std::cout << "TPofTCalc::FakeData: The number of parameters for the histogram creation is not correct. Do nothing." << std::endl;
     return;
   }
 
-  cout << "TPofTCalc::FakeData: " << numHist << " histograms to be built" << endl;
+  std::cout << "TPofTCalc::FakeData: " << numHist << " histograms to be built" << std::endl;
 
   int nChannels = int(par[3]);
-  vector<int> t0;
-  vector<double> asy0;
-  vector<double> phase0;
-  vector<double> N0;
-  vector<double> bg;
+  std::vector<int> t0;
+  std::vector<double> asy0;
+  std::vector<double> phase0;
+  std::vector<double> N0;
+  std::vector<double> bg;
 
   for(unsigned int i(0); i<numHist; ++i) {
     t0.push_back(int(par[i+4+numHist*2]));
@@ -246,13 +246,13 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
     bg.push_back(par[i+4+numHist*4]);
   }
 
-  vector<double> param; // Parameters for TPofTCalc::CalcPol
+  std::vector<double> param; // Parameters for TPofTCalc::CalcPol
   param.push_back(0.0); // phase
   param.push_back(par[0]); // dt
   param.push_back(par[1]); // dB
 
-  vector< vector<double> > asy;
-  vector<double> asydata(nChannels);
+  std::vector< std::vector<double> > asy;
+  std::vector<double> asydata(nChannels);
   double ttime;
   int j,k;
 
@@ -286,12 +286,12 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
 //       }
     asy.push_back(asydata);
 //    asydata.clear();
-    cout << "TPofTCalc::FakeData: " << i+1 << "/" << numHist << " calculated!" << endl;
+    std::cout << "TPofTCalc::FakeData: " << i+1 << "/" << numHist << " calculated!" << std::endl;
   }
 
   // calculate the histograms
-  vector< vector<double> > histo;
-  vector<double> data(nChannels);
+  std::vector< std::vector<double> > histo;
+  std::vector<double> data(nChannels);
 
   for (unsigned int i(0); i<numHist; ++i) {    // loop over all histos
 
@@ -307,16 +307,16 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
 // end omp
 
     histo.push_back(data);
-    cout << "TPofTCalc::FakeData: " << i+1 << "/" << numHist << " done ..." << endl;
+    std::cout << "TPofTCalc::FakeData: " << i+1 << "/" << numHist << " done ..." << std::endl;
   }
 
   // add Poisson noise to the histograms
 
-  cout << "TPofTCalc::FakeData: Adding Poisson noise ..." << endl;
+  std::cout << "TPofTCalc::FakeData: Adding Poisson noise ..." << std::endl;
 
   TH1F* theoHisto;
   TH1F* fakeHisto;
-  vector<TH1F*> histoData;
+  std::vector<TH1F*> histoData;
 
   TString name;
   for (unsigned int i(0); i<numHist; ++i) { // loop over all histos
@@ -351,7 +351,7 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
    }
   }
 
-  cout << "TPofTCalc::FakeData: Write histograms and header information to the file ..." << endl;
+  std::cout << "TPofTCalc::FakeData: Write histograms and header information to the file ..." << std::endl;
 
   // save the histograms as root files
   // create run info folder and content
@@ -385,7 +385,7 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   for (unsigned int i(0); i<histoData.size(); i++)
     decayAnaModule->Add(histoData[i]);
   // post pileup corrected (PPC)
-  vector<TH1F*> histoDataPPC;
+  std::vector<TH1F*> histoDataPPC;
   for (unsigned int i(0); i<histoData.size(); i++) {
     histoDataPPC.push_back(dynamic_cast<TH1F*>(histoData[i]->Clone()));
     if (i < 10)
@@ -434,7 +434,7 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const vector<double> 
   N0.clear();
   bg.clear();
 
-  cout << "TPofTCalc::FakeData: DONE." << endl << endl;
+  std::cout << "TPofTCalc::FakeData: DONE." << std::endl << std::endl;
 
   return;
 }

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include <cctype>
 #include <cstring>
@@ -62,12 +61,12 @@ using namespace std;
  */
 void msr2msr_syntax()
 {
-  cout << endl << "usage: msr2msr <msr-file-in> <msr-file-out> | [--help]";
-  cout << endl << "  <msr-file-in> : input msr-file";
-  cout << endl << "  <msr-file-out>: converted msr-output-file";
-  cout << endl << "  if the <msr-file-in> is already in the 2008 format";
-  cout << endl << "  the output file will be identical to the input file.";
-  cout << endl << endl;
+  std::cout << std::endl << "usage: msr2msr <msr-file-in> <msr-file-out> | [--help]";
+  std::cout << std::endl << "  <msr-file-in> : input msr-file";
+  std::cout << std::endl << "  <msr-file-out>: converted msr-output-file";
+  std::cout << std::endl << "  if the <msr-file-in> is already in the 2008 format";
+  std::cout << std::endl << "  the output file will be identical to the input file.";
+  std::cout << std::endl << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -102,10 +101,10 @@ bool msr2msr_run(char *str)
   // tokenize run
   tokens = line.Tokenize(" \t");
   if (tokens->GetEntries() < 4) {
-    cout << endl << "**ERROR**: Something is wrong with the RUN block header:";
-    cout << endl << "  >> " << str;
-    cout << endl << "  >> no <msr-file-out> is created";
-    cout << endl;
+    std::cout << std::endl << "**ERROR**: Something is wrong with the RUN block header:";
+    std::cout << std::endl << "  >> " << str;
+    std::cout << std::endl << "  >> no <msr-file-out> is created";
+    std::cout << std::endl;
     return false;
   }
 
@@ -137,7 +136,7 @@ bool msr2msr_run(char *str)
   // clean up
   if (tokens) {
     delete tokens;
-    tokens = 0;
+    tokens = nullptr;
   }
 
   return true;
@@ -251,7 +250,7 @@ bool msr2msr_param(char *str)
   // clean up
   if (tokens) {
     delete tokens;
-    tokens = 0;
+    tokens = nullptr;
   }
 
   return true;
@@ -286,9 +285,9 @@ bool msr2msr_theory(char *str, int &tag, int &noOfAddionalParams)
     tokens = line.Tokenize(" \t");
     Int_t noTokens = tokens->GetEntries();
     if (noTokens < 3) {
-      cout << endl << "**ERROR** in THEORY block";
-      cout << endl << "  Line: '" << str << "' is not a valid statKTTab statement.";
-      cout << endl << "  Cannot handle file." << endl;
+      std::cout << std::endl << "**ERROR** in THEORY block";
+      std::cout << std::endl << "  Line: '" << str << "' is not a valid statKTTab statement.";
+      std::cout << std::endl << "  Cannot handle file." << std::endl;
       return false;
     }
     for (Int_t i=1; i<3; i++) {
@@ -306,9 +305,9 @@ bool msr2msr_theory(char *str, int &tag, int &noOfAddionalParams)
     tokens = line.Tokenize(" \t");
     Int_t noTokens = tokens->GetEntries();
     if (noTokens < 3) {
-      cout << endl << "**ERROR** in THEORY block";
-      cout << endl << "  Line: '" << str << "' is not a valid statKTTab statement.";
-      cout << endl << "  Cannot handle file." << endl;
+      std::cout << std::endl << "**ERROR** in THEORY block";
+      std::cout << std::endl << "  Line: '" << str << "' is not a valid statKTTab statement.";
+      std::cout << std::endl << "  Cannot handle file." << std::endl;
       return false;
     }
     for (Int_t i=1; i<3; i++) {
@@ -326,9 +325,9 @@ bool msr2msr_theory(char *str, int &tag, int &noOfAddionalParams)
     tokens = line.Tokenize(" \t");
     Int_t noTokens = tokens->GetEntries();
     if (noTokens < 4) {
-      cout << endl << "**ERROR** in THEORY block";
-      cout << endl << "  Line: '" << str << "' is not a valid dynmKTTab statement.";
-      cout << endl << "  Cannot handle file." << endl;
+      std::cout << std::endl << "**ERROR** in THEORY block";
+      std::cout << std::endl << "  Line: '" << str << "' is not a valid dynmKTTab statement.";
+      std::cout << std::endl << "  Cannot handle file." << std::endl;
       return false;
     }
     for (Int_t i=1; i<4; i++) {
@@ -346,9 +345,9 @@ bool msr2msr_theory(char *str, int &tag, int &noOfAddionalParams)
     tokens = line.Tokenize(" \t");
     Int_t noTokens = tokens->GetEntries();
     if (noTokens < 4) {
-      cout << endl << "**ERROR** in THEORY block";
-      cout << endl << "  Line: '" << str << "' is not a valid dynmKTTab statement.";
-      cout << endl << "  Cannot handle file." << endl;
+      std::cout << std::endl << "**ERROR** in THEORY block";
+      std::cout << std::endl << "  Line: '" << str << "' is not a valid dynmKTTab statement.";
+      std::cout << std::endl << "  Cannot handle file." << std::endl;
       return false;
     }
     for (Int_t i=1; i<4; i++) {
@@ -369,9 +368,9 @@ bool msr2msr_theory(char *str, int &tag, int &noOfAddionalParams)
     tokens = line.Tokenize(" \t");
     Int_t noTokens = tokens->GetEntries();
     if (noTokens < 4) {
-      cout << endl << "**ERROR** in THEORY block";
-      cout << endl << "  Line: '" << str << "' is not a valid internFld statement.";
-      cout << endl << "  Cannot handle file." << endl;
+      std::cout << std::endl << "**ERROR** in THEORY block";
+      std::cout << std::endl << "  Line: '" << str << "' is not a valid internFld statement.";
+      std::cout << std::endl << "  Cannot handle file." << std::endl;
       return false;
     }
     strcat(sstr, "  _x_");
@@ -393,9 +392,9 @@ bool msr2msr_theory(char *str, int &tag, int &noOfAddionalParams)
     tokens = line.Tokenize(" \t");
     Int_t noTokens = tokens->GetEntries();
     if (noTokens < 4) {
-      cout << endl << "**ERROR** in THEORY block";
-      cout << endl << "  Line: '" << str << "' is not a valid internBsl statement.";
-      cout << endl << "  Cannot handle file." << endl;
+      std::cout << std::endl << "**ERROR** in THEORY block";
+      std::cout << std::endl << "  Line: '" << str << "' is not a valid internBsl statement.";
+      std::cout << std::endl << "  Cannot handle file." << std::endl;
       return false;
     }
     strcat(sstr, "  _x_");
@@ -510,20 +509,20 @@ void msr2msr_replace(char *str, int paramNo)
  */
 bool msr2msr_finalize_theory(char *fln, int theoryTag, int noOfAddionalParams)
 {  
-  ifstream fin;
-  fin.open(fln, iostream::in);
+  std::ifstream fin;
+  fin.open(fln, std::iostream::in);
   if (!fin.is_open()) {
-    cout << endl << "**ERROR**: Couldn't open input msr-file " << fln;
-    cout << endl << "           Will quit." << endl;
+    std::cout << std::endl << "**ERROR**: Couldn't open input msr-file " << fln;
+    std::cout << std::endl << "           Will quit." << std::endl;
     return 0;
   }
 
   // open temporary output msr-file
-  ofstream fout;
-  fout.open("__temp.msr", iostream::out);
+  std::ofstream fout;
+  fout.open("__temp.msr", std::iostream::out);
   if (!fout.is_open()) {
-    cout << endl << "**ERROR**: Couldn't open output msr-file __temp.msr";
-    cout << endl << "           Will quit." << endl;
+    std::cout << std::endl << "**ERROR**: Couldn't open output msr-file __temp.msr";
+    std::cout << std::endl << "           Will quit." << std::endl;
     fin.close();
     return 0;
   }
@@ -549,7 +548,7 @@ bool msr2msr_finalize_theory(char *fln, int theoryTag, int noOfAddionalParams)
           if (msr2msr_is_whitespace(str)) {
             // add needed parameters
             for (int i=0; i<noOfAddionalParams; i++) {
-              fout << "        " << param+i << " frac" << i+1 << "       0.333333 0.0        none" << endl;
+              fout << "        " << param+i << " frac" << i+1 << "       0.333333 0.0        none" << std::endl;
             }
           }
         }
@@ -565,7 +564,7 @@ bool msr2msr_finalize_theory(char *fln, int theoryTag, int noOfAddionalParams)
       }
     }
 
-    fout << str << endl;
+    fout << str << std::endl;
   }
 
   // close files
@@ -602,14 +601,14 @@ bool msr2msr_statistic(char *str) {
   double chisq, chisqred;
   if (strstr(str, "  chi")) {
     pstr = strstr(str, "abs = ");
-    if (pstr != 0) {
+    if (pstr != nullptr) {
       status = sscanf(pstr, "abs = %lf", &chisq);
       if (status != 1) {
         success = false;
       }
     }
     pstr = strstr(str, "norm = ");
-    if (pstr != 0) {
+    if (pstr != nullptr) {
       status = sscanf(pstr, "norm = %lf", &chisqred);
       if (status != 1) {
         success = false;
@@ -641,20 +640,20 @@ int main(int argc, char *argv[])
   }
 
   // open input msr-file
-  ifstream fin;
-  fin.open(argv[1], iostream::in);
+  std::ifstream fin;
+  fin.open(argv[1], std::iostream::in);
   if (!fin.is_open()) {
-    cout << endl << "**ERROR**: Couldn't open input msr-file " << argv[1];
-    cout << endl << "           Will quit." << endl;
+    std::cout << std::endl << "**ERROR**: Couldn't open input msr-file " << argv[1];
+    std::cout << std::endl << "           Will quit." << std::endl;
     return 0;
   }
 
   // open output msr-file
-  ofstream fout;
-  fout.open(argv[2], iostream::out);
+  std::ofstream fout;
+  fout.open(argv[2], std::iostream::out);
   if (!fout.is_open()) {
-    cout << endl << "**ERROR**: Couldn't open output msr-file " << argv[2];
-    cout << endl << "           Will quit." << endl;
+    std::cout << std::endl << "**ERROR**: Couldn't open output msr-file " << argv[2];
+    std::cout << std::endl << "           Will quit." << std::endl;
     fin.close();
     return 0;
   }
@@ -695,7 +694,7 @@ int main(int argc, char *argv[])
         break;
     }
 
-    fout << str << endl;
+    fout << str << std::endl;
   }
 
   // close files
@@ -712,7 +711,7 @@ int main(int argc, char *argv[])
     msr2msr_finalize_theory(argv[2], theoryTag, noOfAddionalParams);
   }
 
-  cout << endl << "done ..." << endl;
+  std::cout << std::endl << "done ..." << std::endl;
 
   return 1;
 }

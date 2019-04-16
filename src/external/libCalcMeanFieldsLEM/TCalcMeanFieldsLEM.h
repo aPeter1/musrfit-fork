@@ -39,10 +39,10 @@ public:
   ~TMeanFieldsForScHalfSpace() {delete fImpProfile; fImpProfile = 0;}
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
   double CalcMeanB (double, const TLondon1D_HS&) const;
 
 private:
@@ -59,11 +59,11 @@ public:
   ~TMeanFieldsForScSingleLayer() {delete fImpProfile; fImpProfile = 0;}
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
-  double CalcMeanB (double, const vector<double>&, const vector<double>&, const TLondon1D_1L&) const;
+  double operator()(double, const std::vector<double>&) const;
+  double CalcMeanB (double, const std::vector<double>&, const std::vector<double>&, const TLondon1D_1L&) const;
 
 private:
   TTrimSPData *fImpProfile;
@@ -79,11 +79,11 @@ public:
   ~TMeanFieldsForScBilayer() {delete fImpProfile; fImpProfile = 0;}
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
-  double CalcMeanB (double, const vector<double>&, const vector<double>&, const TLondon1D_2L&, double) const;
+  double operator()(double, const std::vector<double>&) const;
+  double CalcMeanB (double, const std::vector<double>&, const std::vector<double>&, const TLondon1D_2L&, double) const;
 
 private:
   TTrimSPData *fImpProfile;
@@ -99,11 +99,11 @@ public:
   ~TMeanFieldsForScTrilayer() {delete fImpProfile; fImpProfile = 0;}
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
-  double CalcMeanB (double, const vector<double>&, const vector<double>&, const TLondon1D_3L&) const;
+  double operator()(double, const std::vector<double>&) const;
+  double CalcMeanB (double, const std::vector<double>&, const std::vector<double>&, const TLondon1D_3L&) const;
 
 private:
   TTrimSPData *fImpProfile;
@@ -119,11 +119,11 @@ public:
   ~TMeanFieldsForScTrilayerWithInsulator() {delete fImpProfile; fImpProfile = 0;}
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
-  double CalcMeanB (double, const vector<double>&, const vector<double>&, const TLondon1D_3LwInsulator&) const;
+  double operator()(double, const std::vector<double>&) const;
+  double CalcMeanB (double, const std::vector<double>&, const std::vector<double>&, const TLondon1D_3LwInsulator&) const;
 
 private:
   TTrimSPData *fImpProfile;

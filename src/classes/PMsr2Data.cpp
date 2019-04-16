@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009-2016 by Bastian M. Wojek / Andreas Suter           *
+ *   Copyright (C) 2009-2019 by Bastian M. Wojek / Andreas Suter           *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -38,7 +38,6 @@
 #include <iomanip>
 #include <algorithm>
 #include <limits>
-using namespace std;
 
 #include <boost/algorithm/string/trim.hpp>  // for stripping leading whitespace in std::string 
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower() in std::string
@@ -55,15 +54,15 @@ using namespace boost::algorithm;
  *
  * \param ext extension/suffix of the msr-files to be processed
  */
-PMsr2Data::PMsr2Data(const string &ext) : fFileExtension(ext), fRunListFile(false), fNumGlobalParam(0), fNumSpecParam(0), fNumTempRunBlocks(0), fRunNumberDigits(4), fHeaderWritten(false)
+PMsr2Data::PMsr2Data(const std::string &ext) : fFileExtension(ext), fRunListFile(false), fNumGlobalParam(0), fNumSpecParam(0), fNumTempRunBlocks(0), fRunNumberDigits(4), fHeaderWritten(false)
 {
   fRunVector.clear();
   fRunVectorIter = fRunVector.end();
-  fRunListFileStream = 0;
-  fSaxParser = 0;
-  fStartupHandler = 0;
-  fDataHandler = 0;
-  fMsrHandler = 0;
+  fRunListFileStream = nullptr;
+  fSaxParser = nullptr;
+  fStartupHandler = nullptr;
+  fDataHandler = nullptr;
+  fMsrHandler = nullptr;
 }
 
 //-------------------------------------------------------------
@@ -79,23 +78,23 @@ PMsr2Data::~PMsr2Data()
   if (fRunListFileStream) {
     fRunListFileStream->close();
     delete fRunListFileStream;
-    fRunListFileStream = 0;
+    fRunListFileStream = nullptr;
   }
   if (fSaxParser) {
     delete fSaxParser;
-    fSaxParser = 0;
+    fSaxParser = nullptr;
   }
   if (fStartupHandler) {
     delete fStartupHandler;
-    fStartupHandler = 0;
+    fStartupHandler = nullptr;
   }
   if (fDataHandler) {
     delete fDataHandler;
-    fDataHandler = 0;
+    fDataHandler = nullptr;
   }
   if (fMsrHandler) {
     delete fMsrHandler;
-    fMsrHandler = 0;
+    fMsrHandler = nullptr;
   }
 }
 
@@ -117,20 +116,20 @@ PMsr2Data::~PMsr2Data()
  */
 int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) const
 {
-  ostringstream strInfile;
+  std::ostringstream strInfile;
   strInfile << runNo << fFileExtension << ".msr";
-  ifstream *in = new ifstream(strInfile.str().c_str());
+  std::ifstream *in = new std::ifstream(strInfile.str().c_str());
   if (!in->is_open()) {
     delete in;
     if (!normalMode && (runNo == *fRunVectorIter)) {
-      string fileNameCopy(strInfile.str());
+      std::string fileNameCopy(strInfile.str());
       strInfile.clear();
       strInfile.str("");
       strInfile << runNo << "+global" << fFileExtension << ".msr";
-      in = new ifstream(strInfile.str().c_str());
+      in = new std::ifstream(strInfile.str().c_str());
       if (!in->is_open()) {
-        cerr << endl << ">> msr2data: **ERROR** Neither the file " << fileNameCopy << " nor the file " << strInfile.str() << " can be opened! Please check!";
-        cerr << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** Neither the file " << fileNameCopy << " nor the file " << strInfile.str() << " can be opened! Please check!";
+        std::cerr << std::endl;
         delete in;
         return -1;
       }
@@ -138,27 +137,27 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
       if (++fRunVectorIter != fRunVector.end()) {
         return DetermineRunNumberDigits(*fRunVectorIter, true);
       } else {
-        cerr << endl << ">> msr2data: **ERROR** None of the given msr-files can be opened! Please check!";
-        cerr << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** None of the given msr-files can be opened! Please check!";
+        std::cerr << std::endl;
         return -1;
       }
     } else {
-      cerr << endl << ">> msr2data: **ERROR** The given template " << strInfile.str() << " cannot be opened! Please check!";
-      cerr << endl;
+      std::cerr << std::endl << ">> msr2data: **ERROR** The given template " << strInfile.str() << " cannot be opened! Please check!";
+      std::cerr << std::endl;
       return -1;
     }
   }
 
-  ostringstream tempRunNumber;
+  std::ostringstream tempRunNumber;
   tempRunNumber.fill('0');
-  tempRunNumber.setf(ios::internal, ios::adjustfield);
+  tempRunNumber.setf(std::ios::internal, std::ios::adjustfield);
   tempRunNumber.width(fRunNumberDigits);
   tempRunNumber << runNo;
 
   fRunNumberDigits = tempRunNumber.str().length();
 
-  string line, firstOnLine;
-  istringstream strLine;
+  std::string line, firstOnLine;
+  std::istringstream strLine;
 
   while (getline(*in, line)) {
     strLine.clear();
@@ -167,8 +166,8 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
     if (!to_lower_copy(firstOnLine).compare("run")) {
       firstOnLine.clear();
       strLine >> firstOnLine;
-      string::size_type loc = firstOnLine.rfind(tempRunNumber.str());
-      if ( loc != string::npos ) {
+      std::string::size_type loc = firstOnLine.rfind(tempRunNumber.str());
+      if ( loc != std::string::npos ) {
         while ( loc > 0 ) {
           if (isdigit(firstOnLine.at(--loc))) {
             ++fRunNumberDigits;
@@ -178,29 +177,29 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
         }
         in->close();
         delete in;
-        in = 0;
+        in = nullptr;
         fRunVectorIter = fRunVector.begin(); // set back the runlist-iterator which might have changed during the search for the correct file
         return 0;
       } else {
-         cerr << endl << ">> msr2data: **ERROR** The first processed run file number does not match the \"file index\"!";
-         cerr << endl << ">> msr2data: **ERROR** The number of digits to be used for formatting the run numbers cannot be determined!";
-         cerr << endl << ">> msr2data: **ERROR** Please check the first msr-file that should be processed;";
-         cerr << endl << ">> msr2data: **ERROR** this is either some template or the first existing file from the run list.";
-         cerr << endl;
+         std::cerr << std::endl << ">> msr2data: **ERROR** The first processed run file number does not match the \"file index\"!";
+         std::cerr << std::endl << ">> msr2data: **ERROR** The number of digits to be used for formatting the run numbers cannot be determined!";
+         std::cerr << std::endl << ">> msr2data: **ERROR** Please check the first msr-file that should be processed;";
+         std::cerr << std::endl << ">> msr2data: **ERROR** this is either some template or the first existing file from the run list.";
+         std::cerr << std::endl;
          in->close();
          delete in;
-         in = 0;
+         in = nullptr;
          return -2;
       }
     }
   }
-  cerr << endl << ">> msr2data: **ERROR** Please check the first msr-file that should be processed;";
-  cerr << endl << ">> msr2data: **ERROR** this is either some template or the first file from the run list.";
-  cerr << endl << ">> msr2data: **ERROR** Obviously it contains no RUN block...";
-  cerr << endl;
+  std::cerr << std::endl << ">> msr2data: **ERROR** Please check the first msr-file that should be processed;";
+  std::cerr << std::endl << ">> msr2data: **ERROR** this is either some template or the first file from the run list.";
+  std::cerr << std::endl << ">> msr2data: **ERROR** Obviously it contains no RUN block...";
+  std::cerr << std::endl;
   in->close();
   delete in;
-  in = 0;
+  in = nullptr;
   return -3;
 }
 
@@ -216,10 +215,10 @@ int PMsr2Data::CheckRunNumbersInRange() const
 {
   double max(pow(static_cast<double>(10), static_cast<int>(fRunNumberDigits)) - 1.0);
   unsigned int max_UInt;
-  max > static_cast<double>(numeric_limits<unsigned int>::max()) ? max_UInt = numeric_limits<unsigned int>::max()
+  max > static_cast<double>(std::numeric_limits<unsigned int>::max()) ? max_UInt = std::numeric_limits<unsigned int>::max()
                                                                  : max_UInt = static_cast<unsigned int>(max);
 
-  for (vector<unsigned int>::const_iterator iter(fRunVector.begin()); iter != fRunVector.end(); ++iter) {
+  for (std::vector<unsigned int>::const_iterator iter(fRunVector.begin()); iter != fRunVector.end(); ++iter) {
     if (*iter > max_UInt) {
       return -1;
     }
@@ -305,12 +304,12 @@ int PMsr2Data::SetRunNumbers(unsigned int runNoStart, unsigned int runNoEnd)
  *
  * \param runListVector vector containing the run numbers to be processed
  */
-int PMsr2Data::SetRunNumbers(const vector<unsigned int> &runListVector)
+int PMsr2Data::SetRunNumbers(const std::vector<unsigned int> &runListVector)
 {
   if (runListVector.empty())
     return -1;
 
-  for (vector<unsigned int>::const_iterator iter(runListVector.begin()); iter!=runListVector.end(); ++iter) {
+  for (std::vector<unsigned int>::const_iterator iter(runListVector.begin()); iter!=runListVector.end(); ++iter) {
     if (*iter < 1)
       return 1;
   }
@@ -332,20 +331,20 @@ int PMsr2Data::SetRunNumbers(const vector<unsigned int> &runListVector)
  *
  * \param runListFile name of run list file
  */
-int PMsr2Data::SetRunNumbers(const string &runListFile)
+int PMsr2Data::SetRunNumbers(const std::string &runListFile)
 {
   fRunVector.clear();
 
-  ifstream in(runListFile.c_str());
+  std::ifstream in(runListFile.c_str());
   if (!in) {
-    cerr << endl << ">> msr2data: **ERROR** The runlist file " << runListFile << " cannot be opened! Please check!";
-    cerr << endl;
+    std::cerr << std::endl << ">> msr2data: **ERROR** The runlist file " << runListFile << " cannot be opened! Please check!";
+    std::cerr << std::endl;
     return -1;
   }
 
-  string line, indvar;
-  istringstream strLine;
-  vector<string> splitVec;
+  std::string line, indvar;
+  std::istringstream strLine;
+  std::vector<std::string> splitVec;
   unsigned int cntr(0);
   unsigned int runNo;
 
@@ -365,8 +364,8 @@ int PMsr2Data::SetRunNumbers(const string &runListFile)
       strLine.str(splitVec[0]);
       strLine >> indvar; // "RUN"
       if (to_lower_copy(indvar).compare("run")) {
-        cerr << endl << ">> msr2data: **ERROR** The format of the runlist file " << runListFile << " is not correct! Please check!";
-        cerr << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** The format of the runlist file " << runListFile << " is not correct! Please check!";
+        std::cerr << std::endl;
       }
       while (strLine >> indvar)
         fIndVar.push_back(indvar);
@@ -387,7 +386,7 @@ int PMsr2Data::SetRunNumbers(const string &runListFile)
   in.close();
   fRunVectorIter = fRunVector.begin();
   fRunListFile = true;
-  fRunListFileStream = new ifstream(runListFile.c_str());
+  fRunListFileStream = new std::ifstream(runListFile.c_str());
   return 0;
 }
 
@@ -404,7 +403,7 @@ int PMsr2Data::ParseXmlStartupFile()
   int status;
   fSaxParser = new TSAXParser();
   fStartupHandler = new PStartupHandler();
-  string startup_path_name(fStartupHandler->GetStartupFilePath().Data());
+  std::string startup_path_name(fStartupHandler->GetStartupFilePath().Data());
   fSaxParser->ConnectToHandler("PStartupHandler", fStartupHandler);
   //status = fSaxParser->ParseFile(startup_path_name.c_str());
   // parsing the file as above seems to lead to problems in certain environments;
@@ -412,15 +411,15 @@ int PMsr2Data::ParseXmlStartupFile()
   status = parseXmlFile(fSaxParser, startup_path_name.c_str());
   // check for parse errors
   if (status) { // error
-    cerr << endl << ">> msr2data: **WARNING** Reading/parsing musrfit_startup.xml failed." << endl;
+    std::cerr << std::endl << ">> msr2data: **WARNING** Reading/parsing musrfit_startup.xml failed." << std::endl;
     // clean up
     if (fSaxParser) {
       delete fSaxParser;
-      fSaxParser = 0;
+      fSaxParser = nullptr;
     }
     if (fStartupHandler) {
       delete fStartupHandler;
-      fStartupHandler = 0;
+      fStartupHandler = nullptr;
     }
   }
   return status;
@@ -436,7 +435,7 @@ int PMsr2Data::ParseXmlStartupFile()
  *
  * \param infile name of the msr-file to be read
  */
-int PMsr2Data::ReadMsrFile(const string &infile) const
+int PMsr2Data::ReadMsrFile(const std::string &infile) const
 {
   int status;
   fMsrHandler = new PMsrHandler(infile.c_str());
@@ -444,13 +443,13 @@ int PMsr2Data::ReadMsrFile(const string &infile) const
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cerr << endl << ">> msr2data: **ERROR** Could not find " << infile << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** Could not find " << infile << std::endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cerr << endl << ">> msr2data: **SYNTAX ERROR** in file " << infile << ", full stop here." << endl;
+        std::cerr << std::endl << ">> msr2data: **SYNTAX ERROR** in file " << infile << ", full stop here." << std::endl;
         break;
       default:
-        cerr << endl << ">> msr2data: **UNKOWN ERROR** when trying to read the msr-file" << endl;
+        std::cerr << std::endl << ">> msr2data: **UNKOWN ERROR** when trying to read the msr-file" << std::endl;
         break;
     }
   }
@@ -468,7 +467,7 @@ int PMsr2Data::ReadMsrFile(const string &infile) const
  */
 PMsrHandler* PMsr2Data::GetSingleRunMsrFile() const
 {
-  ostringstream singleMsrInFile;
+  std::ostringstream singleMsrInFile;
   singleMsrInFile << *fRunVectorIter << "-OneRunFit" << fFileExtension << ".msr";
   PMsrHandler *singleRunMsrFile = new PMsrHandler(singleMsrInFile.str().c_str());
 
@@ -476,16 +475,16 @@ PMsrHandler* PMsr2Data::GetSingleRunMsrFile() const
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cerr << endl << ">> msr2data: **ERROR** Could not find " << singleMsrInFile.str() << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** Could not find " << singleMsrInFile.str() << std::endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cerr << endl << ">> msr2data: **SYNTAX ERROR** in file " << singleMsrInFile.str() << ", full stop here." << endl;
+        std::cerr << std::endl << ">> msr2data: **SYNTAX ERROR** in file " << singleMsrInFile.str() << ", full stop here." << std::endl;
         break;
       default:
-        cerr << endl << ">> msr2data: **UNKOWN ERROR** when trying to read the msr-file" << endl;
+        std::cerr << std::endl << ">> msr2data: **UNKOWN ERROR** when trying to read the msr-file" << std::endl;
         break;
     }
-    return 0;
+    return nullptr;
   }
   return singleRunMsrFile;
 }
@@ -509,9 +508,9 @@ int PMsr2Data::ReadRunDataFile()
 
   bool success = fDataHandler->IsAllDataAvailable();
   if (!success) {
-    cerr << endl << ">> msr2data: **WARNING** Could not read all data files, will continue without the data file information..." << endl;
+    std::cerr << std::endl << ">> msr2data: **WARNING** Could not read all data files, will continue without the data file information..." << std::endl;
     delete fDataHandler;
-    fDataHandler = 0;
+    fDataHandler = nullptr;
     return 1;
   }
   return 0;
@@ -536,54 +535,54 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun, bool calledFromGlobalM
   if (*fRunVectorIter == tempRun)
     return true;
 
-  string globalTag("");
+  std::string globalTag("");
   if (calledFromGlobalMode)
     globalTag = "-OneRunFit";
 
-  ostringstream strInfile;
+  std::ostringstream strInfile;
   strInfile << tempRun << globalTag << fFileExtension << ".msr";
 
-  ifstream in(strInfile.str().c_str());
+  std::ifstream in(strInfile.str().c_str());
   if (!in) {
-    cerr << endl << ">> msr2data: **ERROR** The template msr-file " << strInfile.str() << " cannot be opened! Please check!";
-    cerr << endl;
+    std::cerr << std::endl << ">> msr2data: **ERROR** The template msr-file " << strInfile.str() << " cannot be opened! Please check!";
+    std::cerr << std::endl;
     return false;
   }
-  ostringstream strOutfile;
+  std::ostringstream strOutfile;
   strOutfile << *fRunVectorIter << globalTag << fFileExtension << ".msr";
-  ofstream out(strOutfile.str().c_str());
+  std::ofstream out(strOutfile.str().c_str());
   if (!out) {
-    cerr << endl << ">> msr2data: **ERROR** The new msr file " << strOutfile.str() << " cannot be opened! Please check!";
-    cerr << endl;
+    std::cerr << std::endl << ">> msr2data: **ERROR** The new msr file " << strOutfile.str() << " cannot be opened! Please check!";
+    std::cerr << std::endl;
     return false;
   }
 
-  ostringstream tempRunNumber;
+  std::ostringstream tempRunNumber;
   tempRunNumber.fill('0');
-  tempRunNumber.setf(ios::internal, ios::adjustfield);
+  tempRunNumber.setf(std::ios::internal, std::ios::adjustfield);
   tempRunNumber.width(fRunNumberDigits);
   tempRunNumber << tempRun;
 
-  ostringstream newRunNumber;
+  std::ostringstream newRunNumber;
   newRunNumber.fill('0');
-  newRunNumber.setf(ios::internal, ios::adjustfield);
+  newRunNumber.setf(std::ios::internal, std::ios::adjustfield);
   newRunNumber.width(fRunNumberDigits);
   newRunNumber << *fRunVectorIter;
 
-  cout << endl << ">> msr2data: **INFO** Generating new input msr file " << strOutfile.str() << endl;
+  std::cout << std::endl << ">> msr2data: **INFO** Generating new input msr file " << strOutfile.str() << std::endl;
 
-  string line, firstOnLine;
-  istringstream strLine;
+  std::string line, firstOnLine;
+  std::istringstream strLine;
   unsigned int emptyLineCounter(0);
 
   // write the run number in the TITLE line of the msr-file (is overwritten later by musrfit if called with the -t option)
   getline(in, line);
-  out << *fRunVectorIter << endl;
+  out << *fRunVectorIter << std::endl;
 
   while (getline(in, line)) {
     if (line.empty()) {
       if (++emptyLineCounter < 3) // allow only two successive empty lines in the input files (just for convenience)
-        out << endl;
+        out << std::endl;
       continue;
     } else
       emptyLineCounter = 0;
@@ -596,23 +595,23 @@ bool PMsr2Data::PrepareNewInputFile(unsigned int tempRun, bool calledFromGlobalM
     strLine >> firstOnLine;
     if (!to_lower_copy(firstOnLine).compare("run")) {
       strLine >> firstOnLine;
-      string::size_type loc = firstOnLine.rfind(tempRunNumber.str());
-      if ( loc != string::npos ) {
+      std::string::size_type loc = firstOnLine.rfind(tempRunNumber.str());
+      if ( loc != std::string::npos ) {
         firstOnLine.replace(loc, fRunNumberDigits, newRunNumber.str());
       } else {
-        cerr << endl << ">> msr2data: **WARNING** The template run file number does not match the \"file index\"";
-        cerr << endl << ">> msr2data: **WARNING** Unexpected things will happen... (for sure)";
-        cerr << endl;
+        std::cerr << std::endl << ">> msr2data: **WARNING** The template run file number does not match the \"file index\"";
+        std::cerr << std::endl << ">> msr2data: **WARNING** Unexpected things will happen... (for sure)";
+        std::cerr << std::endl;
       }
       out << "RUN " << firstOnLine;
       while (strLine >> firstOnLine)
         out << " " << firstOnLine;
-      out << endl;
+      out << std::endl;
     } else if (!to_lower_copy(firstOnLine).compare("chisq") || !to_lower_copy(firstOnLine).compare("maxlh")) {
-      out << "*** FIT DID NOT CONVERGE ***" << endl;
+      out << "*** FIT DID NOT CONVERGE ***" << std::endl;
       break;
     } else {
-      out << line << endl;
+      out << line << std::endl;
     }
   }
   in.close();
@@ -667,11 +666,11 @@ bool compare_parameters(const PMsrParamStructure &par1, const PMsrParamStructure
  *                   - 1: global mode including single run fits and data extraction for the global msr-file (same template for all runs)
  *                   - 2: global mode including single run fits and data extraction for the global msr-file (successive template generation)
  */
-bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOutFile, unsigned int globalPlus) const
+bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const std::string &msrOutFile, unsigned int globalPlus) const
 {
   const TString alpha("alpha"), beta("beta"), norm("norm"), bkgfit("bkgfit"), lifetime("lifetime");
 
-  ostringstream strInfile;
+  std::ostringstream strInfile;
   strInfile << tempRun << fFileExtension << ".msr";
 
   // read template msr-file
@@ -687,28 +686,28 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   fNumTempRunBlocks = msrRunList->size();
 
   // check that the RUN block run numbers match the template run number
-  ostringstream tempRunNumber;
+  std::ostringstream tempRunNumber;
   tempRunNumber.fill('0');
-  tempRunNumber.setf(ios::internal, ios::adjustfield);
+  tempRunNumber.setf(std::ios::internal, std::ios::adjustfield);
   tempRunNumber.width(fRunNumberDigits);
   tempRunNumber << tempRun;
 
-  string tempRunName;
+  std::string tempRunName;
   for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
     tempRunName = msrRunList->at(i).GetRunName()->Data();
-    string::size_type loc = tempRunName.rfind(tempRunNumber.str());
-    if ( loc == string::npos ) {
-      cerr << endl << ">> msr2data: **ERROR** A template run file number does not match the \"file index\"";
-      cerr << endl << ">> msr2data: **ERROR** Please check the template file!";
-      cerr << endl;
+    std::string::size_type loc = tempRunName.rfind(tempRunNumber.str());
+    if ( loc == std::string::npos ) {
+      std::cerr << std::endl << ">> msr2data: **ERROR** A template run file number does not match the \"file index\"";
+      std::cerr << std::endl << ">> msr2data: **ERROR** Please check the template file!";
+      std::cerr << std::endl;
       return false;
     }
   }
 
-  cout << endl << ">> msr2data: **INFO** Generating new global input msr file " << msrOutFile << endl;
+  std::cout << std::endl << ">> msr2data: **INFO** Generating new global input msr file " << msrOutFile << std::endl;
 
   // set some title for the msr-file
-  ostringstream titleStream;
+  std::ostringstream titleStream;
   titleStream << "Global msr file for the runs: ";
   while (fRunVectorIter != fRunVector.end()) {
     titleStream << *fRunVectorIter << " ";
@@ -720,10 +719,10 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   titleStream.str("");
 
   // search parameter list for run-specific parameters - the rest is assumed to be global
-  string tempParamName;
+  std::string tempParamName;
   for (unsigned int i(0); i < msrParamList->size(); ++i) {
     tempParamName = msrParamList->at(i).fName.Data();
-    string::size_type loc = tempParamName.rfind(tempRunNumber.str());
+    std::string::size_type loc = tempParamName.rfind(tempRunNumber.str());
     if ((tempParamName.length() > fRunNumberDigits) && (loc == tempParamName.length() - fRunNumberDigits)) {
       msrParamList->at(i).fIsGlobal = false;
       ++fNumSpecParam;
@@ -731,7 +730,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
       msrParamList->at(i).fIsGlobal = true;
       ++fNumGlobalParam;
     }
-    // cout << "debug> " << msrParamList->at(i).fNo << ": " << msrParamList->at(i).fName.Data() << " is global: " << msrParamList->at(i).fIsGlobal << endl;
+    // std::cout << "debug> " << msrParamList->at(i).fNo << ": " << msrParamList->at(i).fName.Data() << " is global: " << msrParamList->at(i).fIsGlobal << std::endl;
   }
 
   // check if parameters have been sorted correctly from the beginning
@@ -744,10 +743,10 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   }
 
   int tempPar;
-  vector<int> *tempMap;
+  std::vector<int> *tempMap;
   PMsrLines *tempLines;
-  vector<string> tempVec;
-  string line, tempString;
+  std::vector<std::string> tempVec;
+  std::string line, tempString;
 
   if (!wasSorted) {
     // Sort the parameters: global ones first, then run-specific
@@ -768,14 +767,14 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
           for (unsigned int k(0); k < msrParamList->size(); ++k) {
             if (tempPar == msrParamList->at(k).fNo) {
               if (msrParamList->at(k).fIsGlobal) {
-                tempVec[j] = boost::lexical_cast<string>(k + 1);
+                tempVec[j] = boost::lexical_cast<std::string>(k + 1);
               } else {
-                cerr << endl << ">> msr2data: **WARNING** The parameter " << msrParamList->at(k).fName.Data() \
+                std::cerr << std::endl << ">> msr2data: **WARNING** The parameter " << msrParamList->at(k).fName.Data() \
                              << " is recognized as run specific!";
-                cerr << endl << ">> msr2data: **WARNING** Still it appears directly (un-mapped) in the template THEORY block.";
-                cerr << endl << ">> msr2data: **WARNING** The THEORY block entry will be substituted by a mapped parameter.";
-                cerr << endl << ">> msr2data: **WARNING** In case, this is not what has been intended, please review the new msr-file!";
-                cerr << endl;
+                std::cerr << std::endl << ">> msr2data: **WARNING** Still it appears directly (un-mapped) in the template THEORY block.";
+                std::cerr << std::endl << ">> msr2data: **WARNING** The THEORY block entry will be substituted by a mapped parameter.";
+                std::cerr << std::endl << ">> msr2data: **WARNING** In case, this is not what has been intended, please review the new msr-file!";
+                std::cerr << std::endl;
 
                 unsigned int l(0);
                 tempMap = msrRunList->at(0).GetMap();
@@ -798,7 +797,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
                 if (mapExists) {
                   tempVec[j] = "map";
-                  tempVec[j].append(boost::lexical_cast<string>(l + 1));
+                  tempVec[j].append(boost::lexical_cast<std::string>(l + 1));
                   mapExists = false;
                 } else { // look for the first not used map entry
                   for (l = 0; l < tempMap->size(); ++l) {
@@ -810,7 +809,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
                     msrRunList->at(m).SetMap(tempPar, l);
                   }
                   tempVec[j] = "map";
-                  tempVec[j].append(boost::lexical_cast<string>(l + 1));
+                  tempVec[j].append(boost::lexical_cast<std::string>(l + 1));
                 }
               }
               break;
@@ -830,7 +829,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     }
 
     // FUNCTIONS block
-    string::size_type pos(0);
+    std::string::size_type pos(0);
     tempLines = fMsrHandler->GetMsrFunctions();
     for (unsigned int i(0); i < tempLines->size(); ++i) {
       line = (*tempLines)[i].fLine.Data();
@@ -844,22 +843,22 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
               if (tempPar == msrParamList->at(k).fNo) {
                 if (msrParamList->at(k).fIsGlobal) {
                   pos = line.find(tempVec[j], pos);
-                  if ( pos != string::npos ) {
+                  if ( pos != std::string::npos ) {
                     tempString = "par";
-                    tempString.append(boost::lexical_cast<string>(k + 1));
+                    tempString.append(boost::lexical_cast<std::string>(k + 1));
                     line.replace(pos, tempVec[j].length(), tempString);
                   } else {
-                    cerr << endl << ">> msr2data: **ERROR** A previously identified parameter in the FUNCTIONS block is not found any more!";
-                    cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
-                    cerr << endl;
+                    std::cerr << std::endl << ">> msr2data: **ERROR** A previously identified parameter in the FUNCTIONS block is not found any more!";
+                    std::cerr << std::endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
+                    std::cerr << std::endl;
                   }
                 } else {
-                  cerr << endl << ">> msr2data: **WARNING** The parameter " << msrParamList->at(k).fName.Data() \
+                  std::cerr << std::endl << ">> msr2data: **WARNING** The parameter " << msrParamList->at(k).fName.Data() \
                                << " is recognized as run specific!";
-                  cerr << endl << ">> msr2data: **WARNING** Still it appears directly (un-mapped) in the template FUNCTIONS block.";
-                  cerr << endl << ">> msr2data: **WARNING** The FUNCTIONS block entry will be substituted by a mapped parameter.";
-                  cerr << endl << ">> msr2data: **WARNING** In case, this is not what has been intended, please review the new msr-file!";
-                  cerr << endl;
+                  std::cerr << std::endl << ">> msr2data: **WARNING** Still it appears directly (un-mapped) in the template FUNCTIONS block.";
+                  std::cerr << std::endl << ">> msr2data: **WARNING** The FUNCTIONS block entry will be substituted by a mapped parameter.";
+                  std::cerr << std::endl << ">> msr2data: **WARNING** In case, this is not what has been intended, please review the new msr-file!";
+                  std::cerr << std::endl;
 
                   unsigned int l(0);
                   tempMap = msrRunList->at(0).GetMap();
@@ -891,14 +890,14 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
                     }
                   }
                   pos = line.find(tempVec[j], pos);
-                  if ( pos != string::npos ) {
+                  if ( pos != std::string::npos ) {
                     tempString = "map";
-                    tempString.append(boost::lexical_cast<string>(l + 1));
+                    tempString.append(boost::lexical_cast<std::string>(l + 1));
                     line.replace(pos, tempVec[j].length(), tempString);
                   } else {
-                    cerr << endl << ">> msr2data: **ERROR** A previously identified parameter in the FUNCTIONS block is not found any more!";
-                    cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
-                    cerr << endl;
+                    std::cerr << std::endl << ">> msr2data: **ERROR** A previously identified parameter in the FUNCTIONS block is not found any more!";
+                    std::cerr << std::endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
+                    std::cerr << std::endl;
                   }
                   mapExists = false;
                 }
@@ -907,9 +906,9 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
             }
           }
           catch(boost::bad_lexical_cast &) {
-            cerr << endl << ">> msr2data: **ERROR** Something is wrong with the parameters used in the FUNCTIONS block!";
-            cerr << endl << ">> msr2data: **ERROR** Please report a bug - function parsing should have failed earlier!";
-            cerr << endl;
+            std::cerr << std::endl << ">> msr2data: **ERROR** Something is wrong with the parameters used in the FUNCTIONS block!";
+            std::cerr << std::endl << ">> msr2data: **ERROR** Please report a bug - function parsing should have failed earlier!";
+            std::cerr << std::endl;
             return false;
           }
         }
@@ -938,9 +937,9 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
           }
         }
         if (l > msrParamList->size()) {
-          cerr << endl << ">> msr2data: **ERROR** The norm parameter specified in RUN block " << i + 1 << " does not exist!";
-          cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
-          cerr << endl;
+          std::cerr << std::endl << ">> msr2data: **ERROR** The norm parameter specified in RUN block " << i + 1 << " does not exist!";
+          std::cerr << std::endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
+          std::cerr << std::endl;
           return false;
         }
       }
@@ -954,9 +953,9 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
           }
         }
         if (l > msrParamList->size()) {
-          cerr << endl << ">> msr2data: **ERROR** The backgr.fit parameter specified in RUN block " << i + 1 << " does not exist!";
-          cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
-          cerr << endl;
+          std::cerr << std::endl << ">> msr2data: **ERROR** The backgr.fit parameter specified in RUN block " << i + 1 << " does not exist!";
+          std::cerr << std::endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
+          std::cerr << std::endl;
           return false;
         }
       }
@@ -970,9 +969,9 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
           }
         }
         if (l > msrParamList->size()) {
-          cerr << endl << ">> msr2data: **ERROR** The alpha parameter specified in RUN block " << i + 1 << " does not exist!";
-          cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
-          cerr << endl;
+          std::cerr << std::endl << ">> msr2data: **ERROR** The alpha parameter specified in RUN block " << i + 1 << " does not exist!";
+          std::cerr << std::endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
+          std::cerr << std::endl;
           return false;
         }
       }
@@ -986,9 +985,9 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
           }
         }
         if (l > msrParamList->size()) {
-          cerr << endl << ">> msr2data: **ERROR** The beta parameter specified in RUN block " << i + 1 << " does not exist!";
-          cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
-          cerr << endl;
+          std::cerr << std::endl << ">> msr2data: **ERROR** The beta parameter specified in RUN block " << i + 1 << " does not exist!";
+          std::cerr << std::endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
+          std::cerr << std::endl;
           return false;
         }
       }
@@ -1002,9 +1001,9 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
           }
         }
         if (l > msrParamList->size()) {
-          cerr << endl << ">> msr2data: **ERROR** The lifetime parameter specified in RUN block " << i + 1 << " does not exist!";
-          cerr << endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
-          cerr << endl;
+          std::cerr << std::endl << ">> msr2data: **ERROR** The lifetime parameter specified in RUN block " << i + 1 << " does not exist!";
+          std::cerr << std::endl << ">> msr2data: **ERROR** Please report a bug - file checks should have failed earlier!";
+          std::cerr << std::endl;
           return false;
         }
       }
@@ -1021,7 +1020,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
           }
         }
       }
-      tempMap = 0;
+      tempMap = nullptr;
     }
 
     // FOURIER block - in case a parameter is used for the phase
@@ -1065,12 +1064,12 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
         try {
           tempPar = boost::lexical_cast<unsigned int>(tempVec[j]);
           if (!msrParamList->at(tempPar - 1).fIsGlobal) {
-            cerr << endl << ">> msr2data: **WARNING** The parameter " << msrParamList->at(tempPar - 1).fName.Data() \
+            std::cerr << std::endl << ">> msr2data: **WARNING** The parameter " << msrParamList->at(tempPar - 1).fName.Data() \
                          << " is recognized as run specific!";
-            cerr << endl << ">> msr2data: **WARNING** Still it appears directly (un-mapped) in the template THEORY block.";
-            cerr << endl << ">> msr2data: **WARNING** The THEORY block entry will be substituted by a mapped parameter.";
-            cerr << endl << ">> msr2data: **WARNING** In case, this is not what has been intended, please review the new msr-file!";
-            cerr << endl;
+            std::cerr << std::endl << ">> msr2data: **WARNING** Still it appears directly (un-mapped) in the template THEORY block.";
+            std::cerr << std::endl << ">> msr2data: **WARNING** The THEORY block entry will be substituted by a mapped parameter.";
+            std::cerr << std::endl << ">> msr2data: **WARNING** In case, this is not what has been intended, please review the new msr-file!";
+            std::cerr << std::endl;
 
             unsigned int l(0);
             tempMap = msrRunList->at(0).GetMap();
@@ -1093,7 +1092,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
             if (mapExists) {
               tempVec[j] = "map";
-              tempVec[j].append(boost::lexical_cast<string>(l + 1));
+              tempVec[j].append(boost::lexical_cast<std::string>(l + 1));
               lineChanged = true;
               mapExists = false;
             } else {
@@ -1106,7 +1105,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
                 msrRunList->at(m).SetMap(tempPar, l);
               }
               tempVec[j] = "map";
-              tempVec[j].append(boost::lexical_cast<string>(l + 1));
+              tempVec[j].append(boost::lexical_cast<std::string>(l + 1));
               lineChanged = true;
             }
           }
@@ -1128,7 +1127,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
     // FUNCTIONS block
     tempLines = fMsrHandler->GetMsrFunctions();
-    string::size_type pos(0);
+    std::string::size_type pos(0);
     for (unsigned int i(0); i < tempLines->size(); ++i) {
       line = (*tempLines)[i].fLine.Data();
       split( tempVec, line, is_any_of(" ()+-*/=\t,") ); // split the function line at spaces and some characters that might be juxtaposed to the parameters
@@ -1139,12 +1138,12 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
 
             if (!msrParamList->at(tempPar - 1).fIsGlobal) {
 
-              cerr << endl << ">> msr2data: **WARNING** The parameter " << msrParamList->at(tempPar - 1).fName.Data() \
+              std::cerr << std::endl << ">> msr2data: **WARNING** The parameter " << msrParamList->at(tempPar - 1).fName.Data() \
                            << " is recognized as run specific!";
-              cerr << endl << ">> msr2data: **WARNING** Still it appears directly (un-mapped) in the template FUNCTIONS block.";
-              cerr << endl << ">> msr2data: **WARNING** The FUNCTIONS block entry will be substituted by a mapped parameter.";
-              cerr << endl << ">> msr2data: **WARNING** In case, this is not what has been intended, please review the new msr-file!";
-              cerr << endl;
+              std::cerr << std::endl << ">> msr2data: **WARNING** Still it appears directly (un-mapped) in the template FUNCTIONS block.";
+              std::cerr << std::endl << ">> msr2data: **WARNING** The FUNCTIONS block entry will be substituted by a mapped parameter.";
+              std::cerr << std::endl << ">> msr2data: **WARNING** In case, this is not what has been intended, please review the new msr-file!";
+              std::cerr << std::endl;
 
               unsigned int l(0);
               tempMap = msrRunList->at(0).GetMap();
@@ -1176,14 +1175,14 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
                 }
               }
               pos = line.find(tempVec[j], pos);
-              if ( pos != string::npos ) {
+              if ( pos != std::string::npos ) {
                 tempString = "map";
-                tempString.append(boost::lexical_cast<string>(l + 1));
+                tempString.append(boost::lexical_cast<std::string>(l + 1));
                 line.replace(pos, tempVec[j].length(), tempString);
               } else {
-                cerr << endl << ">> msr2data: **ERROR** A previously identified parameter in the FUNCTIONS block is not found any more!";
-                cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
-                cerr << endl;
+                std::cerr << std::endl << ">> msr2data: **ERROR** A previously identified parameter in the FUNCTIONS block is not found any more!";
+                std::cerr << std::endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
+                std::cerr << std::endl;
               }
               mapExists = false;
               lineChanged = true;
@@ -1191,9 +1190,9 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
           }
 
           catch(boost::bad_lexical_cast &) {
-            cerr << endl << ">> msr2data: **ERROR** Something is wrong with the parameters used in the FUNCTIONS block!";
-            cerr << endl << ">> msr2data: **ERROR** Please report a bug - function parsing should have failed earlier!";
-            cerr << endl;
+            std::cerr << std::endl << ">> msr2data: **ERROR** Something is wrong with the parameters used in the FUNCTIONS block!";
+            std::cerr << std::endl << ">> msr2data: **ERROR** Please report a bug - function parsing should have failed earlier!";
+            std::cerr << std::endl;
             return false;
           }
         }
@@ -1263,7 +1262,7 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
         }
       }
     }
-    tempMap = 0;
+    tempMap = nullptr;
   }
 
   // if the global+ option is specified, generate new single run msr-files and fit them
@@ -1286,29 +1285,29 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
       oldTempRun = *fRunVectorIter;
 
       if (!success) {
-        cout << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
+        std::cout << std::endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << std::endl;
         return false;
       }
 
       // and do the fitting
       // check if MUSRFITPATH is set, if not issue a warning
-      string path("");
+      std::string path("");
       bool pathSet(false);
       char *pathPtr(getenv("MUSRFITPATH"));
       if (pathPtr) {
-        path = boost::lexical_cast<string>(pathPtr);
+        path = boost::lexical_cast<std::string>(pathPtr);
         if (!path.empty()) {
           pathSet = true;
           path.append("/");
         }
       }
       if (!pathSet) {
-        cerr << endl << ">> msr2data: **WARNING** The MUSRFITPATH environment variable is not set!";
-        cerr << endl << ">> msr2data: **WARNING** Please set it or at least ensure that musrfit can be found on the PATH!" << endl;
+        std::cerr << std::endl << ">> msr2data: **WARNING** The MUSRFITPATH environment variable is not set!";
+        std::cerr << std::endl << ">> msr2data: **WARNING** Please set it or at least ensure that musrfit can be found on the PATH!" << std::endl;
       }
-      ostringstream oss;
+      std::ostringstream oss;
       oss << path << "musrfit" << " " << *fRunVectorIter << "-OneRunFit" << fFileExtension << ".msr";
-      cout << endl << ">> msr2data: **INFO** Calling " << oss.str() << endl;
+      std::cout << std::endl << ">> msr2data: **INFO** Calling " << oss.str() << std::endl;
       system(oss.str().c_str());
 
       ++fRunVectorIter;
@@ -1316,24 +1315,24 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     // set back the iterator to the first run
     fRunVectorIter = fRunVector.begin();
 
-    cout << endl << ">> msr2data: **INFO** Continuing with the generation of the global input msr file " << msrOutFile << endl;
+    std::cout << std::endl << ">> msr2data: **INFO** Continuing with the generation of the global input msr file " << msrOutFile << std::endl;
   }
 
 
   // now go through the specified runs and add run-specific parameters and RUN blocks
 
   PMsrHandler *singleRunMsrFile;
-  singleRunMsrFile = 0;
+  singleRunMsrFile = nullptr;
 
-  map<UInt_t, TString> commentsP, commentsR;
+  std::map<UInt_t, TString> commentsP, commentsR;
   TString tempTstr;
-  ostringstream newRunNumber;
+  std::ostringstream newRunNumber;
   newRunNumber.fill('0');
-  newRunNumber.setf(ios::internal, ios::adjustfield);
+  newRunNumber.setf(std::ios::internal, std::ios::adjustfield);
   newRunNumber.width(fRunNumberDigits);
   newRunNumber << *fRunVectorIter;
 
-  //cout << "Number of run specific parameters: " << fNumSpecParam << endl;
+  //std::cout << "Number of run specific parameters: " << fNumSpecParam << std::endl;
 
   if (newRunNumber.str().compare(tempRunNumber.str())) { // first run number does not match the template run number
     // in global+ mode, read in the single run msr-file of the corresponding run
@@ -1343,8 +1342,8 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     // substitute the template run-numbers in the parameter names
     for (unsigned int l(fNumGlobalParam); l < msrParamList->size(); ++l) {
       tempParamName = msrParamList->at(l).fName.Data();
-      string::size_type loc = tempParamName.rfind(tempRunNumber.str());
-      if ( loc != string::npos ) {
+      std::string::size_type loc = tempParamName.rfind(tempRunNumber.str());
+      if ( loc != std::string::npos ) {
         tempParamName.replace(loc, fRunNumberDigits, newRunNumber.str());
         msrParamList->at(l).fName = tempParamName;
         if (globalPlus && singleRunMsrFile) {
@@ -1352,34 +1351,34 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
           fMsrHandler->SetMsrParamStep(l, singleRunMsrFile->GetMsrParamList()->at(l).fStep);
         }
       } else {
-        cerr << endl << ">> msr2data: **ERROR** The indices of the run specific parameters do not match the template run number!";
-        cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
-        cerr << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** The indices of the run specific parameters do not match the template run number!";
+        std::cerr << std::endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
+        std::cerr << std::endl;
       }
     }
     if (singleRunMsrFile) {
       delete singleRunMsrFile;
-      singleRunMsrFile = 0;
+      singleRunMsrFile = nullptr;
     }
 
     // substitute the template run-numbers in the RUN names
     for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
       tempRunName = msrRunList->at(i).GetRunName()->Data();
-      string::size_type loc = tempRunName.rfind(tempRunNumber.str());
-      if ( loc != string::npos ) {
+      std::string::size_type loc = tempRunName.rfind(tempRunNumber.str());
+      if ( loc != std::string::npos ) {
         tempRunName.replace(loc, fRunNumberDigits, newRunNumber.str());
         tempTstr = TString(tempRunName);
         msrRunList->at(i).SetRunName(tempTstr, 0);
       } else {
-        cerr << endl << ">> msr2data: **ERROR** A template run file number does not match the \"file index\"";
-        cerr << endl << ">> msr2data: **ERROR** Please check the template file!";
-        cerr << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** A template run file number does not match the \"file index\"";
+        std::cerr << std::endl << ">> msr2data: **ERROR** Please check the template file!";
+        std::cerr << std::endl;
         return false;
       }
     }
   }
 
-  ostringstream tempStrStr;
+  std::ostringstream tempStrStr;
 
   // comments for the output-file
   if (fNumGlobalParam) {
@@ -1401,16 +1400,16 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
   ++fRunVectorIter;
 
   UInt_t runcounter(0);
-  map<TString, Int_t> *runParGlobal(0);
-  map<TString, Int_t>::iterator iter;
-  PIntVector *runMapGlobal(0);
+  std::map<TString, Int_t> *runParGlobal(nullptr);
+  std::map<TString, Int_t>::iterator iter;
+  PIntVector *runMapGlobal(nullptr);
 
   while (fRunVectorIter != fRunVector.end()) {
     tempRunNumber.str(newRunNumber.str());
     newRunNumber.str("");
     newRunNumber.clear();
     newRunNumber.fill('0');
-    newRunNumber.setf(ios::internal, ios::adjustfield);
+    newRunNumber.setf(std::ios::internal, std::ios::adjustfield);
     newRunNumber.width(fRunNumberDigits);
     newRunNumber << *fRunVectorIter;
 
@@ -1422,8 +1421,8 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
     for (unsigned int l(0); l < fNumSpecParam; ++l) {
       msrParamList->push_back(msrParamList->at(fNumGlobalParam + runcounter*fNumSpecParam + l));
       tempParamName = msrParamList->back().fName.Data();
-      string::size_type loc = tempParamName.rfind(tempRunNumber.str());
-      if ( loc != string::npos ) {
+      std::string::size_type loc = tempParamName.rfind(tempRunNumber.str());
+      if ( loc != std::string::npos ) {
         tempParamName.replace(loc, fRunNumberDigits, newRunNumber.str());
         msrParamList->back().fName = tempParamName;
         msrParamList->back().fNo += fNumSpecParam;
@@ -1432,29 +1431,29 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
           fMsrHandler->SetMsrParamStep(msrParamList->size() - 1, singleRunMsrFile->GetMsrParamList()->at(fNumGlobalParam + l).fStep);
         }
       } else {
-        cerr << endl << ">> msr2data: **ERROR** Something went wrong when appending new parameters!";
-        cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
-        cerr << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** Something went wrong when appending new parameters!";
+        std::cerr << std::endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
+        std::cerr << std::endl;
       }
     }
     if (singleRunMsrFile) {
       delete singleRunMsrFile;
-      singleRunMsrFile = 0;
+      singleRunMsrFile = nullptr;
     }
 
     // add RUN blocks for each run
     for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
       msrRunList->push_back(msrRunList->at(runcounter*fNumTempRunBlocks + i));
       tempRunName = msrRunList->back().GetRunName()->Data();
-      string::size_type loc = tempRunName.rfind(tempRunNumber.str());
-      if ( loc != string::npos ) {
+      std::string::size_type loc = tempRunName.rfind(tempRunNumber.str());
+      if ( loc != std::string::npos ) {
         tempRunName.replace(loc, fRunNumberDigits, newRunNumber.str());
         tempTstr = TString(tempRunName);
         msrRunList->back().SetRunName(tempTstr, 0);
       } else {
-        cerr << endl << ">> msr2data: **ERROR** Something went wrong when appending new RUN blocks!";
-        cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
-        cerr << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** Something went wrong when appending new RUN blocks!";
+        std::cerr << std::endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
+        std::cerr << std::endl;
         return false;
       }
       // change run specific parameter numbers in the new RUN block
@@ -1514,19 +1513,19 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const string &msrOu
    fMsrHandler->GetMsrStatistic()->fValid = false;
 
    // write the global msr-file
-   status = fMsrHandler->WriteMsrFile(msrOutFile.c_str(), &commentsP, 0, 0, &commentsR);
+   status = fMsrHandler->WriteMsrFile(msrOutFile.c_str(), &commentsP, nullptr, nullptr, &commentsR);
 
    if (status != PMUSR_SUCCESS) {
-     cerr << endl << ">> msr2data: **ERROR** Writing the new msr-file has not been successful!";
-     cerr << endl;
+     std::cerr << std::endl << ">> msr2data: **ERROR** Writing the new msr-file has not been successful!";
+     std::cerr << std::endl;
      return false;
    }
 
    // set back the run-iterator to the start
    fRunVectorIter = fRunVector.begin();
 
-   msrParamList = 0;
-   msrRunList = 0;
+   msrParamList = nullptr;
+   msrRunList = nullptr;
 
    return true;
 }
@@ -1553,24 +1552,24 @@ bool PMsr2Data::PrepareNewSortedInputFile(unsigned int tempRun) const
   PMsrRunList runListCopy(*msrRunList);
   TString titleCopy(*(fMsrHandler->GetMsrTitle()));
 
-  ostringstream tempRunNumber;
+  std::ostringstream tempRunNumber;
   tempRunNumber.fill('0');
-  tempRunNumber.setf(ios::internal, ios::adjustfield);
+  tempRunNumber.setf(std::ios::internal, std::ios::adjustfield);
   tempRunNumber.width(fRunNumberDigits);
   tempRunNumber << tempRun;
 
-  ostringstream newRunNumber;
+  std::ostringstream newRunNumber;
   newRunNumber.fill('0');
-  newRunNumber.setf(ios::internal, ios::adjustfield);
+  newRunNumber.setf(std::ios::internal, std::ios::adjustfield);
   newRunNumber.width(fRunNumberDigits);
   newRunNumber << *fRunVectorIter;
 
-  string tempParamName, tempRunName;
+  std::string tempParamName, tempRunName;
   TString tempTstr;
 
-  ostringstream msrOutFile;
+  std::ostringstream msrOutFile;
   msrOutFile << *fRunVectorIter << "-OneRunFit" << fFileExtension << ".msr";
-  cout << endl << ">> msr2data: **INFO** Generating new input msr file " << msrOutFile.str() << endl;
+  std::cout << std::endl << ">> msr2data: **INFO** Generating new input msr file " << msrOutFile.str() << std::endl;
 
   tempTstr = TString(newRunNumber.str());
   fMsrHandler->SetMsrTitle(tempTstr);
@@ -1578,14 +1577,14 @@ bool PMsr2Data::PrepareNewSortedInputFile(unsigned int tempRun) const
   // remove the template run-numbers in the parameter names
   for (unsigned int l(fNumGlobalParam); l < msrParamList->size(); ++l) {
     tempParamName = msrParamList->at(l).fName.Data();
-    string::size_type loc = tempParamName.rfind(tempRunNumber.str());
-    if ( loc != string::npos ) {
+    std::string::size_type loc = tempParamName.rfind(tempRunNumber.str());
+    if ( loc != std::string::npos ) {
       tempParamName.erase(loc);
       msrParamList->at(l).fName = tempParamName;
     } else {
-      cerr << endl << ">> msr2data: **ERROR** The indices of the run specific parameters do not match the template run number!";
-      cerr << endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
-      cerr << endl;
+      std::cerr << std::endl << ">> msr2data: **ERROR** The indices of the run specific parameters do not match the template run number!";
+      std::cerr << std::endl << ">> msr2data: **ERROR** This should not happen! Please report a bug!";
+      std::cerr << std::endl;
     }
   }
 
@@ -1593,15 +1592,15 @@ bool PMsr2Data::PrepareNewSortedInputFile(unsigned int tempRun) const
     // substitute the template run-numbers in the RUN names
     for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
       tempRunName = msrRunList->at(i).GetRunName()->Data();
-      string::size_type loc = tempRunName.rfind(tempRunNumber.str());
-      if ( loc != string::npos ) {
+      std::string::size_type loc = tempRunName.rfind(tempRunNumber.str());
+      if ( loc != std::string::npos ) {
         tempRunName.replace(loc, fRunNumberDigits, newRunNumber.str());
         tempTstr = TString(tempRunName);
         msrRunList->at(i).SetRunName(tempTstr, 0);
       } else {
-        cerr << endl << ">> msr2data: **ERROR** A template run file number does not match the \"file index\"";
-        cerr << endl << ">> msr2data: **ERROR** Please check the template file!";
-        cerr << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** A template run file number does not match the \"file index\"";
+        std::cerr << std::endl << ">> msr2data: **ERROR** Please check the template file!";
+        std::cerr << std::endl;
         return false;
       }
     }
@@ -1623,8 +1622,8 @@ bool PMsr2Data::PrepareNewSortedInputFile(unsigned int tempRun) const
   titleCopy.Clear();
 
   if (status != PMUSR_SUCCESS) {
-    cerr << endl << ">> msr2data: **ERROR** Writing the new msr file has not been successful!";
-    cerr << endl;
+    std::cerr << std::endl << ">> msr2data: **ERROR** Writing the new msr file has not been successful!";
+    std::cerr << std::endl;
     return false;
   }
 
@@ -1648,13 +1647,13 @@ bool PMsr2Data::PrepareNewSortedInputFile(unsigned int tempRun) const
  * \param global global mode or not
  * \param counter counter used within the global mode to determine how many runs have been processed already
  */
-int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& paramList, bool db,
+int PMsr2Data::WriteOutput(const std::string &outfile, const std::vector<unsigned int>& paramList, bool db,
                            unsigned int withHeader, bool global, unsigned int counter) const
 {
   // make sure that the parameter number of the parameter list stays within proper bounds
   for (unsigned int i=0; i<paramList.size(); i++) {
     if (paramList[i] > fMsrHandler->GetMsrParamList()->size()) {
-      cerr << "msr2data: **ERROR** found parameter " << paramList[i] << " which is out of bound (>" << fMsrHandler->GetMsrParamList()->size() << ")." << endl;
+      std::cerr << "msr2data: **ERROR** found parameter " << paramList[i] << " which is out of bound (>" << fMsrHandler->GetMsrParamList()->size() << ")." << std::endl;
       return -1;
     }
   }
@@ -1664,14 +1663,14 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
     return PMUSR_SUCCESS;
   }
 
-  ostringstream curRunNumber;
+  std::ostringstream curRunNumber;
   curRunNumber.fill('0');
-  curRunNumber.setf(ios::internal, ios::adjustfield);
+  curRunNumber.setf(std::ios::internal, std::ios::adjustfield);
   curRunNumber.width(fRunNumberDigits);
   curRunNumber << *fRunVectorIter;
 
-  string msrTitle(fMsrHandler->GetMsrTitle()->Data());
-  string msrFileName(fMsrHandler->GetFileName().Data());
+  std::string msrTitle(fMsrHandler->GetMsrTitle()->Data());
+  std::string msrFileName(fMsrHandler->GetFileName().Data());
   unsigned int msrNoOfParams(fMsrHandler->GetNoOfParams());
   PMsrParamList *msrParamList(fMsrHandler->GetMsrParamList());
   PMsrRunList *msrRunList(fMsrHandler->GetMsrRunList());
@@ -1680,18 +1679,18 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
     // since the DB-ASCII-output is in principle independent of the original msr-file-generation
     // the number of global and run specific parameters as well as the number of RUN blocks per run number have to be determined again
     // in case no msr-file has been created before.
-    ostringstream tempRunNumber;
-    string tempName;
+    std::ostringstream tempRunNumber;
+    std::string tempName;
     if (!fNumGlobalParam && !fNumSpecParam && !fNumTempRunBlocks) { // if not all parameters are zero they have been determined before
       tempRunNumber.fill('0');
-      tempRunNumber.setf(ios::internal, ios::adjustfield);
+      tempRunNumber.setf(std::ios::internal, std::ios::adjustfield);
       tempRunNumber.width(fRunNumberDigits);
       tempRunNumber << fRunVector.front();
 
       // search parameter list for run-specific parameters
       for (unsigned int i(0); i < msrParamList->size(); ++i) {
         tempName = msrParamList->at(i).fName.Data();
-        string::size_type loc = tempName.rfind(tempRunNumber.str());
+        std::string::size_type loc = tempName.rfind(tempRunNumber.str());
         if ((tempName.length() > fRunNumberDigits) && (loc == tempName.length() - fRunNumberDigits)) {
           if (!fNumSpecParam) {
             fNumGlobalParam = i;
@@ -1706,19 +1705,19 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
       // look through the RUN blocks and count them
       for (unsigned int i(0); i < msrRunList->size(); ++i) {
         tempName = msrRunList->at(i).GetRunName()->Data();
-        string::size_type loc = tempName.rfind(tempRunNumber.str());
-        if ( loc != string::npos ) {
+        std::string::size_type loc = tempName.rfind(tempRunNumber.str());
+        if ( loc != std::string::npos ) {
           ++fNumTempRunBlocks;
         }
       }
-//       cerr << endl << ">> msr2data: **WARNING** At the moment the full integrity of the global msr file cannot be checked!";
-//       cerr << endl << ">> msr2data: **WARNING** It should therefore be checked carefully that the run order is consistent";
-//       cerr << endl << ">> msr2data: **WARNING** in the specified run list, the parameters and the RUN blocks in the msr file!";
-//       cerr << endl << ">> msr2data: **WARNING** A simple check for the first specified run yields:";
-//       cerr << endl << ">> msr2data: **WARNING** Number of global parameters: " << fNumGlobalParam;
-//       cerr << endl << ">> msr2data: **WARNING** Number of run specific parameters: " << fNumSpecParam;
-//       cerr << endl << ">> msr2data: **WARNING** Number of RUN blocks per run number: " << fNumTempRunBlocks;
-//       cerr << endl;
+//       std::cerr << std::endl << ">> msr2data: **WARNING** At the moment the full integrity of the global msr file cannot be checked!";
+//       std::cerr << std::endl << ">> msr2data: **WARNING** It should therefore be checked carefully that the run order is consistent";
+//       std::cerr << std::endl << ">> msr2data: **WARNING** in the specified run list, the parameters and the RUN blocks in the msr file!";
+//       std::cerr << std::endl << ">> msr2data: **WARNING** A simple check for the first specified run yields:";
+//       std::cerr << std::endl << ">> msr2data: **WARNING** Number of global parameters: " << fNumGlobalParam;
+//       std::cerr << std::endl << ">> msr2data: **WARNING** Number of run specific parameters: " << fNumSpecParam;
+//       std::cerr << std::endl << ">> msr2data: **WARNING** Number of RUN blocks per run number: " << fNumTempRunBlocks;
+//       std::cerr << std::endl;
     }
     // Two more simple consistency checks
     bool okP(true), okR(true);
@@ -1729,10 +1728,10 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
     }
 
     if (!okP) {
-      cerr << endl << ">> msr2data: **ERROR** The number of parameters or their grouping is not consistent with the specified run list!";
-      cerr << endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file!";
-      cerr << endl << ">> msr2data: **ERROR** No output will be written!";
-      cerr << endl;
+      std::cerr << std::endl << ">> msr2data: **ERROR** The number of parameters or their grouping is not consistent with the specified run list!";
+      std::cerr << std::endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file!";
+      std::cerr << std::endl << ">> msr2data: **ERROR** No output will be written!";
+      std::cerr << std::endl;
       return -1;
     }
 
@@ -1743,10 +1742,10 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
     }
 
     if (!okR) {
-      cerr << endl << ">> msr2data: **ERROR** The number of RUN blocks or their grouping is not consistent with the specified run list!";
-      cerr << endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file!";
-      cerr << endl << ">> msr2data: **ERROR** No output will be written!";
-      cerr << endl;
+      std::cerr << std::endl << ">> msr2data: **ERROR** The number of RUN blocks or their grouping is not consistent with the specified run list!";
+      std::cerr << std::endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file!";
+      std::cerr << std::endl << ">> msr2data: **ERROR** No output will be written!";
+      std::cerr << std::endl;
       return -1;
     }
 
@@ -1755,13 +1754,13 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
       tempRunNumber.clear();
       tempRunNumber.str("");
       tempRunNumber.fill('0');
-      tempRunNumber.setf(ios::internal, ios::adjustfield);
+      tempRunNumber.setf(std::ios::internal, std::ios::adjustfield);
       tempRunNumber.width(fRunNumberDigits);
       tempRunNumber << fRunVector[a];
 
       for (unsigned int i(0); i < fNumSpecParam; ++i) {
         tempName = msrParamList->at(fNumGlobalParam + a*fNumSpecParam + i).fName.Data();
-        string::size_type loc = tempName.rfind(tempRunNumber.str());
+        std::string::size_type loc = tempName.rfind(tempRunNumber.str());
         if (!(tempName.length() > fRunNumberDigits) || !(loc == tempName.length() - fRunNumberDigits)) {
           okP = false;
           break;
@@ -1773,10 +1772,10 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
     }
 
     if (!okP) {
-      cerr << endl << ">> msr2data: **ERROR** The run specific parameter names are not consistent with the specified run list!";
-      cerr << endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file and the run list!";
-      cerr << endl << ">> msr2data: **ERROR** No output will be written!";
-      cerr << endl;
+      std::cerr << std::endl << ">> msr2data: **ERROR** The run specific parameter names are not consistent with the specified run list!";
+      std::cerr << std::endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file and the run list!";
+      std::cerr << std::endl << ">> msr2data: **ERROR** No output will be written!";
+      std::cerr << std::endl;
       return -1;
     }
 
@@ -1784,14 +1783,14 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
       tempRunNumber.clear();
       tempRunNumber.str("");
       tempRunNumber.fill('0');
-      tempRunNumber.setf(ios::internal, ios::adjustfield);
+      tempRunNumber.setf(std::ios::internal, std::ios::adjustfield);
       tempRunNumber.width(fRunNumberDigits);
       tempRunNumber << fRunVector[a];
 
       for (unsigned int i(0); i < fNumTempRunBlocks; ++i) {
         tempName = msrRunList->at(a*fNumTempRunBlocks + i).GetRunName()->Data();
-        string::size_type loc = tempName.rfind(tempRunNumber.str());
-        if (loc == string::npos) {
+        std::string::size_type loc = tempName.rfind(tempRunNumber.str());
+        if (loc == std::string::npos) {
           okR = false;
           break;
         }
@@ -1802,17 +1801,17 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
     }
 
     if (!okR) {
-      cerr << endl << ">> msr2data: **ERROR** The run names in the RUN blocks are not consistent with the specified run list!";
-      cerr << endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file and the run list!";
-      cerr << endl << ">> msr2data: **ERROR** No output will be written!";
-      cerr << endl;
+      std::cerr << std::endl << ">> msr2data: **ERROR** The run names in the RUN blocks are not consistent with the specified run list!";
+      std::cerr << std::endl << ">> msr2data: **ERROR** Please check carefully the integrity of the msr file and the run list!";
+      std::cerr << std::endl << ">> msr2data: **ERROR** No output will be written!";
+      std::cerr << std::endl;
       return -1;
     }
   }
 
-  vector<string> dataParamNames;
-  vector<string> dataParamLabels;
-  vector<double> dataParam, dataParamErr;
+  std::vector<std::string> dataParamNames;
+  std::vector<std::string> dataParamLabels;
+  std::vector<double> dataParam, dataParamErr;
 
   if (fDataHandler) {
     PRawRunData *rawRunData;
@@ -1830,7 +1829,7 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
         dataParamErr.push_back(rawRunData->GetTempError(0));
         break;
       default:
-        ostringstream oss;
+        std::ostringstream oss;
         for (unsigned int i(0); i<rawRunData->GetNoOfTemperatures(); i++) {
           oss << "dataT" << i;
           dataParamNames.push_back(oss.str());
@@ -1889,18 +1888,18 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
       dataParam.push_back(value);
     }
 
-    rawRunData = 0;
+    rawRunData = nullptr;
   }
 
 // get the independent variable values from the runlist file if needed
   PDoubleVector indVarValues;
 
   if (fRunListFile) {
-    string line;
-    vector<string> splitVec;
+    std::string line;
+    std::vector<std::string> splitVec;
     unsigned int runNo;
     double val;
-    istringstream strLine;
+    std::istringstream strLine;
 
     while (getline(*fRunListFileStream, line)) {
       trim(line);
@@ -1914,9 +1913,9 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
         strLine.str(splitVec[0]);
         strLine >> runNo;
         if (runNo != *fRunVectorIter) {
-          cerr << endl << ">> msr2data: **ERROR** The run number in the runlist file does not match the one which should be processed...";
-          cerr << endl << ">> msr2data: **ERROR** Something is very strange... Please report this bug!";
-          cerr << endl;
+          std::cerr << std::endl << ">> msr2data: **ERROR** The run number in the runlist file does not match the one which should be processed...";
+          std::cerr << std::endl << ">> msr2data: **ERROR** Something is very strange... Please report this bug!";
+          std::cerr << std::endl;
           fRunVectorIter = fRunVector.end();
           return -1;
         }
@@ -1924,9 +1923,9 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
           indVarValues.push_back(val);
         }
         if (indVarValues.size() != fIndVar.size()) {
-          cerr << endl << ">> msr2data: **ERROR** The number of data entries in the runlist file for the run number " << runNo;
-          cerr << endl << ">> msr2data: **ERROR** does not match the number of labels given in the RUN-line! Please check the file!";
-          cerr << endl;
+          std::cerr << std::endl << ">> msr2data: **ERROR** The number of data entries in the runlist file for the run number " << runNo;
+          std::cerr << std::endl << ">> msr2data: **ERROR** does not match the number of labels given in the RUN-line! Please check the file!";
+          std::cerr << std::endl;
           fRunVectorIter = fRunVector.end();
           return -1;
         }
@@ -1938,17 +1937,17 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
 // The RUNLIST file stream and the run vector iterator might get out of synchronization, if the following check is placed before the above block...
   PMsrStatisticStructure *msrStatistic(fMsrHandler->GetMsrStatistic());
   if (!msrStatistic->fValid) { // in the GLOBAL mode this has already been checked before -> check should be negative anyway
-    cerr << endl << ">> msr2data: **WARNING** The fit of run " << *fRunVectorIter << " has not converged!";
-    cerr << endl << ">> msr2data: **WARNING** Its parameter data have not been appended to the output file " << outfile;
-    cerr << endl;
+    std::cerr << std::endl << ">> msr2data: **WARNING** The fit of run " << *fRunVectorIter << " has not converged!";
+    std::cerr << std::endl << ">> msr2data: **WARNING** Its parameter data have not been appended to the output file " << outfile;
+    std::cerr << std::endl;
     fRunVectorIter++;
 
     delete fMsrHandler;
-    fMsrHandler = 0;
+    fMsrHandler = nullptr;
 
     if (fDataHandler) {
       delete fDataHandler;
-      fDataHandler = 0;
+      fDataHandler = nullptr;
     }
 
 // clean up some vectors
@@ -1962,22 +1961,22 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
   }
 
 // open the DB or dat file and write the data
-  fstream outFile;
-  outFile.open(outfile.c_str(), ios::in | ios::out | ios::ate);
+  std::fstream outFile;
+  outFile.open(outfile.c_str(), std::ios::in | std::ios::out | std::ios::ate);
   if (outFile.is_open()) {
     if (((withHeader == 0) || (withHeader == 1)) && !fHeaderWritten) {
       // Header should (not) be written explicitly, start writing at the end of the file
       // This also ensures the backward compatibility to the old "noheader" option
-      outFile.seekp(0, ios::end);
+      outFile.seekp(0, std::ios::end);
     } else {
       if (!fHeaderWritten) { // File already present: assume header is present already and find the last written block
         fHeaderWritten = true;
       }
       int size(outFile.tellg());
-      string s;
+      std::string s;
 
       for (int i(1); i<=size; ++i) { // find the last non-empty line
-        outFile.seekg(-i, ios::end);
+        outFile.seekg(-i, std::ios::end);
         getline(outFile, s);
         trim(s); // remove whitespace
         if (s.empty()) { // trim cuts off also characters like '\n', therefore this should work also with M$-DOS linebreaks
@@ -1989,16 +1988,16 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
             continue;
           }
         } else {
-          outFile.seekp(0, ios::cur);
+          outFile.seekp(0, std::ios::cur);
           break;
         }
       }
     }
   } else {
-    outFile.open(outfile.c_str(), ios::out);
+    outFile.open(outfile.c_str(), std::ios::out);
     if (!outFile.is_open()) {
-      cerr << endl << ">> msr2data: **ERROR** The output file " << outfile << " cannot be opened! Please check!";
-      cerr << endl;
+      std::cerr << std::endl << ">> msr2data: **ERROR** The output file " << outfile << " cannot be opened! Please check!";
+      std::cerr << std::endl;
       fRunVectorIter = fRunVector.end();
       return -1;
     }
@@ -2007,68 +2006,68 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
   if (db) {
 
     if (withHeader && !fHeaderWritten) {
-      cout << endl << ">> msr2data: **INFO** Write a new DB file header to " << outfile << endl;
+      std::cout << std::endl << ">> msr2data: **INFO** Write a new DB file header to " << outfile << std::endl;
 
-      outFile << "TITLE" << endl;
-      outFile << ">>>Put your title here<<<" << endl << endl;
-      outFile << "Abstract" << endl;
-      outFile << ">>>Put your abstract here<<<" << endl << endl;
-      outFile << "LABELS" << endl;
+      outFile << "TITLE" << std::endl;
+      outFile << ">>>Put your title here<<<" << std::endl << std::endl;
+      outFile << "Abstract" << std::endl;
+      outFile << ">>>Put your abstract here<<<" << std::endl << std::endl;
+      outFile << "LABELS" << std::endl;
 
       if (fDataHandler) {
         for (unsigned int i(0); i < dataParamLabels.size(); ++i) {
-          outFile << dataParamLabels[i] << endl;
+          outFile << dataParamLabels[i] << std::endl;
         }
       }
 
       if (fRunListFile) {
         for (unsigned int i(0); i < fIndVar.size(); ++i) {
-          outFile << fIndVar[i] << endl;
+          outFile << fIndVar[i] << std::endl;
         }
       }
 
       // in the GLOBAL mode write only global parameters and those which belong to the actual run - in the NORMAL mode write all parameters
       if (global) {
-        string tempName;
+        std::string tempName;
         for (unsigned int i(0); i < fNumGlobalParam; ++i) {
           if (InParameterList(i, paramList))
-            outFile << (*msrParamList)[i].fName.Data() << endl;
+            outFile << (*msrParamList)[i].fName.Data() << std::endl;
         }
         for (unsigned int i(0); i < fNumSpecParam; ++i) {
           if (InParameterList(fNumGlobalParam + fNumSpecParam*counter + i, paramList)) {
             tempName = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
-            string::size_type loc = tempName.rfind(curRunNumber.str());
+            std::string::size_type loc = tempName.rfind(curRunNumber.str());
             if (loc == tempName.length() - fRunNumberDigits) {
-              outFile << tempName.substr(0, loc) << endl;
+              outFile << tempName.substr(0, loc) << std::endl;
             } else {
-              cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
-              cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
-              cerr << endl;
+              std::cerr << std::endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
+              std::cerr << std::endl << ">> msr2data: **ERROR** The output will be flawed!";
+              std::cerr << std::endl;
             }
           }
         }
       } else {
         for (unsigned int i(0); i < msrNoOfParams; ++i) {
           if (InParameterList(i, paramList))
-            outFile << (*msrParamList)[i].fName.Data() << endl;
+            outFile << (*msrParamList)[i].fName.Data() << std::endl;
         }
       }
 
       if (msrStatistic->fChisq)
-        outFile << "CHISQ" << endl;
+        outFile << "CHISQ" << std::endl;
       else
-        outFile << "maxLH" << endl;
+        outFile << "maxLH" << std::endl;
 
-      outFile << "NDF" << endl;
+      outFile << "NDF" << std::endl;
 
       if (msrStatistic->fChisq)
-        outFile << "CHISQred" << endl;
+        outFile << "CHISQred" << std::endl;
       else
-        outFile << "maxLHred" << endl;
+        outFile << "maxLHred" << std::endl;
 
-      outFile << "RUN" << endl;
+      outFile << "RUN" << std::endl;
 
-      outFile << endl << "Data";
+      outFile << std::endl << "Data";
 
       if (fDataHandler) {
         for (unsigned int i(0); i < dataParamNames.size(); ++i) {
@@ -2084,7 +2083,7 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
 
       // in the GLOBAL mode write only global parameters and those which belong to the actual run - in the NORMAL mode write all parameters
       if (global) {
-        string tempName;
+        std::string tempName;
         for (unsigned int i(0); i < fNumGlobalParam; ++i) {
           if (InParameterList(i, paramList))
             outFile << " " << (*msrParamList)[i].fName.Data();
@@ -2092,13 +2091,13 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
         for (unsigned int i(0); i < fNumSpecParam; ++i) {
           if (InParameterList(i, paramList)) {
             tempName = (*msrParamList)[fNumGlobalParam + fNumSpecParam*counter + i].fName.Data();
-            string::size_type loc = tempName.rfind(curRunNumber.str());
+            std::string::size_type loc = tempName.rfind(curRunNumber.str());
             if (loc == tempName.length() - fRunNumberDigits) {
               outFile << " " << tempName.substr(0, loc);
             } else {
-              cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
-              cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
-              cerr << endl;
+              std::cerr << std::endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
+              std::cerr << std::endl << ">> msr2data: **ERROR** The output will be flawed!";
+              std::cerr << std::endl;
             }
           }
         }
@@ -2121,9 +2120,9 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
       else
         outFile << " " << "maxLHred";
 
-      outFile << " " << "RUN" << endl;
+      outFile << " " << "RUN" << std::endl;
 
-      outFile << "\\-e" << endl;
+      outFile << "\\-e" << std::endl;
 
       fHeaderWritten = true;
     }
@@ -2132,21 +2131,21 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
       for (unsigned int i(0); i < dataParam.size(); ++i) {
         if (i < dataParamErr.size())
           outFile << dataParamNames[i] << " = " << dataParam[i] << ", " \
-          << dataParamErr[i] << ", " << dataParamErr[i] << ",\\" << endl;
+          << dataParamErr[i] << ", " << dataParamErr[i] << ",\\" << std::endl;
         else
-          outFile << dataParamNames[i] << " = " << dataParam[i] << ", 0, 0,\\" << endl;
+          outFile << dataParamNames[i] << " = " << dataParam[i] << ", 0, 0,\\" << std::endl;
       }
     }
 
     if (fRunListFile) {
       for (unsigned int i(0); i < indVarValues.size(); ++i) {
-        outFile << fIndVar[i] << " = " << indVarValues[i] << ", 0, 0,\\" << endl;
+        outFile << fIndVar[i] << " = " << indVarValues[i] << ", 0, 0,\\" << std::endl;
       }
     }
 
     // in the GLOBAL mode write only global parameters and those which belong to the actual run - in the NORMAL mode write all parameters
     if (global) {
-      string tempName;
+      std::string tempName;
       unsigned int idx;
       for (unsigned int i(0); i < fNumGlobalParam; ++i) {
         if (InParameterList(i, paramList)) {
@@ -2162,14 +2161,14 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
             outFile << (*msrParamList)[i].fPosError << ", ";
           else
             outFile << fabs((*msrParamList)[i].fStep) << ", ";
-          outFile << fabs((*msrParamList)[i].fStep) << ",\\" << endl;
+          outFile << fabs((*msrParamList)[i].fStep) << ",\\" << std::endl;
         }
       }
       for (unsigned int i(0); i < fNumSpecParam; ++i) {
         idx = fNumGlobalParam + fNumSpecParam*counter + i;
         if (InParameterList(idx, paramList)) {
           tempName = (*msrParamList)[idx].fName.Data();
-          string::size_type loc = tempName.rfind(curRunNumber.str());
+          std::string::size_type loc = tempName.rfind(curRunNumber.str());
           if (loc == tempName.length() - fRunNumberDigits) {
             outFile << tempName.substr(0, loc) << " = ";
             if ((*msrParamList)[idx].fPosErrorPresent) {
@@ -2186,7 +2185,7 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
               outFile << ", ";
             }
             WriteValue(outFile, (*msrParamList)[idx].fStep, (*msrParamList)[idx].fStep, outFile.width(), db);
-            outFile << ",\\" << endl;
+            outFile << ",\\" << std::endl;
           }
         }
       }
@@ -2209,24 +2208,24 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
             outFile << ", ";
           }
           WriteValue(outFile, (*msrParamList)[i].fStep, (*msrParamList)[i].fStep, outFile.width(), db);
-          outFile << ",\\" << endl;
+          outFile << ",\\" << std::endl;
         }
       }
     }
 
     if (msrStatistic->fChisq)
-      outFile << "CHISQ = " << msrStatistic->fMin << ", 0, 0,\\" << endl;
+      outFile << "CHISQ = " << msrStatistic->fMin << ", 0, 0,\\" << std::endl;
     else
-      outFile << "maxLH = " << msrStatistic->fMin << ", 0, 0,\\" << endl;
+      outFile << "maxLH = " << msrStatistic->fMin << ", 0, 0,\\" << std::endl;
 
-    outFile << "NDF = " << msrStatistic->fNdf << ", 0, 0,\\" << endl;
+    outFile << "NDF = " << msrStatistic->fNdf << ", 0, 0,\\" << std::endl;
 
     if (msrStatistic->fChisq)
-      outFile << "CHISQred = " << msrStatistic->fMin/msrStatistic->fNdf << ", 0, 0,\\" << endl;
+      outFile << "CHISQred = " << msrStatistic->fMin/msrStatistic->fNdf << ", 0, 0,\\" << std::endl;
     else
-      outFile << "maxLHred = " << msrStatistic->fMin/msrStatistic->fNdf << ", 0, 0,\\" << endl;
+      outFile << "maxLHred = " << msrStatistic->fMin/msrStatistic->fNdf << ", 0, 0,\\" << std::endl;
 
-    outFile << *fRunVectorIter << ",,, " << msrTitle << endl;
+    outFile << *fRunVectorIter << ",,, " << msrTitle << std::endl;
 
   } else { // no DB file but ASCII file with data columns
 
@@ -2242,7 +2241,7 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
         maxlength = length;
     }
     // in the GLOBAL mode write only global parameters and those which belong to the actual run - in the NORMAL mode write all parameters
-    string s;
+    std::string s;
     if (global) {
       for (unsigned int i(0); i < fNumGlobalParam; ++i) {
         if (InParameterList(i, paramList)) {
@@ -2257,15 +2256,15 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
         idx = fNumGlobalParam + fNumSpecParam*counter + i;
         if (InParameterList(idx, paramList)) {
           s = (*msrParamList)[idx].fName.Data();
-          string::size_type loc = s.rfind(curRunNumber.str());
+          std::string::size_type loc = s.rfind(curRunNumber.str());
           if (loc == s.length() - fRunNumberDigits) {
             length = s.length() - fRunNumberDigits;
             if (length > maxlength)
               maxlength = length;
           } else {
-            cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
-            cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
-            cerr << endl;
+            std::cerr << std::endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
+            std::cerr << std::endl << ">> msr2data: **ERROR** The output will be flawed!";
+            std::cerr << std::endl;
           }
         }
       }
@@ -2285,21 +2284,21 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
       maxlength += 1; // maximum length of parameter names + ' '
 
     if (withHeader && !fHeaderWritten) {
-      cout << endl << ">> msr2data: **INFO** Write a new simple-ASCII file header to " << outfile << endl;
+      std::cout << std::endl << ">> msr2data: **INFO** Write a new simple-ASCII file header to " << outfile << std::endl;
 
       if (fDataHandler) {
         for (unsigned int i(0); i < dataParamNames.size(); ++i) {
           s = dataParamNames[i];
           if (i < dataParamErr.size()) {
-            outFile << setw(maxlength) << left << s << setw(maxlength + 3) << left << s + "Err";
+            outFile << std::setw(maxlength) << std::left << s << std::setw(maxlength + 3) << std::left << s + "Err";
           } else
-            outFile << setw(maxlength) << left << s;
+            outFile << std::setw(maxlength) << std::left << s;
         }
       }
 
       if (fRunListFile) {
         for (unsigned int i(0); i < fIndVar.size(); ++i) {
-          outFile << setw(maxlength) << left << fIndVar[i];
+          outFile << std::setw(maxlength) << std::left << fIndVar[i];
         }
       }
 
@@ -2308,9 +2307,9 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
         for (unsigned int i(0); i < fNumGlobalParam; ++i) {
           if (InParameterList(i, paramList)) {
             s = (*msrParamList)[i].fName.Data();
-            outFile << setw(maxlength) << left << s \
-                    << setw(maxlength + 6) << left << s + "PosErr" \
-                    << setw(maxlength + 6) << left << s + "NegErr";
+            outFile << std::setw(maxlength) << std::left << s \
+                    << std::setw(maxlength + 6) << std::left << s + "PosErr" \
+                    << std::setw(maxlength + 6) << std::left << s + "NegErr";
           }
         }
         unsigned int idx;
@@ -2318,16 +2317,16 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
           idx = fNumGlobalParam + fNumSpecParam*counter + i;
           if (InParameterList(idx, paramList)) {
             s = (*msrParamList)[idx].fName.Data();
-            string::size_type loc = s.rfind(curRunNumber.str());
+            std::string::size_type loc = s.rfind(curRunNumber.str());
             if (loc == s.length() - fRunNumberDigits) {
               s = s.substr(0, loc);
-              outFile << setw(maxlength) << left << s \
-                      << setw(maxlength + 6) << left << s + "PosErr" \
-                      << setw(maxlength + 6) << left << s + "NegErr";
+              outFile << std::setw(maxlength) << std::left << s \
+                      << std::setw(maxlength + 6) << std::left << s + "PosErr" \
+                      << std::setw(maxlength + 6) << std::left << s + "NegErr";
             } else {
-              cerr << endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
-              cerr << endl << ">> msr2data: **ERROR** The output will be flawed!";
-              cerr << endl;
+              std::cerr << std::endl << ">> msr2data: **ERROR** The run index of some parameter does not match the run number being processed!";
+              std::cerr << std::endl << ">> msr2data: **ERROR** The output will be flawed!";
+              std::cerr << std::endl;
             }
           }
         }
@@ -2335,27 +2334,27 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
         for (unsigned int i(0); i < msrNoOfParams; ++i) {
           if (InParameterList(i, paramList)) {
             s = (*msrParamList)[i].fName.Data();
-            outFile << setw(maxlength) << left << s \
-                    << setw(maxlength + 6) << left << s + "PosErr" \
-                    << setw(maxlength + 6) << left << s + "NegErr";
+            outFile << std::setw(maxlength) << std::left << s \
+                    << std::setw(maxlength + 6) << std::left << s + "PosErr" \
+                    << std::setw(maxlength + 6) << std::left << s + "NegErr";
           }
         }
       }
       s.clear();
 
       if (msrStatistic->fChisq)
-        outFile << setw(maxlength) << left << "CHISQ";
+        outFile << std::setw(maxlength) << std::left << "CHISQ";
       else
-        outFile << setw(maxlength) << left << "maxLH";
+        outFile << std::setw(maxlength) << std::left << "maxLH";
 
-      outFile << setw(maxlength) << left << "NDF";
+      outFile << std::setw(maxlength) << std::left << "NDF";
 
       if (msrStatistic->fChisq)
-        outFile << setw(maxlength) << left << "CHISQred";
+        outFile << std::setw(maxlength) << std::left << "CHISQred";
       else
-        outFile << setw(maxlength) << left << "maxLHred";
+        outFile << std::setw(maxlength) << std::left << "maxLHred";
 
-      outFile << setw(maxlength) << left << "RUN" << endl;
+      outFile << std::setw(maxlength) << std::left << "RUN" << std::endl;
 
       fHeaderWritten = true;
     }
@@ -2436,15 +2435,15 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
     WriteValue(outFile, msrStatistic->fMin/msrStatistic->fNdf, maxlength);
 
     WriteValue(outFile, *fRunVectorIter, maxlength);
-    outFile << endl;
+    outFile << std::endl;
 
   }
 
   if (global) {
-    cout << endl << ">> msr2data: **INFO** Parameter data of run " << *fRunVectorIter << " of file " << msrFileName \
-                 << " have been appended to " << outfile << endl;
+    std::cout << std::endl << ">> msr2data: **INFO** Parameter data of run " << *fRunVectorIter << " of file " << msrFileName \
+                 << " have been appended to " << outfile << std::endl;
   } else {
-    cout << endl << ">> msr2data: **INFO** Parameter data of file " << msrFileName << " have been appended to " << outfile << endl;
+    std::cout << std::endl << ">> msr2data: **INFO** Parameter data of file " << msrFileName << " have been appended to " << outfile << std::endl;
   }
 
   fRunVectorIter++;
@@ -2453,16 +2452,16 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
 
   if (!global || (fRunVectorIter == fRunVector.end())) {
     delete fMsrHandler;
-    fMsrHandler = 0;
+    fMsrHandler = nullptr;
 
     if (fDataHandler) {
       delete fDataHandler;
-      fDataHandler = 0;
+      fDataHandler = nullptr;
     }
   }
 
-  msrParamList = 0;
-  msrRunList = 0;
+  msrParamList = nullptr;
+  msrRunList = nullptr;
 
 // clean up some vectors
   dataParamNames.clear();
@@ -2483,13 +2482,13 @@ int PMsr2Data::WriteOutput(const string &outfile, const vector<unsigned int>& pa
  * \param value number to be written to the ASCII file
  * \param width column width of the ASCII file
  */
-void PMsr2Data::WriteValue(fstream &outFile, const double &value, const unsigned int &width) const
+void PMsr2Data::WriteValue(std::fstream &outFile, const double &value, const unsigned int &width) const
 {
   if ((fabs(value) >= 1.0e6) || ((fabs(value) < 1.0e-4) && (fabs(value) > 0.0)))
-    outFile << scientific << setprecision(width - 8);
+    outFile << std::scientific << std::setprecision(width - 8);
   else
-    outFile.unsetf(ios::floatfield);
-  outFile << setw(width) << left << value;
+    outFile.unsetf(std::ios::floatfield);
+  outFile << std::setw(width) << std::left << value;
 }
 
 //-------------------------------------------------------------
@@ -2501,22 +2500,22 @@ void PMsr2Data::WriteValue(fstream &outFile, const double &value, const unsigned
  * \param errValue
  * \param width
  */
-void PMsr2Data::WriteValue(fstream &outFile, const double &value, const double &errValue, const unsigned int &width, const bool &db) const
+void PMsr2Data::WriteValue(std::fstream &outFile, const double &value, const double &errValue, const unsigned int &width, const bool &db) const
 {
   Int_t previous_prec = outFile.precision();
   Int_t prec = GetFirstSignificantDigit(errValue);
 
   // for iostream also the number of digit before the decimal points are needed
   if (fabs(value) > 0.0)
-    prec += (int)log10(fabs(value));
+    prec += static_cast<int>(log10(fabs(value)));
 
   if ((fabs(value) >= 1.0e6) || ((fabs(value) < 1.0e-4) && (fabs(value) > 0)))
-    outFile << scientific;
+    outFile << std::scientific;
   else
-    outFile.unsetf(ios::floatfield);
+    outFile.unsetf(std::ios::floatfield);
 
   outFile.precision(prec);
-  outFile << setw(width) << left << value;
+  outFile << std::setw(width) << std::left << value;
   outFile.precision(previous_prec);
 
   // make sure there is at least one space before the next number starts
@@ -2555,7 +2554,7 @@ int PMsr2Data::GetFirstSignificantDigit(const double &value) const
 /**
  *
  */
-bool PMsr2Data::InParameterList(const unsigned int &paramValue, const vector<unsigned int> &paramList) const
+bool PMsr2Data::InParameterList(const unsigned int &paramValue, const std::vector<unsigned int> &paramList) const
 {
   // if paramList.size() == 0, i.e. use ALL parameters
   if (paramList.size() == 0)

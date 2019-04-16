@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,6 +29,8 @@
 
 #ifndef _PFOURIERCANVAS_H_
 #define _PFOURIERCANVAS_H_
+
+#include <vector>
 
 #include <TObject.h>
 #include <TQObject.h>
@@ -71,14 +73,14 @@ typedef struct {
   TH1F *dataFourierPwr;          ///< power spectrum of the Fourier transform of the data histogram
   TH1F *dataFourierPhase;        ///< phase spectrum of the Fourier transform of the data histogram
   TH1F *dataFourierPhaseOptReal; ///< phase otpimized real Fourier transform of the data histogram
-  vector<Double_t> optPhase;     ///< optimal phase which maximizes the real Fourier
+  std::vector<Double_t> optPhase;     ///< optimal phase which maximizes the real Fourier
 } PFourierCanvasDataSet;
 
 //------------------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable: list of histogram data sets.
  */
-typedef vector<PFourierCanvasDataSet> PFourierCanvasDataList;
+typedef std::vector<PFourierCanvasDataSet> PFourierCanvasDataList;
 
 //--------------------------------------------------------------------------
 /**
@@ -88,11 +90,11 @@ class PFourierCanvas : public TObject, public TQObject
 {
   public:
     PFourierCanvas();
-    PFourierCanvas(vector<PFourier*> &fourier, PIntVector dataSetTag, const Char_t* title,
+    PFourierCanvas(std::vector<PFourier*> &fourier, PIntVector dataSetTag, const Char_t* title,
                    const Bool_t showAverage, const Bool_t showAveragePerDataSet,
                    const Int_t fourierPlotOpt, Double_t fourierXrange[2], Double_t phase,
                    Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh, const Bool_t batch);
-    PFourierCanvas(vector<PFourier*> &fourier, PIntVector dataSetTag, const Char_t* title,
+    PFourierCanvas(std::vector<PFourier*> &fourier, PIntVector dataSetTag, const Char_t* title,
                    const Bool_t showAverage, const Bool_t showAveragePerDataSet,
                    const Int_t fourierPlotOpt, Double_t fourierXrange[2], Double_t phase,
                    Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
@@ -127,7 +129,7 @@ class PFourierCanvas : public TObject, public TQObject
 
     TString fTitle;
     TString fXaxisTitle;
-    vector<PFourier*> fFourier; ///< keeps all the Fourier data, ownership is with the caller
+    std::vector<PFourier*> fFourier; ///< keeps all the Fourier data, ownership is with the caller
     PFourierCanvasDataList fFourierHistos; ///< keeps all the Fourier histos
     PFourierCanvasDataList fFourierAverage; ///< keeps the average of the Fourier histos
     Double_t fCurrentFourierPhase; ///< keeps the current Fourier phase (real/imag)

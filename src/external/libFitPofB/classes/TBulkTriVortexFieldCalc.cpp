@@ -40,7 +40,6 @@
 #endif
 
 #include <iostream>
-using namespace std;
 
 #include "TMath.h"
 
@@ -73,7 +72,7 @@ TBulkVortexFieldCalc::~TBulkVortexFieldCalc() {
     FILE *wordsOfWisdomW;
     wordsOfWisdomW = fopen(fWisdom.c_str(), "w");
     if (wordsOfWisdomW == NULL) {
-      cout << "TBulkVortexFieldCalc::~TBulkVortexFieldCalc(): Could not open file ... No wisdom is exported..." << endl;
+      std::cout << "TBulkVortexFieldCalc::~TBulkVortexFieldCalc(): Could not open file ... No wisdom is exported..." << std::endl;
     } else {
       fftw_export_wisdom_to_file(wordsOfWisdomW);
       fclose(wordsOfWisdomW);
@@ -123,7 +122,7 @@ double TBulkVortexFieldCalc::GetBmax() const {
   }
 }
 
-TBulkTriVortexLondonFieldCalc::TBulkTriVortexLondonFieldCalc(const string& wisdom, const unsigned int steps) {
+TBulkTriVortexLondonFieldCalc::TBulkTriVortexLondonFieldCalc(const std::string& wisdom, const unsigned int steps) {
   fWisdom = wisdom;
   if (steps % 2) {
     fSteps = steps + 1;
@@ -143,7 +142,7 @@ TBulkTriVortexLondonFieldCalc::TBulkTriVortexLondonFieldCalc(const string& wisdo
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
 
-//  cout << "Check for the FFT plan..." << endl;
+//  std::cout << "Check for the FFT plan..." << std::endl;
 
 // Load wisdom from file if it exists and should be used
 
@@ -174,11 +173,11 @@ TBulkTriVortexLondonFieldCalc::TBulkTriVortexLondonFieldCalc(const string& wisdo
 void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 3) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    std::cout << std::endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << std::endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2]) {
-    cout << endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << endl;
+    std::cout << std::endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << std::endl;
     return;
   }
 
@@ -302,7 +301,7 @@ void TBulkTriVortexLondonFieldCalc::CalculateGrid() const {
 
 }
 
-TBulkSqVortexLondonFieldCalc::TBulkSqVortexLondonFieldCalc(const string& wisdom, const unsigned int steps) {
+TBulkSqVortexLondonFieldCalc::TBulkSqVortexLondonFieldCalc(const std::string& wisdom, const unsigned int steps) {
   fWisdom = wisdom;
   if (steps % 2) {
     fSteps = steps + 1;
@@ -322,7 +321,7 @@ TBulkSqVortexLondonFieldCalc::TBulkSqVortexLondonFieldCalc(const string& wisdom,
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
 
-//  cout << "Check for the FFT plan..." << endl;
+//  std::cout << "Check for the FFT plan..." << std::endl;
 
 // Load wisdom from file if it exists and should be used
 
@@ -353,11 +352,11 @@ TBulkSqVortexLondonFieldCalc::TBulkSqVortexLondonFieldCalc(const string& wisdom,
 void TBulkSqVortexLondonFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 3) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    std::cout << std::endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << std::endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2]) {
-    cout << endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << endl;
+    std::cout << std::endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << std::endl;
     return;
   }
 
@@ -449,7 +448,7 @@ void TBulkSqVortexLondonFieldCalc::CalculateGrid() const {
 
 
 
-TBulkTriVortexMLFieldCalc::TBulkTriVortexMLFieldCalc(const string& wisdom, const unsigned int steps) {
+TBulkTriVortexMLFieldCalc::TBulkTriVortexMLFieldCalc(const std::string& wisdom, const unsigned int steps) {
   fWisdom = wisdom;
   if (steps % 2) {
     fSteps = steps + 1;
@@ -469,7 +468,7 @@ TBulkTriVortexMLFieldCalc::TBulkTriVortexMLFieldCalc(const string& wisdom, const
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
 
-//  cout << "Check for the FFT plan..." << endl;
+//  std::cout << "Check for the FFT plan..." << std::endl;
 
 // Load wisdom from file if it exists and should be used
 
@@ -500,11 +499,11 @@ TBulkTriVortexMLFieldCalc::TBulkTriVortexMLFieldCalc(const string& wisdom, const
 void TBulkTriVortexMLFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 3) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    std::cout << std::endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << std::endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2]) {
-    cout << endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << endl;
+    std::cout << std::endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << std::endl;
     return;
   }
 
@@ -645,7 +644,7 @@ void TBulkTriVortexMLFieldCalc::CalculateGrid() const {
 }
 
 
-TBulkTriVortexAGLFieldCalc::TBulkTriVortexAGLFieldCalc(const string& wisdom, const unsigned int steps) {
+TBulkTriVortexAGLFieldCalc::TBulkTriVortexAGLFieldCalc(const std::string& wisdom, const unsigned int steps) {
   fWisdom = wisdom;
   if (steps % 2) {
     fSteps = steps + 1;
@@ -665,7 +664,7 @@ TBulkTriVortexAGLFieldCalc::TBulkTriVortexAGLFieldCalc(const string& wisdom, con
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
 
-//  cout << "Check for the FFT plan..." << endl;
+//  std::cout << "Check for the FFT plan..." << std::endl;
 
 // Load wisdom from file if it exists and should be used
 
@@ -696,11 +695,11 @@ TBulkTriVortexAGLFieldCalc::TBulkTriVortexAGLFieldCalc(const string& wisdom, con
 void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 3) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    std::cout << std::endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << std::endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2]) {
-    cout << endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << endl;
+    std::cout << std::endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << std::endl;
     return;
   }
 
@@ -850,7 +849,7 @@ void TBulkTriVortexAGLFieldCalc::CalculateGrid() const {
 
 
 
-TBulkTriVortexAGLIIFieldCalc::TBulkTriVortexAGLIIFieldCalc(const string& wisdom, const unsigned int steps) {
+TBulkTriVortexAGLIIFieldCalc::TBulkTriVortexAGLIIFieldCalc(const std::string& wisdom, const unsigned int steps) {
   fWisdom = wisdom;
   if (steps % 2) {
     fSteps = steps + 1;
@@ -870,7 +869,7 @@ TBulkTriVortexAGLIIFieldCalc::TBulkTriVortexAGLIIFieldCalc(const string& wisdom,
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
 
-//  cout << "Check for the FFT plan..." << endl;
+//  std::cout << "Check for the FFT plan..." << std::endl;
 
 // Load wisdom from file if it exists and should be used
 
@@ -901,11 +900,11 @@ TBulkTriVortexAGLIIFieldCalc::TBulkTriVortexAGLIIFieldCalc(const string& wisdom,
 void TBulkTriVortexAGLIIFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 3) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    std::cout << std::endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << std::endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2]) {
-    cout << endl << "The field, penetration depth and vortex-core radius have to have finite values in order to calculate B(x,y)!" << endl;
+    std::cout << std::endl << "The field, penetration depth and vortex-core radius have to have finite values in order to calculate B(x,y)!" << std::endl;
     return;
   }
 
@@ -1054,7 +1053,7 @@ void TBulkTriVortexAGLIIFieldCalc::CalculateGrid() const {
 }
 
 
-TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const string& wisdom, const unsigned int steps)
+TBulkTriVortexNGLFieldCalc::TBulkTriVortexNGLFieldCalc(const std::string& wisdom, const unsigned int steps)
  : fLatticeConstant(0.0), fKappa(0.0), fSumAk(0.0), fSumOmegaSq(0.0), fSumSum(0.0)
 {
   fWisdom = wisdom;
@@ -1332,7 +1331,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGradient() const {
 // // #pragma omp parallel for default(shared) private(i) schedule(dynamic)
 //   for (i = 0; i < NFFTsq; i += 1) {
 //     if (fOmegaMatrix[i] < 0.0) {
-//       cout << "Omega negative for index " << i << ", value: " << fOmegaMatrix[i] << endl;
+//       std::cout << "Omega negative for index " << i << ", value: " << fOmegaMatrix[i] << std::endl;
 //       fOmegaMatrix[i] = 0.0;
 //     }
 //   }
@@ -1909,11 +1908,11 @@ void TBulkTriVortexNGLFieldCalc::CalculateSumAk() const {
 void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 3) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    std::cout << std::endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << std::endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2]) {
-    cout << endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << endl;
+    std::cout << std::endl << "The field, penetration depth and coherence length have to have finite values in order to calculate B(x,y)!" << std::endl;
     return;
   }
 
@@ -1967,7 +1966,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
   CalculateSumAk();
 
-  // cout << "fSumAk = " << fSumAk << endl;
+  // std::cout << "fSumAk = " << fSumAk << std::endl;
 
   // Do the Fourier transform to get omega(x,y) - Abrikosov
 
@@ -2060,7 +2059,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
     CalculateSumAk();
 
-    // cout << "fSumAk = " << fSumAk << endl;
+    // std::cout << "fSumAk = " << fSumAk << std::endl;
 
     // Need a copy of the aK-matrix since FFTW is manipulating the input in c2r and r2c transforms
     // Store it in the first half of the bK-matrix
@@ -2133,9 +2132,9 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       if (fFFTin[l][0]){
         if (((fabs(fFFTin[l][0]) > 1.0E-6) && (fabs(fCheckAkConvergence[l] - fFFTin[l][0])/fFFTin[l][0] > 1.0E-3)) || \
         (fCheckAkConvergence[l]/fFFTin[l][0] < 0.0)) {
-          //cout << "old: " << fCheckAkConvergence[l] << ", new: " << fFFTin[l][0] << endl;
+          //std::cout << "old: " << fCheckAkConvergence[l] << ", new: " << fFFTin[l][0] << std::endl;
           akConverged = false;
-          //cout << "index = " << l << endl;
+          //std::cout << "index = " << l << std::endl;
           break;
         }
       }
@@ -2156,13 +2155,13 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
       //break;
     }
 
-    //  cout << "Ak Convergence: " << akConverged << endl;
+    //  std::cout << "Ak Convergence: " << akConverged << std::endl;
 
     // Calculate omega again either for the bK-iteration step or again the aK-iteration
 
     CalculateSumAk();
 
-    // cout << "fSumAk = " << fSumAk << " count = " << count << endl;
+    // std::cout << "fSumAk = " << fSumAk << " count = " << count << std::endl;
 
     // Do the Fourier transform to get omega(x,y)
 
@@ -2222,14 +2221,14 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
         if (fBkMatrix[l][0]) {
           if (((fabs(fBkMatrix[l][0]) > 1.0E-6) && (fabs(fCheckBkConvergence[l] - fBkMatrix[l][0])/fabs(fBkMatrix[l][0]) > 1.0E-3)) || \
           (fCheckBkConvergence[l]/fBkMatrix[l][0] < 0.0)) {
-            // cout << "old: " << fCheckBkConvergence[l] << ", new: " << fBkMatrix[l][0] << endl;
+            // std::cout << "old: " << fCheckBkConvergence[l] << ", new: " << fBkMatrix[l][0] << std::endl;
             bkConverged = false;
             break;
           }
         }
       }
 
-      // cout << "Bk Convergence: " << bkConverged << endl;
+      // std::cout << "Bk Convergence: " << bkConverged << std::endl;
 
       if (!bkConverged) {
         #ifdef HAVE_GOMP
@@ -2338,7 +2337,7 @@ void TBulkTriVortexNGLFieldCalc::CalculateGrid() const {
 
 }
 
-TBulkAnisotropicTriVortexLondonFieldCalc::TBulkAnisotropicTriVortexLondonFieldCalc(const string& wisdom, const unsigned int steps) {
+TBulkAnisotropicTriVortexLondonFieldCalc::TBulkAnisotropicTriVortexLondonFieldCalc(const std::string& wisdom, const unsigned int steps) {
   fWisdom = wisdom;
   if (steps % 2) {
     fSteps = steps + 1;
@@ -2358,7 +2357,7 @@ TBulkAnisotropicTriVortexLondonFieldCalc::TBulkAnisotropicTriVortexLondonFieldCa
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
 
-//  cout << "Check for the FFT plan..." << endl;
+//  std::cout << "Check for the FFT plan..." << std::endl;
 
 // Load wisdom from file if it exists and should be used
 
@@ -2389,12 +2388,12 @@ TBulkAnisotropicTriVortexLondonFieldCalc::TBulkAnisotropicTriVortexLondonFieldCa
 void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 5) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    std::cout << std::endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << std::endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2] || !fParam[3] || !fParam[4]) {
-    cout << endl << "The field, penetration depths and coherence lengths have to have finite values in order to calculate B(x,y)!" \
-         << endl;
+    std::cout << std::endl << "The field, penetration depths and coherence lengths have to have finite values in order to calculate B(x,y)!" \
+         << std::endl;
     return;
   }
 
@@ -2555,7 +2554,7 @@ void TBulkAnisotropicTriVortexLondonFieldCalc::CalculateGrid() const {
 
 }
 
-TBulkAnisotropicTriVortexMLFieldCalc::TBulkAnisotropicTriVortexMLFieldCalc(const string& wisdom, const unsigned int steps) {
+TBulkAnisotropicTriVortexMLFieldCalc::TBulkAnisotropicTriVortexMLFieldCalc(const std::string& wisdom, const unsigned int steps) {
   fWisdom = wisdom;
   if (steps % 2) {
     fSteps = steps + 1;
@@ -2575,7 +2574,7 @@ TBulkAnisotropicTriVortexMLFieldCalc::TBulkAnisotropicTriVortexMLFieldCalc(const
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
 
-//  cout << "Check for the FFT plan..." << endl;
+//  std::cout << "Check for the FFT plan..." << std::endl;
 
 // Load wisdom from file if it exists and should be used
 
@@ -2606,12 +2605,12 @@ TBulkAnisotropicTriVortexMLFieldCalc::TBulkAnisotropicTriVortexMLFieldCalc(const
 void TBulkAnisotropicTriVortexMLFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 5) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    std::cout << std::endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << std::endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2] || !fParam[3] || !fParam[4]) {
-    cout << endl << "The field, penetration depths and coherence lengths have to have finite values in order to calculate B(x,y)!" \
-         << endl;
+    std::cout << std::endl << "The field, penetration depths and coherence lengths have to have finite values in order to calculate B(x,y)!" \
+         << std::endl;
     return;
   }
 
@@ -2754,7 +2753,7 @@ void TBulkAnisotropicTriVortexMLFieldCalc::CalculateGrid() const {
 
 }
 
-TBulkAnisotropicTriVortexAGLFieldCalc::TBulkAnisotropicTriVortexAGLFieldCalc(const string& wisdom, const unsigned int steps) {
+TBulkAnisotropicTriVortexAGLFieldCalc::TBulkAnisotropicTriVortexAGLFieldCalc(const std::string& wisdom, const unsigned int steps) {
   fWisdom = wisdom;
   if (steps % 2) {
     fSteps = steps + 1;
@@ -2774,7 +2773,7 @@ TBulkAnisotropicTriVortexAGLFieldCalc::TBulkAnisotropicTriVortexAGLFieldCalc(con
   fFFTin = new fftw_complex[(fSteps/2 + 1) * fSteps];
   fFFTout = new double[fSteps*fSteps];
 
-//  cout << "Check for the FFT plan..." << endl;
+//  std::cout << "Check for the FFT plan..." << std::endl;
 
 // Load wisdom from file if it exists and should be used
 
@@ -2805,12 +2804,12 @@ TBulkAnisotropicTriVortexAGLFieldCalc::TBulkAnisotropicTriVortexAGLFieldCalc(con
 void TBulkAnisotropicTriVortexAGLFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 5) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << endl;
+    std::cout << std::endl << "The SetParameters-method has to be called before B(x,y) can be calculated!" << std::endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2] || !fParam[3] || !fParam[4]) {
-    cout << endl << "The field, penetration depths and coherence lengths have to have finite values in order to calculate B(x,y)!" \
-         << endl;
+    std::cout << std::endl << "The field, penetration depths and coherence lengths have to have finite values in order to calculate B(x,y)!" \
+         << std::endl;
     return;
   }
 

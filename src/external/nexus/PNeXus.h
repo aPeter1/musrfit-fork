@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -32,7 +32,6 @@
 
 #include <string>
 #include <vector>
-using namespace std;
 
 #include "napi.h"
 
@@ -75,18 +74,18 @@ class PNeXusProp {
     PNeXusProp();
     virtual ~PNeXusProp() {}
 
-    virtual string GetName() { return fName; }
+    virtual std::string GetName() { return fName; }
     virtual double GetValue() { return fValue; }
-    virtual string GetUnit() { return fUnit; }
+    virtual std::string GetUnit() { return fUnit; }
 
-    virtual void SetName(string name) { fName = name; }
+    virtual void SetName(std::string name) { fName = name; }
     virtual void SetValue(double val) { fValue = val; }
-    virtual void SetUnit(string unit) { fUnit = unit; }
+    virtual void SetUnit(std::string unit) { fUnit = unit; }
 
   private:
-    string fName;
+    std::string fName;
     double fValue;
-    string fUnit;
+    std::string fUnit;
 };
 
 class PNeXusBeam1 {
@@ -97,14 +96,14 @@ class PNeXusBeam1 {
     virtual bool IsValid(bool strict);
 
     virtual double GetTotalCounts() { return fTotalCounts; }
-    virtual string GetUnits() { return fUnits; }
+    virtual std::string GetUnits() { return fUnits; }
 
     virtual void SetTotalCounts(double counts) { fTotalCounts = counts; }
-    virtual void SetUnits(string units) { fUnits = units; }
+    virtual void SetUnits(std::string units) { fUnits = units; }
 
   private:
     double fTotalCounts; ///< total number of counts
-    string fUnits; ///< 'units' in which total counts is given, e.g. 'Mev'
+    std::string fUnits; ///< 'units' in which total counts is given, e.g. 'Mev'
 };
 
 class PNeXusCollimator1 {
@@ -114,11 +113,11 @@ class PNeXusCollimator1 {
 
     virtual bool IsValid(bool strict) { return true; } // currently only a dummy
 
-    virtual string GetType() { return fType; }
-    virtual void SetType(string type) { fType = type; }
+    virtual std::string GetType() { return fType; }
+    virtual void SetType(std::string type) { fType = type; }
 
   private:
-    string fType;
+    std::string fType;
 };
 
 class PNeXusDetector1 {
@@ -142,18 +141,18 @@ class PNeXusInstrument1 {
 
     virtual bool IsValid(bool strict);
 
-    virtual string GetName() { return fName; }
+    virtual std::string GetName() { return fName; }
     virtual PNeXusDetector1* GetDetector() { return &fDetector; }
     virtual PNeXusCollimator1* GetCollimator() { return &fCollimator; }
     virtual PNeXusBeam1* GetBeam() { return &fBeam; }
 
-    virtual void SetName(string name) { fName = name; }    
+    virtual void SetName(std::string name) { fName = name; }
     virtual void SetDetector(PNeXusDetector1 &detector) { fDetector = detector; }
     virtual void SetCollimator(PNeXusCollimator1 &collimator) { fCollimator = collimator; }
     virtual void SetBeam(PNeXusBeam1 &beam) { fBeam = beam; }
 
   private:
-    string fName; ///< instrument name
+    std::string fName; ///< instrument name
     PNeXusDetector1 fDetector;
     PNeXusCollimator1 fCollimator;
     PNeXusBeam1 fBeam;
@@ -166,38 +165,38 @@ class PNeXusSample1 {
 
     virtual bool IsValid(bool strict);
 
-    virtual string GetName() { return fName; }
-    virtual string GetShape() { return fShape; }
-    virtual string GetMagneticFieldState() { return fMagneticFieldState; }
-    virtual string GetEnvironment() { return fEnvironment; }
-    virtual double GetPhysPropValue(string name, bool &ok);
-    virtual void GetPhysPropUnit(string name, string &unit, bool &ok);
+    virtual std::string GetName() { return fName; }
+    virtual std::string GetShape() { return fShape; }
+    virtual std::string GetMagneticFieldState() { return fMagneticFieldState; }
+    virtual std::string GetEnvironment() { return fEnvironment; }
+    virtual double GetPhysPropValue(std::string name, bool &ok);
+    virtual void GetPhysPropUnit(std::string name, std::string &unit, bool &ok);
     virtual int IsMagneticFieldVectorAvailable() { return fMagneticFieldVectorAvailable; }
-    virtual vector<double> GetMagneticFieldVector() { return fMagneticFieldVector; }
-    virtual string GetMagneticFieldVectorUnits() { return fMagneticFieldVectorUnits; }
-    virtual string GetMagneticFieldVectorCoordinateSystem() { return fMagneticFieldVectorCoordinateSystem; }
+    virtual std::vector<double> GetMagneticFieldVector() { return fMagneticFieldVector; }
+    virtual std::string GetMagneticFieldVectorUnits() { return fMagneticFieldVectorUnits; }
+    virtual std::string GetMagneticFieldVectorCoordinateSystem() { return fMagneticFieldVectorCoordinateSystem; }
 
-    virtual void SetName(string name) { fName = name; }
-    virtual void SetShape(string shape) { fShape = shape; }
-    virtual void SetMagneticFieldState(string magFieldState) { fMagneticFieldState = magFieldState; }
-    virtual void SetEnvironment(string env) { fEnvironment = env; }
-    virtual void SetPhysProp(string name, double value, string unit, int idx=-1);
+    virtual void SetName(std::string name) { fName = name; }
+    virtual void SetShape(std::string shape) { fShape = shape; }
+    virtual void SetMagneticFieldState(std::string magFieldState) { fMagneticFieldState = magFieldState; }
+    virtual void SetEnvironment(std::string env) { fEnvironment = env; }
+    virtual void SetPhysProp(std::string name, double value, std::string unit, int idx=-1);
     virtual void SetMagneticFieldVectorAvailable(int avail) { fMagneticFieldVectorAvailable = avail; }
-    virtual void SetMagneticFieldVector(vector<double> &magVec) { fMagneticFieldVector = magVec; }
-    virtual void SetMagneticFieldVectorCoordinateSystem(string coord) { fMagneticFieldVectorCoordinateSystem = coord; }
-    virtual void SetMagneticFieldUnits(string units) { fMagneticFieldVectorUnits = units; }
+    virtual void SetMagneticFieldVector(std::vector<double> &magVec) { fMagneticFieldVector = magVec; }
+    virtual void SetMagneticFieldVectorCoordinateSystem(std::string coord) { fMagneticFieldVectorCoordinateSystem = coord; }
+    virtual void SetMagneticFieldUnits(std::string units) { fMagneticFieldVectorUnits = units; }
 
   private:
-    string fName; ///< sample name
-    string fShape; ///< sample orientation
-    string fMagneticFieldState; ///< magnetic field state, e.g. TF, ZF, ...
-    string fEnvironment; ///< sample environment, e.g. CCR, Konti-1, ...
-    vector<PNeXusProp> fPhysProp; ///< collects the temperature, magnetic field
+    std::string fName; ///< sample name
+    std::string fShape; ///< sample orientation
+    std::string fMagneticFieldState; ///< magnetic field state, e.g. TF, ZF, ...
+    std::string fEnvironment; ///< sample environment, e.g. CCR, Konti-1, ...
+    std::vector<PNeXusProp> fPhysProp; ///< collects the temperature, magnetic field
 
     int fMagneticFieldVectorAvailable; ///< flag '0' magnetic field vector not available, '1' magnetic field vector available
-    vector<double> fMagneticFieldVector; ///< magnetic field vector
-    string fMagneticFieldVectorUnits; ///< units in which the magnetic field vector is given
-    string fMagneticFieldVectorCoordinateSystem; ///< coordinate system, e.g. 'cartesian'
+    std::vector<double> fMagneticFieldVector; ///< magnetic field vector
+    std::string fMagneticFieldVectorUnits; ///< units in which the magnetic field vector is given
+    std::string fMagneticFieldVectorCoordinateSystem; ///< coordinate system, e.g. 'cartesian'
 };
 
 class PNeXusUser1 {
@@ -207,15 +206,15 @@ class PNeXusUser1 {
 
     virtual bool IsValid(bool strict) { return true; } // currently only a dummy
 
-    virtual string GetName() { return fName; }
-    virtual string GetExperimentNumber() { return fExperimentNumber; }
+    virtual std::string GetName() { return fName; }
+    virtual std::string GetExperimentNumber() { return fExperimentNumber; }
 
-    virtual void SetName(string name) { fName = name; }
-    virtual void SetExperimentNumber(string expNum) { fExperimentNumber = expNum; }
+    virtual void SetName(std::string name) { fName = name; }
+    virtual void SetExperimentNumber(std::string expNum) { fExperimentNumber = expNum; }
 
   private:
-    string fName; ///< user name
-    string fExperimentNumber; ///< experiment number, RB number at ISIS
+    std::string fName; ///< user name
+    std::string fExperimentNumber; ///< experiment number, RB number at ISIS
 };
 
 class PNeXusAlpha1 {
@@ -244,41 +243,41 @@ class PNeXusData1 {
 
     virtual bool IsValid(bool strict);
 
-    virtual double GetTimeResolution(string units);
-    virtual vector<unsigned int> *GetT0s() { return &fT0; }
+    virtual double GetTimeResolution(std::string units);
+    virtual std::vector<unsigned int> *GetT0s() { return &fT0; }
     virtual int GetT0(unsigned int idx);
-    virtual vector<unsigned int> *GetFirstGoodBins() { return &fFirstGoodBin; }
+    virtual std::vector<unsigned int> *GetFirstGoodBins() { return &fFirstGoodBin; }
     virtual int GetFirstGoodBin(unsigned int idx);
-    virtual vector<unsigned int> *GetLastGoodBins() { return &fLastGoodBin; }
+    virtual std::vector<unsigned int> *GetLastGoodBins() { return &fLastGoodBin; }
     virtual int GetLastGoodBin(unsigned int idx);
-    virtual vector<string> *GetHistoNames() { return &fHistoName; }
-    virtual void GetHistoName(unsigned int idx, string &name, bool &ok);
+    virtual std::vector<std::string> *GetHistoNames() { return &fHistoName; }
+    virtual void GetHistoName(unsigned int idx, std::string &name, bool &ok);
     virtual unsigned int GetNoOfHistos() { return fHisto.size(); }
     virtual unsigned int GetHistoLength(unsigned int histoNo=0);
-    virtual vector<unsigned int> *GetHisto(unsigned int histoNo);
-    virtual vector<int> *GetGrouping() { return &fGrouping; }
-    virtual vector<PNeXusAlpha1> *GetAlpha() { return &fAlpha; }
+    virtual std::vector<unsigned int> *GetHisto(unsigned int histoNo);
+    virtual std::vector<int> *GetGrouping() { return &fGrouping; }
+    virtual std::vector<PNeXusAlpha1> *GetAlpha() { return &fAlpha; }
 
-    virtual void SetTimeResolution(double val, string units);
+    virtual void SetTimeResolution(double val, std::string units);
     virtual void SetT0(unsigned int t0, int idx=-1);
     virtual void SetFirstGoodBin(unsigned int fgb, int idx=-1);
     virtual void SetLastGoodBin(unsigned int lgb, int idx=-1);
     virtual void FlushHistos();
-    virtual void SetHisto(vector<unsigned int> &data, int histoNo=-1);
+    virtual void SetHisto(std::vector<unsigned int> &data, int histoNo=-1);
     virtual void FlushGrouping() { fGrouping.clear(); }
-    virtual void SetGrouping(vector<int> &grouping) { fGrouping = grouping; }
+    virtual void SetGrouping(std::vector<int> &grouping) { fGrouping = grouping; }
     virtual void FlushAlpha() { fAlpha.clear(); }
-    virtual void SetAlpha(vector<PNeXusAlpha1> &alpha) { fAlpha = alpha; }
+    virtual void SetAlpha(std::vector<PNeXusAlpha1> &alpha) { fAlpha = alpha; }
 
   private:
     double fTimeResolution;                   ///< time resolution in (ps)
-    vector<unsigned int> fT0;
-    vector<unsigned int> fFirstGoodBin;
-    vector<unsigned int> fLastGoodBin;
-    vector<string> fHistoName;
-    vector< vector<unsigned int> > fHisto;
-    vector<int> fGrouping;
-    vector<PNeXusAlpha1> fAlpha;
+    std::vector<unsigned int> fT0;
+    std::vector<unsigned int> fFirstGoodBin;
+    std::vector<unsigned int> fLastGoodBin;
+    std::vector<std::string> fHistoName;
+    std::vector< std::vector<unsigned int> > fHisto;
+    std::vector<int> fGrouping;
+    std::vector<PNeXusAlpha1> fAlpha;
 };
 
 class PNeXusEntry1 {
@@ -288,32 +287,32 @@ class PNeXusEntry1 {
 
     virtual bool IsValid(bool strict);
 
-    virtual string GetProgramName() { return fProgramName; }    
-    virtual string GetProgramVersion() { return fProgramVersion; }
+    virtual std::string GetProgramName() { return fProgramName; }
+    virtual std::string GetProgramVersion() { return fProgramVersion; }
     virtual int GetRunNumber() { return fRunNumber; }
-    virtual string GetTitle() { return fTitle; }
-    virtual string GetNotes() { return fNotes; }
-    virtual string GetAnalysis() { return fAnalysis; }
-    virtual string GetLaboratory() { return fLaboratory; }
-    virtual string GetBeamline() { return fBeamline; }
-    virtual string GetStartTime() { return fStartTime; }
-    virtual string GetStopTime() { return fStopTime; }
+    virtual std::string GetTitle() { return fTitle; }
+    virtual std::string GetNotes() { return fNotes; }
+    virtual std::string GetAnalysis() { return fAnalysis; }
+    virtual std::string GetLaboratory() { return fLaboratory; }
+    virtual std::string GetBeamline() { return fBeamline; }
+    virtual std::string GetStartTime() { return fStartTime; }
+    virtual std::string GetStopTime() { return fStopTime; }
     virtual int GetSwitchingState() { return fSwitchingState; }
     virtual PNeXusUser1* GetUser() { return &fUser; }
     virtual PNeXusSample1* GetSample()  { return &fSample; }
     virtual PNeXusInstrument1* GetInstrument() { return &fInstrument; }
     virtual PNeXusData1* GetData() { return &fData; }
 
-    virtual void SetProgramName(string name) { fProgramName = name; }
-    virtual void SetProgramVersion(string version) { fProgramVersion = version; }
+    virtual void SetProgramName(std::string name) { fProgramName = name; }
+    virtual void SetProgramVersion(std::string version) { fProgramVersion = version; }
     virtual void SetRunNumber(int number) { fRunNumber = number; }
-    virtual void SetTitle(string title) { fTitle = title; }
-    virtual void SetNotes(string notes) { fNotes = notes; }
-    virtual void SetAnalysis(string analysis) { fAnalysis = analysis; }
-    virtual void SetLaboratory(string lab) { fLaboratory = lab; }
-    virtual void SetBeamline(string beamline) { fBeamline = beamline; }
-    virtual int SetStartTime(string time);
-    virtual int SetStopTime(string time);
+    virtual void SetTitle(std::string title) { fTitle = title; }
+    virtual void SetNotes(std::string notes) { fNotes = notes; }
+    virtual void SetAnalysis(std::string analysis) { fAnalysis = analysis; }
+    virtual void SetLaboratory(std::string lab) { fLaboratory = lab; }
+    virtual void SetBeamline(std::string beamline) { fBeamline = beamline; }
+    virtual int SetStartTime(std::string time);
+    virtual int SetStopTime(std::string time);
     virtual int SetSwitchingState(int state);
     virtual void SetUser(PNeXusUser1 &user) { fUser = user; }
     virtual void SetSample(PNeXusSample1 &sample) { fSample = sample; }
@@ -321,16 +320,16 @@ class PNeXusEntry1 {
     virtual void SetData(PNeXusData1 &data) { fData = data; }
 
   private:
-    string fProgramName;      ///< name of the creating program
-    string fProgramVersion;   ///< version of the creating program
+    std::string fProgramName;      ///< name of the creating program
+    std::string fProgramVersion;   ///< version of the creating program
     int fRunNumber;           ///< run number
-    string fTitle;            ///< string containing the run title
-    string fNotes;            ///< comments
-    string fAnalysis;         ///< type of muon experiment "muonTD", "ALC", ...
-    string fLaboratory;       ///< name of the laboratory where the data are taken, e.g. PSI, triumf, ISIS, J-Parc
-    string fBeamline;         ///< name of the beamline used for the experiment, e.g. muE4
-    string fStartTime;        ///< start date/time of the run
-    string fStopTime;         ///< stop date/time of the run
+    std::string fTitle;            ///< string containing the run title
+    std::string fNotes;            ///< comments
+    std::string fAnalysis;         ///< type of muon experiment "muonTD", "ALC", ...
+    std::string fLaboratory;       ///< name of the laboratory where the data are taken, e.g. PSI, triumf, ISIS, J-Parc
+    std::string fBeamline;         ///< name of the beamline used for the experiment, e.g. muE4
+    std::string fStartTime;        ///< start date/time of the run
+    std::string fStopTime;         ///< stop date/time of the run
     int fSwitchingState;      ///< '1' normal data collection, '2' Red/Green mode
     PNeXusUser1 fUser;        ///< NXuser info IDF Version 1
     PNeXusSample1 fSample;    ///< NXsample info IDF Version 1
@@ -345,18 +344,18 @@ class PNeXusSource2 {
 
     virtual bool IsValid(bool strict);
 
-    virtual string GetName() { return fName; }
-    virtual string GetType() { return fType; }
-    virtual string GetProbe() { return fProbe; }
+    virtual std::string GetName() { return fName; }
+    virtual std::string GetType() { return fType; }
+    virtual std::string GetProbe() { return fProbe; }
 
-    virtual void SetName(string name) { fName = name; }
-    virtual void SetType(string type) { fType = type; }
-    virtual void SetProbe(string probe) { fProbe = probe; }
+    virtual void SetName(std::string name) { fName = name; }
+    virtual void SetType(std::string type) { fType = type; }
+    virtual void SetProbe(std::string probe) { fProbe = probe; }
 
   private:
-    string fName; ///< facility name
-    string fType; ///< continous muon source, pulsed muon source, low energy muon source, ...
-    string fProbe; ///< positive muon, negative muon
+    std::string fName; ///< facility name
+    std::string fType; ///< continous muon source, pulsed muon source, low energy muon source, ...
+    std::string fProbe; ///< positive muon, negative muon
 };
 
 class PNeXusBeamline2 {
@@ -366,12 +365,12 @@ class PNeXusBeamline2 {
 
     virtual bool IsValid(bool strict);
 
-    virtual string GetName() { return fName; }
+    virtual std::string GetName() { return fName; }
 
-    virtual void SetName(string name) { fName = name; }
+    virtual void SetName(std::string name) { fName = name; }
 
   private:
-    string fName;
+    std::string fName;
 };
 
 class PNeXusDetector2 {
@@ -380,21 +379,21 @@ class PNeXusDetector2 {
     virtual ~PNeXusDetector2();    
 
     virtual bool IsValid(bool strict);
-    virtual string GetErrorMsg() { return fErrorMsg; }
+    virtual std::string GetErrorMsg() { return fErrorMsg; }
 
-    virtual string GetDescription() { return fDescription; }
-    virtual double GetTimeResolution(string units);
-    virtual vector<double> *GetRawTime() { return &fRawTime; }
-    virtual string GetRawTimeName() { return fRawTimeName; }
-    virtual string GetRawTimeUnit() { return fRawTimeUnit; }
-    virtual bool IsT0Present() { return (fT0 == 0) ? false : true; }
+    virtual std::string GetDescription() { return fDescription; }
+    virtual double GetTimeResolution(std::string units);
+    virtual std::vector<double> *GetRawTime() { return &fRawTime; }
+    virtual std::string GetRawTimeName() { return fRawTimeName; }
+    virtual std::string GetRawTimeUnit() { return fRawTimeUnit; }
+    virtual bool IsT0Present() { return (fT0 == nullptr) ? false : true; }
     virtual int GetT0Tag() { return fT0Tag; }
     virtual int GetT0(int idxp=-1, int idxs=-1);
     virtual int* GetT0s() { return fT0; }
-    virtual bool IsFirstGoodBinPresent() { return (fFirstGoodBin == 0) ? false : true; }
+    virtual bool IsFirstGoodBinPresent() { return (fFirstGoodBin == nullptr) ? false : true; }
     virtual int GetFirstGoodBin(int idxp=-1, int idxs=-1);
     virtual int* GetFirstGoodBins() { return fFirstGoodBin; }
-    virtual bool IsLastGoodBinPresent() { return (fLastGoodBin == 0) ? false : true; }
+    virtual bool IsLastGoodBinPresent() { return (fLastGoodBin == nullptr) ? false : true; }
     virtual int GetLastGoodBin(int idxp=-1, int idxs=-1);
     virtual int* GetLastGoodBins() { return fLastGoodBin; }
     virtual int GetNoOfPeriods() { return fNoOfPeriods; }
@@ -403,14 +402,14 @@ class PNeXusDetector2 {
     virtual int GetHistoValue(int idx_p, int idx_s, int idx_b);
     virtual int* GetHistos() { return fHisto; }
     virtual unsigned int GetSpectrumIndexSize() { return fSpectrumIndex.size(); }
-    virtual vector<int> *GetSpectrumIndex() { return &fSpectrumIndex; }
+    virtual std::vector<int> *GetSpectrumIndex() { return &fSpectrumIndex; }
     virtual int GetSpectrumIndex(unsigned int idx);
 
-    virtual void SetDescription(string description) { fDescription = description; }
-    virtual void SetTimeResolution(double val, string units);
-    virtual void SetRawTime(vector<double> &rawTime);
-    virtual void SetRawTimeName(string rawTimeName) { fRawTimeName = rawTimeName; }
-    virtual void SetRawTimeUnit(string rawTimeUnit) { fRawTimeUnit = rawTimeUnit; }
+    virtual void SetDescription(std::string description) { fDescription = description; }
+    virtual void SetTimeResolution(double val, std::string units);
+    virtual void SetRawTime(std::vector<double> &rawTime);
+    virtual void SetRawTimeName(std::string rawTimeName) { fRawTimeName = rawTimeName; }
+    virtual void SetRawTimeUnit(std::string rawTimeUnit) { fRawTimeUnit = rawTimeUnit; }
     virtual void SetT0Tag(int tag) { fT0Tag = tag; }
     virtual int  SetT0(int *t0);
     virtual int  SetFirstGoodBin(int *fgb);
@@ -419,17 +418,17 @@ class PNeXusDetector2 {
     virtual void SetNoOfSpectra(int val) { fNoOfSpectra = val; }
     virtual void SetNoOfBins(int val) { fNoOfBins = val; }
     virtual int  SetHistos(int *histo);
-    virtual void SetSpectrumIndex(vector<int> spectIdx) { fSpectrumIndex = spectIdx; }
+    virtual void SetSpectrumIndex(std::vector<int> spectIdx) { fSpectrumIndex = spectIdx; }
     virtual void SetSpectrumIndex(int spectIdx, int idx=-1);
 
   private:
-    string fErrorMsg;           ///< internal error message
-    string fDescription;        ///< description of the detector
+    std::string fErrorMsg;      ///< internal error message
+    std::string fDescription;   ///< description of the detector
     double fTimeResolution;     ///< keeps the time resolution in (ps)
-    vector<int> fSpectrumIndex; ///< list of global spectra
-    vector<double> fRawTime;    ///< keeps a raw time vector
-    string fRawTimeName;        ///< name of the raw time vector
-    string fRawTimeUnit;        ///< unit of the raw time vector
+    std::vector<int> fSpectrumIndex; ///< list of global spectra
+    std::vector<double> fRawTime;    ///< keeps a raw time vector
+    std::string fRawTimeName;   ///< name of the raw time vector
+    std::string fRawTimeUnit;   ///< unit of the raw time vector
 
     int fNoOfPeriods; ///< number of periods or -1 if not defined
     int fNoOfSpectra; ///< number of spectra or -1 if not defined
@@ -449,18 +448,18 @@ class PNeXusInstrument2 {
 
     virtual bool IsValid(bool strict);
 
-    virtual string GetName() { return fName; }
+    virtual std::string GetName() { return fName; }
     virtual PNeXusSource2* GetSource() { return &fSource; }
     virtual PNeXusBeamline2* GetBeamline() { return &fBeamline; }
     virtual PNeXusDetector2* GetDetector() { return &fDetector; }
 
-    virtual void SetName(string name) { fName = name; }
+    virtual void SetName(std::string name) { fName = name; }
     virtual void SetSource(PNeXusSource2 &source) { fSource = source; }
     virtual void SetBeamline(PNeXusBeamline2 &beamline) { fBeamline = beamline; }
     virtual void SetDetector(PNeXusDetector2 &detector) { fDetector = detector; }
 
   private:
-    string fName; ///< name of the instrument
+    std::string fName; ///< name of the instrument
     PNeXusSource2 fSource; ///< details of the muon source used
     PNeXusBeamline2 fBeamline; ///< beamline description
     PNeXusDetector2 fDetector; ///< details of the detectors which also includes the data!!
@@ -473,28 +472,28 @@ class PNeXusSample2 {
 
     virtual bool IsValid(bool strict);
 
-    virtual string GetName() { return fName; }
-    virtual string GetDescription() { return fDescription; }
-    virtual string GetMagneticFieldState() { return fMagneticFieldState; }
-    virtual string GetEnvironmentTemp() { return fEnvironmentTemp; }
-    virtual string GetEnvironmentField() { return fEnvironmentField; }
-    virtual double GetPhysPropValue(string name, bool &ok);
-    virtual void GetPhysPropUnit(string name, string &unit, bool &ok);
+    virtual std::string GetName() { return fName; }
+    virtual std::string GetDescription() { return fDescription; }
+    virtual std::string GetMagneticFieldState() { return fMagneticFieldState; }
+    virtual std::string GetEnvironmentTemp() { return fEnvironmentTemp; }
+    virtual std::string GetEnvironmentField() { return fEnvironmentField; }
+    virtual double GetPhysPropValue(std::string name, bool &ok);
+    virtual void GetPhysPropUnit(std::string name, std::string &unit, bool &ok);
 
-    virtual void SetName(string name) { fName = name; }
-    virtual void SetDescription(string description) { fDescription = description; }
-    virtual void SetMagneticFieldState(string magFieldState) { fMagneticFieldState = magFieldState; }
-    virtual void SetEnvironmentTemp(string env) { fEnvironmentTemp = env; }
-    virtual void SetEnvironmentField(string env) { fEnvironmentField = env; }
-    virtual void SetPhysProp(string name, double value, string unit, int idx=-1);
+    virtual void SetName(std::string name) { fName = name; }
+    virtual void SetDescription(std::string description) { fDescription = description; }
+    virtual void SetMagneticFieldState(std::string magFieldState) { fMagneticFieldState = magFieldState; }
+    virtual void SetEnvironmentTemp(std::string env) { fEnvironmentTemp = env; }
+    virtual void SetEnvironmentField(std::string env) { fEnvironmentField = env; }
+    virtual void SetPhysProp(std::string name, double value, std::string unit, int idx=-1);
 
   private:
-    string fName; ///< sample name
-    string fDescription; ///< sample description
-    string fMagneticFieldState; ///< magnetic field state, e.g. TF, ZF, ...
-    string fEnvironmentTemp; ///< sample environment related to temperature, e.g. CCR, Konti-1, ...
-    string fEnvironmentField; ///< sample environment related to field, e.g. WEW-Bruker
-    vector<PNeXusProp> fPhysProp; ///< collects the temperature, magnetic field
+    std::string fName; ///< sample name
+    std::string fDescription; ///< sample description
+    std::string fMagneticFieldState; ///< magnetic field state, e.g. TF, ZF, ...
+    std::string fEnvironmentTemp; ///< sample environment related to temperature, e.g. CCR, Konti-1, ...
+    std::string fEnvironmentField; ///< sample environment related to field, e.g. WEW-Bruker
+    std::vector<PNeXusProp> fPhysProp; ///< collects the temperature, magnetic field
 };
 
 class PNeXusUser2 {
@@ -504,12 +503,12 @@ class PNeXusUser2 {
 
     virtual bool IsValid(bool strict) { return true; } // currently only a dummy
 
-    virtual string GetName() { return fName; }
+    virtual std::string GetName() { return fName; }
 
-    virtual void SetName(string name) { fName = name; }
+    virtual void SetName(std::string name) { fName = name; }
 
   private:
-    string fName; ///< user name
+    std::string fName; ///< user name
 };
 
 class PNeXusEntry2 {
@@ -519,41 +518,41 @@ class PNeXusEntry2 {
 
     virtual bool IsValid(bool strict);
 
-    virtual string GetErrorMsg() { return fErrorMsg; }
-    virtual string GetDefinition() { return fDefinition; }
-    virtual string GetProgramName() { return fProgramName; }
-    virtual string GetProgramVersion() { return fProgramVersion; }
+    virtual std::string GetErrorMsg() { return fErrorMsg; }
+    virtual std::string GetDefinition() { return fDefinition; }
+    virtual std::string GetProgramName() { return fProgramName; }
+    virtual std::string GetProgramVersion() { return fProgramVersion; }
     virtual int GetRunNumber() { return fRunNumber; }
-    virtual string GetTitle() { return fTitle; }
-    virtual string GetStartTime() { return fStartTime; }
-    virtual string GetStopTime() { return fStopTime; }
-    virtual string GetExperimentIdentifier() { return fExperimentIdentifier; }
+    virtual std::string GetTitle() { return fTitle; }
+    virtual std::string GetStartTime() { return fStartTime; }
+    virtual std::string GetStopTime() { return fStopTime; }
+    virtual std::string GetExperimentIdentifier() { return fExperimentIdentifier; }
     virtual PNeXusUser2* GetUser() { return &fUser; }
     virtual PNeXusSample2* GetSample() { return &fSample; }
     virtual PNeXusInstrument2* GetInstrument() { return &fInstrument; }
 
-    virtual void SetDefinition(string def) { fDefinition = def; }
-    virtual void SetProgramName(string name) { fProgramName = name; }
-    virtual void SetProgramVersion(string version) { fProgramVersion = version; }
+    virtual void SetDefinition(std::string def) { fDefinition = def; }
+    virtual void SetProgramName(std::string name) { fProgramName = name; }
+    virtual void SetProgramVersion(std::string version) { fProgramVersion = version; }
     virtual void SetRunNumber(int number) { fRunNumber = number; }
-    virtual void SetTitle(string title) { fTitle = title; }
-    virtual int SetStartTime(string time);
-    virtual int SetStopTime(string time);
-    virtual void SetExperimentIdentifier(string expId) { fExperimentIdentifier = expId; }
+    virtual void SetTitle(std::string title) { fTitle = title; }
+    virtual int SetStartTime(std::string time);
+    virtual int SetStopTime(std::string time);
+    virtual void SetExperimentIdentifier(std::string expId) { fExperimentIdentifier = expId; }
     virtual void SetUser(PNeXusUser2 &user) { fUser = user; }
     virtual void SetSample(PNeXusSample2 &sample) { fSample = sample; }
     virtual void SetInstrument(PNeXusInstrument2 &instrument) { fInstrument = instrument; }
 
   private:
-    string fErrorMsg;         ///< internal error message
-    string fDefinition;       ///< the template (DTD name) on which the entry was based, e.g. 'pulsedTD'
-    string fProgramName;      ///< name of the creating program
-    string fProgramVersion;   ///< version of the creating program
+    std::string fErrorMsg;    ///< internal error message
+    std::string fDefinition;  ///< the template (DTD name) on which the entry was based, e.g. 'pulsedTD'
+    std::string fProgramName; ///< name of the creating program
+    std::string fProgramVersion; ///< version of the creating program
     int fRunNumber;           ///< run number
-    string fTitle;            ///< string containing the run title
-    string fStartTime;        ///< start date/time of the run
-    string fStopTime;         ///< stop date/time of the run
-    string fExperimentIdentifier; ///< experiment number, (for ISIS, the RB number)
+    std::string fTitle;       ///< string containing the run title
+    std::string fStartTime;   ///< start date/time of the run
+    std::string fStopTime;    ///< stop date/time of the run
+    std::string fExperimentIdentifier; ///< experiment number, (for ISIS, the RB number)
     PNeXusUser2 fUser;        ///< NXuser info IDF Version 2
     PNeXusSample2 fSample;    ///< NXsample info IDF Version 2
     PNeXusInstrument2 fInstrument; ///< NXinstrument inf IDF Version 2
@@ -566,56 +565,56 @@ class PNeXus {
     virtual ~PNeXus();
 
     virtual int GetIdfVersion() { return fIdfVersion; }
-    virtual string GetFileName() { return fFileName; }
-    virtual string GetFileTime() { return fFileTime; }
+    virtual std::string GetFileName() { return fFileName; }
+    virtual std::string GetFileTime() { return fFileTime; }
 
     virtual void SetIdfVersion(unsigned int idf);
-    virtual void SetFileName(string name) { fFileName = name; }
-    virtual void SetFileTime(string time) { fFileTime = time; }
+    virtual void SetFileName(std::string name) { fFileName = name; }
+    virtual void SetFileTime(std::string time) { fFileTime = time; }
 
     virtual PNeXusEntry1* GetEntryIdf1() { return fNxEntry1; }
     virtual PNeXusEntry2* GetEntryIdf2() { return fNxEntry2; }
 
     virtual bool IsValid(bool strict=false);
     virtual int GetErrorCode() { return fErrorCode; }
-    virtual string GetErrorMsg() { return fErrorMsg; }
+    virtual std::string GetErrorMsg() { return fErrorMsg; }
 
-    virtual vector<unsigned int>* GetGroupedHisto(unsigned int idx);    
+    virtual std::vector<unsigned int>* GetGroupedHisto(unsigned int idx);
 
     virtual int ReadFile(const char *fileName);
     virtual int WriteFile(const char *fileName, const char *fileType="hdf4", const unsigned int idf=2);
 
-    virtual void SetCreator(string str) { fCreator = str; }
+    virtual void SetCreator(std::string str) { fCreator = str; }
 
     virtual void Dump();
 
   private:
     bool fValid;
     int fErrorCode;
-    string fErrorMsg;
+    std::string fErrorMsg;
 
-    string fNeXusVersion; ///< version of the NeXus API used in writing the file
-    string fFileFormatVersion; ///< version of the HDF, HDF5, or XML library used to create the file (IDF 2 only)
+    std::string fNeXusVersion; ///< version of the NeXus API used in writing the file
+    std::string fFileFormatVersion; ///< version of the HDF, HDF5, or XML library used to create the file (IDF 2 only)
 
     unsigned int fIdfVersion; ///< version of the instrument definition
-    string fFileName; ///< file name of the original NeXus file to assist identification if the external name has been changed
-    string fFileTime; ///< date and time of file creating (IDF 2 only)
+    std::string fFileName; ///< file name of the original NeXus file to assist identification if the external name has been changed
+    std::string fFileTime; ///< date and time of file creating (IDF 2 only)
     NXhandle fFileHandle;
 
-    string fCreator; ///< facility of program where the file originated
+    std::string fCreator; ///< facility of program where the file originated
 
     PNeXusEntry1 *fNxEntry1; ///< NXentry for IDF 1
     PNeXusEntry2 *fNxEntry2; ///< NXentry for IDF 2
 
-    vector< vector<unsigned int> > fGroupedHisto;
+    std::vector< std::vector<unsigned int> > fGroupedHisto;
 
     virtual void Init();
-    virtual bool ErrorHandler(NXstatus status, int errCode, const string &errMsg);
-    virtual NXstatus GetStringData(string &str);
-    virtual NXstatus GetStringAttr(string attr, string &str);
+    virtual bool ErrorHandler(NXstatus status, int errCode, const std::string &errMsg);
+    virtual NXstatus GetStringData(std::string &str);
+    virtual NXstatus GetStringAttr(std::string attr, std::string &str);
     virtual int GetDataSize(int type);
-    virtual NXstatus GetDoubleVectorData(vector<double> &data);
-    virtual NXstatus GetIntVectorData(vector<int> &data);
+    virtual NXstatus GetDoubleVectorData(std::vector<double> &data);
+    virtual NXstatus GetIntVectorData(std::vector<int> &data);
 
     virtual int ReadFileIdf1();
     virtual int ReadFileIdf2();
@@ -628,8 +627,8 @@ class PNeXus {
     virtual bool IsValidIdf1(bool strict);
     virtual bool IsValidIdf2(bool strict);
 
-    virtual bool SearchInGroup(string str, string tag, NXname &nxname, NXname &nxclass, int &dataType);
-    virtual bool SearchAttrInData(string str, int &length, int &dataType);
+    virtual bool SearchInGroup(std::string str, std::string tag, NXname &nxname, NXname &nxclass, int &dataType);
+    virtual bool SearchAttrInData(std::string str, int &length, int &dataType);
 };
 
 #endif // _PNEXUS_H_

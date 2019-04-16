@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 #define _PGBGLF_H_
 
 #include <vector>
-using namespace std;
 
 #include "PUserFcnBase.h"
 
@@ -46,7 +45,7 @@ class PGbGLF : public PUserFcnBase
     virtual ~PGbGLF() {}
 
     virtual Bool_t NeedGlobalPart() const { return false; }
-    virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) {}
+    virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) {}
     virtual Bool_t GlobalPartIsValid() const { return true; }
 
     virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;

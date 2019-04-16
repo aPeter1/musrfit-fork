@@ -35,8 +35,6 @@
 #include <cmath>
 #include <vector>
 
-using namespace std;
-
 ClassImp(ZFMagGss)
 ClassImp(ZFMagExp)
 
@@ -49,7 +47,7 @@ ClassImp(ZFMagExp)
  * \param t time \htmlonly (&mu;s) \endhtmlonly \latexonly ($\mu\mathrm{s}$) \endlatexonly
  * \param par parameters [\htmlonly &alpha; (1), &nu; (MHz), &sigma;<sub>T</sub>; (&mu;s<sup>-1</sup>), &sigma;<sub>L</sub>; (&mu;s<sup>-1</sup>)\endhtmlonly \latexonly $\alpha~(1)$, $\nu~(\mathrm{MHz})$, $\sigma_{\mathrm{T}}~(\mu\mathrm{s}^{-1})$, $\sigma_{\mathrm{L}}~(\mu\mathrm{s}^{-1})$ \endlatexonly]
  */
-double ZFMagGss::operator()(double t, const vector<double> &par) const {
+double ZFMagGss::operator()(double t, const std::vector<double> &par) const {
   assert(par.size()==4);
   double w(TWO_PI * par[1]), sst(par[2]*par[2]*t);
   return par[0] * (cos(w*t) - sst/w*sin(w*t)) * exp(-0.5*sst*t) + (1.0-par[0]) * exp(-0.5*par[3]*par[3]*t*t);
@@ -64,7 +62,7 @@ double ZFMagGss::operator()(double t, const vector<double> &par) const {
  * \param t time \htmlonly (&mu;s) \endhtmlonly \latexonly ($\mu\mathrm{s}$) \endlatexonly
  * \param par parameters [\htmlonly &alpha; (1), &nu; (MHz), <i>a</i><sub>T</sub>; (&mu;s<sup>-1</sup>), <i>a</i><sub>L</sub>; (&mu;s<sup>-1</sup>)\endhtmlonly \latexonly $\alpha~(1)$, $\nu~(\mathrm{MHz})$, $a_{\mathrm{T}}~(\mu\mathrm{s}^{-1})$, $a_{\mathrm{L}}~(\mu\mathrm{s}^{-1})$ \endlatexonly]
  */
-double ZFMagExp::operator()(double t, const vector<double> &par) const {
+double ZFMagExp::operator()(double t, const std::vector<double> &par) const {
   assert(par.size()==4);
   double w(TWO_PI * par[1]);
   return par[0] * (cos(w*t) - par[2]/w*sin(w*t)) * exp(-par[2]*t) + (1.0-par[0]) * exp(-par[3]*t);
@@ -88,8 +86,8 @@ UniaxialStatGssKT::UniaxialStatGssKT() {
  * <p>Destructor
  */
 UniaxialStatGssKT::~UniaxialStatGssKT() {
-  delete fIntFirst; fIntFirst = 0;
-  delete fIntSecond; fIntSecond = 0;
+  delete fIntFirst; fIntFirst = nullptr;
+  delete fIntSecond; fIntSecond = nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -101,27 +99,27 @@ UniaxialStatGssKT::~UniaxialStatGssKT() {
  * \param t time \htmlonly (&mu;s) \endhtmlonly \latexonly ($\mu\mathrm{s}$) \endlatexonly
  * \param par parameters [\htmlonly &sigma;<sub>1</sub> (&mu;s<sup>-1</sup>), &sigma;<sub>2</sub> (&mu;s<sup>-1</sup>), &Theta; (&deg;)\endhtmlonly \latexonly $\sigma_{1}~(\mu\mathrm{s}^{-1})$, $\sigma_{2}~(\mu\mathrm{s}^{-1})$, $\Theta~(^{\circ})$ \endlatexonly]
  */
-double UniaxialStatGssKT::operator()(double t, const vector<double> &par) const {
+double UniaxialStatGssKT::operator()(double t, const std::vector<double> &par) const {
   assert(par.size() == 3);
 
   if (t < 0.0)
     return 1.0;
 
   // set the parameters for the integrations
-  vector<double> intParam(3);
+  std::vector<double> intParam(3);
   intParam[0] = par[0];
   intParam[1] = par[1];
   intParam[2] = t;
 
   if (((fabs(par[1]) < 1.0e-5) && (fabs(par[0]) > 1.0e-2)) || (fabs(par[0]/par[1]) > 1000.0)) {
-    cerr << endl;
-    cerr << ">> UniaxialStatGssKT: WARNING Ratio sigma1/sigma2 unreasonably large! Set it internally to 1000. Please check your parameters!";
-    cerr << endl;
+    std::cerr << std::endl;
+    std::cerr << ">> UniaxialStatGssKT: WARNING Ratio sigma1/sigma2 unreasonably large! Set it internally to 1000. Please check your parameters!";
+    std::cerr << std::endl;
     intParam[1] = 1.0e-3*intParam[0];
   } else if (fabs(par[1]) < 1.0e-10) {
-    cerr << endl;
-    cerr << ">> UniaxialStatGssKT: WARNING sigma2 too small! Set it internally to 1.0E-10. Please check your parameters!";
-    cerr << endl;
+    std::cerr << std::endl;
+    std::cerr << ">> UniaxialStatGssKT: WARNING sigma2 too small! Set it internally to 1.0E-10. Please check your parameters!";
+    std::cerr << std::endl;
     intParam[1] = 1.0e-10;
   }
 

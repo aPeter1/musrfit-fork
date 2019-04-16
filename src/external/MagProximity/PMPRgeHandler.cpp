@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2011 by Andreas Suter                                   *
+ *   Copyright (C) 2011-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include "PMPRgeHandler.h"
 
@@ -92,7 +91,7 @@ Double_t PMPRgeHandler::GetRgeValue(const Int_t index, const Double_t dist)
 {
   Double_t rgeVal = 0.0;
 
-  UInt_t distIdx = (UInt_t)(dist/(fRgeDataList[index].stoppingDistance[1]-fRgeDataList[index].stoppingDistance[0]));
+  UInt_t distIdx = static_cast<UInt_t>(dist/(fRgeDataList[index].stoppingDistance[1]-fRgeDataList[index].stoppingDistance[0]));
 
   if (distIdx >= fRgeDataList[index].stoppingDistance.size()) {
     rgeVal = 0.0;
@@ -140,7 +139,7 @@ Double_t PMPRgeHandler::GetRgeValue(const Double_t energy, const Double_t dist)
  */
 Bool_t PMPRgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList)
 {
-  ifstream fin;
+  std::ifstream fin;
   PMPRgeData data;
   Int_t idx=0;
   TString dataName, tstr;
@@ -150,11 +149,11 @@ Bool_t PMPRgeHandler::LoadRgeData(const PStringVector &rgeDataPathList, const PD
 
   for (UInt_t i=0; i<rgeDataPathList.size(); i++) {
     // open rge-file for reading
-    fin.open(rgeDataPathList[i].Data(), iostream::in);
+    fin.open(rgeDataPathList[i].Data(), std::iostream::in);
     if (!fin.is_open()) {
-      cout << endl << "PMPRgeHandler::LoadRgeData **ERROR**";
-      cout << endl << "  Could not open file " << rgeDataPathList[i].Data();
-      cout << endl;
+      std::cout << std::endl << "PMPRgeHandler::LoadRgeData **ERROR**";
+      std::cout << std::endl << "  Could not open file " << rgeDataPathList[i].Data();
+      std::cout << std::endl;
       return false;
     }
 

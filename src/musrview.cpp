@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -36,7 +36,6 @@
 #include <string.h>
 
 #include <iostream>
-using namespace std;
 
 #include <TApplication.h>
 #include <TSAXParser.h>
@@ -57,26 +56,26 @@ using namespace std;
  */
 void musrview_syntax()
 {
-  cout << endl << "usage: musrview <msr-file> [Options]";
-  cout << endl << "       <msr-file>: msr/mlog input file";
-  cout << endl << "       Options:";
-  cout << endl << "       --help    : display this help and exit.";
-  cout << endl << "       --version : output version information and exit.";
-  cout << endl << "       --show-dynamic-path : dumps the dynamic search paths and exit.";
-  cout << endl << "       -f, --fourier: will directly present the Fourier transform of the <msr-file>.";
-  cout << endl << "       -a, --avg: will directly present the averaged data/Fourier of the <msr-file>.";
-  cout << endl << "       --<graphic-format-extension>: ";
-  cout << endl << "           will produce a graphics-output-file without starting a root session.";
-  cout << endl << "           the name is based on the <msr-file>, e.g. 3310.msr -> 3310_0.png";
-  cout << endl << "           supported graphic-format-extension:";
-  cout << endl << "           eps, pdf, gif, jpg, png, svg, xpm, root";
-  cout << endl << "           example: musrview 3310.msr --png, will produce a files 3310_X.png";
-  cout << endl << "                    where 'X' stands for the plot number (starting form 0)";
-  cout << endl << "       --ascii: ";
-  cout << endl << "           will produce an ascii dump of the data and fit as plotted.";
-  cout << endl << "       --timeout <timeout>: <timeout> given in seconds after which musrview terminates.";
-  cout << endl << "           If <timeout> <= 0, no timeout will take place. Default <timeout> is 0.";
-  cout << endl << endl;
+  std::cout << std::endl << "usage: musrview <msr-file> [Options]";
+  std::cout << std::endl << "       <msr-file>: msr/mlog input file";
+  std::cout << std::endl << "       Options:";
+  std::cout << std::endl << "       --help    : display this help and exit.";
+  std::cout << std::endl << "       --version : output version information and exit.";
+  std::cout << std::endl << "       --show-dynamic-path : dumps the dynamic search paths and exit.";
+  std::cout << std::endl << "       -f, --fourier: will directly present the Fourier transform of the <msr-file>.";
+  std::cout << std::endl << "       -a, --avg: will directly present the averaged data/Fourier of the <msr-file>.";
+  std::cout << std::endl << "       --<graphic-format-extension>: ";
+  std::cout << std::endl << "           will produce a graphics-output-file without starting a root session.";
+  std::cout << std::endl << "           the name is based on the <msr-file>, e.g. 3310.msr -> 3310_0.png";
+  std::cout << std::endl << "           supported graphic-format-extension:";
+  std::cout << std::endl << "           eps, pdf, gif, jpg, png, svg, xpm, root";
+  std::cout << std::endl << "           example: musrview 3310.msr --png, will produce a files 3310_X.png";
+  std::cout << std::endl << "                    where 'X' stands for the plot number (starting form 0)";
+  std::cout << std::endl << "       --ascii: ";
+  std::cout << std::endl << "           will produce an ascii dump of the data and fit as plotted.";
+  std::cout << std::endl << "       --timeout <timeout>: <timeout> given in seconds after which musrview terminates.";
+  std::cout << std::endl << "           If <timeout> <= 0, no timeout will take place. Default <timeout> is 0.";
+  std::cout << std::endl << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -114,7 +113,7 @@ int main(int argc, char *argv[])
 
   // add default shared library path /usr/local/lib if not already persent
   const char *dsp = gSystem->GetDynamicPath();
-  if (strstr(dsp, "/usr/local/lib") == NULL)
+  if (strstr(dsp, "/usr/local/lib") == nullptr)
     gSystem->AddDynamicPath("/usr/local/lib");
 
   // check input arguments
@@ -127,20 +126,20 @@ int main(int argc, char *argv[])
       if (strlen(fileName) == 0) {
         strcpy(fileName, argv[i]);
       } else {
-        cerr << endl << "**ERROR** only one file name allowed." << endl;
+        std::cerr << std::endl << "**ERROR** only one file name allowed." << std::endl;
         show_syntax = true;
         break;
       }
     } else if (!strcmp(argv[i], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrview version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "musrview version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #else
-      cout << endl << "musrview git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "musrview git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--show-dynamic-path")) {
-      cout << endl << "musrview: internal dynamic search paths for shared libraries/root dictionaries:";
-      cout << endl << "  '" << gSystem->GetDynamicPath() << "'" << endl << endl;
+      std::cout << std::endl << "musrview: internal dynamic search paths for shared libraries/root dictionaries:";
+      std::cout << std::endl << "  '" << gSystem->GetDynamicPath() << "'" << std::endl << std::endl;
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--help")) {
       show_syntax = true;
@@ -187,16 +186,16 @@ int main(int argc, char *argv[])
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << ">> musrview **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
-    cerr << endl;
+    std::cerr << std::endl << ">> musrview **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    std::cerr << std::endl;
     // clean up
     if (saxParser) {
       delete saxParser;
-      saxParser = 0;
+      saxParser = nullptr;
     }
     if (startupHandler) {
       delete startupHandler;
-      startupHandler = 0;
+      startupHandler = nullptr;
     }
   } else {
     strcpy(startup_path_name, startupHandler->GetStartupFilePath().Data());
@@ -207,17 +206,17 @@ int main(int argc, char *argv[])
     status = parseXmlFile(saxParser, startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << ">> musrview **WARNING** Reading/parsing musrfit_startup.xml failed.";
-      cerr << endl << ">>                      Any graph will appear with random symbols and colors!";
-      cerr << endl;
+      std::cerr << std::endl << ">> musrview **WARNING** Reading/parsing musrfit_startup.xml failed.";
+      std::cerr << std::endl << ">>                      Any graph will appear with random symbols and colors!";
+      std::cerr << std::endl;
       // clean up
       if (saxParser) {
         delete saxParser;
-        saxParser = 0;
+        saxParser = nullptr;
       }
       if (startupHandler) {
         delete startupHandler;
-        startupHandler = 0;
+        startupHandler = nullptr;
       }
     } else {
       startupHandler->CheckLists();
@@ -230,13 +229,13 @@ int main(int argc, char *argv[])
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cerr << endl << ">> musrview **ERROR** couldn't find '" << fileName << "'" << endl << endl;
+        std::cerr << std::endl << ">> musrview **ERROR** couldn't find '" << fileName << "'" << std::endl << std::endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cerr << endl << ">> musrview **SYNTAX ERROR** in file " << fileName << ", full stop here." << endl << endl;
+        std::cerr << std::endl << ">> musrview **SYNTAX ERROR** in file " << fileName << ", full stop here." << std::endl << std::endl;
         break;
       default:
-        cerr << endl << ">> musrview **UNKNOWN ERROR** when trying to read the msr-file" << endl << endl;
+        std::cerr << std::endl << ">> musrview **UNKNOWN ERROR** when trying to read the msr-file" << std::endl << std::endl;
         break;
     }
     return status;
@@ -272,11 +271,11 @@ int main(int argc, char *argv[])
 
   success = dataHandler->IsAllDataAvailable();
   if (!success) {
-    cerr << endl << ">> musrview **ERROR** Couldn't read all data files, will quit ..." << endl;
+    std::cerr << std::endl << ">> musrview **ERROR** Couldn't read all data files, will quit ..." << std::endl;
   }
 
   // generate the necessary histogramms for the view
-  PRunListCollection *runListCollection = 0;
+  PRunListCollection *runListCollection = nullptr;
   if (success) {
     // feed all the necessary histogramms for the view
     runListCollection = new PRunListCollection(msrHandler, dataHandler);
@@ -292,8 +291,8 @@ int main(int argc, char *argv[])
       if (runPresent) {
         success = runListCollection->Add(i, kView);
         if (!success) {
-          cerr << endl << ">> musrview **ERROR** Couldn't handle run no " << i << " ";
-          cerr << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
+          std::cerr << std::endl << ">> musrview **ERROR** Couldn't handle run no " << i << " ";
+          std::cerr << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
           break;
         }
       }
@@ -309,7 +308,7 @@ int main(int argc, char *argv[])
     }
     TApplication app("App", &argc, argv);
 
-    vector<PMusrCanvas*> canvasVector;
+    std::vector<PMusrCanvas*> canvasVector;
     PMusrCanvas *musrCanvas;
 
     bool ok = true;
@@ -330,8 +329,8 @@ int main(int argc, char *argv[])
                                      fourier, avg);
 
       if (!musrCanvas->IsValid()) {
-        cerr << endl << ">> musrview **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
-        cerr << endl;
+        std::cerr << std::endl << ">> musrview **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
+        std::cerr << std::endl;
         ok = false;
         break;
       }
@@ -380,7 +379,7 @@ int main(int argc, char *argv[])
     for (unsigned int i=0; i<canvasVector.size(); i++) {
       // check if canvas is still there before calling the destructor **TO BE DONE**
       sprintf(canvasName, "fMainCanvas%d", i);
-      if (gROOT->GetListOfCanvases()->FindObject(canvasName) != 0) {
+      if (gROOT->GetListOfCanvases()->FindObject(canvasName) != nullptr) {
         canvasVector[i]->~PMusrCanvas();
       }
     }
@@ -391,23 +390,23 @@ int main(int argc, char *argv[])
   plotList.clear();
   if (saxParser) {
     delete saxParser;
-    saxParser = 0;
+    saxParser = nullptr;
   }
   if (startupHandler) {
     delete startupHandler;
-    startupHandler = 0;
+    startupHandler = nullptr;
   }
   if (msrHandler) {
     delete msrHandler;
-    msrHandler = 0;
+    msrHandler = nullptr;
   }
   if (dataHandler) {
     delete dataHandler;
-    dataHandler = 0;
+    dataHandler = nullptr;
   }
   if (runListCollection) {
     delete runListCollection;
-    runListCollection = 0;
+    runListCollection = nullptr;
   }
 
   return PMUSR_SUCCESS;

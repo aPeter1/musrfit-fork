@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -50,8 +50,8 @@ class PMsrHandler
 
     virtual Int_t ReadMsrFile();
     virtual Int_t WriteMsrLogFile(const Bool_t messages = true);
-    virtual Int_t WriteMsrFile(const Char_t *filename, map<UInt_t, TString> *commentsPAR = 0, map<UInt_t, TString> *commentsTHE = 0, \
-                                                       map<UInt_t, TString> *commentsFUN = 0, map<UInt_t, TString> *commentsRUN = 0);
+    virtual Int_t WriteMsrFile(const Char_t *filename, std::map<UInt_t, TString> *commentsPAR = 0, std::map<UInt_t, TString> *commentsTHE = 0, \
+                                                       std::map<UInt_t, TString> *commentsFUN = 0, std::map<UInt_t, TString> *commentsRUN = 0);
 
     virtual TString*                GetMsrTitle() { return &fTitle; }
     virtual PMsrParamList*          GetMsrParamList() { return &fParam; }
@@ -91,7 +91,7 @@ class PMsrHandler
     virtual UInt_t GetFuncIndex(Int_t funNo) { return fFuncHandler->GetFuncIndex(funNo); }
     virtual Bool_t CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
                        { return fFuncHandler->CheckMapAndParamRange(mapSize, paramSize); }
-    virtual Double_t EvalFunc(UInt_t i, vector<Int_t> map, vector<Double_t> param)
+    virtual Double_t EvalFunc(UInt_t i, std::vector<Int_t> map, std::vector<Double_t> param)
                        { return fFuncHandler->Eval(i,map,param); }
 
     virtual UInt_t GetNoOfFitParameters(UInt_t idx);

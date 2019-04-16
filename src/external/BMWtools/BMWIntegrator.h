@@ -36,8 +36,6 @@
 #include <cmath>
 #include <vector>
 
-using namespace std;
-
 /**
  * <p>Alternative base class for 1D integrations using the GNU Scientific Library integrator.
  *    The difference to the other class is that here the integration parameters have to be supplied directly to the IntegrateFunc method.
@@ -67,7 +65,7 @@ class T2Integrator {
  */
 inline double T2Integrator::FuncAtXgsl(double x, void *ptrPair)
 {
-  pair<T2Integrator*, const vector<double>*> *pairOfPointers = static_cast<pair<T2Integrator*, const vector<double>*>*>(ptrPair);
+  std::pair<T2Integrator*, const std::vector<double>*> *pairOfPointers = static_cast<std::pair<T2Integrator*, const std::vector<double>*>*>(ptrPair);
   return pairOfPointers->first->FuncAtX(x, *(pairOfPointers->second));
 }
 
@@ -83,14 +81,14 @@ inline double T2Integrator::FuncAtXgsl(double x, void *ptrPair)
  */
 inline double T2Integrator::IntegrateFunc(double x1, double x2, const std::vector<double> &par)
 {
-  pair<T2Integrator*, const vector<double>*> ptrPair;
+  std::pair<T2Integrator*, const std::vector<double>*> ptrPair;
   ptrPair.first = (this);
   ptrPair.second = &par;
 
   ROOT::Math::GSLIntegrator *integrator = new ROOT::Math::GSLIntegrator(ROOT::Math::Integration::kADAPTIVE,ROOT::Math::Integration::kGAUSS31);
   double value(integrator->Integral(&T2Integrator::FuncAtXgsl, static_cast<void*>(&ptrPair), x1, x2));
   delete integrator;
-  integrator = 0;
+  integrator = nullptr;
 
   return value;
 }
@@ -123,7 +121,7 @@ class TIntegrator {
     double IntegrateFunc(double, double);
 
   protected:
-    mutable vector<double> fPar; ///< parameters of the integrand
+    mutable std::vector<double> fPar; ///< parameters of the integrand
 
   private:
     static double FuncAtXgsl(double, void *);
@@ -146,7 +144,7 @@ inline TIntegrator::TIntegrator() : fFunc(0) {
 inline TIntegrator::~TIntegrator(){
   fPar.clear();
   delete fIntegrator;
-  fIntegrator=0;
+  fIntegrator=nullptr;
   fFunc=0;
 }
 
@@ -193,7 +191,7 @@ class TMCIntegrator {
     double IntegrateFunc(size_t, double *, double *);
 
   protected:
-    mutable vector<double> fPar; ///< parameters of the integrand
+    mutable std::vector<double> fPar; ///< parameters of the integrand
 
   private:
     static double FuncAtXgsl(double *, size_t, void *);
@@ -216,7 +214,7 @@ inline TMCIntegrator::TMCIntegrator() : fFunc(0) {
 inline TMCIntegrator::~TMCIntegrator(){
   fPar.clear();
   delete fMCIntegrator;
-  fMCIntegrator=0;
+  fMCIntegrator=nullptr;
   fFunc=0;
 }
 
@@ -265,7 +263,7 @@ class TDWaveGapIntegralCuhre {
     double IntegrateFunc();
 
   protected:
-    static vector<double> fPar; ///< parameters of the integrand
+    static std::vector<double> fPar; ///< parameters of the integrand
     unsigned int fNDim; ///< dimension of the integral
 };
 
@@ -284,7 +282,7 @@ class TCosSqDWaveGapIntegralCuhre {
     double IntegrateFunc();
 
   protected:
-    static vector<double> fPar; ///< parameters of the integrand
+    static std::vector<double> fPar; ///< parameters of the integrand
     unsigned int fNDim; ///< dimension of the integral
 };
 
@@ -303,7 +301,7 @@ class TSinSqDWaveGapIntegralCuhre {
     double IntegrateFunc();
 
   protected:
-    static vector<double> fPar; ///< parameters of the integrand
+    static std::vector<double> fPar; ///< parameters of the integrand
     unsigned int fNDim; ///< dimension of the integral
 };
 
@@ -321,7 +319,7 @@ class TAnSWaveGapIntegralCuhre {
     double IntegrateFunc();
 
   protected:
-    static vector<double> fPar; ///< parameters of the integrand
+    static std::vector<double> fPar; ///< parameters of the integrand
     unsigned int fNDim; ///< dimension of the integral
 };
 
@@ -339,7 +337,7 @@ class TAnSWaveGapIntegralDivonne {
     double IntegrateFunc();
 
   protected:
-    static vector<double> fPar; ///< parameters of the integrand
+    static std::vector<double> fPar; ///< parameters of the integrand
     unsigned int fNDim; ///< dimension of the integral
 };
 
@@ -357,7 +355,7 @@ class TAnSWaveGapIntegralSuave {
     double IntegrateFunc();
 
   protected:
-    static vector<double> fPar; ///< parameters of the integrand
+    static std::vector<double> fPar; ///< parameters of the integrand
     unsigned int fNDim; ///< dimension of the integral
 };
 
@@ -375,7 +373,7 @@ class TNonMonDWave1GapIntegralCuhre {
     double IntegrateFunc();
 
   protected:
-    static vector<double> fPar; ///< parameters of the integrand
+    static std::vector<double> fPar; ///< parameters of the integrand
     unsigned int fNDim; ///< dimension of the integral
 };
 
@@ -393,7 +391,7 @@ class TNonMonDWave2GapIntegralCuhre {
     double IntegrateFunc();
 
   protected:
-    static vector<double> fPar; ///< parameters of the integrand
+    static std::vector<double> fPar; ///< parameters of the integrand
     unsigned int fNDim; ///< dimension of the integral
 };
 
@@ -485,7 +483,7 @@ class TIntBesselJ0Exp : public T2Integrator {
     ~TIntBesselJ0Exp() {}
 
   private:
-    double FuncAtX(double, const vector<double>&) const;
+    double FuncAtX(double, const std::vector<double>&) const;
 };
 
 /**
@@ -496,7 +494,7 @@ class TIntBesselJ0Exp : public T2Integrator {
  *
  * \param x point where the function should be evaluated
  */
-inline double TIntBesselJ0Exp::FuncAtX(double x, const vector<double> &par) const
+inline double TIntBesselJ0Exp::FuncAtX(double x, const std::vector<double> &par) const
 {
   double w0t(TMath::TwoPi()*par[0]*x);
   double j0;
@@ -518,7 +516,7 @@ class TIntSinGss : public T2Integrator {
     ~TIntSinGss() {}
 
   private:
-    double FuncAtX(double, const vector<double>&) const;
+    double FuncAtX(double, const std::vector<double>&) const;
 };
 
 /**
@@ -529,7 +527,7 @@ class TIntSinGss : public T2Integrator {
  *
  * \param x point where the function should be evaluated
  */
-inline double TIntSinGss::FuncAtX(double x, const vector<double> &par) const
+inline double TIntSinGss::FuncAtX(double x, const std::vector<double> &par) const
 {
   return TMath::Sin(TMath::TwoPi()*par[0]*x) * TMath::Exp(-0.5*par[1]*par[1]*x*x);
 }
@@ -546,7 +544,7 @@ class TIntSGInterpolation : public T2Integrator {
     ~TIntSGInterpolation() {}
 
   private:
-    double FuncAtX(double, const vector<double>&) const;
+    double FuncAtX(double, const std::vector<double>&) const;
 };
 
 /**
@@ -557,7 +555,7 @@ class TIntSGInterpolation : public T2Integrator {
  *
  * \param x point where the function should be evaluated
  */
-inline double TIntSGInterpolation::FuncAtX(double x, const vector<double> &par) const
+inline double TIntSGInterpolation::FuncAtX(double x, const std::vector<double> &par) const
 {
   // Parameters: nu_L [MHz], a [1/us], lambda [1/us], beta [1], t [us]
   double wt(TMath::TwoPi()*par[0]*x);
@@ -600,7 +598,7 @@ class TFirstUniaxialGssKTIntegral : public T2Integrator {
     virtual ~TFirstUniaxialGssKTIntegral() {}
 
   private:
-    virtual double FuncAtX(double, const vector<double>&) const; // variable: x
+    virtual double FuncAtX(double, const std::vector<double>&) const; // variable: x
 };
 
 /**
@@ -611,7 +609,7 @@ class TFirstUniaxialGssKTIntegral : public T2Integrator {
  *
  * \param x point where the function should be evaluated
  */
-inline double TFirstUniaxialGssKTIntegral::FuncAtX(double x, const vector<double> &par) const
+inline double TFirstUniaxialGssKTIntegral::FuncAtX(double x, const std::vector<double> &par) const
 {
   double eps(par[0]*par[0]/(par[1]*par[1]) - 1.0);
   double p(1.0 + eps*x*x);
@@ -630,7 +628,7 @@ class TSecondUniaxialGssKTIntegral : public T2Integrator {
     virtual ~TSecondUniaxialGssKTIntegral() {}
 
   private:
-    virtual double FuncAtX(double, const vector<double>&) const; // variable: x
+    virtual double FuncAtX(double, const std::vector<double>&) const; // variable: x
 };
 
 /**
@@ -641,7 +639,7 @@ class TSecondUniaxialGssKTIntegral : public T2Integrator {
  *
  * \param x point where the function should be evaluated
  */
-inline double TSecondUniaxialGssKTIntegral::FuncAtX(double x, const vector<double> &par) const
+inline double TSecondUniaxialGssKTIntegral::FuncAtX(double x, const std::vector<double> &par) const
 {
   double eps(par[0]*par[0]/(par[1]*par[1]) - 1.0);
   double p(1.0 + eps*x*x);

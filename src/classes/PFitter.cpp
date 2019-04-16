@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -41,7 +41,6 @@
 #include <limits>
 
 #include <cmath>
-using namespace std;
 
 #include <sys/time.h>
 
@@ -92,8 +91,8 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bo
   fCmdLines = *runInfo->GetMsrCommands();
 
   // init class variables
-  fFitterFcn = 0;
-  fFcnMin = 0;
+  fFitterFcn = nullptr;
+  fFcnMin = nullptr;
 
   fScanAll = true;
   fScanParameter[0] = 0;
@@ -141,12 +140,12 @@ PFitter::~PFitter()
 
   if (fFcnMin) {
     delete fFcnMin;
-    fFcnMin = 0;
+    fFcnMin = nullptr;
   }
 
   if (fFitterFcn) {
     delete fFitterFcn;
-    fFitterFcn = 0;
+    fFitterFcn = nullptr;
   }
 }
 
@@ -172,7 +171,7 @@ Bool_t PFitter::DoFit()
       if (error[i] != 0.0)
         usedParams++;
     }
-    Int_t ndf = fFitterFcn->GetTotalNoOfFittedBins() - usedParams;
+    Int_t ndf = static_cast<int>(fFitterFcn->GetTotalNoOfFittedBins()) - usedParams;
     Double_t val = (*fFitterFcn)(param);
     if (fUseChi2) {
       // calculate expected chisq
@@ -185,22 +184,22 @@ Bool_t PFitter::DoFit()
         chisqPerHisto.push_back(fRunListCollection->GetSingleRunChisq(param, i));
       }
 
-      cout << endl << endl << ">> chisq = " << val << ", NDF = " << ndf << ", chisq/NDF = " << val/ndf;
+      std::cout << std::endl << std::endl << ">> chisq = " << val << ", NDF = " << ndf << ", chisq/NDF = " << val/ndf;
 
       if (totalExpectedChisq != 0.0) {
-        cout << endl << ">> expected chisq = " << totalExpectedChisq << ", NDF = " << ndf << ", expected chisq/NDF = " << totalExpectedChisq/ndf;
+        std::cout << std::endl << ">> expected chisq = " << totalExpectedChisq << ", NDF = " << ndf << ", expected chisq/NDF = " << totalExpectedChisq/ndf;
         UInt_t ndf_histo = 0;
         for (UInt_t i=0; i<expectedChisqPerHisto.size(); i++) {
           ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
           if (ndf_histo > 0)
-            cout << endl << ">> run block " << i+1 << ": (NDF/red.chisq/red.chisq_e) = (" << ndf_histo << "/" << chisqPerHisto[i]/ndf_histo << "/" << expectedChisqPerHisto[i]/ndf_histo << ")";
+            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq/red.chisq_e) = (" << ndf_histo << "/" << chisqPerHisto[i]/ndf_histo << "/" << expectedChisqPerHisto[i]/ndf_histo << ")";
         }
       } else if (chisqPerHisto.size() > 0) { // in case expected chisq is not applicable like for asymmetry fits
         UInt_t ndf_histo = 0;
         for (UInt_t i=0; i<chisqPerHisto.size(); i++) {
           ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
           if (ndf_histo > 0)
-            cout << endl << ">> run block " << i+1 << ": (NDF/red.chisq) = (" << ndf_histo << "/" << chisqPerHisto[i]/ndf_histo << ")";
+            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq) = (" << ndf_histo << "/" << chisqPerHisto[i]/ndf_histo << ")";
         }
       }
 
@@ -208,22 +207,22 @@ Bool_t PFitter::DoFit()
       chisqPerHisto.clear();
       expectedChisqPerHisto.clear();
     } else { // max. log likelihood
-      cout << endl << endl << ">> maxLH = " << val << ", NDF = " << ndf << ", maxLH/NDF = " << val/ndf;
+      std::cout << std::endl << std::endl << ">> maxLH = " << val << ", NDF = " << ndf << ", maxLH/NDF = " << val/ndf;
     }
-    cout << endl << endl;
+    std::cout << std::endl << std::endl;
     return true;
   }
 
   // debugging information
   #ifdef HAVE_GOMP
-  cout << endl << ">> Number of available threads for the function optimization: " << omp_get_num_procs() << endl;
+  std::cout << std::endl << ">> Number of available threads for the function optimization: " << omp_get_num_procs() << std::endl;
   #endif
 
   // real fit wanted
   if (fUseChi2)
-    cout << endl << ">> Chi Square fit will be executed" << endl;
+    std::cout << std::endl << ">> Chi Square fit will be executed" << std::endl;
   else
-    cout << endl << ">> Maximum Likelihood fit will be executed" << endl;
+    std::cout << std::endl << ">> Maximum Likelihood fit will be executed" << std::endl;
 
   Bool_t status = true;
   // init positive errors to default false, if minos is called, it will be set true there
@@ -236,8 +235,8 @@ Bool_t PFitter::DoFit()
   for (UInt_t i=0; i<fCmdList.size(); i++) {
     switch (fCmdList[i].first) {
       case PMN_INTERACTIVE:
-        cerr << endl << "**WARNING** from PFitter::DoFit() : the command INTERACTIVE is not yet implemented.";
-        cerr << endl;
+        std::cerr << std::endl << "**WARNING** from PFitter::DoFit() : the command INTERACTIVE is not yet implemented.";
+        std::cerr << std::endl;
         break;
       case PMN_CONTOURS:
         status = ExecuteContours();
@@ -249,15 +248,15 @@ Bool_t PFitter::DoFit()
         status = ExecuteFix(fCmdList[i].second);
         break;
       case PMN_EIGEN:
-        cerr << endl << "**WARNING** from PFitter::DoFit() : the command EIGEN is not yet implemented.";
-        cerr << endl;
+        std::cerr  << std::endl << "**WARNING** from PFitter::DoFit() : the command EIGEN is not yet implemented.";
+        std::cerr  << std::endl;
         break;
       case PMN_HESSE:
         status = ExecuteHesse();
         break;
       case PMN_MACHINE_PRECISION:
-        cerr << endl << "**WARNING** from PFitter::DoFit() : the command MACHINE_PRECISION is not yet implemented.";
-        cerr << endl;
+        std::cerr  << std::endl << "**WARNING** from PFitter::DoFit() : the command MACHINE_PRECISION is not yet implemented.";
+        std::cerr  << std::endl;
         break;
       case PMN_MIGRAD:
         status = ExecuteMigrad();
@@ -289,21 +288,20 @@ Bool_t PFitter::DoFit()
         status = ExecuteSimplex();
         break;
       case PMN_USER_COVARIANCE:
-        cerr << endl << "**WARNING** from PFitter::DoFit() : the command USER_COVARIANCE is not yet implemented.";
-        cerr << endl;
+        std::cerr  << std::endl << "**WARNING** from PFitter::DoFit() : the command USER_COVARIANCE is not yet implemented.";
+        std::cerr  << std::endl;
         break;
       case PMN_USER_PARAM_STATE:
-        cerr << endl << "**WARNING** from PFitter::DoFit() : the command USER_PARAM_STATE is not yet implemented.";
-        cerr << endl;
+        std::cerr  << std::endl << "**WARNING** from PFitter::DoFit() : the command USER_PARAM_STATE is not yet implemented.";
+        std::cerr  << std::endl;
         break;
       case PMN_PRINT:
         status = ExecutePrintLevel(fCmdList[i].second);
         break;
       default:
-        cerr << endl << "**PANIC ERROR**: PFitter::DoFit(): You should never have reached this point";
-        cerr << endl;
+        std::cerr  << std::endl << "**PANIC ERROR**: PFitter::DoFit(): You should never have reached this point";
+        std::cerr  << std::endl;
         exit(0);
-        break;
     }
 
     // check if command has been successful
@@ -366,7 +364,7 @@ Bool_t PFitter::CheckCommands()
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
       // filter out possible parameters for scan
-      TObjArray *tokens = 0;
+      TObjArray *tokens = nullptr;
       TObjString *ostr;
       TString str;
       UInt_t ival;
@@ -380,30 +378,30 @@ Bool_t PFitter::CheckCommands()
         if ((i==1) || (i==2)) { // parX / parY
           // check that token is a UInt_t
           if (!str.IsDigit()) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> parameter number is not number!";
-            cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> parameter number is not number!";
+            std::cerr  << std::endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
           ival = str.Atoi();
           // check that parameter is within range
           if ((ival < 1) || (ival > fParams.size())) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> parameter number is out of range [1," << fParams.size() << "]!";
-            cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> parameter number is out of range [1," << fParams.size() << "]!";
+            std::cerr  << std::endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
@@ -415,29 +413,29 @@ Bool_t PFitter::CheckCommands()
         if (i==3) {
           // check that token is a UInt_t
           if (!str.IsDigit()) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> number of points is not number!";
-            cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> number of points is not number!";
+            std::cerr  << std::endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
           ival = str.Atoi();
           if ((ival < 1) || (ival > 100)) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> number of scan points is out of range [1,100]!";
-            cerr << endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> number of scan points is out of range [1,100]!";
+            std::cerr  << std::endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
@@ -447,7 +445,7 @@ Bool_t PFitter::CheckCommands()
 
       if (tokens) {
         delete tokens;
-        tokens = 0;
+        tokens = nullptr;
       }
     } else if (it->fLine.Contains("EIGEN", TString::kIgnoreCase)) {
       cmd.first  = PMN_EIGEN;
@@ -460,7 +458,7 @@ Bool_t PFitter::CheckCommands()
       // (iii) FIT_RANGE start1 end1 start2 end2 ... startN endN
       // (iv)  FIT_RANGE fgb+n0 lgb-n1
       // (v)   FIT_RANGE fgb+n00 lgb-n01 fgb+n10 lgb-n11 ... fgb+nN0 lgb-nN1
-      TObjArray *tokens = 0;
+      TObjArray *tokens = nullptr;
       TObjString *ostr;
       TString str;
 
@@ -469,35 +467,35 @@ Bool_t PFitter::CheckCommands()
       if (tokens->GetEntries() == 2) { // should only be RESET
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
-        if (str.Contains("RESET"), TString::kIgnoreCase) {
+        if (str.Contains("RESET", TString::kIgnoreCase)) {
           cmd.first = PMN_FIT_RANGE;
           cmd.second = cmdLineNo;
           fCmdList.push_back(cmd);
         } else {
-          cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-          cerr << endl << ">> " << it->fLine.Data();
-          cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE start end | FIT_RANGE s1 e1 s2 e2 .. sN eN,";
-          cerr << endl << ">>         with N the number of runs in the msr-file." << endl;
-          cerr << endl << ">>         Found " << str.Data() << ", instead of RESET" << endl;
+          std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+          std::cerr  << std::endl << ">> " << it->fLine.Data();
+          std::cerr  << std::endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE start end | FIT_RANGE s1 e1 s2 e2 .. sN eN,";
+          std::cerr  << std::endl << ">>         with N the number of runs in the msr-file." << std::endl;
+          std::cerr  << std::endl << ">>         Found " << str.Data() << ", instead of RESET" << std::endl;
           fIsValid = false;
           if (tokens) {
             delete tokens;
-            tokens = 0;
+            tokens = nullptr;
           }
           break;
         }
       } else if ((tokens->GetEntries() > 1) && (static_cast<UInt_t>(tokens->GetEntries()) % 2) == 1) {
         if ((tokens->GetEntries() > 3) && ((static_cast<UInt_t>(tokens->GetEntries())-1)) != 2*fRunInfo->GetMsrRunList()->size()) {
-          cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-          cerr << endl << ">> " << it->fLine.Data();
-          cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
-          cerr << endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
-          cerr << endl << ">>         with N the number of runs in the msr-file.";
-          cerr << endl << ">>         Found N=" << (tokens->GetEntries()-1)/2 << ", # runs in msr-file=" << fRunInfo->GetMsrRunList()->size() << endl;
+          std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+          std::cerr  << std::endl << ">> " << it->fLine.Data();
+          std::cerr  << std::endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
+          std::cerr  << std::endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
+          std::cerr  << std::endl << ">>         with N the number of runs in the msr-file.";
+          std::cerr  << std::endl << ">>         Found N=" << (tokens->GetEntries()-1)/2 << ", # runs in msr-file=" << fRunInfo->GetMsrRunList()->size() << std::endl;
           fIsValid = false;
           if (tokens) {
             delete tokens;
-            tokens = 0;
+            tokens = nullptr;
           }
           break;
         } else {
@@ -521,41 +519,41 @@ Bool_t PFitter::CheckCommands()
             cmd.second = cmdLineNo;
             fCmdList.push_back(cmd);
           } else {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
-            cerr << endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
-            cerr << endl << ">>         with N the number of runs in the msr-file.";
-            cerr << endl << ">>         Found token '" << str.Data() << "', which is not a floating point number." << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
+            std::cerr  << std::endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
+            std::cerr  << std::endl << ">>         with N the number of runs in the msr-file.";
+            std::cerr  << std::endl << ">>         Found token '" << str.Data() << "', which is not a floating point number." << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
         }
       } else {
-        cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-        cerr << endl << ">> " << it->fLine.Data();
-        cerr << endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
-        cerr << endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
-        cerr << endl << ">>         with N the number of runs in the msr-file.";
+        std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+        std::cerr  << std::endl << ">> " << it->fLine.Data();
+        std::cerr  << std::endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
+        std::cerr  << std::endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
+        std::cerr  << std::endl << ">>         with N the number of runs in the msr-file.";
         fIsValid = false;
         if (tokens) {
           delete tokens;
-          tokens = 0;
+          tokens = nullptr;
         }
         break;
       }
 
       if (tokens) {
         delete tokens;
-        tokens = 0;
+        tokens = nullptr;
       }
     } else if (it->fLine.Contains("FIX", TString::kIgnoreCase)) {
       // check if the given set of parameters (number or names) is present
-      TObjArray *tokens = 0;
+      TObjArray *tokens = nullptr;
       TObjString *ostr;
       TString str;
       UInt_t ival;
@@ -570,14 +568,14 @@ Bool_t PFitter::CheckCommands()
           ival = str.Atoi();
           // check that ival is in the parameter list
           if (ival > fParams.size()) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> Parameter " << ival << " is out of the Parameter Range [1," << fParams.size() << "]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> Parameter " << ival << " is out of the Parameter Range [1," << fParams.size() << "]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
@@ -591,14 +589,14 @@ Bool_t PFitter::CheckCommands()
             }
           }
           if (!found) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> Parameter '" << str.Data() << "' is NOT present as a parameter name";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> Parameter '" << str.Data() << "' is NOT present as a parameter name";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
@@ -607,7 +605,7 @@ Bool_t PFitter::CheckCommands()
 
       if (tokens) {
         delete tokens;
-        tokens = 0;
+        tokens = nullptr;
       }
 
       // everything looks fine, feed the command list
@@ -648,7 +646,7 @@ Bool_t PFitter::CheckCommands()
       fCmdList.push_back(cmd);
     } else if (it->fLine.Contains("RELEASE", TString::kIgnoreCase)) {
       // check if the given set of parameters (number or names) is present
-      TObjArray *tokens = 0;
+      TObjArray *tokens = nullptr;
       TObjString *ostr;
       TString str;
       UInt_t ival;
@@ -663,14 +661,14 @@ Bool_t PFitter::CheckCommands()
           ival = str.Atoi();
           // check that ival is in the parameter list
           if (ival > fParams.size()) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> Parameter " << ival << " is out of the Parameter Range [1," << fParams.size() << "]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> Parameter " << ival << " is out of the Parameter Range [1," << fParams.size() << "]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
@@ -684,14 +682,14 @@ Bool_t PFitter::CheckCommands()
             }
           }
           if (!found) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> Parameter '" << str.Data() << "' is NOT present as a parameter name";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> Parameter '" << str.Data() << "' is NOT present as a parameter name";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
@@ -700,7 +698,7 @@ Bool_t PFitter::CheckCommands()
 
       if (tokens) {
         delete tokens;
-        tokens = 0;
+        tokens = nullptr;
       }
       cmd.first  = PMN_RELEASE;
       cmd.second = cmdLineNo;
@@ -718,7 +716,7 @@ Bool_t PFitter::CheckCommands()
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
       // filter out possible parameters for scan
-      TObjArray *tokens = 0;
+      TObjArray *tokens = nullptr;
       TObjString *ostr;
       TString str;
       UInt_t ival;
@@ -731,30 +729,30 @@ Bool_t PFitter::CheckCommands()
         if (i==1) { // get parameter number
           // check that token is a UInt_t
           if (!str.IsDigit()) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> parameter number is not number!";
-            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
-            cerr << endl;            
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> parameter number is not number!";
+            std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
           ival = str.Atoi();
           // check that parameter is within range
           if ((ival < 1) || (ival > fParams.size())) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> parameter number is out of range [1," << fParams.size() << "]!";
-            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> parameter number is out of range [1," << fParams.size() << "]!";
+            std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
@@ -766,29 +764,29 @@ Bool_t PFitter::CheckCommands()
         if (i==2) { // get number of points
           // check that token is a UInt_t
           if (!str.IsDigit()) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> number of points is not number!";
-            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> number of points is not number!";
+            std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
           ival = str.Atoi();
           if ((ival < 1) || (ival > 100)) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> number of scan points is out of range [1,100]!";
-            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> number of scan points is out of range [1,100]!";
+            std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
@@ -798,15 +796,15 @@ Bool_t PFitter::CheckCommands()
         if (i==3) { // get low
           // check that token is a Double_t
           if (!str.IsFloat()) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> low is not a floating point number!";
-            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> low is not a floating point number!";
+            std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
@@ -816,15 +814,15 @@ Bool_t PFitter::CheckCommands()
         if (i==4) { // get high
           // check that token is a Double_t
           if (!str.IsFloat()) {
-            cerr << endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            cerr << endl << ">> " << it->fLine.Data();
-            cerr << endl << ">> high is not a floating point number!";
-            cerr << endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
-            cerr << endl;
+            std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
+            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> high is not a floating point number!";
+            std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
+            std::cerr  << std::endl;
             fIsValid = false;
             if (tokens) {
               delete tokens;
-              tokens = 0;
+              tokens = nullptr;
             }
             break;
           }
@@ -834,14 +832,14 @@ Bool_t PFitter::CheckCommands()
 
       if (tokens) {
         delete tokens;
-        tokens = 0;
+        tokens = nullptr;
       }
     } else if (it->fLine.Contains("SIMPLEX", TString::kIgnoreCase)) {
       cmd.first  = PMN_SIMPLEX;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
     } else if (it->fLine.Contains("STRATEGY", TString::kIgnoreCase)) {
-      TObjArray *tokens = 0;
+      TObjArray *tokens = nullptr;
       TObjString *ostr;
       TString str;
 
@@ -866,7 +864,7 @@ Bool_t PFitter::CheckCommands()
 
       if (tokens) {
         delete tokens;
-        tokens = 0;
+        tokens = nullptr;
       }
     } else if (it->fLine.Contains("USER_COVARIANCE", TString::kIgnoreCase)) {
       cmd.first  = PMN_USER_COVARIANCE;
@@ -877,10 +875,10 @@ Bool_t PFitter::CheckCommands()
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
     } else { // unkown command
-      cerr << endl << ">> PFitter::CheckCommands(): **FATAL ERROR** in line " << it->fLineNo << " an unkown command is found:";
-      cerr << endl << ">> " << it->fLine.Data();
-      cerr << endl << ">> Will stop ...";
-      cerr << endl;
+      std::cerr  << std::endl << ">> PFitter::CheckCommands(): **FATAL ERROR** in line " << it->fLineNo << " an unkown command is found:";
+      std::cerr  << std::endl << ">> " << it->fLine.Data();
+      std::cerr  << std::endl << ">> Will stop ...";
+      std::cerr  << std::endl;
       fIsValid = false;
       break;
     }
@@ -904,10 +902,10 @@ Bool_t PFitter::CheckCommands()
         minimizerFlag = true;
     } else if (it->fLine.Contains("MINOS", TString::kIgnoreCase)) {
       if (fixFlag && releaseFlag && !minimizerFlag) {
-        cerr << endl << ">> PFitter::CheckCommands(): **WARNING** RELEASE/RESTORE command present";
-        cerr << endl << ">> without minimizer command (MINIMIZE/MIGRAD/SIMPLEX) between";
-        cerr << endl << ">> RELEASE/RESTORE and MINOS. Behaviour might be different to the";
-        cerr << endl << ">> expectation of the user ?!?" << endl;
+        std::cerr  << std::endl << ">> PFitter::CheckCommands(): **WARNING** RELEASE/RESTORE command present";
+        std::cerr  << std::endl << ">> without minimizer command (MINIMIZE/MIGRAD/SIMPLEX) between";
+        std::cerr  << std::endl << ">> RELEASE/RESTORE and MINOS. Behaviour might be different to the";
+        std::cerr  << std::endl << ">> expectation of the user ?!?" << std::endl;
       }
       fixFlag = false;
       releaseFlag = false;
@@ -959,8 +957,8 @@ Bool_t PFitter::SetParameters()
     // parameter not used in the whole theory and not already fixed!!
     if ((fRunInfo->ParameterInUse(i) == 0) && (fParams[i].fStep != 0.0)) {
       fMnUserParams.Fix(i); // fix the unused parameter so that minuit will not vary it
-      cerr << endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it";
-      cerr << endl;
+      std::cerr  << std::endl << "**WARNING** : Parameter No " << i+1 << " is not used at all, will fix it";
+      std::cerr  << std::endl;
     }
   }
 
@@ -977,19 +975,19 @@ Bool_t PFitter::SetParameters()
  */
 Bool_t PFitter::ExecuteContours()
 {
-  cout << ">> PFitter::ExecuteContours() ..." << endl;
+  std::cout << ">> PFitter::ExecuteContours() ..." << std::endl;
 
   // if already some minimization is done use the minuit2 output as input
   if (!fFcnMin) {
-    cerr << endl << "**WARNING**: CONTOURS musn't be called before any minimization (MINIMIZE/MIGRAD/SIMPLEX) is done!!";
-    cerr << endl;
+    std::cerr  << std::endl << "**WARNING**: CONTOURS musn't be called before any minimization (MINIMIZE/MIGRAD/SIMPLEX) is done!!";
+    std::cerr  << std::endl;
     return false;
   }
 
   // check if minimum was valid
   if (!fFcnMin->IsValid()) {
-    cerr << endl << "**ERROR**: CONTOURS cannot started since the previous minimization failed :-(";
-    cerr << endl;
+    std::cerr  << std::endl << "**ERROR**: CONTOURS cannot started since the previous minimization failed :-(";
+    std::cerr  << std::endl;
     return false;
   }
 
@@ -1012,14 +1010,14 @@ Bool_t PFitter::ExecuteContours()
  */
 Bool_t PFitter::ExecuteFitRange(UInt_t lineNo)
 {
-  cout << ">> PFitter::ExecuteFitRange(): " << fCmdLines[lineNo].fLine.Data() << endl;
+  std::cout << ">> PFitter::ExecuteFitRange(): " << fCmdLines[lineNo].fLine.Data() << std::endl;
 
   if (fCmdLines[lineNo].fLine.Contains("fgb", TString::kIgnoreCase)) { // fit range given in bins
     fRunListCollection->SetFitRange(fCmdLines[lineNo].fLine);
     return true;
   }
 
-  TObjArray *tokens = 0;
+  TObjArray *tokens = nullptr;
   TObjString *ostr;
   TString str;
 
@@ -1083,9 +1081,9 @@ Bool_t PFitter::ExecuteFitRange(UInt_t lineNo)
  */
 Bool_t PFitter::ExecuteFix(UInt_t lineNo)
 {
-  cout << ">> PFitter::ExecuteFix(): " << fCmdLines[lineNo].fLine.Data() << endl;
+  std::cout << ">> PFitter::ExecuteFix(): " << fCmdLines[lineNo].fLine.Data() << std::endl;
 
-  TObjArray *tokens = 0;
+  TObjArray *tokens = nullptr;
   TObjString *ostr;
   TString str;
 
@@ -1105,7 +1103,7 @@ Bool_t PFitter::ExecuteFix(UInt_t lineNo)
   // clean up
   if (tokens) {
     delete tokens;
-    tokens = 0;
+    tokens = nullptr;
   }
 
   return true;
@@ -1121,30 +1119,30 @@ Bool_t PFitter::ExecuteFix(UInt_t lineNo)
  */
 Bool_t PFitter::ExecuteHesse()
 {
-  cout << ">> PFitter::ExecuteHesse(): will call hesse ..." << endl;
+  std::cout << ">> PFitter::ExecuteHesse(): will call hesse ..." << std::endl;
 
   // create the hesse object
   ROOT::Minuit2::MnHesse hesse;
 
   // specify maximal number of function calls
-  UInt_t maxfcn = numeric_limits<UInt_t>::max();
+  UInt_t maxfcn = std::numeric_limits<UInt_t>::max();
 
   // call hesse
   Double_t start=0.0, end=0.0;
   start=MilliTime();
   ROOT::Minuit2::MnUserParameterState mnState = hesse((*fFitterFcn), fMnUserParams, maxfcn);
   end=MilliTime();
-  cout << ">> PFitter::ExecuteMinimize(): execution time for Hesse = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  std::cout << ">> PFitter::ExecuteMinimize(): execution time for Hesse = " << std::setprecision(3) << (end-start)/1.0e3 << " sec." << std::endl;
   TString str = TString::Format("Hesse:    %.3f sec", (end-start)/1.0e3);
   fElapsedTime.push_back(str);
   if (!mnState.IsValid()) {
-    cerr << endl << ">> PFitter::ExecuteHesse(): **WARNING** Hesse encountered a problem! The state found is invalid.";
-    cerr << endl;
+    std::cerr  << std::endl << ">> PFitter::ExecuteHesse(): **WARNING** Hesse encountered a problem! The state found is invalid.";
+    std::cerr  << std::endl;
     return false;
   }
   if (!mnState.HasCovariance()) {
-    cerr << endl << ">> PFitter::ExecuteHesse(): **WARNING** Hesse encountered a problem! No covariance matrix available.";
-    cerr << endl;
+    std::cerr  << std::endl << ">> PFitter::ExecuteHesse(): **WARNING** Hesse encountered a problem! No covariance matrix available.";
+    std::cerr  << std::endl;
     return false;
   }
 
@@ -1155,7 +1153,7 @@ Bool_t PFitter::ExecuteHesse()
   }
 
   if (fPrintLevel >= 2)
-    cout << mnState << endl;
+    std::cout << mnState << std::endl;
 
   return true;
 }
@@ -1170,7 +1168,7 @@ Bool_t PFitter::ExecuteHesse()
  */
 Bool_t PFitter::ExecuteMigrad()
 {
-  cout << ">> PFitter::ExecuteMigrad(): will call migrad ..." << endl;
+  std::cout << ">> PFitter::ExecuteMigrad(): will call migrad ..." << std::endl;
 
   // create migrad object
   // strategy is by default = 'default'
@@ -1178,7 +1176,7 @@ Bool_t PFitter::ExecuteMigrad()
 
   // minimize
   // maxfcn is MINUIT2 Default maxfcn
-  UInt_t maxfcn = numeric_limits<UInt_t>::max();
+  UInt_t maxfcn = std::numeric_limits<UInt_t>::max();
   // tolerance = MINUIT2 Default tolerance
   Double_t tolerance = 0.1;
   // keep track of elapsed time
@@ -1186,12 +1184,12 @@ Bool_t PFitter::ExecuteMigrad()
   start=MilliTime();
   ROOT::Minuit2::FunctionMinimum min = migrad(maxfcn, tolerance);
   end=MilliTime();
-  cout << ">> PFitter::ExecuteMinimize(): execution time for Migrad = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  std::cout << ">> PFitter::ExecuteMinimize(): execution time for Migrad = " << std::setprecision(3) << (end-start)/1.0e3 << " sec." << std::endl;
   TString str = TString::Format("Migrad:   %.3f sec", (end-start)/1.0e3);
   fElapsedTime.push_back(str);
   if (!min.IsValid()) {
-    cerr << endl << ">> PFitter::ExecuteMigrad(): **WARNING**: Fit did not converge, sorry ...";
-    cerr << endl;
+    std::cerr  << std::endl << ">> PFitter::ExecuteMigrad(): **WARNING**: Fit did not converge, sorry ...";
+    std::cerr  << std::endl;
     fIsValid = false;
     return false;
   }
@@ -1199,7 +1197,7 @@ Bool_t PFitter::ExecuteMigrad()
   // keep FunctionMinimum object
   if (fFcnMin) { // fFcnMin exist hence clean up first
     delete fFcnMin;
-    fFcnMin = 0;
+    fFcnMin = nullptr;
   }
   fFcnMin = new ROOT::Minuit2::FunctionMinimum(min);
 
@@ -1230,7 +1228,7 @@ Bool_t PFitter::ExecuteMigrad()
   fConverged = true;
 
   if (fPrintLevel >= 2)
-    cout << *fFcnMin << endl;
+    std::cout << *fFcnMin << std::endl;
 
   return true;
 }
@@ -1245,7 +1243,7 @@ Bool_t PFitter::ExecuteMigrad()
  */
 Bool_t PFitter::ExecuteMinimize()
 {
-  cout << ">> PFitter::ExecuteMinimize(): will call minimize ..." << endl;
+  std::cout << ">> PFitter::ExecuteMinimize(): will call minimize ..." << std::endl;
 
   // create minimizer object
   // strategy is by default = 'default'
@@ -1253,7 +1251,7 @@ Bool_t PFitter::ExecuteMinimize()
 
   // minimize
   // maxfcn is MINUIT2 Default maxfcn
-  UInt_t maxfcn = numeric_limits<UInt_t>::max();
+  UInt_t maxfcn = std::numeric_limits<UInt_t>::max();
 
   // tolerance = MINUIT2 Default tolerance
   Double_t tolerance = 0.1;
@@ -1262,12 +1260,12 @@ Bool_t PFitter::ExecuteMinimize()
   start = MilliTime();
   ROOT::Minuit2::FunctionMinimum min = minimize(maxfcn, tolerance);
   end = MilliTime();
-  cout << ">> PFitter::ExecuteMinimize(): execution time for Minimize = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  std::cout << ">> PFitter::ExecuteMinimize(): execution time for Minimize = " << std::setprecision(3) << (end-start)/1.0e3 << " sec." << std::endl;
   TString str = TString::Format("Minimize: %.3f sec", (end-start)/1.0e3);
   fElapsedTime.push_back(str);
   if (!min.IsValid()) {
-    cerr << endl << ">> PFitter::ExecuteMinimize(): **WARNING**: Fit did not converge, sorry ...";
-    cerr << endl;
+    std::cerr  << std::endl << ">> PFitter::ExecuteMinimize(): **WARNING**: Fit did not converge, sorry ...";
+    std::cerr  << std::endl;
     fIsValid = false;
     return false;
   }
@@ -1275,7 +1273,7 @@ Bool_t PFitter::ExecuteMinimize()
   // keep FunctionMinimum object
   if (fFcnMin) { // fFcnMin exist hence clean up first
     delete fFcnMin;
-    fFcnMin = 0;
+    fFcnMin = nullptr;
   }
   fFcnMin = new ROOT::Minuit2::FunctionMinimum(min);
 
@@ -1306,7 +1304,7 @@ Bool_t PFitter::ExecuteMinimize()
   fConverged = true;
 
   if (fPrintLevel >= 2)
-    cout << *fFcnMin << endl;
+    std::cout << *fFcnMin << std::endl;
 
   return true;
 }
@@ -1321,19 +1319,19 @@ Bool_t PFitter::ExecuteMinimize()
  */
 Bool_t PFitter::ExecuteMinos()
 {
-  cout << ">> PFitter::ExecuteMinos(): will call minos ..." << endl;
+  std::cout << ">> PFitter::ExecuteMinos(): will call minos ..." << std::endl;
 
   // if already some minimization is done use the minuit2 output as input
   if (!fFcnMin) {
-    cerr << endl << "**ERROR**: MINOS musn't be called before any minimization (MINIMIZE/MIGRAD/SIMPLEX) is done!!";
-    cerr << endl;
+    std::cerr  << std::endl << "**ERROR**: MINOS musn't be called before any minimization (MINIMIZE/MIGRAD/SIMPLEX) is done!!";
+    std::cerr  << std::endl;
     return false;
   }
 
   // check if minimum was valid
   if (!fFcnMin->IsValid()) {
-    cerr << endl << "**ERROR**: MINOS cannot started since the previous minimization failed :-(";
-    cerr << endl;
+    std::cerr  << std::endl << "**ERROR**: MINOS cannot started since the previous minimization failed :-(";
+    std::cerr  << std::endl;
     return false;
   }
 
@@ -1348,7 +1346,7 @@ Bool_t PFitter::ExecuteMinos()
     // the 2nd condition is from an all together unused variable
     // the 3rd condition is a variable fixed via the FIX command
     if ((fMnUserParams.Error(i) != 0.0) && (fRunInfo->ParameterInUse(i) != 0) && (!fMnUserParams.Parameters().at(i).IsFixed())) {
-      cout << ">> PFitter::ExecuteMinos(): calculate errors for " << fParams[i].fName << endl;
+      std::cout << ">> PFitter::ExecuteMinos(): calculate errors for " << fParams[i].fName << std::endl;
 
       // 1-sigma MINOS errors
       ROOT::Minuit2::MinosError err = minos.Minos(i);
@@ -1364,16 +1362,16 @@ Bool_t PFitter::ExecuteMinos()
     }
 
     if (fMnUserParams.Parameters().at(i).IsFixed()) {
-      cerr << endl << ">> PFitter::ExecuteMinos(): **WARNING** Parameter " << fMnUserParams.Name(i) << " (ParamNo " << i+1 << ") is fixed!";
-      cerr << endl << ">>    Will set STEP to zero, i.e. making it a constant parameter";
-      cerr << endl;
+      std::cerr  << std::endl << ">> PFitter::ExecuteMinos(): **WARNING** Parameter " << fMnUserParams.Name(i) << " (ParamNo " << i+1 << ") is fixed!";
+      std::cerr  << std::endl << ">>    Will set STEP to zero, i.e. making it a constant parameter";
+      std::cerr  << std::endl;
       fRunInfo->SetMsrParamStep(i, 0.0);
       fRunInfo->SetMsrParamPosErrorPresent(i, false);
     }
   }
 
   end=MilliTime();
-  cout << ">> PFitter::ExecuteMinimize(): execution time for Minos = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  std::cout << ">> PFitter::ExecuteMinimize(): execution time for Minos = " << std::setprecision(3) << (end-start)/1.0e3 << " sec." << std::endl;
   TString str = TString::Format("Minos:    %.3f sec", (end-start)/1.0e3);
   fElapsedTime.push_back(str);
 
@@ -1390,7 +1388,7 @@ Bool_t PFitter::ExecuteMinos()
  */
 Bool_t PFitter::ExecutePlot()
 {
-  cout << ">> PFitter::ExecutePlot() ..." << endl;
+  std::cout << ">> PFitter::ExecutePlot() ..." << std::endl;
 
   ROOT::Minuit2::MnPlot plot;
   plot(fScanData);
@@ -1410,16 +1408,16 @@ Bool_t PFitter::ExecutePlot()
  */
 Bool_t PFitter::ExecutePrintLevel(UInt_t lineNo)
 {
-  cout << ">> PFitter::ExecutePrintLevel(): " << fCmdLines[lineNo].fLine.Data() << endl;
+  std::cout << ">> PFitter::ExecutePrintLevel(): " << fCmdLines[lineNo].fLine.Data() << std::endl;
 
-  TObjArray *tokens = 0;
+  TObjArray *tokens = nullptr;
   TObjString *ostr;
   TString str;
 
   tokens = fCmdLines[lineNo].fLine.Tokenize(", \t");
 
   if (tokens->GetEntries() < 2) {
-    cerr << endl << "**ERROR** from PFitter::ExecutePrintLevel(): SYNTAX: PRINT_LEVEL <N>, where <N>=0-3" << endl << endl;
+    std::cerr  << std::endl << "**ERROR** from PFitter::ExecutePrintLevel(): SYNTAX: PRINT_LEVEL <N>, where <N>=0-3" << std::endl << std::endl;
     return false;
   }
 
@@ -1432,12 +1430,12 @@ Bool_t PFitter::ExecutePrintLevel(UInt_t lineNo)
     if ((ival >=0) && (ival <= 3)) {
       fPrintLevel = (UInt_t) ival;
     } else {
-      cerr << endl << "**ERROR** from PFitter::ExecutePrintLevel(): SYNTAX: PRINT_LEVEL <N>, where <N>=0-3";
-      cerr << endl << "   found <N>=" << ival << endl << endl;
+      std::cerr  << std::endl << "**ERROR** from PFitter::ExecutePrintLevel(): SYNTAX: PRINT_LEVEL <N>, where <N>=0-3";
+      std::cerr  << std::endl << "   found <N>=" << ival << std::endl << std::endl;
       return false;
     }
   } else {
-    cerr << endl << "**ERROR** from PFitter::ExecutePrintLevel(): SYNTAX: PRINT_LEVEL <N>, where <N>=0-3" << endl << endl;
+    std::cerr  << std::endl << "**ERROR** from PFitter::ExecutePrintLevel(): SYNTAX: PRINT_LEVEL <N>, where <N>=0-3" << std::endl << std::endl;
     return false;
   }
 
@@ -1446,7 +1444,7 @@ Bool_t PFitter::ExecutePrintLevel(UInt_t lineNo)
   // clean up
   if (tokens) {
     delete tokens;
-    tokens = 0;
+    tokens = nullptr;
   }
 
   return true;
@@ -1464,13 +1462,13 @@ Bool_t PFitter::ExecutePrintLevel(UInt_t lineNo)
  */
 Bool_t PFitter::ExecuteRelease(UInt_t lineNo)
 {
-  TObjArray *tokens = 0;
+  TObjArray *tokens = nullptr;
   TObjString *ostr;
   TString str;
 
   tokens = fCmdLines[lineNo].fLine.Tokenize(", \t");
 
-  cout << ">> PFitter::ExecuteRelease(): " << fCmdLines[lineNo].fLine.Data() << endl;
+  std::cout << ">> PFitter::ExecuteRelease(): " << fCmdLines[lineNo].fLine.Data() << std::endl;
 
   for (Int_t i=1; i<tokens->GetEntries(); i++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(i));
@@ -1490,7 +1488,7 @@ Bool_t PFitter::ExecuteRelease(UInt_t lineNo)
   // clean up
   if (tokens) {
     delete tokens;
-    tokens = 0;
+    tokens = nullptr;
   }
 
   return true;
@@ -1506,7 +1504,7 @@ Bool_t PFitter::ExecuteRelease(UInt_t lineNo)
  */
 Bool_t PFitter::ExecuteRestore()
 {
-  cout << "PFitter::ExecuteRestore(): release all fixed parameters (RESTORE) ..." << endl;
+  std::cout << "PFitter::ExecuteRestore(): release all fixed parameters (RESTORE) ..." << std::endl;
 
   for (UInt_t i=0; i<fMnUserParams.Parameters().size(); i++) {
     if (fMnUserParams.Parameters().at(i).IsFixed()) {
@@ -1528,7 +1526,7 @@ Bool_t PFitter::ExecuteRestore()
  */
 Bool_t PFitter::ExecuteScan()
 {
-  cout << ">> PFitter::ExecuteScan(): will call scan ..." << endl;
+  std::cout << ">> PFitter::ExecuteScan(): will call scan ..." << std::endl;
 
   ROOT::Minuit2::MnScan scan((*fFitterFcn), fMnUserParams);
 
@@ -1557,7 +1555,7 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
 {
   // if any minimization was done, otherwise get out immediately
   if (!fFcnMin) {
-    cout << endl << ">> PFitter::ExecuteSave(): nothing to be saved ...";
+    std::cout << std::endl << ">> PFitter::ExecuteSave(): nothing to be saved ...";
     return false;
   }
 
@@ -1565,8 +1563,8 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
 
   // check if the user parameter state is valid
   if (!mnState.IsValid()) {
-    cerr << endl << ">> PFitter::ExecuteSave: **WARNING** Minuit2 User Parameter State is not valid, i.e. nothing to be saved";
-    cerr << endl;
+    std::cerr  << std::endl << ">> PFitter::ExecuteSave: **WARNING** Minuit2 User Parameter State is not valid, i.e. nothing to be saved";
+    std::cerr  << std::endl;
     return false;
   }
 
@@ -1631,44 +1629,44 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
   ndfPerHisto.clear();
   chisqPerHisto.clear();
 
-  cout << ">> PFitter::ExecuteSave(): will write minuit2 output file ..." << endl;
+  std::cout << ">> PFitter::ExecuteSave(): will write minuit2 output file ..." << std::endl;
 
-  ofstream fout;
+  std::ofstream fout;
 
   // open minuit2 output file
   if (firstSave)
-    fout.open("MINUIT2.OUTPUT", iostream::out);
+    fout.open("MINUIT2.OUTPUT", std::iostream::out);
   else
-    fout.open("MINUIT2.OUTPUT", iostream::out | iostream::app);
+    fout.open("MINUIT2.OUTPUT", std::iostream::out | std::iostream::app);
 
   if (!fout.is_open()) {
-    cerr << endl << "**ERROR** PFitter::ExecuteSave() couldn't open MINUIT2.OUTPUT file";
-    cerr << endl;
+    std::cerr  << std::endl << "**ERROR** PFitter::ExecuteSave() couldn't open MINUIT2.OUTPUT file";
+    std::cerr  << std::endl;
     return false;
   }
 
   // write header
   TDatime dt;
-  fout << endl << "*************************************************************************";
-  fout << endl << " musrfit MINUIT2 output file from " << fRunInfo->GetFileName().Data() << " - " << dt.AsSQLString();
-  fout << endl << "*************************************************************************";
-  fout << endl;
+  fout << std::endl << "*************************************************************************";
+  fout << std::endl << " musrfit MINUIT2 output file from " << fRunInfo->GetFileName().Data() << " - " << dt.AsSQLString();
+  fout << std::endl << "*************************************************************************";
+  fout << std::endl;
 
   // write elapsed times
-  fout << endl << " elapsed times:";
+  fout << std::endl << " elapsed times:";
   for (UInt_t i=0; i<fElapsedTime.size(); i++) {
-    fout << endl << "   " << fElapsedTime[i];
+    fout << std::endl << "   " << fElapsedTime[i];
   }
-  fout << endl;
-  fout << endl << "*************************************************************************";
-  fout << endl;
+  fout << std::endl;
+  fout << std::endl << "*************************************************************************";
+  fout << std::endl;
   fElapsedTime.clear();
 
   // write global informations
-  fout << endl << " Fval() = " << mnState.Fval() << ", Edm() = " << mnState.Edm() << ", NFcn() = " << mnState.NFcn();
-  fout << endl;
-  fout << endl << "*************************************************************************";
-  fout << endl;
+  fout << std::endl << " Fval() = " << mnState.Fval() << ", Edm() = " << mnState.Edm() << ", NFcn() = " << mnState.NFcn();
+  fout << std::endl;
+  fout << std::endl << "*************************************************************************";
+  fout << std::endl;
 
   // identifiy the longest variable name for proper formating reasons
   Int_t maxLength = 10;
@@ -1679,32 +1677,32 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
 
   // write parameters
   fParams = *(fRunInfo->GetMsrParamList()); // get the update parameters back
-  fout << endl << " PARAMETERS";
-  fout << endl << "-------------------------------------------------------------------------";
-  fout << endl << "                         ";
+  fout << std::endl << " PARAMETERS";
+  fout << std::endl << "-------------------------------------------------------------------------";
+  fout << std::endl << "                         ";
   for (Int_t j=0; j<=maxLength-4; j++)
     fout << " ";
   fout << "Parabolic           Minos";
-  fout << endl << " No   Name";
+  fout << std::endl << " No   Name";
   for (Int_t j=0; j<=maxLength-4; j++)
     fout << " ";
   fout << "Value      Error      Negative    Positive    Limits";
   for (UInt_t i=0; i<fParams.size(); i++) {
     // write no
-    fout.setf(ios::right, ios::adjustfield);
+    fout.setf(std::ios::right, std::ios::adjustfield);
     fout.width(3);
-    fout << endl << i+1 << "   ";
+    fout << std::endl << i+1 << "   ";
     // write name
     fout << fParams[i].fName.Data();
     for (Int_t j=0; j<=maxLength-fParams[i].fName.Length(); j++)
       fout << " ";
     // write value
-    fout.setf(ios::left, ios::adjustfield);
+    fout.setf(std::ios::left, std::ios::adjustfield);
     fout.precision(6);
     fout.width(10);
     fout << fParams[i].fValue << " ";
     // write parabolic error
-    fout.setf(ios::left, ios::adjustfield);
+    fout.setf(std::ios::left, std::ios::adjustfield);
     fout.precision(6);
     fout.width(10);
     if (fParams[i].fStep != 0.0)
@@ -1713,58 +1711,58 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
       fout << "---";
     // write minos errors
     if (fParams[i].fPosErrorPresent) {
-      fout.setf(ios::left, ios::adjustfield);
+      fout.setf(std::ios::left, std::ios::adjustfield);
       fout.precision(6);
       fout.width(12);
       fout << fParams[i].fStep; 
-      fout.setf(ios::left, ios::adjustfield);
+      fout.setf(std::ios::left, std::ios::adjustfield);
       fout.precision(6);
       fout.width(11);
       fout << fParams[i].fPosError << " ";
     } else {
-      fout.setf(ios::left, ios::adjustfield);
+      fout.setf(std::ios::left, std::ios::adjustfield);
       fout.width(12);
       fout << "---";
-      fout.setf(ios::left, ios::adjustfield);
+      fout.setf(std::ios::left, std::ios::adjustfield);
       fout.width(12);
       fout << "---";
     }
     // write limits
     if (fParams[i].fNoOfParams > 5) {
-      fout.setf(ios::left, ios::adjustfield);
+      fout.setf(std::ios::left, std::ios::adjustfield);
       fout.width(7);
       if (fParams[i].fLowerBoundaryPresent)
         fout << fParams[i].fLowerBoundary;
       else
         fout << "---";
-      fout.setf(ios::left, ios::adjustfield);
+      fout.setf(std::ios::left, std::ios::adjustfield);
       fout.width(7);
       if (fParams[i].fUpperBoundaryPresent)
         fout << fParams[i].fUpperBoundary;
       else
         fout << "---";
     } else {
-      fout.setf(ios::left, ios::adjustfield);
+      fout.setf(std::ios::left, std::ios::adjustfield);
       fout.width(7);
       fout << "---";
-      fout.setf(ios::left, ios::adjustfield);
+      fout.setf(std::ios::left, std::ios::adjustfield);
       fout.width(7);
       fout << "---";
     }
   }
-  fout << endl;
-  fout << endl << "*************************************************************************";
+  fout << std::endl;
+  fout << std::endl << "*************************************************************************";
 
   // write covariance matrix
-  fout << endl << " COVARIANCE MATRIX";
-  fout << endl << "-------------------------------------------------------------------------";
+  fout << std::endl << " COVARIANCE MATRIX";
+  fout << std::endl << "-------------------------------------------------------------------------";
   if (mnState.HasCovariance()) {
     ROOT::Minuit2::MnUserCovariance cov = mnState.Covariance();
-    fout << endl << "from " << cov.Nrow() << " free parameters";
+    fout << std::endl << "from " << cov.Nrow() << " free parameters";
     for (UInt_t i=0; i<cov.Nrow(); i++) {
-      fout << endl;
+      fout << std::endl;
       for (UInt_t j=0; j<i; j++) {
-        fout.setf(ios::left, ios::adjustfield);
+        fout.setf(std::ios::left, std::ios::adjustfield);
         fout.precision(6);
         if (cov(i,j) > 0.0) {
           fout << " ";
@@ -1776,23 +1774,23 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
       }
     }
   } else {
-    fout << endl << " no covariance matrix available";
+    fout << std::endl << " no covariance matrix available";
   }
-  fout << endl;
-  fout << endl << "*************************************************************************";
+  fout << std::endl;
+  fout << std::endl << "*************************************************************************";
 
   // write correlation matrix
-  fout << endl << " CORRELATION COEFFICIENTS";
-  fout << endl << "-------------------------------------------------------------------------";
+  fout << std::endl << " CORRELATION COEFFICIENTS";
+  fout << std::endl << "-------------------------------------------------------------------------";
   if (mnState.HasGlobalCC() && mnState.HasCovariance()) {
     ROOT::Minuit2::MnGlobalCorrelationCoeff corr = mnState.GlobalCC();
     ROOT::Minuit2::MnUserCovariance cov = mnState.Covariance();
     PIntVector parNo;
-    fout << endl << " No   Global       ";
+    fout << std::endl << " No   Global       ";
     for (UInt_t i=0; i<fParams.size(); i++) {
       // only free parameters, i.e. not fixed, and not unsed ones!
       if ((fParams[i].fStep != 0) && (fRunInfo->ParameterInUse(i) > 0) && (!fMnUserParams.Parameters().at(i).IsFixed())) {
-        fout.setf(ios::left, ios::adjustfield);
+        fout.setf(std::ios::left, std::ios::adjustfield);
         fout.width(9);
         fout << i+1;
         parNo.push_back(i);
@@ -1800,8 +1798,8 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
     }
     // check that there is a correspondens between minuit2 and musrfit book keeping
     if (parNo.size() != cov.Nrow()) {
-      cerr << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): minuit2 and musrfit book keeping to not correspond! Unable to write correlation matrix.";
-      cerr << endl;
+      std::cerr  << std::endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): minuit2 and musrfit book keeping to not correspond! Unable to write correlation matrix.";
+      std::cerr  << std::endl;
     } else { // book keeping is OK
       TString title("Minuit2 Output Correlation Matrix for ");
       title += fRunInfo->GetFileName();
@@ -1812,18 +1810,18 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
       Double_t dval;
       for (UInt_t i=0; i<cov.Nrow(); i++) {
         // parameter number
-        fout << endl << " ";
-        fout.setf(ios::left, ios::adjustfield);
+        fout << std::endl << " ";
+        fout.setf(std::ios::left, std::ios::adjustfield);
         fout.width(5);
         fout << parNo[i]+1;
         // global correlation coefficient
-        fout.setf(ios::left, ios::adjustfield);
+        fout.setf(std::ios::left, std::ios::adjustfield);
         fout.precision(6);
         fout.width(12);
         fout << corr.GlobalCC()[i];
         // correlations matrix
         for (UInt_t j=0; j<cov.Nrow(); j++) {
-          fout.setf(ios::left, ios::adjustfield);
+          fout.setf(std::ios::left, std::ios::adjustfield);
 //          fout.precision(4);
           if (i==j) {
             fout.width(9);
@@ -1832,12 +1830,12 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
           } else {
             // check that errors are none zero
             if (fMnUserParams.Error(parNo[i]) == 0.0) {
-              cerr << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): parameter no " << parNo[i]+1 << " has an error == 0. Cannot correctly handle the correlation matrix.";
-              cerr << endl;
+              std::cerr  << std::endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): parameter no " << parNo[i]+1 << " has an error == 0. Cannot correctly handle the correlation matrix.";
+              std::cerr  << std::endl;
               dval = 0.0;
             } else if (fMnUserParams.Error(parNo[j]) == 0.0) {
-              cerr << endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): parameter no " << parNo[j]+1 << " has an error == 0. Cannot correctly handle the correlation matrix.";
-              cerr << endl;
+              std::cerr  << std::endl << "**SEVERE ERROR** in PFitter::ExecuteSave(): parameter no " << parNo[j]+1 << " has an error == 0. Cannot correctly handle the correlation matrix.";
+              std::cerr  << std::endl;
               dval = 0.0;
             } else {
               dval = cov(i,j)/(fMnUserParams.Error(parNo[i])*fMnUserParams.Error(parNo[j]));
@@ -1873,22 +1871,22 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
       // clean up
       if (ccorr) {
         delete ccorr;
-        ccorr = 0;
+        ccorr = nullptr;
       }
       if (hcorr) {
         delete hcorr;
-        hcorr = 0;
+        hcorr = nullptr;
       }
     }
     parNo.clear(); // clean up
   } else {
-    fout << endl << " no correlation coefficients available";
+    fout << std::endl << " no correlation coefficients available";
   }
-  fout << endl;
-  fout << endl << "*************************************************************************";
-  fout << endl << " DONE ";
-  fout << endl << "*************************************************************************";
-  fout << endl << endl;
+  fout << std::endl;
+  fout << std::endl << "*************************************************************************";
+  fout << std::endl << " DONE ";
+  fout << std::endl << "*************************************************************************";
+  fout << std::endl << std::endl;
 
   // close MINUIT2.OUTPUT file
   fout.close();
@@ -1906,7 +1904,7 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
  */
 Bool_t PFitter::ExecuteSimplex()
 {
-  cout << ">> PFitter::ExecuteSimplex(): will call simplex ..." << endl;
+  std::cout << ">> PFitter::ExecuteSimplex(): will call simplex ..." << std::endl;
 
   // create minimizer object
   // strategy is by default = 'default'
@@ -1914,7 +1912,7 @@ Bool_t PFitter::ExecuteSimplex()
 
   // minimize
   // maxfcn is 10*MINUIT2 Default maxfcn
-  UInt_t maxfcn = numeric_limits<UInt_t>::max();
+  UInt_t maxfcn = std::numeric_limits<UInt_t>::max();
   // tolerance = MINUIT2 Default tolerance
   Double_t tolerance = 0.1;
   // keep track of elapsed time
@@ -1922,12 +1920,12 @@ Bool_t PFitter::ExecuteSimplex()
   start=MilliTime();
   ROOT::Minuit2::FunctionMinimum min = simplex(maxfcn, tolerance);
   end=MilliTime();
-  cout << ">> PFitter::ExecuteMinimize(): execution time for Simplex = " << setprecision(3) << (end-start)/1.0e3 << " sec." << endl;
+  std::cout << ">> PFitter::ExecuteMinimize(): execution time for Simplex = " << std::setprecision(3) << (end-start)/1.0e3 << " sec." << std::endl;
   TString str = TString::Format("Simplex:  %.3f sec", (end-start)/1.0e3);
   fElapsedTime.push_back(str);
   if (!min.IsValid()) {
-    cerr << endl << ">> PFitter::ExecuteSimplex(): **WARNING**: Fit did not converge, sorry ...";
-    cerr << endl;
+    std::cerr  << std::endl << ">> PFitter::ExecuteSimplex(): **WARNING**: Fit did not converge, sorry ...";
+    std::cerr  << std::endl;
     fIsValid = false;
     return false;
   }
@@ -1935,7 +1933,7 @@ Bool_t PFitter::ExecuteSimplex()
   // keep FunctionMinimum object
   if (fFcnMin) { // fFcnMin exist hence clean up first
     delete fFcnMin;
-    fFcnMin = 0;
+    fFcnMin = nullptr;
   }
   fFcnMin = new ROOT::Minuit2::FunctionMinimum(min);
 
@@ -1966,7 +1964,7 @@ Bool_t PFitter::ExecuteSimplex()
   fConverged = true;
 
   if (fPrintLevel >= 2)
-    cout << *fFcnMin << endl;
+    std::cout << *fFcnMin << std::endl;
 
   return true;
 }
@@ -1982,7 +1980,7 @@ Bool_t PFitter::ExecuteSimplex()
 Double_t PFitter::MilliTime()
 {
   struct timeval now;
-  gettimeofday(&now, 0);
+  gettimeofday(&now, nullptr);
 
   return ((Double_t)now.tv_sec * 1.0e6 + (Double_t)now.tv_usec)/1.0e3;
 }

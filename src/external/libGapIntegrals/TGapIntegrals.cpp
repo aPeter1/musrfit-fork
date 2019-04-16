@@ -29,14 +29,11 @@
 #include <cassert>
 #include <iostream>
 
-using namespace std;
-
 #include "BMWIntegrator.h"
 #include "TGapIntegrals.h"
 
 #define PI 3.14159265358979323846
 #define TWOPI 6.28318530717958647692
-
 
 ClassImp(TGapSWave)
 ClassImp(TGapDWave)
@@ -71,7 +68,7 @@ ClassImp(TFilmMagnetizationDWave)
 TGapSWave::TGapSWave() {
   TGapIntegral *gapint = new TGapIntegral();
   fGapIntegral = gapint;
-  gapint = 0;
+  gapint = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -87,7 +84,7 @@ TGapSWave::TGapSWave() {
 TGapDWave::TGapDWave() {
   TDWaveGapIntegralCuhre *gapint = new TDWaveGapIntegralCuhre();
   fGapIntegral = gapint;
-  gapint = 0;
+  gapint = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -103,7 +100,7 @@ TGapDWave::TGapDWave() {
 TGapCosSqDWave::TGapCosSqDWave() {
   TCosSqDWaveGapIntegralCuhre *gapint = new TCosSqDWaveGapIntegralCuhre();
   fGapIntegral = gapint;
-  gapint = 0;
+  gapint = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -119,7 +116,7 @@ TGapCosSqDWave::TGapCosSqDWave() {
 TGapSinSqDWave::TGapSinSqDWave() {
   TSinSqDWaveGapIntegralCuhre *gapint = new TSinSqDWaveGapIntegralCuhre();
   fGapIntegral = gapint;
-  gapint = 0;
+  gapint = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -135,7 +132,7 @@ TGapSinSqDWave::TGapSinSqDWave() {
 TGapAnSWave::TGapAnSWave() {
   TAnSWaveGapIntegralCuhre *gapint = new TAnSWaveGapIntegralCuhre();
   fGapIntegral = gapint;
-  gapint = 0;
+  gapint = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -151,7 +148,7 @@ TGapAnSWave::TGapAnSWave() {
 TGapNonMonDWave1::TGapNonMonDWave1() {
   TNonMonDWave1GapIntegralCuhre *gapint = new TNonMonDWave1GapIntegralCuhre();
   fGapIntegral = gapint;
-  gapint = 0;
+  gapint = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -167,7 +164,7 @@ TGapNonMonDWave1::TGapNonMonDWave1() {
 TGapNonMonDWave2::TGapNonMonDWave2() {
   TNonMonDWave2GapIntegralCuhre *gapint = new TNonMonDWave2GapIntegralCuhre();
   fGapIntegral = gapint;
-  gapint = 0;
+  gapint = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -262,7 +259,7 @@ TLambdaInvNonMonDWave2::TLambdaInvNonMonDWave2() {
  */
 TGapSWave::~TGapSWave() {
   delete fGapIntegral;
-  fGapIntegral = 0;
+  fGapIntegral = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -277,7 +274,7 @@ TGapSWave::~TGapSWave() {
  */
 TGapDWave::~TGapDWave() {
   delete fGapIntegral;
-  fGapIntegral = 0;
+  fGapIntegral = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -292,7 +289,7 @@ TGapDWave::~TGapDWave() {
  */
 TGapCosSqDWave::~TGapCosSqDWave() {
   delete fGapIntegral;
-  fGapIntegral = 0;
+  fGapIntegral = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -307,7 +304,7 @@ TGapCosSqDWave::~TGapCosSqDWave() {
  */
 TGapSinSqDWave::~TGapSinSqDWave() {
   delete fGapIntegral;
-  fGapIntegral = 0;
+  fGapIntegral = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -322,7 +319,7 @@ TGapSinSqDWave::~TGapSinSqDWave() {
  */
 TGapAnSWave::~TGapAnSWave() {
   delete fGapIntegral;
-  fGapIntegral = 0;
+  fGapIntegral = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -337,7 +334,7 @@ TGapAnSWave::~TGapAnSWave() {
  */
 TGapNonMonDWave1::~TGapNonMonDWave1() {
   delete fGapIntegral;
-  fGapIntegral = 0;
+  fGapIntegral = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -352,7 +349,7 @@ TGapNonMonDWave1::~TGapNonMonDWave1() {
  */
 TGapNonMonDWave2::~TGapNonMonDWave2() {
   delete fGapIntegral;
-  fGapIntegral = 0;
+  fGapIntegral = nullptr;
 
   fTemp.clear();
   fTempIter = fTemp.end();
@@ -367,7 +364,7 @@ TGapNonMonDWave2::~TGapNonMonDWave2() {
  */
 TLambdaSWave::~TLambdaSWave() {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
 }
 
 //--------------------------------------------------------------------
@@ -376,7 +373,7 @@ TLambdaSWave::~TLambdaSWave() {
  */
 TLambdaDWave::~TLambdaDWave() {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
 }
 
 //--------------------------------------------------------------------
@@ -385,7 +382,7 @@ TLambdaDWave::~TLambdaDWave() {
  */
 TLambdaAnSWave::~TLambdaAnSWave() {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
 }
 
 //--------------------------------------------------------------------
@@ -394,7 +391,7 @@ TLambdaAnSWave::~TLambdaAnSWave() {
  */
 TLambdaNonMonDWave1::~TLambdaNonMonDWave1() {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
 }
 
 //--------------------------------------------------------------------
@@ -403,7 +400,7 @@ TLambdaNonMonDWave1::~TLambdaNonMonDWave1() {
  */
 TLambdaNonMonDWave2::~TLambdaNonMonDWave2() {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
 }
 
 //--------------------------------------------------------------------
@@ -412,7 +409,7 @@ TLambdaNonMonDWave2::~TLambdaNonMonDWave2() {
  */
 TLambdaInvSWave::~TLambdaInvSWave() {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
 }
 
 //--------------------------------------------------------------------
@@ -421,7 +418,7 @@ TLambdaInvSWave::~TLambdaInvSWave() {
  */
 TLambdaInvDWave::~TLambdaInvDWave() {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
 }
 
 //--------------------------------------------------------------------
@@ -430,7 +427,7 @@ TLambdaInvDWave::~TLambdaInvDWave() {
  */
 TLambdaInvAnSWave::~TLambdaInvAnSWave() {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
 }
 
 //--------------------------------------------------------------------
@@ -439,7 +436,7 @@ TLambdaInvAnSWave::~TLambdaInvAnSWave() {
  */
 TLambdaInvNonMonDWave1::~TLambdaInvNonMonDWave1() {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
 }
 
 //--------------------------------------------------------------------
@@ -448,7 +445,7 @@ TLambdaInvNonMonDWave1::~TLambdaInvNonMonDWave1() {
  */
 TLambdaInvNonMonDWave2::~TLambdaInvNonMonDWave2() {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
 }
 
 
@@ -457,7 +454,7 @@ TLambdaInvNonMonDWave2::~TLambdaInvNonMonDWave2() {
  * <p>prepare the needed parameters for the integration carried out in TGapIntegral.
  * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (9).
  */
-double TGapSWave::operator()(double t, const vector<double> &par) const {
+double TGapSWave::operator()(double t, const std::vector<double> &par) const {
 
   // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] c0 (1), [3] aG (1)]
 
@@ -506,7 +503,7 @@ double TGapSWave::operator()(double t, const vector<double> &par) const {
 
     double ds;
 
-    vector<double> intPar; // parameters for the integral, T & Delta(T)
+    std::vector<double> intPar; // parameters for the integral, T & Delta(T)
     intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
     if (par.size() == 2) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
@@ -536,7 +533,7 @@ double TGapSWave::operator()(double t, const vector<double> &par) const {
  * <p>prepare the needed parameters for the integration carried out in TDWaveGapIntegralCuhre.
  * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (10).
  */
-double TGapDWave::operator()(double t, const vector<double> &par) const {
+double TGapDWave::operator()(double t, const std::vector<double> &par) const {
 
   // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] c0 (1), [3] aG (1)]
 
@@ -584,7 +581,7 @@ double TGapDWave::operator()(double t, const vector<double> &par) const {
   if (fCalcNeeded[vectorIndex]) {
 
     double ds;
-    vector<double> intPar; // parameters for the integral, T & Delta(T)
+    std::vector<double> intPar; // parameters for the integral, T & Delta(T)
     intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
     if (par.size() == 2) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
@@ -620,7 +617,7 @@ double TGapDWave::operator()(double t, const vector<double> &par) const {
  * <p>prepare the needed parameters for the integration carried out in TCosSqDWaveGapIntegralCuhre.
  * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (??).
  */
-double TGapCosSqDWave::operator()(double t, const vector<double> &par) const {
+double TGapCosSqDWave::operator()(double t, const std::vector<double> &par) const {
 
   // parameters: [0] Tc (K), [1] Delta0_D (meV), [2] Delta0_S (meV) [[3] c0_D (1), [4] aG_D (1), [5] c0_S (1), [6] aG_S (1)]
 
@@ -667,7 +664,7 @@ double TGapCosSqDWave::operator()(double t, const vector<double> &par) const {
   if (fCalcNeeded[vectorIndex]) {
 
     double ds;
-    vector<double> intPar; // parameters for the integral, T & Delta(T)
+    std::vector<double> intPar; // parameters for the integral, T & Delta(T)
     intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
@@ -708,7 +705,7 @@ double TGapCosSqDWave::operator()(double t, const vector<double> &par) const {
  * <p>prepare the needed parameters for the integration carried out in TSinSqDWaveGapIntegralCuhre.
  * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (??).
  */
-double TGapSinSqDWave::operator()(double t, const vector<double> &par) const {
+double TGapSinSqDWave::operator()(double t, const std::vector<double> &par) const {
 
   // parameters: [0] Tc (K), [1] Delta0_D (meV), [2] Delta0_S (meV) [[3] c0_D (1), [4] aG_D (1), [5] c0_S (1), [6] aG_S (1)]
 
@@ -756,7 +753,7 @@ double TGapSinSqDWave::operator()(double t, const vector<double> &par) const {
   if (fCalcNeeded[vectorIndex]) {
 
     double ds;
-    vector<double> intPar; // parameters for the integral, T & Delta(T)
+    std::vector<double> intPar; // parameters for the integral, T & Delta(T)
     intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
@@ -797,7 +794,7 @@ double TGapSinSqDWave::operator()(double t, const vector<double> &par) const {
  * <p>prepare the needed parameters for the integration carried out in TAnSWaveGapIntegralCuhre (anisotropic s-wave).
  * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (13).
  */
-double TGapAnSWave::operator()(double t, const vector<double> &par) const {
+double TGapAnSWave::operator()(double t, const std::vector<double> &par) const {
 
   // parameters: [0] Tc (K), [1] Delta0 (meV), [2] a (1), [[3] c0 (1), [4] aG (1)]
 
@@ -846,7 +843,7 @@ double TGapAnSWave::operator()(double t, const vector<double> &par) const {
   if (fCalcNeeded[vectorIndex]) {
 
     double ds;
-    vector<double> intPar; // parameters for the integral, T & Delta(T)
+    std::vector<double> intPar; // parameters for the integral, T & Delta(T)
     intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
@@ -883,7 +880,7 @@ double TGapAnSWave::operator()(double t, const vector<double> &par) const {
  * <p>prepare the needed parameters for the integration carried out in TNonMonDWave1GapIntegralCuhre.
  * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (11).
  */
-double TGapNonMonDWave1::operator()(double t, const vector<double> &par) const {
+double TGapNonMonDWave1::operator()(double t, const std::vector<double> &par) const {
 
   // parameters: [0] Tc (K), [1] Delta0 (meV), [2] a (1), [[3] c0 (1), [4] aG (1)]
 
@@ -931,7 +928,7 @@ double TGapNonMonDWave1::operator()(double t, const vector<double> &par) const {
   if (fCalcNeeded[vectorIndex]) {
 
     double ds;
-    vector<double> intPar; // parameters for the integral: 2 k_B T, Delta(T), a, E_c, phi_c
+    std::vector<double> intPar; // parameters for the integral: 2 k_B T, Delta(T), a, E_c, phi_c
     intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
@@ -965,7 +962,7 @@ double TGapNonMonDWave1::operator()(double t, const vector<double> &par) const {
  * <p>prepare the needed parameters for the integration carried out in TNonMonDWave2GapIntegralCuhre.
  * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (11).
  */
-double TGapNonMonDWave2::operator()(double t, const vector<double> &par) const {
+double TGapNonMonDWave2::operator()(double t, const std::vector<double> &par) const {
 
   // parameters: [0] Tc (K), [1] Delta0 (meV), [2] a (1), [[3] c0 (1), [4] aG (1)]
 
@@ -1013,7 +1010,7 @@ double TGapNonMonDWave2::operator()(double t, const vector<double> &par) const {
   if (fCalcNeeded[vectorIndex]) {
 
     double ds;
-    vector<double> intPar; // parameters for the integral: 2 k_B T, Delta(T), a, E_c, phi_c
+    std::vector<double> intPar; // parameters for the integral: 2 k_B T, Delta(T), a, E_c, phi_c
     intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
     if (par.size() == 3) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
@@ -1047,7 +1044,7 @@ double TGapNonMonDWave2::operator()(double t, const vector<double> &par) const {
  * <p>Superfluid density in the ``two-fluid'' approximation.
  * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (14).
  */
-double TGapPowerLaw::operator()(double t, const vector<double> &par) const {
+double TGapPowerLaw::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 2); // two parameters: Tc, n
 
@@ -1068,7 +1065,7 @@ double TGapPowerLaw::operator()(double t, const vector<double> &par) const {
  * Here we use INTENTIONALLY the temperature dependence of the gap according
  * to A. Carrington and F. Manzano, Physica C 385 (2003) 205
  */
-double TGapDirtySWave::operator()(double t, const vector<double> &par) const {
+double TGapDirtySWave::operator()(double t, const std::vector<double> &par) const {
 
   // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] c0 (1), [3] aG (1)]
 
@@ -1095,7 +1092,7 @@ double TGapDirtySWave::operator()(double t, const vector<double> &par) const {
 /**
  * <p>
  */
-double TLambdaSWave::operator()(double t, const vector<double> &par) const
+double TLambdaSWave::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 2); // two parameters: Tc, Delta0
 
@@ -1113,7 +1110,7 @@ double TLambdaSWave::operator()(double t, const vector<double> &par) const
 /**
  * <p>
  */
-double TLambdaDWave::operator()(double t, const vector<double> &par) const
+double TLambdaDWave::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 2); // two parameters: Tc, Delta0
 
@@ -1131,7 +1128,7 @@ double TLambdaDWave::operator()(double t, const vector<double> &par) const
 /**
  * <p>
  */
-double TLambdaAnSWave::operator()(double t, const vector<double> &par) const
+double TLambdaAnSWave::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
 
@@ -1149,7 +1146,7 @@ double TLambdaAnSWave::operator()(double t, const vector<double> &par) const
 /**
  * <p>
  */
-double TLambdaNonMonDWave1::operator()(double t, const vector<double> &par) const
+double TLambdaNonMonDWave1::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
 
@@ -1167,7 +1164,7 @@ double TLambdaNonMonDWave1::operator()(double t, const vector<double> &par) cons
 /**
  * <p>
  */
-double TLambdaNonMonDWave2::operator()(double t, const vector<double> &par) const
+double TLambdaNonMonDWave2::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
 
@@ -1185,7 +1182,7 @@ double TLambdaNonMonDWave2::operator()(double t, const vector<double> &par) cons
 /**
  * <p>
  */
-double TLambdaPowerLaw::operator()(double t, const vector<double> &par) const {
+double TLambdaPowerLaw::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 2); // two parameters: Tc, N
 
@@ -1203,7 +1200,7 @@ double TLambdaPowerLaw::operator()(double t, const vector<double> &par) const {
 /**
  * <p>
  */
-double TLambdaInvSWave::operator()(double t, const vector<double> &par) const
+double TLambdaInvSWave::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 2); // two parameters: Tc, Delta0
 
@@ -1221,7 +1218,7 @@ double TLambdaInvSWave::operator()(double t, const vector<double> &par) const
 /**
  * <p>
  */
-double TLambdaInvDWave::operator()(double t, const vector<double> &par) const
+double TLambdaInvDWave::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 2); // two parameters: Tc, Delta0
 
@@ -1239,7 +1236,7 @@ double TLambdaInvDWave::operator()(double t, const vector<double> &par) const
 /**
  * <p>
  */
-double TLambdaInvAnSWave::operator()(double t, const vector<double> &par) const
+double TLambdaInvAnSWave::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
 
@@ -1257,7 +1254,7 @@ double TLambdaInvAnSWave::operator()(double t, const vector<double> &par) const
 /**
  * <p>
  */
-double TLambdaInvNonMonDWave1::operator()(double t, const vector<double> &par) const
+double TLambdaInvNonMonDWave1::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
 
@@ -1275,7 +1272,7 @@ double TLambdaInvNonMonDWave1::operator()(double t, const vector<double> &par) c
 /**
  * <p>
  */
-double TLambdaInvNonMonDWave2::operator()(double t, const vector<double> &par) const
+double TLambdaInvNonMonDWave2::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 3); // three parameters: Tc, Delta0, a
 
@@ -1293,7 +1290,7 @@ double TLambdaInvNonMonDWave2::operator()(double t, const vector<double> &par) c
 /**
  * <p>
  */
-double TLambdaInvPowerLaw::operator()(double t, const vector<double> &par) const {
+double TLambdaInvPowerLaw::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 2); // two parameters: Tc, N
 
@@ -1323,7 +1320,7 @@ TFilmMagnetizationDWave::TFilmMagnetizationDWave()
 TFilmMagnetizationDWave::~TFilmMagnetizationDWave()
 {
   delete fLambdaInvSq;
-  fLambdaInvSq = 0;
+  fLambdaInvSq = nullptr;
   fPar.clear();
 }
 
@@ -1331,7 +1328,7 @@ TFilmMagnetizationDWave::~TFilmMagnetizationDWave()
 /**
  * <p>
  */
-double TFilmMagnetizationDWave::operator()(double t, const vector<double> &par) const
+double TFilmMagnetizationDWave::operator()(double t, const std::vector<double> &par) const
 {
   assert(par.size() == 4); // four parameters: Tc, Delta0, lambda0, film-thickness
 
@@ -1340,7 +1337,7 @@ double TFilmMagnetizationDWave::operator()(double t, const vector<double> &par) 
   if (t >= fPar[0])
     return 0.0;
 
-  vector<double> parForGapIntegral;
+  std::vector<double> parForGapIntegral;
   parForGapIntegral.push_back(fPar[0]);
   parForGapIntegral.push_back(fPar[1]);
 

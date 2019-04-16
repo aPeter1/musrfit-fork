@@ -32,7 +32,6 @@
 
 #include <vector>
 #include <string>
-using namespace std;
 
 // the following ifdef is needed for GCC 4.6 or higher, fftw 3.3 or higher and root 5.30.03 or lower
 //#ifdef __CINT__
@@ -52,8 +51,8 @@ public:
 
   virtual ~TFilmVortexFieldCalc();
 
-  virtual vector<float*> DataB() const {return fBout;}
-  virtual void SetParameters(const vector<float>& par) {fParam = par; fGridExists = false;}
+  virtual std::vector<float*> DataB() const {return fBout;}
+  virtual void SetParameters(const std::vector<float>& par) {fParam = par; fGridExists = false;}
   virtual void CalculateGrid() const = 0;
   virtual float GetBmin() const;
   virtual float GetBmax() const;
@@ -62,14 +61,14 @@ public:
   virtual unsigned int GetNumberOfSteps() const {return fSteps;}
 
 protected:
-  vector<float> fParam;
+  std::vector<float> fParam;
   unsigned int fSteps;  // number of steps, the "unit cell" of the vortex lattice is devided in (in x- and y- direction)
   unsigned int fStepsZ; // number of layers that should be calculated in z-direction (film slices)
   mutable fftwf_complex *fFFTin; // Fourier components of omega
-  mutable vector<float*> fBout; // three pointers to Bx, By, Bz; each of these arrays is in row-major order
+  mutable std::vector<float*> fBout; // three pointers to Bx, By, Bz; each of these arrays is in row-major order
   fftwf_plan fFFTplan;
   bool fUseWisdom;
-  string fWisdom;
+  std::string fWisdom;
   mutable bool fGridExists;
 };
 
@@ -81,7 +80,7 @@ class TFilmTriVortexNGLFieldCalc : public TFilmVortexFieldCalc {
 
 public:
 
-  TFilmTriVortexNGLFieldCalc(const string&, const unsigned int steps = 256, const unsigned int stepsZ = 32);
+  TFilmTriVortexNGLFieldCalc(const std::string&, const unsigned int steps = 256, const unsigned int stepsZ = 32);
   ~TFilmTriVortexNGLFieldCalc();
 
   void CalculateGrid() const;
@@ -91,7 +90,7 @@ public:
   fftwf_complex* GetRealSpaceMatrix() const {return fRealSpaceMatrix;}
   float* GetOmegaMatrix() const {return fOmegaMatrix;}
   fftwf_complex* GetBkSMatrix() const {return fBkS;}
-  vector<float*> GetOmegaDiffMatrix() const {return fOmegaDiffMatrix;}
+  std::vector<float*> GetOmegaDiffMatrix() const {return fOmegaDiffMatrix;}
   fftwf_complex* GetQMatrix() const {return fQMatrix;}
   fftwf_complex* GetPMatrix() const {return fPkMatrix;}
 
@@ -113,7 +112,7 @@ private:
   void CalculateGatVortexCore() const;
 
   mutable float *fOmegaMatrix;
-  mutable vector<float*> fOmegaDiffMatrix;
+  mutable std::vector<float*> fOmegaDiffMatrix;
   mutable fftwf_complex *fRealSpaceMatrix;
   mutable fftwf_complex *fBkMatrix;
   mutable fftwf_complex *fPkMatrix;

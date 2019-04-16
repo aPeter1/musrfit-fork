@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2013 by Andreas Suter                                   *
+ *   Copyright (C) 2013-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,10 +31,8 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include "PStartupHandler_PM.h"
-
 
 //--------------------------------------------------------------------------
 // Constructor
@@ -93,7 +91,7 @@ Double_t PRgeHandler_PM::GetRgeValue(const Int_t index, const Double_t dist)
 {
   Double_t rgeVal = 0.0;
 
-  UInt_t distIdx = (UInt_t)(dist/(fRgeDataList[index].stoppingDistance[1]-fRgeDataList[index].stoppingDistance[0]));
+  UInt_t distIdx = static_cast<UInt_t>(dist/(fRgeDataList[index].stoppingDistance[1]-fRgeDataList[index].stoppingDistance[0]));
 
   if (distIdx >= fRgeDataList[index].stoppingDistance.size()) {
     rgeVal = 0.0;
@@ -141,7 +139,7 @@ Double_t PRgeHandler_PM::GetRgeValue(const Double_t energy, const Double_t dist)
  */
 Bool_t PRgeHandler_PM::LoadRgeData(const PStringVector &rgeDataPathList, const PDoubleVector &rgeDataEnergyList)
 {
-  ifstream fin;
+  std::ifstream fin;
   PRgeData_PM data;
   Int_t idx=0;
   TString dataName, tstr;
@@ -151,11 +149,11 @@ Bool_t PRgeHandler_PM::LoadRgeData(const PStringVector &rgeDataPathList, const P
 
   for (UInt_t i=0; i<rgeDataPathList.size(); i++) {
     // open rge-file for reading
-    fin.open(rgeDataPathList[i].Data(), iostream::in);
+    fin.open(rgeDataPathList[i].Data(), std::iostream::in);
     if (!fin.is_open()) {
-      cerr << endl << "PRgeHandler_PM::LoadRgeData **ERROR**";
-      cerr << endl << "  Could not open file " << rgeDataPathList[i].Data();
-      cerr << endl;
+      std::cerr << std::endl << "PRgeHandler_PM::LoadRgeData **ERROR**";
+      std::cerr << std::endl << "  Could not open file " << rgeDataPathList[i].Data();
+      std::cerr << std::endl;
       return false;
     }
 
@@ -240,7 +238,7 @@ PStartupHandler_PM::PStartupHandler_PM()
     fStartupFileFound = true;
     fStartupFilePath = TString(startup_path_name);
   } else { // startup file is not found in the current directory
-    cout << endl << ">> PStartupHandler_PM(): **WARNING** Couldn't find photoMeissner_startup.xml in the current directory, will try default one." << endl;
+    std::cout << std::endl << ">> PStartupHandler_PM(): **WARNING** Couldn't find photoMeissner_startup.xml in the current directory, will try default one." << std::endl;
     home_path = getenv("HOME");
     snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/external/photoMeissner_startup.xml", home_path);
     if (StartupFileExists(startup_path_name)) {
@@ -250,7 +248,7 @@ PStartupHandler_PM::PStartupHandler_PM()
   }
 
   // init RGE handler
-  fRgeHandler = 0;
+  fRgeHandler = nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -286,15 +284,15 @@ void PStartupHandler_PM::OnEndDocument()
 
 
   fRgeHandler = new PRgeHandler_PM(fRgeFilePathList, fRgeDataEnergyList);
-  if (fRgeHandler == 0) { // severe problem
+  if (fRgeHandler == nullptr) { // severe problem
     fIsValid = false;
-    cerr << endl << ">> PStartupHandler_PM::OnEndDocument(): **ERROR** couldn't invoke RGE handler." << endl << endl;
+    std::cerr << std::endl << ">> PStartupHandler_PM::OnEndDocument(): **ERROR** couldn't invoke RGE handler." << std::endl << std::endl;
     return;
   }
 
   if (!fRgeHandler->IsValid()) { // severe problem
     fIsValid = false;
-    cerr << endl << ">> PStartupHandler_PM::OnEndDocument(): **ERROR** RGE handler not valid." << endl << endl;
+    std::cerr << std::endl << ">> PStartupHandler_PM::OnEndDocument(): **ERROR** RGE handler not valid." << std::endl << std::endl;
     return;
   }
 }
@@ -353,9 +351,9 @@ void PStartupHandler_PM::OnCharacters(const char *str)
         dval = tstr.Atof();
         fRgeDataEnergyList.push_back(dval);
       } else {
-        cerr << endl << "PStartupHandler_PM::OnCharacters: **ERROR** when finding energy:";
-        cerr << endl << "\"" << str << "\" is not a floating point number, will ignore it.";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler_PM::OnCharacters: **ERROR** when finding energy:";
+        std::cerr << std::endl << "\"" << str << "\" is not a floating point number, will ignore it.";
+        std::cerr << std::endl;
       }
       break;
     default:
@@ -386,8 +384,8 @@ void PStartupHandler_PM::OnComment(const char *str)
  */
 void PStartupHandler_PM::OnWarning(const char *str)
 {
-  cerr << endl << "PStartupHandler_PM **WARNING** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "PStartupHandler_PM **WARNING** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -400,8 +398,8 @@ void PStartupHandler_PM::OnWarning(const char *str)
  */
 void PStartupHandler_PM::OnError(const char *str)
 {
-  cerr << endl << "PStartupHandler_PM **ERROR** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "PStartupHandler_PM **ERROR** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -414,8 +412,8 @@ void PStartupHandler_PM::OnError(const char *str)
  */
 void PStartupHandler_PM::OnFatalError(const char *str)
 {
-  cerr << endl << "PStartupHandler_PM **FATAL ERROR** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "PStartupHandler_PM **FATAL ERROR** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -492,7 +490,7 @@ bool PStartupHandler_PM::StartupFileExists(char *fln)
 {
   bool result = false;
 
-  ifstream ifile(fln);
+  std::ifstream ifile(fln);
 
   if (ifile.fail()) {
     result = false;

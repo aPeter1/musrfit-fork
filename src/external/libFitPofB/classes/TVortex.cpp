@@ -30,7 +30,6 @@
 #include <iostream>
 #include <cassert>
 #include <cmath>
-using namespace std;
 
 #include <TSAXParser.h>
 #include "BMWStartupHandler.h"
@@ -158,7 +157,7 @@ TBulkTriVortexNGL::~TBulkTriVortexNGL() {
 TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("BMW_startup.xml");
+    std::string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -218,7 +217,7 @@ TBulkTriVortexLondon::TBulkTriVortexLondon() : fCalcNeeded(true), fFirstCall(tru
 TBulkSqVortexLondon::TBulkSqVortexLondon() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("BMW_startup.xml");
+    std::string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -274,7 +273,7 @@ TBulkSqVortexLondon::TBulkSqVortexLondon() : fCalcNeeded(true), fFirstCall(true)
 // Parameters: all the parameters for the function to be fitted through TBulkTriVortexLondon (phase, av.field, lambda, xi, [not implemented: bkg weight])
 //------------------
 
-double TBulkTriVortexLondon::operator()(double t, const vector<double> &par) const {
+double TBulkTriVortexLondon::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 4 || par.size() == 5 || par.size() == 7 || par.size() == 8); // normal, +BkgWeight, +VortexWeighting, +AFfield
 
@@ -365,7 +364,7 @@ double TBulkTriVortexLondon::operator()(double t, const vector<double> &par) con
 // Parameters: all the parameters for the function to be fitted through TBulkSqVortexLondon (phase, av.field, lambda, xi, [not implemented: bkg weight])
 //------------------
 
-double TBulkSqVortexLondon::operator()(double t, const vector<double> &par) const {
+double TBulkSqVortexLondon::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 4 || par.size() == 5);
 
@@ -448,7 +447,7 @@ double TBulkSqVortexLondon::operator()(double t, const vector<double> &par) cons
 TBulkTriVortexML::TBulkTriVortexML() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("BMW_startup.xml");
+    std::string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -504,7 +503,7 @@ TBulkTriVortexML::TBulkTriVortexML() : fCalcNeeded(true), fFirstCall(true) {
 // Parameters: all the parameters for the function to be fitted through TBulkTriVortexML (phase, av.field, lambda, xi, [not implemented: bkg weight])
 //------------------
 
-double TBulkTriVortexML::operator()(double t, const vector<double> &par) const {
+double TBulkTriVortexML::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 4 || par.size() == 5);
 
@@ -587,7 +586,7 @@ double TBulkTriVortexML::operator()(double t, const vector<double> &par) const {
 TBulkTriVortexAGL::TBulkTriVortexAGL() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("BMW_startup.xml");
+    std::string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -643,7 +642,7 @@ TBulkTriVortexAGL::TBulkTriVortexAGL() : fCalcNeeded(true), fFirstCall(true) {
 // Parameters: all the parameters for the function to be fitted through TBulkTriVortexAGL (phase, av.field, lambda, xi, [not implemented: bkg weight])
 //------------------
 
-double TBulkTriVortexAGL::operator()(double t, const vector<double> &par) const {
+double TBulkTriVortexAGL::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 4 || par.size() == 5);
 
@@ -725,7 +724,7 @@ double TBulkTriVortexAGL::operator()(double t, const vector<double> &par) const 
 TBulkTriVortexAGLII::TBulkTriVortexAGLII() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("BMW_startup.xml");
+    std::string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -783,7 +782,7 @@ TBulkTriVortexAGLII::TBulkTriVortexAGLII() : fCalcNeeded(true), fFirstCall(true)
 // Parameters: all the parameters for the function to be fitted through TBulkTriVortexAGLII (phase, av.field, lambda, core-radius, [not implemented: bkg weight])
 //------------------
 
-double TBulkTriVortexAGLII::operator()(double t, const vector<double> &par) const {
+double TBulkTriVortexAGLII::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 4 || par.size() == 5 || par.size() == 7 || par.size() == 8);
 
@@ -876,7 +875,7 @@ double TBulkTriVortexAGLII::operator()(double t, const vector<double> &par) cons
 TBulkTriVortexNGL::TBulkTriVortexNGL() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("BMW_startup.xml");
+    std::string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -932,7 +931,7 @@ TBulkTriVortexNGL::TBulkTriVortexNGL() : fCalcNeeded(true), fFirstCall(true) {
 // Parameters: all the parameters for the function to be fitted through TBulkTriVortexNGL (phase, appl.field, lambda, xi, [not implemented: bkg weight])
 //------------------
 
-double TBulkTriVortexNGL::operator()(double t, const vector<double> &par) const {
+double TBulkTriVortexNGL::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 4 || par.size() == 5);
 
@@ -1031,7 +1030,7 @@ TBulkAnisotropicTriVortexLondonGlobal::~TBulkAnisotropicTriVortexLondonGlobal() 
 TBulkAnisotropicTriVortexLondonGlobal::TBulkAnisotropicTriVortexLondonGlobal() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("BMW_startup.xml");
+    std::string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -1081,7 +1080,7 @@ TBulkAnisotropicTriVortexLondonGlobal::TBulkAnisotropicTriVortexLondonGlobal() :
     }
 }
 
-void TBulkAnisotropicTriVortexLondonGlobal::Calc(const vector<double> &par) const {
+void TBulkAnisotropicTriVortexLondonGlobal::Calc(const std::vector<double> &par) const {
 
   assert(par.size() == 6);
 /*
@@ -1191,7 +1190,7 @@ TBulkAnisotropicTriVortexLondon::~TBulkAnisotropicTriVortexLondon()
  * \param globalPart reference to the global user function object vector
  * \param idx global user function index within the theory tree
  */
-void TBulkAnisotropicTriVortexLondon::SetGlobalPart(vector<void *> &globalPart, UInt_t idx)
+void TBulkAnisotropicTriVortexLondon::SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx)
 {
   fIdxGlobal = static_cast<Int_t>(idx);
 
@@ -1273,7 +1272,7 @@ TBulkAnisotropicTriVortexMLGlobal::~TBulkAnisotropicTriVortexMLGlobal() {
 TBulkAnisotropicTriVortexMLGlobal::TBulkAnisotropicTriVortexMLGlobal() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("BMW_startup.xml");
+    std::string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -1323,7 +1322,7 @@ TBulkAnisotropicTriVortexMLGlobal::TBulkAnisotropicTriVortexMLGlobal() : fCalcNe
     }
 }
 
-void TBulkAnisotropicTriVortexMLGlobal::Calc(const vector<double> &par) const {
+void TBulkAnisotropicTriVortexMLGlobal::Calc(const std::vector<double> &par) const {
 
   assert(par.size() == 6);
 /*
@@ -1433,7 +1432,7 @@ TBulkAnisotropicTriVortexML::~TBulkAnisotropicTriVortexML()
  * \param globalPart reference to the global user function object vector
  * \param idx global user function index within the theory tree
  */
-void TBulkAnisotropicTriVortexML::SetGlobalPart(vector<void *> &globalPart, UInt_t idx)
+void TBulkAnisotropicTriVortexML::SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx)
 {
   fIdxGlobal = static_cast<Int_t>(idx);
 
@@ -1515,7 +1514,7 @@ TBulkAnisotropicTriVortexAGLGlobal::~TBulkAnisotropicTriVortexAGLGlobal() {
 TBulkAnisotropicTriVortexAGLGlobal::TBulkAnisotropicTriVortexAGLGlobal() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("BMW_startup.xml");
+    std::string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -1565,7 +1564,7 @@ TBulkAnisotropicTriVortexAGLGlobal::TBulkAnisotropicTriVortexAGLGlobal() : fCalc
     }
 }
 
-void TBulkAnisotropicTriVortexAGLGlobal::Calc(const vector<double> &par) const {
+void TBulkAnisotropicTriVortexAGLGlobal::Calc(const std::vector<double> &par) const {
 
   assert(par.size() == 6);
 /*
@@ -1676,7 +1675,7 @@ TBulkAnisotropicTriVortexAGL::~TBulkAnisotropicTriVortexAGL()
  * \param globalPart reference to the global user function object vector
  * \param idx global user function index within the theory tree
  */
-void TBulkAnisotropicTriVortexAGL::SetGlobalPart(vector<void *> &globalPart, UInt_t idx)
+void TBulkAnisotropicTriVortexAGL::SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx)
 {
   fIdxGlobal = static_cast<Int_t>(idx);
 

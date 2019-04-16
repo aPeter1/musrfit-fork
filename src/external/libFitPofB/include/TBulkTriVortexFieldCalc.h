@@ -31,7 +31,6 @@
 
 #include <vector>
 #include <string>
-using namespace std;
 
 // the following ifdef is needed for GCC 4.6 or higher, fftw 3.3 or higher and root 5.30.03 or lower
 //#ifdef __CINT__
@@ -51,7 +50,7 @@ public:
   virtual ~TBulkVortexFieldCalc();
 
   virtual double* DataB() const {return fFFTout;}
-  virtual void SetParameters(const vector<double>& par) {fParam = par; fGridExists = false;}
+  virtual void SetParameters(const std::vector<double>& par) {fParam = par; fGridExists = false;}
   virtual void CalculateGrid() const = 0;
   virtual double GetBmin() const;
   virtual double GetBmax() const;
@@ -61,13 +60,13 @@ public:
   virtual bool IsTriangular() const = 0;
 
 protected:
-  vector<double> fParam; ///< parameters used to calculate B(x,y)
+  std::vector<double> fParam; ///< parameters used to calculate B(x,y)
   unsigned int fSteps;  ///< number of steps in which the "unit cell" of the vortex lattice is devided in (in each direction)
   mutable fftw_complex *fFFTin; ///< Fourier components of the field
   mutable double *fFFTout; ///< spatial field distribution B(x,y) in a "unit cell" of the vortex lattice
   fftw_plan fFFTplan; ///< FFTW plan for the 2D-Fourier transform from Fourier space to real space
   bool fUseWisdom; ///< tag determining if FFTW wisdom is used
-  string fWisdom; ///< file name of the FFTW wisdom-file
+  std::string fWisdom; ///< file name of the FFTW wisdom-file
   mutable bool fGridExists; ///< tag determining if B(x,y) has been calculated for the given set of parameters
 };
 
@@ -79,7 +78,7 @@ class TBulkTriVortexLondonFieldCalc : public TBulkVortexFieldCalc {
 
 public:
 
-  TBulkTriVortexLondonFieldCalc(const string&, const unsigned int steps = 256);
+  TBulkTriVortexLondonFieldCalc(const std::string&, const unsigned int steps = 256);
   ~TBulkTriVortexLondonFieldCalc() {}
 
   void CalculateGrid() const;
@@ -95,7 +94,7 @@ class TBulkAnisotropicTriVortexLondonFieldCalc : public TBulkVortexFieldCalc {
 
 public:
 
-  TBulkAnisotropicTriVortexLondonFieldCalc(const string&, const unsigned int steps = 256);
+  TBulkAnisotropicTriVortexLondonFieldCalc(const std::string&, const unsigned int steps = 256);
   ~TBulkAnisotropicTriVortexLondonFieldCalc() {}
 
   void CalculateGrid() const;
@@ -111,7 +110,7 @@ class TBulkSqVortexLondonFieldCalc : public TBulkVortexFieldCalc {
 
 public:
 
-  TBulkSqVortexLondonFieldCalc(const string&, const unsigned int steps = 256);
+  TBulkSqVortexLondonFieldCalc(const std::string&, const unsigned int steps = 256);
   ~TBulkSqVortexLondonFieldCalc() {}
 
   void CalculateGrid() const;
@@ -127,7 +126,7 @@ class TBulkTriVortexMLFieldCalc : public TBulkVortexFieldCalc {
 
 public:
 
-  TBulkTriVortexMLFieldCalc(const string&, const unsigned int steps = 256);
+  TBulkTriVortexMLFieldCalc(const std::string&, const unsigned int steps = 256);
   ~TBulkTriVortexMLFieldCalc() {}
 
   void CalculateGrid() const;
@@ -144,7 +143,7 @@ class TBulkAnisotropicTriVortexMLFieldCalc : public TBulkVortexFieldCalc {
 
 public:
 
-  TBulkAnisotropicTriVortexMLFieldCalc(const string&, const unsigned int steps = 256);
+  TBulkAnisotropicTriVortexMLFieldCalc(const std::string&, const unsigned int steps = 256);
   ~TBulkAnisotropicTriVortexMLFieldCalc() {}
 
   void CalculateGrid() const;
@@ -160,7 +159,7 @@ class TBulkTriVortexAGLFieldCalc : public TBulkVortexFieldCalc {
 
 public:
 
-  TBulkTriVortexAGLFieldCalc(const string&, const unsigned int steps = 256);
+  TBulkTriVortexAGLFieldCalc(const std::string&, const unsigned int steps = 256);
   ~TBulkTriVortexAGLFieldCalc() {}
 
   void CalculateGrid() const;
@@ -176,7 +175,7 @@ class TBulkTriVortexAGLIIFieldCalc : public TBulkVortexFieldCalc {
 
 public:
 
-  TBulkTriVortexAGLIIFieldCalc(const string&, const unsigned int steps = 256);
+  TBulkTriVortexAGLIIFieldCalc(const std::string&, const unsigned int steps = 256);
   ~TBulkTriVortexAGLIIFieldCalc() {}
 
   void CalculateGrid() const;
@@ -193,7 +192,7 @@ class TBulkAnisotropicTriVortexAGLFieldCalc : public TBulkVortexFieldCalc {
 
 public:
 
-  TBulkAnisotropicTriVortexAGLFieldCalc(const string&, const unsigned int steps = 256);
+  TBulkAnisotropicTriVortexAGLFieldCalc(const std::string&, const unsigned int steps = 256);
   ~TBulkAnisotropicTriVortexAGLFieldCalc() {}
 
   void CalculateGrid() const;
@@ -210,7 +209,7 @@ class TBulkTriVortexNGLFieldCalc : public TBulkVortexFieldCalc {
 
 public:
 
-  TBulkTriVortexNGLFieldCalc(const string&, const unsigned int steps = 256);
+  TBulkTriVortexNGLFieldCalc(const std::string&, const unsigned int steps = 256);
   ~TBulkTriVortexNGLFieldCalc();
 
   void CalculateGrid() const;

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -350,7 +350,7 @@ Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Doubl
   Double_t expectedChisq = 0.0;
 
   if (idx > fMsrInfo->GetMsrRunList()->size()) {
-    cerr << ">> PRunListCollection::GetSingleHistoChisqExpected() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << endl << endl;
+    std::cerr << ">> PRunListCollection::GetSingleHistoChisqExpected() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << std::endl << std::endl;
     return expectedChisq;
   }
 
@@ -410,7 +410,7 @@ Double_t PRunListCollection::GetSingleRunChisq(const std::vector<Double_t>& par,
   Double_t chisq = 0.0;
 
   if (idx > fMsrInfo->GetMsrRunList()->size()) {
-    cerr << ">> PRunListCollection::GetSingleRunChisq() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << endl << endl;
+    std::cerr << ">> PRunListCollection::GetSingleRunChisq() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << std::endl << std::endl;
     return chisq;
   }
 
@@ -600,7 +600,7 @@ Double_t PRunListCollection::GetSingleHistoMaximumLikelihoodExpected(const std::
   Double_t expected_mlh = 0.0;
 
   if (idx > fMsrInfo->GetMsrRunList()->size()) {
-    cerr << ">> PRunListCollection::GetSingleHistoMaximumLikelihoodExpected() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << endl << endl;
+    std::cerr << ">> PRunListCollection::GetSingleHistoMaximumLikelihoodExpected() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << std::endl << std::endl;
     return expected_mlh;
   }
 
@@ -645,7 +645,7 @@ Double_t PRunListCollection::GetSingleRunMaximumLikelihood(const std::vector<Dou
   Double_t mlh = 0.0;
 
   if (idx > fMsrInfo->GetMsrRunList()->size()) {
-    cerr << ">> PRunListCollection::GetSingleRunMaximumLikelihood() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << endl << endl;
+    std::cerr << ">> PRunListCollection::GetSingleRunMaximumLikelihood() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << std::endl << std::endl;
     return mlh;
   }
 
@@ -691,7 +691,7 @@ UInt_t PRunListCollection::GetNoOfBinsFitted(const UInt_t idx) const
   UInt_t result = 0;
 
   if (idx > fMsrInfo->GetMsrRunList()->size()) {
-    cerr << ">> PRunListCollection::GetNoOfBinsFitted() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << endl << endl;
+    std::cerr << ">> PRunListCollection::GetNoOfBinsFitted() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << std::endl << std::endl;
     return result;
   }
 
@@ -784,14 +784,14 @@ UInt_t PRunListCollection::GetTotalNoOfBinsFitted() const
  */
 PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
 {
-  PRunData *data = 0;
+  PRunData *data = nullptr;
 
   switch (tag) {
     case kIndex:
       if (index >= fRunSingleHistoList.size()) {
-        cerr << endl << ">> PRunListCollection::GetSingleHisto(): **ERROR** index = " << index << " out of bounds";
-        cerr << endl;
-        return 0;
+        std::cerr << std::endl << ">> PRunListCollection::GetSingleHisto(): **ERROR** index = " << index << " out of bounds";
+        std::cerr << std::endl;
+        return nullptr;
       }
 
       fRunSingleHistoList[index]->CalcTheory();
@@ -827,14 +827,14 @@ PRunData* PRunListCollection::GetSingleHisto(UInt_t index, EDataSwitch tag)
  */
 PRunData* PRunListCollection::GetSingleHistoRRF(UInt_t index, EDataSwitch tag)
 {
-  PRunData *data = 0;
+  PRunData *data = nullptr;
 
   switch (tag) {
     case kIndex:
       if (index >= fRunSingleHistoRRFList.size()) {
-        cerr << endl << ">> PRunListCollection::GetSingleHistoRRF(): **ERROR** index = " << index << " out of bounds";
-        cerr << endl;
-        return 0;
+        std::cerr << std::endl << ">> PRunListCollection::GetSingleHistoRRF(): **ERROR** index = " << index << " out of bounds";
+        std::cerr << std::endl;
+        return nullptr;
       }
 
       fRunSingleHistoRRFList[index]->CalcTheory();
@@ -870,14 +870,14 @@ PRunData* PRunListCollection::GetSingleHistoRRF(UInt_t index, EDataSwitch tag)
  */
 PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
 {
-  PRunData *data = 0;
+  PRunData *data = nullptr;
 
   switch (tag) {
     case kIndex: // called from musrfit when dumping the data
       if (index > fRunAsymmetryList.size()) {
-        cerr << endl << ">> PRunListCollection::GetAsymmetry(): **ERROR** index = " << index << " out of bounds";
-        cerr << endl;
-        return 0;
+        std::cerr << std::endl << ">> PRunListCollection::GetAsymmetry(): **ERROR** index = " << index << " out of bounds";
+        std::cerr << std::endl;
+        return nullptr;
       }
 
       fRunAsymmetryList[index]->CalcTheory();
@@ -913,14 +913,14 @@ PRunData* PRunListCollection::GetAsymmetry(UInt_t index, EDataSwitch tag)
  */
 PRunData* PRunListCollection::GetAsymmetryRRF(UInt_t index, EDataSwitch tag)
 {
-  PRunData *data = 0;
+  PRunData *data = nullptr;
 
   switch (tag) {
     case kIndex: // called from musrfit when dumping the data
       if (index > fRunAsymmetryRRFList.size()) {
-        cerr << endl << ">> PRunListCollection::GetAsymmetryRRF(): **ERROR** index = " << index << " out of bounds";
-        cerr << endl;
-        return 0;
+        std::cerr << std::endl << ">> PRunListCollection::GetAsymmetryRRF(): **ERROR** index = " << index << " out of bounds";
+        std::cerr << std::endl;
+        return nullptr;
       }
 
       fRunAsymmetryRRFList[index]->CalcTheory();
@@ -956,14 +956,14 @@ PRunData* PRunListCollection::GetAsymmetryRRF(UInt_t index, EDataSwitch tag)
  */
 PRunData* PRunListCollection::GetMuMinus(UInt_t index, EDataSwitch tag)
 {
-  PRunData *data = 0;
+  PRunData *data = nullptr;
 
   switch (tag) {
     case kIndex:
       if (index > fRunMuMinusList.size()) {
-        cerr << endl << ">> PRunListCollection::GetMuMinus(): **ERROR** index = " << index << " out of bounds";
-        cerr << endl;
-        return 0;
+        std::cerr << std::endl << ">> PRunListCollection::GetMuMinus(): **ERROR** index = " << index << " out of bounds";
+        std::cerr << std::endl;
+        return nullptr;
       }
       fRunMuMinusList[index]->CalcTheory();
       data = fRunMuMinusList[index]->GetData();
@@ -998,14 +998,14 @@ PRunData* PRunListCollection::GetMuMinus(UInt_t index, EDataSwitch tag)
  */
 PRunData* PRunListCollection::GetNonMusr(UInt_t index, EDataSwitch tag)
 {
-  PRunData *data = 0;
+  PRunData *data = nullptr;
 
   switch (tag) {
     case kIndex:
       if (index > fRunNonMusrList.size()) {
-        cerr << endl << ">> PRunListCollection::GetNonMusr(): **ERROR** index = " << index << " out of bounds";
-        cerr << endl;
-        return 0;
+        std::cerr << std::endl << ">> PRunListCollection::GetNonMusr(): **ERROR** index = " << index << " out of bounds";
+        std::cerr << std::endl;
+        return nullptr;
       }
       break;
     case kRunNo:
@@ -1103,7 +1103,7 @@ const Char_t* PRunListCollection::GetXAxisTitle(const TString &runName, const UI
 {
   PRawRunData *runData = fData->GetRunData(runName);
 
-  const Char_t *result = 0;
+  const Char_t *result = nullptr;
 
   if (runData->fDataNonMusr.FromAscii()) {
     result = runData->fDataNonMusr.GetLabels()->at(0).Data();
@@ -1136,7 +1136,7 @@ const Char_t* PRunListCollection::GetYAxisTitle(const TString &runName, const UI
 {
   PRawRunData *runData = fData->GetRunData(runName);
 
-  const Char_t *result = 0;
+  const Char_t *result = nullptr;
 
   if (runData->fDataNonMusr.FromAscii()) {
     result = runData->fDataNonMusr.GetLabels()->at(1).Data();

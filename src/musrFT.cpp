@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2015 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -36,7 +36,6 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-using namespace std;
 
 #include <TApplication.h>
 #include <TROOT.h>
@@ -90,67 +89,67 @@ typedef struct {
  */
 void musrFT_syntax()
 {
-  cout << endl << "usage: musrFT [Options] [<msr-files> | -df, --data-file <data-file>]";
-  cout << endl << "  <msr-files> : msr-file name(s). These msr-files are used for the Fourier transform.";
-  cout << endl << "                It can be a list of msr-files, e.g. musrFT 3110.msr 3111.msr";
-  cout << endl << "                For the syntax of the msr-file check the user manual of musrfit.";
-  cout << endl << "  -df, --data-file <data-file> : This allows to feed only muSR data file(s) to";
-  cout << endl << "                perform the Fourier transform. Since the extended <msr-file> information";
-  cout << endl << "                are missing, they will need to be provided by to options, or musrFT";
-  cout << endl << "                tries to guess, based on musrfit_startup.xml settings.";
-  cout << endl << "  Options: ";
-  cout << endl << "    --help    : display this help and exit";
-  cout << endl << "    --version : output version information and exit";
-  cout << endl << "    -g, --graphic-format <graphic-format-extension> : ";
-  cout << endl << "                will produce a graphic-output-file without starting a root session.";
-  cout << endl << "                the name is based either on the <msr-file> or the <data-file>,";
-  cout << endl << "                e.g. 3310.msr -> 3310_0.png.";
-  cout << endl << "                Supported graphic-format-extension: eps, pdf, gif, jpg, png, svg, xpm, root";
-  cout << endl << "    --dump <fln> : rather than starting a root session and showing Fourier graphs of the data,";
-  cout << endl << "                it will output the Fourier data in an ascii file <fln>.";
-  cout << endl << "    -br, --background-range <start> <end>: background interval used to estimate the background to be";
-  cout << endl << "                subtracted before the Fourier transform. <start>, <end> to be given in bins.";
-  cout << endl << "    -bg, --background <list> : gives the background explicit for each histogram.";
-  cout << endl << "    -fo, --fourier-option <fopt>: <fopt> can be 'real', 'imag', 'real+imag', 'power', 'phase', or 'phaseOptReal'.";
-  cout << endl << "                If this is not defined (neither on the command line nor in the musrfit_startup.xml),";
-  cout << endl << "                default will be 'power'.";
-  cout << endl << "    -ap, --apodization <val> : <val> can be either 'none', 'weak', 'medium', 'strong'.";
-  cout << endl << "                Default will be 'none'.";
-  cout << endl << "    -fp, --fourier-power <N> : <N> being the Fourier power, i.e. 2^<N> used for zero padding.";
-  cout << endl << "                Default is -1, i.e. no zero padding will be performed.";
-  cout << endl << "    -u, --units <units> : <units> is used to define the x-axis of the Fourier transform.";
-  cout << endl << "                One may choose between the fields (Gauss) or (Tesla), the frequency (MHz),";
-  cout << endl << "                and the angular-frequency domain (Mc/s).";
-  cout << endl << "                Default will be 'MHz'.";
-  cout << endl << "    -ph, --phase <val> : defines the initial phase <val>. This only is of concern for 'real',";
-  cout << endl << "                '<imag>', and 'real+imag'.";
-  cout << endl << "                 Default will be 0.0.";
-  cout << endl << "    -fr, --fourier-range <start> <end> : Fourier range. <start>, <end> are interpreted in the units given.";
-  cout << endl << "                 Default will be -1.0 for both which means, take the full Fourier range.";
-  cout << endl << "    -tr, --time-range <start> <end> : time domain range to be used for Fourier transform.";
-  cout << endl << "                 <start>, <end> are to be given in (us). If nothing is given, the full time range";
-  cout << endl << "                 found in the data file(s) will be used.";
-  cout << endl << "    --histo <list> : give the <list> of histograms to be used for the Fourier transform.";
-  cout << endl << "                 E.g. musrFT -df lem15_his_01234.root --histo 1 3, will only be needed together with";
-  cout << endl << "                 the option --data-file. If multiple data file are given, <list> will apply";
-  cout << endl << "                 to all data-files given. If --histo is not given, all histos of a data file will be used.";
-  cout << endl << "                 <list> can be anything like: 2 3 6, or 2-17, or 1-6 9, etc.";
-  cout << endl << "    -a, --average : show the average of ALL Fourier transformed data.";
-  cout << endl << "    -ad, --average-per-data-set : show the average of the Fourier transformed data per data set.";
-  cout << endl << "    --t0 <list> : A list of t0's can be provided. This in conjunction with --data-file and";
-  cout << endl << "                 --fourier-option real allows to get the proper initial phase if t0's are known.";
-  cout << endl << "                 If a single t0 for multiple histos is given, it is assume, that this t0 is common";
-  cout << endl << "                 to all histos.";
-  cout << endl << "                 Example: musrFT -df lem15_his_01234.root -fo real --t0 2750 --histo 1 3";
-  cout << endl << "    -pa, --packing <N> : if <N> (an integer), the time domain data will first be packed/rebinned by <N>.";
-  cout << endl << "    --title <title> : give a global title for the plot.";
-  cout << endl << "    --create-msr-file <fln> : creates a msr-file based on the command line options";
-  cout << endl << "                 provided. This will help on the way to a full fitting model.";
-  cout << endl << "    -lc, --lifetimecorrection <fudge>: try to eliminate muon life time decay. Only makes sense for low";
-  cout << endl << "                 transverse fields. <fudge> is a tweaking factor and should be kept around 1.0.";
-  cout << endl << "    --timeout <timeout> : <timeout> given in seconds after which musrFT terminates.";
-  cout << endl << "                 If <timeout> <= 0, no timeout will take place. Default <timeout> is 3600.";
-  cout << endl << endl;
+  std::cout << std::endl << "usage: musrFT [Options] [<msr-files> | -df, --data-file <data-file>]";
+  std::cout << std::endl << "  <msr-files> : msr-file name(s). These msr-files are used for the Fourier transform.";
+  std::cout << std::endl << "                It can be a list of msr-files, e.g. musrFT 3110.msr 3111.msr";
+  std::cout << std::endl << "                For the syntax of the msr-file check the user manual of musrfit.";
+  std::cout << std::endl << "  -df, --data-file <data-file> : This allows to feed only muSR data file(s) to";
+  std::cout << std::endl << "                perform the Fourier transform. Since the extended <msr-file> information";
+  std::cout << std::endl << "                are missing, they will need to be provided by to options, or musrFT";
+  std::cout << std::endl << "                tries to guess, based on musrfit_startup.xml settings.";
+  std::cout << std::endl << "  Options: ";
+  std::cout << std::endl << "    --help    : display this help and exit";
+  std::cout << std::endl << "    --version : output version information and exit";
+  std::cout << std::endl << "    -g, --graphic-format <graphic-format-extension> : ";
+  std::cout << std::endl << "                will produce a graphic-output-file without starting a root session.";
+  std::cout << std::endl << "                the name is based either on the <msr-file> or the <data-file>,";
+  std::cout << std::endl << "                e.g. 3310.msr -> 3310_0.png.";
+  std::cout << std::endl << "                Supported graphic-format-extension: eps, pdf, gif, jpg, png, svg, xpm, root";
+  std::cout << std::endl << "    --dump <fln> : rather than starting a root session and showing Fourier graphs of the data,";
+  std::cout << std::endl << "                it will output the Fourier data in an ascii file <fln>.";
+  std::cout << std::endl << "    -br, --background-range <start> <end>: background interval used to estimate the background to be";
+  std::cout << std::endl << "                subtracted before the Fourier transform. <start>, <end> to be given in bins.";
+  std::cout << std::endl << "    -bg, --background <list> : gives the background explicit for each histogram.";
+  std::cout << std::endl << "    -fo, --fourier-option <fopt>: <fopt> can be 'real', 'imag', 'real+imag', 'power', 'phase', or 'phaseOptReal'.";
+  std::cout << std::endl << "                If this is not defined (neither on the command line nor in the musrfit_startup.xml),";
+  std::cout << std::endl << "                default will be 'power'.";
+  std::cout << std::endl << "    -ap, --apodization <val> : <val> can be either 'none', 'weak', 'medium', 'strong'.";
+  std::cout << std::endl << "                Default will be 'none'.";
+  std::cout << std::endl << "    -fp, --fourier-power <N> : <N> being the Fourier power, i.e. 2^<N> used for zero padding.";
+  std::cout << std::endl << "                Default is -1, i.e. no zero padding will be performed.";
+  std::cout << std::endl << "    -u, --units <units> : <units> is used to define the x-axis of the Fourier transform.";
+  std::cout << std::endl << "                One may choose between the fields (Gauss) or (Tesla), the frequency (MHz),";
+  std::cout << std::endl << "                and the angular-frequency domain (Mc/s).";
+  std::cout << std::endl << "                Default will be 'MHz'.";
+  std::cout << std::endl << "    -ph, --phase <val> : defines the initial phase <val>. This only is of concern for 'real',";
+  std::cout << std::endl << "                '<imag>', and 'real+imag'.";
+  std::cout << std::endl << "                 Default will be 0.0.";
+  std::cout << std::endl << "    -fr, --fourier-range <start> <end> : Fourier range. <start>, <end> are interpreted in the units given.";
+  std::cout << std::endl << "                 Default will be -1.0 for both which means, take the full Fourier range.";
+  std::cout << std::endl << "    -tr, --time-range <start> <end> : time domain range to be used for Fourier transform.";
+  std::cout << std::endl << "                 <start>, <end> are to be given in (us). If nothing is given, the full time range";
+  std::cout << std::endl << "                 found in the data file(s) will be used.";
+  std::cout << std::endl << "    --histo <list> : give the <list> of histograms to be used for the Fourier transform.";
+  std::cout << std::endl << "                 E.g. musrFT -df lem15_his_01234.root --histo 1 3, will only be needed together with";
+  std::cout << std::endl << "                 the option --data-file. If multiple data file are given, <list> will apply";
+  std::cout << std::endl << "                 to all data-files given. If --histo is not given, all histos of a data file will be used.";
+  std::cout << std::endl << "                 <list> can be anything like: 2 3 6, or 2-17, or 1-6 9, etc.";
+  std::cout << std::endl << "    -a, --average : show the average of ALL Fourier transformed data.";
+  std::cout << std::endl << "    -ad, --average-per-data-set : show the average of the Fourier transformed data per data set.";
+  std::cout << std::endl << "    --t0 <list> : A list of t0's can be provided. This in conjunction with --data-file and";
+  std::cout << std::endl << "                 --fourier-option real allows to get the proper initial phase if t0's are known.";
+  std::cout << std::endl << "                 If a single t0 for multiple histos is given, it is assume, that this t0 is common";
+  std::cout << std::endl << "                 to all histos.";
+  std::cout << std::endl << "                 Example: musrFT -df lem15_his_01234.root -fo real --t0 2750 --histo 1 3";
+  std::cout << std::endl << "    -pa, --packing <N> : if <N> (an integer), the time domain data will first be packed/rebinned by <N>.";
+  std::cout << std::endl << "    --title <title> : give a global title for the plot.";
+  std::cout << std::endl << "    --create-msr-file <fln> : creates a msr-file based on the command line options";
+  std::cout << std::endl << "                 provided. This will help on the way to a full fitting model.";
+  std::cout << std::endl << "    -lc, --lifetimecorrection <fudge>: try to eliminate muon life time decay. Only makes sense for low";
+  std::cout << std::endl << "                 transverse fields. <fudge> is a tweaking factor and should be kept around 1.0.";
+  std::cout << std::endl << "    --timeout <timeout> : <timeout> given in seconds after which musrFT terminates.";
+  std::cout << std::endl << "                 If <timeout> <= 0, no timeout will take place. Default <timeout> is 3600.";
+  std::cout << std::endl << std::endl;
 }
 
 //-------------------------------------------------------------------------
@@ -213,7 +212,7 @@ Bool_t musrFT_filter_histo(Int_t &i, Int_t argc, Char_t *argv[], musrFT_startup_
   end = i;
   --i;
   if (end < start) {
-    cerr << endl << ">> musrFT **ERROR** something is wrong with the --histo arguments." << endl;
+    std::cerr << std::endl << ">> musrFT **ERROR** something is wrong with the --histo arguments." << std::endl;
     startupParam.histo.clear();
     return false;
   }
@@ -226,14 +225,14 @@ Bool_t musrFT_filter_histo(Int_t &i, Int_t argc, Char_t *argv[], musrFT_startup_
       if (tstr.IsDigit()) {
         startupParam.histo.push_back(tstr.Atoi());
       } else { // not a number -> error
-        cerr << endl << ">> musrFT **ERROR** found --histo argument '" << tstr << "' which is not a number." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found --histo argument '" << tstr << "' which is not a number." << std::endl;
         startupParam.histo.clear();
         return false;
       }
     } else { // should be something like h0-hN with h0, hN numbers
       TObjArray *tok = tstr.Tokenize("-");
       if (tok->GetEntries() != 2) {
-        cerr << endl << ">> musrFT **ERROR** found --histo argument '" << tstr << "' which is not of the form <h0>-<hN>." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found --histo argument '" << tstr << "' which is not of the form <h0>-<hN>." << std::endl;
         startupParam.histo.clear();
         return false;
       }
@@ -245,8 +244,8 @@ Bool_t musrFT_filter_histo(Int_t &i, Int_t argc, Char_t *argv[], musrFT_startup_
       if (sstr.IsDigit()) {
         first = sstr.Atoi();
       } else {
-        cerr << endl << ">> musrFT **ERROR** found --histo argument '" << tstr << "' which is of the form <h0>-<hN>,";
-        cerr << endl << "          but <h0>='" << sstr << "' is not a number." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found --histo argument '" << tstr << "' which is of the form <h0>-<hN>,";
+        std::cerr << std::endl << "          but <h0>='" << sstr << "' is not a number." << std::endl;
         startupParam.histo.clear();
         return false;
       }
@@ -255,14 +254,14 @@ Bool_t musrFT_filter_histo(Int_t &i, Int_t argc, Char_t *argv[], musrFT_startup_
       if (sstr.IsDigit()) {
         last = sstr.Atoi();
       } else {
-        cerr << endl << ">> musrFT **ERROR** found --histo argument '" << tstr << "' which is of the form <h0>-<hN>,";
-        cerr << endl << "          but <hN>='" << sstr << "' is not a number." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found --histo argument '" << tstr << "' which is of the form <h0>-<hN>,";
+        std::cerr << std::endl << "          but <hN>='" << sstr << "' is not a number." << std::endl;
         startupParam.histo.clear();
         return false;
       }
 
       if (first > last) {
-        cerr << endl << ">> musrFT **ERROR** found --histo argument of the form <h0>-<hN> with h0=" << first << " > hN=" << last << "." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found --histo argument of the form <h0>-<hN> with h0=" << first << " > hN=" << last << "." << std::endl;
         startupParam.histo.clear();
         return false;
       }
@@ -298,9 +297,9 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
     tstr = argv[i];
     if (tstr.BeginsWith("--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrFT version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "musrFT version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #else
-      cout << endl << "musrFT git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "musrFT git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #endif
       return 1;
     } else if (tstr.BeginsWith("--help")) {
@@ -308,38 +307,38 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
       return 1;
     } else if (tstr.BeginsWith("-g") || tstr.BeginsWith("--graphic-format")) {
       if (i+1 >= argc) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --graphic-format without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --graphic-format without argument!" << std::endl;
         return 2;
       }
       TString topt(argv[i+1]);
       if (!topt.BeginsWith("eps") && !topt.BeginsWith("pdf") && !topt.BeginsWith("gif") && !topt.BeginsWith("jpg") &&
           !topt.BeginsWith("png") && !topt.BeginsWith("svg") && !topt.BeginsWith("xpm") && !topt.BeginsWith("root")) {
-        cerr << endl << ">> musrFT **ERROR** found unrecogniced graphic format '" << topt << "'!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found unrecogniced graphic format '" << topt << "'!" << std::endl;
         return 2;
       }
       startupParam.graphicFormat = topt;
       i++;
     } else if (tstr.BeginsWith("--dump")) {
       if (i+1 >= argc) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --dump without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --dump without argument!" << std::endl;
         return 2;
       }
       startupParam.dumpFln = argv[i+1];
       i++;
     } else if (tstr.Contains("-br") || tstr.Contains("--background-range")) {
       if (i+2 >= argc) { // something is wrong since there needs to be two arguments here
-        cerr << endl << ">> musrFT **ERROR** found option --background-range with wrong number of arguments." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --background-range with wrong number of arguments." << std::endl;
         return 2;
       }
       TString bkgRange[2];
       bkgRange[0] = argv[i+1];
       bkgRange[1] = argv[i+2];
       if (!bkgRange[0].IsDigit()) {
-        cerr << endl << ">> musrFT **ERROR** <start> bin of option --background-range is NOT an int-number! ('" << bkgRange[0] << "')." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** <start> bin of option --background-range is NOT an int-number! ('" << bkgRange[0] << "')." << std::endl;
         return 2;
       }
       if (!bkgRange[1].IsDigit()) {
-        cerr << endl << ">> musrFT **ERROR** <end> bin of option --background-range is NOT an int-number! ('" << bkgRange[1] << "')." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** <end> bin of option --background-range is NOT an int-number! ('" << bkgRange[1] << "')." << std::endl;
         return 2;
       }
       startupParam.bkg_range[0] = bkgRange[0].Atoi();
@@ -354,90 +353,90 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
         } else {
           topt = argv[i];
           if (!topt.IsFloat()) {
-            cerr << endl << ">> musrFT **ERROR** found option --background='" << topt << "' which is not a float" << endl;
+            std::cerr << std::endl << ">> musrFT **ERROR** found option --background='" << topt << "' which is not a float" << std::endl;
             return 2;
           }
           startupParam.bkg.push_back(topt.Atoi());
         }
       }
       if (startupParam.bkg.size() == 0) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --background without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --background without argument!" << std::endl;
         return 2;
       }
     } else if (tstr.BeginsWith("-fo") || tstr.BeginsWith("--fourier-option")) {
       if (i+1 >= argc) { // something is wrong since there needs to be two arguments here
-        cerr << endl << ">> musrFT **ERROR** found option --fourier-option without arguments." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --fourier-option without arguments." << std::endl;
         return 2;
       }
       TString topt(argv[i+1]);
       if (!topt.BeginsWith("real") && !topt.BeginsWith("imag") && !topt.BeginsWith("power") &&
           !topt.BeginsWith("phase") && !topt.BeginsWith("phaseOptReal")) {
-        cerr << endl << ">> musrFT **ERROR** found option --fourier-option with unrecognized argument '" << topt << "'." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --fourier-option with unrecognized argument '" << topt << "'." << std::endl;
         return 2;
       }
       startupParam.fourierOpt = topt;
       i++;
     } else if (tstr.BeginsWith("-ap") || tstr.BeginsWith("--apodization")) {
       if (i+1 >= argc) { // something is wrong since there needs to be two arguments here
-        cerr << endl << ">> musrFT **ERROR** found option --apodization without arguments." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --apodization without arguments." << std::endl;
         return 2;
       }
       TString topt(argv[i+1]);
       if (!topt.BeginsWith("none") && !topt.BeginsWith("weak") && !topt.BeginsWith("medium") && !topt.BeginsWith("strong")) {
-        cerr << endl << ">> musrFT **ERROR** found option --apodization with unrecognized argument '" << topt << "'." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --apodization with unrecognized argument '" << topt << "'." << std::endl;
         return 2;
       }
       startupParam.apodization = topt;
       i++;
     } else if (tstr.BeginsWith("-fp") || tstr.BeginsWith("--fourier-power")) {
       if (i+1 >= argc) { // something is wrong since there needs to be two arguments here
-        cerr << endl << ">> musrFT **ERROR** found option --fourier-power without arguments." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --fourier-power without arguments." << std::endl;
         return 2;
       }
       TString fourierPower(argv[i+1]);
       if (!fourierPower.IsDigit()) {
-        cerr << endl << ">> musrFT **ERROR** found option --fourier-power with a power which is not an integer '" << fourierPower << "'." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --fourier-power with a power which is not an integer '" << fourierPower << "'." << std::endl;
         return 2;
       }
       startupParam.fourierPower = fourierPower.Atoi();
       if ((startupParam.fourierPower < 1) || (startupParam.fourierPower > 20)) {
-        cerr << endl << ">> musrFT **ERROR** found Fourier power '" << fourierPower << "', which is out of range [1..20]" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found Fourier power '" << fourierPower << "', which is out of range [1..20]" << std::endl;
         return 2;
       }
       i++;
     } else if (tstr.BeginsWith("-u") || tstr.BeginsWith("--units")) {
       if (i+1 >= argc) { // something is wrong since there needs to be two arguments here
-        cerr << endl << ">> musrFT **ERROR** found option --units without arguments." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --units without arguments." << std::endl;
         return 2;
       }
       TString topt(argv[i+1]);
       if (!topt.BeginsWith("MHz", TString::kIgnoreCase) && !topt.BeginsWith("Gauss", TString::kIgnoreCase) &&
           !topt.BeginsWith("Tesla", TString::kIgnoreCase) && !topt.BeginsWith("Mc/s", TString::kIgnoreCase)) {
-        cerr << endl << ">> musrFT **ERROR** found option --fourier-option with unrecognized argument '" << topt << "'." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --fourier-option with unrecognized argument '" << topt << "'." << std::endl;
         return 2;
       }
       startupParam.fourierUnits = topt;
       i++;
     } else if (tstr.BeginsWith("-ph") || tstr.BeginsWith("--phase")) {
       if (i+1 >= argc) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --phase without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --phase without argument!" << std::endl;
         return 2;
       }
       TString phase(argv[i+1]);
       if (!phase.IsFloat()) {
-        cerr << endl << ">> musrFT **ERROR** found --phase argument '" << phase << "' which is not a number." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found --phase argument '" << phase << "' which is not a number." << std::endl;
         return 2;
       }
       startupParam.initialPhase = phase.Atof();
       i++;
     } else if (tstr.BeginsWith("-fr") || tstr.BeginsWith("--fourier-range")) {
       if (i+2 >= argc) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --fourier-range with wrong number of arguments!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --fourier-range with wrong number of arguments!" << std::endl;
         return 2;
       }
       TString fourierRange[2] = {argv[i+1], argv[i+2]};
       if (!fourierRange[0].IsFloat() || !fourierRange[1].IsFloat()) {
-        cerr << endl << ">> musrFT **ERROR** found invalid --fourier-range arguments '" << fourierRange[0] << "' and/or '" << fourierRange[1] << "'." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found invalid --fourier-range arguments '" << fourierRange[0] << "' and/or '" << fourierRange[1] << "'." << std::endl;
         return 2;
       }
       startupParam.fourierRange[0] = fourierRange[0].Atof();
@@ -445,12 +444,12 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
       i += 2;
     } else if (tstr.BeginsWith("-tr") || tstr.BeginsWith("--time-range")) {
       if (i+2 >= argc) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --time-range with wrong number of arguments!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --time-range with wrong number of arguments!" << std::endl;
         return 2;
       }
       TString timeRange[2] = {argv[i+1], argv[i+2]};
       if (!timeRange[0].IsFloat() || !timeRange[1].IsFloat()) {
-        cerr << endl << ">> musrFT **ERROR** found invalid --time-range arguments '" << timeRange[0] << "' and/or '" << timeRange[1] << "'." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found invalid --time-range arguments '" << timeRange[0] << "' and/or '" << timeRange[1] << "'." << std::endl;
         return 2;
       }
       startupParam.timeRange[0] = timeRange[0].Atof();
@@ -472,63 +471,63 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
         } else {
           topt = argv[i];
           if (!topt.IsDigit()) {
-            cerr << endl << ">> musrFT **ERROR** found option t0='" << topt << "' which is not a number" << endl;
+            std::cerr << std::endl << ">> musrFT **ERROR** found option t0='" << topt << "' which is not a number" << std::endl;
             return 2;
           }
           startupParam.t0.push_back(topt.Atoi());
         }
       }
       if (startupParam.t0.size() == 0) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --t0 without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --t0 without argument!" << std::endl;
         return 2;
       }
     } else if (tstr.BeginsWith("--title")) {
       if (i+1 >= argc) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --title without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --title without argument!" << std::endl;
         return 2;
       }
       ++i;
       startupParam.title = argv[i];
     } else if (tstr.BeginsWith("-pa") || tstr.BeginsWith("--packing")) {
       if (i+1 >= argc) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --packing without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --packing without argument!" << std::endl;
         return 2;
       }
       ++i;
       TString pack = TString(argv[i]);
       if (!pack.IsDigit()) {
-        cerr << endl << ">> musrFT **ERROR** found option --packing with argument '" << pack << "' which is NOT an integer!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --packing with argument '" << pack << "' which is NOT an integer!" << std::endl;
         return 2;
       }
       startupParam.packing = pack.Atoi();
     } else if (tstr.BeginsWith("--create-msr-file")) {
       if (i+1 >= argc) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --create-msr-file without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --create-msr-file without argument!" << std::endl;
         return 2;
       }
       ++i;
       startupParam.msrFlnOut = TString(argv[i]);
     } else if (tstr.BeginsWith("-lc") || tstr.BeginsWith("--lifetimecorrection")) {
       if (i+1 >= argc) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --lifetimecorrection without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --lifetimecorrection without argument!" << std::endl;
         return 2;
       }
       ++i;
       TString fudge(argv[i]);
       if (!fudge.IsFloat()) {
-        cerr << endl << ">> musrFT **ERROR** found option --lifetimecorrection with a fudge which is not a double '" << fudge << "'." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --lifetimecorrection with a fudge which is not a double '" << fudge << "'." << std::endl;
         return 2;
       }
       startupParam.lifetimecorrection = fudge.Atof();
     } else if (tstr.BeginsWith("--timeout")) {
       if (i+1 >= argc) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --timeout without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --timeout without argument!" << std::endl;
         return 2;
       }
       ++i;
       TString tt(argv[i]);
       if (!tt.IsDigit()) {
-        cerr << endl << ">> musrFT **ERROR** found option --timeout with a <timeout> which is not an integer '" << tt << "'." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --timeout with a <timeout> which is not an integer '" << tt << "'." << std::endl;
         return 2;
       }
       startupParam.timeout = tt.Atoi();
@@ -553,7 +552,7 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
             fileFormat = "Mud";
 
           if (fileFormat == "??") {
-            cerr << endl << ">> musrFT **ERROR** found data file name with unrecognized data file format ('" << fln << "')." << endl;
+            std::cerr << std::endl << ">> musrFT **ERROR** found data file name with unrecognized data file format ('" << fln << "')." << std::endl;
             return 2;
           } else {
             startupParam.dataFileFormat.push_back(fileFormat);
@@ -561,36 +560,36 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
         }
       }
       if (startupParam.dataFln.size() == 0) { // something is wrong since there needs to be an argument here
-        cerr << endl << ">> musrFT **ERROR** found option --data-file without argument!" << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** found option --data-file without argument!" << std::endl;
         return 2;
       }
     } else if (tstr.Contains(".msr")) {
       startupParam.msrFln.push_back(tstr);
     } else {
-      cerr << endl << ">> musrFT **ERROR** unrecognized option '" << tstr << "' found." << endl;
+      std::cerr << std::endl << ">> musrFT **ERROR** unrecognized option '" << tstr << "' found." << std::endl;
       return 2;
     }
   }
 
   // consistency checks
   if ((startupParam.msrFln.size() == 0) && (startupParam.dataFln.size() == 0)) {
-    cerr << endl << ">> musrFT **ERROR** neither <msr-file> nor <data-file> defined." << endl;
+    std::cerr << std::endl << ">> musrFT **ERROR** neither <msr-file> nor <data-file> defined." << std::endl;
     return 2;
   }
   if (startupParam.bkg_range[0] > startupParam.bkg_range[1]) {
-    cerr << endl << ">> musrFT **WARNING** in --background-range, start=" << startupParam.bkg_range[0] << " > end=" << startupParam.bkg_range[1] << ", will swap them." << endl;
+    std::cerr << std::endl << ">> musrFT **WARNING** in --background-range, start=" << startupParam.bkg_range[0] << " > end=" << startupParam.bkg_range[1] << ", will swap them." << std::endl;
     Double_t swap = startupParam.bkg_range[0];
     startupParam.bkg_range[0] = startupParam.bkg_range[1];
     startupParam.bkg_range[1] = swap;
   }
   if (startupParam.fourierRange[0] > startupParam.fourierRange[1]) {
-    cerr << endl << ">> musrFT **WARNING** in --fourier-range, start=" << startupParam.fourierRange[0] << " > end=" << startupParam.fourierRange[1] << ", will swap them." << endl;
+    std::cerr << std::endl << ">> musrFT **WARNING** in --fourier-range, start=" << startupParam.fourierRange[0] << " > end=" << startupParam.fourierRange[1] << ", will swap them." << std::endl;
     Double_t swap = startupParam.fourierRange[0];
     startupParam.fourierRange[0] = startupParam.fourierRange[1];
     startupParam.fourierRange[1] = swap;
   }
   if (startupParam.showAverage && startupParam.showAveragePerDataSet) {
-    cerr << endl << ">> musrFT **WARNING** Options: --average and --average-per-data-set exclude each other, will choose the latter." << endl;
+    std::cerr << std::endl << ">> musrFT **WARNING** Options: --average and --average-per-data-set exclude each other, will choose the latter." << std::endl;
     startupParam.showAverage = false;
   }
 
@@ -652,9 +651,9 @@ void musrFT_getMetaInfo(const TString fln, PRawRunData *rawRunData, TString &met
  */
 void musrFT_estimateT0(musrFT_data &rd)
 {
-  cout << endl << ">> musrFT **WARNING** try to estimate t0 from maximum in the data set";
-  cout << endl << "                      '" << rd.info << "'";
-  cout << endl << "                      NO warranty this is sensible!" << endl;
+  std::cout << std::endl << ">> musrFT **WARNING** try to estimate t0 from maximum in the data set";
+  std::cout << std::endl << "                      '" << rd.info << "'";
+  std::cout << std::endl << "                      NO warranty this is sensible!" << std::endl;
 
   UInt_t idx = 0;
   Double_t max = rd.rawData[0];
@@ -664,7 +663,7 @@ void musrFT_estimateT0(musrFT_data &rd)
       idx = (Int_t)i;
     }
   }
-  cout << endl << ">> musrFT_estimateT0: estimated t0=" << idx << endl;
+  std::cout << std::endl << ">> musrFT_estimateT0: estimated t0=" << idx << std::endl;
   rd.t0 = idx;
 }
 
@@ -691,14 +690,14 @@ void musrFT_cleanup(TH1F *h)
  * \param start starting point from where the data shall be written to file.
  * \param end ending point up to where the data shall be written to file.
  */
-Int_t musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, Double_t start, Double_t end)
+Int_t musrFT_dumpData(TString fln, std::vector<PFourier*> &fourierData, Double_t start, Double_t end)
 {
-  vector<PDoubleVector> data;
+  std::vector<PDoubleVector> data;
   PDoubleVector freq;
   PDoubleVector re;
   PDoubleVector im;
   PDoubleVector pwr;
-  TH1F *hRe=0, *hIm=0;
+  TH1F *hRe=nullptr, *hIm=nullptr;
   Double_t dval;
 
   // make sure start/end are given, otherwise take the minimum/maximum off all data
@@ -743,20 +742,20 @@ Int_t musrFT_dumpData(TString fln, vector<PFourier*> &fourierData, Double_t star
     musrFT_cleanup(hIm);
   }
 
-  ofstream fout(fln, ofstream::out);
+  std::ofstream fout(fln, std::ofstream::out);
 
   // write header
   fout << "% ";
   for (UInt_t i=0; i<fourierData.size()-1; i++)
     fout << "freq" << i << ", Re[d" << i << "], Im[d" << i << "], Pwr[d" << i << "], ";
-  fout << "freq" << fourierData.size()-1 << ", Re[d" << fourierData.size()-1 << "], Im[d" << fourierData.size()-1 << "], Pwr[d" << fourierData.size()-1 << "]" << endl;
+  fout << "freq" << fourierData.size()-1 << ", Re[d" << fourierData.size()-1 << "], Im[d" << fourierData.size()-1 << "], Pwr[d" << fourierData.size()-1 << "]" << std::endl;
 
   // write data
   for (UInt_t j=0; j<data[0].size(); j++) {
     for (UInt_t i=0; i<data.size()-1; i++) {
       fout << data[i][j] << ", ";
     }
-    fout << data[data.size()-1][j] << endl;
+    fout << data[data.size()-1][j] << std::endl;
   }
   fout.close();
 
@@ -778,8 +777,8 @@ Int_t musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *globa
   // get proper raw run data set
   TString runName = *(run.GetRunName());
   PRawRunData *rawRunData = runDataHandler->GetRunData(runName);
-  if (rawRunData == 0) {
-    cerr << endl << ">> musrFT_groupHistos **ERROR** Couldn't get raw run data for run '" << runName << "'." << endl;
+  if (rawRunData == nullptr) {
+    std::cerr << std::endl << ">> musrFT_groupHistos **ERROR** Couldn't get raw run data for run '" << runName << "'." << std::endl;
     return 1;
   }
 
@@ -798,9 +797,9 @@ Int_t musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *globa
   // 1st: check in the global block
   for (UInt_t i=0; i<global->GetT0BinSize(); i++) {
     if (i >= t0.size()) { // something is VERY strange
-      cerr << endl << ">> musrFT_groupHistos **WARNING** found #t0's in GLOBAL block > #histos!";
-      cerr << endl << ">>                    This should NEVER happen. Will ignore these entries.";
-      cerr << endl << ">>                    Please check your msr-file!!" << endl;
+      std::cerr << std::endl << ">> musrFT_groupHistos **WARNING** found #t0's in GLOBAL block > #histos!";
+      std::cerr << std::endl << ">>                    This should NEVER happen. Will ignore these entries.";
+      std::cerr << std::endl << ">>                    Please check your msr-file!!" << std::endl;
     } else {
       t0[i] = global->GetT0Bin(i);
     }
@@ -808,9 +807,9 @@ Int_t musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *globa
   // 2nd: check in the run block
   for (UInt_t i=0; i<run.GetT0BinSize(); i++) {
     if (i >= t0.size()) { // something is VERY strange
-      cerr << endl << ">> musrFT_groupHistos **WARNING** found #t0's in RUN block > #histos!";
-      cerr << endl << ">>                    This should NEVER happen. Will ignore these entries.";
-      cerr << endl << ">>                    Please check your msr-file!!" << endl;
+      std::cerr << std::endl << ">> musrFT_groupHistos **WARNING** found #t0's in RUN block > #histos!";
+      std::cerr << std::endl << ">>                    This should NEVER happen. Will ignore these entries.";
+      std::cerr << std::endl << ">>                    Please check your msr-file!!" << std::endl;
     } else {
       t0[i] = run.GetT0Bin(i);
     }
@@ -820,8 +819,8 @@ Int_t musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *globa
   Double_t max;
   for (UInt_t i=0; i<t0.size(); i++) {
     if (t0[i] == -1.0) {
-      cout << endl << ">> musrFT_groupHistos **WARNING** try to estimate t0 from maximum in the data set";
-      cout << endl << ">>   '" << runName << "', histo " << histoList[i] << ". NO warranty this is sensible!";
+      std::cout << std::endl << ">> musrFT_groupHistos **WARNING** try to estimate t0 from maximum in the data set";
+      std::cout << std::endl << ">>   '" << runName << "', histo " << histoList[i] << ". NO warranty this is sensible!";
       idx = 0;
       max = rawRunData->GetDataBin(histoList[i])->at(0);
       for (UInt_t j=1; j<rawRunData->GetDataBin(histoList[i])->size(); j++) {
@@ -830,7 +829,7 @@ Int_t musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *globa
           idx = j;
         }
       }
-      cout << endl << ">>    estimated t0=" << idx << endl;
+      std::cout << std::endl << ">>    estimated t0=" << idx << std::endl;
       t0[i] = idx;
     }
   }
@@ -847,7 +846,7 @@ Int_t musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *globa
 
   rd.rawData.clear();
   rd.rawData = data;
-  rd.t0 = (Int_t)t0[0];
+  rd.t0 = static_cast<Int_t>(t0[0]);
 
   return 0;
 }
@@ -864,7 +863,7 @@ Int_t musrFT_groupHistos(PRunDataHandler *runDataHandler, PMsrGlobalBlock *globa
  */
 void musrFT_dumpMsrFile(musrFT_startup_param &param)
 {
-  ofstream fout(param.msrFlnOut.Data(), ofstream::out);
+  std::ofstream fout(param.msrFlnOut.Data(), std::ofstream::out);
 
   // write title
   if (param.title.Length() == 0) { // create title if not given
@@ -874,21 +873,21 @@ void musrFT_dumpMsrFile(musrFT_startup_param &param)
       param.title = param.msrFlnOut;
     }
   }
-  fout << param.title << endl;
-  fout << "###############################################################" << endl;
+  fout << param.title << std::endl;
+  fout << "###############################################################" << std::endl;
 
   // write GLOBAL block
-  fout << "GLOBAL" << endl;
-  fout << "fittype         0         (single histogram fit)" << endl;
+  fout << "GLOBAL" << std::endl;
+  fout << "fittype         0         (single histogram fit)" << std::endl;
   if (param.t0.size() == 1) { // only a single t0 value given, hence assume it is valid for ALL histos
-    fout << "t0              " << param.t0[0] << endl;
+    fout << "t0              " << param.t0[0] << std::endl;
   }
   if ((param.timeRange[0] != -1.0) && (param.timeRange[1] != -1.0)) {
-    fout << "fit             " << param.timeRange[0] << "  " << param.timeRange[1] << endl;
+    fout << "fit             " << param.timeRange[0] << "  " << param.timeRange[1] << std::endl;
   }
-  fout << "packing         " << param.packing << endl;
-  fout << endl;
-  fout << "###############################################################" << endl;
+  fout << "packing         " << param.packing << std::endl;
+  fout << std::endl;
+  fout << "###############################################################" << std::endl;
 
   // write RUN block
   // get extension of the data file
@@ -903,55 +902,55 @@ void musrFT_dumpMsrFile(musrFT_startup_param &param)
     else if (param.dataFileFormat[i].BeginsWith("Mud"))
       fileFormat = TString("MUD");
     for (UInt_t j=0; j<param.histo.size(); j++) {
-      fout << "RUN " << param.dataFln[i] << " BXXX IXX " << fileFormat << "   (name beamline institute data-file-format)" << endl;
-      fout << "forward         " << param.histo[j] << endl;
+      fout << "RUN " << param.dataFln[i] << " BXXX IXX " << fileFormat << "   (name beamline institute data-file-format)" << std::endl;
+      fout << "forward         " << param.histo[j] << std::endl;
       if ((param.t0.size() > 1) && (j < param.t0.size())) {
-        fout << "t0              " << param.t0[j] << endl;
+        fout << "t0              " << param.t0[j] << std::endl;
       }
       if ((param.bkg_range[0] > -1) && (param.bkg_range[1] > -1))
-        fout << "background      " << param.bkg_range[0] << "     " << param.bkg_range[1] << endl;
-      fout << "#--------------------------------------------------------------" << endl;
+        fout << "background      " << param.bkg_range[0] << "     " << param.bkg_range[1] << std::endl;
+      fout << "#--------------------------------------------------------------" << std::endl;
     }
   }
-  fout << endl;
-  fout << "###############################################################" << endl;
+  fout << std::endl;
+  fout << "###############################################################" << std::endl;
 
   // write PLOT block
-  fout << "PLOT 0   (single histo plot)" << endl;
+  fout << "PLOT 0   (single histo plot)" << std::endl;
   if (param.histo.size() == 0) {
-    fout << "runs     1" << endl;
+    fout << "runs     1" << std::endl;
   } else {
     fout << "runs     ";
     for (UInt_t i=0; i<param.histo.size(); i++)
       fout << i+1 << " ";
-    fout << endl;
+    fout << std::endl;
   }
   if ((param.timeRange[0] == -1.0) && (param.timeRange[1] == -1.0)) {
-    fout << "range    0    10" << endl;
+    fout << "range    0    10" << std::endl;
   } else {
-    fout << "range    " << param.timeRange[0] << "   " << param.timeRange[1] << endl;
+    fout << "range    " << param.timeRange[0] << "   " << param.timeRange[1] << std::endl;
   }
-  fout << endl;
-  fout << "###############################################################" << endl;
+  fout << std::endl;
+  fout << "###############################################################" << std::endl;
 
   // write FOURIER block
-  fout << "FOURIER" << endl;
+  fout << "FOURIER" << std::endl;
   if (param.fourierUnits.BeginsWith("??")) { // Fourier units not given, hence choose MHz
-    fout << "units            MHz   # units either 'Gauss', 'MHz', or 'Mc/s'" << endl;
+    fout << "units            MHz   # units either 'Gauss', 'MHz', or 'Mc/s'" << std::endl;
   } else {
-    fout << "units            " << param.fourierUnits << "   # units either 'Gauss', 'MHz', or 'Mc/s'" << endl;
+    fout << "units            " << param.fourierUnits << "   # units either 'Gauss', 'MHz', or 'Mc/s'" << std::endl;
   }
   if (param.fourierOpt.BeginsWith("??")) { // Fourier plot option not given, hence choose POWER
-    fout << "plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL" << endl;
+    fout << "plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL" << std::endl;
   } else {
-    fout << "plot             " << param.fourierOpt << "     # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL" << endl;
+    fout << "plot             " << param.fourierOpt << "     # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL" << std::endl;
   }
   if (param.fourierPower > 1) {
-    fout << "fourier_power    " << param.fourierPower << endl;
+    fout << "fourier_power    " << param.fourierPower << std::endl;
   }
-  fout << "apodization      " << param.apodization << "        # NONE, WEAK, MEDIUM, STRONG" << endl;
+  fout << "apodization      " << param.apodization << "        # NONE, WEAK, MEDIUM, STRONG" << std::endl;
   if ((param.fourierRange[0] > -1.0) && (param.fourierRange[1] > -1.0)) {
-    fout << "range            " << param.fourierRange[0] << "   " << param.fourierRange[1] << endl;
+    fout << "range            " << param.fourierRange[0] << "   " << param.fourierRange[1] << std::endl;
   }
 
   fout.close();
@@ -968,7 +967,7 @@ Double_t millitime()
   struct timeval now;
   gettimeofday(&now, 0);
 
-  return ((Double_t)now.tv_sec * 1.0e6 + (Double_t)now.tv_usec)/1.0e3;
+  return (static_cast<Double_t>(now.tv_sec) * 1.0e6 + static_cast<Double_t>(now.tv_usec))/1.0e3;
 }
 
 //-------------------------------------------------------------------------
@@ -1023,16 +1022,16 @@ Int_t main(Int_t argc, Char_t *argv[])
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << ">> musrFT **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
-    cerr << endl;
+    std::cerr << std::endl << ">> musrFT **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    std::cerr << std::endl;
     // clean up
     if (saxParser) {
       delete saxParser;
-      saxParser = 0;
+      saxParser = nullptr;
     }
     if (startupHandler) {
       delete startupHandler;
-      startupHandler = 0;
+      startupHandler = nullptr;
     }
   } else {
     strcpy(startup_path_name, startupHandler->GetStartupFilePath().Data());
@@ -1043,16 +1042,16 @@ Int_t main(Int_t argc, Char_t *argv[])
     status = parseXmlFile(saxParser, startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << ">> musrFT **WARNING** Reading/parsing musrfit_startup.xml failed.";
-      cerr << endl;
+      std::cerr << std::endl << ">> musrFT **WARNING** Reading/parsing musrfit_startup.xml failed.";
+      std::cerr << std::endl;
       // clean up
       if (saxParser) {
         delete saxParser;
-        saxParser = 0;
+        saxParser = nullptr;
       }
       if (startupHandler) {
         delete startupHandler;
-        startupHandler = 0;
+        startupHandler = nullptr;
       }
     }
   }
@@ -1061,7 +1060,7 @@ Int_t main(Int_t argc, Char_t *argv[])
   PPrepFourier data(startupParam.packing, startupParam.bkg_range, startupParam.bkg);
 
   // load msr-file(s)
-  vector<PMsrHandler*> msrHandler;
+  std::vector<PMsrHandler*> msrHandler;
   msrHandler.resize(startupParam.msrFln.size());
   for (UInt_t i=0; i<startupParam.msrFln.size(); i++) {
     msrHandler[i] = new PMsrHandler(startupParam.msrFln[i].Data(), &startup_options, true);
@@ -1069,20 +1068,20 @@ Int_t main(Int_t argc, Char_t *argv[])
     if (status != PMUSR_SUCCESS) {
       switch (status) {
         case PMUSR_MSR_FILE_NOT_FOUND:
-          cout << endl << ">> musrFT **ERROR** couldn't find " << startupParam.msrFln[i] << endl << endl;
+          std::cout << std::endl << ">> musrFT **ERROR** couldn't find " << startupParam.msrFln[i] << std::endl << std::endl;
           break;
         case PMUSR_MSR_SYNTAX_ERROR:
-          cout << endl << ">> musrFT **SYNTAX ERROR** in file " << startupParam.msrFln[i] << ", full stop here." << endl << endl;
+          std::cout << std::endl << ">> musrFT **SYNTAX ERROR** in file " << startupParam.msrFln[i] << ", full stop here." << std::endl << std::endl;
           break;
         default:
-          cout << endl << ">> musrFT **UNKOWN ERROR** when trying to read the msr-file" << endl << endl;
+          std::cout << std::endl << ">> musrFT **UNKOWN ERROR** when trying to read the msr-file" << std::endl << std::endl;
           break;
       }
       return status;
     }
   }
 
-  vector<PRunDataHandler*> runDataHandler;
+  std::vector<PRunDataHandler*> runDataHandler;
   runDataHandler.resize(startupParam.msrFln.size()+startupParam.dataFln.size()); // resize to the total number of run data provided
   // load data-file(s) related to msr-file
   for (UInt_t i=0; i<msrHandler.size(); i++) {
@@ -1115,20 +1114,20 @@ Int_t main(Int_t argc, Char_t *argv[])
 
     if (!runDataHandler[i]->IsAllDataAvailable()) {
       if (i < msrHandler.size()) {
-        cerr << endl << ">> musrFT **ERROR** couldn't read data from msr-file '" << startupParam.msrFln[i] << "'." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** couldn't read data from msr-file '" << startupParam.msrFln[i] << "'." << std::endl;
       } else {
-        cerr << endl << ">> musrFT **ERROR** couldn't read data-file '" << startupParam.dataFln[i] << "'." << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** couldn't read data-file '" << startupParam.dataFln[i] << "'." << std::endl;
       }
       return PMUSR_DATA_FILE_READ_ERROR;
     }
 
     // dig out all the necessary time domain data
     PRawRunData *rawRunData = runDataHandler[i]->GetRunData();
-    if (rawRunData == 0) {
+    if (rawRunData == nullptr) {
       if (i < msrHandler.size()) {
-        cerr << endl << ">> musrFT **ERROR** couldn't obtain the raw run data set from msr-file " << startupParam.msrFln[i] << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** couldn't obtain the raw run data set from msr-file " << startupParam.msrFln[i] << std::endl;
       } else {
-        cerr << endl << ">> musrFT **ERROR** couldn't obtain the raw run data set for " << startupParam.dataFln[i-msrHandler.size()] << endl;
+        std::cerr << std::endl << ">> musrFT **ERROR** couldn't obtain the raw run data set for " << startupParam.dataFln[i-msrHandler.size()] << std::endl;
       }
       return PMUSR_DATA_FILE_READ_ERROR;
     }
@@ -1137,8 +1136,8 @@ Int_t main(Int_t argc, Char_t *argv[])
     if (i >= msrHandler.size()) { // only check if originating from data-files (not msr-files)
       for (UInt_t j=0; j<startupParam.histo.size(); j++) {
         if ((UInt_t)startupParam.histo[j] > rawRunData->GetNoOfHistos()) {
-          cerr << endl << ">> musrFT **ERROR** found histo no " << startupParam.histo[j] << " > # of histo in the file (";
-          cerr << startupParam.dataFln[i] << " // # histo: " << rawRunData->GetNoOfHistos() << ")." << endl;
+          std::cerr << std::endl << ">> musrFT **ERROR** found histo no " << startupParam.histo[j] << " > # of histo in the file (";
+          std::cerr << startupParam.dataFln[i] << " // # histo: " << rawRunData->GetNoOfHistos() << ")." << std::endl;
           return PMUSR_DATA_FILE_READ_ERROR;
         }
       }
@@ -1156,26 +1155,26 @@ Int_t main(Int_t argc, Char_t *argv[])
         startupParam.title = *(msrHandler[0]->GetMsrTitle());
       // keep PLOT block info
       PMsrPlotList *plot = msrHandler[i]->GetMsrPlotList();
-      if (plot == 0) {
-        cerr << endl << ">> musrFT **ERROR** couldn't obtain PLOT block from msr-handler." << endl;
+      if (plot == nullptr) {
+        std::cerr << std::endl << ">> musrFT **ERROR** couldn't obtain PLOT block from msr-handler." << std::endl;
         return PMUSR_DATA_FILE_READ_ERROR;
       }
       // keep RUN block(s) info
       PMsrRunList *runs = msrHandler[i]->GetMsrRunList();
-      if (runs == 0) {
-        cerr << endl << ">> musrFT **ERROR** couldn't obtain RUN block(s) from msr-handler." << endl;
+      if (runs == nullptr) {
+        std::cerr << std::endl << ">> musrFT **ERROR** couldn't obtain RUN block(s) from msr-handler." << std::endl;
         return PMUSR_DATA_FILE_READ_ERROR;
       }
       // keep GLOBAL block info
       PMsrGlobalBlock *global = msrHandler[i]->GetMsrGlobal();
-      if (global == 0) {
-        cerr << endl << ">> musrFT **ERROR** couldn't obtain GLOBAL block from msr-handler." << endl;
+      if (global == nullptr) {
+        std::cerr << std::endl << ">> musrFT **ERROR** couldn't obtain GLOBAL block from msr-handler." << std::endl;
         return PMUSR_DATA_FILE_READ_ERROR;
       }
       // keep FOURIER block info
       PMsrFourierStructure *fourierBlock = msrHandler[i]->GetMsrFourierList();
-      if (fourierBlock == 0) {
-        cerr << endl << ">> msrFT **WARNING** couldn't obtain FOURIER block from msr-handler." << endl;
+      if (fourierBlock == nullptr) {
+        std::cerr << std::endl << ">> msrFT **WARNING** couldn't obtain FOURIER block from msr-handler." << std::endl;
         return PMUSR_DATA_FILE_READ_ERROR;
       } else { // filter out all necessary info
         if (fourierBlock->fFourierBlockPresent) {
@@ -1384,7 +1383,7 @@ Int_t main(Int_t argc, Char_t *argv[])
   data.DoPacking();
 
   // get all the corrected data
-  vector<TH1F*> histo = data.GetData();
+  std::vector<TH1F*> histo = data.GetData();
 
   // prepare Fourier
   if (startupParam.fourierUnits.BeginsWith("gauss", TString::kIgnoreCase))
@@ -1398,7 +1397,7 @@ Int_t main(Int_t argc, Char_t *argv[])
   else if (startupParam.fourierUnits.BeginsWith("??", TString::kIgnoreCase) && (unitTag == FOURIER_UNIT_NOT_GIVEN))
     unitTag = FOURIER_UNIT_FREQ;
 
-  vector<PFourier*> fourier;
+  std::vector<PFourier*> fourier;
   fourier.resize(histo.size());
   for (UInt_t i=0; i<fourier.size(); i++) {
     fourier[i] = new PFourier(histo[i], unitTag, 0.0, 0.0, true, startupParam.fourierPower);
@@ -1417,7 +1416,7 @@ Int_t main(Int_t argc, Char_t *argv[])
     fourier[i]->Transform(apodTag);
   }
   Double_t end = millitime();
-  cout << endl << "info> after FFT. calculation time: " << (end-start)/1.0e3  << " (sec)." << endl;
+  std::cout << std::endl << "info> after FFT. calculation time: " << (end-start)/1.0e3  << " (sec)." << std::endl;
 
   // make sure that a Fourier range is provided, if not calculate one
   if ((startupParam.fourierRange[0] == -1.0) && (startupParam.fourierRange[1] == -1.0)) {
@@ -1425,7 +1424,7 @@ Int_t main(Int_t argc, Char_t *argv[])
     startupParam.fourierRange[1] = fourier[0]->GetMaxFreq();
   }
 
-  PFourierCanvas *fourierCanvas = 0;
+  PFourierCanvas *fourierCanvas = nullptr;
 
   // if Fourier dumped if whished do it now
   if (startupParam.dumpFln.Length() > 0) {
@@ -1465,8 +1464,8 @@ Int_t main(Int_t argc, Char_t *argv[])
 
     Bool_t ok = true;
     if (!fourierCanvas->IsValid()) {
-      cerr << endl << ">> musrFT **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
-      cerr << endl;
+      std::cerr << std::endl << ">> musrFT **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
+      std::cerr << std::endl;
       ok = false;
     } else {
       // connect signal/slot

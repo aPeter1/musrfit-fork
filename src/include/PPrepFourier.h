@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -32,7 +32,6 @@
 
 #include <iostream>
 #include <vector>
-using namespace std;
 
 #include <TH1F.h>
 #include <TMath.h>
@@ -75,12 +74,12 @@ class PPrepFourier {
     TString GetInfo(const UInt_t idx);
     Int_t GetDataSetTag(const UInt_t idx);
     UInt_t GetNoOfData() { return fRawData.size(); }
-    vector<TH1F*> GetData();
+    std::vector<TH1F*> GetData();
     TH1F *GetData(const UInt_t idx);
 
   private:
-    vector<musrFT_data> fRawData;
-    vector<PDoubleVector>fData;
+    std::vector<musrFT_data> fRawData;
+    std::vector<PDoubleVector>fData;
     Int_t fBkgRange[2];
     PDoubleVector fBkg;
     Int_t fPacking;

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009 by Andreas Suter                                   *
+ *   Copyright (C) 2009-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include "PNL_StartupHandler.h"
 
@@ -63,7 +62,7 @@ PNL_StartupHandler::PNL_StartupHandler()
     fStartupFileFound = true;
     fStartupFilePath = TString(startup_path_name);
   } else { // startup file is not found in the current directory
-    cout << endl << "PNL_StartupHandler(): **WARNING** Couldn't find nonlocal_startup.xml in the current directory, will try default one." << endl;
+    std::cout << std::endl << "PNL_StartupHandler(): **WARNING** Couldn't find nonlocal_startup.xml in the current directory, will try default one." << std::endl;
     home_str = getenv("HOME");
     snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/nonlocal_startup.xml", home_str);
     if (StartupFileExists(startup_path_name)) {
@@ -107,8 +106,8 @@ void PNL_StartupHandler::OnEndDocument()
   // check if anything was set, and if not set some default stuff
   if (fFourierPoints == 0) {
     fFourierPoints = 262144;
-    cout << endl << "PNL_StartupHandler::OnEndDocument: **WARNING** \"fourier_points\" not defined in nonlocal_startup.xml.";
-    cout << endl << "  will set it to " << fFourierPoints << "." << endl;
+    std::cout << std::endl << "PNL_StartupHandler::OnEndDocument: **WARNING** \"fourier_points\" not defined in nonlocal_startup.xml.";
+    std::cout << std::endl << "  will set it to " << fFourierPoints << "." << std::endl;
   }
 }
 
@@ -163,9 +162,9 @@ void PNL_StartupHandler::OnCharacters(const char *str)
       if (tstr.IsDigit()) {
         fFourierPoints = tstr.Atoi();
       } else {
-        cout << endl << "PNL_StartupHandler::OnCharacters: **ERROR** when finding fourier_points:";
-        cout << endl << "\"" << str << "\" is not a number, will ignore it and use the default value.";
-        cout << endl;
+        std::cout << std::endl << "PNL_StartupHandler::OnCharacters: **ERROR** when finding fourier_points:";
+        std::cout << std::endl << "\"" << str << "\" is not a number, will ignore it and use the default value.";
+        std::cout << std::endl;
       }
       break;
     case eDataPath:
@@ -180,9 +179,9 @@ void PNL_StartupHandler::OnCharacters(const char *str)
         tstr += ".rge";
         fTrimSpDataPathList.push_back(tstr);
       } else {
-        cout << endl << "PNL_StartupHandler::OnCharacters: **ERROR** when finding energy:";
-        cout << endl << "\"" << str << "\" is not a floating point number, will ignore it and use the default value.";
-        cout << endl;
+        std::cout << std::endl << "PNL_StartupHandler::OnCharacters: **ERROR** when finding energy:";
+        std::cout << std::endl << "\"" << str << "\" is not a floating point number, will ignore it and use the default value.";
+        std::cout << std::endl;
       }
       break;
     default:
@@ -213,8 +212,8 @@ void PNL_StartupHandler::OnComment(const char *str)
  */
 void PNL_StartupHandler::OnWarning(const char *str)
 {
-  cout << endl << "PNL_StartupHandler **WARNING** " << str;
-  cout << endl;
+  std::cout << std::endl << "PNL_StartupHandler **WARNING** " << str;
+  std::cout << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -227,8 +226,8 @@ void PNL_StartupHandler::OnWarning(const char *str)
  */
 void PNL_StartupHandler::OnError(const char *str)
 {
-  cout << endl << "PNL_StartupHandler **ERROR** " << str;
-  cout << endl;
+  std::cout << std::endl << "PNL_StartupHandler **ERROR** " << str;
+  std::cout << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -241,8 +240,8 @@ void PNL_StartupHandler::OnError(const char *str)
  */
 void PNL_StartupHandler::OnFatalError(const char *str)
 {
-  cout << endl << "PNL_StartupHandler **FATAL ERROR** " << str;
-  cout << endl;
+  std::cout << std::endl << "PNL_StartupHandler **FATAL ERROR** " << str;
+  std::cout << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -269,7 +268,7 @@ bool PNL_StartupHandler::StartupFileExists(char *fln)
 {
   bool result = false;
 
-  ifstream ifile(fln);
+  std::ifstream ifile(fln);
 
   if (ifile.fail()) {
     result = false;

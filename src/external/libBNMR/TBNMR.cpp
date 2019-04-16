@@ -40,7 +40,7 @@ ClassImp(ExpRlx)  // for the ROOT-dictionary
 ClassImp(SExpRlx)
 
 
-double ExpRlx::operator()(double x, const vector<double> &par) const {
+double ExpRlx::operator()(double x, const std::vector<double> &par) const {
   assert(par.size()==2); // make sure the number of parameters handed to the function is correct
 
   // par[0] time of beam off
@@ -66,7 +66,7 @@ double ExpRlx::operator()(double x, const vector<double> &par) const {
 TF1 SExpRlx::sexp1=TF1("sexp", "exp(-([0]-x)/[3])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20000.0);
 TF1 SExpRlx::sexp2=TF1("sexp", "exp(-([3]-x)/[4])*exp(-pow(([1]*([0]-x)),[2]))", 0.0, 20000.0);
 
-double SExpRlx::operator()(double x, const vector<double> &par) const {
+double SExpRlx::operator()(double x, const std::vector<double> &par) const {
   assert(par.size()==3); // make sure the number of parameters handed to the function is correct
   
   // par[0] time of beam off

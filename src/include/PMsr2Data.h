@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009-2016 by Bastian M. Wojek / Andreas Suter           *
+ *   Copyright (C) 2009-2019 by Bastian M. Wojek / Andreas Suter           *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -37,7 +37,6 @@
 
 #include <string>
 #include <sstream>
-using namespace std;
 
 #include "PRunDataHandler.h"
 #include "PStartupHandler.h"
@@ -52,42 +51,42 @@ using namespace std;
 class PMsr2Data
 {
   public:
-    PMsr2Data(const string&); // File extension
+    PMsr2Data(const std::string&); // File extension
     ~PMsr2Data();
 
     int SetRunNumbers(unsigned int); // single run given
     int SetRunNumbers(unsigned int, unsigned int); // run list specified through first and last run number
-    int SetRunNumbers(const string&); // run list file given
-    int SetRunNumbers(const vector<unsigned int>&); // explicit run list specified using [ ]
+    int SetRunNumbers(const std::string&); // run list file given
+    int SetRunNumbers(const std::vector<unsigned int>&); // explicit run list specified using [ ]
     unsigned int GetPresentRun() const;
 
     int DetermineRunNumberDigits(unsigned int, bool) const;
     int CheckRunNumbersInRange() const;
 
     int ParseXmlStartupFile();
-    int ReadMsrFile(const string&) const;
+    int ReadMsrFile(const std::string&) const;
     int ReadRunDataFile();
 
     bool PrepareNewInputFile(unsigned int, bool) const; // template
-    bool PrepareGlobalInputFile(unsigned int, const string&, unsigned int) const; // generate msr-input file for a global fit
+    bool PrepareGlobalInputFile(unsigned int, const std::string&, unsigned int) const; // generate msr-input file for a global fit
 
-    int WriteOutput(const string&, const vector<unsigned int>&, bool, unsigned int, bool global = false, unsigned int counter = 0) const;
+    int WriteOutput(const std::string&, const std::vector<unsigned int>&, bool, unsigned int, bool global = false, unsigned int counter = 0) const;
 
   private:
     bool PrepareNewSortedInputFile(unsigned int) const; // template
     PMsrHandler* GetSingleRunMsrFile() const;
 
-    void WriteValue(fstream &outFile, const double &value, const unsigned int &width) const;
-    void WriteValue(fstream &outFile, const double &value, const double &errValue, const unsigned int &width, const bool &db) const;
+    void WriteValue(std::fstream &outFile, const double &value, const unsigned int &width) const;
+    void WriteValue(std::fstream &outFile, const double &value, const double &errValue, const unsigned int &width, const bool &db) const;
     int GetFirstSignificantDigit(const double &value) const;
-    bool InParameterList(const unsigned int &paramValue, const vector<unsigned int>&) const;
+    bool InParameterList(const unsigned int &paramValue, const std::vector<unsigned int>&) const;
 
-    string fFileExtension;
-    vector<unsigned int> fRunVector;
-    mutable vector<unsigned int>::const_iterator fRunVectorIter;
+    std::string fFileExtension;
+    std::vector<unsigned int> fRunVector;
+    mutable std::vector<unsigned int>::const_iterator fRunVectorIter;
     bool fRunListFile;
-    vector<string> fIndVar;
-    ifstream *fRunListFileStream;
+    std::vector<std::string> fIndVar;
+    std::ifstream *fRunListFileStream;
     TSAXParser *fSaxParser;
     PStartupHandler *fStartupHandler;
     mutable PRunDataHandler *fDataHandler;

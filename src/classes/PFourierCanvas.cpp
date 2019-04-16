@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include <TColor.h>
 #include <TRandom.h>
@@ -45,7 +44,7 @@ using namespace std;
 
 static const Char_t *gFiletypes[] = { "Data files", "*.dat",
                                       "All files",  "*",
-                                      0,            0 };
+                                      nullptr, nullptr };
 
 ClassImpQ(PFourierCanvas)
 
@@ -56,7 +55,7 @@ ClassImpQ(PFourierCanvas)
 PFourierCanvas::PFourierCanvas()
 {
   fTimeout = 0;
-  fTimeoutTimer = 0;
+  fTimeoutTimer = nullptr;
 
   fBatchMode = false;
   fValid = false;
@@ -70,18 +69,18 @@ PFourierCanvas::PFourierCanvas()
   fXaxisTitle = TString("");
 
   fCurrentFourierPhase = 0.0;
-  fCurrentFourierPhaseText = 0;
+  fCurrentFourierPhaseText = nullptr;
 
-  fStyle = 0;
-  fImp = 0;
-  fBar = 0;
-  fPopupMain = 0;
-  fPopupFourier = 0;
+  fStyle = nullptr;
+  fImp = nullptr;
+  fBar = nullptr;
+  fPopupMain = nullptr;
+  fPopupFourier = nullptr;
 
-  fMainCanvas = 0;
-  fTitlePad = 0;
-  fFourierPad = 0;
-  fInfoPad = 0;
+  fMainCanvas = nullptr;
+  fTitlePad = nullptr;
+  fFourierPad = nullptr;
+  fInfoPad = nullptr;
 }
 
 //---------------------------------------------------------------------------
@@ -100,7 +99,7 @@ PFourierCanvas::PFourierCanvas()
  * \param wh
  * \param batch
  */
-PFourierCanvas::PFourierCanvas(vector<PFourier*> &fourier, PIntVector dataSetTag, const Char_t* title,
+PFourierCanvas::PFourierCanvas(std::vector<PFourier*> &fourier, PIntVector dataSetTag, const Char_t* title,
                                const Bool_t showAverage, const Bool_t showAveragePerDataSet,
                                const Int_t fourierPlotOpt, Double_t fourierXrange[], Double_t phase,
                                Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
@@ -113,20 +112,20 @@ PFourierCanvas::PFourierCanvas(vector<PFourier*> &fourier, PIntVector dataSetTag
   fInitialXRange[1] = fourierXrange[1];
 
   fTimeout = 0;
-  fTimeoutTimer = 0;
+  fTimeoutTimer = nullptr;
 
   fValid = false;
 
-  fCurrentFourierPhaseText = 0;
+  fCurrentFourierPhaseText = nullptr;
 
   // generate fMarkerList and fColorList, since they are not provided
   TRandom rand;
   Int_t style, color;
   for (UInt_t i=0; i<fourier.size(); i++) {
     rand.SetSeed(i);
-    style = 20+(Int_t)rand.Integer(10);
+    style = 20+static_cast<Int_t>(rand.Integer(10));
     fMarkerList.push_back(style);
-    color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
+    color = TColor::GetColor(static_cast<Int_t>(rand.Integer(255)), static_cast<Int_t>(rand.Integer(255)), static_cast<Int_t>(rand.Integer(255)));
     fColorList.push_back(color);
   }
 
@@ -156,7 +155,7 @@ PFourierCanvas::PFourierCanvas(vector<PFourier*> &fourier, PIntVector dataSetTag
  * \param colorList
  * \param batch
  */
-PFourierCanvas::PFourierCanvas(vector<PFourier*> &fourier, PIntVector dataSetTag, const Char_t* title,
+PFourierCanvas::PFourierCanvas(std::vector<PFourier*> &fourier, PIntVector dataSetTag, const Char_t* title,
                                const Bool_t showAverage, const Bool_t showAveragePerDataSet,
                                const Int_t fourierPlotOpt, Double_t fourierXrange[], Double_t phase,
                                Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
@@ -169,23 +168,23 @@ PFourierCanvas::PFourierCanvas(vector<PFourier*> &fourier, PIntVector dataSetTag
   fInitialXRange[1] = fourierXrange[1];
 
   fTimeout = 0;
-  fTimeoutTimer = 0;
+  fTimeoutTimer = nullptr;
 
   fValid = false;
 
-  fCurrentFourierPhaseText = 0;
+  fCurrentFourierPhaseText = nullptr;
 
   // generate fMarkerList and fColorList, since they are not provided
   TRandom rand;
   Int_t style, color;
-  for (UInt_t i=fMarkerList.size(); i<fourier.size(); i++) {
+  for (UInt_t i=static_cast<UInt_t>(fMarkerList.size()); i<fourier.size(); i++) {
     rand.SetSeed(i);
-    style = 20+(Int_t)rand.Integer(10);
+    style = 20+static_cast<Int_t>(rand.Integer(10));
     fMarkerList.push_back(style);
   }
-  for (UInt_t i=fColorList.size(); i<fourier.size(); i++) {
+  for (UInt_t i=static_cast<UInt_t>(fColorList.size()); i<fourier.size(); i++) {
     rand.SetSeed(i);
-    color = TColor::GetColor((Int_t)rand.Integer(255), (Int_t)rand.Integer(255), (Int_t)rand.Integer(255));
+    color = TColor::GetColor(static_cast<Int_t>(rand.Integer(255)), static_cast<Int_t>(rand.Integer(255)), static_cast<Int_t>(rand.Integer(255)));
     fColorList.push_back(color);
   }
 
@@ -218,7 +217,7 @@ PFourierCanvas::~PFourierCanvas()
   if (fTitlePad) {
     fTitlePad->Clear();
     delete fTitlePad;
-    fTitlePad = 0;
+    fTitlePad = nullptr;
   }
 
   if (fFourierHistos.size() > 0) {
@@ -244,19 +243,19 @@ PFourierCanvas::~PFourierCanvas()
   if (fInfoPad) {
     fInfoPad->Clear();
     delete fInfoPad;
-    fInfoPad = 0;
+    fInfoPad = nullptr;
   }
 
   if (fLegAvgPerDataSet) {
     fLegAvgPerDataSet->Clear();
     delete fLegAvgPerDataSet;
-    fLegAvgPerDataSet = 0;
+    fLegAvgPerDataSet = nullptr;
   }
 
 /*
   if (fMainCanvas) {
     delete fMainCanvas;
-    fMainCanvas = 0;
+    fMainCanvas = nullptr;
   }
 */
 }
@@ -476,7 +475,7 @@ void PFourierCanvas::HandleMenuPopup(Int_t id)
     fi.fFileTypes = gFiletypes;
     fi.fIniDir = StrDup(dir);
     fi.fOverwrite = true;
-    new TGFileDialog(0, fImp, kFDSave, &fi);
+    new TGFileDialog(nullptr, fImp, kFDSave, &fi);
     if (fi.fFilename && strlen(fi.fFilename)) {
       ExportData(fi.fFilename);
     }
@@ -566,7 +565,7 @@ void PFourierCanvas::SetTimeout(Int_t timeout)
 
   if (fTimeoutTimer) {
     delete fTimeoutTimer;
-    fTimeoutTimer = 0;
+    fTimeoutTimer = nullptr;
   }
   fTimeoutTimer = new TTimer();
 
@@ -585,7 +584,7 @@ void PFourierCanvas::SetTimeout(Int_t timeout)
  */
 void PFourierCanvas::SaveGraphicsAndQuit(const Char_t *fileName)
 {
-  cout << endl << ">> SaveGraphicsAndQuit: will dump the canvas into a graphics output file: " << fileName << " ..." << endl;
+  std::cout << std::endl << ">> SaveGraphicsAndQuit: will dump the canvas into a graphics output file: " << fileName << " ..." << std::endl;
 
   fMainCanvas->SaveAs(fileName);
 
@@ -605,7 +604,7 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
   if (pathFileName) { // path file name provided
     pfn = TString(pathFileName);
   } else { // path file name NOT provided, generate a default path file name
-    cerr << endl << ">> PFourierCanvas::ExportData **ERROR** NO path file name provided. Will do nothing." << endl;
+    std::cerr << std::endl << ">> PFourierCanvas::ExportData **ERROR** NO path file name provided. Will do nothing." << std::endl;
     return;
   }
 
@@ -698,33 +697,33 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
   }
 
   // write data to file
-  ofstream fout(pfn.Data(), ofstream::out);
+  std::ofstream fout(pfn.Data(), std::ofstream::out);
 
   if (fAveragedView) {
     // write header
-    fout << "% " << pfn << endl;
-    fout << "% averaged data of:" << endl;
+    fout << "% " << pfn << std::endl;
+    fout << "% averaged data of:" << std::endl;
     for (UInt_t i=0; i<fFourierHistos.size(); i++) {
-      fout << "%   " << fFourierHistos[i].dataFourierRe->GetTitle() << endl;
+      fout << "%   " << fFourierHistos[i].dataFourierRe->GetTitle() << std::endl;
     }
-    fout << "%------------" << endl;
-    fout << "% " << xAxis << ", " << yAxis << endl;
+    fout << "%------------" << std::endl;
+    fout << "% " << xAxis << ", " << yAxis << std::endl;
     for (Int_t i=xMinBin; i<xMaxBin; i++) {
       switch (fCurrentPlotView) {
         case FOURIER_PLOT_REAL:
-          fout << fFourierAverage[0].dataFourierRe->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierRe->GetBinContent(i) << endl;
+          fout << fFourierAverage[0].dataFourierRe->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierRe->GetBinContent(i) << std::endl;
           break;
         case FOURIER_PLOT_IMAG:
-          fout << fFourierAverage[0].dataFourierIm->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierIm->GetBinContent(i) << endl;
+          fout << fFourierAverage[0].dataFourierIm->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierIm->GetBinContent(i) << std::endl;
           break;
         case FOURIER_PLOT_POWER:
-          fout << fFourierAverage[0].dataFourierPwr->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierPwr->GetBinContent(i) << endl;
+          fout << fFourierAverage[0].dataFourierPwr->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierPwr->GetBinContent(i) << std::endl;
           break;
         case FOURIER_PLOT_PHASE:
-          fout << fFourierAverage[0].dataFourierPhase->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierPhase->GetBinContent(i) << endl;
+          fout << fFourierAverage[0].dataFourierPhase->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierPhase->GetBinContent(i) << std::endl;
           break;
         case FOURIER_PLOT_PHASE_OPT_REAL:
-          fout << fFourierAverage[0].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierPhaseOptReal->GetBinContent(i) << endl;
+          fout << fFourierAverage[0].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierAverage[0].dataFourierPhaseOptReal->GetBinContent(i) << std::endl;
           break;
         default:
           break;
@@ -732,17 +731,17 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
     }
   } else {
     // write header
-    fout << "% " << pfn << endl;
-    fout << "% data of:" << endl;
+    fout << "% " << pfn << std::endl;
+    fout << "% data of:" << std::endl;
     for (UInt_t i=0; i<fFourierHistos.size(); i++) {
-      fout << "%   " << fFourierHistos[i].dataFourierRe->GetTitle() << endl;
+      fout << "%   " << fFourierHistos[i].dataFourierRe->GetTitle() << std::endl;
     }
-    fout << "%------------" << endl;
+    fout << "%------------" << std::endl;
     fout << "% ";
     for (UInt_t i=0; i<fFourierHistos.size()-1; i++) {
       fout << xAxis << i << ", " << yAxis << i << ", ";
     }
-    fout << xAxis << fFourierHistos.size()-1 << ", " << yAxis << fFourierHistos.size()-1 << endl;
+    fout << xAxis << fFourierHistos.size()-1 << ", " << yAxis << fFourierHistos.size()-1 << std::endl;
 
     // write data
     for (Int_t i=xMinBin; i<xMaxBin; i++) {
@@ -771,21 +770,21 @@ void PFourierCanvas::ExportData(const Char_t *pathFileName)
       }
       switch (fCurrentPlotView) {
         case FOURIER_PLOT_REAL:
-          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierRe->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierRe->GetBinContent(i) << endl;
+          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierRe->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierRe->GetBinContent(i) << std::endl;
           break;
         case FOURIER_PLOT_IMAG:
-          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierIm->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierIm->GetBinContent(i) << endl;
+          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierIm->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierIm->GetBinContent(i) << std::endl;
           break;
         case FOURIER_PLOT_REAL_AND_IMAG:
           break;
         case FOURIER_PLOT_POWER:
-          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPwr->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPwr->GetBinContent(i) << endl;
+          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPwr->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPwr->GetBinContent(i) << std::endl;
           break;
         case FOURIER_PLOT_PHASE:
-          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinContent(i) << endl;
+          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhase->GetBinContent(i) << std::endl;
           break;
         case FOURIER_PLOT_PHASE_OPT_REAL:
-          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhaseOptReal->GetBinContent(i) << endl;
+          fout << fFourierHistos[fFourierHistos.size()-1].dataFourierPhaseOptReal->GetBinCenter(i) << ", " << fFourierHistos[fFourierHistos.size()-1].dataFourierPhaseOptReal->GetBinContent(i) << std::endl;
           break;
         default:
           break;
@@ -988,28 +987,28 @@ void PFourierCanvas::InitFourierDataSets()
  */
 void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh)
 {
-  fImp   = 0;
-  fBar   = 0;
-  fPopupMain    = 0;
-  fPopupFourier = 0;
+  fImp   = nullptr;
+  fBar   = nullptr;
+  fPopupMain    = nullptr;
+  fPopupFourier = nullptr;
 
-  fMainCanvas  = 0;
-  fTitlePad    = 0;
-  fFourierPad  = 0;
-  fInfoPad     = 0;
+  fMainCanvas  = nullptr;
+  fTitlePad    = nullptr;
+  fFourierPad  = nullptr;
+  fInfoPad     = nullptr;
 
   // invoke canvas
   TString canvasName = TString("fMainCanvas");
   fMainCanvas = new TCanvas(canvasName.Data(), title, wtopx, wtopy, ww, wh);
-  if (fMainCanvas == 0) {
-    cerr << endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: Couldn't invoke " << canvasName.Data();
-    cerr << endl;
+  if (fMainCanvas == nullptr) {
+    std::cerr << std::endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: Couldn't invoke " << canvasName.Data();
+    std::cerr << std::endl;
     return;
   }
 
   // add canvas menu if not in batch mode
   if (!fBatchMode) {
-    fImp = (TRootCanvas*)fMainCanvas->GetCanvasImp();
+    fImp = static_cast<TRootCanvas*>(fMainCanvas->GetCanvasImp());
     fBar = fImp->GetMenuBar();
     fPopupMain = fBar->AddPopup("MusrFT");
 
@@ -1069,9 +1068,9 @@ void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t w
   // divide the canvas into sub pads
   // title pad
   fTitlePad = new TPaveText(0.0, YTITLE, 1.0, 1.0, "NDC");
-  if (fTitlePad == 0) {
-    cerr << endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: Couldn't invoke fTitlePad";
-    cerr << endl;
+  if (fTitlePad == nullptr) {
+    std::cerr << std::endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: Couldn't invoke fTitlePad";
+    std::cerr << std::endl;
     return;
   }
   fTitlePad->SetFillColor(TColor::GetColor(255,255,255));
@@ -1081,9 +1080,9 @@ void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t w
 
   // fourier pad
   fFourierPad = new TPad("fFourierPad", "fFourierPad", 0.0, YINFO, 1.0, YTITLE);
-  if (fFourierPad == 0) {
-    cerr << endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: Couldn't invoke fFourierPad";
-    cerr << endl;
+  if (fFourierPad == nullptr) {
+    std::cerr << std::endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: Couldn't invoke fFourierPad";
+    std::cerr << std::endl;
     return;
   }
   fFourierPad->SetFillColor(TColor::GetColor(255,255,255));
@@ -1091,21 +1090,21 @@ void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t w
 
   // info pad
   fInfoPad = new TLegend(0.0, 0.0, 1.0, YINFO, "NDC");
-  if (fInfoPad == 0) {
-    cerr << endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: Couldn't invoke fInfoPad";
-    cerr << endl;
+  if (fInfoPad == nullptr) {
+    std::cerr << std::endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: Couldn't invoke fInfoPad";
+    std::cerr << std::endl;
     return;
   }
   fInfoPad->SetFillColor(TColor::GetColor(255,255,255));
   fInfoPad->SetTextAlign(12); // middle, left
 
-  fLegAvgPerDataSet = 0;
+  fLegAvgPerDataSet = nullptr;
 
   fValid = true;
 
   if ((fFourier.size() != fDataSetTag.size()) && fAveragedViewPerDataSet) {
     fValid = false;
-    cerr << endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: # Fourier != # Data Set Tags." << endl;
+    std::cerr << std::endl << "PFourierCanvas::PFourierCanvas: **PANIC ERROR**: # Fourier != # Data Set Tags." << std::endl;
   }
 
   fMainCanvas->cd();
@@ -1125,25 +1124,25 @@ void PFourierCanvas::InitFourierCanvas(const Char_t* title, Int_t wtopx, Int_t w
 void PFourierCanvas::CleanupAverage()
 {
   for (UInt_t i=0; i<fFourierAverage.size(); i++) {
-    if (fFourierAverage[i].dataFourierRe != 0) {
+    if (fFourierAverage[i].dataFourierRe != nullptr) {
       delete fFourierAverage[i].dataFourierRe;
-      fFourierAverage[i].dataFourierRe = 0;
+      fFourierAverage[i].dataFourierRe = nullptr;
     }
     if (fFourierAverage[i].dataFourierIm) {
       delete fFourierAverage[i].dataFourierIm;
-      fFourierAverage[i].dataFourierIm = 0;
+      fFourierAverage[i].dataFourierIm = nullptr;
     }
     if (fFourierAverage[i].dataFourierPwr) {
       delete fFourierAverage[i].dataFourierPwr;
-      fFourierAverage[i].dataFourierPwr = 0;
+      fFourierAverage[i].dataFourierPwr = nullptr;
     }
     if (fFourierAverage[i].dataFourierPhase) {
       delete fFourierAverage[i].dataFourierPhase;
-      fFourierAverage[i].dataFourierPhase = 0;
+      fFourierAverage[i].dataFourierPhase = nullptr;
     }
     if (fFourierAverage[i].dataFourierPhaseOptReal) {
       delete fFourierAverage[i].dataFourierPhaseOptReal;
-      fFourierAverage[i].dataFourierPhaseOptReal = 0;
+      fFourierAverage[i].dataFourierPhaseOptReal = nullptr;
     }
   }
   fFourierAverage.clear();
@@ -1166,7 +1165,7 @@ void PFourierCanvas::HandleAverage()
   Double_t dval=0.0;
 
   Bool_t phaseOptRealPresent = false;
-  if (fFourierHistos[0].dataFourierPhaseOptReal != 0)
+  if (fFourierHistos[0].dataFourierPhaseOptReal != nullptr)
     phaseOptRealPresent = true;
 
   // check if ALL data shall be averaged
@@ -1473,7 +1472,7 @@ void PFourierCanvas::PlotFourier()
   // check if phase opt real Fourier spectra already exists if requested,
   // and if not calculate them first
   if (fCurrentPlotView == FOURIER_PLOT_PHASE_OPT_REAL) {
-    if (fFourierHistos[0].dataFourierPhaseOptReal == 0) { // not yet calculated
+    if (fFourierHistos[0].dataFourierPhaseOptReal == nullptr) { // not yet calculated
       CalcPhaseOptReal();
     }
   }
@@ -1633,7 +1632,7 @@ void PFourierCanvas::PlotFourierPhaseValue()
   // check if phase TLatex object is present
   if (fCurrentFourierPhaseText) {
     delete fCurrentFourierPhaseText;
-    fCurrentFourierPhaseText = 0;
+    fCurrentFourierPhaseText = nullptr;
   }
 
   Double_t x, y;
@@ -1679,7 +1678,7 @@ void PFourierCanvas::PlotAverage()
   if (fLegAvgPerDataSet) {
     fLegAvgPerDataSet->Clear();
     delete fLegAvgPerDataSet;
-    fLegAvgPerDataSet = 0;
+    fLegAvgPerDataSet = nullptr;
   }
 
   switch (fCurrentPlotView) {
@@ -1773,8 +1772,8 @@ void PFourierCanvas::PlotAverage()
     fFourierAverage[0].dataFourierPhase->Draw("p");
     break;
   case FOURIER_PLOT_PHASE_OPT_REAL:
-    if (fFourierHistos[0].dataFourierPhaseOptReal == 0) {
-      cout << "debug> need to calculate phase opt. average first ..." << endl;
+    if (fFourierHistos[0].dataFourierPhaseOptReal == nullptr) {
+      std::cout << "debug> need to calculate phase opt. average first ..." << std::endl;
       CalcPhaseOptReal();
       HandleAverage();
     }
@@ -1862,7 +1861,7 @@ void PFourierCanvas::IncrementFourierPhase()
   PlotFourierPhaseValue();
 
   for (UInt_t i=0; i<fFourierHistos.size(); i++) { // loop over all data sets
-    if ((fFourierHistos[i].dataFourierRe != 0) && (fFourierHistos[i].dataFourierIm != 0)) {
+    if ((fFourierHistos[i].dataFourierRe != nullptr) && (fFourierHistos[i].dataFourierIm != nullptr)) {
       for (Int_t j=0; j<fFourierHistos[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
         re = fFourierHistos[i].dataFourierRe->GetBinContent(j) * cp + fFourierHistos[i].dataFourierIm->GetBinContent(j) * sp;
@@ -1895,7 +1894,7 @@ void PFourierCanvas::DecrementFourierPhase()
   PlotFourierPhaseValue();
 
   for (UInt_t i=0; i<fFourierHistos.size(); i++) { // loop over all data sets
-    if ((fFourierHistos[i].dataFourierRe != 0) && (fFourierHistos[i].dataFourierIm != 0)) {
+    if ((fFourierHistos[i].dataFourierRe != nullptr) && (fFourierHistos[i].dataFourierIm != nullptr)) {
       for (Int_t j=0; j<fFourierHistos[i].dataFourierRe->GetNbinsX(); j++) { // loop over a fourier data set
         // calculate new fourier data set value
         re = fFourierHistos[i].dataFourierRe->GetBinContent(j) * cp - fFourierHistos[i].dataFourierIm->GetBinContent(j) * sp;
@@ -1924,7 +1923,7 @@ void PFourierCanvas::DecrementFourierPhase()
  */
 Double_t PFourierCanvas::GetMaximum(TH1F* histo, Double_t xmin, Double_t xmax)
 {
-  if (histo == 0)
+  if (histo == nullptr)
     return 0.0;
 
   Int_t start=0, end=0;
@@ -1967,7 +1966,7 @@ Double_t PFourierCanvas::GetMaximum(TH1F* histo, Double_t xmin, Double_t xmax)
  */
 Double_t PFourierCanvas::GetMinimum(TH1F* histo, Double_t xmin, Double_t xmax)
 {
-  if (histo == 0)
+  if (histo == nullptr)
     return 0.0;
 
   Int_t start=0, end=0;
@@ -2009,7 +2008,7 @@ Double_t PFourierCanvas::GetMinimum(TH1F* histo, Double_t xmin, Double_t xmax)
  */
 Double_t PFourierCanvas::GetInterpolatedValue(TH1F* histo, Double_t xVal)
 {
-  if (histo == 0)
+  if (histo == nullptr)
     return 0.0;
 
   Int_t idx = histo->FindBin(xVal);

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,9 +29,6 @@
 
 #ifndef _PFUNCTIONGRAMMAR_H_
 #define _PFUNCTIONGRAMMAR_H_
-
-#include <iostream>
-using namespace std;
 
 //#define BOOST_SPIRIT_DEBUG
 

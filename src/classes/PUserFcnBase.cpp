@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,6 @@
 
 #include <vector>
 #include <fstream>
-using namespace std;
 
 #include "PUserFcnBase.h"
 
@@ -74,14 +73,14 @@ PUserFcnBase::~PUserFcnBase()
 Int_t parseXmlFile(TSAXParser *saxParser, const char *startup_path_name)
 {
   Int_t status;
-  fstream xmlFile;
+  std::fstream xmlFile;
   UInt_t xmlSize = 0;
-  Char_t *xmlBuffer = 0;
+  Char_t *xmlBuffer = nullptr;
 
-  xmlFile.open(startup_path_name, ios::in | ios::ate); // open file for reading and go to the end of the file
+  xmlFile.open(startup_path_name, std::ios::in | std::ios::ate); // open file for reading and go to the end of the file
   if (xmlFile.is_open()) { // check if file has been opened successfully
     xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-    xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+    xmlFile.seekg(0, std::ios::beg); // go back to the beginning of the stream
     xmlBuffer = new Char_t[xmlSize]; // allocate buffer memory for the whole XML file
     xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
     xmlFile.close(); // close the XML file
@@ -91,11 +90,11 @@ Int_t parseXmlFile(TSAXParser *saxParser, const char *startup_path_name)
   } else {
     status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
     delete[] xmlBuffer; // free the buffer memory
-    xmlBuffer = 0;
+    xmlBuffer = nullptr;
   }
 
   return status;
 }
 
 // place a void pointer vector for global user function objects which might be needed
-vector<void *> gGlobalUserFcn;
+std::vector<void *> gGlobalUserFcn;

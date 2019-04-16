@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -36,7 +36,6 @@
 #include <string.h>
 
 #include <iostream>
-using namespace std;
 
 #include <TApplication.h>
 #include <TSAXParser.h>
@@ -56,24 +55,24 @@ using namespace std;
  */
 void musrt0_syntax()
 {
-  cout << endl << "usage: musrt0 <msr-file> [{--getT0FromPromptPeak | -g} [<firstGoodBinOffset>]]";
-  cout << endl << "       [--timeout <timeout>] | --show-dynamic-path | --version | --help";
-  cout << endl << "       <msr-file>: msr input file";
-  cout << endl << "       --getT0FromPromptPeak, -g with <firstGoodBinOffset>:";
-  cout << endl << "         will, in non-interactive mode estimate the t0's from the prompt peak";
-  cout << endl << "         and write it into the msr-file.";
-  cout << endl << "         if <firstGoodBinOffset> is given, to first good bin will be t0+<firstGoodBinOffset>.";
-  cout << endl << "         if no <firstGoodBinOffset> is given, only t0 will be set.";
-  cout << endl << "       --timeout <timeout>: <timeout> given in seconds after which musrview terminates.";
-  cout << endl << "           If <timeout> <= 0, no timeout will take place. Default <timeout> is 0.";
-  cout << endl;
-  cout << endl << "       'musrt0 <msr-file>' will execute musrt0";
-  cout << endl << "       'musrt0 <msr-file> --timeout 180' will execute musrt0, but terminate it after";
-  cout << endl << "                          180 sec if not already done so.";
-  cout << endl << "       'musrt0' or 'musrt0 --help' will show this help";
-  cout << endl << "       'musrt0 --version' will print the musrt0 version";
-  cout << endl << "       'musrt0 --show-dynamic-path' dumps the dynamic search paths and exit.";
-  cout << endl << endl;
+  std::cout << std::endl << "usage: musrt0 <msr-file> [{--getT0FromPromptPeak | -g} [<firstGoodBinOffset>]]";
+  std::cout << std::endl << "       [--timeout <timeout>] | --show-dynamic-path | --version | --help";
+  std::cout << std::endl << "       <msr-file>: msr input file";
+  std::cout << std::endl << "       --getT0FromPromptPeak, -g with <firstGoodBinOffset>:";
+  std::cout << std::endl << "         will, in non-interactive mode estimate the t0's from the prompt peak";
+  std::cout << std::endl << "         and write it into the msr-file.";
+  std::cout << std::endl << "         if <firstGoodBinOffset> is given, to first good bin will be t0+<firstGoodBinOffset>.";
+  std::cout << std::endl << "         if no <firstGoodBinOffset> is given, only t0 will be set.";
+  std::cout << std::endl << "       --timeout <timeout>: <timeout> given in seconds after which musrview terminates.";
+  std::cout << std::endl << "           If <timeout> <= 0, no timeout will take place. Default <timeout> is 0.";
+  std::cout << std::endl;
+  std::cout << std::endl << "       'musrt0 <msr-file>' will execute musrt0";
+  std::cout << std::endl << "       'musrt0 <msr-file> --timeout 180' will execute musrt0, but terminate it after";
+  std::cout << std::endl << "                          180 sec if not already done so.";
+  std::cout << std::endl << "       'musrt0' or 'musrt0 --help' will show this help";
+  std::cout << std::endl << "       'musrt0 --version' will print the musrt0 version";
+  std::cout << std::endl << "       'musrt0 --show-dynamic-path' dumps the dynamic search paths and exit.";
+  std::cout << std::endl << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -95,17 +94,17 @@ Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data
   PMusrT0 *musrT0 = new PMusrT0(data);
 
   // check if the musrT0 object could be invoked
-  if (musrT0 == 0) {
-    cerr << endl << ">> musrt0 **ERROR** Couldn't invoke musrT0 ...";
-    cerr << endl << ">> run name " << data.GetRawRunData(idx)->GetRunName()->Data();
-    cerr << endl;
+  if (musrT0 == nullptr) {
+    std::cerr << std::endl << ">> musrt0 **ERROR** Couldn't invoke musrT0 ...";
+    std::cerr << std::endl << ">> run name " << data.GetRawRunData(idx)->GetRunName()->Data();
+    std::cerr << std::endl;
     return false;
   }
 
   // check if the musrT0 object is valid
   if (!musrT0->IsValid()) {
-    cerr << endl << ">> musrt0 **ERROR** invalid item found! (idx=" << idx << ")";
-    cerr << endl;
+    std::cerr << std::endl << ">> musrt0 **ERROR** invalid item found! (idx=" << idx << ")";
+    std::cerr << std::endl;
     return false;
   }
 
@@ -139,7 +138,7 @@ Bool_t musrt0_item(TApplication &app, PMsrHandler *msrHandler, PMusrT0Data &data
 
   // cleanup
   delete musrT0;
-  musrT0 = 0;
+  musrT0 = nullptr;
 
   return result;
 }
@@ -157,19 +156,19 @@ void musrt0_cleanup(TSAXParser *saxParser, PStartupHandler *startupHandler, PMsr
 {
   if (saxParser) {
     delete saxParser;
-    saxParser = 0;
+    saxParser = nullptr;
   }
   if (startupHandler) {
     delete startupHandler;
-    startupHandler = 0;
+    startupHandler = nullptr;
   }
   if (msrHandler) {
     delete msrHandler;
-    msrHandler = 0;
+    msrHandler = nullptr;
   }
   if (dataHandler) {
     delete dataHandler;
-    dataHandler = 0;
+    dataHandler = nullptr;
   }
 }
 
@@ -231,30 +230,30 @@ Int_t main(Int_t argc, Char_t *argv[])
 
   // add default shared library path /usr/local/lib if not already persent
   const char *dsp = gSystem->GetDynamicPath();
-  if (strstr(dsp, "/usr/local/lib") == NULL)
+  if (strstr(dsp, "/usr/local/lib") == nullptr)
     gSystem->AddDynamicPath("/usr/local/lib");
 
   memset(filename, '\0', sizeof(filename));
   for (int i=1; i<argc; i++) {
     if (!strcmp(argv[i], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrt0 version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "musrt0 version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #else
-      cout << endl << "musrt0 git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "musrt0 git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--help")) {
       musrt0_syntax();
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--show-dynamic-path")) {
-      cout << endl << "musrt0: internal dynamic search paths for shared libraries/root dictionaries:";
-      cout << endl << "  '" << gSystem->GetDynamicPath() << "'" << endl << endl;
+      std::cout << std::endl << "musrt0: internal dynamic search paths for shared libraries/root dictionaries:";
+      std::cout << std::endl << "  '" << gSystem->GetDynamicPath() << "'" << std::endl << std::endl;
       return PMUSR_SUCCESS;
     } else if (strstr(argv[i], ".msr")) { // check for filename
       if (strlen(filename) == 0) {
         strcpy(filename, argv[i]);
       } else {
-        cout << endl << "**ERROR** only one file name allowed." << endl;
+        std::cout << std::endl << "**ERROR** only one file name allowed." << std::endl;
         show_syntax = true;
         break;
       }
@@ -274,13 +273,13 @@ Int_t main(Int_t argc, Char_t *argv[])
         if (numStr.IsDigit()) {
           timeout = numStr.Atoi();
         } else {
-          cout << endl << "**ERROR** timeout '" << argv[i+1] << "' is not a number" << endl;
+          std::cout << std::endl << "**ERROR** timeout '" << argv[i+1] << "' is not a number" << std::endl;
           show_syntax = true;
           break;
         }
         i++;
       } else {
-        cout << endl << "**ERROR** no timeout given." << endl;
+        std::cout << std::endl << "**ERROR** no timeout given." << std::endl;
         show_syntax = true;
         break;
       }
@@ -291,7 +290,7 @@ Int_t main(Int_t argc, Char_t *argv[])
   }
 
   if (strlen(filename) == 0) {
-    cout  << endl << "**ERROR** msr-file missing!" << endl;
+    std::cout  << std::endl << "**ERROR** msr-file missing!" << std::endl;
     show_syntax = true;
   }
 
@@ -305,16 +304,16 @@ Int_t main(Int_t argc, Char_t *argv[])
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << ">> musrt0 **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
-    cerr << endl;
+    std::cerr << std::endl << ">> musrt0 **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    std::cerr << std::endl;
     // clean up
     if (saxParser) {
       delete saxParser;
-      saxParser = 0;
+      saxParser = nullptr;
     }
     if (startupHandler) {
       delete startupHandler;
-      startupHandler = 0;
+      startupHandler = nullptr;
     }
   } else {
     strcpy(startup_path_name, startupHandler->GetStartupFilePath().Data());
@@ -325,16 +324,16 @@ Int_t main(Int_t argc, Char_t *argv[])
     status = parseXmlFile(saxParser, startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << ">> musrt0 **WARNING** Reading/parsing musrfit_startup.xml failed.";
-      cerr << endl;
+      std::cerr << std::endl << ">> musrt0 **WARNING** Reading/parsing musrfit_startup.xml failed.";
+      std::cerr << std::endl;
       // clean up
       if (saxParser) {
         delete saxParser;
-        saxParser = 0;
+        saxParser = nullptr;
       }
       if (startupHandler) {
         delete startupHandler;
-        startupHandler = 0;
+        startupHandler = nullptr;
       }
     }
   }
@@ -345,13 +344,13 @@ Int_t main(Int_t argc, Char_t *argv[])
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cout << endl << ">> musrt0 **ERROR** couldn't find '" << filename << "'" << endl << endl;
+        std::cout << std::endl << ">> musrt0 **ERROR** couldn't find '" << filename << "'" << std::endl << std::endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cout << endl << "**SYNTAX ERROR** in file " << filename << ", full stop here." << endl << endl;
+        std::cout << std::endl << "**SYNTAX ERROR** in file " << filename << ", full stop here." << std::endl << std::endl;
         break;
       default:
-        cout << endl << "**UNKNOWN ERROR** when trying to read the msr-file" << endl << endl;
+        std::cout << std::endl << "**UNKNOWN ERROR** when trying to read the msr-file" << std::endl << std::endl;
         break;
     }
     return status;
@@ -366,14 +365,14 @@ Int_t main(Int_t argc, Char_t *argv[])
       fitType = msrHandler->GetMsrGlobal()->GetFitType();
     }
     if (fitType == MSR_FITTYPE_NON_MUSR) {
-      cout << endl << ">> musrt0 **ERROR** t0 setting for NonMusr fit type doesn't make any sense, will quit ..." << endl;
+      std::cout << std::endl << ">> musrt0 **ERROR** t0 setting for NonMusr fit type doesn't make any sense, will quit ..." << std::endl;
       success = false;
       break;
     }
   }
 
   // read all the necessary runs (raw data)
-  PRunDataHandler *dataHandler = 0;
+  PRunDataHandler *dataHandler = nullptr;
   if (success) {
     if (startupHandler)
       dataHandler = new PRunDataHandler(msrHandler, startupHandler->GetDataPathList());
@@ -384,7 +383,7 @@ Int_t main(Int_t argc, Char_t *argv[])
 
     success = dataHandler->IsAllDataAvailable();
     if (!success) {
-      cout << endl << ">> musrt0 **ERROR** Couldn't read all data files, will quit ..." << endl;
+      std::cout << std::endl << ">> musrt0 **ERROR** Couldn't read all data files, will quit ..." << std::endl;
     }
   }
 
@@ -392,7 +391,7 @@ Int_t main(Int_t argc, Char_t *argv[])
 
     Int_t  histoNo = -1;
     UInt_t t0Bin = 0;
-    TString *runName = 0;
+    TString *runName = nullptr;
     UInt_t start, end;
 
     // go through all runs in the msr-file
@@ -668,7 +667,7 @@ Int_t main(Int_t argc, Char_t *argv[])
       TApplication app("App", &argc, argv);
 
       PMusrT0Data musrT0Data;
-      vector<PRawRunData*> rawRunData;
+      std::vector<PRawRunData*> rawRunData;
       PIntVector forwardHistos;
       PIntVector backwardHistos;
       // generate vector of all necessary PMusrT0 objects

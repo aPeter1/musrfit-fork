@@ -32,7 +32,6 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include <TSAXParser.h>
 #include "BMWStartupHandler.h"
@@ -49,7 +48,7 @@ ClassImp(TMeanFieldsForScTrilayer)
 TMeanFieldsForScHalfSpace::TMeanFieldsForScHalfSpace() {
 
   // read startup file
-  string startup_path_name("BMW_startup.xml");
+  std::string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -63,8 +62,8 @@ TMeanFieldsForScHalfSpace::TMeanFieldsForScHalfSpace() {
     assert(false);
   }
 
-  string rge_path(startupHandler->GetDataPath());
-  map<double, string> energy_vec(startupHandler->GetEnergies());
+  std::string rge_path(startupHandler->GetDataPath());
+  map<double, std::string> energy_vec(startupHandler->GetEnergies());
 
   fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
@@ -83,15 +82,15 @@ TMeanFieldsForScHalfSpace::TMeanFieldsForScHalfSpace() {
 // Operator-method that returns the mean field for a given implantation energy
 // Parameters: field, deadlayer, lambda
 
-double TMeanFieldsForScHalfSpace::operator()(double E, const vector<double> &par_vec) const{
+double TMeanFieldsForScHalfSpace::operator()(double E, const std::vector<double> &par_vec) const{
 
   // Calculate field profile
-  vector<double> parForBofZ(par_vec);
+  std::vector<double> parForBofZ(par_vec);
 
   TLondon1D_HS BofZ(parForBofZ);
 
-  vector<double> energies(fImpProfile->Energy());
-  vector<double>::const_iterator energyIter;
+  std::vector<double> energies(fImpProfile->Energy());
+  std::vector<double>::const_iterator energyIter;
   energyIter = find(energies.begin(), energies.end(), E);
 
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
@@ -121,8 +120,8 @@ double TMeanFieldsForScHalfSpace::CalcMeanB (double E, const TLondon1D_HS& BofZ)
 
     fImpProfile->Normalize(E);
 
-    vector<double> z(fImpProfile->DataZ(E));
-    vector<double> nz(fImpProfile->DataNZ(E));
+    std::vector<double> z(fImpProfile->DataZ(E));
+    std::vector<double> nz(fImpProfile->DataNZ(E));
     double dz(fImpProfile->DataDZ(E));
 
     // calculate mean field
@@ -140,7 +139,7 @@ double TMeanFieldsForScHalfSpace::CalcMeanB (double E, const TLondon1D_HS& BofZ)
 TMeanFieldsForScSingleLayer::TMeanFieldsForScSingleLayer() {
 
   // read startup file
-  string startup_path_name("BMW_startup.xml");
+  std::string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -154,8 +153,8 @@ TMeanFieldsForScSingleLayer::TMeanFieldsForScSingleLayer() {
     assert(false);
   }
 
-  string rge_path(startupHandler->GetDataPath());
-  map<double, string> energy_vec(startupHandler->GetEnergies());
+  std::string rge_path(startupHandler->GetDataPath());
+  map<double, std::string> energy_vec(startupHandler->GetEnergies());
 
   fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
@@ -174,24 +173,24 @@ TMeanFieldsForScSingleLayer::TMeanFieldsForScSingleLayer() {
 // Operator-method that returns the mean field for a given implantation energy
 // Parameters: field, deadlayer, thicknessSC, lambda, weight (deadlayer), weight (SC), weight (substrate)
 
-double TMeanFieldsForScSingleLayer::operator()(double E, const vector<double> &par_vec) const{
+double TMeanFieldsForScSingleLayer::operator()(double E, const std::vector<double> &par_vec) const{
 
-  vector<double> interfaces;
+  std::vector<double> interfaces;
   interfaces.push_back(par_vec[1]);
   interfaces.push_back(par_vec[1]+par_vec[2]);
 
-  vector<double> weights;
+  std::vector<double> weights;
   weights.push_back(par_vec[4]);
   weights.push_back(par_vec[5]);
   weights.push_back(par_vec[6]);
 
   // Calculate field profile
-  vector<double> parForBofZ(par_vec);
+  std::vector<double> parForBofZ(par_vec);
 
   TLondon1D_1L BofZ(parForBofZ);
 
-  vector<double> energies(fImpProfile->Energy());
-  vector<double>::const_iterator energyIter;
+  std::vector<double> energies(fImpProfile->Energy());
+  std::vector<double>::const_iterator energyIter;
   energyIter = find(energies.begin(), energies.end(), E);
 
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
@@ -215,13 +214,13 @@ double TMeanFieldsForScSingleLayer::operator()(double E, const vector<double> &p
   }
 }
 
-double TMeanFieldsForScSingleLayer::CalcMeanB (double E, const vector<double>& interfaces, const vector<double>& weights, const TLondon1D_1L& BofZ) const {
+double TMeanFieldsForScSingleLayer::CalcMeanB (double E, const std::vector<double>& interfaces, const std::vector<double>& weights, const TLondon1D_1L& BofZ) const {
     //calcData->UseHighResolution(E);
     fImpProfile->WeightLayers(E, interfaces, weights);
     fImpProfile->Normalize(E);
 
-    vector<double> z(fImpProfile->DataZ(E));
-    vector<double> nz(fImpProfile->DataNZ(E));
+    std::vector<double> z(fImpProfile->DataZ(E));
+    std::vector<double> nz(fImpProfile->DataNZ(E));
     double dz(fImpProfile->DataDZ(E));
 
     // calculate mean field
@@ -239,7 +238,7 @@ double TMeanFieldsForScSingleLayer::CalcMeanB (double E, const vector<double>& i
 TMeanFieldsForScBilayer::TMeanFieldsForScBilayer() {
 
   // read startup file
-  string startup_path_name("BMW_startup.xml");
+  std::string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -253,8 +252,8 @@ TMeanFieldsForScBilayer::TMeanFieldsForScBilayer() {
     assert(false);
   }
 
-  string rge_path(startupHandler->GetDataPath());
-  map<double, string> energy_vec(startupHandler->GetEnergies());
+  std::string rge_path(startupHandler->GetDataPath());
+  map<double, std::string> energy_vec(startupHandler->GetEnergies());
 
   fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug(), 1);
 
@@ -274,33 +273,33 @@ TMeanFieldsForScBilayer::TMeanFieldsForScBilayer() {
 // Parameters: field, deadlayer, layer1, layer2, lambda1, lambda2, weight1 (deadlayer), weight2, weight3, weight4 (substrate),
 //             [Gss width for profile convolution]
 
-double TMeanFieldsForScBilayer::operator()(double E, const vector<double> &par_vec) const{
+double TMeanFieldsForScBilayer::operator()(double E, const std::vector<double> &par_vec) const{
 
   double width(0.0);
   if (par_vec.size() == 11) {
     width = par_vec[10];
   }
 
-  vector<double> interfaces;
+  std::vector<double> interfaces;
   interfaces.push_back(par_vec[1]);
   interfaces.push_back(par_vec[1]+par_vec[2]);
   interfaces.push_back(par_vec[1]+par_vec[2]+par_vec[3]);
   
-  vector<double> weights;
+  std::vector<double> weights;
   weights.push_back(par_vec[6]);
   weights.push_back(par_vec[7]);
   weights.push_back(par_vec[8]);
   weights.push_back(par_vec[9]);
   
   // Calculate field profile
-  vector<double> parForBofZ;
+  std::vector<double> parForBofZ;
   for (unsigned int i(0); i<6; i++)
     parForBofZ.push_back(par_vec[i]);
 
   TLondon1D_2L BofZ(parForBofZ);
 
-  vector<double> energies(fImpProfile->Energy());
-  vector<double>::const_iterator energyIter;
+  std::vector<double> energies(fImpProfile->Energy());
+  std::vector<double>::const_iterator energyIter;
   energyIter = find(energies.begin(), energies.end(), E);
 
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
@@ -324,7 +323,7 @@ double TMeanFieldsForScBilayer::operator()(double E, const vector<double> &par_v
   }
 }
 
-double TMeanFieldsForScBilayer::CalcMeanB (double E, const vector<double>& interfaces, const vector<double>& weights, const TLondon1D_2L& BofZ, double width=0.0) const {
+double TMeanFieldsForScBilayer::CalcMeanB (double E, const std::vector<double>& interfaces, const std::vector<double>& weights, const TLondon1D_2L& BofZ, double width=0.0) const {
     //fImpProfile->UseHighResolution(E);
     //fImpProfile->ConvolveGss(width, E);
     //fImpProfile->SetOriginal();
@@ -332,8 +331,8 @@ double TMeanFieldsForScBilayer::CalcMeanB (double E, const vector<double>& inter
     fImpProfile->ConvolveGss(width, E);
     fImpProfile->Normalize(E);
 
-    vector<double> z(fImpProfile->DataZ(E));
-    vector<double> nz(fImpProfile->DataNZ(E));
+    std::vector<double> z(fImpProfile->DataZ(E));
+    std::vector<double> nz(fImpProfile->DataNZ(E));
     double dz(fImpProfile->DataDZ(E));
 
   if (E==20.0){
@@ -358,7 +357,7 @@ double TMeanFieldsForScBilayer::CalcMeanB (double E, const vector<double>& inter
 TMeanFieldsForScTrilayer::TMeanFieldsForScTrilayer() {
 
   // read startup file
-  string startup_path_name("BMW_startup.xml");
+  std::string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -372,8 +371,8 @@ TMeanFieldsForScTrilayer::TMeanFieldsForScTrilayer() {
     assert(false);
   }
 
-  string rge_path(startupHandler->GetDataPath());
-  map<double, string> energy_vec(startupHandler->GetEnergies());
+  std::string rge_path(startupHandler->GetDataPath());
+  map<double, std::string> energy_vec(startupHandler->GetEnergies());
 
   fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
@@ -392,15 +391,15 @@ TMeanFieldsForScTrilayer::TMeanFieldsForScTrilayer() {
 // Operator-method that returns the mean field for a given implantation energy
 // Parameters: field, deadlayer, layer1, layer2, layer3, lambda1, lambda2, lambda3, weight1, weight2, weight3, weight4, weight5
 
-double TMeanFieldsForScTrilayer::operator()(double E, const vector<double> &par_vec) const{
+double TMeanFieldsForScTrilayer::operator()(double E, const std::vector<double> &par_vec) const{
   
-  vector<double> interfaces;
+  std::vector<double> interfaces;
   interfaces.push_back(par_vec[1]);
   interfaces.push_back(par_vec[1]+par_vec[2]);
   interfaces.push_back(par_vec[1]+par_vec[2]+par_vec[3]);
   interfaces.push_back(par_vec[1]+par_vec[2]+par_vec[3]+par_vec[4]);
   
-  vector<double> weights;
+  std::vector<double> weights;
   weights.push_back(par_vec[8]);
   weights.push_back(par_vec[9]);
   weights.push_back(par_vec[10]);
@@ -408,14 +407,14 @@ double TMeanFieldsForScTrilayer::operator()(double E, const vector<double> &par_
   weights.push_back(par_vec[12]);
   
   // Calculate field profile
-  vector<double> parForBofZ;
+  std::vector<double> parForBofZ;
   for (unsigned int i(0); i<8; i++)
     parForBofZ.push_back(par_vec[i]);
 
   TLondon1D_3L BofZ(parForBofZ);
 
-  vector<double> energies(fImpProfile->Energy());
-  vector<double>::const_iterator energyIter;
+  std::vector<double> energies(fImpProfile->Energy());
+  std::vector<double>::const_iterator energyIter;
   energyIter = find(energies.begin(), energies.end(), E);
 
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
@@ -439,13 +438,13 @@ double TMeanFieldsForScTrilayer::operator()(double E, const vector<double> &par_
   }
 }
 
-double TMeanFieldsForScTrilayer::CalcMeanB (double E, const vector<double>& interfaces, const vector<double>& weights, const TLondon1D_3L& BofZ) const {
+double TMeanFieldsForScTrilayer::CalcMeanB (double E, const std::vector<double>& interfaces, const std::vector<double>& weights, const TLondon1D_3L& BofZ) const {
   //calcData->UseHighResolution(E);
     fImpProfile->WeightLayers(E, interfaces, weights);
     fImpProfile->Normalize(E);
 
-    vector<double> z(fImpProfile->DataZ(E));
-    vector<double> nz(fImpProfile->DataNZ(E));
+    std::vector<double> z(fImpProfile->DataZ(E));
+    std::vector<double> nz(fImpProfile->DataNZ(E));
     double dz(fImpProfile->DataDZ(E));
 
     // calculate mean field
@@ -463,7 +462,7 @@ double TMeanFieldsForScTrilayer::CalcMeanB (double E, const vector<double>& inte
 TMeanFieldsForScTrilayerWithInsulator::TMeanFieldsForScTrilayerWithInsulator() {
 
   // read startup file
-  string startup_path_name("BMW_startup.xml");
+  std::string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -477,8 +476,8 @@ TMeanFieldsForScTrilayerWithInsulator::TMeanFieldsForScTrilayerWithInsulator() {
     assert(false);
   }
 
-  string rge_path(startupHandler->GetDataPath());
-  map<double, string> energy_vec(startupHandler->GetEnergies());
+  std::string rge_path(startupHandler->GetDataPath());
+  map<double, std::string> energy_vec(startupHandler->GetEnergies());
 
   fImpProfile = new TTrimSPData(rge_path, energy_vec, startupHandler->GetDebug());
 
@@ -497,15 +496,15 @@ TMeanFieldsForScTrilayerWithInsulator::TMeanFieldsForScTrilayerWithInsulator() {
 // Operator-method that returns the mean field for a given implantation energy
 // Parameters: field, deadlayer, layer1, layer2, layer3, lambda1, lambda2, weight1, weight2, weight3, weight4, weight5
 
-double TMeanFieldsForScTrilayerWithInsulator::operator()(double E, const vector<double> &par_vec) const{
+double TMeanFieldsForScTrilayerWithInsulator::operator()(double E, const std::vector<double> &par_vec) const{
   
-  vector<double> interfaces;
+  std::vector<double> interfaces;
   interfaces.push_back(par_vec[1]);
   interfaces.push_back(par_vec[1]+par_vec[2]);
   interfaces.push_back(par_vec[1]+par_vec[2]+par_vec[3]);
   interfaces.push_back(par_vec[1]+par_vec[2]+par_vec[3]+par_vec[4]);
   
-  vector<double> weights;
+  std::vector<double> weights;
   weights.push_back(par_vec[7]);
   weights.push_back(par_vec[8]);
   weights.push_back(par_vec[9]);
@@ -513,14 +512,14 @@ double TMeanFieldsForScTrilayerWithInsulator::operator()(double E, const vector<
   weights.push_back(par_vec[11]);
   
   // Calculate field profile
-  vector<double> parForBofZ;
+  std::vector<double> parForBofZ;
   for (unsigned int i(0); i<7; i++)
     parForBofZ.push_back(par_vec[i]);
 
   TLondon1D_3LwInsulator BofZ(parForBofZ);
 
-  vector<double> energies(fImpProfile->Energy());
-  vector<double>::const_iterator energyIter;
+  std::vector<double> energies(fImpProfile->Energy());
+  std::vector<double>::const_iterator energyIter;
   energyIter = find(energies.begin(), energies.end(), E);
 
   if (energyIter != energies.end()) { // implantation profile found - no interpolation needed
@@ -545,13 +544,13 @@ double TMeanFieldsForScTrilayerWithInsulator::operator()(double E, const vector<
 }
 
 double TMeanFieldsForScTrilayerWithInsulator::CalcMeanB
- (double E, const vector<double>& interfaces, const vector<double>& weights, const TLondon1D_3LwInsulator& BofZ) const {
+ (double E, const std::vector<double>& interfaces, const std::vector<double>& weights, const TLondon1D_3LwInsulator& BofZ) const {
   //calcData->UseHighResolution(E);
     fImpProfile->WeightLayers(E, interfaces, weights);
     fImpProfile->Normalize(E);
 
-    vector<double> z(fImpProfile->DataZ(E));
-    vector<double> nz(fImpProfile->DataNZ(E));
+    std::vector<double> z(fImpProfile->DataZ(E));
+    std::vector<double> nz(fImpProfile->DataNZ(E));
     double dz(fImpProfile->DataDZ(E));
 
     // calculate mean field

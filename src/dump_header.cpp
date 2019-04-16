@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2012 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -45,9 +45,13 @@
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
-using namespace std;
 
+#include <TObject.h>
+#include <TObjArray.h>
+#include <TObjString.h>
 #include <TFile.h>
+#include <TFolder.h>
+#include <TString.h>
 
 #include "git-revision.h"
 #include "PStartupHandler.h"
@@ -69,37 +73,37 @@ using namespace std;
  */
 void dump_header_syntax()
 {
-  cout << endl << "usage: dump_header [-rn <runNo> | -fn <fileName>] [-ff, --fileFormat <fileFormat>]";
-  cout << endl << "                   [-y, --year <year>] [-s, --summary] [--psi-bulk <opt>] |";
-  cout << endl << "                   --help | --version";
-  cout << endl;
-  cout << endl << "       Dumps the header information of a given muSR data file onto the standard output.";
-  cout << endl << "       If no <fileFormat> info is povided, it will try to guess what <fileFormat> it might be.";
-  cout << endl << "       For <runNo> guessing of the file format is not possible. The default assumption here is 'MusrRoot'.";
-  cout << endl;
-  cout << endl << "       -rn, --runNo <runNo> : run number of the header to be dumped.";
-  cout << endl << "       -fn, --fileName <fileName> : muSR data file name.";
-  cout << endl << "       -ff, --fileFormat <fileFormat> : where <fileFormat> can be:";
-  cout << endl << "                     MusrRoot, NeXus, ROOT (old LEM), PSI-BIN, PSI-MDU, MUD, WKM";
-  cout << endl << "                     NeXus is only supported if enabled.";
-  cout << endl << "       -y, --year <year> : <year> has to be 4 digit, e.g. 2005, if provided it is used to";
-  cout << endl << "                     generate the file name for the given <runNo>, otherwise the current";
-  cout << endl << "                     year is used. If a file name is given, this option has no effect.";
-  cout << endl << "       -s, --summary : this option is used for LE-uSR data sets only. It will, additionally";
-  cout << endl << "                     to the header information, print the summary file content.";
-  cout << endl << "       --psi-bulk <opt> : where <opt> consists of two items: (i) pta or tdc, ";
-  cout << endl << "                     (ii) gps | ltf | dolly | gpd | hifi. This is needed in combination with";
-  cout << endl << "                     the file formats PSI-BIN and PSI-MDU.";
-  cout << endl << "       -h, --help    : will show this help";
-  cout << endl << "       -v, --version : will show the current version.";
-  cout << endl << endl;
+  std::cout << std::endl << "usage: dump_header [-rn <runNo> | -fn <fileName>] [-ff, --fileFormat <fileFormat>]";
+  std::cout << std::endl << "                   [-y, --year <year>] [-s, --summary] [--psi-bulk <opt>] |";
+  std::cout << std::endl << "                   --help | --version";
+  std::cout << std::endl;
+  std::cout << std::endl << "       Dumps the header information of a given muSR data file onto the standard output.";
+  std::cout << std::endl << "       If no <fileFormat> info is povided, it will try to guess what <fileFormat> it might be.";
+  std::cout << std::endl << "       For <runNo> guessing of the file format is not possible. The default assumption here is 'MusrRoot'.";
+  std::cout << std::endl;
+  std::cout << std::endl << "       -rn, --runNo <runNo> : run number of the header to be dumped.";
+  std::cout << std::endl << "       -fn, --fileName <fileName> : muSR data file name.";
+  std::cout << std::endl << "       -ff, --fileFormat <fileFormat> : where <fileFormat> can be:";
+  std::cout << std::endl << "                     MusrRoot, NeXus, ROOT (old LEM), PSI-BIN, PSI-MDU, MUD, WKM";
+  std::cout << std::endl << "                     NeXus is only supported if enabled.";
+  std::cout << std::endl << "       -y, --year <year> : <year> has to be 4 digit, e.g. 2005, if provided it is used to";
+  std::cout << std::endl << "                     generate the file name for the given <runNo>, otherwise the current";
+  std::cout << std::endl << "                     year is used. If a file name is given, this option has no effect.";
+  std::cout << std::endl << "       -s, --summary : this option is used for LE-uSR data sets only. It will, additionally";
+  std::cout << std::endl << "                     to the header information, print the summary file content.";
+  std::cout << std::endl << "       --psi-bulk <opt> : where <opt> consists of two items: (i) pta or tdc, ";
+  std::cout << std::endl << "                     (ii) gps | ltf | dolly | gpd | hifi. This is needed in combination with";
+  std::cout << std::endl << "                     the file formats PSI-BIN and PSI-MDU.";
+  std::cout << std::endl << "       -h, --help    : will show this help";
+  std::cout << std::endl << "       -v, --version : will show the current version.";
+  std::cout << std::endl << std::endl;
 }
 
 //------------------------------------------------------------------------
 /**
  *
  */
-int dump_header_root(const string fileName, const string fileFormat, const bool summary)
+int dump_header_root(const std::string fileName, const std::string fileFormat, const bool summary)
 {
   TFile f(fileName.c_str());
   if (f.IsZombie()) {
@@ -113,7 +117,7 @@ int dump_header_root(const string fileName, const string fileFormat, const bool 
   if (!folder) { // either something is wrong, or it is a MusrRoot file
     f.GetObject("RunHeader", folder);
     if (!folder) { // something is wrong!!
-      cerr << endl << "**ERROR** Couldn't neither obtain RunInfo (LEM), nor RunHeader (MusrRoot) from " << fileName << endl;
+      std::cerr << std::endl << "**ERROR** Couldn't neither obtain RunInfo (LEM), nor RunHeader (MusrRoot) from " << fileName << std::endl;
       f.Close();
       return 1;
     } else {
@@ -129,64 +133,64 @@ int dump_header_root(const string fileName, const string fileFormat, const bool 
 
     // check if run header is valid
     if (!runHeader) {
-      cerr << endl << "**ERROR** Couldn't obtain run header info from ROOT file " << fileName << endl;
+      std::cerr << std::endl << "**ERROR** Couldn't obtain run header info from ROOT file " << fileName << std::endl;
       f.Close();
       return 1;
     }
 
-    cout << endl << "-------------------";
-    cout << endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
-    cout << endl << "-------------------";
-    cout << endl << "Run Title          : " << runHeader->GetRunTitle().GetString().Data();
-    cout << endl << "Run Number         : " << runHeader->GetRunNumber();
-    cout << endl << "Run Start Time     : " << runHeader->GetStartTimeString().GetString().Data();
-    cout << endl << "Run Stop Time      : " << runHeader->GetStopTimeString().GetString().Data();
-    cout << endl << "Laboratory         : PSI";
-    cout << endl << "Instrument         : LEM";
-    cout << endl << "Beamline           : muE4";
-    cout << endl << "Muon Beam Momentum : 28 MeV/c";
-    cout << endl << "Muon Species       : positive muons";
-    cout << endl << "Muon Source        : Target E - slow muons";
-    cout << endl << "Setup              : " << runHeader->GetLemSetup().GetString().Data();
-    cout << endl << "Comment            : n/a";
-    cout << endl << "Sample Name        : n/a";
-    cout << endl << "Sample Orientation : n/a";
-    cout << endl << "Sample Temperature : " << runHeader->GetSampleTemperature() << "+-" << runHeader->GetSampleTemperatureError() << " K";
-    cout << endl << "Sample Mag. Field  : " << runHeader->GetSampleBField() << "+-" << runHeader->GetSampleBFieldError() << " G";
-    cout << endl << "No of Histos       : " << runHeader->GetNHist();
-    cout << endl << "Time Resolution    : " << runHeader->GetTimeResolution() << " ns";
-    cout << endl << "-------------------";
-    cout << endl << "LEM Specific Entries :";
-    cout << endl << "Moderator          : " << runHeader->GetModerator().GetString().Data();
-    cout << endl << "Moderator HV       : " << runHeader->GetModeratorHV() << " kV";
-    cout << endl << "Sample HV          : " << runHeader->GetSampleHV() << " kV";
-    cout << endl << "Impl. Energy       : " << runHeader->GetImpEnergy() << " keV";
-    cout << endl << "-------------------";
-    cout << endl << "Detector Info (for all detectors the same): ";
-    cout << endl << "-------------------";
-    cout << endl << "Histo Length       : " << runHeader->GetNChannels();
+    std::cout << std::endl << "-------------------";
+    std::cout << std::endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
+    std::cout << std::endl << "-------------------";
+    std::cout << std::endl << "Run Title          : " << runHeader->GetRunTitle().GetString().Data();
+    std::cout << std::endl << "Run Number         : " << runHeader->GetRunNumber();
+    std::cout << std::endl << "Run Start Time     : " << runHeader->GetStartTimeString().GetString().Data();
+    std::cout << std::endl << "Run Stop Time      : " << runHeader->GetStopTimeString().GetString().Data();
+    std::cout << std::endl << "Laboratory         : PSI";
+    std::cout << std::endl << "Instrument         : LEM";
+    std::cout << std::endl << "Beamline           : muE4";
+    std::cout << std::endl << "Muon Beam Momentum : 28 MeV/c";
+    std::cout << std::endl << "Muon Species       : positive muons";
+    std::cout << std::endl << "Muon Source        : Target E - slow muons";
+    std::cout << std::endl << "Setup              : " << runHeader->GetLemSetup().GetString().Data();
+    std::cout << std::endl << "Comment            : n/a";
+    std::cout << std::endl << "Sample Name        : n/a";
+    std::cout << std::endl << "Sample Orientation : n/a";
+    std::cout << std::endl << "Sample Temperature : " << runHeader->GetSampleTemperature() << "+-" << runHeader->GetSampleTemperatureError() << " K";
+    std::cout << std::endl << "Sample Mag. Field  : " << runHeader->GetSampleBField() << "+-" << runHeader->GetSampleBFieldError() << " G";
+    std::cout << std::endl << "No of Histos       : " << runHeader->GetNHist();
+    std::cout << std::endl << "Time Resolution    : " << runHeader->GetTimeResolution() << " ns";
+    std::cout << std::endl << "-------------------";
+    std::cout << std::endl << "LEM Specific Entries :";
+    std::cout << std::endl << "Moderator          : " << runHeader->GetModerator().GetString().Data();
+    std::cout << std::endl << "Moderator HV       : " << runHeader->GetModeratorHV() << " kV";
+    std::cout << std::endl << "Sample HV          : " << runHeader->GetSampleHV() << " kV";
+    std::cout << std::endl << "Impl. Energy       : " << runHeader->GetImpEnergy() << " keV";
+    std::cout << std::endl << "-------------------";
+    std::cout << std::endl << "Detector Info (for all detectors the same): ";
+    std::cout << std::endl << "-------------------";
+    std::cout << std::endl << "Histo Length       : " << runHeader->GetNChannels();
     double *timeZero;
     timeZero = runHeader->GetTimeZero();
-    cout << endl << "Time Zero Bin      : " << timeZero[0];
-    cout << endl << "First Good Bin     : " << timeZero[0];
-    cout << endl << "Last Good Bin      : " << runHeader->GetNChannels()-1;
-    cout << endl << "-------------------" << endl << endl;
+    std::cout << std::endl << "Time Zero Bin      : " << timeZero[0];
+    std::cout << std::endl << "First Good Bin     : " << timeZero[0];
+    std::cout << std::endl << "Last Good Bin      : " << runHeader->GetNChannels()-1;
+    std::cout << std::endl << "-------------------" << std::endl << std::endl;
 
     delete runHeader;
   } else { // MusrRoot
     // invoke the MusrRoot header object
     TMusrRunHeader *header = new TMusrRunHeader(fileName.c_str(), true); // read quite
     if (header == 0) {
-      cerr << endl << "**ERROR** Couldn't invoke MusrRoot RunHeader in file:" << fileName;
-      cerr << endl;
+      std::cerr << std::endl << "**ERROR** Couldn't invoke MusrRoot RunHeader in file:" << fileName;
+      std::cerr << std::endl;
       f.Close();
       return 1;
     }
 
     // try to populate the MusrRoot header object
     if (!header->ExtractAll(folder)) {
-      cerr << endl << "**ERROR** Couldn't invoke MusrRoot RunHeader in file:" << fileName;
-      cerr << endl;
+      std::cerr << std::endl << "**ERROR** Couldn't invoke MusrRoot RunHeader in file:" << fileName;
+      std::cerr << std::endl;
       f.Close();
       return 1;
     }
@@ -198,22 +202,22 @@ int dump_header_root(const string fileName, const string fileFormat, const bool 
 
   // summary as well?
   if (summary && (fileType == DH_MUSR_ROOT)) {
-    TObjArray *runSum=0;
-    runSum = (TObjArray*)folder->FindObject("RunSummary");
+    TObjArray *runSum=nullptr;
+    runSum = static_cast<TObjArray*>(folder->FindObject("RunSummary"));
     if (!runSum) { // something is wrong!!
-      cerr << endl << "**ERROR** Couldn't obtain RunSummary " << fileName << endl;
+      std::cerr << std::endl << "**ERROR** Couldn't obtain RunSummary " << fileName << std::endl;
       f.Close();
       return 1;
     }
-    cout << "++++++++++++++++++++" << endl;
-    cout << " Run Summary" << endl;
-    cout << "++++++++++++++++++++" << endl;
+    std::cout << "++++++++++++++++++++" << std::endl;
+    std::cout << " Run Summary" << std::endl;
+    std::cout << "++++++++++++++++++++" << std::endl;
     TObjString *tstr;
     TString str;
     for (Int_t i=0; i<runSum->GetEntries(); i++) {
-      tstr = (TObjString*)runSum->At(i);
+      tstr = static_cast<TObjString*>(runSum->At(i));
       str = tstr->String();
-      cout << str;
+      std::cout << str;
     }
   }
 
@@ -226,7 +230,7 @@ int dump_header_root(const string fileName, const string fileFormat, const bool 
 /**
  *
  */
-int dump_header_nexus(const string fileName) {
+int dump_header_nexus(const std::string fileName) {
 
 #ifdef PNEXUS_ENABLED
   PNeXus *nxs_file = new PNeXus(fileName.c_str());
@@ -238,7 +242,7 @@ int dump_header_nexus(const string fileName) {
   if (nxs_file)
     delete nxs_file;
 #else
-  cout << endl << "NeXus not enabled, hence the header information cannot be dumped." << endl << endl;
+  std::cout << std::endl << "NeXus not enabled, hence the header information cannot be dumped." << std::endl << std::endl;
 #endif
 
   return 0;
@@ -248,44 +252,44 @@ int dump_header_nexus(const string fileName) {
 /**
  *
  */
-vector<string> dump_header_instrument_info(string fileName)
+std::vector<std::string> dump_header_instrument_info(std::string fileName)
 {
-  vector<string> result;
-  string fln(fileName);
+  std::vector<std::string> result;
+  std::string fln(fileName);
   boost::to_lower(fln);
 
-  if ((fln.find(".bin") != string::npos) || (fln.find(".mdu") != string::npos)) { // PSI-BIN or PSI-MDU format
-    if (fln.find("_gps_") != string::npos) {
+  if ((fln.find(".bin") != std::string::npos) || (fln.find(".mdu") != std::string::npos)) { // PSI-BIN or PSI-MDU format
+    if (fln.find("_gps_") != std::string::npos) {
       result.push_back("GPS");
       result.push_back("piM3.2");
       result.push_back("28 MeV/c");
       result.push_back("likely to be positive muons");
       result.push_back("Target M");
-    } else if (fln.find("_ltf_") != string::npos) {
+    } else if (fln.find("_ltf_") != std::string::npos) {
       result.push_back("LTF");
       result.push_back("piM3.1");
       result.push_back("28 MeV/c");
       result.push_back("likely to be positive muons");
       result.push_back("Target M");
-    } else if (fln.find("_dolly_") != string::npos) {
+    } else if (fln.find("_dolly_") != std::string::npos) {
       result.push_back("DOLLY");
       result.push_back("piE1");
       result.push_back("28 MeV/c");
       result.push_back("likely to be positive muons");
       result.push_back("Target E");
-    } else if (fln.find("_alc_") != string::npos) {
+    } else if (fln.find("_alc_") != std::string::npos) {
       result.push_back("ALC");
       result.push_back("piE3");
       result.push_back("28 MeV/c");
       result.push_back("likely to be positive muons");
       result.push_back("Target E");
-    } else if (fln.find("_hifi_") != string::npos) {
+    } else if (fln.find("_hifi_") != std::string::npos) {
       result.push_back("HAL9500");
       result.push_back("piE3");
       result.push_back("28 MeV/c");
       result.push_back("likely to be positive muons");
       result.push_back("Target E");
-    } else if (fln.find("_gpd_") != string::npos) {
+    } else if (fln.find("_gpd_") != std::string::npos) {
       result.push_back("GPD");
       result.push_back("muE1");
       result.push_back("60-125 MeV/c");
@@ -307,7 +311,7 @@ vector<string> dump_header_instrument_info(string fileName)
 /**
  *
  */
-int dump_header_psi_bin(const string fileName, const string fileFormat)
+int dump_header_psi_bin(const std::string fileName, const std::string fileFormat)
 {
   MuSR_td_PSI_bin psiBin;
   int status;
@@ -320,23 +324,23 @@ int dump_header_psi_bin(const string fileName, const string fileFormat)
       success = true;
       break;
     case 1: // couldn't open file, or failed while reading the header
-      cout << endl << "**ERROR** couldn't open psi-bin file, or failed while reading the header." << endl;
+      std::cout << std::endl << "**ERROR** couldn't open psi-bin file, or failed while reading the header." << std::endl;
       success = false;
       break;
     case 2: // unsupported version of the data
-      cout << endl << "**ERROR** psi-bin file: unsupported version of the data." << endl;
+      std::cout << std::endl << "**ERROR** psi-bin file: unsupported version of the data." << std::endl;
       success = false;
       break;
     case 3: // error when allocating data buffer
-      cout << endl << "**ERROR** psi-bin file: error when allocating data buffer." << endl;
+      std::cout << std::endl << "**ERROR** psi-bin file: error when allocating data buffer." << std::endl;
       success = false;
       break;
     case 4: // number of histograms/record not equals 1
-      cout << endl << ">> **ERROR** psi-bin file: number of histograms/record not equals 1." << endl;
+      std::cout << std::endl << ">> **ERROR** psi-bin file: number of histograms/record not equals 1." << std::endl;
       success = false;
       break;
     default: // you never should have reached this point
-      cout << endl << ">> **ERROR** psi-bin file: no clue why you reached this point." << endl;
+      std::cout << std::endl << ">> **ERROR** psi-bin file: no clue why you reached this point." << std::endl;
       success = false;
       break;
   }
@@ -345,63 +349,63 @@ int dump_header_psi_bin(const string fileName, const string fileFormat)
   if (!success)
     return 1;
 
-  vector<string> vstr;
-  vector<double> dVal, dErrVal;
-  cout << endl << "-------------------";
-  cout << endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
-  cout << endl << "-------------------";
-  cout << endl << "Run Title          : " << psiBin.get_comment();
-  cout << endl << "Run Number         : " << psiBin.get_runNumber_int();
+  std::vector<std::string> vstr;
+  std::vector<double> dVal, dErrVal;
+  std::cout << std::endl << "-------------------";
+  std::cout << std::endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
+  std::cout << std::endl << "-------------------";
+  std::cout << std::endl << "Run Title          : " << psiBin.get_comment();
+  std::cout << std::endl << "Run Number         : " << psiBin.get_runNumber_int();
   vstr = psiBin.get_timeStart_vector();
   if (vstr.size() < 2) {
-    cout << endl << "**ERROR** couldn't obtain \"Run Start Time\" will quit." << endl << endl;
+    std::cout << std::endl << "**ERROR** couldn't obtain \"Run Start Time\" will quit." << std::endl << std::endl;
     return 1;
   }
-  cout << endl << "Run Start Time     : " << vstr[0] << "; " << vstr[1];
+  std::cout << std::endl << "Run Start Time     : " << vstr[0] << "; " << vstr[1];
   vstr = psiBin.get_timeStop_vector();
   if (vstr.size() < 2) {
-    cout << endl << "**ERROR** couldn't obtain \"Run Stop Time\" will quit." << endl << endl;
+    std::cout << std::endl << "**ERROR** couldn't obtain \"Run Stop Time\" will quit." << std::endl << std::endl;
     return 1;
   }
-  cout << endl << "Run Stop Time      : " << vstr[0] << "; " << vstr[1];
-  cout << endl << "Laboratory         : PSI";
+  std::cout << std::endl << "Run Stop Time      : " << vstr[0] << "; " << vstr[1];
+  std::cout << std::endl << "Laboratory         : PSI";
   vstr = dump_header_instrument_info(fileName);
   if (vstr.size() < 5) {
-    cout << endl << "**ERROR** couldn't obtain \"Instrument\" will quit." << endl << endl;
+    std::cout << std::endl << "**ERROR** couldn't obtain \"Instrument\" will quit." << std::endl << std::endl;
     return 1;
   }
-  cout << endl << "Instrument         : " << vstr[0];
-  cout << endl << "Beamline           : " << vstr[1];
-  cout << endl << "Muon Beam Momentum : " << vstr[2];
-  cout << endl << "Muon Species       : " << vstr[3];
-  cout << endl << "Muon Source        : " << vstr[4];
-  cout << endl << "Setup              : " << psiBin.get_comment();
-  cout << endl << "Comment            : n/a";
-  cout << endl << "Sample Name        : " << psiBin.get_sample();
-  cout << endl << "Sample Orientation : " << psiBin.get_orient();
+  std::cout << std::endl << "Instrument         : " << vstr[0];
+  std::cout << std::endl << "Beamline           : " << vstr[1];
+  std::cout << std::endl << "Muon Beam Momentum : " << vstr[2];
+  std::cout << std::endl << "Muon Species       : " << vstr[3];
+  std::cout << std::endl << "Muon Source        : " << vstr[4];
+  std::cout << std::endl << "Setup              : " << psiBin.get_comment();
+  std::cout << std::endl << "Comment            : n/a";
+  std::cout << std::endl << "Sample Name        : " << psiBin.get_sample();
+  std::cout << std::endl << "Sample Orientation : " << psiBin.get_orient();
   dVal = psiBin.get_temperatures_vector();
   dErrVal = psiBin.get_devTemperatures_vector();
   if (dVal.size() != dErrVal.size()) {
-    cout << endl << "Sample Temperature : " << psiBin.get_temp();
+    std::cout << std::endl << "Sample Temperature : " << psiBin.get_temp();
   } else {
     for (unsigned int i=0; i<dVal.size(); i++) {
-      cout << endl << "Sample Temp. " << i+1 << "     : " << dVal[i] << " (" << dErrVal[i] << ") K";
+      std::cout << std::endl << "Sample Temp. " << i+1 << "     : " << dVal[i] << " (" << dErrVal[i] << ") K";
     }
   }
-  cout << endl << "Sample Mag. Field  : " << psiBin.get_field();
-  cout << endl << "No of Histos       : " << psiBin.get_numberHisto_int();
-  cout << endl << "Time Resolution    : " << psiBin.get_binWidth_ns() << " ns";
+  std::cout << std::endl << "Sample Mag. Field  : " << psiBin.get_field();
+  std::cout << std::endl << "No of Histos       : " << psiBin.get_numberHisto_int();
+  std::cout << std::endl << "Time Resolution    : " << psiBin.get_binWidth_ns() << " ns";
   for (int i=0; i<psiBin.get_numberHisto_int(); i++) {
-    cout << endl << "-------------------";
-    cout << endl << "Histo No           : " << i;
-    cout << endl << "Histo Name         : " << psiBin.get_nameHisto(i);
-    cout << endl << "Histo Length       : " << psiBin.get_histoLength_bin();
-    cout << endl << "Time Zero Bin      : " << psiBin.get_t0_int(i);
-    cout << endl << "First Good Bin     : " << psiBin.get_firstGood_int(i);
-    cout << endl << "Last Good Bin      : " << psiBin.get_lastGood_int(i);
-    cout << endl << "No of Events       : " << psiBin.get_eventsHisto_long(i);
+    std::cout << std::endl << "-------------------";
+    std::cout << std::endl << "Histo No           : " << i;
+    std::cout << std::endl << "Histo Name         : " << psiBin.get_nameHisto(i);
+    std::cout << std::endl << "Histo Length       : " << psiBin.get_histoLength_bin();
+    std::cout << std::endl << "Time Zero Bin      : " << psiBin.get_t0_int(i);
+    std::cout << std::endl << "First Good Bin     : " << psiBin.get_firstGood_int(i);
+    std::cout << std::endl << "Last Good Bin      : " << psiBin.get_lastGood_int(i);
+    std::cout << std::endl << "No of Events       : " << psiBin.get_eventsHisto_long(i);
   }
-  cout << endl << "-------------------" << endl << endl;
+  std::cout << std::endl << "-------------------" << std::endl << std::endl;
 
   return 0;
 }
@@ -410,7 +414,7 @@ int dump_header_psi_bin(const string fileName, const string fileFormat)
 /**
  *
  */
-int dump_header_mud(const string fileName, const string fileFormat)
+int dump_header_mud(const std::string fileName, const std::string fileFormat)
 {
   int    fh;
   UINT32 type, val;
@@ -421,113 +425,113 @@ int dump_header_mud(const string fileName, const string fileFormat)
   strncpy(fln, fileName.c_str(), sizeof(fln));
   fh = MUD_openRead(fln, &type);
   if (fh == -1) {
-    cerr << endl << "**ERROR** Couldn't open mud-file " << fileName << ", sorry." << endl;
+    std::cerr << std::endl << "**ERROR** Couldn't open mud-file " << fileName << ", sorry." << std::endl;
     return 1;
   }
 
-  cout << endl << "-------------------";
-  cout << endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
-  cout << endl << "-------------------";
+  std::cout << std::endl << "-------------------";
+  std::cout << std::endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
+  std::cout << std::endl << "-------------------";
   // run title
   success = MUD_getTitle( fh, str, sizeof(str) );
   if (success)
-    cout << endl << "Run Title          : " << str;
+    std::cout << std::endl << "Run Title          : " << str;
   else
-    cout << endl << "Run Title          : ???";
+    std::cout << std::endl << "Run Title          : ???";
   // run number
   success = MUD_getRunNumber( fh, &val );
   if (success)
-    cout << endl << "Run Number         : " << val;
+    std::cout << std::endl << "Run Number         : " << val;
   else
-    cout << endl << "Run Number         : ???";
+    std::cout << std::endl << "Run Number         : ???";
   // start time
   time_t tval;
   struct tm *dt;
   success = MUD_getTimeBegin( fh, (UINT32*)&tval );
   if (success) {
-    dt = localtime((const time_t*)&tval);
+    dt = localtime(static_cast<const time_t*>(&tval));
     assert(dt);
     strftime(str, sizeof(str), "%F; %T", dt);
-    cout << endl << "Run Start Time     : " << str;
+    std::cout << std::endl << "Run Start Time     : " << str;
   } else {
-    cout << endl << "Run Start Time     : ???";
+    std::cout << std::endl << "Run Start Time     : ???";
   }
   // stop time
   success = MUD_getTimeEnd( fh, (UINT32*)&tval );
   if (success) {
-    dt = localtime((const time_t*)&tval);
+    dt = localtime(static_cast<const time_t*>(&tval));
     assert(dt);
     strftime(str, sizeof(str), "%F; %T", dt);
-    cout << endl << "Run Stop Time      : " << str;
+    std::cout << std::endl << "Run Stop Time      : " << str;
   } else {
-    cout << endl << "Run Stop Time      : ???";
+    std::cout << std::endl << "Run Stop Time      : ???";
   }
   // laboratory
   success = MUD_getLab( fh, str, sizeof(str) );
   if (success)
-    cout << endl << "Laboratory         : " << str;
+    std::cout << std::endl << "Laboratory         : " << str;
   else
-    cout << endl << "Laboratory         : ???";
+    std::cout << std::endl << "Laboratory         : ???";
   // instrument
   success = MUD_getApparatus( fh, str, sizeof(str) );
   if (success)
-    cout << endl << "Instrument         : " << str;
+    std::cout << std::endl << "Instrument         : " << str;
   else
-    cout << endl << "Instrument         : ???";
+    std::cout << std::endl << "Instrument         : ???";
   // beamline
   success = MUD_getArea( fh, str, sizeof(str) );
   if (success)
-    cout << endl << "Beamline           : " << str;
+    std::cout << std::endl << "Beamline           : " << str;
   else
-    cout << endl << "Beamline           : ???";
+    std::cout << std::endl << "Beamline           : ???";
 
-  cout << endl << "Muon Beam Momentum : ???";
-  cout << endl << "Muon Species       : positive muon?";
-  cout << endl << "Muon Source        : ???";
+  std::cout << std::endl << "Muon Beam Momentum : ???";
+  std::cout << std::endl << "Muon Species       : positive muon?";
+  std::cout << std::endl << "Muon Source        : ???";
 
   // method
   success = MUD_getMethod( fh, str, sizeof(str) );
   if (success)
-    cout << endl << "Method             : " << str;
+    std::cout << std::endl << "Method             : " << str;
   else
-    cout << endl << "Method             : ???";
+    std::cout << std::endl << "Method             : ???";
 
   // sample
   success = MUD_getSample( fh, str, sizeof(str) );
   if (success)
-    cout << endl << "Sample Name        : " << str;
+    std::cout << std::endl << "Sample Name        : " << str;
   else
-    cout << endl << "Sample Name        : ???";
+    std::cout << std::endl << "Sample Name        : ???";
 
   // orientation
   success = MUD_getOrient( fh, str, sizeof(str) );
   if (success)
-    cout << endl << "Sample Orientation : " << str;
+    std::cout << std::endl << "Sample Orientation : " << str;
   else
-    cout << endl << "Sample Orientation : ???";
+    std::cout << std::endl << "Sample Orientation : ???";
 
   // temperature
   success = MUD_getTemperature( fh, str, sizeof(str) );
   if (success)
-    cout << endl << "Sample Temperature : " << str;
+    std::cout << std::endl << "Sample Temperature : " << str;
   else
-    cout << endl << "Sample Temperature : ???";
+    std::cout << std::endl << "Sample Temperature : ???";
 
   // magnetic field
   success = MUD_getField( fh, str, sizeof(str) );
   if (success)
-    cout << endl << "Sample Magn. Field : " << str;
+    std::cout << std::endl << "Sample Magn. Field : " << str;
   else
-    cout << endl << "Sample Magn. Field : ???";
+    std::cout << std::endl << "Sample Magn. Field : ???";
 
   // number of histograms
   int noHistos = 0;
   success = MUD_getHists(fh, &type, &val);
   if (success) {
-    cout << endl << "No of Histos       : " << val;
+    std::cout << std::endl << "No of Histos       : " << val;
     noHistos = val;
   } else {
-    cout << endl << "No of Histos       : ???";
+    std::cout << std::endl << "No of Histos       : ???";
   }
 
   // time resolution
@@ -535,47 +539,47 @@ int dump_header_mud(const string fileName, const string fileFormat)
   success = MUD_getHistSecondsPerBin( fh, 1, &timeResolution );
   timeResolution *= 1.0e9; // sec -> nsec
   if (success)
-    cout << endl << "Time Resolution    : " << timeResolution << " ns";
+    std::cout << std::endl << "Time Resolution    : " << timeResolution << " ns";
   else
-    cout << endl << "Time Resolution    : ??? ns";
+    std::cout << std::endl << "Time Resolution    : ??? ns";
 
   // detector related stuff
   for (int i=0; i<noHistos; i++) {
-    cout << endl << "-------------------";
-    cout << endl << "Histo No " << i+1;
+    std::cout << std::endl << "-------------------";
+    std::cout << std::endl << "Histo No " << i+1;
 
     success = MUD_getHistTitle( fh, i+1, str, 1023);
     if (success)
-      cout << endl << "Histo Name     : " << str;
+      std::cout << std::endl << "Histo Name     : " << str;
     else
-      cout << endl << "Histo Name     : ???";
+      std::cout << std::endl << "Histo Name     : ???";
 
     success = MUD_getHistNumBins( fh, i+1, &val );
     if (success)
-      cout << endl << "Histo Length   : " << val;
+      std::cout << std::endl << "Histo Length   : " << val;
     else
-      cout << endl << "Histo Length   : ???";
+      std::cout << std::endl << "Histo Length   : ???";
 
     success = MUD_getHistT0_Bin( fh, i+1, &val );
     if (success)
-      cout << endl << "Time Zero Bin  : " << val;
+      std::cout << std::endl << "Time Zero Bin  : " << val;
     else
-      cout << endl << "Time Zero Bin  : ???";
+      std::cout << std::endl << "Time Zero Bin  : ???";
 
     success = MUD_getHistGoodBin1( fh, i+1, &val );
     if (success)
-      cout << endl << "First Good Bin : " << val;
+      std::cout << std::endl << "First Good Bin : " << val;
     else
-      cout << endl << "First Good Bin : ???";
+      std::cout << std::endl << "First Good Bin : ???";
 
     success = MUD_getHistGoodBin2( fh, i+1, &val );
     if (success)
-      cout << endl << "Last Good Bin  : " << val;
+      std::cout << std::endl << "Last Good Bin  : " << val;
     else
-      cout << endl << "Last Good Bin  : ???";
+      std::cout << std::endl << "Last Good Bin  : ???";
   }
 
-  cout << endl << "-------------------" << endl << endl;
+  std::cout << std::endl << "-------------------" << std::endl << std::endl;
 
   MUD_closeRead(fh);
 
@@ -586,24 +590,24 @@ int dump_header_mud(const string fileName, const string fileFormat)
 /**
  *
  */
-int dump_header_wkm(const string fileName, const string fileFormat)
+int dump_header_wkm(const std::string fileName, const std::string fileFormat)
 {
-  ifstream fin(fileName.c_str(), ifstream::in);
+  std::ifstream fin(fileName.c_str(), std::ifstream::in);
   if (!fin.is_open()) {
-    cout << endl << "**ERROR** haven't found \"" << fileName << "\", will quit." << endl << endl;
+    std::cout << std::endl << "**ERROR** haven't found \"" << fileName << "\", will quit." << std::endl << std::endl;
     return 1;
   }
-  cout << endl << "-------------------";
-  cout << endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
-  cout << endl << "-------------------";
+  std::cout << std::endl << "-------------------";
+  std::cout << std::endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
+  std::cout << std::endl << "-------------------";
   char header[256];
   while (fin.good()) {
     fin.getline(header, 256);
     if (strlen(header) == 0)
       break;
-    cout << endl << header;
+    std::cout << std::endl << header;
   }
-  cout << endl << "-------------------" << endl << endl;
+  std::cout << std::endl << "-------------------" << std::endl << std::endl;
   fin.close();
 
   return 0;
@@ -619,7 +623,7 @@ bool dump_is_number(const char *s)
 {
   int i=0;
 
-  if (s == 0) // make sure it is not a null pointer
+  if (s == nullptr) // make sure it is not a null pointer
     return false;
 
   while (isdigit(s[i]))
@@ -639,7 +643,7 @@ bool dump_is_number(const char *s)
 int dump_current_year()
 {
   time_t rawtime;
-  struct tm * timeinfo;
+  struct tm *timeinfo;
   char buffer[32];
 
   time (&rawtime);
@@ -657,9 +661,9 @@ int dump_current_year()
  * @param fileFormat
  * @return
  */
-string dump_create_fln(string runNo, string year, string fileFormat, bool pta, string instrument)
+std::string dump_create_fln(std::string runNo, std::string year, std::string fileFormat, bool pta, std::string instrument)
 {
-  string result = "??";
+  std::string result = "??";
   int yearShort=0;
   int iRunNo=0;
 
@@ -679,7 +683,7 @@ string dump_create_fln(string runNo, string year, string fileFormat, bool pta, s
 
   // if year is an empty string get the current year
   int yy=-1;
-  stringstream ss;
+  std::stringstream ss;
   if (year.empty()) {
     yy = dump_current_year();
     ss << yy;
@@ -723,7 +727,7 @@ string dump_create_fln(string runNo, string year, string fileFormat, bool pta, s
  * @param pathName
  * @return
  */
-bool dump_file_exists(const string pathName)
+bool dump_file_exists(const std::string pathName)
 {
   bool exists = true;
 
@@ -758,12 +762,12 @@ int main(int argc, char *argv[])
     return 0;
   }
 
-  string runNo("");
-  string fileName("");
-  string fileFormat("");
-  string year("");
+  std::string runNo("");
+  std::string fileName("");
+  std::string fileFormat("");
+  std::string year("");
   bool pta(false);
-  string instrument("");
+  std::string instrument("");
   bool summary(false);
 
   for (int i=1; i<argc; i++) {
@@ -772,14 +776,14 @@ int main(int argc, char *argv[])
       return 0;
     } else if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-v")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "dump_header version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "dump_header version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #else
-      cout << endl << "dump_header git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "dump_header git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #endif
       return 0;
     } else if (!strcmp(argv[i], "-rn") || !strcmp(argv[i], "--runNo")) {
       if (i+1 >= argc) {
-        cerr << endl << "**ERROR** found -rn, --runNo without <runNo>!" << endl;
+        std::cerr << std::endl << "**ERROR** found -rn, --runNo without <runNo>!" << std::endl;
         dump_header_syntax();
         return 1;
       }
@@ -789,12 +793,12 @@ int main(int argc, char *argv[])
         count++;
       // make sure there is one and only one run number given
       if (count == 1) {
-        cerr << endl << "**ERROR** found -rn, --runNo without <runNo>, or the provided <runNo> ('" << argv[i+1] << "') is not a number!" << endl;
+        std::cerr << std::endl << "**ERROR** found -rn, --runNo without <runNo>, or the provided <runNo> ('" << argv[i+1] << "') is not a number!" << std::endl;
         dump_header_syntax();
         return 1;
       }
       if (count > 2) {
-        cerr << endl << "**ERROR** found -rn, --runNo with more than one <runNo>! This is not yet supported." << endl;
+        std::cerr << std::endl << "**ERROR** found -rn, --runNo with more than one <runNo>! This is not yet supported." << std::endl;
         dump_header_syntax();
         return 1;
       }
@@ -802,7 +806,7 @@ int main(int argc, char *argv[])
       i++;
     } else if (!strcmp(argv[i], "-fn") || !strcmp(argv[i], "--fileName")) {
       if (i+1 >= argc) {
-        cerr << endl << "**ERROR** found -fn, --fileName without <fileName>!" << endl;
+        std::cerr << std::endl << "**ERROR** found -fn, --fileName without <fileName>!" << std::endl;
         dump_header_syntax();
         return 1;
       }
@@ -810,15 +814,15 @@ int main(int argc, char *argv[])
       i++;
     } else if (!strcmp(argv[i], "--fileFormat") || !strcmp(argv[i], "-ff")) {
       if (i+1 >= argc) {
-        cerr << endl << "**ERROR** found -ff, --fileFormat without <fileFormat>!" << endl;
+        std::cerr << std::endl << "**ERROR** found -ff, --fileFormat without <fileFormat>!" << std::endl;
         dump_header_syntax();
         return 1;
       }
-      string ff(argv[i+1]);
+      std::string ff(argv[i+1]);
       if (!boost::iequals(ff, "MusrRoot") && !boost::iequals(ff, "NeXus") && !boost::iequals(ff, "ROOT") &&
           !boost::iequals(ff, "PSI-BIN") && !boost::iequals(ff, "PSI-MDU")  && !boost::iequals(ff, "MUD") &&
           !boost::iequals(ff, "WKM")) { // none of the listed found
-        cerr << endl << "**ERROR** found unsupported muSR file data format: " << argv[i+1] << endl;
+        std::cerr << std::endl << "**ERROR** found unsupported muSR file data format: " << argv[i+1] << std::endl;
         dump_header_syntax();
         return 1;
       }
@@ -826,19 +830,19 @@ int main(int argc, char *argv[])
       i++;
     } else if (!strcmp(argv[i], "-y") || !strcmp(argv[i], "--year")) {
       if (i+1 >= argc) {
-        cerr << endl << "**ERROR** found -y, --year without <year>!" << endl;
+        std::cerr << std::endl << "**ERROR** found -y, --year without <year>!" << std::endl;
         dump_header_syntax();
         return 1;
       }
       if (!dump_is_number(argv[i+1])) {
-        cerr << endl << "**ERROR** found -y, --year with sensless <year> '" << argv[i+1] << "'!" << endl;
+        std::cerr << std::endl << "**ERROR** found -y, --year with sensless <year> '" << argv[i+1] << "'!" << std::endl;
         dump_header_syntax();
         return 1;
       }
-      int yy = strtod(argv[i+1], (char**)0);
+      int yy = static_cast<int>(strtod(argv[i+1], static_cast<char**>(nullptr)));
       if ((yy < 1950) || (yy > dump_current_year())) {
-        cerr << endl << "**ERROR** found -y, --year with <year> '" << yy << "'!";
-        cerr << endl << "     Well, cannot handle files in the pre-muSR time nor in the future." << endl;
+        std::cerr << std::endl << "**ERROR** found -y, --year with <year> '" << yy << "'!";
+        std::cerr << std::endl << "     Well, cannot handle files in the pre-muSR time nor in the future." << std::endl;
         dump_header_syntax();
         return 1;
       }
@@ -848,7 +852,7 @@ int main(int argc, char *argv[])
       summary = true;
     } else if (!strcmp(argv[i], "--psi-bulk")) {
       if (i+2 >= argc) {
-        cerr << endl << "**ERROR** found --psi-bulk with insufficient input!" << endl;
+        std::cerr << std::endl << "**ERROR** found --psi-bulk with insufficient input!" << std::endl;
         dump_header_syntax();
         return 1;
       }
@@ -857,20 +861,20 @@ int main(int argc, char *argv[])
       else if (!strcmp(argv[i+1], "tdc"))
         pta = false;
       else {
-        cerr << endl << "**ERROR** found --psi-bulk with 1st argument '" << argv[i+1] << "'! Allowed is 'pta' or 'tdc'." << endl;
+        std::cerr << std::endl << "**ERROR** found --psi-bulk with 1st argument '" << argv[i+1] << "'! Allowed is 'pta' or 'tdc'." << std::endl;
         dump_header_syntax();
         return 1;
       }
       if (strcmp(argv[i+2], "gps") && strcmp(argv[i+2], "ltf") && strcmp(argv[i+2], "dolly") &&
           strcmp(argv[i+2], "gpd") && strcmp(argv[i+2], "hifi")) {
-        cerr << endl << "**ERROR** found --psi-bulk with 2nd argument '" << argv[i+1] << "'! This is an unkown instrument." << endl;
+        std::cerr << std::endl << "**ERROR** found --psi-bulk with 2nd argument '" << argv[i+1] << "'! This is an unkown instrument." << std::endl;
         dump_header_syntax();
         return 1;
       }
       instrument = argv[i+2];
       i += 2;
     } else {
-      cerr << endl << "**ERROR** found unkown option '" << argv[i] << "'." << endl;
+      std::cerr << std::endl << "**ERROR** found unkown option '" << argv[i] << "'." << std::endl;
       dump_header_syntax();
       return 1;
     }
@@ -878,13 +882,13 @@ int main(int argc, char *argv[])
 
   // if year is not provided, take the current one
   if (year.empty()) {
-    stringstream ss;
+    std::stringstream ss;
     ss << dump_current_year();
     year = ss.str();
   }
 
   if ((runNo.length() != 0) && (fileName.length() != 0)) {
-    cerr << endl << "**ERROR** currently only either runNo or fileName can be handled, not both simultanously." << endl;
+    std::cerr << std::endl << "**ERROR** currently only either runNo or fileName can be handled, not both simultanously." << std::endl;
     return 1;
   }
 
@@ -894,16 +898,16 @@ int main(int argc, char *argv[])
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << ">> musrfit **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
-    cerr << endl;
+    std::cerr << std::endl << ">> musrfit **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    std::cerr << std::endl;
     // clean up
     if (saxParser) {
       delete saxParser;
-      saxParser = 0;
+      saxParser = nullptr;
     }
     if (startupHandler) {
       delete startupHandler;
-      startupHandler = 0;
+      startupHandler = nullptr;
     }
   } else {
     strcpy(startup_path_name, startupHandler->GetStartupFilePath().Data());
@@ -914,32 +918,32 @@ int main(int argc, char *argv[])
     int status = parseXmlFile(saxParser, startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << ">> musrfit **WARNING** Reading/parsing musrfit_startup.xml failed.";
-      cerr << endl;
+      std::cerr << std::endl << ">> musrfit **WARNING** Reading/parsing musrfit_startup.xml failed.";
+      std::cerr << std::endl;
       // clean up
       if (saxParser) {
         delete saxParser;
-        saxParser = 0;
+        saxParser = nullptr;
       }
       if (startupHandler) {
         delete startupHandler;
-        startupHandler = 0;
+        startupHandler = nullptr;
       }
     }
   }
 
   // runNo given, hence try to create the necessary file name based on the provided information
   if (runNo != "") {
-     string str = dump_create_fln(runNo, year, fileFormat, pta, instrument);
+     std::string str = dump_create_fln(runNo, year, fileFormat, pta, instrument);
      if (str == "??") {
-       cerr << endl << "**ERROR** couldn't get a proper file name." << endl;
+       std::cerr << std::endl << "**ERROR** couldn't get a proper file name." << std::endl;
        return 1;
      }
      fileName = str;
   }
 
   bool found_fln = false;
-  string pathFln("");
+  std::string pathFln("");
   // 1st check if the file name is the full path-file name and the file exists
   pathFln = fileName;
   if (dump_file_exists(pathFln))
@@ -973,7 +977,7 @@ int main(int argc, char *argv[])
   }
 
   if (!found_fln) {
-    cerr << "**ERROR** couldn't find any appropriate file." << endl;
+    std::cerr << "**ERROR** couldn't find any appropriate file." << std::endl;
     // cleanup
     if (saxParser) {
       delete saxParser;
@@ -981,33 +985,33 @@ int main(int argc, char *argv[])
     }
     if (startupHandler) {
       delete startupHandler;
-      startupHandler = 0;
+      startupHandler = nullptr;
     }
     return 1;
   }
 
   // if file format is not given explicitly try to guess it based on the file name extension
   if ((fileFormat == "") && (fileName != "")) {
-    string fln(fileName);
+    std::string fln(fileName);
     boost::to_lower(fln);
-    if (fln.find(".root") != string::npos)
+    if (fln.find(".root") != std::string::npos)
       fileFormat = "MusrRoot"; // could be old ROOT (LEM) as well
-    else if (fln.find(".nxs") != string::npos)
+    else if (fln.find(".nxs") != std::string::npos)
       fileFormat = "NeXus";
-    else if (fln.find(".bin") != string::npos)
+    else if (fln.find(".bin") != std::string::npos)
       fileFormat = "PSI-BIN";
-    else if (fln.find(".mdu") != string::npos)
+    else if (fln.find(".mdu") != std::string::npos)
       fileFormat = "PSI-MDU";
-    else if (fln.find(".msr") != string::npos)
+    else if (fln.find(".msr") != std::string::npos)
       fileFormat = "MUD";
-    else if ((fln.find(".nemu") != string::npos) || (fln.find(".wkm") != string::npos))
+    else if ((fln.find(".nemu") != std::string::npos) || (fln.find(".wkm") != std::string::npos))
       fileFormat = "WKM";
 
     if (fileFormat != "")
-      cout << endl << "**INFO** the guessed file format is " << fileFormat << endl;
+      std::cout << std::endl << "**INFO** the guessed file format is " << fileFormat << std::endl;
   }
   if (fileFormat == "") {
-    cout << endl << "**ERROR** Couldn't guess your file format. You will need to provide it explicitly" << endl << endl;
+    std::cout << std::endl << "**ERROR** Couldn't guess your file format. You will need to provide it explicitly" << std::endl << std::endl;
     return 1;
   }
 
@@ -1019,7 +1023,7 @@ int main(int argc, char *argv[])
 #ifdef PNEXUS_ENABLED
     dump_header_nexus(pathFln);
 #else
-    cout << endl << "Sorry, NeXus is not enabled, hence I cannot help you." << endl;
+    std::cout << std::endl << "Sorry, NeXus is not enabled, hence I cannot help you." << std::endl;
 #endif
   } else if (boost::iequals(fileFormat, "PSI-BIN") || boost::iequals(fileFormat, "PSI-MDU")) {
     dump_header_psi_bin(pathFln, fileFormat);
@@ -1032,11 +1036,11 @@ int main(int argc, char *argv[])
   // cleanup
   if (saxParser) {
     delete saxParser;
-    saxParser = 0;
+    saxParser = nullptr;
   }
   if (startupHandler) {
     delete startupHandler;
-    startupHandler = 0;
+    startupHandler = nullptr;
   }
 
   return 0;

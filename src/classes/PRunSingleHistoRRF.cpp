@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -38,7 +38,6 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include <TString.h>
 #include <TObjArray.h>
@@ -88,24 +87,24 @@ PRunSingleHistoRRF::PRunSingleHistoRRF(PMsrHandler *msrInfo, PRunDataHandler *ra
   PMsrGlobalBlock *global = msrInfo->GetMsrGlobal();
 
   if (!global->IsPresent()) {
-    cerr << endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: no GLOBAL-block present!";
-    cerr << endl << ">> For Single Histo RRF the GLOBAL-block is mandatory! Please fix this first.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: no GLOBAL-block present!";
+    std::cerr << std::endl << ">> For Single Histo RRF the GLOBAL-block is mandatory! Please fix this first.";
+    std::cerr << std::endl;
     fValid = false;
     return;
   }
 
   if (!global->GetRRFUnit().CompareTo("??")) {
-    cerr << endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: no RRF-Frequency found!";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: no RRF-Frequency found!";
+    std::cerr << std::endl;
     fValid = false;
     return;
   }
 
   fRRFPacking = global->GetRRFPacking();
   if (fRRFPacking == -1) {
-    cerr << endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: no RRF-Packing found!";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: no RRF-Packing found!";
+    std::cerr << std::endl;
     fValid = false;
     return;
   }
@@ -118,9 +117,9 @@ PRunSingleHistoRRF::PRunSingleHistoRRF(PMsrHandler *msrInfo, PRunDataHandler *ra
   fN0EstimateEndTime = 1.0; // end time in (us) over which N0 is estimated.
  
   if (!PrepareData()) {
-    cerr << endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: Couldn't prepare data for fitting!";
-    cerr << endl << ">> This is very bad :-(, will quit ...";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::PRunSingleHistoRRF(): **SEVERE ERROR**: Couldn't prepare data for fitting!";
+    std::cerr << std::endl << ">> This is very bad :-(, will quit ...";
+    std::cerr << std::endl;
     fValid = false;
   }
 }
@@ -154,7 +153,7 @@ Double_t PRunSingleHistoRRF::CalcChiSquare(const std::vector<Double_t>& par)
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    Int_t funcNo = fMsrInfo->GetFuncNo(i);
+    UInt_t funcNo = fMsrInfo->GetFuncNo(i);
     fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
   }
 
@@ -175,7 +174,7 @@ Double_t PRunSingleHistoRRF::CalcChiSquare(const std::vector<Double_t>& par)
   #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
   for (i=fStartTimeBin; i<fEndTimeBin; ++i) {
-    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+    time = fData.GetDataTimeStart() + static_cast<Double_t>(i)*fData.GetDataTimeStep();
     diff = fData.GetValue()->at(i) - fTheory->Func(time, par, fFuncValues);
     chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
   }
@@ -202,7 +201,7 @@ Double_t PRunSingleHistoRRF::CalcChiSquareExpected(const std::vector<Double_t>& 
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    Int_t funcNo = fMsrInfo->GetFuncNo(i);
+    UInt_t funcNo = fMsrInfo->GetFuncNo(i);
     fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
   }
 
@@ -223,7 +222,7 @@ Double_t PRunSingleHistoRRF::CalcChiSquareExpected(const std::vector<Double_t>& 
   #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
   for (i=fStartTimeBin; i < fEndTimeBin; ++i) {
-    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+    time = fData.GetDataTimeStart() + static_cast<Double_t>(i)*fData.GetDataTimeStep();
     theo = fTheory->Func(time, par, fFuncValues);
     diff = fData.GetValue()->at(i) - theo;
     chisq += diff*diff / theo;
@@ -275,7 +274,7 @@ void PRunSingleHistoRRF::CalcTheory()
   Double_t resolution = fData.GetDataTimeStep();
   Double_t time;
   for (UInt_t i=0; i<size; i++) {
-    time = start + (Double_t)i*resolution;
+    time = start + static_cast<Double_t>(i)*resolution;
     fData.AppendTheoryValue(fTheory->Func(time, par, fFuncValues));
   }
 
@@ -314,8 +313,8 @@ UInt_t PRunSingleHistoRRF::GetNoOfFitBins()
  */
 void PRunSingleHistoRRF::SetFitRangeBin(const TString fitRange)
 {
-  TObjArray *tok = 0;
-  TObjString *ostr = 0;
+  TObjArray *tok = nullptr;
+  TObjString *ostr = nullptr;
   TString str;
   Ssiz_t idx = -1;
   Int_t offset = 0;
@@ -324,7 +323,7 @@ void PRunSingleHistoRRF::SetFitRangeBin(const TString fitRange)
 
   if (tok->GetEntries() == 3) { // structure FIT_RANGE fgb+n0 lgb-n1
     // handle fgb+n0 entry
-    ostr = (TObjString*) tok->At(1);
+    ostr = dynamic_cast<TObjString*>(tok->At(1));
     str = ostr->GetString();
     // check if there is an offset present
     idx = str.First("+");
@@ -336,7 +335,7 @@ void PRunSingleHistoRRF::SetFitRangeBin(const TString fitRange)
     fFitStartTime = (fGoodBins[0] + offset - fT0s[0]) * fTimeResolution;
 
     // handle lgb-n1 entry
-    ostr = (TObjString*) tok->At(2);
+    ostr = dynamic_cast<TObjString*>(tok->At(2));
     str = ostr->GetString();
     // check if there is an offset present
     idx = str.First("-");
@@ -350,11 +349,11 @@ void PRunSingleHistoRRF::SetFitRangeBin(const TString fitRange)
     Int_t pos = 2*(fRunNo+1)-1;
 
     if (pos + 1 >= tok->GetEntries()) {
-      cerr << endl << ">> PRunSingleHistoRRF::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
-      cerr << endl << ">> will ignore it. Sorry ..." << endl;
+      std::cerr << std::endl << ">> PRunSingleHistoRRF::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+      std::cerr << std::endl << ">> will ignore it. Sorry ..." << std::endl;
     } else {
       // handle fgb+n0 entry
-      ostr = (TObjString*) tok->At(pos);
+      ostr = dynamic_cast<TObjString*>(tok->At(pos));
       str = ostr->GetString();
       // check if there is an offset present
       idx = str.First("+");
@@ -366,7 +365,7 @@ void PRunSingleHistoRRF::SetFitRangeBin(const TString fitRange)
       fFitStartTime = (fGoodBins[0] + offset - fT0s[0]) * fTimeResolution;
 
       // handle lgb-n1 entry
-      ostr = (TObjString*) tok->At(pos+1);
+      ostr = dynamic_cast<TObjString*>(tok->At(pos+1));
       str = ostr->GetString();
       // check if there is an offset present
       idx = str.First("-");
@@ -378,8 +377,8 @@ void PRunSingleHistoRRF::SetFitRangeBin(const TString fitRange)
       fFitEndTime = (fGoodBins[1] - offset - fT0s[0]) * fTimeResolution;
     }
   } else { // error
-    cerr << endl << ">> PRunSingleHistoRRF::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
-    cerr << endl << ">> will ignore it. Sorry ..." << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+    std::cerr << std::endl << ">> will ignore it. Sorry ..." << std::endl;
   }
 
   // clean up
@@ -436,8 +435,8 @@ Bool_t PRunSingleHistoRRF::PrepareData()
   // get the proper run
   PRawRunData* runData = fRawData->GetRunData(*fRunInfo->GetRunName());
   if (!runData) { // couldn't get run
-    cerr << endl << ">> PRunSingleHistoRRF::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->GetRunName()->Data() << "!";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->GetRunName()->Data() << "!";
+    std::cerr << std::endl;
     return false;
   }
 
@@ -447,10 +446,10 @@ Bool_t PRunSingleHistoRRF::PrepareData()
     histoNo.push_back(fRunInfo->GetForwardHistoNo(i));
 
     if (!runData->IsPresent(histoNo[i])) {
-      cerr << endl << ">> PRunSingleHistoRRF::PrepareData(): **PANIC ERROR**:";
-      cerr << endl << ">> histoNo found = " << histoNo[i] << ", which is NOT present in the data file!?!?";
-      cerr << endl << ">> Will quit :-(";
-      cerr << endl;
+      std::cerr << std::endl << ">> PRunSingleHistoRRF::PrepareData(): **PANIC ERROR**:";
+      std::cerr << std::endl << ">> histoNo found = " << histoNo[i] << ", which is NOT present in the data file!?!?";
+      std::cerr << std::endl << ">> Will quit :-(";
+      std::cerr << std::endl;
       histoNo.clear();
       return false;
     }
@@ -458,8 +457,8 @@ Bool_t PRunSingleHistoRRF::PrepareData()
 
   // keep the time resolution in (us)
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
-  cout.precision(10);
-  cout << endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
+  std::cout.precision(10);
+  std::cout << std::endl << ">> PRunSingleHisto::PrepareData(): time resolution=" << std::fixed << runData->GetTimeResolution() << "(ns)" << std::endl;
 
   // get all the proper t0's and addt0's for the current RUN block
   if (!GetProperT0(runData, globalBlock, histoNo)) {
@@ -467,7 +466,7 @@ Bool_t PRunSingleHistoRRF::PrepareData()
   }
 
   // keep the histo of each group at this point (addruns handled below)
-  vector<PDoubleVector> forward;
+  std::vector<PDoubleVector> forward;
   forward.resize(histoNo.size());   // resize to number of groups
   for (UInt_t i=0; i<histoNo.size(); i++) {
     forward[i].resize(runData->GetDataBin(histoNo[i])->size());
@@ -481,9 +480,9 @@ Bool_t PRunSingleHistoRRF::PrepareData()
 
       // get run to be added to the main one
       addRunData = fRawData->GetRunData(*fRunInfo->GetRunName(i));
-      if (addRunData == 0) { // couldn't get run
-        cerr << endl << ">> PRunSingleHistoRRF::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
-        cerr << endl;
+      if (addRunData == nullptr) { // couldn't get run
+        std::cerr << std::endl << ">> PRunSingleHistoRRF::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
+        std::cerr << std::endl;
         return false;
       }
 
@@ -493,8 +492,9 @@ Bool_t PRunSingleHistoRRF::PrepareData()
         addRunSize = addRunData->GetDataBin(histoNo[k])->size();
         for (UInt_t j=0; j<addRunData->GetDataBin(histoNo[k])->size(); j++) { // loop over the bin indices
           // make sure that the index stays in the proper range
-          if (((Int_t)j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k] >= 0) && (j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k] < addRunSize)) {
-            forward[k][j] += addRunData->GetDataBin(histoNo[k])->at(j+(Int_t)fAddT0s[i-1][k]-(Int_t)fT0s[k]);
+          if ((static_cast<Int_t>(j)+static_cast<Int_t>(fAddT0s[i-1][k])-static_cast<Int_t>(fT0s[k]) >= 0) &&
+              (j+static_cast<Int_t>(fAddT0s[i-1][k])-static_cast<Int_t>(fT0s[k]) < addRunSize)) {
+            forward[k][j] += addRunData->GetDataBin(histoNo[k])->at(j+static_cast<Int_t>(fAddT0s[i-1][k])-static_cast<Int_t>(fT0s[k]));
           }
         }
       }
@@ -511,8 +511,9 @@ Bool_t PRunSingleHistoRRF::PrepareData()
   for (UInt_t i=1; i<histoNo.size(); i++) { // loop over the groupings
     for (UInt_t j=0; j<runData->GetDataBin(histoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
-      if (((Int_t)j+fT0s[i]-fT0s[0] >= 0) && (j+fT0s[i]-fT0s[0] < runData->GetDataBin(histoNo[i])->size())) {
-        fForward[j] += forward[i][j+(Int_t)fT0s[i]-(Int_t)fT0s[0]];
+      if ((static_cast<Int_t>(j)+static_cast<Int_t>(fT0s[i])-static_cast<Int_t>(fT0s[0]) >= 0) &&
+          (j+static_cast<Int_t>(fT0s[i])-static_cast<Int_t>(fT0s[0]) < runData->GetDataBin(histoNo[i])->size())) {
+        fForward[j] += forward[i][j+static_cast<Int_t>(fT0s[i])-static_cast<Int_t>(fT0s[0])];
       }
     }
   }
@@ -567,13 +568,13 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
     rawNt.push_back(fForward[i]);  // N(t) without any corrections
   }
   Double_t freqMax = GetMainFrequency(rawNt);
-  cout << "info> freqMax=" << freqMax << " (MHz)" << endl;
+  std::cout << "info> freqMax=" << freqMax << " (MHz)" << std::endl;
 
   // "optimal packing"
   Double_t optNoPoints = 8;
   if (freqMax < 271.0) // < 271 MHz, i.e ~ 2T
     optNoPoints = 5;
-  cout << "info> optimal packing: " << (Int_t)(1.0 / (fTimeResolution*(freqMax - fMsrInfo->GetMsrGlobal()->GetRRFFreq("MHz"))) / optNoPoints);
+  std::cout << "info> optimal packing: " << static_cast<Int_t>(1.0 / (fTimeResolution*(freqMax - fMsrInfo->GetMsrGlobal()->GetRRFFreq("MHz"))) / optNoPoints);
 
   // initially fForward is the "raw data set" (i.e. grouped histo and raw runs already added) to be fitted. This means fForward = N(t) at this point.
 
@@ -586,10 +587,10 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
     } else { // no background given to do the job, try estimate
       fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.1), 0);
       fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.6), 1);
-      cerr << endl << ">> PRunSingleHistoRRF::PrepareFitData(): **WARNING** Neither fix background nor background bins are given!";
-      cerr << endl << ">> Will try the following: bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
-      cerr << endl << ">> NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
-      cerr << endl;
+      std::cerr << std::endl << ">> PRunSingleHistoRRF::PrepareFitData(): **WARNING** Neither fix background nor background bins are given!";
+      std::cerr << std::endl << ">> Will try the following: bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
+      std::cerr << std::endl << ">> NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
+      std::cerr << std::endl;
       if (!EstimateBkg(histoNo))
         return false;
     }
@@ -604,10 +605,10 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   }
   // here fForward = N(t) - Nbkg
 
-  Int_t t0 = (Int_t)fT0s[0];
+  Int_t t0 = static_cast<Int_t>(fT0s[0]);
 
   // 2) N(t) - Nbkg -> exp(+t/tau) [N(t)-Nbkg]
-  Double_t startTime = fTimeResolution * ((Double_t)fGoodBins[0] - (Double_t)t0);
+  Double_t startTime = fTimeResolution * (static_cast<Double_t>(fGoodBins[0]) - static_cast<Double_t>(t0));
 
   Double_t time_tau=0.0;
   Double_t exp_t_tau=0.0;
@@ -650,7 +651,7 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   Double_t phaseRRF = globalBlock->GetRRFPhase()*TMath::TwoPi()/180.0;
   Double_t time = 0.0;
   for (Int_t i=fGoodBins[0]; i<=fGoodBins[1]; i++) {
-    time = startTime + fTimeResolution * ((Double_t)i - (Double_t)fGoodBins[0]);
+    time = startTime + fTimeResolution * (static_cast<Double_t>(i) - static_cast<Double_t>(fGoodBins[0]));
     fForward[i] *= 2.0*cos(wRRF * time + phaseRRF);
   }
 
@@ -683,7 +684,7 @@ Bool_t PRunSingleHistoRRF::PrepareFitData(PRawRunData* runData, const UInt_t his
   }
 
   // set start time and time step
-  fData.SetDataTimeStart(fTimeResolution*((Double_t)fGoodBins[0]-(Double_t)t0+(Double_t)(fRRFPacking-1)/2.0));
+  fData.SetDataTimeStart(fTimeResolution*(static_cast<Double_t>(fGoodBins[0])-static_cast<Double_t>(t0)+static_cast<Double_t>(fRRFPacking-1)/2.0));
   fData.SetDataTimeStep(fTimeResolution*fRRFPacking);
 
   CalcNoOfFitBins();
@@ -723,8 +724,8 @@ Bool_t PRunSingleHistoRRF::PrepareViewData(PRawRunData* runData, const UInt_t hi
   Int_t viewPacking = fMsrInfo->GetMsrPlotList()->at(0).fViewPacking;
   if (viewPacking > 0) {
     if (viewPacking < fRRFPacking) {
-      cerr << ">> PRunSingleHistoRRF::PrepareViewData(): **WARNING** Found View Packing (" << viewPacking << ") < RRF Packing (" << fRRFPacking << ").";
-      cerr << ">> Will ignore View Packing." << endl;
+      std::cerr << ">> PRunSingleHistoRRF::PrepareViewData(): **WARNING** Found View Packing (" << viewPacking << ") < RRF Packing (" << fRRFPacking << ").";
+      std::cerr << ">> Will ignore View Packing." << std::endl;
     } else {
       // STILL MISSING
     }
@@ -753,14 +754,14 @@ Bool_t PRunSingleHistoRRF::PrepareViewData(PRawRunData* runData, const UInt_t hi
 
   if (fData.GetValue()->size() * 10 > fForward.size()) {
     size = fData.GetValue()->size() * 10;
-    factor = (Double_t)fForward.size() / (Double_t)size;
+    factor = static_cast<Double_t>(fForward.size()) / static_cast<Double_t>(size);
   }
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
   fData.SetTheoryTimeStep(fTimeResolution*factor);
 
   // calculate theory
   for (UInt_t i=0; i<size; i++) {
-    time = fData.GetTheoryTimeStart() + (Double_t)i*fData.GetTheoryTimeStep();
+    time = fData.GetTheoryTimeStart() + static_cast<Double_t>(i)*fData.GetTheoryTimeStep();
     theoryValue = fTheory->Func(time, par, fFuncValues);
     if (fabs(theoryValue) > 10.0) { // dirty hack needs to be fixed!!
       theoryValue = 0.0;
@@ -808,7 +809,7 @@ Bool_t PRunSingleHistoRRF::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *gl
 
   // fill in the T0's from the GLOBAL block section (if present)
   for (UInt_t i=0; i<globalBlock->GetT0BinSize(); i++) {
-    if (fT0s[i] == -1) { // i.e. not given in the RUN block section
+    if (fT0s[i] == -1.0) { // i.e. not given in the RUN block section
       fT0s[i] = globalBlock->GetT0Bin(i);
     }
   }
@@ -829,19 +830,19 @@ Bool_t PRunSingleHistoRRF::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *gl
       fT0s[i] = runData->GetT0BinEstimated(histoNo[i]);
       fRunInfo->SetT0Bin(fT0s[i], i); // keep value for the msr-file
 
-      cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-      cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-      cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
-      cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-      cerr << endl;
+      std::cerr << std::endl << ">> PRunSingleHistoRRF::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+      std::cerr << std::endl << ">> run: " << fRunInfo->GetRunName()->Data();
+      std::cerr << std::endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(histoNo[i]);
+      std::cerr << std::endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+      std::cerr << std::endl;
     }
   }
 
   // check if t0 is within proper bounds
   for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {
-    if ((fT0s[i] < 0) || (fT0s[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **ERROR** t0 data bin (" << fT0s[i] << ") doesn't make any sense!";
-      cerr << endl;
+    if ((fT0s[i] < 0.0) || (fT0s[i] > static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunSingleHistoRRF::GetProperT0(): **ERROR** t0 data bin (" << fT0s[i] << ") doesn't make any sense!";
+      std::cerr << std::endl;
       return false;
     }
   }
@@ -854,9 +855,9 @@ Bool_t PRunSingleHistoRRF::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *gl
 
       // get run to be added to the main one
       addRunData = fRawData->GetRunData(*fRunInfo->GetRunName(i));
-      if (addRunData == 0) { // couldn't get run
-        cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
-        cerr << endl;
+      if (addRunData == nullptr) { // couldn't get run
+        std::cerr << std::endl << ">> PRunSingleHistoRRF::GetProperT0(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
+        std::cerr << std::endl;
         return false;
       }
 
@@ -887,19 +888,19 @@ Bool_t PRunSingleHistoRRF::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *gl
           fAddT0s[i-1][j] = addRunData->GetT0BinEstimated(histoNo[j]);
           fRunInfo->SetAddT0Bin(fAddT0s[i-1][j], i-1, j); // keep value for the msr-file
 
-          cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-          cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
-          cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
-          cerr << endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-          cerr << endl;
+          std::cerr << std::endl << ">> PRunSingleHistoRRF::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+          std::cerr << std::endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
+          std::cerr << std::endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(histoNo[j]);
+          std::cerr << std::endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+          std::cerr << std::endl;
         }
       }
 
       // check if t0 is within proper bounds
       for (UInt_t j=0; j<fRunInfo->GetForwardHistoNoSize(); j++) {
-        if ((fAddT0s[i-1][j] < 0) || (fAddT0s[i-1][j] > (Int_t)addRunData->GetDataBin(histoNo[j])->size())) {
-          cerr << endl << ">> PRunSingleHistoRRF::GetProperT0(): **ERROR** addt0 data bin (" << fAddT0s[i-1][j] << ") doesn't make any sense!";
-          cerr << endl;
+        if ((fAddT0s[i-1][j] < 0) || (fAddT0s[i-1][j] > static_cast<Int_t>(addRunData->GetDataBin(histoNo[j])->size()))) {
+          std::cerr << std::endl << ">> PRunSingleHistoRRF::GetProperT0(): **ERROR** addt0 data bin (" << fAddT0s[i-1][j] << ") doesn't make any sense!";
+          std::cerr << std::endl;
           return false;
         }
       }
@@ -940,19 +941,19 @@ Bool_t PRunSingleHistoRRF::GetProperDataRange()
 
   // check if data range has been provided, and if not try to estimate them
   if (start < 0) {
-    Int_t offset = (Int_t)(10.0e-3/fTimeResolution);
-    start = (Int_t)fT0s[0]+offset;
+    Int_t offset = static_cast<Int_t>(10.0e-3/fTimeResolution);
+    start = static_cast<Int_t>(fT0s[0])+offset;
     fRunInfo->SetDataRange(start, 0);
-    cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **WARNING** data range was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start << ".";
+    std::cerr << std::endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    std::cerr << std::endl;
   }
   if (end < 0) {
     end = fForward.size();
     fRunInfo->SetDataRange(end, 1);
-    cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **WARNING** data range was not provided, will try data range end = " << end << ".";
-    cerr << endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **WARNING** data range was not provided, will try data range end = " << end << ".";
+    std::cerr << std::endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    std::cerr << std::endl;
   }
 
   // check if start and end make any sense
@@ -963,22 +964,22 @@ Bool_t PRunSingleHistoRRF::GetProperDataRange()
     start = keep;
   }
   // 2nd check if start is within proper bounds
-  if ((start < 0) || (start > (Int_t)fForward.size())) {
-    cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **ERROR** start data bin (" << start << ") doesn't make any sense!";
-    cerr << endl;
+  if ((start < 0) || (start > static_cast<Int_t>(fForward.size()))) {
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **ERROR** start data bin (" << start << ") doesn't make any sense!";
+    std::cerr << std::endl;
     return false;
   }
   // 3rd check if end is within proper bounds
   if (end < 0) {
-    cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **ERROR** end data bin (" << end << ") doesn't make any sense!";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **ERROR** end data bin (" << end << ") doesn't make any sense!";
+    std::cerr << std::endl;
     return false;
   }
-  if (end > (Int_t)fForward.size()) {
-    cerr << endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **WARNING** end data bin (" << end << ") > histo length (" << (Int_t)fForward.size() << ").";
-    cerr << endl << ">>    Will set end = (histo length - 1). Consider to change it in the msr-file." << endl;
-    cerr << endl;
-    end = (Int_t)fForward.size()-1;
+  if (end > static_cast<Int_t>(fForward.size())) {
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::GetProperDataRange(): **WARNING** end data bin (" << end << ") > histo length (" << fForward.size() << ").";
+    std::cerr << std::endl << ">>    Will set end = (histo length - 1). Consider to change it in the msr-file." << std::endl;
+    std::cerr << std::endl;
+    end = static_cast<Int_t>(fForward.size()-1);
   }
 
   // keep good bins for potential later use
@@ -1031,8 +1032,8 @@ void PRunSingleHistoRRF::GetProperFitRange(PMsrGlobalBlock *globalBlock)
   if ((fFitStartTime == PMUSR_UNDEFINED) || (fFitEndTime == PMUSR_UNDEFINED)) {
     fFitStartTime = (fGoodBins[0] - fT0s[0]) * fTimeResolution; // (fgb-t0)*dt
     fFitEndTime = (fGoodBins[1] - fT0s[0]) * fTimeResolution;   // (lgb-t0)*dt
-    cerr << ">> PRunSingleHistoRRF::GetProperFitRange(): **WARNING** Couldn't get fit start/end time!" << endl;
-    cerr << ">>    Will set it to fgb/lgb which given in time is: " << fFitStartTime << "..." << fFitEndTime << " (usec)" << endl;
+    std::cerr << ">> PRunSingleHistoRRF::GetProperFitRange(): **WARNING** Couldn't get fit start/end time!" << std::endl;
+    std::cerr << ">>    Will set it to fgb/lgb which given in time is: " << fFitStartTime << "..." << fFitEndTime << " (usec)" << std::endl;
   }
 }
 
@@ -1102,7 +1103,7 @@ Double_t PRunSingleHistoRRF::EstimateN0(Double_t &errN0, Double_t freqMax)
 {
   // endBin is estimated such that the number of full cycles (according to the maximum frequency of the data)
   // is approximately the time fN0EstimateEndTime.
-  Int_t endBin = (Int_t)round(ceil(fN0EstimateEndTime*freqMax/TMath::TwoPi()) * (TMath::TwoPi()/freqMax) / fTimeResolution);
+  Int_t endBin = static_cast<Int_t>(round(ceil(fN0EstimateEndTime*freqMax/TMath::TwoPi()) * (TMath::TwoPi()/freqMax) / fTimeResolution));
 
   Double_t n0 = 0.0;
   Double_t wN = 0.0;
@@ -1120,7 +1121,7 @@ Double_t PRunSingleHistoRRF::EstimateN0(Double_t &errN0, Double_t freqMax)
   }
   errN0 = sqrt(errN0)/wN;
 
-  cout << "info> PRunSingleHistoRRF::EstimateN0(): N0=" << n0 << "(" << errN0 << ")" << endl;
+  std::cout << "info> PRunSingleHistoRRF::EstimateN0(): N0=" << n0 << "(" << errN0 << ")" << std::endl;
 
   return n0;
 }
@@ -1155,7 +1156,7 @@ Bool_t PRunSingleHistoRRF::EstimateBkg(UInt_t histoNo)
   UInt_t start = fRunInfo->GetBkgRange(0);
   UInt_t end   = fRunInfo->GetBkgRange(1);
   if (end < start) {
-    cout << endl << "PRunSingleHistoRRF::EstimatBkg(): end = " << end << " > start = " << start << "! Will swap them!";
+    std::cout << std::endl << "PRunSingleHistoRRF::EstimatBkg(): end = " << end << " > start = " << start << "! Will swap them!";
     UInt_t keep = end;
     end = start;
     start = keep;
@@ -1163,30 +1164,30 @@ Bool_t PRunSingleHistoRRF::EstimateBkg(UInt_t histoNo)
 
   // calculate proper background range
   if (beamPeriod != 0.0) {
-    Double_t timeBkg = (Double_t)(end-start)*fTimeResolution; // length of the background intervall in time
-    UInt_t fullCycles = (UInt_t)(timeBkg/beamPeriod); // how many proton beam cylces can be placed within the proposed background intervall
+    Double_t timeBkg = static_cast<Double_t>(end-start)*fTimeResolution; // length of the background intervall in time
+    UInt_t fullCycles = static_cast<UInt_t>(timeBkg/beamPeriod); // how many proton beam cylces can be placed within the proposed background intervall
     // correct the end of the background intervall such that the background is as close as possible to a multiple of the proton cylce
-    end = start + (UInt_t) ((fullCycles*beamPeriod)/fTimeResolution);
-    cout << endl << "PRunSingleHistoRRF::EstimatBkg(): Background " << start << ", " << end;
+    end = start + static_cast<UInt_t>((fullCycles*beamPeriod)/fTimeResolution);
+    std::cout << std::endl << "PRunSingleHistoRRF::EstimatBkg(): Background " << start << ", " << end;
     if (end == start)
       end = fRunInfo->GetBkgRange(1);
   }
 
   // check if start is within histogram bounds
   if (start >= fForward.size()) {
-    cerr << endl << ">> PRunSingleHistoRRF::EstimatBkg(): **ERROR** background bin values out of bound!";
-    cerr << endl << ">> histo lengths    = " << fForward.size();
-    cerr << endl << ">> background start = " << start;
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::EstimatBkg(): **ERROR** background bin values out of bound!";
+    std::cerr << std::endl << ">> histo lengths    = " << fForward.size();
+    std::cerr << std::endl << ">> background start = " << start;
+    std::cerr << std::endl;
     return false;
   }
 
   // check if end is within histogram bounds
   if (end >= fForward.size()) {
-    cerr << endl << ">> PRunSingleHistoRRF::EstimatBkg(): **ERROR** background bin values out of bound!";
-    cerr << endl << ">> histo lengths  = " << fForward.size();
-    cerr << endl << ">> background end = " << end;
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunSingleHistoRRF::EstimatBkg(): **ERROR** background bin values out of bound!";
+    std::cerr << std::endl << ">> histo lengths  = " << fForward.size();
+    std::cerr << std::endl << ">> background end = " << end;
+    std::cerr << std::endl;
     return false;
   }
 
@@ -1205,7 +1206,7 @@ Bool_t PRunSingleHistoRRF::EstimateBkg(UInt_t histoNo)
     bkg += pow(fForward[i]-fBackground, 2.0);
   fBkgErr = sqrt(bkg/(static_cast<Double_t>(end - start)));
 
-  cout << endl << "info> fBackground=" << fBackground << "(" << fBkgErr << ")" << endl;
+  std::cout << std::endl << "info> fBackground=" << fBackground << "(" << fBkgErr << ")" << std::endl;
 
   fRunInfo->SetBkgEstimated(fBackground, 0);
 

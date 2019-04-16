@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,6 @@
 
 #include <iostream>
 #include <vector>
-using namespace std;
 
 #include <TObject.h>
 #include <TString.h>
@@ -47,7 +46,7 @@ using namespace std;
 #define SQRT_TWO 1.41421356237
 #define SQRT_PI  1.77245385091
 
-extern vector<void*> gGlobalUserFcn;
+extern std::vector<void*> gGlobalUserFcn;
 
 //--------------------------------------------------------------------------
 // Constructor
@@ -95,10 +94,10 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
 {
   // init stuff
   fValid = true;
-  fAdd = 0;
-  fMul = 0;
+  fAdd = nullptr;
+  fMul = nullptr;
   fUserFcnClassName = TString("");
-  fUserFcn = 0;
+  fUserFcn = nullptr;
   fDynLFdt = 0.0;
   fSamplingTime = 0.001; // default = 1ns (units in us)
 
@@ -143,9 +142,9 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
 
   tokens = str.Tokenize(" \t");
   if (!tokens) {
-    cerr << endl << ">> PTheory::PTheory: **SEVERE ERROR** Couldn't tokenize theory block line " << line->fLineNo << ".";
-    cerr << endl << ">>  line content: " << line->fLine.Data();
-    cerr << endl;
+    std::cerr << std::endl << ">> PTheory::PTheory: **SEVERE ERROR** Couldn't tokenize theory block line " << line->fLineNo << ".";
+    std::cerr << std::endl << ">>  line content: " << line->fLine.Data();
+    std::cerr << std::endl;
     exit(0);
   }
   ostr = dynamic_cast<TObjString*>(tokens->At(0));
@@ -155,21 +154,21 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
   UInt_t idx = SearchDataBase(str);
 
   // function found is not defined
-  if (idx == (UInt_t) THEORY_UNDEFINED) {
-    cerr << endl << ">> PTheory::PTheory: **ERROR** Theory line '" << line->fLine.Data() << "'";
-    cerr << endl << ">>  in line no " << line->fLineNo << " is undefined!";
-    cerr << endl;
+  if (idx == static_cast<UInt_t>(THEORY_UNDEFINED)) {
+    std::cerr << std::endl << ">> PTheory::PTheory: **ERROR** Theory line '" << line->fLine.Data() << "'";
+    std::cerr << std::endl << ">>  in line no " << line->fLineNo << " is undefined!";
+    std::cerr << std::endl;
     fValid = false;
     return;
   }
 
   // line is a valid function, hence analyze parameters
-  if (((UInt_t)(tokens->GetEntries()-1) < fNoOfParam) &&
+  if ((static_cast<UInt_t>(tokens->GetEntries()-1) < fNoOfParam) &&
       ((idx != THEORY_USER_FCN) && (idx != THEORY_POLYNOM))) {
-    cerr << endl << ">> PTheory::PTheory: **ERROR** Theory line '" << line->fLine.Data() << "'";
-    cerr << endl << ">>  in line no " << line->fLineNo;
-    cerr << endl << ">>  expecting " << fgTheoDataBase[idx].fNoOfParam << ", but found " << tokens->GetEntries()-1;
-    cerr << endl;
+    std::cerr << std::endl << ">> PTheory::PTheory: **ERROR** Theory line '" << line->fLine.Data() << "'";
+    std::cerr << std::endl << ">>  in line no " << line->fLineNo;
+    std::cerr << std::endl << ">>  expecting " << fgTheoDataBase[idx].fNoOfParam << ", but found " << tokens->GetEntries()-1;
+    std::cerr << std::endl;
     fValid = false;
   }
   // keep function index
@@ -203,13 +202,13 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
         if ((value <= maps.size()) && (value > 0)) { // everything fine
           fParamNo.push_back(maps[value-1]-1);
         } else { // map index out of range
-          cerr << endl << ">> PTheory::PTheory: **ERROR** map index " << value << " out of range! See line no " << line->fLineNo;
-          cerr << endl;
+          std::cerr << std::endl << ">> PTheory::PTheory: **ERROR** map index " << value << " out of range! See line no " << line->fLineNo;
+          std::cerr << std::endl;
           fValid = false;
         }
       } else { // something wrong
-        cerr << endl << ">> PTheory::PTheory: **ERROR**: map '" << str.Data() << "' not allowed. See line no " << line->fLineNo;
-        cerr << endl;
+        std::cerr << std::endl << ">> PTheory::PTheory: **ERROR**: map '" << str.Data() << "' not allowed. See line no " << line->fLineNo;
+        std::cerr << std::endl;
         fValid = false;
       }
     } else if (str.Contains("fun")) { // check if str is fun
@@ -230,8 +229,8 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
       }
       // check if one of the valid entries was found
       if (!ok) {
-        cerr << endl << ">> PTheory::PTheory: **ERROR** '" << str.Data() << "' not allowed. See line no " << line->fLineNo;
-        cerr << endl;
+        std::cerr << std::endl << ">> PTheory::PTheory: **ERROR** '" << str.Data() << "' not allowed. See line no " << line->fLineNo;
+        std::cerr << std::endl;
         fValid = false;
       }
     }
@@ -265,41 +264,41 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
 
   // check if user function, if so, check if it is reachable (root) and if yes invoke object
   if (!fUserFcnClassName.IsWhitespace()) {
-    cout << endl << ">> user function class name: " << fUserFcnClassName.Data() << endl;
+    std::cout << std::endl << ">> user function class name: " << fUserFcnClassName.Data() << std::endl;
     if (!TClass::GetDict(fUserFcnClassName.Data())) {
       if (gSystem->Load(fUserFcnSharedLibName.Data()) < 0) {
-        cerr << endl << ">> PTheory::PTheory: **ERROR** user function class '" << fUserFcnClassName.Data() << "' not found.";
-        cerr << endl << ">>           Tried to load " << fUserFcnSharedLibName.Data() << " but failed.";
-        cerr << endl << ">>           See line no " << line->fLineNo;
-        cerr << endl;
+        std::cerr << std::endl << ">> PTheory::PTheory: **ERROR** user function class '" << fUserFcnClassName.Data() << "' not found.";
+        std::cerr << std::endl << ">>           Tried to load " << fUserFcnSharedLibName.Data() << " but failed.";
+        std::cerr << std::endl << ">>           See line no " << line->fLineNo;
+        std::cerr << std::endl;
         fValid = false;
         // clean up
         if (tokens) {
           delete tokens;
-          tokens = 0;
+          tokens = nullptr;
         }
         return;
       } else if (!TClass::GetDict(fUserFcnClassName.Data())) {
-        cerr << endl << ">> PTheory::PTheory: **ERROR** user function class '" << fUserFcnClassName.Data() << "' not found.";
-        cerr << endl << ">>           " << fUserFcnSharedLibName.Data() << " loaded successfully, but no dictionary present.";
-        cerr << endl << ">>           See line no " << line->fLineNo;
-        cerr << endl;
+        std::cerr << std::endl << ">> PTheory::PTheory: **ERROR** user function class '" << fUserFcnClassName.Data() << "' not found.";
+        std::cerr << std::endl << ">>           " << fUserFcnSharedLibName.Data() << " loaded successfully, but no dictionary present.";
+        std::cerr << std::endl << ">>           See line no " << line->fLineNo;
+        std::cerr << std::endl;
         fValid = false;
         // clean up
         if (tokens) {
           delete tokens;
-          tokens = 0;
+          tokens = nullptr;
         }
         return;
       }
     }
 
     // invoke user function object
-    fUserFcn = 0;
-    fUserFcn = (PUserFcnBase*)TClass::GetClass(fUserFcnClassName.Data())->New();
-    if (fUserFcn == 0) {
-      cerr << endl << ">> PTheory::PTheory: **ERROR** user function object could not be invoked. See line no " << line->fLineNo;
-      cerr << endl;
+    fUserFcn = nullptr;
+    fUserFcn = static_cast<PUserFcnBase*>(TClass::GetClass(fUserFcnClassName.Data())->New());
+    if (fUserFcn == nullptr) {
+      std::cerr << std::endl << ">> PTheory::PTheory: **ERROR** user function object could not be invoked. See line no " << line->fLineNo;
+      std::cerr << std::endl;
       fValid = false;
       return;
     } else { // user function valid, hence expand the fUserParam vector to the proper size
@@ -310,8 +309,8 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
     if (fUserFcn->NeedGlobalPart()) {
       fUserFcn->SetGlobalPart(gGlobalUserFcn, fUserFcnIdx); // invoke or retrieve global user function object
       if (!fUserFcn->GlobalPartIsValid()) {
-        cerr << endl << ">> PTheory::PTheory: **ERROR** global user function object could not be invoked/retrived. See line no " << line->fLineNo;
-        cerr << endl;
+        std::cerr << std::endl << ">> PTheory::PTheory: **ERROR** global user function object could not be invoked/retrived. See line no " << line->fLineNo;
+        std::cerr << std::endl;
         fValid = false;
       }
     }
@@ -320,7 +319,7 @@ PTheory::PTheory(PMsrHandler *msrInfo, UInt_t runNo, const Bool_t hasParent) : f
   // clean up
   if (tokens) {
     delete tokens;
-    tokens = 0;
+    tokens = nullptr;
   }
 }
 
@@ -343,7 +342,7 @@ PTheory::~PTheory()
 
   if (fUserFcn) {
     delete fUserFcn;
-    fUserFcn = 0;
+    fUserFcn = nullptr;
   }
 
   gGlobalUserFcn.clear();
@@ -375,8 +374,6 @@ Bool_t PTheory::IsValid()
       return fValid;
     }
   }
-
-  return false;
 }
 
 //--------------------------------------------------------------------------
@@ -398,223 +395,163 @@ Double_t PTheory::Func(Double_t t, const PDoubleVector& paramValues, const PDoub
         case THEORY_CONST:
           return Constant(paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
               fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_ASYMMETRY:
           return Asymmetry(paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SIMPLE_EXP:
           return SimpleExp(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_GENERAL_EXP:
           return GeneralExp(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SIMPLE_GAUSS:
           return SimpleGauss(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_GAUSS_KT:
           return StaticGaussKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_GAUSS_KT_LF:
           return StaticGaussKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_GAUSS_KT_LF:
           return DynamicGaussKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_LORENTZ_KT:
           return StaticLorentzKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_LORENTZ_KT_LF:
           return StaticLorentzKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_LORENTZ_KT_LF:
           return DynamicLorentzKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STR_KT:
           return StrKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SPIN_GLASS:
           return SpinGlass(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_RANDOM_ANISOTROPIC_HYPERFINE:
           return RandomAnisotropicHyperfine(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_ABRAGAM:
           return Abragam(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) + 
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_TF_COS:
           return TFCos(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD:
           return InternalField(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD_KORNILOV:
           return InternalFieldGK(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
               fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD_LARKIN:
           return InternalFieldLL(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
               fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_BESSEL:
           return Bessel(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) + 
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_BESSEL:
           return InternalBessel(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SKEWED_GAUSS:
           return SkewedGauss(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_ZF_NK:
           return StaticNKZF (t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
-                 fAdd->Func(t, paramValues, funcValues);
-          break;
+                 fAdd->Func(t, paramValues, funcValues);          
         case THEORY_STATIC_TF_NK:
           return StaticNKTF (t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_ZF_NK:
           return DynamicNKZF (t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_TF_NK:
           return DynamicNKTF (t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_POLYNOM:
           return Polynom(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_MU_MINUS_EXP:
           return MuMinusExpTF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_USER_FCN:
           return UserFcn(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues) +
                  fAdd->Func(t, paramValues, funcValues);
-          break;
         default:
-          cerr << endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
-          cerr << endl;
+          std::cerr << std::endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
+          std::cerr << std::endl;
           exit(0);
       }
     } else { // fMul !=0 && fAdd == 0
       switch (fType) {
         case THEORY_CONST:
           return Constant(paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_ASYMMETRY:
           return Asymmetry(paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SIMPLE_EXP:
           return SimpleExp(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_GENERAL_EXP:
           return GeneralExp(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SIMPLE_GAUSS:
           return SimpleGauss(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_GAUSS_KT:
           return StaticGaussKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_GAUSS_KT_LF:
           return StaticGaussKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_GAUSS_KT_LF:
           return DynamicGaussKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_LORENTZ_KT:
           return StaticLorentzKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_LORENTZ_KT_LF:
           return StaticLorentzKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_LORENTZ_KT_LF:
           return DynamicLorentzKTLF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STR_KT:
           return StrKT(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SPIN_GLASS:
           return SpinGlass(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_RANDOM_ANISOTROPIC_HYPERFINE:
           return RandomAnisotropicHyperfine(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_ABRAGAM:
           return Abragam(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_TF_COS:
           return TFCos(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD:
           return InternalField(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD_KORNILOV:
           return InternalFieldGK(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD_LARKIN:
           return InternalFieldLL(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_BESSEL:
           return Bessel(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_BESSEL:
           return InternalBessel(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SKEWED_GAUSS:
           return SkewedGauss(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_ZF_NK:
           return StaticNKZF (t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_TF_NK:
           return StaticNKTF (t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_ZF_NK:
           return DynamicNKZF (t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_TF_NK:
           return DynamicNKTF (t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_MU_MINUS_EXP:
           return MuMinusExpTF(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_POLYNOM:
           return Polynom(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         case THEORY_USER_FCN:
           return UserFcn(t, paramValues, funcValues) * fMul->Func(t, paramValues, funcValues);
-          break;
         default:
-          cerr << endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
-          cerr << endl;
+          std::cerr << std::endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
+          std::cerr << std::endl;
           exit(0);
       }
     }
@@ -623,200 +560,138 @@ Double_t PTheory::Func(Double_t t, const PDoubleVector& paramValues, const PDoub
       switch (fType) {
         case THEORY_CONST:
           return Constant(paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_ASYMMETRY:
           return Asymmetry(paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SIMPLE_EXP:
           return SimpleExp(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_GENERAL_EXP:
           return GeneralExp(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SIMPLE_GAUSS:
           return SimpleGauss(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_GAUSS_KT:
           return StaticGaussKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_GAUSS_KT_LF:
           return StaticGaussKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_GAUSS_KT_LF:
           return DynamicGaussKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_LORENTZ_KT:
           return StaticLorentzKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_LORENTZ_KT_LF:
           return StaticLorentzKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_LORENTZ_KT_LF:
           return DynamicLorentzKTLF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STR_KT:
           return StrKT(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SPIN_GLASS:
           return SpinGlass(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_RANDOM_ANISOTROPIC_HYPERFINE:
           return RandomAnisotropicHyperfine(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_ABRAGAM:
           return Abragam(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_TF_COS:
           return TFCos(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD:
           return InternalField(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD_KORNILOV:
           return InternalFieldGK(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD_LARKIN:
           return InternalFieldLL(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_BESSEL:
           return Bessel(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_BESSEL:
           return InternalBessel(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_SKEWED_GAUSS:
           return SkewedGauss(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_ZF_NK:
           return StaticNKZF (t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_TF_NK:
           return StaticNKTF (t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_ZF_NK:
           return DynamicNKZF (t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_TF_NK:
           return DynamicNKTF (t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_MU_MINUS_EXP:
           return MuMinusExpTF(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_POLYNOM:
           return Polynom(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         case THEORY_USER_FCN:
           return UserFcn(t, paramValues, funcValues) + fAdd->Func(t, paramValues, funcValues);
-          break;
         default:
-          cerr << endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
-          cerr << endl;
+          std::cerr << std::endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
+          std::cerr << std::endl;
           exit(0);
       }
     } else { // fMul == 0 && fAdd == 0
       switch (fType) {
         case THEORY_CONST:
           return Constant(paramValues, funcValues);
-          break;
         case THEORY_ASYMMETRY:
           return Asymmetry(paramValues, funcValues);
-          break;
         case THEORY_SIMPLE_EXP:
           return SimpleExp(t, paramValues, funcValues);
-          break;
         case THEORY_GENERAL_EXP:
           return GeneralExp(t, paramValues, funcValues);
-          break;
         case THEORY_SIMPLE_GAUSS:
           return SimpleGauss(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_GAUSS_KT:
           return StaticGaussKT(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_GAUSS_KT_LF:
           return StaticGaussKTLF(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_GAUSS_KT_LF:
           return DynamicGaussKTLF(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_LORENTZ_KT:
           return StaticLorentzKT(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_LORENTZ_KT_LF:
           return StaticLorentzKTLF(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_LORENTZ_KT_LF:
           return DynamicLorentzKTLF(t, paramValues, funcValues);
-          break;
         case THEORY_COMBI_LGKT:
           return CombiLGKT(t, paramValues, funcValues);
-          break;
         case THEORY_STR_KT:
           return StrKT(t, paramValues, funcValues);
-          break;
         case THEORY_SPIN_GLASS:
           return SpinGlass(t, paramValues, funcValues);
-          break;
         case THEORY_RANDOM_ANISOTROPIC_HYPERFINE:
           return RandomAnisotropicHyperfine(t, paramValues, funcValues);
-          break;
         case THEORY_ABRAGAM:
           return Abragam(t, paramValues, funcValues);
-          break;
         case THEORY_TF_COS:
           return TFCos(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD:
           return InternalField(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD_KORNILOV:
           return InternalFieldGK(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_FIELD_LARKIN:
           return InternalFieldLL(t, paramValues, funcValues);
-          break;
         case THEORY_BESSEL:
           return Bessel(t, paramValues, funcValues);
-          break;
         case THEORY_INTERNAL_BESSEL:
           return InternalBessel(t, paramValues, funcValues);
-          break;
         case THEORY_SKEWED_GAUSS:
           return SkewedGauss(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_ZF_NK:
           return StaticNKZF(t, paramValues, funcValues);
-          break;
         case THEORY_STATIC_TF_NK:
           return StaticNKTF(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_ZF_NK:
           return DynamicNKZF(t, paramValues, funcValues);
-          break;
         case THEORY_DYNAMIC_TF_NK:
           return DynamicNKTF(t, paramValues, funcValues);
-          break;
         case THEORY_MU_MINUS_EXP:
           return MuMinusExpTF(t, paramValues, funcValues);
-          break;
         case THEORY_POLYNOM:
           return Polynom(t, paramValues, funcValues);
-          break;
         case THEORY_USER_FCN:
           return UserFcn(t, paramValues, funcValues);
-          break;
         default:
-          cerr << endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
-          cerr << endl;
+          std::cerr << std::endl << ">> PTheory::Func: **PANIC ERROR** You never should have reached this line?!?! (" << fType << ")";
+          std::cerr << std::endl;
           exit(0);
       }
     }
   }
-
-  return 0.0;
 }
 
 //--------------------------------------------------------------------------
@@ -842,12 +717,12 @@ void PTheory::CleanUp(PTheory *theo)
 {
   if (theo->fMul) { // '*' present
      delete theo->fMul;
-     theo->fMul = 0;
+     theo->fMul = nullptr;
   }
 
   if (theo->fAdd) {
      delete theo->fAdd;
-     theo->fAdd = 0;
+     theo->fAdd = nullptr;
   }
 }
 
@@ -868,8 +743,8 @@ Int_t PTheory::SearchDataBase(TString name)
   for (UInt_t i=0; i<THEORY_MAX; i++) {
     if (!name.CompareTo(fgTheoDataBase[i].fName, TString::kIgnoreCase) ||
         !name.CompareTo(fgTheoDataBase[i].fAbbrev, TString::kIgnoreCase)) {
-      idx = fgTheoDataBase[i].fType;
-      fType = idx;
+      idx = static_cast<Int_t>(fgTheoDataBase[i].fType);
+      fType = fgTheoDataBase[i].fType;
       fNoOfParam = fgTheoDataBase[i].fNoOfParam;
     }
   }
@@ -921,8 +796,8 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
   PMsrLineStructure *line;
   TString str, tidy;
   Char_t substr[256];
-  TObjArray *tokens = 0;
-  TObjString *ostr = 0;
+  TObjArray *tokens = nullptr;
+  TObjString *ostr = nullptr;
   Int_t idx = THEORY_UNDEFINED;
 
   for (UInt_t i=1; i<fullTheoryBlock->size(); i++) {
@@ -956,19 +831,19 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     for (UInt_t j=0; j<THEORY_MAX; j++) {
       if (!str.CompareTo(fgTheoDataBase[j].fName, TString::kIgnoreCase) ||
           !str.CompareTo(fgTheoDataBase[j].fAbbrev, TString::kIgnoreCase)) {
-        idx = fgTheoDataBase[j].fType;
+        idx = static_cast<Int_t>(fgTheoDataBase[j].fType);
       }
     }
     // check if theory is indeed defined. This should not be necessay at this point but ...
     if (idx == THEORY_UNDEFINED)
       return;
     // check that there enough tokens. This should not be necessay at this point but ...
-    if ((UInt_t)tokens->GetEntries() < fgTheoDataBase[idx].fNoOfParam + 1)
+    if (static_cast<UInt_t>(tokens->GetEntries()) < fgTheoDataBase[idx].fNoOfParam + 1)
       return;
     // make tidy string
     sprintf(substr, "%-10s", fgTheoDataBase[idx].fName.Data());
     tidy = TString(substr);
-    for (UInt_t j=1; j<(UInt_t)tokens->GetEntries(); j++) {
+    for (Int_t j=1; j<tokens->GetEntries(); j++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(j));
       str = ostr->GetString();
       sprintf(substr, "%6s", str.Data());
@@ -976,12 +851,12 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     }
     if (fgTheoDataBase[idx].fComment.Length() != 0) {
       if (tidy.Length() < 35) {
-        for (UInt_t k=0; k<35-(UInt_t)tidy.Length(); k++)
+        for (Int_t k=0; k<35-tidy.Length(); k++)
           tidy += TString(" ");
       } else {
         tidy += TString(" ");
       }
-      if ((UInt_t)tokens->GetEntries() == fgTheoDataBase[idx].fNoOfParam + 1) // no tshift
+      if (static_cast<UInt_t>(tokens->GetEntries()) == fgTheoDataBase[idx].fNoOfParam + 1) // no tshift
         tidy += fgTheoDataBase[idx].fComment;
       else
         tidy += fgTheoDataBase[idx].fCommentTimeShift;
@@ -992,7 +867,7 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     // clean up
     if (tokens) {
       delete tokens;
-      tokens = 0;
+      tokens = nullptr;
     }
   }
 
@@ -1011,7 +886,7 @@ void PTheory::MakeCleanAndTidyPolynom(UInt_t i, PMsrLines *fullTheoryBlock)
 {
   PMsrLineStructure *line;
   TString str, tidy;
-  TObjArray *tokens = 0;
+  TObjArray *tokens = nullptr;
   TObjString *ostr;
   Char_t substr[256];
 
@@ -1025,8 +900,8 @@ void PTheory::MakeCleanAndTidyPolynom(UInt_t i, PMsrLines *fullTheoryBlock)
   tokens = str.Tokenize(" \t");
 
   // check if comment is already present, and if yes ignore it by setting max correctly
-  UInt_t max = (UInt_t)tokens->GetEntries();
-  for (UInt_t j=1; j<max; j++) {
+  Int_t max = tokens->GetEntries();
+  for (Int_t j=1; j<max; j++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(j));
     str = ostr->GetString();
     if (str.Contains("(")) { // comment present
@@ -1035,7 +910,7 @@ void PTheory::MakeCleanAndTidyPolynom(UInt_t i, PMsrLines *fullTheoryBlock)
     }
   }
 
-  for (UInt_t j=1; j<max; j++) {
+  for (Int_t j=1; j<max; j++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(j));
     str = ostr->GetString();
     sprintf(substr, "%6s", str.Data());
@@ -1051,7 +926,7 @@ void PTheory::MakeCleanAndTidyPolynom(UInt_t i, PMsrLines *fullTheoryBlock)
   // clean up
   if (tokens) {
     delete tokens;
-    tokens = 0;
+    tokens = nullptr;
   }
 }
 
@@ -1068,7 +943,7 @@ void PTheory::MakeCleanAndTidyUserFcn(UInt_t i, PMsrLines *fullTheoryBlock)
 {
   PMsrLineStructure *line;
   TString str, tidy;
-  TObjArray *tokens = 0;
+  TObjArray *tokens = nullptr;
   TObjString *ostr;
 
   // init tidy
@@ -1080,7 +955,7 @@ void PTheory::MakeCleanAndTidyUserFcn(UInt_t i, PMsrLines *fullTheoryBlock)
   // tokenize line
   tokens = str.Tokenize(" \t");
 
-  for (UInt_t j=1; j<(UInt_t)tokens->GetEntries(); j++) {
+  for (Int_t j=1; j<tokens->GetEntries(); j++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(j));
     str = ostr->GetString();
     tidy += TString(" ") + str;
@@ -1092,7 +967,7 @@ void PTheory::MakeCleanAndTidyUserFcn(UInt_t i, PMsrLines *fullTheoryBlock)
   // clean up
   if (tokens) {
     delete tokens;
-    tokens = 0;
+    tokens = nullptr;
   }
 }
 
@@ -2853,7 +2728,7 @@ void PTheory::CalculateDynKTLF(const Double_t *val, Int_t tag) const
       CalculateLorentzLFIntegral(val);
       break;
     default:
-      cerr << endl << ">> PTheory::CalculateDynKTLF: **FATAL ERROR** You should never have reached this point." << endl;
+      std::cerr << std::endl << ">> PTheory::CalculateDynKTLF: **FATAL ERROR** You should never have reached this point." << std::endl;
       assert(false);
       break;
   }

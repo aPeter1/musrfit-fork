@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -111,7 +111,7 @@ void PPrepFourier::SetBkgRange(const Int_t *bkgRange)
   }
 
   if (err != 0) {
-    cerr << endl << ">> PPrepFourier::SetBkgRange: **WARNING** " << errMsg << endl;
+    std::cerr << std::endl << ">> PPrepFourier::SetBkgRange: **WARNING** " << errMsg << std::endl;
   }
 }
 
@@ -142,7 +142,7 @@ void PPrepFourier::SetPacking(const Int_t packing)
   if (packing > 0) {
     fPacking = packing;
   } else {
-    cerr << endl << ">> PPrepFourier::SetPacking: **WARNING** found packing=" << packing << " < 0, will ignore it." << endl;
+    std::cerr << std::endl << ">> PPrepFourier::SetPacking: **WARNING** found packing=" << packing << " < 0, will ignore it." << std::endl;
   }
 }
 
@@ -181,8 +181,8 @@ void PPrepFourier::DoBkgCorrection()
   if ((fBkgRange[0] != -1) && (fBkgRange[1] != -1)) { // background range is given
     // make sure that the bkg range is ok
     for (UInt_t i=0; i<fRawData.size(); i++) {
-      if ((fBkgRange[0] >= (Int_t)fRawData[i].rawData.size()) || (fBkgRange[1] >= (Int_t)fRawData[i].rawData.size())) {
-        cerr << endl << "PPrepFourier::DoBkgCorrection() **ERROR** bkg-range out of data-range!";
+      if ((fBkgRange[0] >= static_cast<Int_t>(fRawData[i].rawData.size())) || (fBkgRange[1] >= static_cast<Int_t>(fRawData[i].rawData.size()))) {
+        std::cerr << std::endl << "PPrepFourier::DoBkgCorrection() **ERROR** bkg-range out of data-range!";
         return;
       }
     }
@@ -194,7 +194,7 @@ void PPrepFourier::DoBkgCorrection()
         bkg += fRawData[i].rawData[j];
       }
       bkg /= (fBkgRange[1]-fBkgRange[0]+1);
-      cout << "info> background " << i << ": " << bkg << endl;
+      std::cout << "info> background " << i << ": " << bkg << std::endl;
 
       // correct data
       for (UInt_t j=0; j<fData[i].size(); j++)
@@ -207,7 +207,7 @@ void PPrepFourier::DoBkgCorrection()
 
     // check if there are as many background values than data values
     if (fBkg.size() != fData.size()) {
-      cerr << endl << "PPrepFourier::DoBkgCorrection() **ERROR** #bkg values != #histos. Will do nothing here." << endl;
+      std::cerr << std::endl << "PPrepFourier::DoBkgCorrection() **ERROR** #bkg values != #histos. Will do nothing here." << std::endl;
       return;
     }
 
@@ -338,9 +338,9 @@ Int_t PPrepFourier::GetDataSetTag(const UInt_t idx)
  * <p>Creates the requested TH1F objects and returns them. The ownership is with
  * the caller.
  */
-vector<TH1F*> PPrepFourier::GetData()
+std::vector<TH1F*> PPrepFourier::GetData()
 {
-  vector<TH1F*> data;
+  std::vector<TH1F*> data;
   data.resize(fData.size());
 
   // if not data are present, just return an empty vector
@@ -368,12 +368,12 @@ vector<TH1F*> PPrepFourier::GetData()
 
     // time range given, hence calculate the proper size
     if (start != -1.0) {
-      size = (UInt_t)((end-start)/dt);
+      size = static_cast<UInt_t>((end-start)/dt);
       if (start >= 0.0) {
-        startIdx = (UInt_t)(start/dt)+1;
-        endIdx = (UInt_t)(end/dt)+1;
+        startIdx = static_cast<UInt_t>(start/dt)+1;
+        endIdx = static_cast<UInt_t>(end/dt)+1;
       } else {
-        cerr << endl << ">> PPrepFourier::GetData **WARNING** found start time < 0.0, will set it to 0.0" << endl;
+        std::cerr << std::endl << ">> PPrepFourier::GetData **WARNING** found start time < 0.0, will set it to 0.0" << std::endl;
         endIdx = static_cast<UInt_t>(end/dt)+1;
       }
     }
@@ -410,10 +410,10 @@ vector<TH1F*> PPrepFourier::GetData()
 TH1F *PPrepFourier::GetData(const UInt_t idx)
 {
   if (fData.size() == 0) // no data present
-    return 0;
+    return nullptr;
 
   if (idx > fData.size()) // requested index out of range
-    return 0;
+    return nullptr;
 
   TString name = TString::Format("histo%2d", idx);
   Double_t dt = fRawData[idx].timeResolution*fPacking;
@@ -425,13 +425,13 @@ TH1F *PPrepFourier::GetData(const UInt_t idx)
 
   // time range given, hence calculate the proper size
   if (start != -1.0) {
-    size = (UInt_t)((end-start)/dt);
+    size = static_cast<UInt_t>((end-start)/dt);
     if (start >= 0.0) {
-      startIdx = (UInt_t)(start/dt)+1;
-      endIdx = (UInt_t)(end/dt)+1;
+      startIdx = static_cast<UInt_t>(start/dt)+1;
+      endIdx = static_cast<UInt_t>(end/dt)+1;
     } else {
-      cerr << endl << ">> PPrepFourier::GetData **WARNING** found start time < 0.0, will set it to 0.0" << endl;
-      endIdx = (UInt_t)(end/dt)+1;
+      std::cerr << std::endl << ">> PPrepFourier::GetData **WARNING** found start time < 0.0, will set it to 0.0" << std::endl;
+      endIdx = static_cast<UInt_t>(end/dt)+1;
     }
   }
 

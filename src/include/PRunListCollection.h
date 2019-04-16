@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 #define _PRUNLISTCOLLECTION_H_
 
 #include <vector>
-using namespace std;
 
 #include "PMusr.h"
 #include "PMsrHandler.h"
@@ -107,12 +106,12 @@ class PRunListCollection
     PMsrHandler *fMsrInfo;  ///< pointer to the msr-file handler
     PRunDataHandler *fData; ///< pointer to the run-data handler
 
-    vector<PRunSingleHisto*>    fRunSingleHistoList;    ///< stores all processed single histogram data
-    vector<PRunSingleHistoRRF*> fRunSingleHistoRRFList; ///< stores all processed single histogram RRF data
-    vector<PRunAsymmetry*>      fRunAsymmetryList;      ///< stores all processed asymmetry data
-    vector<PRunAsymmetryRRF*>   fRunAsymmetryRRFList;   ///< stores all processed asymmetry RRF data
-    vector<PRunMuMinus*>        fRunMuMinusList;        ///< stores all processed mu-minus data
-    vector<PRunNonMusr*>        fRunNonMusrList;        ///< stores all processed non-muSR data
+    std::vector<PRunSingleHisto*>    fRunSingleHistoList;    ///< stores all processed single histogram data
+    std::vector<PRunSingleHistoRRF*> fRunSingleHistoRRFList; ///< stores all processed single histogram RRF data
+    std::vector<PRunAsymmetry*>      fRunAsymmetryList;      ///< stores all processed asymmetry data
+    std::vector<PRunAsymmetryRRF*>   fRunAsymmetryRRFList;   ///< stores all processed asymmetry RRF data
+    std::vector<PRunMuMinus*>        fRunMuMinusList;        ///< stores all processed mu-minus data
+    std::vector<PRunNonMusr*>        fRunNonMusrList;        ///< stores all processed non-muSR data
 };
 
 #endif // _PRUNLISTCOLLECTION_H_

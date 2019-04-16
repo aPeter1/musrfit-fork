@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -145,7 +145,7 @@ typedef struct {
 /**
  * <p>typedef to make to code more readable: list of histogram data sets.
  */
-typedef vector<PMusrCanvasDataSet> PMusrCanvasDataList;
+typedef std::vector<PMusrCanvasDataSet> PMusrCanvasDataList;
 
 //------------------------------------------------------------------------
 /**
@@ -176,7 +176,7 @@ typedef struct {
 /**
  * <p>typedef to make to code more readable: list of error graph data sets.
  */
-typedef vector<PMusrCanvasNonMusrDataSet> PMusrCanvasNonMusrDataList;
+typedef std::vector<PMusrCanvasNonMusrDataSet> PMusrCanvasNonMusrDataList;
 
 //------------------------------------------------------------------------
 /**
@@ -193,7 +193,7 @@ typedef struct {
  * <p> typedef to make to code more readable: vector of the above data structure.
  * Used if there are multiple histogramms to be dumped.
  */
-typedef vector<PMusrCanvasAsciiDump> PMusrCanvasAsciiDumpVector;
+typedef std::vector<PMusrCanvasAsciiDump> PMusrCanvasAsciiDumpVector;
 
 //--------------------------------------------------------------------------
 /**
