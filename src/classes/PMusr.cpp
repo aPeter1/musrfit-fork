@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,6 @@
 
 #include <cassert>
 #include <iostream>
-using namespace std;
 
 #include <boost/algorithm/string.hpp>
 using namespace boost;
@@ -164,8 +163,8 @@ PNonMusrRawRunData::~PNonMusrRawRunData()
 void PNonMusrRawRunData::SetLabel(const UInt_t idx, const TString str)
 {
   if (idx >= fLabels.size()) {
-    cerr << endl << ">> PNonMusrRawRunData::SetLabel: **WARNING** idx=" << idx << " is out of range [0," << fLabels.size() << "[.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PNonMusrRawRunData::SetLabel: **WARNING** idx=" << idx << " is out of range [0," << fLabels.size() << "[.";
+    std::cerr << std::endl;
     return;
   }
   fLabels[idx] = str;
@@ -184,8 +183,8 @@ void PNonMusrRawRunData::SetLabel(const UInt_t idx, const TString str)
 void PNonMusrRawRunData::AppendSubData(const UInt_t idx, const Double_t dval)
 {
   if (idx >= fData.size()) {
-    cerr << endl << ">> PNonMusrRawRunData::AppendSubData: **WARNING** idx=" << idx << " is out of range [0," << fData.size() << "[.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PNonMusrRawRunData::AppendSubData: **WARNING** idx=" << idx << " is out of range [0," << fData.size() << "[.";
+    std::cerr << std::endl;
     return;
   }
   fData[idx].push_back(dval);
@@ -204,8 +203,8 @@ void PNonMusrRawRunData::AppendSubData(const UInt_t idx, const Double_t dval)
 void PNonMusrRawRunData::AppendSubErrData(const UInt_t idx, const Double_t dval)
 {
   if (idx >= fErrData.size()) {
-    cerr << endl << ">> PNonMusrRawRunData::AppendSubErrData: **WARNING** idx=" << idx << " is out of range [0," << fErrData.size() << "[.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PNonMusrRawRunData::AppendSubErrData: **WARNING** idx=" << idx << " is out of range [0," << fErrData.size() << "[.";
+    std::cerr << std::endl;
     return;
   }
   fErrData[idx].push_back(dval);
@@ -267,7 +266,7 @@ Bool_t PRawRunDataVector::IsPresent(UInt_t histoNo)
   Bool_t found=false;
 
   for (UInt_t i=0; i<fDataVec.size(); i++) {
-    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+    if (fDataVec[i].GetHistoNo() == static_cast<Int_t>(histoNo)) {
       found = true;
       break;
     }
@@ -292,7 +291,7 @@ Bool_t PRawRunDataVector::IsPresent(UInt_t histoNo)
  */
 PRawRunDataSet* PRawRunDataVector::GetSet(UInt_t idx)
 {
-  PRawRunDataSet *result=0;
+  PRawRunDataSet *result = nullptr;
 
   if (idx >= fDataVec.size())
     return result;
@@ -314,10 +313,10 @@ PRawRunDataSet* PRawRunDataVector::GetSet(UInt_t idx)
  */
 PRawRunDataSet* PRawRunDataVector::Get(UInt_t histoNo)
 {
-  PRawRunDataSet *result=0;
+  PRawRunDataSet *result = nullptr;
 
   for (UInt_t i=0; i<fDataVec.size(); i++) {
-    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+    if (fDataVec[i].GetHistoNo() == static_cast<Int_t>(histoNo)) {
       result = &fDataVec[i];
       break;
     }
@@ -357,10 +356,10 @@ PRawRunDataSet* PRawRunDataVector::operator[](UInt_t histoNo)
  */
 PDoubleVector* PRawRunDataVector::GetData(UInt_t histoNo)
 {
-  PDoubleVector *result=0;
+  PDoubleVector *result = nullptr;
 
   for (UInt_t i=0; i<fDataVec.size(); i++) {
-    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+    if (fDataVec[i].GetHistoNo() == static_cast<Int_t>(histoNo)) {
       result = fDataVec[i].GetData();
       break;
     }
@@ -386,7 +385,7 @@ Double_t PRawRunDataVector::GetT0Bin(UInt_t histoNo)
   Double_t result=-1.0; // undefined
 
   for (UInt_t i=0; i<fDataVec.size(); i++) {
-    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+    if (fDataVec[i].GetHistoNo() == static_cast<Int_t>(histoNo)) {
       result = fDataVec[i].GetTimeZeroBin();
       break;
     }
@@ -412,7 +411,7 @@ Double_t PRawRunDataVector::GetT0BinEstimated(UInt_t histoNo)
   Double_t result=PMUSR_UNDEFINED;
 
   for (UInt_t i=0; i<fDataVec.size(); i++) {
-    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+    if (fDataVec[i].GetHistoNo() == static_cast<Int_t>(histoNo)) {
       result = fDataVec[i].GetTimeZeroBinEstimated();
       break;
     }
@@ -438,7 +437,7 @@ PIntPair PRawRunDataVector::GetBkgBin(UInt_t histoNo)
   PIntPair bkg(-1,-1);
 
   for (UInt_t i=0; i<fDataVec.size(); i++) {
-    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+    if (fDataVec[i].GetHistoNo() == static_cast<Int_t>(histoNo)) {
       bkg.first  = fDataVec[i].GetFirstBkgBin();
       bkg.second = fDataVec[i].GetLastBkgBin();
       break;
@@ -465,7 +464,7 @@ PIntPair PRawRunDataVector::GetGoodDataBin(UInt_t histoNo)
   PIntPair gdb(-1,-1);
 
   for (UInt_t i=0; i<fDataVec.size(); i++) {
-    if (fDataVec[i].GetHistoNo() == (Int_t)histoNo) {
+    if (fDataVec[i].GetHistoNo() == static_cast<Int_t>(histoNo)) {
       gdb.first  = fDataVec[i].GetFirstGoodBin();
       gdb.second = fDataVec[i].GetLastGoodBin();
       break;
@@ -491,7 +490,7 @@ void PRawRunDataVector::Set(PRawRunDataSet dataSet, Int_t idx)
   if (idx == -1) { // data set to be appended
     fDataVec.push_back(dataSet);
   } else {
-    if (idx >= (Int_t)fDataVec.size())
+    if (idx >= static_cast<Int_t>(fDataVec.size()))
       fDataVec.resize(idx+1);
     fDataVec[idx] = dataSet;
   }
@@ -571,8 +570,8 @@ PRawRunData::~PRawRunData()
 const Double_t PRawRunData::GetTemperature(const UInt_t idx)
 {
   if (idx >= fTemp.size()) {
-    cerr << endl << ">> PRawRunData::GetTemperature: **WARNING** idx=" << idx << " is out of range [0," << fTemp.size() << "[.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRawRunData::GetTemperature: **WARNING** idx=" << idx << " is out of range [0," << fTemp.size() << "[.";
+    std::cerr << std::endl;
     return PMUSR_UNDEFINED;
   }
   return fTemp[idx].first;
@@ -593,8 +592,8 @@ const Double_t PRawRunData::GetTemperature(const UInt_t idx)
 const Double_t PRawRunData::GetTempError(const UInt_t idx)
 {
   if (idx >= fTemp.size()) {
-    cerr << endl << ">> PRawRunData::GetTempError: **WARNING** idx=" << idx << " is out of range [0," << fTemp.size() << "[.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRawRunData::GetTempError: **WARNING** idx=" << idx << " is out of range [0," << fTemp.size() << "[.";
+    std::cerr << std::endl;
     return PMUSR_UNDEFINED;
   }
   return fTemp[idx].second;
@@ -615,8 +614,8 @@ const Double_t PRawRunData::GetTempError(const UInt_t idx)
 const Double_t PRawRunData::GetRingAnode(const UInt_t idx)
 {
   if (idx >= fRingAnode.size()) {
-    cerr << endl << ">> PRawRunData::GetRingAnode: **WARNING** idx=" << idx << " is out of range [0," << fRingAnode.size() << "[.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRawRunData::GetRingAnode: **WARNING** idx=" << idx << " is out of range [0," << fRingAnode.size() << "[.";
+    std::cerr << std::endl;
     return PMUSR_UNDEFINED;
   }
   return fRingAnode[idx];
@@ -790,8 +789,8 @@ void PMsrGlobalBlock::SetRRFFreq(Double_t freq, const char *unit)
   else if (!unitStr.CompareTo("T", TString::kIgnoreCase))
     unitTag = RRF_UNIT_T;
   else {
-    cerr << endl << ">> PMsrGlobalBlock::SetRRFFreq: **ERROR** found undefined RRF unit '" << unit << "'!";
-    cerr << endl << ">>                              Will set RRF frequency to 0.0." << endl;
+    std::cerr << std::endl << ">> PMsrGlobalBlock::SetRRFFreq: **ERROR** found undefined RRF unit '" << unit << "'!";
+    std::cerr << std::endl << ">>                              Will set RRF frequency to 0.0." << std::endl;
     fRRFFreq = 0.0;
     fRRFUnitTag = RRF_UNIT_UNDEF;
   }
@@ -848,7 +847,7 @@ TString PMsrGlobalBlock::GetRRFUnit()
 void PMsrGlobalBlock::SetRRFPacking(Int_t pack)
 {
   if (pack <= 0) {
-    cerr << endl << "PMsrGlobalBlock::SetRRFPacking: **WARNING** found RRF packing <= 0. Likely doesn't make any sense." << endl;
+    std::cerr << std::endl << "PMsrGlobalBlock::SetRRFPacking: **WARNING** found RRF packing <= 0. Likely doesn't make any sense." << std::endl;
     fRRFPacking = -1; // set to undefined
   }
 
@@ -887,8 +886,8 @@ Int_t PMsrGlobalBlock::GetDataRange(UInt_t idx)
 void PMsrGlobalBlock::SetDataRange(Int_t ival, Int_t idx)
 {
   if (idx >= 4) {
-    cerr << endl << ">> PMsrGlobalBlock::SetDataRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PMsrGlobalBlock::SetDataRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
+    std::cerr << std::endl;
     return;
   }
 
@@ -1207,7 +1206,7 @@ void PMsrRunBlock::CleanUp()
 TString* PMsrRunBlock::GetRunName(UInt_t idx)
 {
   if (idx>fRunName.size())
-    return 0;
+    return nullptr;
 
   return &fRunName[idx];
 }
@@ -1249,7 +1248,7 @@ void PMsrRunBlock::SetRunName(TString &str, Int_t idx)
 TString* PMsrRunBlock::GetBeamline(UInt_t idx)
 {
   if (idx>fBeamline.size())
-    return 0;
+    return nullptr;
 
   return &fBeamline[idx];
 }
@@ -1291,7 +1290,7 @@ void PMsrRunBlock::SetBeamline(TString &str, Int_t idx)
 TString* PMsrRunBlock::GetInstitute(UInt_t idx)
 {
   if (idx>fInstitute.size())
-    return 0;
+    return nullptr;
 
   return &fInstitute[idx];
 }
@@ -1333,7 +1332,7 @@ void PMsrRunBlock::SetInstitute(TString &str, Int_t idx)
 TString* PMsrRunBlock::GetFileFormat(UInt_t idx)
 {
   if (idx>fFileFormat.size())
-    return 0;
+    return nullptr;
 
   return &fFileFormat[idx];
 }
@@ -1524,8 +1523,8 @@ Double_t PMsrRunBlock::GetBkgEstimated(UInt_t idx)
 void PMsrRunBlock::SetBkgEstimated(Double_t dval, Int_t idx)
 {
   if (idx >= 2) {
-    cerr << endl << ">> PMsrRunBlock::SetBkgEstimated: **WARNING** idx=" << idx << ", only idx=0,1 are sensible.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PMsrRunBlock::SetBkgEstimated: **WARNING** idx=" << idx << ", only idx=0,1 are sensible.";
+    std::cerr << std::endl;
     return;
   }
 
@@ -1564,8 +1563,8 @@ Double_t PMsrRunBlock::GetBkgFix(UInt_t idx)
 void PMsrRunBlock::SetBkgFix(Double_t dval, Int_t idx)
 {
   if (idx >= 2) {
-    cerr << endl << ">> PMsrRunBlock::SetBkgFix: **WARNING** idx=" << idx << ", only idx=0,1 are sensible.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PMsrRunBlock::SetBkgFix: **WARNING** idx=" << idx << ", only idx=0,1 are sensible.";
+    std::cerr << std::endl;
     return;
   }
 
@@ -1605,8 +1604,8 @@ Int_t PMsrRunBlock::GetBkgRange(UInt_t idx)
 void PMsrRunBlock::SetBkgRange(Int_t ival, Int_t idx)
 {
   if (idx >= 4) {
-    cerr << endl << ">> PMsrRunBlock::SetBkgRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PMsrRunBlock::SetBkgRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
+    std::cerr << std::endl;
     return;
   }
 
@@ -1647,8 +1646,8 @@ Int_t PMsrRunBlock::GetDataRange(UInt_t idx)
 void PMsrRunBlock::SetDataRange(Int_t ival, Int_t idx)
 {
   if (idx >= 4) {
-    cerr << endl << ">> PMsrRunBlock::SetDataRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PMsrRunBlock::SetDataRange: **WARNING** idx=" << idx << ", only idx=0..3 are sensible.";
+    std::cerr << std::endl;
     return;
   }
 
@@ -1897,10 +1896,10 @@ void PMsrRunBlock::SetMapGlobal(UInt_t idx, Int_t ival)
  *
  * @return true if parse has been successful, otherwise false
  */
-bool PStringNumberList::Parse(string &errorMsg, bool ignoreFirstToken)
+bool PStringNumberList::Parse(std::string &errorMsg, bool ignoreFirstToken)
 {
   bool result=true;
-  vector<string> splitVec;
+  std::vector<std::string> splitVec;
   int ival;
 
   // before checking tokens, remove 'forbidden' " - " and " : "
@@ -1915,8 +1914,8 @@ bool PStringNumberList::Parse(string &errorMsg, bool ignoreFirstToken)
 
   for (unsigned int i=start; i<splitVec.size(); i++) {
     if (splitVec[i].length() != 0) { // ignore empty tokens
-      if (splitVec[i].find("-") != string::npos) { // check for potential range
-        vector<string> subSplitVec;
+      if (splitVec[i].find("-") != std::string::npos) { // check for potential range
+        std::vector<std::string> subSplitVec;
         // split potential nS-nE token
         split(subSplitVec, splitVec[i], is_any_of("-"),  token_compress_on);
 
@@ -1944,15 +1943,15 @@ bool PStringNumberList::Parse(string &errorMsg, bool ignoreFirstToken)
         if (result) { // no error, hence check start and end
           if (start > end) {
             int swap = end;
-            cerr << "**WARNING** start=" << start << " > end=" << end << ", hence I will swap them" << endl;
+            std::cerr << "**WARNING** start=" << start << " > end=" << end << ", hence I will swap them" << std::endl;
             end = start;
             start = swap;
           }
           for (int j=start; j<=end; j++)
             fList.push_back(j);
         }
-      } else if (splitVec[i].find(":") != string::npos) { // check for potential sequence
-        vector<string> subSplitVec;
+      } else if (splitVec[i].find(":") != std::string::npos) { // check for potential sequence
+        std::vector<std::string> subSplitVec;
         // split potential rStart:rEnd:rStep token
         split(subSplitVec, splitVec[i], is_any_of(":"),  token_compress_on);
 
@@ -1982,7 +1981,7 @@ bool PStringNumberList::Parse(string &errorMsg, bool ignoreFirstToken)
         if (result) { // no error, hence check start and end
           if (start > end) {
             int swap = end;
-            cerr << "**WARNING** start=" << start << " > end=" << end << ", hence I will swap them" << endl;
+            std::cerr << "**WARNING** start=" << start << " > end=" << end << ", hence I will swap them" << std::endl;
             end = start;
             start = swap;
           }
@@ -2011,7 +2010,7 @@ bool PStringNumberList::Parse(string &errorMsg, bool ignoreFirstToken)
  */
 void PStringNumberList::StripSpaces()
 {
-  string str=fString;
+  std::string str=fString;
   int pos=-1;
 
   // backward scan

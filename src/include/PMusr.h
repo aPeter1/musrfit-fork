@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2018 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -32,7 +32,6 @@
 
 #include <vector>
 #include <map>
-using namespace std;
 
 #include <TString.h>
 
@@ -152,55 +151,55 @@ using namespace std;
 /**
  * <p>typedef to make to code more readable. Definition of a bool vector.
  */
-typedef vector<Bool_t> PBoolVector;
+typedef std::vector<Bool_t> PBoolVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of an unsigned int vector
  */
-typedef vector<UInt_t> PUIntVector;
+typedef std::vector<UInt_t> PUIntVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of an int vector
  */
-typedef vector<Int_t> PIntVector;
+typedef std::vector<Int_t> PIntVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of an int pair
  */
-typedef pair<Int_t, Int_t> PIntPair;
+typedef std::pair<Int_t, Int_t> PIntPair;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of an int pair vector
  */
-typedef vector<PIntPair> PIntPairVector;
+typedef std::vector<PIntPair> PIntPairVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of a double vector
  */
-typedef vector<Double_t> PDoubleVector;
+typedef std::vector<Double_t> PDoubleVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of a double pair
  */
-typedef pair<Double_t, Double_t> PDoublePair;
+typedef std::pair<Double_t, Double_t> PDoublePair;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of a double pair vector
  */
-typedef vector<PDoublePair> PDoublePairVector;
+typedef std::vector<PDoublePair> PDoublePairVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of a string vector
  */
-typedef vector<TString> PStringVector;
+typedef std::vector<TString> PStringVector;
 
 //-------------------------------------------------------------
 /**
@@ -269,8 +268,8 @@ class PNonMusrRawRunData {
     virtual Bool_t FromAscii() { return fFromAscii; }
     virtual const PStringVector* GetLabels() { return &fLabels; }
     virtual const PStringVector* GetDataTags() { return &fDataTags; }
-    virtual const vector<PDoubleVector>* GetData() { return &fData; }
-    virtual const vector<PDoubleVector>* GetErrData() { return &fErrData; }
+    virtual const std::vector<PDoubleVector>* GetData() { return &fData; }
+    virtual const std::vector<PDoubleVector>* GetErrData() { return &fErrData; }
 
     virtual void SetFromAscii(const Bool_t bval) { fFromAscii = bval; }
     virtual void AppendLabel(const TString str) { fLabels.push_back(str); }
@@ -285,8 +284,8 @@ class PNonMusrRawRunData {
     Bool_t fFromAscii;              ///< if true: data file was an ascii input file, otherwise it is a db input file
     PStringVector fLabels;          ///< vector of all labels (used for x-, y-axis title in view)
     PStringVector fDataTags;        ///< vector of all data tags
-    vector<PDoubleVector> fData;    ///< vector of all data
-    vector<PDoubleVector> fErrData; ///< vector of all data errors
+    std::vector<PDoubleVector> fData;    ///< vector of all data
+    std::vector<PDoubleVector> fErrData; ///< vector of all data errors
 };
 
 //-------------------------------------------------------------
@@ -356,7 +355,7 @@ class PRawRunDataVector {
     virtual void Set(PRawRunDataSet dataSet, Int_t idx=-1);
 
   private:
-    vector<PRawRunDataSet> fDataVec;
+    std::vector<PRawRunDataSet> fDataVec;
 };
 
 //-------------------------------------------------------------
@@ -499,7 +498,7 @@ class PRawRunData {
 /**
  * <p>typedef to make to code more readable. A vector of a raw musr run.
  */
-typedef vector<PRawRunData> PRawRunDataList;
+typedef std::vector<PRawRunData> PRawRunDataList;
 
 //-------------------------------------------------------------
 /**
@@ -514,7 +513,7 @@ typedef struct {
 /**
  * <p>typedef to make to code more readable: list of msr-file lines.
  */
-typedef vector<PMsrLineStructure> PMsrLines;
+typedef std::vector<PMsrLineStructure> PMsrLines;
 
 //-------------------------------------------------------------
 /**
@@ -539,7 +538,7 @@ typedef struct {
 /**
  * <p>typedef to make to code more readable: vector of fit parameters.
  */
-typedef vector<PMsrParamStructure> PMsrParamList;
+typedef std::vector<PMsrParamStructure> PMsrParamList;
 
 //-------------------------------------------------------------
 /**
@@ -590,7 +589,7 @@ class PMsrGlobalBlock {
     Int_t fFitType;           ///< fit type: 0=single histo fit, 1=single histo RRF fit, 2=asymmetry fit, 4=mu^- single histo fit, 8=non muSR fit
     Int_t fDataRange[4];      ///< data bin range (fit type 0, 1, 2, 4)
     PDoubleVector fT0;        ///< t0 bins (fit type 0, 1, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
-    vector<PDoubleVector> fAddT0; ///< addt0 bins (fit type 0, 1, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
+    std::vector<PDoubleVector> fAddT0; ///< addt0 bins (fit type 0, 1, 2, 4).  if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
     Bool_t fFitRangeInBins;   ///< flag telling if fit range is given in time or in bins
     Double_t fFitRange[2];    ///< fit range in (us)
     Int_t fFitRangeOffset[2]; ///< if fit range is given in bins it can have the form fit fgb+n0 lgb-n1. This variable holds the n0 and n1.
@@ -646,7 +645,7 @@ class PMsrRunBlock {
     virtual Int_t GetYDataIndex() { return fXYDataIndex[1]; }
     virtual TString* GetXDataLabel() { return &fXYDataLabel[0]; }
     virtual TString* GetYDataLabel() { return &fXYDataLabel[1]; }
-    virtual map<TString, Int_t> *GetParGlobal() { return &fParGlobal; }
+    virtual std::map<TString, Int_t> *GetParGlobal() { return &fParGlobal; }
     virtual PIntVector *GetMapGlobal() { return &fMapGlobal; }
 
     virtual void SetRunName(TString &str, Int_t idx=-1);
@@ -700,7 +699,7 @@ class PMsrRunBlock {
     Int_t fBkgRange[4];             ///< background bin range (fit type 0, 2, 4)
     Int_t fDataRange[4];            ///< data bin range (fit type 0, 2, 4)
     PDoubleVector fT0;              ///< t0 bins (fit type 0, 2, 4). if fit type 0 -> f0, f1, f2, ...; if fit type 2, 4 -> f0, b0, f1, b1, ...
-    vector<PDoubleVector> fAddT0;   ///< t0 bins for addrun's
+    std::vector<PDoubleVector> fAddT0;   ///< t0 bins for addrun's
     Bool_t fFitRangeInBins;         ///< flag telling if fit range is given in time or in bins
     Double_t fFitRange[2];          ///< fit range in (us)
     Int_t fFitRangeOffset[2];       ///< if fit range is given in bins it can have the form fit fgb+n0 lgb-n1. This variable holds the n0 and n1.
@@ -716,7 +715,7 @@ class PMsrRunBlock {
     //                                    -1 -> tag not present in the RUN block
     // The information about global parameters in the map line is stored in an std::vector which should have the same length as the map-vector
     // The values in this std::vector can be the same as for the std::map of the other parameters.
-    map<TString, Int_t> fParGlobal; ///< here is stored if the parameters used in the RUN block are global or not
+    std::map<TString, Int_t> fParGlobal; ///< here is stored if the parameters used in the RUN block are global or not
     PIntVector fMapGlobal;          ///< here is stored if the maps used in the RUN block are global or not
 };
 
@@ -724,7 +723,7 @@ class PMsrRunBlock {
 /**
  * <p>typedef to make to code more readable: list of runs with its parameters.
  */
-typedef vector<PMsrRunBlock> PMsrRunList;
+typedef std::vector<PMsrRunBlock> PMsrRunList;
 
 //-------------------------------------------------------------
 /**
@@ -772,7 +771,7 @@ typedef struct {
 /**
  * <p>typedef to make to code more readable: list of plots.
  */
-typedef vector<PMsrPlotStructure>  PMsrPlotList;
+typedef std::vector<PMsrPlotStructure>  PMsrPlotList;
 
 //-------------------------------------------------------------
 /**
@@ -833,18 +832,18 @@ typedef struct {
 class PStringNumberList {
   public:
     PStringNumberList(char *str) { fString = str; }
-    PStringNumberList(string str) { fString = str; }
+    PStringNumberList(std::string str) { fString = str; }
     virtual ~PStringNumberList() { fList.clear(); }
 
-    virtual bool Parse(string &errorMsg, bool ignoreFirstToken=false);
+    virtual bool Parse(std::string &errorMsg, bool ignoreFirstToken=false);
     virtual PUIntVector GetList() { return fList; }
 
   private:
-    string fString;
+    std::string fString;
     bool fIsValid;
     PUIntVector fList;
 
-    virtual bool IsNumber(string &str) { return (str.find_first_not_of("0123456789") == string::npos); }
+    virtual bool IsNumber(std::string &str) { return (str.find_first_not_of("0123456789") == std::string::npos); }
     virtual void StripSpaces();
 };
 

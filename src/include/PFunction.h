@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -81,7 +81,7 @@ typedef struct func_tree_node {
   Int_t    fIvalue; ///< for parameter numbers and maps
   Bool_t fSign; ///< for sign, true means '-', false '+'
   Double_t fDvalue; ///< for numbers
-  vector<func_tree_node> children; ///< holding sub-tree
+  std::vector<func_tree_node> children; ///< holding sub-tree
 } PFuncTreeNode;
 
 //----------------------------------------------------------------------------
@@ -96,8 +96,8 @@ class PFunction {
     virtual Bool_t IsValid() { return fValid; }
     virtual Int_t GetFuncNo() { return fFuncNo; }
     virtual Bool_t CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize);
-    virtual Double_t Eval(vector<Double_t> param);
-    virtual void SetMap(vector<Int_t> map) { fMap = map; }
+    virtual Double_t Eval(std::vector<Double_t> param);
+    virtual void SetMap(std::vector<Int_t> map) { fMap = map; }
 
     virtual TString* GetFuncString() { return &fFuncString; }
 
@@ -114,8 +114,8 @@ class PFunction {
 
   private:
     tree_parse_info<> fInfo; ///< AST parse tree holding a single parsed msr-function in an ascii representation
-    vector<Double_t> fParam; ///< parameter vector (from the msr-file Fit Parameter block)
-    vector<Int_t> fMap;      ///< map vector
+    std::vector<Double_t> fParam; ///< parameter vector (from the msr-file Fit Parameter block)
+    std::vector<Int_t> fMap;      ///< map vector
     PFuncTreeNode fFunc;
 
     Bool_t fValid; ///< flag showing if the function is valid

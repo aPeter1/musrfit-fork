@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 #define _PUSERFCNBASE_H_
 
 #include <vector>
-using namespace std;
 
 #include "TObject.h"
 #include "TSAXParser.h"
@@ -47,7 +46,7 @@ class PUserFcnBase : public TObject
     virtual ~PUserFcnBase();
 
     virtual Bool_t NeedGlobalPart() const = 0; ///< if a user function needs a global part this function should return true, otherwise false
-    virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) = 0; ///< if a user function is using a global part, this function is used to invoke and retrieve the proper global object
+    virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) = 0; ///< if a user function is using a global part, this function is used to invoke and retrieve the proper global object
     virtual Bool_t GlobalPartIsValid() const = 0; ///< if a user function is using a global part, this function returns if the global object part is valid
 
     virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const = 0;

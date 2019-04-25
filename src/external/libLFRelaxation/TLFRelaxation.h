@@ -34,8 +34,6 @@
 #include<cmath>
 #include<map>
 
-using namespace std;
-
 #include "PUserFcnBase.h"
 
 // the following ifdef is needed for GCC 4.6 or higher, fftw 3.3 or higher and root 5.30.03 or lower
@@ -61,10 +59,10 @@ public:
   ~TLFStatGssKT();
 
   Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
   TIntSinGss *fIntSinGss;                  ///< integrator
@@ -88,10 +86,10 @@ public:
   ~TLFStatExpKT();
 
   Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
   TIntBesselJ0Exp *fIntBesselJ0Exp;         ///< integrator
@@ -122,17 +120,17 @@ public:
   ~TLFDynGssKT();
 
   Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;        ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), &#963; (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $\sigma~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
+  mutable std::vector<double> fPar;   ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), &#963; (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $\sigma~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
   mutable bool fCalcNeeded;           ///< flag indicating if the expensive Laplace transform has to be done (e.g. after parameters have changed)
   mutable bool fFirstCall;            ///< flag indicating if the function is evaluated for the first time
   bool fUseWisdom;                    ///< flag showing if a FFTW3-wisdom file is used
-  string fWisdom;                     ///< path to the wisdom file
+  std::string fWisdom;                ///< path to the wisdom file
   unsigned int fNSteps;               ///< length of the Laplace transform
   double fDt;                         ///< time resolution
   double fDw;                         ///< frequency resolution
@@ -175,17 +173,17 @@ public:
   ~TLFDynExpKT();
 
   Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;         ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
+  mutable std::vector<double> fPar;    ///< parameters of the function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
   mutable bool fCalcNeeded;            ///< flag indicating if the expensive Laplace transform has to be done (e.g. after parameters have changed)
   mutable bool fFirstCall;             ///< flag indicating if the function is evaluated for the first time
   bool fUseWisdom;                     ///< flag showing if a FFTW3-wisdom file is used
-  string fWisdom;                      ///< path to the wisdom file
+  std::string fWisdom;                 ///< path to the wisdom file
   unsigned int fNSteps;                ///< length of the Laplace transform
   double fDt;                          ///< time resolution
   double fDw;                          ///< frequency resolution
@@ -230,14 +228,14 @@ public:
   ~TLFDynSG();
 
   Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
-  mutable vector<double> fPar;               ///< parameters of the dynamic Gaussian depolarization function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), &#963; (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $\sigma~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
-  vector<TLFDynGssKT*> fLFDynGssIntegral;    ///< vector of dynamic Gaussian depolarization functions for a subset of static widths
+  mutable std::vector<double> fPar;          ///< parameters of the dynamic Gaussian depolarization function [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), &#963; (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $\sigma~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
+  std::vector<TLFDynGssKT*> fLFDynGssIntegral; ///< vector of dynamic Gaussian depolarization functions for a subset of static widths
 
   ClassDef(TLFDynSG,1)
 };
@@ -258,10 +256,10 @@ public:
   ~TLFSGInterpolation();
 
   Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
   TIntSGInterpolation *fIntegral;           ///< integrator

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,9 +29,6 @@
 
 #ifndef _PRUNDATAHANDLER_H_
 #define _PRUNDATAHANDLER_H_
-
-#include <vector>
-using namespace std;
 
 #include <TString.h>
 
@@ -108,7 +105,7 @@ class PRunDataHandler
     virtual TString GenerateOutputFileName(const TString fileName, const TString extension, Bool_t &ok);
     virtual TString GetFileName(const TString extension, Bool_t &ok);
     virtual TString FileNameFromTemplate(TString &fileNameTemplate, Int_t run, TString &year, Bool_t &ok);
-    virtual bool DateToISO8601(string inDate, string &iso8601Date);
+    virtual bool DateToISO8601(std::string inDate, std::string &iso8601Date);
     virtual void SplitTimeDate(TString timeDate, TString &time, TString &date, Bool_t &ok);
     virtual TString GetMonth(Int_t month);
     virtual TString GetYear(Int_t month);

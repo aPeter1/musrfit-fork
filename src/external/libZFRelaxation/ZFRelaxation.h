@@ -33,7 +33,6 @@
 #include "BMWIntegrator.h"
 
 #include <vector>
-using namespace std;
 
 //-----------------------------------------------------------------------------------------------------------------
 /**
@@ -52,10 +51,10 @@ public:
   ~ZFMagGss(){} ///< default destructor
 
   Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
   ClassDef(ZFMagGss,1)
 };
@@ -77,10 +76,10 @@ public:
   ~ZFMagExp(){} ///< default destructor
 
   Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
   ClassDef(ZFMagExp,1)
 };
@@ -101,10 +100,10 @@ public:
   virtual ~UniaxialStatGssKT();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
   TFirstUniaxialGssKTIntegral *fIntFirst;

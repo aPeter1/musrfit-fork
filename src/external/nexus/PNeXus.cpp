@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -34,7 +34,6 @@
 
 #include <iostream>
 #include <sstream>
-using namespace std;
 
 #include "PNeXus.h"
 
@@ -87,9 +86,9 @@ bool PNeXusBeam1::IsValid(bool strict)
   bool valid = true;
 
   if (fTotalCounts == 0) {
-    cerr << ">> **WARNING** NXbeam total_counts not given" << endl;
+    std::cerr << ">> **WARNING** NXbeam total_counts not given" << std::endl;
   } else if (!fUnits.compare("n/a")) {
-    cerr << ">> **WARNING** NXbeam total_counts units not given" << endl;
+    std::cerr << ">> **WARNING** NXbeam total_counts units not given" << std::endl;
   }
 
   return valid;
@@ -110,7 +109,7 @@ bool PNeXusDetector1::IsValid(bool strict)
   bool valid = true;
 
   if (fNumber == 0) {
-    cerr << ">> **WARNING** NXdetector number of detectors not given" << endl;
+    std::cerr << ">> **WARNING** NXdetector number of detectors not given" << std::endl;
   }
 
   return valid;
@@ -131,7 +130,7 @@ bool PNeXusInstrument1::IsValid(bool strict)
   bool valid = true;
 
   if (!fName.compare("n/a")) {
-    cerr << ">> **ERROR** NXinstrument name not given" << endl;
+    std::cerr << ">> **ERROR** NXinstrument name not given" << std::endl;
     valid = false;
   } else if (!fDetector.IsValid(strict)) {
     valid = false;
@@ -188,10 +187,10 @@ bool PNeXusSample1::IsValid(bool strict)
   bool valid = true;
 
   if (!fName.compare("n/a")) {
-    cerr << ">> **ERROR** NXsample name not given." << endl;
+    std::cerr << ">> **ERROR** NXsample name not given." << std::endl;
     valid = false;
   } else if (!fShape.compare("n/a")) {
-    cerr << ">> **WARNING** NXsample shape not given." << endl;
+    std::cerr << ">> **WARNING** NXsample shape not given." << std::endl;
   }
 
   int count=0; // at the end count holds the number of required physiscal properties. Currently these are: temperature, magnetic_field
@@ -199,28 +198,28 @@ bool PNeXusSample1::IsValid(bool strict)
     if (!fPhysProp[i].GetName().compare("temperature")) {
       count++;
       if (!fPhysProp[i].GetUnit().compare("n/a")) {
-        cerr << ">> **ERROR** NXsample temperature unit not given." << endl;
+        std::cerr << ">> **ERROR** NXsample temperature unit not given." << std::endl;
         valid = false;
       }
       if (fPhysProp[i].GetValue() == 1.0e99) {
-        cerr << ">> **ERROR** NXsample temperature value not given." << endl;
+        std::cerr << ">> **ERROR** NXsample temperature value not given." << std::endl;
         valid = false;
       }
     }
     if (!fPhysProp[i].GetName().compare("magnetic_field")) {
       count++;
       if (!fPhysProp[i].GetUnit().compare("n/a")) {
-        cerr << ">> **ERROR** NXsample magnetic_field unit not given." << endl;
+        std::cerr << ">> **ERROR** NXsample magnetic_field unit not given." << std::endl;
         valid = false;
       }
       if (fPhysProp[i].GetValue() == 1.0e99) {
-        cerr << ">> **ERROR** NXsample magnetic_field value not given." << endl;
+        std::cerr << ">> **ERROR** NXsample magnetic_field value not given." << std::endl;
         valid = false;
       }
     }
   }
   if (count < 2) {
-    cerr << ">> **ERROR** not all required physical properties (e.g. temperature, magnetic_field) are given." << endl;
+    std::cerr << ">> **ERROR** not all required physical properties (e.g. temperature, magnetic_field) are given." << std::endl;
     valid = false;
   }
 
@@ -236,7 +235,7 @@ bool PNeXusSample1::IsValid(bool strict)
  * \param name
  * \param ok
  */
-double PNeXusSample1::GetPhysPropValue(string name, bool &ok)
+double PNeXusSample1::GetPhysPropValue(std::string name, bool &ok)
 {
   double dval=0.0;
   ok = false;
@@ -261,7 +260,7 @@ double PNeXusSample1::GetPhysPropValue(string name, bool &ok)
  * \param name
  * \param ok
  */
-void PNeXusSample1::GetPhysPropUnit(string name, string &unit, bool &ok)
+void PNeXusSample1::GetPhysPropUnit(std::string name, std::string &unit, bool &ok)
 {
   unit = "n/a";
   ok = false;
@@ -286,7 +285,7 @@ void PNeXusSample1::GetPhysPropUnit(string name, string &unit, bool &ok)
  * \param value of the physical property
  * \param idx index where to set the physical property
  */
-void PNeXusSample1::SetPhysProp(string name, double value, string unit, int idx)
+void PNeXusSample1::SetPhysProp(std::string name, double value, std::string unit, int idx)
 {
   PNeXusProp prop;
 
@@ -352,34 +351,34 @@ PNeXusEntry1::PNeXusEntry1()
 bool PNeXusEntry1::IsValid(bool strict)
 {
   if (!fProgramName.compare("n/a")) {
-    cerr << ">> **WARNING** NXentry: program_name not given." << endl;
+    std::cerr << ">> **WARNING** NXentry: program_name not given." << std::endl;
   } else if (!fProgramVersion.compare("n/a")) {
-    cerr << ">> **WARNING** NXentry: program_name/version not given." << endl;
+    std::cerr << ">> **WARNING** NXentry: program_name/version not given." << std::endl;
   } else if (fRunNumber == -1) {
-    cerr << ">> **ERROR** NXentry: number (i.e. run number) not given." << endl;
+    std::cerr << ">> **ERROR** NXentry: number (i.e. run number) not given." << std::endl;
     return false;
   } else if (!fTitle.compare("n/a")) {
-    cerr << ">> **ERROR** NXentry: title not given." << endl;
+    std::cerr << ">> **ERROR** NXentry: title not given." << std::endl;
     return false;
   } else if (!fNotes.compare("n/a")) {
-    cerr << ">> **WARNING** NXentry: notes not given." << endl;
+    std::cerr << ">> **WARNING** NXentry: notes not given." << std::endl;
   } else if (!fAnalysis.compare("n/a")) {
-    cerr << ">> **ERROR** NXentry: analysis (i.e. type of muon experiment like 'TF', 'ALC', ...) not given." << endl;
+    std::cerr << ">> **ERROR** NXentry: analysis (i.e. type of muon experiment like 'TF', 'ALC', ...) not given." << std::endl;
     return false;
   } else if (!fLaboratory.compare("n/a")) {
-    cerr << ">> **ERROR** NXentry: lab (e.g. 'PSI') not given." << endl;
+    std::cerr << ">> **ERROR** NXentry: lab (e.g. 'PSI') not given." << std::endl;
     return false;
   } else if (!fBeamline.compare("n/a")) {
-    cerr << ">> **ERROR** NXentry: beamline (e.g. 'piE3') not given." << endl;
+    std::cerr << ">> **ERROR** NXentry: beamline (e.g. 'piE3') not given." << std::endl;
     return false;
   } else if (!fStartTime.compare("n/a")) {
-    cerr << ">> **ERROR** NXentry: start_time not given." << endl;
+    std::cerr << ">> **ERROR** NXentry: start_time not given." << std::endl;
     return false;
   } else if (!fStopTime.compare("n/a")) {
-    cerr << ">> **ERROR** NXentry: stop_time not given." << endl;
+    std::cerr << ">> **ERROR** NXentry: stop_time not given." << std::endl;
     return false;
   } else if (fSwitchingState == -1) {
-    cerr << ">> **ERROR** NXentry: switching_state (i.e. '1' normal data taking, '2' red/green mode) not given." << endl;
+    std::cerr << ">> **ERROR** NXentry: switching_state (i.e. '1' normal data taking, '2' red/green mode) not given." << std::endl;
     return false;
   } else if (!fUser.IsValid(strict)) {
     return false;
@@ -398,11 +397,11 @@ bool PNeXusEntry1::IsValid(bool strict)
 // SetStartTime (public)
 //------------------------------------------------------------------------------------------
 /**
- * <p>Set the start time string and check that it is ISO 8601 conform.
+ * <p>Set the start time std::string and check that it is ISO 8601 conform.
  *
- * \param time start time string
+ * \param time start time std::string
  */
-int PNeXusEntry1::SetStartTime(string time)
+int PNeXusEntry1::SetStartTime(std::string time)
 {
   struct tm tm;
   memset(&tm, 0, sizeof(tm));
@@ -421,11 +420,11 @@ int PNeXusEntry1::SetStartTime(string time)
 // SetStopTime (public)
 //------------------------------------------------------------------------------------------
 /**
- * <p>Set the stop time string and check that it is ISO 8601 conform.
+ * <p>Set the stop time std::string and check that it is ISO 8601 conform.
  *
- * \param time stop time string
+ * \param time stop time std::string
  */
-int PNeXusEntry1::SetStopTime(string time)
+int PNeXusEntry1::SetStopTime(std::string time)
 {
   struct tm tm;
   memset(&tm, 0, sizeof(tm));
@@ -505,17 +504,17 @@ PNeXusData1::~PNeXusData1()
 bool PNeXusData1::IsValid(bool strict)
 {
   if (GetNoOfHistos() == 0) {
-    cerr << ">> **ERROR** NXdata no histograms given." << endl;
+    std::cerr << ">> **ERROR** NXdata no histograms given." << std::endl;
     return false;
   } else if (fTimeResolution == 0.0) {
-    cerr << ">> **ERROR** NXdata time resolution not given." << endl;
+    std::cerr << ">> **ERROR** NXdata time resolution not given." << std::endl;
     return false;
   } else if (fT0.size() == 0) {
-    cerr << ">> **WARNING** NXdata t0 not given." << endl;
+    std::cerr << ">> **WARNING** NXdata t0 not given." << std::endl;
   } else if (fFirstGoodBin.size() == 0) {
-    cerr << ">> **WARNING** NXdata first good bin not given." << endl;
+    std::cerr << ">> **WARNING** NXdata first good bin not given." << std::endl;
   } else if (fLastGoodBin.size() == 0) {
-    cerr << ">> **WARNING** NXdata last good bin not given." << endl;
+    std::cerr << ">> **WARNING** NXdata last good bin not given." << std::endl;
   }
 
   return true;
@@ -532,7 +531,7 @@ bool PNeXusData1::IsValid(bool strict)
  *
  * \param units requested units for the time resolution.
  */
-double PNeXusData1::GetTimeResolution(string units)
+double PNeXusData1::GetTimeResolution(std::string units)
 {
   double result=0.0;
 
@@ -610,7 +609,7 @@ int PNeXusData1::GetLastGoodBin(unsigned int idx)
  * \param name histogram name if idx is within range
  * \param ok =true if idx was within range, otherwise false
  */
-void PNeXusData1::GetHistoName(unsigned int idx, string &name, bool &ok)
+void PNeXusData1::GetHistoName(unsigned int idx, std::string &name, bool &ok)
 {
   if (idx >= fHistoName.size()) {
     ok = false;
@@ -644,7 +643,7 @@ unsigned int PNeXusData1::GetHistoLength(unsigned int histoNo)
  *
  * \param histoNo index of the requested histogram
  */
-vector<unsigned int> *PNeXusData1::GetHisto(unsigned int histoNo)
+std::vector<unsigned int> *PNeXusData1::GetHisto(unsigned int histoNo)
 {
   if (histoNo >= fHisto.size())
     return 0;
@@ -663,7 +662,7 @@ vector<unsigned int> *PNeXusData1::GetHisto(unsigned int histoNo)
  * \param val time resolution value
  * \param units time resolution units
  */
-void PNeXusData1::SetTimeResolution(double val, string units)
+void PNeXusData1::SetTimeResolution(double val, std::string units)
 {
   if (!units.compare("fs"))
     fTimeResolution = val * 1.0e-3;
@@ -761,7 +760,7 @@ void PNeXusData1::FlushHistos()
  * \param data histogram vector
  * \param histoNo index where to set the histogram
  */
-void PNeXusData1::SetHisto(vector<unsigned int> &data, int histoNo)
+void PNeXusData1::SetHisto(std::vector<unsigned int> &data, int histoNo)
 {
   if (histoNo == -1) {
     fHisto.push_back(data);
@@ -785,15 +784,15 @@ void PNeXusData1::SetHisto(vector<unsigned int> &data, int histoNo)
  */
 bool PNeXusBeamline2::IsValid(bool strict)
 {
-  string msg("");
+  std::string msg("");
 
   if (!fName.compare("n/a")) {
     msg = "IDF2 NXbeamline 'name' not set.";
     if (strict) {
-      cerr << ">> **ERROR** " << msg << endl;
+      std::cerr << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << ">> **WARNING** " << msg << endl;
+      std::cerr << ">> **WARNING** " << msg << std::endl;
     }
   }
 
@@ -864,45 +863,45 @@ PNeXusDetector2::~PNeXusDetector2()
  */
 bool PNeXusDetector2::IsValid(bool strict)
 {
-  string msg("");
+  std::string msg("");
 
   if (!fDescription.compare("n/a")) {
     msg = "IDF2 NXdetector 'description' not set.";
     if (strict) {
-      cerr << ">> **ERROR** " << msg << endl;
+      std::cerr << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << ">> **WARNING** " << msg << endl;
+      std::cerr << ">> **WARNING** " << msg << std::endl;
     }
   }
 
   if (fTimeResolution == 0.0) {
-    cerr << ">> **ERROR** IDF2 NXdetector 'histogram_resolution' is not set." << endl;
+    std::cerr << ">> **ERROR** IDF2 NXdetector 'histogram_resolution' is not set." << std::endl;
     return false;
   }
 
   if (fSpectrumIndex.size() == 0) {
-    cerr << ">> **ERROR** IDF2 NXdetector 'spectrum_index' is not set." << endl;
+    std::cerr << ">> **ERROR** IDF2 NXdetector 'spectrum_index' is not set." << std::endl;
     return false;
   }
 
   if ((fT0Tag != 1) && (fT0Tag !=2)) {
-    cerr << ">> **ERROR** IDF2 NXdetector problem with t0/first_good_bin/last_good_bin/counts settings (tagging)." << endl;
+    std::cerr << ">> **ERROR** IDF2 NXdetector problem with t0/first_good_bin/last_good_bin/counts settings (tagging)." << std::endl;
     return false;
   }
 
   if (fT0 == 0) {
-    cerr << ">> **ERROR** IDF2 NXdetector t0 settings pointer is null." << endl;
+    std::cerr << ">> **ERROR** IDF2 NXdetector t0 settings pointer is null." << std::endl;
     return false;
   }
 
   if (fHisto == 0) {
-    cerr << ">> **ERROR** IDF2 NXdetector counts settings pointer is null." << endl;
+    std::cerr << ">> **ERROR** IDF2 NXdetector counts settings pointer is null." << std::endl;
     return false;
   }
 
   if (fNoOfBins == -1) {
-    cerr << ">> **ERROR** IDF2 NXdetector fNoOfBins==-1." << endl;
+    std::cerr << ">> **ERROR** IDF2 NXdetector fNoOfBins==-1." << std::endl;
     return false;
   }
 
@@ -962,7 +961,7 @@ int PNeXusDetector2::SetT0(int *t0)
 
   int result = 1;
   unsigned int size=0;
-  stringstream ss;
+  std::stringstream ss;
 
   switch (fT0Tag) {
     case -1:
@@ -1072,7 +1071,7 @@ int PNeXusDetector2::SetFirstGoodBin(int *fgb)
 
   int result = 1;
   unsigned int size=0;
-  stringstream ss;
+  std::stringstream ss;
 
   switch (fT0Tag) {
     case -1:
@@ -1182,7 +1181,7 @@ int PNeXusDetector2::SetLastGoodBin(int *lgb)
 
   int result = 1;
   unsigned int size=0;
-  stringstream ss;
+  std::stringstream ss;
 
   switch (fT0Tag) {
     case -1:
@@ -1350,7 +1349,7 @@ int PNeXusDetector2::SetHistos(int *histo)
  *
  * \param units requested units for the time resolution.
  */
-double PNeXusDetector2::GetTimeResolution(string units)
+double PNeXusDetector2::GetTimeResolution(std::string units)
 {
   double result=0.0;
 
@@ -1378,7 +1377,7 @@ double PNeXusDetector2::GetTimeResolution(string units)
  * \param val time resolution value
  * \param units time resolution units
  */
-void PNeXusDetector2::SetTimeResolution(double val, string units)
+void PNeXusDetector2::SetTimeResolution(double val, std::string units)
 {
   if (!units.compare("fs") || !units.compare("femto.second") || !units.compare("femto second") || !units.compare("femtoseconds"))
     fTimeResolution = val * 1.0e-3;
@@ -1398,7 +1397,7 @@ void PNeXusDetector2::SetTimeResolution(double val, string units)
  *
  * \param rawTime raw time vector.
  */
-void PNeXusDetector2::SetRawTime(vector<double> &rawTime)
+void PNeXusDetector2::SetRawTime(std::vector<double> &rawTime)
 {
   for (unsigned int i=0; i<rawTime.size(); i++)
     fRawTime.push_back(rawTime[i]);
@@ -1453,15 +1452,15 @@ void PNeXusDetector2::SetSpectrumIndex(int spectIdx, int idx)
  */
 bool PNeXusInstrument2::IsValid(bool strict)
 {
-  string msg("");
+  std::string msg("");
 
   if (!fName.compare("n/a")) {
     msg = "IDF2 NXinstrument 'name' not set.";
     if (strict) {
-      cerr << ">> **ERROR** " << msg << endl;
+      std::cerr << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << ">> **WARNING** " << msg << endl;
+      std::cerr << ">> **WARNING** " << msg << std::endl;
     }
   }
 
@@ -1502,35 +1501,35 @@ PNeXusSource2::PNeXusSource2()
  */
 bool PNeXusSource2::IsValid(bool strict)
 {
-  string msg("");
+  std::string msg("");
 
   if (!fName.compare("n/a")) {
     msg = "IDF2 NXsample 'name' not set.";
     if (strict) {
-      cerr << ">> **ERROR** " << msg << endl;
+      std::cerr << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << ">> **WARNING** " << msg << endl;
+      std::cerr << ">> **WARNING** " << msg << std::endl;
     }
   }
 
   if (!fType.compare("n/a")) {
     msg = "IDF2 NXsample 'type' not set.";
     if (strict) {
-      cerr << ">> **ERROR** " << msg << endl;
+      std::cerr << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << ">> **WARNING** " << msg << endl;
+      std::cerr << ">> **WARNING** " << msg << std::endl;
     }
   }
 
   if (!fProbe.compare("n/a")) {
     msg = "IDF2 NXsample 'probe' not set.";
     if (strict) {
-      cerr << ">> **ERROR** " << msg << endl;
+      std::cerr << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << ">> **WARNING** " << msg << endl;
+      std::cerr << ">> **WARNING** " << msg << std::endl;
     }
   }
 
@@ -1575,26 +1574,26 @@ PNeXusSample2::~PNeXusSample2()
  */
 bool PNeXusSample2::IsValid(bool strict)
 {
-  string msg("");
+  std::string msg("");
 
   if (!fName.compare("n/a")) {
-    cerr << ">> **WARNING** IDF2 NXsample 'name' not set." << msg << endl;
+    std::cerr << ">> **WARNING** IDF2 NXsample 'name' not set." << msg << std::endl;
   }
 
   if (!fDescription.compare("n/a")) {
-    cerr << endl << ">> **WARNING** IDF2 NXsample 'description' not set." << endl;
+    std::cerr << std::endl << ">> **WARNING** IDF2 NXsample 'description' not set." << std::endl;
   }
 
   if (!fMagneticFieldState.compare("n/a")) {
-    cerr << endl << ">> **WARNING** IDF2 NXsample 'magnetic_field_state' not set." << endl;
+    std::cerr << std::endl << ">> **WARNING** IDF2 NXsample 'magnetic_field_state' not set." << std::endl;
   }
 
   if (!fEnvironmentTemp.compare("n/a")) {
-    cerr << endl << ">> **WARNING** IDF2 NXsample 'temperature_1_env' not set." << endl;
+    std::cerr << std::endl << ">> **WARNING** IDF2 NXsample 'temperature_1_env' not set." << std::endl;
   }
 
   if (!fEnvironmentField.compare("n/a")) {
-    cerr << endl << ">> **WARNING** IDF2 NXsample 'magnetic_field_1_env' not set." << endl;
+    std::cerr << std::endl << ">> **WARNING** IDF2 NXsample 'magnetic_field_1_env' not set." << std::endl;
   }
 
   bool ok;
@@ -1602,12 +1601,12 @@ bool PNeXusSample2::IsValid(bool strict)
 
   dummy = GetPhysPropValue("temperature_1", ok);
   if (!ok) {
-    cerr << endl << ">> **WARNING** IDF2 NXsample 'temperature_1' not set." << endl;
+    std::cerr << std::endl << ">> **WARNING** IDF2 NXsample 'temperature_1' not set." << std::endl;
   }
 
   dummy = GetPhysPropValue("magnetic_field_1", ok);
   if (!ok) {
-    cerr << endl << ">> **WARNING** IDF2 NXsample 'magnetic_field_1' not set." << endl;
+    std::cerr << std::endl << ">> **WARNING** IDF2 NXsample 'magnetic_field_1' not set." << std::endl;
   }
 
   return true;
@@ -1622,7 +1621,7 @@ bool PNeXusSample2::IsValid(bool strict)
  * \param name
  * \param ok
  */
-double PNeXusSample2::GetPhysPropValue(string name, bool &ok)
+double PNeXusSample2::GetPhysPropValue(std::string name, bool &ok)
 {
   double dval=0.0;
   ok = false;
@@ -1647,7 +1646,7 @@ double PNeXusSample2::GetPhysPropValue(string name, bool &ok)
  * \param name
  * \param ok
  */
-void PNeXusSample2::GetPhysPropUnit(string name, string &unit, bool &ok)
+void PNeXusSample2::GetPhysPropUnit(std::string name, std::string &unit, bool &ok)
 {
   unit = "n/a";
   ok = false;
@@ -1672,7 +1671,7 @@ void PNeXusSample2::GetPhysPropUnit(string name, string &unit, bool &ok)
  * \param value of the physical property
  * \param idx index where to set the physical property
  */
-void PNeXusSample2::SetPhysProp(string name, double value, string unit, int idx)
+void PNeXusSample2::SetPhysProp(std::string name, double value, std::string unit, int idx)
 {
   PNeXusProp prop;
 
@@ -1721,65 +1720,65 @@ PNeXusEntry2::PNeXusEntry2()
  */
 bool PNeXusEntry2::IsValid(bool strict)
 {
-  string msg("");
+  std::string msg("");
 
   if (!fDefinition.compare("n/a")) {
     msg = "IDF2 NXentry definition not set.";
     if (strict) {
-      cerr << endl << ">> **ERROR** " << msg << endl;
+      std::cerr << std::endl << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << endl << ">> **WARNING** " << msg << endl;
+      std::cerr << std::endl << ">> **WARNING** " << msg << std::endl;
     }
   }
 
   if (fRunNumber == -1) {
     msg = "run number not set.";
     if (strict) {
-      cerr << endl << ">> **ERROR** " << msg << endl;
+      std::cerr << std::endl << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << endl << ">> **WARNING** " << msg << endl;
+      std::cerr << std::endl << ">> **WARNING** " << msg << std::endl;
     }
   }
 
   if (!fTitle.compare("n/a")) {
     msg = "run title not set.";
     if (strict) {
-      cerr << endl << ">> **ERROR** " << msg << endl;
+      std::cerr << std::endl << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << endl << ">> **WARNING** " << msg << endl;
+      std::cerr << std::endl << ">> **WARNING** " << msg << std::endl;
     }
   }
 
   if (!fStartTime.compare("n/a")) {
     msg = "start time not set.";
     if (strict) {
-      cerr << endl << ">> **ERROR** " << msg << endl;
+      std::cerr << std::endl << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << endl << ">> **WARNING** " << msg << endl;
+      std::cerr << std::endl << ">> **WARNING** " << msg << std::endl;
     }
   }
 
   if (!fStopTime.compare("n/a")) {
     msg = "end time not set.";
     if (strict) {
-      cerr << endl << ">> **ERROR** " << msg << endl;
+      std::cerr << std::endl << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << endl << ">> **WARNING** " << msg << endl;
+      std::cerr << std::endl << ">> **WARNING** " << msg << std::endl;
     }
   }
 
   if (!fExperimentIdentifier.compare("n/a")) {
     msg = "experiment identifier not set.";
     if (strict) {
-      cerr << endl << ">> **ERROR** " << msg << endl;
+      std::cerr << std::endl << ">> **ERROR** " << msg << std::endl;
       return false;
     } else {
-      cerr << endl << ">> **WARNING** " << msg << endl;
+      std::cerr << std::endl << ">> **WARNING** " << msg << std::endl;
     }
   }
 
@@ -1801,11 +1800,11 @@ bool PNeXusEntry2::IsValid(bool strict)
 // SetStartTime (public)
 //------------------------------------------------------------------------------------------
 /**
- * <p>Set the start time string and check that it is ISO 8601 conform.
+ * <p>Set the start time std::string and check that it is ISO 8601 conform.
  *
- * \param time start time string
+ * \param time start time std::string
  */
-int PNeXusEntry2::SetStartTime(string time)
+int PNeXusEntry2::SetStartTime(std::string time)
 {
   struct tm tm;
   memset(&tm, 0, sizeof(tm));
@@ -1826,11 +1825,11 @@ int PNeXusEntry2::SetStartTime(string time)
 // SetStopTime (public)
 //------------------------------------------------------------------------------------------
 /**
- * <p>Set the stop time string and check that it is ISO 8601 conform.
+ * <p>Set the stop time std::string and check that it is ISO 8601 conform.
  *
- * \param time stop time string
+ * \param time stop time std::string
  */
-int PNeXusEntry2::SetStopTime(string time)
+int PNeXusEntry2::SetStopTime(std::string time)
 {
   struct tm tm;
   memset(&tm, 0, sizeof(tm));
@@ -1873,7 +1872,7 @@ PNeXus::PNeXus(const char* fileName)
   fFileName = fileName;
 
   if (ReadFile(fileName) != NX_OK) {
-    cerr << endl << fErrorMsg << " (error code=" << fErrorCode << ")" << endl << endl;
+    std::cerr << std::endl << fErrorMsg << " (error code=" << fErrorCode << ")" << std::endl << std::endl;
   } else {
     fValid = true;
   }
@@ -1913,7 +1912,7 @@ PNeXus::~PNeXus()
 void PNeXus::SetIdfVersion(unsigned int idf)
 {
   if ((idf != 1) && (idf != 2)) {
-    cerr << endl << ">> **ERROR** Only IDF versions 1 and 2 are supported." << endl;
+    std::cerr << std::endl << ">> **ERROR** Only IDF versions 1 and 2 are supported." << std::endl;
     return;
   }
 
@@ -1927,7 +1926,7 @@ void PNeXus::SetIdfVersion(unsigned int idf)
 
     fNxEntry1 = new PNeXusEntry1();
     if (fNxEntry1 == 0) {
-      cerr << endl << ">> **ERROR** couldn't invoke IDF 1 object PNeXusEntry1." << endl;
+      std::cerr << std::endl << ">> **ERROR** couldn't invoke IDF 1 object PNeXusEntry1." << std::endl;
       return;
     }
   } else { // IDF 2
@@ -1938,7 +1937,7 @@ void PNeXus::SetIdfVersion(unsigned int idf)
 
     fNxEntry2 = new PNeXusEntry2();
     if (fNxEntry2 == 0) {
-      cerr << endl << ">> **ERROR** couldn't invoke IDF 2 object PNeXusEntry1." << endl;
+      std::cerr << std::endl << ">> **ERROR** couldn't invoke IDF 2 object PNeXusEntry1." << std::endl;
       return;
     }
   }
@@ -1963,7 +1962,7 @@ bool PNeXus::IsValid(bool strict)
   else if (fIdfVersion == 2) // IDF Version 2
     valid = IsValidIdf2(strict);
   else {
-    cerr << endl << ">> **ERROR** found IDF Version " << fIdfVersion << ", which is not implemented yet." << endl << endl;
+    std::cerr << std::endl << ">> **ERROR** found IDF Version " << fIdfVersion << ", which is not implemented yet." << std::endl << std::endl;
     valid = false;
   }
 
@@ -1978,7 +1977,7 @@ bool PNeXus::IsValid(bool strict)
  *
  * \param idx index of the grouped histogram to be returned.
  */
-vector<unsigned int>* PNeXus::GetGroupedHisto(unsigned int idx)
+std::vector<unsigned int>* PNeXus::GetGroupedHisto(unsigned int idx)
 {
   if (idx >= fGroupedHisto.size())
     return 0;
@@ -2007,7 +2006,7 @@ int PNeXus::ReadFile(const char *fileName)
   status = NXopen(fileName, NXACC_READ, &fFileHandle);
   if (status != NX_OK) {
     fErrorCode = PNEXUS_FILE_OPEN_ERROR;
-    fErrorMsg  = "PNeXus::ReadFile() **ERROR** Couldn't open file "+string(fileName)+"!";
+    fErrorMsg  = "PNeXus::ReadFile() **ERROR** Couldn't open file "+std::string(fileName)+"!";
     return NX_ERROR;
   }
 
@@ -2025,7 +2024,7 @@ int PNeXus::ReadFile(const char *fileName)
   status = NXopengroup(fFileHandle, nxname, "NXentry");
   if (status != NX_OK) {
     fErrorCode = PNEXUS_GROUP_OPEN_ERROR;
-    fErrorMsg  = "PNeXus::ReadFile() **ERROR** Couldn't open the NeXus group '" + string(nxname) + "'!";
+    fErrorMsg  = "PNeXus::ReadFile() **ERROR** Couldn't open the NeXus group '" + std::string(nxname) + "'!";
     return NX_ERROR;
   }
   // 3) get the IDF
@@ -2063,7 +2062,7 @@ int PNeXus::ReadFile(const char *fileName)
     break;
   default:
     fErrorCode = PNEXUS_IDF_NOT_IMPLEMENTED;
-    stringstream ss;
+    std::stringstream ss;
     ss << ">> **ERROR** idf_version=" << fIdfVersion << " not yet implemented.";
     fErrorMsg = ss.str();
     status = NX_ERROR;
@@ -2130,287 +2129,287 @@ int PNeXus::WriteFile(const char *fileName, const char *fileType, const unsigned
 void PNeXus::Dump()
 {
   double dval;
-  string str;
+  std::string str;
   bool ok;
 
   if (fIdfVersion == 1) {
-    cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
-    cout << endl << "NXfile:";
-    cout << endl << "  NeXus_version  : " << fNeXusVersion;
-    cout << endl << "  file format ver: " << fFileFormatVersion;
-    cout << endl << "  file name      : " << fFileName;
-    cout << endl << "  file time      : " << fFileTime;
-    cout << endl << "  user           : " << fCreator;
-    cout << endl << "NXentry:";
-    cout << endl << "  idf version    : " << fIdfVersion;
-    cout << endl << "  program name   : " << fNxEntry1->GetProgramName() << ", version: " << fNxEntry1->GetProgramVersion();
-    cout << endl << "  run number     : " << fNxEntry1->GetRunNumber();
-    cout << endl << "  title          : " << fNxEntry1->GetTitle();
-    cout << endl << "  notes          : " << fNxEntry1->GetNotes();
-    cout << endl << "  analysis       : " << fNxEntry1->GetAnalysis();
-    cout << endl << "  laboratory     : " << fNxEntry1->GetLaboratory();
-    cout << endl << "  beamline       : " << fNxEntry1->GetBeamline();
-    cout << endl << "  start time     : " << fNxEntry1->GetStartTime();
-    cout << endl << "  stop time      : " << fNxEntry1->GetStopTime();
-    cout << endl << "  switching state: " << fNxEntry1->GetSwitchingState() << ", '1' normal data collection, '2' Red/Green mode";
-    cout << endl << "NXuser:";
-    cout << endl << "  name           : " << fNxEntry1->GetUser()->GetName();
-    cout << endl << "  exp.number     : " << fNxEntry1->GetUser()->GetExperimentNumber();
-    cout << endl << "NXsample:";
-    cout << endl << "  name           : " << fNxEntry1->GetSample()->GetName();
+    std::cout << std::endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+    std::cout << std::endl << "NXfile:";
+    std::cout << std::endl << "  NeXus_version  : " << fNeXusVersion;
+    std::cout << std::endl << "  file format ver: " << fFileFormatVersion;
+    std::cout << std::endl << "  file name      : " << fFileName;
+    std::cout << std::endl << "  file time      : " << fFileTime;
+    std::cout << std::endl << "  user           : " << fCreator;
+    std::cout << std::endl << "NXentry:";
+    std::cout << std::endl << "  idf version    : " << fIdfVersion;
+    std::cout << std::endl << "  program name   : " << fNxEntry1->GetProgramName() << ", version: " << fNxEntry1->GetProgramVersion();
+    std::cout << std::endl << "  run number     : " << fNxEntry1->GetRunNumber();
+    std::cout << std::endl << "  title          : " << fNxEntry1->GetTitle();
+    std::cout << std::endl << "  notes          : " << fNxEntry1->GetNotes();
+    std::cout << std::endl << "  analysis       : " << fNxEntry1->GetAnalysis();
+    std::cout << std::endl << "  laboratory     : " << fNxEntry1->GetLaboratory();
+    std::cout << std::endl << "  beamline       : " << fNxEntry1->GetBeamline();
+    std::cout << std::endl << "  start time     : " << fNxEntry1->GetStartTime();
+    std::cout << std::endl << "  stop time      : " << fNxEntry1->GetStopTime();
+    std::cout << std::endl << "  switching state: " << fNxEntry1->GetSwitchingState() << ", '1' normal data collection, '2' Red/Green mode";
+    std::cout << std::endl << "NXuser:";
+    std::cout << std::endl << "  name           : " << fNxEntry1->GetUser()->GetName();
+    std::cout << std::endl << "  exp.number     : " << fNxEntry1->GetUser()->GetExperimentNumber();
+    std::cout << std::endl << "NXsample:";
+    std::cout << std::endl << "  name           : " << fNxEntry1->GetSample()->GetName();
     dval = fNxEntry1->GetSample()->GetPhysPropValue("temperature", ok);
     if (ok)
-      cout << endl << "  temperature    : " << dval;
+      std::cout << std::endl << "  temperature    : " << dval;
     fNxEntry1->GetSample()->GetPhysPropUnit("temperature", str, ok);
     if (ok)
-      cout << " (" << str << ")";
+      std::cout << " (" << str << ")";
     dval = fNxEntry1->GetSample()->GetPhysPropValue("magnetic_field", ok);
     if (ok)
-      cout << endl << "  magnetic_field : " << dval;
+      std::cout << std::endl << "  magnetic_field : " << dval;
     fNxEntry1->GetSample()->GetPhysPropUnit("magnetic_field", str, ok);
     if (ok)
-      cout << " (" << str << ")";
-    cout << endl << "  shape          : " << fNxEntry1->GetSample()->GetShape();
-    cout << endl << "  mag.field state: " << fNxEntry1->GetSample()->GetMagneticFieldState();
-    cout << endl << "  environment    : " << fNxEntry1->GetSample()->GetEnvironment();
+      std::cout << " (" << str << ")";
+    std::cout << std::endl << "  shape          : " << fNxEntry1->GetSample()->GetShape();
+    std::cout << std::endl << "  mag.field state: " << fNxEntry1->GetSample()->GetMagneticFieldState();
+    std::cout << std::endl << "  environment    : " << fNxEntry1->GetSample()->GetEnvironment();
     if (fNxEntry1->GetSample()->IsMagneticFieldVectorAvailable()) {
-      cout << endl << "  magnetic field vector: ";
+      std::cout << std::endl << "  magnetic field vector: ";
       for (unsigned int i=0; i<fNxEntry1->GetSample()->GetMagneticFieldVector().size(); i++) {
-        cout << fNxEntry1->GetSample()->GetMagneticFieldVector().at(i) << ", ";
+        std::cout << fNxEntry1->GetSample()->GetMagneticFieldVector().at(i) << ", ";
       }
-      cout << "(" << fNxEntry1->GetSample()->GetMagneticFieldVectorUnits() << "), ";
-      cout << fNxEntry1->GetSample()->GetMagneticFieldVectorCoordinateSystem();
+      std::cout << "(" << fNxEntry1->GetSample()->GetMagneticFieldVectorUnits() << "), ";
+      std::cout << fNxEntry1->GetSample()->GetMagneticFieldVectorCoordinateSystem();
     }
-    cout << endl << "NXinstrument:";
-    cout << endl << "  name           : " << fNxEntry1->GetInstrument()->GetName();
-    cout << endl << "  NXdetector:";
-    cout << endl << "    number of detectors: " << fNxEntry1->GetInstrument()->GetDetector()->GetNumber();
-    cout << endl << "  NXcollimator:";
-    cout << endl << "    type               : " << fNxEntry1->GetInstrument()->GetCollimator()->GetType();
-    cout << endl << "  Nxbeam:";
-    cout << endl << "    total_counts       : " << fNxEntry1->GetInstrument()->GetBeam()->GetTotalCounts() << " (" << fNxEntry1->GetInstrument()->GetBeam()->GetUnits() << ")";
-    cout << endl << "NXdata:";
-    cout << endl << "  number of histos     : " << fNxEntry1->GetData()->GetNoOfHistos();
-    cout << endl << "  time resolution      : " << fNxEntry1->GetData()->GetTimeResolution("ns") << " (ns)";
+    std::cout << std::endl << "NXinstrument:";
+    std::cout << std::endl << "  name           : " << fNxEntry1->GetInstrument()->GetName();
+    std::cout << std::endl << "  NXdetector:";
+    std::cout << std::endl << "    number of detectors: " << fNxEntry1->GetInstrument()->GetDetector()->GetNumber();
+    std::cout << std::endl << "  NXcollimator:";
+    std::cout << std::endl << "    type               : " << fNxEntry1->GetInstrument()->GetCollimator()->GetType();
+    std::cout << std::endl << "  Nxbeam:";
+    std::cout << std::endl << "    total_counts       : " << fNxEntry1->GetInstrument()->GetBeam()->GetTotalCounts() << " (" << fNxEntry1->GetInstrument()->GetBeam()->GetUnits() << ")";
+    std::cout << std::endl << "NXdata:";
+    std::cout << std::endl << "  number of histos     : " << fNxEntry1->GetData()->GetNoOfHistos();
+    std::cout << std::endl << "  time resolution      : " << fNxEntry1->GetData()->GetTimeResolution("ns") << " (ns)";
     if (fNxEntry1->GetData()->GetGrouping()->size() != 0) {
-     cout << endl << "  grouping             : ";
+     std::cout << std::endl << "  grouping             : ";
      for (unsigned int i=0; i<fNxEntry1->GetData()->GetGrouping()->size(); i++) {
-       cout << "(" << i << "/" << fNxEntry1->GetData()->GetGrouping()->at(i) << "), ";
+       std::cout << "(" << i << "/" << fNxEntry1->GetData()->GetGrouping()->at(i) << "), ";
      }
     } else {
-     cout << endl << "  grouping             : not available";
+     std::cout << std::endl << "  grouping             : not available";
     }
     if (fNxEntry1->GetData()->GetT0s()->size() == 0) {
-      cout << endl << "  t0's                 : not available";
+      std::cout << std::endl << "  t0's                 : not available";
     } else {
-      cout << endl << "  t0's                 : ";
+      std::cout << std::endl << "  t0's                 : ";
       for (unsigned int i=0; i<fNxEntry1->GetData()->GetT0s()->size(); i++) {
-        cout << fNxEntry1->GetData()->GetT0(i) << ", ";
+        std::cout << fNxEntry1->GetData()->GetT0(i) << ", ";
       }
     }
     if (fNxEntry1->GetData()->GetFirstGoodBins()->size() == 0) {
-      cout << endl << "  first good bins      : not available";
+      std::cout << std::endl << "  first good bins      : not available";
     } else {
-      cout << endl << "  first good bins      : ";
+      std::cout << std::endl << "  first good bins      : ";
       for (unsigned int i=0; i<fNxEntry1->GetData()->GetFirstGoodBins()->size(); i++) {
-        cout << fNxEntry1->GetData()->GetFirstGoodBin(i) << ", ";
+        std::cout << fNxEntry1->GetData()->GetFirstGoodBin(i) << ", ";
       }
     }
     if (fNxEntry1->GetData()->GetLastGoodBins()->size() == 0) {
-      cout << endl << "  last good bins       : not available";
+      std::cout << std::endl << "  last good bins       : not available";
     } else {
-      cout << endl << "  last good bins       : ";
+      std::cout << std::endl << "  last good bins       : ";
       for (unsigned int i=0; i<fNxEntry1->GetData()->GetLastGoodBins()->size(); i++) {
-        cout << fNxEntry1->GetData()->GetLastGoodBin(i) << ", ";
+        std::cout << fNxEntry1->GetData()->GetLastGoodBin(i) << ", ";
       }
     }
     if (fNxEntry1->GetData()->GetNoOfHistos() == 0) {
-      cout << endl << "  historgrams          : not available";
+      std::cout << std::endl << "  historgrams          : not available";
     } else {
-      cout << endl << "  historgrams          : +++++++++++++";
+      std::cout << std::endl << "  historgrams          : +++++++++++++";
       for (unsigned int i=0; i<fNxEntry1->GetData()->GetNoOfHistos(); i++) {
-        cout << endl << "   histo " << i+1 << ": ";
+        std::cout << std::endl << "   histo " << i+1 << ": ";
         for (unsigned int j=0; j<15; j++) {
-          cout << fNxEntry1->GetData()->GetHisto(i)->at(j) << ", ";
+          std::cout << fNxEntry1->GetData()->GetHisto(i)->at(j) << ", ";
         }
-        cout << "...";
+        std::cout << "...";
       }
     }
     if (fNxEntry1->GetData()->GetAlpha()->size() == 0) {
-      cout << endl << "  alpha                 : not available";
+      std::cout << std::endl << "  alpha                 : not available";
     } else {
-      cout << endl << "  alpha                 : ";
+      std::cout << std::endl << "  alpha                 : ";
       for (unsigned int i=0; i<fNxEntry1->GetData()->GetAlpha()->size(); i++)
-        cout << "(" << fNxEntry1->GetData()->GetAlpha()->at(i).GetGroupFirst() << "/" << fNxEntry1->GetData()->GetAlpha()->at(i).GetGroupSecond() << "/" << fNxEntry1->GetData()->GetAlpha()->at(i).GetAlpha() << "), ";
+        std::cout << "(" << fNxEntry1->GetData()->GetAlpha()->at(i).GetGroupFirst() << "/" << fNxEntry1->GetData()->GetAlpha()->at(i).GetGroupSecond() << "/" << fNxEntry1->GetData()->GetAlpha()->at(i).GetAlpha() << "), ";
     }
     if (fGroupedHisto.size() == 0) {
-      cout << endl << "  grouped historgrams   : not available";
+      std::cout << std::endl << "  grouped historgrams   : not available";
     } else {
-      cout << endl << "  grouped historgrams   : +++++++++++++";
+      std::cout << std::endl << "  grouped historgrams   : +++++++++++++";
       for (unsigned int i=0; i<fGroupedHisto.size(); i++) {
-        cout << endl << "   grouped histo " << i+1 << ": ";
+        std::cout << std::endl << "   grouped histo " << i+1 << ": ";
         for (unsigned int j=0; j<15; j++) {
-          cout << fGroupedHisto[i][j] << ", ";
+          std::cout << fGroupedHisto[i][j] << ", ";
         }
-        cout << "...";
+        std::cout << "...";
       }
     }
-    cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
-    cout << endl << "that's all!";
-    cout << endl << endl;
+    std::cout << std::endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+    std::cout << std::endl << "that's all!";
+    std::cout << std::endl << std::endl;
   } else if (fIdfVersion == 2) {
-    cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
-    cout << endl << "NXfile:";
-    cout << endl << "  file_name           : " << fFileName;
-    cout << endl << "  file_time           : " << fFileTime;
-    cout << endl << "  NeXus_version       : " << fNeXusVersion;
-    cout << endl << "  file format version : " << fFileFormatVersion;
-    cout << endl << "  creator             : " << fCreator;
-    cout << endl << "NXentry:";
-    cout << endl << "  idf version         : " << fIdfVersion;
-    cout << endl << "  definition          : " << fNxEntry2->GetDefinition();
+    std::cout << std::endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+    std::cout << std::endl << "NXfile:";
+    std::cout << std::endl << "  file_name           : " << fFileName;
+    std::cout << std::endl << "  file_time           : " << fFileTime;
+    std::cout << std::endl << "  NeXus_version       : " << fNeXusVersion;
+    std::cout << std::endl << "  file format version : " << fFileFormatVersion;
+    std::cout << std::endl << "  creator             : " << fCreator;
+    std::cout << std::endl << "NXentry:";
+    std::cout << std::endl << "  idf version         : " << fIdfVersion;
+    std::cout << std::endl << "  definition          : " << fNxEntry2->GetDefinition();
     if (!fNxEntry2->GetProgramName().empty())
-      cout << endl << "  program name        : " << fNxEntry2->GetProgramName() << ", version: " << fNxEntry2->GetProgramVersion();
-    cout << endl << "  run_number          : " << fNxEntry2->GetRunNumber();
-    cout << endl << "  run_title           : " << fNxEntry2->GetTitle();
-    cout << endl << "  start_time          : " << fNxEntry2->GetStartTime();
-    cout << endl << "  end_time            : " << fNxEntry2->GetStopTime();
-    cout << endl << "  exp.identifier      : " << fNxEntry2->GetExperimentIdentifier();
-    cout << endl << "  NXuser:";
-    cout << endl << "    name              : " << fNxEntry2->GetUser()->GetName();
-    cout << endl << "  NXsample:";
-    cout << endl << "    name              : " << fNxEntry2->GetSample()->GetName();
-    cout << endl << "    description       : " << fNxEntry2->GetSample()->GetDescription();
-    cout << endl << "    mag.field state   : " << fNxEntry2->GetSample()->GetMagneticFieldState();
+      std::cout << std::endl << "  program name        : " << fNxEntry2->GetProgramName() << ", version: " << fNxEntry2->GetProgramVersion();
+    std::cout << std::endl << "  run_number          : " << fNxEntry2->GetRunNumber();
+    std::cout << std::endl << "  run_title           : " << fNxEntry2->GetTitle();
+    std::cout << std::endl << "  start_time          : " << fNxEntry2->GetStartTime();
+    std::cout << std::endl << "  end_time            : " << fNxEntry2->GetStopTime();
+    std::cout << std::endl << "  exp.identifier      : " << fNxEntry2->GetExperimentIdentifier();
+    std::cout << std::endl << "  NXuser:";
+    std::cout << std::endl << "    name              : " << fNxEntry2->GetUser()->GetName();
+    std::cout << std::endl << "  NXsample:";
+    std::cout << std::endl << "    name              : " << fNxEntry2->GetSample()->GetName();
+    std::cout << std::endl << "    description       : " << fNxEntry2->GetSample()->GetDescription();
+    std::cout << std::endl << "    mag.field state   : " << fNxEntry2->GetSample()->GetMagneticFieldState();
     dval = fNxEntry2->GetSample()->GetPhysPropValue("temperature_1", ok);
     if (ok)
-      cout << endl << "    temperature       : " << dval;
+      std::cout << std::endl << "    temperature       : " << dval;
     fNxEntry2->GetSample()->GetPhysPropUnit("temperature_1", str, ok);
     if (ok)
-      cout << " (" << str << ")";
-    cout << endl << "    temp.environment  : " << fNxEntry2->GetSample()->GetEnvironmentTemp();
+      std::cout << " (" << str << ")";
+    std::cout << std::endl << "    temp.environment  : " << fNxEntry2->GetSample()->GetEnvironmentTemp();
     dval = fNxEntry2->GetSample()->GetPhysPropValue("magnetic_field_1", ok);
     if (ok)
-      cout << endl << "    magnetic_field    : " << dval;
+      std::cout << std::endl << "    magnetic_field    : " << dval;
     fNxEntry2->GetSample()->GetPhysPropUnit("magnetic_field_1", str, ok);
     if (ok)
-      cout << " (" << str << ")";
-    cout << endl << "    mag. field env.   : " << fNxEntry2->GetSample()->GetEnvironmentField();
-    cout << endl << "  NXinstrument:";
-    cout << endl << "    name              : " << fNxEntry2->GetInstrument()->GetName();
-    cout << endl << "    NXsource:";
-    cout << endl << "      name            : " << fNxEntry2->GetInstrument()->GetSource()->GetName();
-    cout << endl << "      type            : " << fNxEntry2->GetInstrument()->GetSource()->GetType();
-    cout << endl << "      probe           : " << fNxEntry2->GetInstrument()->GetSource()->GetProbe();
-    cout << endl << "    NXbeamline:";
-    cout << endl << "      name            : " << fNxEntry2->GetInstrument()->GetBeamline()->GetName();
-    cout << endl << "    NXdetector:";
-    cout << endl << "      description     : " << fNxEntry2->GetInstrument()->GetDetector()->GetDescription();
-    cout << endl << "      time resolution : " << fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution("ns") << " (ns)";
+      std::cout << " (" << str << ")";
+    std::cout << std::endl << "    mag. field env.   : " << fNxEntry2->GetSample()->GetEnvironmentField();
+    std::cout << std::endl << "  NXinstrument:";
+    std::cout << std::endl << "    name              : " << fNxEntry2->GetInstrument()->GetName();
+    std::cout << std::endl << "    NXsource:";
+    std::cout << std::endl << "      name            : " << fNxEntry2->GetInstrument()->GetSource()->GetName();
+    std::cout << std::endl << "      type            : " << fNxEntry2->GetInstrument()->GetSource()->GetType();
+    std::cout << std::endl << "      probe           : " << fNxEntry2->GetInstrument()->GetSource()->GetProbe();
+    std::cout << std::endl << "    NXbeamline:";
+    std::cout << std::endl << "      name            : " << fNxEntry2->GetInstrument()->GetBeamline()->GetName();
+    std::cout << std::endl << "    NXdetector:";
+    std::cout << std::endl << "      description     : " << fNxEntry2->GetInstrument()->GetDetector()->GetDescription();
+    std::cout << std::endl << "      time resolution : " << fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution("ns") << " (ns)";
     if (fNxEntry2->GetInstrument()->GetDetector()->IsT0Present()) {
       if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 1) { // only one t0 for all histograms
-        cout << endl << "      t0              : " << fNxEntry2->GetInstrument()->GetDetector()->GetT0();
+        std::cout << std::endl << "      t0              : " << fNxEntry2->GetInstrument()->GetDetector()->GetT0();
       } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 2) { // t0[ns]
-        cout << endl << "      t0 (idx_s/t0)   : ";
+        std::cout << std::endl << "      t0 (idx_s/t0)   : ";
         for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
-          cout << "(" << i+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetT0(-1, i) << "), ";
+          std::cout << "(" << i+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetT0(-1, i) << "), ";
         }
       } else { // t0 vector of the form t0[np][ns]
-        cout << endl << "      t0 (idx_p/idx_s/t0): ";
+        std::cout << std::endl << "      t0 (idx_p/idx_s/t0): ";
         for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
           for (int j=0; j<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
-            cout << "(" << i+1 << "/" << j+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetT0(i,j) << "), ";
+            std::cout << "(" << i+1 << "/" << j+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetT0(i,j) << "), ";
           }
         }
       }
     } else {
-      cout << endl << "      t0              : n/a";
+      std::cout << std::endl << "      t0              : n/a";
     }
     if (fNxEntry2->GetInstrument()->GetDetector()->IsFirstGoodBinPresent()) {
       if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 1) { // only one fgb for all histograms
-        cout << endl << "      first good bin  : " << fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBin();
+        std::cout << std::endl << "      first good bin  : " << fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBin();
       } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 2) { // fgb[ns]
-        cout << endl << "      fgb (idx_s/fgb) : ";
+        std::cout << std::endl << "      fgb (idx_s/fgb) : ";
         for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
-          cout << "(" << i+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBin(-1,i) << ") , ";
+          std::cout << "(" << i+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBin(-1,i) << ") , ";
         }
       } else { // fgb vector of the form fgb[np][ns]
-        cout << endl << "      fgb (idx_p/idx_s/fgb): ";
+        std::cout << std::endl << "      fgb (idx_p/idx_s/fgb): ";
         for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
           for (int j=0; j<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
-            cout << "(" << i+1 << "/" << j+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBin(i,j);
+            std::cout << "(" << i+1 << "/" << j+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBin(i,j);
           }
         }
       }
     } else {
-      cout << endl << "      first good bin  : n/a";
+      std::cout << std::endl << "      first good bin  : n/a";
     }
     if (fNxEntry2->GetInstrument()->GetDetector()->IsLastGoodBinPresent()) {
       if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 1) { // only one lgb for all histograms
-        cout << endl << "      last good bin   : " << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin();
+        std::cout << std::endl << "      last good bin   : " << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin();
       } else if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == 2) { // lgb[ns]
-        cout << endl << "      lgb (idx_s/lgb) : ";
+        std::cout << std::endl << "      lgb (idx_s/lgb) : ";
         for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); i++) {
-          cout << "(" << i+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin(-1,i) << "), ";
+          std::cout << "(" << i+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin(-1,i) << "), ";
         }
       } else { // lgb vector of the form lgb[np][ns]
-        cout << endl << "      lgb (idx_p/idx_s/lgb): ";
+        std::cout << std::endl << "      lgb (idx_p/idx_s/lgb): ";
         for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
           for (int j=0; j<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
-            cout << "(" << i+1 << "/" << j+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin(i,j) << "), ";
+            std::cout << "(" << i+1 << "/" << j+1 << "/" << fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBin(i,j) << "), ";
           }
         }
       }
     } else {
-      cout << endl << "      last good bin   : n/a";
+      std::cout << std::endl << "      last good bin   : n/a";
     }
-    cout << endl << "      spectrum_index  : ";
+    std::cout << std::endl << "      spectrum_index  : ";
     for (unsigned int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetSpectrumIndexSize(); i++)
-      cout << fNxEntry2->GetInstrument()->GetDetector()->GetSpectrumIndex(i) << ", ";
+      std::cout << fNxEntry2->GetInstrument()->GetDetector()->GetSpectrumIndex(i) << ", ";
 
     // dump data
     int maxDump = 15;
-    cout << endl << "      counts    : ";
+    std::cout << std::endl << "      counts    : ";
     if (fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods() > 0) { // counts[np][ns][ntc]
       for (int i=0; i<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfPeriods(); i++) {
-        cout << endl << "       period    : " << i+1;
+        std::cout << std::endl << "       period    : " << i+1;
         for (int j=0; j<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
-          cout << endl << "        spectrum : " << j+1 << ", (#bins=" << fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins() << ")";
+          std::cout << std::endl << "        spectrum : " << j+1 << ", (#bins=" << fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins() << ")";
           if (maxDump > fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins())
             maxDump = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins();
-          cout << endl << "         ";
+          std::cout << std::endl << "         ";
           for (int k=0; k<maxDump; k++) {
-            cout << fNxEntry2->GetInstrument()->GetDetector()->GetHistoValue(i,j,k) << ", ";
+            std::cout << fNxEntry2->GetInstrument()->GetDetector()->GetHistoValue(i,j,k) << ", ";
           }
-          cout << "...";
+          std::cout << "...";
         }
       }
     } else {
       if (fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra() > 0) {  // counts[ns][ntc]
         for (int j=0; j<fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra(); j++) {
-          cout << endl << "       spectrum : " << j+1 << ", (#bins=" << fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins() << ")";
+          std::cout << std::endl << "       spectrum : " << j+1 << ", (#bins=" << fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins() << ")";
           if (maxDump > fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins())
             maxDump = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins();
-          cout << endl << "        ";
+          std::cout << std::endl << "        ";
           for (int k=0; k<maxDump; k++) {
-            cout << fNxEntry2->GetInstrument()->GetDetector()->GetHistoValue(0,j,k) << ", ";
+            std::cout << fNxEntry2->GetInstrument()->GetDetector()->GetHistoValue(0,j,k) << ", ";
           }
-          cout << "...";
+          std::cout << "...";
         }
       } else {  // counts[ntc]
-        cout << endl << "      (#bins=" << fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins() << ")";
+        std::cout << std::endl << "      (#bins=" << fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins() << ")";
         if (maxDump > fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins())
           maxDump = fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins();
-        cout << endl << "      ";
+        std::cout << std::endl << "      ";
         for (int k=0; k<maxDump; k++) {
-          cout << fNxEntry2->GetInstrument()->GetDetector()->GetHistoValue(0,0,k) << ", ";
+          std::cout << fNxEntry2->GetInstrument()->GetDetector()->GetHistoValue(0,0,k) << ", ";
         }
-        cout << "...";
+        std::cout << "...";
       }
     }
-    cout << endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
-    cout << endl << "that's all!";
-    cout << endl << endl;
+    std::cout << std::endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
+    std::cout << std::endl << "that's all!";
+    std::cout << std::endl << std::endl;
   }
 }
 
@@ -2450,12 +2449,12 @@ void PNeXus::Init()
  * \param errCode will set the fErrorCode of the class
  * \param errMsg will set the fErrorMsg of the class
  */
-bool PNeXus::ErrorHandler(NXstatus status, int errCode, const string &errMsg)
+bool PNeXus::ErrorHandler(NXstatus status, int errCode, const std::string &errMsg)
 {
   if (status != NX_OK) {
     fErrorCode = errCode;
     fErrorMsg = errMsg;
-    cerr << endl << ">> **ERROR** " << fErrorMsg << endl;
+    std::cerr << std::endl << ">> **ERROR** " << fErrorMsg << std::endl;
     if (fFileHandle != 0) {
       NXclose(&fFileHandle);
     }
@@ -2474,9 +2473,9 @@ bool PNeXus::ErrorHandler(NXstatus status, int errCode, const string &errMsg)
  * - NX_OK on success
  * - NX_ERROR otherwiese
  *
- * \param str string to be fed
+ * \param str std::string to be fed
  */
-NXstatus PNeXus::GetStringData(string &str)
+NXstatus PNeXus::GetStringData(std::string &str)
 {
   int i, status, rank, type, dims[32];
   char cstr[1024];
@@ -2484,14 +2483,14 @@ NXstatus PNeXus::GetStringData(string &str)
 
   status = NXgetinfo(fFileHandle, &rank, dims, &type);
   if (status != NX_OK) {
-    cerr << endl << ">> **ERROR** in NXgetinfo: couldn't get meta info!" << endl;
+    std::cerr << std::endl << ">> **ERROR** in NXgetinfo: couldn't get meta info!" << std::endl;
     fErrorCode = PNEXUS_GET_META_INFO_ERROR;
     fErrorMsg = "PNeXus::GetStringData() **ERROR** couldn't get meta info!";    
     return NX_ERROR;
   }
 
   if ((type != NX_CHAR) || (rank > 1) || (dims[0] >= (int)sizeof(cstr))) {
-    cerr << endl << ">> **ERROR** in NXgetinfo: found wrong meta info!" << endl;
+    std::cerr << std::endl << ">> **ERROR** in NXgetinfo: found wrong meta info!" << std::endl;
     fErrorCode = PNEXUS_WRONG_META_INFO;
     fErrorMsg = "PNeXus::GetStringData() **ERROR** found wrong meta info!";
     return NX_ERROR;
@@ -2499,7 +2498,7 @@ NXstatus PNeXus::GetStringData(string &str)
 
   status = NXgetdata(fFileHandle, data_value);
   if (status != NX_OK) {
-    cerr << endl << ">> **ERROR** in routine NXgetdata: couldn't get data for '" << str << "'!" << endl;
+    std::cerr << std::endl << ">> **ERROR** in routine NXgetdata: couldn't get data for '" << str << "'!" << std::endl;
     fErrorCode = PNEXUS_GET_DATA_ERROR;
     fErrorMsg = "couldn't get data!";
     return NX_ERROR;
@@ -2525,9 +2524,9 @@ NXstatus PNeXus::GetStringData(string &str)
  * - NX_ERROR otherwiese
  *
  * \param attr attribute tag
- * \param str string to be fed
+ * \param str std::string to be fed
  */
-NXstatus PNeXus::GetStringAttr(string attr, string &str)
+NXstatus PNeXus::GetStringAttr(std::string attr, std::string &str)
 {
   int i, status, attlen, atttype;
   char cstr[VGNAMELENMAX];
@@ -2537,9 +2536,9 @@ NXstatus PNeXus::GetStringAttr(string attr, string &str)
   atttype = NX_CHAR;
   status = NXgetattr(fFileHandle, (char *)attr.c_str(), data_value, &attlen, &atttype);
   if (status != NX_OK) {
-    cerr << endl << ">> **ERROR** in routine NXgetattr: couldn't get attribute '" << attr << "'! status=" << status << endl << endl;
+    std::cerr << std::endl << ">> **ERROR** in routine NXgetattr: couldn't get attribute '" << attr << "'! status=" << status << std::endl << std::endl;
     fErrorCode = PNEXUS_GET_ATTR_ERROR;
-    fErrorMsg = "couldn't get string attribute data!";
+    fErrorMsg = "couldn't get std::string attribute data!";
     return NX_ERROR;
   }
 
@@ -2616,7 +2615,7 @@ int PNeXus::GetDataSize(int type)
  *
  * \param data
  */
-NXstatus PNeXus::GetDoubleVectorData(vector<double> &data)
+NXstatus PNeXus::GetDoubleVectorData(std::vector<double> &data)
 {
   // get information of the current nexus entity
   int rank, type, dims[32], size, noOfElements;
@@ -2632,7 +2631,7 @@ NXstatus PNeXus::GetDoubleVectorData(vector<double> &data)
 
   // allocate locale memory to get the data
   char *data_ptr = new char[size];
-  if (data_ptr == 0) {
+  if (data_ptr == nullptr) {
     return NX_ERROR;
   }
 
@@ -2669,7 +2668,7 @@ NXstatus PNeXus::GetDoubleVectorData(vector<double> &data)
  *
  * \param data
  */
-NXstatus PNeXus::GetIntVectorData(vector<int> &data)
+NXstatus PNeXus::GetIntVectorData(std::vector<int> &data)
 {
   // get information of the current nexus entity
   int rank, type, dims[32], size, noOfElements;
@@ -2685,7 +2684,7 @@ NXstatus PNeXus::GetIntVectorData(vector<int> &data)
 
   // allocate locale memory to get the data
   char *data_ptr = new char[size];
-  if (data_ptr == 0) {
+  if (data_ptr == nullptr) {
     return NX_ERROR;
   }
 
@@ -2722,7 +2721,7 @@ NXstatus PNeXus::GetIntVectorData(vector<int> &data)
  */
 int PNeXus::ReadFileIdf1()
 {
-  cout << endl << ">> reading NeXus IDF Version 1 file ..." << endl;
+  std::cout << std::endl << ">> reading NeXus IDF Version 1 file ..." << std::endl;
 
   // create first the necessary NXentry object for IDF Version 1
   fNxEntry1 = new PNeXusEntry1();
@@ -2732,7 +2731,7 @@ int PNeXus::ReadFileIdf1()
     return NX_ERROR;
   }
 
-  string str;
+  std::string str;
   char cstr[128];
   int ival;
   float fval;
@@ -2757,21 +2756,21 @@ int PNeXus::ReadFileIdf1()
         atttype = NX_CHAR;
         status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
         if (status == NX_OK) {
-          fFileFormatVersion = string(data_value);
+          fFileFormatVersion = std::string(data_value);
         }
       } else if (!strcmp(nxAttrName, "HDF5_Version")) {
         attlen = VGNAMELENMAX - 1;
         atttype = NX_CHAR;
         status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
         if (status == NX_OK) {
-          fFileFormatVersion = string("HDF5: ")+string(data_value);
+          fFileFormatVersion = std::string("HDF5: ")+std::string(data_value);
         }
       } else if (!strcmp(nxAttrName, "XML_version")) {
         attlen = VGNAMELENMAX - 1;
         atttype = NX_CHAR;
         status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
         if (status == NX_OK) {
-          fFileFormatVersion = string(data_value);
+          fFileFormatVersion = std::string(data_value);
         }
       } else if (!strcmp(nxAttrName, "file_name")) {
         if (!ErrorHandler(GetStringAttr("file_name", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'file_name' attribute!")) return NX_ERROR;
@@ -2805,7 +2804,7 @@ int PNeXus::ReadFileIdf1()
   status = NXopengroup(fFileHandle, nxname, "NXentry");
   if (status != NX_OK) {
     fErrorCode = PNEXUS_GROUP_OPEN_ERROR;
-    fErrorMsg  = "PNeXus::ReadFile() **ERROR** Couldn't open the NeXus group '" + string(nxname) + "'!";
+    fErrorMsg  = "PNeXus::ReadFile() **ERROR** Couldn't open the NeXus group '" + std::string(nxname) + "'!";
     return NX_ERROR;
   }
 
@@ -2914,7 +2913,7 @@ int PNeXus::ReadFileIdf1()
   if (SearchInGroup("NXsample", "class", nxname, nxclass, dataType)) {
     if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXsample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup 'sample'!")) return NX_ERROR;
   } else {
-    cout << endl << ">> **WARNING** unable to open subgroup NXsample, will try NXSample." << endl;
+    std::cout << std::endl << ">> **WARNING** unable to open subgroup NXsample, will try NXSample." << std::endl;
     if (!ErrorHandler(NXopengroup(fFileHandle, "sample", "NXSample"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup 'sample'!")) return NX_ERROR;
   }
 
@@ -2960,7 +2959,7 @@ int PNeXus::ReadFileIdf1()
   if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'magnetic_field_vector available' data in sample group!")) return NX_ERROR;
   fNxEntry1->GetSample()->SetMagneticFieldVectorAvailable(ival);
   if (fNxEntry1->GetSample()->IsMagneticFieldVectorAvailable()) {
-    vector<double> magVec;
+    std::vector<double> magVec;
     if (!ErrorHandler(GetDoubleVectorData(magVec), PNEXUS_GET_DATA_ERROR, "couldn't get 'magnetic_field_vector' data!")) return NX_ERROR;
     fNxEntry1->GetSample()->SetMagneticFieldVector(magVec);
     magVec.clear();
@@ -2976,10 +2975,10 @@ int PNeXus::ReadFileIdf1()
         strncpy(cstr, data_value, sizeof(cstr));
         str = cstr;
       } else {
-        str = string("Gauss");
+        str = std::string("Gauss");
       }
     } else {
-      str = string("Gauss");
+      str = std::string("Gauss");
     }
     fNxEntry1->GetSample()->SetMagneticFieldUnits(str);
   }
@@ -3102,7 +3101,7 @@ int PNeXus::ReadFileIdf1()
   if (SearchAttrInData(cstr, attLen, attType)) {
     if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'T0_bin' data in NXdata group!")) return NX_ERROR;
   } else {
-    cout << endl << ">> **WARNING** didn't find attribute 'T0_bin' in NXdata/counts, will try 't0_bin'." << endl;
+    std::cout << std::endl << ">> **WARNING** didn't find attribute 'T0_bin' in NXdata/counts, will try 't0_bin'." << std::endl;
     memset(cstr, '\0', sizeof(cstr));
     strncpy(cstr, "t0_bin", sizeof(cstr));
     if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 't0_bin' data in NXdata group!")) return NX_ERROR;
@@ -3140,7 +3139,7 @@ int PNeXus::ReadFileIdf1()
 
   // allocate locale memory to get the data
   char *data_ptr = new char[size];
-  if (data_ptr == 0) {
+  if (data_ptr == nullptr) {
     return NX_ERROR;
   }
 
@@ -3160,7 +3159,7 @@ int PNeXus::ReadFileIdf1()
 
   // copy the data into the vector
   fNxEntry1->GetData()->FlushHistos();
-  vector<unsigned int> data;
+  std::vector<unsigned int> data;
   for (int i=0; i<noOfElements; i++) {
     if ((i % histoLength == 0) && (i>0)) {
       fNxEntry1->GetData()->SetHisto(data);
@@ -3188,7 +3187,7 @@ int PNeXus::ReadFileIdf1()
   strncpy(cstr, "available", sizeof(cstr));
   if (!ErrorHandler(NXgetattr(fFileHandle, cstr, &ival, &attLen, &attType), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'grouping available' data in NXdata group!")) return NX_ERROR;
   if (ival) {
-    vector<int> grouping;
+    std::vector<int> grouping;
     if (!ErrorHandler(GetIntVectorData(grouping), PNEXUS_GET_DATA_ERROR, "couldn't read 'grouping' data in NXdata group!")) return NX_ERROR;
     fNxEntry1->GetData()->SetGrouping(grouping);
     grouping.clear();
@@ -3201,12 +3200,12 @@ int PNeXus::ReadFileIdf1()
     // check grouping vector for consistency
     if (fNxEntry1->GetData()->GetGrouping()->size() != fNxEntry1->GetData()->GetNoOfHistos()) {
       fNxEntry1->GetData()->FlushGrouping();
-      cerr << endl << ">> **WARNING** grouping vector size (" << fNxEntry1->GetData()->GetGrouping()->size()<< ") != no of histograms (" << fNxEntry1->GetData()->GetNoOfHistos() << ") which doesn't make sence, hence grouping will be ignored." << endl;
+      std::cerr << std::endl << ">> **WARNING** grouping vector size (" << fNxEntry1->GetData()->GetGrouping()->size()<< ") != no of histograms (" << fNxEntry1->GetData()->GetNoOfHistos() << ") which doesn't make sence, hence grouping will be ignored." << std::endl;
     }
     // check that the grouping values do make sense, i.e. allowed range is grouping value > 0 and grouping value <= # of histos
     for (unsigned int i=0; i<fNxEntry1->GetData()->GetGrouping()->size(); i++) {
       if ((fNxEntry1->GetData()->GetGrouping()->at(i) == 0) || (fNxEntry1->GetData()->GetGrouping()->at(i) > (int)fNxEntry1->GetData()->GetNoOfHistos())) {
-        cerr << endl << ">> **WARNING** found grouping entry '" << fNxEntry1->GetData()->GetGrouping()->at(i) << "' which doesn't make sense, hence grouping will be ignored." << endl;
+        std::cerr << std::endl << ">> **WARNING** found grouping entry '" << fNxEntry1->GetData()->GetGrouping()->at(i) << "' which doesn't make sense, hence grouping will be ignored." << std::endl;
         ok = false;
         break;
       }
@@ -3235,13 +3234,13 @@ int PNeXus::ReadFileIdf1()
     if ((3*(noOfElements/3)-noOfElements) != 0) {
       fErrorCode = PNEXUS_GET_META_INFO_ERROR;
       fErrorMsg  = "alpha NeXus structure (grp_1, grp_2, alpha_12, etc.) violation.";
-      cerr << endl << ">> **ERROR** " << fErrorMsg << endl;
+      std::cerr << std::endl << ">> **ERROR** " << fErrorMsg << std::endl;
       return NX_ERROR;
     }
 
     // allocate locale memory to get the data
     char *data_ptr = new char[size];
-    if (data_ptr == 0) {
+    if (data_ptr == nullptr) {
       return NX_ERROR;
     }
 
@@ -3255,7 +3254,7 @@ int PNeXus::ReadFileIdf1()
     // copy the data into the vector
     fNxEntry1->GetData()->FlushAlpha();
     PNeXusAlpha1 alpha;
-    vector<PNeXusAlpha1> alphaVec;
+    std::vector<PNeXusAlpha1> alphaVec;
     for (int i=0; i<noOfElements; i+=3) {
       fval = *(f_data_ptr+i);
       alpha.SetGroupFirst((unsigned int) fval);
@@ -3302,7 +3301,7 @@ int PNeXus::ReadFileIdf1()
  */
 int PNeXus::ReadFileIdf2()
 {
-  cout << endl << ">> reading NeXus IDF Version 2 file ..." << endl;
+  std::cout << std::endl << ">> reading NeXus IDF Version 2 file ..." << std::endl;
 
   // create first the necessary NXentry object for IDF Version 2
   fNxEntry2 = new PNeXusEntry2();
@@ -3312,7 +3311,7 @@ int PNeXus::ReadFileIdf2()
     return NX_ERROR;
   }
 
-  string str;
+  std::string str;
   int ival, attlen, atttype;
   float fval;
   NXname data_value, nxAttrName;
@@ -3336,21 +3335,21 @@ int PNeXus::ReadFileIdf2()
         atttype = NX_CHAR;
         status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
         if (status == NX_OK) {
-          fFileFormatVersion = string(data_value);
+          fFileFormatVersion = std::string(data_value);
         }
       } else if (!strcmp(nxAttrName, "HDF5_Version")) {
         attlen = VGNAMELENMAX - 1;
         atttype = NX_CHAR;
         status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
         if (status == NX_OK) {
-          fFileFormatVersion = string("HDF5: ")+string(data_value);
+          fFileFormatVersion = std::string("HDF5: ")+std::string(data_value);
         }
       } else if (!strcmp(nxAttrName, "XML_version")) {
         attlen = VGNAMELENMAX - 1;
         atttype = NX_CHAR;
         status = NXgetattr(fFileHandle, nxAttrName, data_value, &attlen, &atttype);
         if (status == NX_OK) {
-          fFileFormatVersion = string(data_value);
+          fFileFormatVersion = std::string(data_value);
         }
       } else if (!strcmp(nxAttrName, "file_name")) {
         if (!ErrorHandler(GetStringAttr("file_name", str), PNEXUS_GET_ATTR_ERROR, "couldn't read NXroot 'file_name' attribute!")) return NX_ERROR;
@@ -3389,7 +3388,7 @@ int PNeXus::ReadFileIdf2()
   status = NXopengroup(fFileHandle, nxname, "NXentry");
   if (status != NX_OK) {
     fErrorCode = PNEXUS_GROUP_OPEN_ERROR;
-    fErrorMsg  = "PNeXus::ReadFileIdf2() **ERROR** Couldn't open the NeXus group '" + string(nxname) + "'!";
+    fErrorMsg  = "PNeXus::ReadFileIdf2() **ERROR** Couldn't open the NeXus group '" + std::string(nxname) + "'!";
     return NX_ERROR;
   }
 
@@ -3451,7 +3450,7 @@ int PNeXus::ReadFileIdf2()
     status = NXopengroup(fFileHandle, nxname, "NXuser");
     if (status != NX_OK) {
       fErrorCode = PNEXUS_GROUP_OPEN_ERROR;
-      fErrorMsg  = "PNeXus::ReadFileIdf2() **ERROR** Couldn't open NXuser '" + string(nxname) + "' in NXentry!";
+      fErrorMsg  = "PNeXus::ReadFileIdf2() **ERROR** Couldn't open NXuser '" + std::string(nxname) + "' in NXentry!";
       return NX_ERROR;
     }
 
@@ -3608,7 +3607,7 @@ int PNeXus::ReadFileIdf2()
     fNxEntry2->GetInstrument()->GetDetector()->SetTimeResolution((double)fval, str);
   } else { // 3nd 'histogram_resolution' is not present, hence extract the time resolution from the 'raw_time' vector
     if (!ErrorHandler(NXopendata(fFileHandle, "raw_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'raw_time' data in NXdetector!")) return NX_ERROR;
-    vector<double> rawTime;
+    std::vector<double> rawTime;
     if (!ErrorHandler(GetDoubleVectorData(rawTime), PNEXUS_GET_DATA_ERROR, "couldn't get 'raw_time' data in NXdetector!")) return NX_ERROR;
     if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read 'raw_time' units in NXdetector!")) return NX_ERROR;
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'raw_time' data in NXdetector!")) return NX_ERROR;
@@ -3630,7 +3629,7 @@ int PNeXus::ReadFileIdf2()
 
   // allocate locale memory to get the data
   char *data_ptr = new char[size];
-  if (data_ptr == 0) {
+  if (data_ptr == nullptr) {
     return NX_ERROR;
   }
 
@@ -3657,19 +3656,19 @@ int PNeXus::ReadFileIdf2()
     fNxEntry2->GetInstrument()->GetDetector()->SetNoOfPeriods(-1);
     fNxEntry2->GetInstrument()->GetDetector()->SetNoOfSpectra(-1);
     fNxEntry2->GetInstrument()->GetDetector()->SetNoOfBins(-1);
-    cerr << endl << ">> **ERROR** found rank=" << rank << " for NXinstrument:NXdetector:counts! Allowed ranks are 1, 2, or 3." << endl;
+    std::cerr << std::endl << ">> **ERROR** found rank=" << rank << " for NXinstrument:NXdetector:counts! Allowed ranks are 1, 2, or 3." << std::endl;
     return NX_ERROR;
   }
 
   if (!fNxEntry2->GetInstrument()->GetDetector()->SetHistos(i_data_ptr)) {
-    cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+    std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
     return NX_ERROR;
   }
 
   // clean up
   if (data_ptr) {
     delete [] data_ptr;
-    data_ptr = 0;
+    data_ptr = nullptr;
   }
 
   if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'counts' data in NXdetector!")) return NX_ERROR;
@@ -3679,16 +3678,16 @@ int PNeXus::ReadFileIdf2()
   // check the dimensions of 'spectrum_index'
   if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'spectrum_index' info in NXdetector!")) return NX_ERROR;
   if (rank > 1) {
-    cerr << endl << ">> **ERROR** found rank=" << rank << " of spectrum_index in NXdetector. Rank needs to be == 1!" << endl;
+    std::cerr << std::endl << ">> **ERROR** found rank=" << rank << " of spectrum_index in NXdetector. Rank needs to be == 1!" << std::endl;
     return NX_ERROR;
   }
   if (dims[0] != fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra()) {
-    cerr << endl << ">> **ERROR** found spectrum_index dimension=" << dims[0] << " inconsistent with counts (" << fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra() << "!" << endl;
+    std::cerr << std::endl << ">> **ERROR** found spectrum_index dimension=" << dims[0] << " inconsistent with counts (" << fNxEntry2->GetInstrument()->GetDetector()->GetNoOfSpectra() << "!" << std::endl;
     return NX_ERROR;
   }
   // allocate locale memory to get the data
   data_ptr = new char[dims[0]*GetDataSize(type)];
-  if (data_ptr == 0) {
+  if (data_ptr == nullptr) {
     return NX_ERROR;
   }
   // get the data
@@ -3703,7 +3702,7 @@ int PNeXus::ReadFileIdf2()
   // clean up
   if (data_ptr) {
     delete [] data_ptr;
-    data_ptr = 0;
+    data_ptr = nullptr;
   }
 
   if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'spectrum_index' data in NXdetector!")) return NX_ERROR;
@@ -3722,7 +3721,7 @@ int PNeXus::ReadFileIdf2()
     } else if (rank == 2) { // t0 of the form t0[np][ns]
       fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(3);
     } else {
-      cerr << endl << ">> **ERROR** found 'time_zero_bin' info in NXdetector with rank=" << rank << ". Do not know how to handle." << endl;
+      std::cerr << std::endl << ">> **ERROR** found 'time_zero_bin' info in NXdetector with rank=" << rank << ". Do not know how to handle." << std::endl;
       return NX_ERROR;
     }
 
@@ -3735,7 +3734,7 @@ int PNeXus::ReadFileIdf2()
 
     // allocate locale memory to get the data
     char *data_ptr = new char[size];
-    if (data_ptr == 0) {
+    if (data_ptr == nullptr) {
       return NX_ERROR;
     }
 
@@ -3747,14 +3746,14 @@ int PNeXus::ReadFileIdf2()
     }
 
     if (!fNxEntry2->GetInstrument()->GetDetector()->SetT0(i_data_ptr)) {
-      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
       return NX_ERROR;
     }
 
     // clean up
     if (data_ptr) {
       delete [] data_ptr;
-      data_ptr = 0;
+      data_ptr = nullptr;
     }
 
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'time_zero_bin' data in NXdetector!")) return NX_ERROR;
@@ -3770,7 +3769,7 @@ int PNeXus::ReadFileIdf2()
     } else if (rank == 2) { // t0 of the form t0[np][ns]
       fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(3);
     } else {
-      cerr << endl << ">> **ERROR** found 'time_zero' info in NXdetector with rank=" << rank << ". Do not know how to handle." << endl;
+      std::cerr << std::endl << ">> **ERROR** found 'time_zero' info in NXdetector with rank=" << rank << ". Do not know how to handle." << std::endl;
       return NX_ERROR;
     }
 
@@ -3783,7 +3782,7 @@ int PNeXus::ReadFileIdf2()
 
     // allocate locale memory to get the data
     char *data_ptr = new char[size];
-    if (data_ptr == 0) {
+    if (data_ptr == nullptr) {
       return NX_ERROR;
     }
 
@@ -3799,11 +3798,11 @@ int PNeXus::ReadFileIdf2()
     // Set T0's
     // check that the necessary time resolution is present
     if (fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str) == 0.0) {
-      cerr << endl << ">> **ERROR** trying to set T0's based on 'time_zero'. Need a valid time resolution to do so, but this is not given." << endl;
+      std::cerr << std::endl << ">> **ERROR** trying to set T0's based on 'time_zero'. Need a valid time resolution to do so, but this is not given." << std::endl;
       return NX_ERROR;
     }
     // set the t0's based on the t0 time stamp and the time resolution
-    int *pt0 = 0;
+    int *pt0 = nullptr;
     if (rank == 1) {
       pt0 = new int;
       *pt0 = (int)(*f_data_ptr / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
@@ -3815,20 +3814,20 @@ int PNeXus::ReadFileIdf2()
     }
 
     if (!fNxEntry2->GetInstrument()->GetDetector()->SetT0(pt0)) {
-      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
       return NX_ERROR;
     }
 
     // clean up
     if (data_ptr) {
       delete [] data_ptr;
-      data_ptr = 0;
+      data_ptr = nullptr;
     }
 
-    cerr << endl << ">> **WARNING** found only 'time_zero' will convert it to 'time_zero_bin' values" << endl;
+    std::cerr << std::endl << ">> **WARNING** found only 'time_zero' will convert it to 'time_zero_bin' values" << std::endl;
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'time_zero' data in NXdetector!")) return NX_ERROR;
   } else {
-    cerr << endl << ">> **WARNING** found neither 'time_zero_bin' nor 'time_zero' values ..." << endl;
+    std::cerr << std::endl << ">> **WARNING** found neither 'time_zero_bin' nor 'time_zero' values ..." << std::endl;
   }
 
   // handle first good bin
@@ -3847,7 +3846,7 @@ int PNeXus::ReadFileIdf2()
 
     // allocate locale memory to get the data
     char *data_ptr = new char[size];
-    if (data_ptr == 0) {
+    if (data_ptr == nullptr) {
       return NX_ERROR;
     }
 
@@ -3859,13 +3858,13 @@ int PNeXus::ReadFileIdf2()
     }
 
     if (!fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(i_data_ptr)) {
-      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
       return NX_ERROR;
     }
 
     if (data_ptr) {
       delete [] data_ptr;
-      data_ptr = 0;
+      data_ptr = nullptr;
     }
 
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'first_good_bin' data in NXdetector!")) return NX_ERROR;
@@ -3884,7 +3883,7 @@ int PNeXus::ReadFileIdf2()
 
     // allocate locale memory to get the data
     char *data_ptr = new char[size];
-    if (data_ptr == 0) {
+    if (data_ptr == nullptr) {
       return NX_ERROR;
     }
 
@@ -3896,7 +3895,7 @@ int PNeXus::ReadFileIdf2()
     }
 
     // set the fgb's based on the fgb time stamp and the time resolution
-    int *p_fgb = 0;
+    int *p_fgb = nullptr;
     if (rank == 1) {
       p_fgb = new int;
       *p_fgb = (int)(*f_data_ptr / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
@@ -3908,7 +3907,7 @@ int PNeXus::ReadFileIdf2()
     }
 
     if (!fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(p_fgb)) {
-      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
       return NX_ERROR;
     }
 
@@ -3919,12 +3918,12 @@ int PNeXus::ReadFileIdf2()
     }
     if (data_ptr) {
       delete [] data_ptr;
-      data_ptr = 0;
+      data_ptr = nullptr;
     }
 
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'first_good_time' data in NXdetector!")) return NX_ERROR;
   } else {
-    cerr << endl << ">> **WARNING** found neither 'first_good_bin' nor 'first_good_time' values ..." << endl;
+    std::cerr << std::endl << ">> **WARNING** found neither 'first_good_bin' nor 'first_good_time' values ..." << std::endl;
   }
 
   // handle last good bin
@@ -3943,7 +3942,7 @@ int PNeXus::ReadFileIdf2()
 
     // allocate locale memory to get the data
     char *data_ptr = new char[size];
-    if (data_ptr == 0) {
+    if (data_ptr == nullptr) {
       return NX_ERROR;
     }
 
@@ -3955,14 +3954,14 @@ int PNeXus::ReadFileIdf2()
     }
 
     if (!fNxEntry2->GetInstrument()->GetDetector()->SetLastGoodBin(i_data_ptr)) {
-      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
       return NX_ERROR;
     }
 
     // clean up
     if (data_ptr) {
       delete [] data_ptr;
-      data_ptr = 0;
+      data_ptr = nullptr;
     }
 
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'last_good_bin' data in NXdetector!")) return NX_ERROR;
@@ -3981,7 +3980,7 @@ int PNeXus::ReadFileIdf2()
 
     // allocate locale memory to get the data
     char *data_ptr = new char[size];
-    if (data_ptr == 0) {
+    if (data_ptr == nullptr) {
       return NX_ERROR;
     }
 
@@ -3993,7 +3992,7 @@ int PNeXus::ReadFileIdf2()
     }
 
     // set the lgb's based on the lgb time stamp and the time resolution
-    int *p_lgb = 0;
+    int *p_lgb = nullptr;
     if (rank == 1) {
       p_lgb = new int;
       *p_lgb = (int)(*f_data_ptr / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
@@ -4005,7 +4004,7 @@ int PNeXus::ReadFileIdf2()
     }
 
     if (fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(p_lgb)) {
-      cerr << endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << endl;
+      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
       return NX_ERROR;
     }
 
@@ -4016,12 +4015,12 @@ int PNeXus::ReadFileIdf2()
     }
     if (data_ptr) {
       delete [] data_ptr;
-      data_ptr = 0;
+      data_ptr = nullptr;
     }
 
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'last_good_time' data in NXdetector!")) return NX_ERROR;
   } else {
-    cerr << endl << ">> **WARNING** found neither 'last_good_bin' nor 'last_good_time' values ..." << endl;
+    std::cerr << std::endl << ">> **WARNING** found neither 'last_good_bin' nor 'last_good_time' values ..." << std::endl;
   }
 
   // close group NXdetector
@@ -4066,7 +4065,7 @@ NXstatus PNeXus::GroupHistoData()
     }
 
     // make a vector of all grouping present
-    vector<unsigned int> groupingValue;
+    std::vector<unsigned int> groupingValue;
     bool newGroup = true;
     for (unsigned int i=0; i<fNxEntry1->GetData()->GetGrouping()->size(); i++) {
       newGroup = true;
@@ -4130,7 +4129,7 @@ NXstatus PNeXus::GroupHistoData()
  */
 int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
 {
-  string str;
+  std::string str;
   char  cstr[1204];
   bool ok = false;
   int   size, idata;
@@ -4297,11 +4296,11 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
   size = 1;
   if (!ErrorHandler(NXmakedata(fFileHandle, "temperature", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/temperature'.")) return NX_ERROR;
   if (!ErrorHandler(NXopendata(fFileHandle, "temperature"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/temperature' for writting.")) return NX_ERROR;
-  fdata = (float)fNxEntry1->GetSample()->GetPhysPropValue(string("temperature"), ok);
+  fdata = (float)fNxEntry1->GetSample()->GetPhysPropValue(std::string("temperature"), ok);
   if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/temperature'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
-  str = string("n/a");
-  fNxEntry1->GetSample()->GetPhysPropUnit(string("temperature"), str, ok);
+  str = std::string("n/a");
+  fNxEntry1->GetSample()->GetPhysPropUnit(std::string("temperature"), str, ok);
   strncpy(cstr, str.c_str(), sizeof(cstr));
   if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXsample/temperature'")) return NX_ERROR;
   NXclosedata(fFileHandle);
@@ -4310,11 +4309,11 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
   size = 1;
   if (!ErrorHandler(NXmakedata(fFileHandle, "magnetic_field", NX_FLOAT32, 1, &size), PNEXUS_MAKE_DATA_ERROR, "couldn't create data entry 'NXsample/magnetic_field'.")) return NX_ERROR;
   if (!ErrorHandler(NXopendata(fFileHandle, "magnetic_field"), PNEXUS_OPEN_DATA_ERROR, "couldn't open data 'NXsample/magnetic_field' for writting.")) return NX_ERROR;
-  fdata = (float)fNxEntry1->GetSample()->GetPhysPropValue(string("magnetic_field"), ok);
+  fdata = (float)fNxEntry1->GetSample()->GetPhysPropValue(std::string("magnetic_field"), ok);
   if (!ErrorHandler(NXputdata(fFileHandle, &fdata), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'NXsample/magnetic_field'.")) return NX_ERROR;
   memset(cstr, '\0', sizeof(cstr));
-  str = string("n/a");
-  fNxEntry1->GetSample()->GetPhysPropUnit(string("magnetic_field"), str, ok);
+  str = std::string("n/a");
+  fNxEntry1->GetSample()->GetPhysPropUnit(std::string("magnetic_field"), str, ok);
   memset(cstr, '\0', sizeof(cstr));
   strncpy(cstr, str.c_str(), sizeof(cstr));
   if (!ErrorHandler(NXputattr(fFileHandle, "units", cstr, strlen(cstr), NX_CHAR), PNEXUS_PUT_ATTR_ERROR, "couldn't put attribute 'units' for 'NXsample/magnetic_field'")) return NX_ERROR;
@@ -4576,7 +4575,7 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
 
   // write data 'grouping'
   int *grouping = new int[noOfHistos];
-  vector<int> groupNo; // keep the number of different groupings
+  std::vector<int> groupNo; // keep the number of different groupings
   if (noOfHistos == (int)fNxEntry1->GetData()->GetGrouping()->size()) { // grouping vector seems to be properly defined
     bool found;
     groupNo.push_back(fNxEntry1->GetData()->GetGrouping()->at(0));
@@ -4666,14 +4665,14 @@ int PNeXus::WriteFileIdf1(const char* fileName, const NXaccess access)
  */
 int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
 {
-  string str;
+  std::string str;
   char  cstr[1204];
   bool ok = false;
   int   size, idata;
   float fdata;
   double dval;
   NXlink nxLink;
-  vector<NXlink> nxLinkVec;
+  std::vector<NXlink> nxLinkVec;
 
   memset(cstr, '\0', sizeof(cstr));
   snprintf(cstr, sizeof(cstr), "couldn't open file '%s' for writing", fileName);
@@ -5113,7 +5112,7 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
       if (!ErrorHandler(NXputdata(fFileHandle, (void*)fNxEntry2->GetInstrument()->GetDetector()->GetT0s()), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'time_zero_bin' in NXdetector.")) return NX_ERROR;
       NXclosedata(fFileHandle);
     } else {
-      cerr << endl << ">> **WARNING** time_zero_bin with rank " << fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() << " requested. Do not know how to handle." << endl;
+      std::cerr << std::endl << ">> **WARNING** time_zero_bin with rank " << fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() << " requested. Do not know how to handle." << std::endl;
     }
   }
 
@@ -5142,7 +5141,7 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
       if (!ErrorHandler(NXputdata(fFileHandle, (void*)fNxEntry2->GetInstrument()->GetDetector()->GetFirstGoodBins()), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'first_good_bin' in NXdetector.")) return NX_ERROR;
       NXclosedata(fFileHandle);
     } else {
-      cerr << endl << ">> **WARNING** first_good_bin with rank " << fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() << " requested. Do not know how to handle." << endl;
+      std::cerr << std::endl << ">> **WARNING** first_good_bin with rank " << fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() << " requested. Do not know how to handle." << std::endl;
     }
   }
 
@@ -5171,7 +5170,7 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
       if (!ErrorHandler(NXputdata(fFileHandle, (void*)fNxEntry2->GetInstrument()->GetDetector()->GetLastGoodBins()), PNEXUS_PUT_DATA_ERROR, "couldn't put data 'last_good_bin' in NXdetector.")) return NX_ERROR;
       NXclosedata(fFileHandle);
     } else {
-      cerr << endl << ">> **WARNING** last_good_bin with rank " << fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() << " requested. Do not know how to handle." << endl;
+      std::cerr << std::endl << ">> **WARNING** last_good_bin with rank " << fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() << " requested. Do not know how to handle." << std::endl;
     }
   }
 
@@ -5187,7 +5186,7 @@ int PNeXus::WriteFileIdf2(const char* fileName, const NXaccess access)
   if (!ErrorHandler(NXopengroup(fFileHandle, "detector_1", "NXdata"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open group 'detector_1' in NXroot.")) return NX_ERROR;
 
   for (unsigned int i=0; i<nxLinkVec.size(); i++) {
-    str = string("couldn't create link to ") + string(nxLinkVec[i].targetPath);
+    str = std::string("couldn't create link to ") + std::string(nxLinkVec[i].targetPath);
     if (!ErrorHandler(NXmakelink(fFileHandle, &nxLinkVec[i]), PNEXUS_LINKING_ERROR, str.c_str())) return NX_ERROR;
   }
 
@@ -5222,7 +5221,7 @@ bool PNeXus::IsValidIdf1(bool strict)
   bool valid = true;
 
   if (fIdfVersion != 1) {
-    cerr << endl << ">> **ERROR** wrong IDF version found, namely IDF " << fIdfVersion << ", instead of IDF 1" << endl;
+    std::cerr << std::endl << ">> **ERROR** wrong IDF version found, namely IDF " << fIdfVersion << ", instead of IDF 1" << std::endl;
     return false;
   }
 
@@ -5247,34 +5246,34 @@ bool PNeXus::IsValidIdf1(bool strict)
 bool PNeXus::IsValidIdf2(bool strict)
 {
   if (fIdfVersion != 2) {
-    cerr << endl << ">> **ERROR** wrong IDF version found, namely IDF " << fIdfVersion << ", instead of IDF 2" << endl;
+    std::cerr << std::endl << ">> **ERROR** wrong IDF version found, namely IDF " << fIdfVersion << ", instead of IDF 2" << std::endl;
     return false;
   }
 
   if (!fCreator.compare("n/a")) {
     if (strict) {
-      cerr << endl << ">> **ERROR** creator not set." << endl;
+      std::cerr << std::endl << ">> **ERROR** creator not set." << std::endl;
       return false;
     } else {
-      cerr << endl << ">> **WARNING** creator not set." << endl;
+      std::cerr << std::endl << ">> **WARNING** creator not set." << std::endl;
     }
   }
 
   if (!fFileName.compare("n/a")) {
     if (strict) {
-      cerr << endl << ">> **ERROR** file name not given." << endl;
+      std::cerr << std::endl << ">> **ERROR** file name not given." << std::endl;
       return false;
     } else {
-      cerr << endl << ">> **WARNING** file name not given." << endl;
+      std::cerr << std::endl << ">> **WARNING** file name not given." << std::endl;
     }
   }
 
   if (!fFileTime.compare("n/a")) {
     if (strict) {
-      cerr << endl << ">> **ERROR** no file creation time is given." << endl;
+      std::cerr << std::endl << ">> **ERROR** no file creation time is given." << std::endl;
       return false;
     } else {
-      cerr << endl << ">> **WARNING** no file creation time is given." << endl;
+      std::cerr << std::endl << ">> **WARNING** no file creation time is given." << std::endl;
     }
   }
 
@@ -5302,7 +5301,7 @@ bool PNeXus::IsValidIdf2(bool strict)
  * \param nxclass 'class name' of the entry if entry is found
  * \param dataType of the entry if entry is found
  */
-bool PNeXus::SearchInGroup(string str, string tag, NXname &nxname, NXname &nxclass, int &dataType)
+bool PNeXus::SearchInGroup(std::string str, std::string tag, NXname &nxname, NXname &nxclass, int &dataType)
 {
   bool found = false;
   int status;
@@ -5321,7 +5320,7 @@ bool PNeXus::SearchInGroup(string str, string tag, NXname &nxname, NXname &nxcla
         break;
       }
     } else {
-      cerr << endl << ">> **ERROR** found tag='" << tag << "' which is not handled!" << endl;
+      std::cerr << std::endl << ">> **ERROR** found tag='" << tag << "' which is not handled!" << std::endl;
       break;
     }
   } while (!found && (status == NX_OK));
@@ -5343,7 +5342,7 @@ bool PNeXus::SearchInGroup(string str, string tag, NXname &nxname, NXname &nxcla
  * \param length of the attribute data it entry is found
  * \param dataType of the entry if entry is found
  */
-bool PNeXus::SearchAttrInData(string str, int &length, int &dataType)
+bool PNeXus::SearchAttrInData(std::string str, int &length, int &dataType)
 {
   bool found = false;
   int status;

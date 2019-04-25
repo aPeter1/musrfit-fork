@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -32,7 +32,6 @@
 
 #include <iostream>
 #include <vector>
-using namespace std;
 
 #include <TString.h>
 
@@ -52,7 +51,7 @@ class PFunctionHandler
     virtual Bool_t IsValid() { return fValid; }
     virtual Bool_t DoParse();
     virtual Bool_t CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize);
-    virtual double Eval(Int_t funNo, vector<Int_t> map, vector<double> param);
+    virtual double Eval(Int_t funNo, std::vector<Int_t> map, std::vector<double> param);
     virtual Int_t GetFuncNo(UInt_t idx);
     virtual Int_t GetFuncIndex(Int_t funcNo);
     virtual UInt_t GetNoOfFuncs() { return fFuncs.size(); }
@@ -62,8 +61,8 @@ class PFunctionHandler
     Bool_t fValid; ///< true = function handler has valid functions
 
     PMsrLines fLines; ///< stores the msr-file FUNCTIONS block as clear text.
-    vector<PFunction> fFuncs; ///< vector of all evaluatable functions
-    vector<TString> fFuncComment; ///< vector of prepended function comments
+    std::vector<PFunction> fFuncs; ///< vector of all evaluatable functions
+    std::vector<TString> fFuncComment; ///< vector of prepended function comments
 };
 
 #endif // _PFUNCTIONHANDLER_H_

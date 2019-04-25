@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,9 +31,10 @@
 #define _PFOURIER_H_
 
 #include <vector>
-using namespace std;
 
 #include "fftw3.h"
+
+#include <TH1F.h>
 
 #include "Minuit2/FCNBase.h"
 
@@ -51,7 +52,7 @@ class PFTPhaseCorrection : public ROOT::Minuit2::FCNBase
 {
   public:
     PFTPhaseCorrection(const Int_t minBin=-1, const Int_t maxBin=-1);
-    PFTPhaseCorrection(vector<Double_t> &reFT, vector<Double_t> &imFT, const Int_t minBin=-1, const Int_t maxBin=-1);
+    PFTPhaseCorrection(std::vector<Double_t> &reFT, std::vector<Double_t> &imFT, const Int_t minBin=-1, const Int_t maxBin=-1);
     virtual ~PFTPhaseCorrection() {}
 
     virtual Bool_t IsValid() { return fValid; }
@@ -67,14 +68,14 @@ class PFTPhaseCorrection : public ROOT::Minuit2::FCNBase
   private:
     Bool_t fValid;
 
-    vector<Double_t> fReal; /// original real Fourier data set
-    vector<Double_t> fImag; /// original imag Fourier data set
-    mutable vector<Double_t> fRealPh;  /// phased real Fourier data set
-    mutable vector<Double_t> fImagPh;  /// phased imag Fourier data set
-    mutable vector<Double_t> fRealPhD; /// 1st derivative of fRealPh
+    std::vector<Double_t> fReal; /// original real Fourier data set
+    std::vector<Double_t> fImag; /// original imag Fourier data set
+    mutable std::vector<Double_t> fRealPh;  /// phased real Fourier data set
+    mutable std::vector<Double_t> fImagPh;  /// phased imag Fourier data set
+    mutable std::vector<Double_t> fRealPhD; /// 1st derivative of fRealPh
 
-    Double_t fMinBin; /// minimum bin from Fourier range to be used for the phase correction estimate
-    Double_t fMaxBin; /// maximum bin from Fourier range to be used for the phase correction estimate
+    Int_t fMinBin; /// minimum bin from Fourier range to be used for the phase correction estimate
+    Int_t fMaxBin; /// maximum bin from Fourier range to be used for the phase correction estimate
     mutable Double_t fPh_c0; /// constant part of the phase dispersion used for the phase correction
     mutable Double_t fPh_c1; /// linear part of the phase dispersion used for the phase correction
     Double_t fGamma; /// gamma parameter to balance between entropy and penalty
@@ -87,7 +88,7 @@ class PFTPhaseCorrection : public ROOT::Minuit2::FCNBase
     virtual Double_t Entropy() const;
 
     virtual Double_t Up() const { return 1.0; }
-    virtual Double_t operator()(const vector<Double_t>&) const;
+    virtual Double_t operator()(const std::vector<Double_t>&) const;
 };
 
 /**
@@ -108,12 +109,12 @@ class PFourier
     virtual Double_t GetResolution() { return fResolution; }
     virtual Double_t GetMaxFreq();
     virtual TH1F* GetRealFourier(const Double_t scale = 1.0);
-//as    virtual TH1F* GetPhaseOptRealFourier(vector<Double_t> &phase, const Double_t scale = 1.0, const Double_t min = -1.0, const Double_t max = -1.0);
+//as    virtual TH1F* GetPhaseOptRealFourier(std::vector<Double_t> &phase, const Double_t scale = 1.0, const Double_t min = -1.0, const Double_t max = -1.0);
     virtual TH1F* GetImaginaryFourier(const Double_t scale = 1.0);
     virtual TH1F* GetPowerFourier(const Double_t scale = 1.0);
     virtual TH1F* GetPhaseFourier(const Double_t scale = 1.0);
 
-    static TH1F* GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, vector<Double_t> &phase,
+    static TH1F* GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, std::vector<Double_t> &phase,
                                         const Double_t scale = 1.0, const Double_t min = -1.0, const Double_t max = -1.0);
 
     virtual Bool_t IsValid() { return fValid; }

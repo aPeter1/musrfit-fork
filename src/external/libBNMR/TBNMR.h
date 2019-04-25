@@ -52,11 +52,11 @@ public:
   ~ExpRlx(){}
 
   Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   Bool_t GlobalPartIsValid() const { return true; }
 
   // function operator
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
   // definition of the class for the ROOT-dictionary
   ClassDef(ExpRlx,1)
@@ -70,11 +70,11 @@ public:
   ~SExpRlx(){}
 
   Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   Bool_t GlobalPartIsValid() const { return true; }
 
   // function operator
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 private:
   static TF1 sexp1;
   static TF1 sexp2;

@@ -29,7 +29,6 @@
 #include "TSkewedGss.h"
 #include <iostream>
 #include <cassert>
-using namespace std;
 
 #include <TSAXParser.h>
 #include "BMWStartupHandler.h"
@@ -57,7 +56,7 @@ TSkewedGss::~TSkewedGss() {
 TSkewedGss::TSkewedGss() : fCalcNeeded(true), fFirstCall(true) {
 
     // read startup file
-    string startup_path_name("BMW_startup.xml");
+    std::string startup_path_name("BMW_startup.xml");
 
     TSAXParser *saxParser = new TSAXParser();
     BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -104,7 +103,7 @@ TSkewedGss::TSkewedGss() : fCalcNeeded(true), fFirstCall(true) {
 // Parameters: all the parameters for the function to be fitted through TSkewedGss (phase,freq0,sigma-,sigma+)
 //------------------
 
-double TSkewedGss::operator()(double t, const vector<double> &par) const {
+double TSkewedGss::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 4);
 
@@ -146,7 +145,7 @@ double TSkewedGss::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      std::cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << std::endl;
 
       fParForPofB[2] = par[1]; // nu0
       fParForPofB[3] = par[2]; // sigma-
@@ -156,7 +155,7 @@ double TSkewedGss::operator()(double t, const vector<double> &par) const {
       fPofT->DoFFT();
 
     }/* else {
-      cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
+      std::cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << std::endl;
     }*/
 
     fPofT->CalcPol(fParForPofT);

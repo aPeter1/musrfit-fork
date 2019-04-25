@@ -31,7 +31,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include "PStartupHandler_SV.h"
 
@@ -60,7 +59,7 @@ PStartupHandler_SV::PStartupHandler_SV()
     fStartupFileFound = true;
     fStartupFilePath = TString(startup_path_name);
   } else { // startup file is not found in the current directory
-    cout << endl << ">> PStartupHandler_SV(): **WARNING** Couldn't find spinValve_startup.xml in the current directory, will try default one." << endl;
+    std::cout << std::endl << ">> PStartupHandler_SV(): **WARNING** Couldn't find spinValve_startup.xml in the current directory, will try default one." << std::endl;
     home_path = getenv("HOME");
     snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/external/spinValve_startup.xml", home_path);
     if (StartupFileExists(startup_path_name)) {
@@ -145,9 +144,9 @@ void PStartupHandler_SV::OnCharacters(const char *str)
       if (tstr.IsDigit()) {
       fNoOfFields = tstr.Atoi();
       } else {
-        cout << endl << "PStartupHandler_SV::OnCharacters: **ERROR** when finding number_of_fields:";
-        cout << endl << "\"" << str << "\" is not a number, will ignore it and use the default value.";
-        cout << endl;
+        std::cout << std::endl << "PStartupHandler_SV::OnCharacters: **ERROR** when finding number_of_fields:";
+        std::cout << std::endl << "\"" << str << "\" is not a number, will ignore it and use the default value.";
+        std::cout << std::endl;
       }
       break;
     case eRange:
@@ -155,9 +154,9 @@ void PStartupHandler_SV::OnCharacters(const char *str)
       if (tstr.IsFloat()) {
         fRange = tstr.Atof();
       } else {
-        cout << endl << "PStartupHandler_SV::OnCharacters: **ERROR** when finding range:";
-        cout << endl << "\"" << str << "\" is not a floating point number, will ignore it and use the default value.";
-        cout << endl;
+        std::cout << std::endl << "PStartupHandler_SV::OnCharacters: **ERROR** when finding range:";
+        std::cout << std::endl << "\"" << str << "\" is not a floating point number, will ignore it and use the default value.";
+        std::cout << std::endl;
       }
       break;
     default:
@@ -188,8 +187,8 @@ void PStartupHandler_SV::OnComment(const char *str)
  */
 void PStartupHandler_SV::OnWarning(const char *str)
 {
-  cout << endl << "PStartupHandler_SV **WARNING** " << str;
-  cout << endl;
+  std::cout << std::endl << "PStartupHandler_SV **WARNING** " << str;
+  std::cout << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -202,8 +201,8 @@ void PStartupHandler_SV::OnWarning(const char *str)
  */
 void PStartupHandler_SV::OnError(const char *str)
 {
-  cout << endl << "PStartupHandler_SV **ERROR** " << str;
-  cout << endl;
+  std::cout << std::endl << "PStartupHandler_SV **ERROR** " << str;
+  std::cout << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -216,8 +215,8 @@ void PStartupHandler_SV::OnError(const char *str)
  */
 void PStartupHandler_SV::OnFatalError(const char *str)
 {
-  cout << endl << "PStartupHandler_SV **FATAL ERROR** " << str;
-  cout << endl;
+  std::cout << std::endl << "PStartupHandler_SV **FATAL ERROR** " << str;
+  std::cout << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -244,7 +243,7 @@ bool PStartupHandler_SV::StartupFileExists(char *fln)
 {
   bool result = false;
 
-  ifstream ifile(fln);
+  std::ifstream ifile(fln);
 
   if (ifile.fail()) {
     result = false;

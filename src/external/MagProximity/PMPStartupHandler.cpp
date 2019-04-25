@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2011 by Andreas Suter                                   *
+ *   Copyright (C) 2011-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include "PMPStartupHandler.h"
 
@@ -61,7 +60,7 @@ PMPStartupHandler::PMPStartupHandler()
     fStartupFileFound = true;
     fStartupFilePath = TString(startup_path_name);
   } else { // startup file is not found in the current directory
-    cout << endl << "PMPStartupHandler(): **WARNING** Couldn't find mag_proximity_startup.xml in the current directory, will try default one." << endl;
+    std::cout << std::endl << "PMPStartupHandler(): **WARNING** Couldn't find mag_proximity_startup.xml in the current directory, will try default one." << std::endl;
     strncpy(startup_path_name, "/home/nemu/analysis/musrfit/src/external/MagProximity/mag_proximity_startup.xml", sizeof(startup_path_name));
     if (StartupFileExists(startup_path_name)) {
       fStartupFileFound = true;
@@ -160,9 +159,9 @@ void PMPStartupHandler::OnCharacters(const char *str)
         tstr += ".rge";
         fTrimSpDataPathList.push_back(tstr);
       } else {
-        cout << endl << "PMPStartupHandler::OnCharacters: **ERROR** when finding energy:";
-        cout << endl << "\"" << str << "\" is not a floating point number, will ignore it and use the default value.";
-        cout << endl;
+        std::cout << std::endl << "PMPStartupHandler::OnCharacters: **ERROR** when finding energy:";
+        std::cout << std::endl << "\"" << str << "\" is not a floating point number, will ignore it and use the default value.";
+        std::cout << std::endl;
       }
       break;
     default:
@@ -193,8 +192,8 @@ void PMPStartupHandler::OnComment(const char *str)
  */
 void PMPStartupHandler::OnWarning(const char *str)
 {
-  cout << endl << "PMPStartupHandler **WARNING** " << str;
-  cout << endl;
+  std::cout << std::endl << "PMPStartupHandler **WARNING** " << str;
+  std::cout << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -207,8 +206,8 @@ void PMPStartupHandler::OnWarning(const char *str)
  */
 void PMPStartupHandler::OnError(const char *str)
 {
-  cout << endl << "PMPStartupHandler **ERROR** " << str;
-  cout << endl;
+  std::cout << std::endl << "PMPStartupHandler **ERROR** " << str;
+  std::cout << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -221,8 +220,8 @@ void PMPStartupHandler::OnError(const char *str)
  */
 void PMPStartupHandler::OnFatalError(const char *str)
 {
-  cout << endl << "PMPStartupHandler **FATAL ERROR** " << str;
-  cout << endl;
+  std::cout << std::endl << "PMPStartupHandler **FATAL ERROR** " << str;
+  std::cout << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -249,7 +248,7 @@ bool PMPStartupHandler::StartupFileExists(char *fln)
 {
   bool result = false;
 
-  ifstream ifile(fln);
+  std::ifstream ifile(fln);
 
   if (ifile.fail()) {
     result = false;

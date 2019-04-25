@@ -41,7 +41,6 @@
 #endif
 
 #include <iostream>
-using namespace std;
 
 #include "TMath.h"
 
@@ -60,7 +59,7 @@ TFilmVortexFieldCalc::~TFilmVortexFieldCalc() {
     FILE *wordsOfWisdomW;
     wordsOfWisdomW = fopen(fWisdom.c_str(), "w");
     if (wordsOfWisdomW == NULL) {
-      cout << "TFilmVortexFieldCalc::~TFilmVortexFieldCalc(): Could not open file ... No wisdom is exported..." << endl;
+      std::cout << "TFilmVortexFieldCalc::~TFilmVortexFieldCalc(): Could not open file ... No wisdom is exported..." << std::endl;
     } else {
       fftwf_export_wisdom_to_file(wordsOfWisdomW);
       fclose(wordsOfWisdomW);
@@ -71,7 +70,7 @@ TFilmVortexFieldCalc::~TFilmVortexFieldCalc() {
 
   fftwf_destroy_plan(fFFTplan);
 
-  delete[] fFFTin; fFFTin = 0;
+  delete[] fFFTin; fFFTin = nullptr;
 
   for(unsigned int i(0); i<3; ++i){
     delete[] fBout[i]; fBout[i] = 0;
@@ -117,10 +116,10 @@ float TFilmVortexFieldCalc::GetBmax() const {
 }
 
 
-TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc(const string& wisdom, const unsigned int steps, const unsigned int stepsZ)
+TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc(const std::string& wisdom, const unsigned int steps, const unsigned int stepsZ)
  : fLatticeConstant(0.0), fKappa(0.0), fSumOmegaSq(0.0), fSumSum(0.0), fFind3dSolution(false)
 {
-//  cout << "TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc... ";
+//  std::cout << "TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc... ";
 
   fWisdom = wisdom;
   switch (stepsZ % 2) {
@@ -171,7 +170,7 @@ TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc(const string& wisdom, con
     temp = new float[stepsSqStZ]; // (grad omega)_(x,y,z)
     fOmegaDiffMatrix.push_back(temp);
   }
-  temp = 0;
+  temp = nullptr;
 
   fOmegaMatrix = new float[stepsSqStZ];  // |psi|^2
 
@@ -201,7 +200,7 @@ TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc(const string& wisdom, con
 
   FILE *wordsOfWisdomR;
   wordsOfWisdomR = fopen(fWisdom.c_str(), "r");
-  if (wordsOfWisdomR == NULL) {
+  if (wordsOfWisdomR == nullptr) {
     fUseWisdom = false;
   } else {
     wisdomLoaded = fftwf_import_wisdom_from_file(wordsOfWisdomR);
@@ -215,7 +214,7 @@ TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc(const string& wisdom, con
 // create the FFT plans
 
   if (fUseWisdom) {
-//    cout << "use wisdom ... ";
+//    std::cout << "use wisdom ... ";
     // use the first plan from the base class here - it will be destroyed by the base class destructor
     fFFTplan = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fFFTin, fRealSpaceMatrix, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
     fFFTplanBkToBandQ = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fBkMatrix, fBkMatrix, FFTW_BACKWARD, FFTW_EXHAUSTIVE);
@@ -226,7 +225,7 @@ TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc(const string& wisdom, con
     fFFTplanForBatSurf = fftwf_plan_dft_2d(fSteps, fSteps, fBkS, fBkS, FFTW_FORWARD, FFTW_EXHAUSTIVE);
   }
   else {
-//    cout << "do not use wisdom ... ";
+//    std::cout << "do not use wisdom ... ";
     // use the first plan from the base class here - it will be destroyed by the base class destructor
     fFFTplan = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fFFTin, fRealSpaceMatrix, FFTW_BACKWARD, FFTW_ESTIMATE);
     fFFTplanBkToBandQ = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fBkMatrix, fBkMatrix, FFTW_BACKWARD, FFTW_ESTIMATE);
@@ -236,7 +235,7 @@ TFilmTriVortexNGLFieldCalc::TFilmTriVortexNGLFieldCalc(const string& wisdom, con
     fFFTplanForPk2 = fftwf_plan_dft_3d(fSteps, fSteps, fStepsZ, fQMatrix, fQMatrix, FFTW_BACKWARD, FFTW_ESTIMATE);
     fFFTplanForBatSurf = fftwf_plan_dft_2d(fSteps, fSteps, fBkS, fBkS, FFTW_FORWARD, FFTW_ESTIMATE);
   }
-//  cout << "done" << endl;
+//  std::cout << "done" << endl;
 }
 
 TFilmTriVortexNGLFieldCalc::~TFilmTriVortexNGLFieldCalc() {
@@ -254,19 +253,19 @@ TFilmTriVortexNGLFieldCalc::~TFilmTriVortexNGLFieldCalc() {
   }
   fOmegaDiffMatrix.clear();
 
-  delete[] fOmegaMatrix; fOmegaMatrix = 0;
-  delete[] fBkMatrix; fBkMatrix = 0;
-  delete[] fRealSpaceMatrix; fRealSpaceMatrix = 0;
-  delete[] fPkMatrix; fPkMatrix = 0;
-  delete[] fQMatrix; fQMatrix = 0;
-  delete[] fQMatrixA; fQMatrixA = 0;
-  delete[] fSumAkFFTin; fSumAkFFTin = 0;
-  delete[] fSumAk; fSumAk = 0;
-  delete[] fBkS; fBkS = 0;
-  delete[] fGstorage; fGstorage = 0;
+  delete[] fOmegaMatrix; fOmegaMatrix = nullptr;
+  delete[] fBkMatrix; fBkMatrix = nullptr;
+  delete[] fRealSpaceMatrix; fRealSpaceMatrix = nullptr;
+  delete[] fPkMatrix; fPkMatrix = nullptr;
+  delete[] fQMatrix; fQMatrix = nullptr;
+  delete[] fQMatrixA; fQMatrixA = nullptr;
+  delete[] fSumAkFFTin; fSumAkFFTin = nullptr;
+  delete[] fSumAk; fSumAk = nullptr;
+  delete[] fBkS; fBkS = nullptr;
+  delete[] fGstorage; fGstorage = nullptr;
 
-  delete[] fCheckAkConvergence; fCheckAkConvergence = 0;
-  delete[] fCheckBkConvergence; fCheckBkConvergence = 0;
+  delete[] fCheckAkConvergence; fCheckAkConvergence = nullptr;
+  delete[] fCheckBkConvergence; fCheckBkConvergence = nullptr;
 }
 
 void TFilmTriVortexNGLFieldCalc::CalculateGatVortexCore() const {
@@ -2612,11 +2611,11 @@ void TFilmTriVortexNGLFieldCalc::CalculateSumAk() const {
 void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
   // SetParameters - method has to be called from the user before the calculation!!
   if (fParam.size() < 4) {
-    cout << endl << "The SetParameters-method has to be called before B(x,y,z) can be calculated!" << endl;
+    std::cout << std::endl << "The SetParameters-method has to be called before B(x,y,z) can be calculated!" << std::endl;
     return;
   }
   if (!fParam[0] || !fParam[1] || !fParam[2] || !fParam[3]) {
-    cout << endl << "The field, penetration depth, coherence length and layer thickness have to have finite values in order to calculate B(x,y,z)!" << endl;
+    std::cout << std::endl << "The field, penetration depth, coherence length and layer thickness have to have finite values in order to calculate B(x,y,z)!" << std::endl;
     return;
   }
 
@@ -2785,7 +2784,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
 //       CalculateGatVortexCore();
 //       for (k = 0; k < NFFTz; ++k) {
-//         cout << "g[" << k << "] = " << fGstorage[k] << endl;
+//         std::cout << "g[" << k << "] = " << fGstorage[k] << std::endl;
 //       }
 
     #ifdef HAVE_GOMP
@@ -2800,7 +2799,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
          (fOmegaDiffMatrix[0][l]*fOmegaDiffMatrix[0][l] + fOmegaDiffMatrix[1][l]*fOmegaDiffMatrix[1][l] + \
           fOmegaDiffMatrix[2][l]*fOmegaDiffMatrix[2][l])/(fourKappaSq*fOmegaMatrix[l]);
       } else {
-//        cout << "index where omega is zero: " << l << endl;
+//        std::cout << "index where omega is zero: " << l << std::endl;
         fRealSpaceMatrix[l][0] = 0.0;
       }
       fRealSpaceMatrix[l][1] = 0.0;
@@ -2862,7 +2861,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
             (fOmegaDiffMatrix[0][index]*fOmegaDiffMatrix[0][index] + fOmegaDiffMatrix[1][index]*fOmegaDiffMatrix[1][index] + \
               fOmegaDiffMatrix[2][index]*fOmegaDiffMatrix[2][index])/(fourKappaSq*fOmegaMatrix[index]);
           } else {
-//            cout << "! fOmegaMatrix at index " << index << endl;
+//            std::cout << "! fOmegaMatrix at index " << index << std::endl;
            // fSumSum -= fGstorage[k];
            index = k + fStepsZ*(j + fSteps*(i + 1));
             if (i < NFFT - 1 && fOmegaMatrix[index]) {
@@ -2898,9 +2897,9 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
         if (fFFTin[index][0]) {
           if (((fabs(fFFTin[index][0]) > 1.0E-5f) && (fabs(fCheckAkConvergence[index] - fFFTin[index][0])/fFFTin[index][0] > 5.0E-3f)) \
              || ((fabs(fFFTin[index][0]) > 1.0E-10f) && (fCheckAkConvergence[index]/fFFTin[index][0] < 0.0))) {
-            //cout << "old: " << fCheckAkConvergence[index] << ", new: " << fFFTin[index][0] << endl;
+            //std::cout << "old: " << fCheckAkConvergence[index] << ", new: " << fFFTin[index][0] << std::endl;
             akConverged = false;
-            //cout << "count = " << count << ", Ak index = " << index << endl;
+            //std::cout << "count = " << count << ", Ak index = " << index << std::endl;
             break;
           }
         }
@@ -2926,17 +2925,17 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
       }
     }
 
-    //  cout << "Ak Convergence: " << akConverged << endl;
+    //  std::cout << "Ak Convergence: " << akConverged << std::endl;
 
     // Calculate omega again either for the bK-iteration step or again the aK-iteration
 
     CalculateSumAk();
 
-//    cout << "fSumAk = ";
+//    std::cout << "fSumAk = ";
 //    for (k = 0; k < NFFTz; ++k){
-//      cout << fSumAk[k][0] << ", ";
+//      std::cout << fSumAk[k][0] << ", ";
 //    }
-//    cout << endl;
+//    std::cout << endl;
 
     meanAk = 0.0f;
     for (k = 0; k < NFFTz; ++k) {
@@ -2995,7 +2994,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
       fBkS[index][1] = 0.f;
     }
 
-    //  cout << "fC = " << fC << ", meanAk = " << meanAk << endl;
+    //  std::cout << "fC = " << fC << ", meanAk = " << meanAk << endl;
 
     fSumSum = fC*meanAk;
 
@@ -3027,9 +3026,9 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
           if (((fabs(fBkMatrix[index][0]) > 1.0E-5f) && \
               (fabs(fCheckBkConvergence[index] - fBkMatrix[index][0])/fBkMatrix[index][0] > 5.0E-3f)) \
             || ((fabs(fBkMatrix[index][0]) > 1.0E-10f) && (fCheckBkConvergence[index]/fBkMatrix[index][0] < 0.0))) {
-            //cout << "old: " << fCheckBkConvergence[index] << ", new: " << fBkMatrix[index][0] << endl;
+            //std::cout << "old: " << fCheckBkConvergence[index] << ", new: " << fBkMatrix[index][0] << std::endl;
             bkConverged = false;
-            //cout << "count = " << count << ", Bk index = " << index << endl;
+            //std::cout << "count = " << count << ", Bk index = " << index << std::endl;
             break;
           }
         }
@@ -3038,7 +3037,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
         break;
     }
 
-    // cout << "Bk Convergence: " << bkConverged << endl;
+    // std::cout << "Bk Convergence: " << bkConverged << std::endl;
 
     if (!bkConverged) {
       #ifdef HAVE_GOMP
@@ -3069,7 +3068,7 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
     }
 
     if (count == 50) {
-      cout << "3D iterations aborted after " << count << " steps" << endl;
+      std::cout << "3D iterations aborted after " << count << " steps" << std::endl;
       break;
     }
 
@@ -3080,14 +3079,14 @@ void TFilmTriVortexNGLFieldCalc::CalculateGrid() const {
 
     if (bkConverged && akConverged) {
       if (!fFind3dSolution) {
-        //cout << "count = " << count << " 2D converged" << endl;
-        //cout << "2D iterations converged after " << count << " steps" << endl;
+        //std::cout << "count = " << count << " 2D converged" << std::endl;
+        //std::cout << "2D iterations converged after " << count << " steps" << std::endl;
         //break;
         akConverged = false;
         bkConverged = false;
         fFind3dSolution = true;
       } else {
-        cout << "3D iterations converged after " << count << " steps" << endl;
+        std::cout << "3D iterations converged after " << count << " steps" << std::endl;
         break;
       }
     }

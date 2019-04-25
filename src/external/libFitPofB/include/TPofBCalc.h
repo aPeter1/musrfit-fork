@@ -46,25 +46,25 @@ class TPofBCalc {
 public:
 
   // standard constructor: allocates memory for B and PB, the arrays are filled later by one of the Calculate-methods
-  TPofBCalc(const vector<double>&);
+  TPofBCalc(const std::vector<double>&);
   // alternative constructor: PB is not actually calculated but copied from a vector
-  TPofBCalc(const vector<double>&, const vector<double>& , double dt = 0.01);
+  TPofBCalc(const std::vector<double>&, const std::vector<double>& , double dt = 0.01);
   ~TPofBCalc() {
-    delete[] fB; fB = 0;
-    delete[] fPB; fPB = 0;
+    delete[] fB; fB = nullptr;
+    delete[] fPB; fPB = nullptr;
   }
 
-  void Calculate(const string&, const vector<double>&);
-  void Calculate(const TBofZCalc*, const TTrimSPData*, const vector<double>&, unsigned int);
-  void Calculate(const TBofZCalcInverse*, const TTrimSPData*, const vector<double>&);
-  void Calculate(const TBulkVortexFieldCalc*, const vector<double>&);
+  void Calculate(const std::string&, const std::vector<double>&);
+  void Calculate(const TBofZCalc*, const TTrimSPData*, const std::vector<double>&, unsigned int);
+  void Calculate(const TBofZCalcInverse*, const TTrimSPData*, const std::vector<double>&);
+  void Calculate(const TBulkVortexFieldCalc*, const std::vector<double>&);
 
   const double* DataB() const {return fB;}
   double* DataPB() const {return fPB;}
   double GetBmin() const {return fBmin;}
   double GetBmax() const {return fBmax;}
   unsigned int GetPBSize() const {return fPBSize;}
-  void SetPB(const vector<double>&) const;
+  void SetPB(const std::vector<double>&) const;
   void ConvolveGss(double);
   void AddBackground(double, double, double);
   double GetFirstMoment() const;

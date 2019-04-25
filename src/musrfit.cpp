@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -40,7 +40,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include <TSAXParser.h>
 #include <TString.h>
@@ -74,11 +73,11 @@ void* musrfit_timeout(void *args)
 
   sleep(timeout);
 
-  cerr << endl << ">> **FATAL ERROR** musrfit_timeout for task pid=" << *pid << " called! Will kill it!" << endl << endl;
+  std::cerr << std::endl << ">> **FATAL ERROR** musrfit_timeout for task pid=" << *pid << " called! Will kill it!" << std::endl << std::endl;
 
   kill(*pid, SIGKILL);
 
-  return (void*)0;
+  return (void*)nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -87,38 +86,38 @@ void* musrfit_timeout(void *args)
  */
 void musrfit_syntax()
 {
-  cout << endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [-t, --title-from-data-file]";
-  cout << endl << "                            [-e, --estimateN0] [-p, --per-run-block-chisq]";
-  cout << endl << "                            [--dump <type>] [--timeout <timeout_tag>] |";
-  cout << endl << "                            --nexus-support | --show-dynamic-path | --version | --help";
-  cout << endl << "       <msr-file>: msr input file";
-  cout << endl << "       'musrfit <msr-file>' will execute musrfit";
-  cout << endl << "       'musrfit' or 'musrfit --help' will show this help";
-  cout << endl << "       'musrfit --version' will print the musrfit version";
-  cout << endl << "       'musrfit --nexus-support' will print if NeXus support is available.";
-  cout << endl << "       'musrfit --show-dynamic-path' will print the internal dynamic library search paths.";
-  cout << endl << "       -k, --keep-mn2-output: will rename the files MINUIT2.OUTPUT and ";
-  cout << endl << "              MINUIT2.root to <msr-file>-mn2.output and <msr-file>-mn2.root,";
-  cout << endl << "              respectively,";
-  cout << endl << "              e.g. <msr-file> = 147.msr -> 147-mn2.output, 147-mn2.root";
-  cout << endl << "       -c, --chisq-only: instead of fitting the data, chisq is just calculated";
-  cout << endl << "              once and the result is set to the stdout. This feature is useful";
-  cout << endl << "              to adjust initial parameters.";
-  cout << endl << "       -t, --title-from-data-file: will replace the <msr-file> run title by the";
-  cout << endl << "              run title of the FIRST run of the <msr-file> run block, if a run title";
-  cout << endl << "              is present in the data file.";
-  cout << endl << "       -e, --estimateN0: estimate N0 for single histogram fits.";
-  cout << endl << "       -p, --per-run-block-chisq: will write per run block chisq to the msr-file.";
-  cout << endl << "       --dump <type> is writing a data file with the fit data and the theory";
-  cout << endl << "              <type> can be 'ascii', 'root'";
-  cout << endl << "       --timeout <timeout_tag>: overwrites to predefined timeout of " << timeout << " (sec).";
-  cout << endl << "              <timeout_tag> <= 0 means timeout facility is not enabled. <timeout_tag> = nn";
-  cout << endl << "              will set the timeout to nn (sec).";
-  cout << endl;
-  cout << endl << "       At the end of a fit, musrfit writes the fit results into an <mlog-file> and";
-  cout << endl << "       swaps them, i.e. in the <msr-file> you will find the fit results and in the";
-  cout << endl << "       <mlog-file> your initial guess values.";
-  cout << endl << endl;
+  std::cout << std::endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [-t, --title-from-data-file]";
+  std::cout << std::endl << "                            [-e, --estimateN0] [-p, --per-run-block-chisq]";
+  std::cout << std::endl << "                            [--dump <type>] [--timeout <timeout_tag>] |";
+  std::cout << std::endl << "                            --nexus-support | --show-dynamic-path | --version | --help";
+  std::cout << std::endl << "       <msr-file>: msr input file";
+  std::cout << std::endl << "       'musrfit <msr-file>' will execute musrfit";
+  std::cout << std::endl << "       'musrfit' or 'musrfit --help' will show this help";
+  std::cout << std::endl << "       'musrfit --version' will print the musrfit version";
+  std::cout << std::endl << "       'musrfit --nexus-support' will print if NeXus support is available.";
+  std::cout << std::endl << "       'musrfit --show-dynamic-path' will print the internal dynamic library search paths.";
+  std::cout << std::endl << "       -k, --keep-mn2-output: will rename the files MINUIT2.OUTPUT and ";
+  std::cout << std::endl << "              MINUIT2.root to <msr-file>-mn2.output and <msr-file>-mn2.root,";
+  std::cout << std::endl << "              respectively,";
+  std::cout << std::endl << "              e.g. <msr-file> = 147.msr -> 147-mn2.output, 147-mn2.root";
+  std::cout << std::endl << "       -c, --chisq-only: instead of fitting the data, chisq is just calculated";
+  std::cout << std::endl << "              once and the result is set to the stdout. This feature is useful";
+  std::cout << std::endl << "              to adjust initial parameters.";
+  std::cout << std::endl << "       -t, --title-from-data-file: will replace the <msr-file> run title by the";
+  std::cout << std::endl << "              run title of the FIRST run of the <msr-file> run block, if a run title";
+  std::cout << std::endl << "              is present in the data file.";
+  std::cout << std::endl << "       -e, --estimateN0: estimate N0 for single histogram fits.";
+  std::cout << std::endl << "       -p, --per-run-block-chisq: will write per run block chisq to the msr-file.";
+  std::cout << std::endl << "       --dump <type> is writing a data file with the fit data and the theory";
+  std::cout << std::endl << "              <type> can be 'ascii', 'root'";
+  std::cout << std::endl << "       --timeout <timeout_tag>: overwrites to predefined timeout of " << timeout << " (sec).";
+  std::cout << std::endl << "              <timeout_tag> <= 0 means timeout facility is not enabled. <timeout_tag> = nn";
+  std::cout << std::endl << "              will set the timeout to nn (sec).";
+  std::cout << std::endl;
+  std::cout << std::endl << "       At the end of a fit, musrfit writes the fit results into an <mlog-file> and";
+  std::cout << std::endl << "       swaps them, i.e. in the <msr-file> you will find the fit results and in the";
+  std::cout << std::endl << "       <mlog-file> your initial guess values.";
+  std::cout << std::endl << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -137,23 +136,23 @@ void musrfit_write_ascii(TString fln, PRunData *data, int runCounter)
   Ssiz_t index = fln.Index(".");
   fln.Insert(index, count);
 
-  ofstream f;
+  std::ofstream f;
 
   // open dump-file
-  f.open(fln.Data(), iostream::out);
+  f.open(fln.Data(), std::iostream::out);
   if (!f.is_open()) {
-    cout << endl << "Couldn't open dump (" << fln.Data() << ") file for writting, sorry ...";
-    cout << endl;
+    std::cout << std::endl << "Couldn't open dump (" << fln.Data() << ") file for writting, sorry ...";
+    std::cout << std::endl;
     return;
   }
 
   // dump data
-  f << "% number of data values = " << data->GetValue()->size() << endl;
-  f << "% time (us), value, error, theory" << endl;
+  f << "% number of data values = " << data->GetValue()->size() << std::endl;
+  f << "% time (us), value, error, theory" << std::endl;
   double time;
   for (unsigned int i=0; i<data->GetValue()->size(); i++) {
     time = data->GetDataTimeStart() + (double)i*data->GetDataTimeStep();
-    f << time << ", " << data->GetValue()->at(i) << ", " << data->GetError()->at(i) << ", " << data->GetTheory()->at(i) << endl;
+    f << time << ", " << data->GetValue()->at(i) << ", " << data->GetError()->at(i) << ", " << data->GetTheory()->at(i) << std::endl;
   }
 
   // close file
@@ -305,15 +304,15 @@ void musrfit_write_root(TFile &f, TString fln, PRunData *data, int runCounter)
   // clean up
   if (hdata) {
     delete hdata;
-    hdata = 0;
+    hdata = nullptr;
   }
   if (htheo) {
     delete htheo;
-    htheo = 0;
+    htheo = nullptr;
   }
   if (c) {
     delete c;
-    c = 0;
+    c = nullptr;
   }
 }
 
@@ -459,27 +458,27 @@ int main(int argc, char *argv[])
 
   // add default shared library path /usr/local/lib if not already persent
   const char *dsp = gSystem->GetDynamicPath();
-  if (strstr(dsp, "/usr/local/lib") == NULL)
+  if (strstr(dsp, "/usr/local/lib") == nullptr)
     gSystem->AddDynamicPath("/usr/local/lib");
 
   if (argc == 2) {
     if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrfit version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "musrfit version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #else
-      cout << endl << "musrfit git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "musrfit git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[1], "--nexus-support")) {
 #ifdef PNEXUS_ENABLED
-      cout << endl << ">> musrfit: NeXus support enabled." << endl << endl;
+      std::cout << std::endl << ">> musrfit: NeXus support enabled." << std::endl << std::endl;
 #else
-      cout << endl << "musrfit: NeXus support NOT enabled." << endl << endl;
+      std::cout << std::endl << "musrfit: NeXus support NOT enabled." << std::endl << std::endl;
 #endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[1], "--show-dynamic-path")) {
-      cout << endl << "musrfit: internal dynamic search paths for shared libraries/root dictionaries:";
-      cout << endl << "  '" << gSystem->GetDynamicPath() << "'" << endl << endl;
+      std::cout << std::endl << "musrfit: internal dynamic search paths for shared libraries/root dictionaries:";
+      std::cout << std::endl << "  '" << gSystem->GetDynamicPath() << "'" << std::endl << std::endl;
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[1], "--help")) {
       show_syntax = true;
@@ -506,7 +505,7 @@ int main(int argc, char *argv[])
         dump = TString(argv[i+1]);
         i++;
       } else {
-        cerr << endl << "musrfit: **ERROR** found option --dump without <type>" << endl;
+        std::cerr << std::endl << "musrfit: **ERROR** found option --dump without <type>" << std::endl;
         show_syntax = true;
         break;
       }
@@ -521,16 +520,16 @@ int main(int argc, char *argv[])
           timeout = str.Atoi();
           if (timeout <= 0) {
             timeout_enabled = false;
-            cout << endl << ">> musrfit: timeout disabled." << endl;
+            std::cout << std::endl << ">> musrfit: timeout disabled." << std::endl;
           }
         } else {
-          cerr << endl << "musrfit: **ERROR** found option --timeout with unsupported <timeout_tag> = " << argv[i+1] << endl;
+          std::cerr << std::endl << "musrfit: **ERROR** found option --timeout with unsupported <timeout_tag> = " << argv[i+1] << std::endl;
           show_syntax = true;
           break;
         }
         i++;
       } else {
-        cerr << endl << "musrfit: **ERROR** found option --timeout without <timeout_tag>" << endl;
+        std::cerr << std::endl << "musrfit: **ERROR** found option --timeout without <timeout_tag>" << std::endl;
         show_syntax = true;
         break;
       }
@@ -543,7 +542,7 @@ int main(int argc, char *argv[])
   // check if a filename is present
   if (strlen(filename) == 0) {
     show_syntax = true;
-    cout << endl << ">> musrfit **ERROR** no msr-file present!" << endl;
+    std::cout << std::endl << ">> musrfit **ERROR** no msr-file present!" << std::endl;
   }
 
   if (show_syntax) {
@@ -555,7 +554,7 @@ int main(int argc, char *argv[])
   if (!dump.IsNull()) {
     dump.ToLower();
     if (!dump.Contains("ascii") && !dump.Contains("root")) {
-      cerr << endl << "musrfit: **ERROR** found option --dump with unsupported <type> = " << dump << endl;
+      std::cerr << std::endl << "musrfit: **ERROR** found option --dump with unsupported <type> = " << dump << std::endl;
       musrfit_syntax();
       return PMUSR_WRONG_STARTUP_SYNTAX;
     }
@@ -566,16 +565,16 @@ int main(int argc, char *argv[])
   TSAXParser *saxParser = new TSAXParser();
   PStartupHandler *startupHandler = new PStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << ">> musrfit **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
-    cerr << endl;
+    std::cerr << std::endl << ">> musrfit **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    std::cerr << std::endl;
     // clean up
     if (saxParser) {
       delete saxParser;
-      saxParser = 0;
+      saxParser = nullptr;
     }
     if (startupHandler) {
       delete startupHandler;
-      startupHandler = 0;
+      startupHandler = nullptr;
     }
   } else {
     strcpy(startup_path_name, startupHandler->GetStartupFilePath().Data());
@@ -586,22 +585,22 @@ int main(int argc, char *argv[])
     status = parseXmlFile(saxParser, startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << ">> musrfit **WARNING** Reading/parsing musrfit_startup.xml failed.";
-      cerr << endl;
+      std::cerr << std::endl << ">> musrfit **WARNING** Reading/parsing musrfit_startup.xml failed.";
+      std::cerr << std::endl;
       // clean up
       if (saxParser) {
         delete saxParser;
-        saxParser = 0;
+        saxParser = nullptr;
       }
       if (startupHandler) {
         delete startupHandler;
-        startupHandler = 0;
+        startupHandler = nullptr;
       }
     }
   }
 
   // read msr-file
-  PMsrHandler *msrHandler = 0;
+  PMsrHandler *msrHandler = nullptr;
   if (startupHandler)
     msrHandler = new PMsrHandler(filename, &startup_options);
   else
@@ -610,13 +609,13 @@ int main(int argc, char *argv[])
   if (status != PMUSR_SUCCESS) {
     switch (status) {
       case PMUSR_MSR_FILE_NOT_FOUND:
-        cout << endl << ">> musrfit **ERROR** couldn't find " << filename << endl << endl;
+        std::cout << std::endl << ">> musrfit **ERROR** couldn't find " << filename << std::endl << std::endl;
         break;
       case PMUSR_MSR_SYNTAX_ERROR:
-        cout << endl << ">> musrfit **SYNTAX ERROR** in file " << filename << ", full stop here." << endl << endl;
+        std::cout << std::endl << ">> musrfit **SYNTAX ERROR** in file " << filename << ", full stop here." << std::endl << std::endl;
         break;
       default:
-        cout << endl << ">> musrfit **UNKOWN ERROR** when trying to read the msr-file" << endl << endl;
+        std::cout << std::endl << ">> musrfit **UNKOWN ERROR** when trying to read the msr-file" << std::endl << std::endl;
         break;
     }
     return status;
@@ -633,7 +632,7 @@ int main(int argc, char *argv[])
 
   bool success = dataHandler->IsAllDataAvailable();
   if (!success) {
-    cout << endl << ">> musrfit **ERROR** Couldn't read all data files, will quit ..." << endl;
+    std::cout << std::endl << ">> musrfit **ERROR** Couldn't read all data files, will quit ..." << std::endl;
   }
 
   // if present, replace the run title of the <msr-file> with the run title of the FIRST run in the run block of the msr-file
@@ -645,22 +644,22 @@ int main(int argc, char *argv[])
   }
 
   // generate the necessary fit histogramms for the fit
-  PRunListCollection *runListCollection = 0;
+  PRunListCollection *runListCollection = nullptr;
   if (success) {
     // feed all the necessary histogramms for the fit   
     runListCollection = new PRunListCollection(msrHandler, dataHandler);
     for (unsigned int i=0; i < msrHandler->GetMsrRunList()->size(); i++) {
       success = runListCollection->Add(i, kFit);
       if (!success) {
-        cout << endl << ">> musrfit **ERROR** Couldn't handle run no " << i+1 << ": ";
-        cout << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
+        std::cout << std::endl << ">> musrfit **ERROR** Couldn't handle run no " << i+1 << ": ";
+        std::cout << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
         break;
       }
     }
   }
 
   // start timeout thread
-  TThread *th = 0;
+  TThread *th = nullptr;
   if (timeout_enabled) {
     pid_t musrfit_pid = getpid();
     th = new TThread(musrfit_timeout, (void*)&musrfit_pid);
@@ -670,7 +669,7 @@ int main(int argc, char *argv[])
   }
 
   // do fitting
-  PFitter *fitter = 0;
+  PFitter *fitter = nullptr;
   if (success) {
     fitter = new PFitter(msrHandler, runListCollection, chisq_only);
     if (fitter->IsValid()) {
@@ -687,13 +686,13 @@ int main(int argc, char *argv[])
       if (status != PMUSR_SUCCESS) {
         switch (status) {
         case PMUSR_MSR_LOG_FILE_WRITE_ERROR:
-          cout << endl << ">> musrfit **ERROR** couldn't write mlog-file" << endl << endl;
+          std::cout << std::endl << ">> musrfit **ERROR** couldn't write mlog-file" << std::endl << std::endl;
           break;
         case PMUSR_TOKENIZE_ERROR:
-          cout << endl << ">> musrfit **ERROR** couldn't generate mlog-file name" << endl << endl;
+          std::cout << std::endl << ">> musrfit **ERROR** couldn't generate mlog-file name" << std::endl << std::endl;
           break;
         default:
-          cout << endl << ">> musrfit **UNKOWN ERROR** when trying to write the mlog-file" << endl << endl;
+          std::cout << std::endl << ">> musrfit **UNKOWN ERROR** when trying to write the mlog-file" << std::endl << std::endl;
           break;
         }
       }
@@ -702,14 +701,14 @@ int main(int argc, char *argv[])
 
   // check if dump is wanted
   if (success && !dump.IsNull()) {
-    cout << endl << "will write dump file ..." << endl;
+    std::cout << std::endl << "will write dump file ..." << std::endl;
     dump.ToLower();
     if (dump.Contains("ascii"))
       musrfit_dump_ascii(filename, runListCollection);
     else if (dump.Contains("root"))
       musrfit_dump_root(filename, runListCollection);
     else
-      cout << endl << "do not know format " << dump.Data() << ", sorry :-| " << endl;
+      std::cout << std::endl << "do not know format " << dump.Data() << ", sorry :-| " << std::endl;
   }
 
   // rename MINUIT2.OUTPUT and MINUIT2.root file if wanted
@@ -733,7 +732,7 @@ int main(int argc, char *argv[])
   if (success) {
     if (!chisq_only && !fitter->IsScanOnly()) {
       // swap msr- and mlog-file
-      cout << endl << ">> swapping msr-, mlog-file ..." << endl;
+      std::cout << std::endl << ">> swapping msr-, mlog-file ..." << std::endl;
       // copy msr-file -> __temp.msr
       gSystem->CopyFile(filename, "__temp.msr", kTRUE);
       // copy mlog-file -> msr-file
@@ -756,30 +755,30 @@ int main(int argc, char *argv[])
   }
   if (saxParser) {
     delete saxParser;
-    saxParser = 0;
+    saxParser = nullptr;
   }
   if (startupHandler) {
     delete startupHandler;
-    startupHandler = 0;
+    startupHandler = nullptr;
   }
   if (msrHandler) {
     delete msrHandler;
-    msrHandler = 0;
+    msrHandler = nullptr;
   }
   if (dataHandler) {
     delete dataHandler;
-    dataHandler = 0;
+    dataHandler = nullptr;
   }
   if (runListCollection) {
     delete runListCollection;
-    runListCollection = 0;
+    runListCollection = nullptr;
   }
   if (fitter) {
     delete fitter;
-    fitter = 0;
+    fitter = nullptr;
   }
 
-  cout << endl << "done ..." << endl;
+  std::cout << std::endl << "done ..." << std::endl;
 
   return PMUSR_SUCCESS;
 }

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -30,7 +30,6 @@
 #include<cmath>
 
 #include <iostream>
-using namespace std;
 
 #include <boost/algorithm/string/trim.hpp>  // for stripping leading whitespace in std::string
 
@@ -128,7 +127,7 @@ Bool_t PFunction::SetFuncNo()
   i = i->children.begin(); // FUNx
 
   // get string from tree
-  string str(i->value.begin(), i->value.end());
+  std::string str(i->value.begin(), i->value.end());
   boost::algorithm::trim(str);
 
   // extract function number from string
@@ -171,13 +170,13 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
   Double_t dvalue;
   Int_t    ivalue;
   Int_t    status;
-  string str;
+  std::string str;
   PFuncTreeNode child;
 
   InitNode(child);
 
   if (i->value.id() == PFunctionGrammar::realID) { // handle number
-    str = string(i->value.begin(), i->value.end()); // get string
+    str = std::string(i->value.begin(), i->value.end()); // get string
     boost::algorithm::trim(str);
     status = sscanf(str.c_str(), "%lf", &dvalue); // convert string to Double_t
     node.fID = PFunctionGrammar::realID; // keep the ID
@@ -189,7 +188,7 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     node.fID = PFunctionGrammar::constGammaMuID; // keep the ID
     node.fDvalue = GAMMA_BAR_MUON; // keep the value
   } else if (i->value.id() == PFunctionGrammar::parameterID) { // handle parameter number
-    str = string(i->value.begin(), i->value.end()); // get string
+    str = std::string(i->value.begin(), i->value.end()); // get string
     boost::algorithm::trim(str);
     if (strstr(str.c_str(), "-")) {
       node.fSign = true;
@@ -200,7 +199,7 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     node.fID = PFunctionGrammar::parameterID; // keep the ID
     node.fIvalue = ivalue; // keep the value
   } else if (i->value.id() == PFunctionGrammar::mapID) { // handle map number
-    str = string(i->value.begin(), i->value.end()); // get string
+    str = std::string(i->value.begin(), i->value.end()); // get string
     boost::algorithm::trim(str);
     status = sscanf(str.c_str(), "MAP%d", &ivalue); // convert string to map number
     node.fID = PFunctionGrammar::mapID; // keep the ID
@@ -209,7 +208,7 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     // keep the id
     node.fID = PFunctionGrammar::functionID;
     // keep function tag
-    str =  string(i->value.begin(), i->value.end()); // get string
+    str =  std::string(i->value.begin(), i->value.end()); // get string
     if (!strcmp(str.c_str(), "COS"))
       node.fFunctionTag = FUN_COS;
     else if (!strcmp(str.c_str(), "SIN"))
@@ -243,8 +242,8 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     else if (!strcmp(str.c_str(), "SQRT"))
       node.fFunctionTag = FUN_SQRT;
     else {
-      cerr << endl << "**PANIC ERROR**: function " << str << " doesn't exist, but you never should have reached this point!";
-      cerr << endl;
+      std::cerr << std::endl << "**PANIC ERROR**: function " << str << " doesn't exist, but you never should have reached this point!";
+      std::cerr << std::endl;
       assert(0);
     }
     // add node
@@ -255,13 +254,13 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
     // keep the id
     node.fID = PFunctionGrammar::powerID;
     // keep function tag
-    str =  string(i->value.begin(), i->value.end()); // get string
+    str =  std::string(i->value.begin(), i->value.end()); // get string
 
     if (!strcmp(str.c_str(), "POW"))
       node.fFunctionTag = FUN_POW;
     else {
-      cerr << endl << "**PANIC ERROR**: function " << str << " doesn't exist, but you never should have reached this point!";
-      cerr << endl;
+      std::cerr << std::endl << "**PANIC ERROR**: function " << str << " doesn't exist, but you never should have reached this point!";
+      std::cerr << std::endl;
       assert(0);
     }
     // i: '(', 'expression', ',', expression, ')'
@@ -345,12 +344,12 @@ Bool_t PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSi
   } else if (node.fID == PFunctionGrammar::constGammaMuID) {
     return true;
   } else if (node.fID == PFunctionGrammar::parameterID) {
-    if (node.fIvalue <= (Int_t) paramSize)
+    if (node.fIvalue <= static_cast<Int_t>(paramSize))
       return true;
     else
       return false;
   } else if (node.fID == PFunctionGrammar::mapID) {
-    if (node.fIvalue <= (Int_t) mapSize)
+    if (node.fIvalue <= static_cast<Int_t>(mapSize))
       return true;
     else
       return false;
@@ -374,9 +373,9 @@ Bool_t PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSi
     else
       return false;
   } else {
-    cerr << endl << ">> **PANIC ERROR**: PFunction::FindAndCheckMapAndParamRange: you never should have reached this point!";
-    cerr << endl << ">> node.fID = " << node.fID;
-    cerr << endl;
+    std::cerr << std::endl << ">> **PANIC ERROR**: PFunction::FindAndCheckMapAndParamRange: you never should have reached this point!";
+    std::cerr << std::endl << ">> node.fID = " << node.fID;
+    std::cerr << std::endl;
     assert(0);
   }
   return true;
@@ -392,7 +391,7 @@ Bool_t PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSi
  *
  * \param param fit parameter vector
  */
-Double_t PFunction::Eval(vector<Double_t> param)
+Double_t PFunction::Eval(std::vector<Double_t> param)
 {
   fParam = param;
 
@@ -461,8 +460,8 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
     } else if (node.fFunctionTag == FUN_SQRT) {
       return sqrt(fabs(EvalNode(node.children[0])));
     } else {
-      cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::functionID: you never should have reached this point!";
-      cerr << endl;
+      std::cerr << std::endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::functionID: you never should have reached this point!";
+      std::cerr << std::endl;
       assert(0);
     }
   } else if (node.fID == PFunctionGrammar::powerID) {
@@ -476,8 +475,8 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
       }
       return pow(base, expo);
     } else {
-      cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::powerID: you never should have reached this point!";
-      cerr << endl;
+      std::cerr << std::endl << "**PANIC ERROR**: PFunction::EvalNode: node.fID == PFunctionGrammar::powerID: you never should have reached this point!";
+      std::cerr << std::endl;
       assert(0);
     }
   } else if (node.fID == PFunctionGrammar::factorID) {
@@ -488,10 +487,10 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
     } else {
       Double_t denominator = EvalNode(node.children[1]);
       if (denominator == 0.0) {
-        cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: division by 0.0";
-        cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: requested operation: " << EvalNode(node.children[0]) << "/" << EvalNode(node.children[1]);
-        cerr << endl << ">> " << fFuncString.Data() << endl;
-        cerr << endl;
+        std::cerr << std::endl << "**PANIC ERROR**: PFunction::EvalNode: division by 0.0";
+        std::cerr << std::endl << "**PANIC ERROR**: PFunction::EvalNode: requested operation: " << EvalNode(node.children[0]) << "/" << EvalNode(node.children[1]);
+        std::cerr << std::endl << ">> " << fFuncString.Data() << std::endl;
+        std::cerr << std::endl;
         assert(0);
       }
       return EvalNode(node.children[0]) / denominator;
@@ -503,8 +502,8 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
       return EvalNode(node.children[0]) - EvalNode(node.children[1]);
     }
   } else {
-    cerr << endl << "**PANIC ERROR**: PFunction::EvalNode: you never should have reached this point!";
-    cerr << endl;
+    std::cerr << std::endl << "**PANIC ERROR**: PFunction::EvalNode: you never should have reached this point!";
+    std::cerr << std::endl;
     assert(0);
   }
   return 0.0;
@@ -570,7 +569,7 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
     assert(i->children.size() == 0);
     if (*i->value.begin() == '-')
       fFuncString += "(";
-    fFuncString += boost::algorithm::trim_copy(string(i->value.begin(), i->value.end())).c_str();
+    fFuncString += boost::algorithm::trim_copy(std::string(i->value.begin(), i->value.end())).c_str();
     if (*i->value.begin() == '-')
       fFuncString += ")";
   } else if (i->value.id() == PFunctionGrammar::constPiID) {
@@ -580,23 +579,23 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
   } else if (i->value.id() == PFunctionGrammar::funLabelID) {
     assert(i->children.size() == 0);
     //SetFuncNo(i);
-    fFuncString += string(i->value.begin(), i->value.end()).c_str(); // funx
+    fFuncString += std::string(i->value.begin(), i->value.end()).c_str(); // funx
   } else if (i->value.id() == PFunctionGrammar::parameterID) {
     assert(i->children.size() == 0);
-    fFuncString += boost::algorithm::trim_copy(string(i->value.begin(), i->value.end())).c_str();
+    fFuncString += boost::algorithm::trim_copy(std::string(i->value.begin(), i->value.end())).c_str();
   } else if (i->value.id() == PFunctionGrammar::mapID) {
     assert(i->children.size() == 0);
-    fFuncString += boost::algorithm::trim_copy(string(i->value.begin(), i->value.end())).c_str();
+    fFuncString += boost::algorithm::trim_copy(std::string(i->value.begin(), i->value.end())).c_str();
   } else if (i->value.id() == PFunctionGrammar::functionID) {
     assert(i->children.size() == 3);
-    fFuncString += string(i->value.begin(), i->value.end()).c_str(); // keep function name
+    fFuncString += std::string(i->value.begin(), i->value.end()).c_str(); // keep function name
     fFuncString += "(";
     // '(', expression, ')'
     EvalTreeForStringExpression(i->children.begin()+1); // the real stuff
     fFuncString += ")";
   } else if (i->value.id() == PFunctionGrammar::powerID) {
     assert(i->children.size() == 5);
-    fFuncString += string(i->value.begin(), i->value.end()).c_str(); // keep function name
+    fFuncString += std::string(i->value.begin(), i->value.end()).c_str(); // keep function name
     fFuncString += "(";
     // '(', expression, ',' expression, ')'
     EvalTreeForStringExpression(i->children.begin()+1); // base expression

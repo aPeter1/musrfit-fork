@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -96,7 +96,7 @@ Bool_t PFunctionHandler::DoParse()
       PFunction func(info); // generate an evaluation function object based on the AST tree
       fFuncs.push_back(func); // feeds it to the functions vector
     } else {
-      cerr << endl << "**ERROR**: FUNCTIONS parse failed in line " << fLines[i].fLineNo << endl;
+      std::cerr << std::endl << "**ERROR**: FUNCTIONS parse failed in line " << fLines[i].fLineNo << std::endl;
       success = false;
       break;
     }
@@ -107,9 +107,9 @@ Bool_t PFunctionHandler::DoParse()
     for (UInt_t i=0; i<fFuncs.size(); i++) {
       for (UInt_t j=i+1; j<fFuncs.size(); j++) {
         if (fFuncs[i].GetFuncNo() == fFuncs[j].GetFuncNo()) {
-          cerr << endl << "**ERROR**: function number " << fFuncs[i].GetFuncNo();
-          cerr << " is at least twice present! Fix this first.";
-          cerr << endl;
+          std::cerr << std::endl << "**ERROR**: function number " << fFuncs[i].GetFuncNo();
+          std::cerr << " is at least twice present! Fix this first.";
+          std::cerr << std::endl;
           success = false;
         }
       }
@@ -155,11 +155,11 @@ Bool_t PFunctionHandler::CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
  * \param map map vector
  * \param param fit parameter vector
  */
-Double_t PFunctionHandler::Eval(Int_t funNo, vector<Int_t> map, vector<double> param)
+Double_t PFunctionHandler::Eval(Int_t funNo, std::vector<Int_t> map, std::vector<double> param)
 {
   if (GetFuncIndex(funNo) == -1) {
-    cerr << endl << "**ERROR**: Couldn't find FUN" << funNo << " for evaluation";
-    cerr << endl;
+    std::cerr << std::endl << "**ERROR**: Couldn't find FUN" << funNo << " for evaluation";
+    std::cerr << std::endl;
     return 0.0;
   }
 

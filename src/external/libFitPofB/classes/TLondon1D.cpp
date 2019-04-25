@@ -32,7 +32,6 @@
 #include <iostream>
 #include <cassert>
 #include <cmath>
-using namespace std;
 
 #include <TSAXParser.h>
 #include "BMWStartupHandler.h"
@@ -256,7 +255,7 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      std::cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << std::endl;
 
       for (unsigned int i(2); i<fPar.size(); i++)
         fParForBofZ[i-2] = par[i];
@@ -278,7 +277,7 @@ double TLondon1DHS::operator()(double t, const vector<double> &par) const {
       fPofT->DoFFT();
 
     }/* else {
-      cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
+      std::cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << std::endl;
     }*/
 
     fPofT->CalcPol(fParForPofT);
@@ -416,7 +415,7 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      std::cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << std::endl;
 
       for (unsigned int i(2); i<fPar.size(); i++)
         fParForBofZ[i-2] = par[i];
@@ -433,7 +432,7 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
         for(unsigned int i(6); i<8; i++)
           weights.push_back(par[i]);
 
-//        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
+//        std::cout << "Weighting has changed, re-calculating n(z) now..." << std::endl;
         fImpProfile->WeightLayers(par[1], interfaces, weights);
 
         interfaces.clear();
@@ -456,7 +455,7 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
       fPofT->DoFFT();
 
     }/* else {
-      cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
+      std::cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << std::endl;
     }*/
 
     fPofT->CalcPol(fParForPofT);
@@ -466,11 +465,11 @@ double TLondon1D1L::operator()(double t, const vector<double> &par) const {
   
 //   // Debugging start
 //   if (!(fCallCounter%10000)){
-//     cout << fCallCounter-1 << "\t";
+//     std::cout << fCallCounter-1 << "\t";
 //     for (unsigned int i(0); i<fPar.size(); i++){
-//       cout << fPar[i] << "\t";
+//       std::cout << fPar[i] << "\t";
 //     }
-//     cout << endl;
+//     std::cout << std::endl;
 //   }
 //   // Debugging end
 
@@ -597,7 +596,7 @@ double TLondon1D2L::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      std::cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << std::endl;
 
       for (unsigned int i(2); i<par.size(); i++)
         fParForBofZ[i-2] = par[i];
@@ -615,7 +614,7 @@ double TLondon1D2L::operator()(double t, const vector<double> &par) const {
         for(unsigned int i(8); i<11; i++)
           weights.push_back(par[i]);
 
-//        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
+//        std::cout << "Weighting has changed, re-calculating n(z) now..." << std::endl;
         fImpProfile->WeightLayers(par[1], interfaces, weights);
 
         interfaces.clear();
@@ -638,7 +637,7 @@ double TLondon1D2L::operator()(double t, const vector<double> &par) const {
 
 
     }/* else {
-      cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
+      std::cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << std::endl;
     }*/
 
     fPofT->CalcPol(fParForPofT);
@@ -766,7 +765,7 @@ double TProximity1D1LHS::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      std::cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << std::endl;
 
       for (unsigned int i(2); i<fPar.size(); i++)
         fParForBofZ[i-2] = par[i];
@@ -789,7 +788,7 @@ double TProximity1D1LHS::operator()(double t, const vector<double> &par) const {
 
 
     }/* else {
-      cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
+      std::cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << std::endl;
     }*/
 
     fPofT->CalcPol(fParForPofT);
@@ -920,7 +919,7 @@ double TLondon1D3L::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      std::cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << std::endl;
 
       for (unsigned int i(2); i<par.size(); i++)
         fParForBofZ[i-2] = par[i];
@@ -939,7 +938,7 @@ double TLondon1D3L::operator()(double t, const vector<double> &par) const {
         for(unsigned int i(10); i<14; i++)
           weights.push_back(par[i]);
 
-//        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
+//        std::cout << "Weighting has changed, re-calculating n(z) now..." << std::endl;
         fImpProfile->WeightLayers(par[1], interfaces, weights);
 
         interfaces.clear();
@@ -961,7 +960,7 @@ double TLondon1D3L::operator()(double t, const vector<double> &par) const {
       fPofT->DoFFT();
 
     }/* else {
-      cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
+      std::cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << std::endl;
     }*/
 
     fPofT->CalcPol(fParForPofT);
@@ -1092,7 +1091,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 
     if(!only_phase_changed) {
 
-//      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+//      std::cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << std::endl;
 
       for (unsigned int i(2); i<par.size(); i++)
         fParForBofZ[i-2] = par[i];
@@ -1111,7 +1110,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
         for(unsigned int i(9); i<13; i++)
           weights.push_back(par[i]);
 
-//        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
+//        std::cout << "Weighting has changed, re-calculating n(z) now..." << std::endl;
         fImpProfile->WeightLayers(par[1], interfaces, weights);
 
         interfaces.clear();
@@ -1133,7 +1132,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
       fPofT->DoFFT();
 
     }/* else {
-      cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
+      std::cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << std::endl;
     }*/
 
     fPofT->CalcPol(fParForPofT);
@@ -1163,7 +1162,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 //     int status = parseXmlFile(saxParser, startup_path_name.c_str());
 //     // check for parse errors
 //     if (status) { // error
-//       cout << endl << "**WARNING** Reading/parsing " << startup_path_name << " failed." << endl;
+//       std::cout << endl << "**WARNING** Reading/parsing " << startup_path_name << " failed." << std::endl;
 //     }
 // 
 //     fNSteps = startupHandler->GetNSteps();
@@ -1213,12 +1212,12 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 //     fPar = par;
 // 
 // /*    for (unsigned int i(0); i<fPar.size(); i++){
-//       cout << "fPar[" << i << "] = " << fPar[i] << endl;
+//       std::cout << "fPar[" << i << "] = " << fPar[i] << std::endl;
 //     }
 // */
 //     for (unsigned int i(2); i<fPar.size(); i++){
 //       fParForBofZ.push_back(fPar[i]);
-// //      cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << endl;
+// //      std::cout << "fParForBofZ[" << i-2 << "] = " << fParForBofZ[i-2] << std::endl;
 //     }
 //     fFirstCall=false;
 //   }
@@ -1253,7 +1252,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 // 
 //     if(!only_phase_changed) {
 // 
-// //      cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << endl;
+// //      std::cout << " Parameters have changed, (re-)calculating p(B) and P(t) now..." << std::endl;
 // 
 //       for (unsigned int i(2); i<par.size(); i++)
 //         fParForBofZ[i-2] = par[i];
@@ -1262,15 +1261,15 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 // 
 // /* DEBUG ---------------------------
 //       for(unsigned int i(0); i<fParForBofZ.size(); i++) {
-//         cout << "ParForBofZ[" << i << "] = " << fParForBofZ[i] << endl;
+//         std::cout << "ParForBofZ[" << i << "] = " << fParForBofZ[i] << std::endl;
 //       }
 // 
 //       for(unsigned int i(0); i<fParForPofB.size(); i++) {
-//         cout << "ParForPofB[" << i << "] = " << fParForPofB[i] << endl;
+//         std::cout << "ParForPofB[" << i << "] = " << fParForPofB[i] << std::endl;
 //       }
 // 
 //       for(unsigned int i(0); i<fParForPofT.size(); i++) {
-//         cout << "ParForPofT[" << i << "] = " << fParForPofT[i] << endl;
+//         std::cout << "ParForPofT[" << i << "] = " << fParForPofT[i] << std::endl;
 //       }
 // ------------------------------------*/
 // 
@@ -1284,7 +1283,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 //         for(unsigned int i(par.size()-4); i<par.size(); i++)
 //           weights.push_back(par[i]);
 // 
-// //        cout << "Weighting has changed, re-calculating n(z) now..." << endl;
+// //        std::cout << "Weighting has changed, re-calculating n(z) now..." << std::endl;
 //         fImpProfile->WeightLayers(par[1], interfaces, weights);
 //       }
 // 
@@ -1293,7 +1292,7 @@ double TLondon1D3LS::operator()(double t, const vector<double> &par) const {
 //       fPofT->DoFFT(PofB4);
 // 
 //     }/* else {
-//       cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << endl;
+//       std::cout << "Only the phase parameter has changed, (re-)calculating P(t) now..." << std::endl;
 //     }*/
 // 
 //     fPofT->CalcPol(fParForPofT);

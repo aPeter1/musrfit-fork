@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2013 by Andreas Suter                                   *
+ *   Copyright (C) 2013-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 #define _PSKEWEDLORENTZIAN_H_
 
 #include <vector>
-using namespace std;
 
 #include "PUserFcnBase.h"
 #include "PStartupHandler_SV.h"
@@ -46,11 +45,11 @@ class PSkewedLorentzian : public PUserFcnBase
 
     // global user-function-access functions, here without any functionality
     virtual Bool_t NeedGlobalPart() const { return false; }
-    void SetGlobalPart(vector<void*> &globalPart, UInt_t idx) { }
+    void SetGlobalPart(std::vector<void*> &globalPart, UInt_t idx) { }
     Bool_t GlobalPartIsValid() const { return true; }
 
     // function operator
-    Double_t operator()(Double_t, const vector<Double_t>&) const;
+    Double_t operator()(Double_t, const std::vector<Double_t>&) const;
 
   private:
     PStartupHandler_SV *fStartupHandler;

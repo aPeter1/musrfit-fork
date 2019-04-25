@@ -46,7 +46,7 @@
 #include <ctime>
 /-------------------------------------------------------*/
 
-TPofBCalc::TPofBCalc(const vector<double> &para) : fBmin(0.0), fBmax(0.0), fDT(para[0]), fDB(para[1]), fPBExists(false) {
+TPofBCalc::TPofBCalc(const std::vector<double> &para) : fBmin(0.0), fBmax(0.0), fDT(para[0]), fDB(para[1]), fPBExists(false) {
   fPBSize = static_cast<int>(1.0/(gBar*fDT*fDB));
   if (fPBSize % 2) {
     fPBSize += 1;
@@ -74,7 +74,7 @@ TPofBCalc::TPofBCalc(const vector<double> &para) : fBmin(0.0), fBmax(0.0), fDT(p
 
 // Do not actually calculate P(B) but take it from a B and a P(B) vector of the same size
 
-TPofBCalc::TPofBCalc(const vector<double>& b, const vector<double>& pb, double dt) {
+TPofBCalc::TPofBCalc(const std::vector<double>& b, const std::vector<double>& pb, double dt) {
   assert(b.size() == pb.size() && b.size() >= 2);
   fPBSize = pb.size();
 
@@ -94,7 +94,7 @@ TPofBCalc::TPofBCalc(const vector<double>& b, const vector<double>& pb, double d
     fPB[i] = pb[i];
   }
 
-  vector<double>::const_iterator iter, iterB;
+  std::vector<double>::const_iterator iter, iterB;
   iterB = b.begin();
 
   for(iter = pb.begin(); iter != pb.end(); ++iter){
@@ -165,7 +165,7 @@ void TPofBCalc::Normalize(unsigned int minFilledIndex = 0, unsigned int maxFille
 
 // Do not actually calculate P(B) but take it from a B and a P(B) vector of the same size
 
-void TPofBCalc::SetPB(const vector<double> &pb) const {
+void TPofBCalc::SetPB(const std::vector<double> &pb) const {
   assert(fPBSize == pb.size());
 
   int i;
@@ -183,7 +183,7 @@ void TPofBCalc::SetPB(const vector<double> &pb) const {
   return;
 }
 
-void TPofBCalc::Calculate(const string &type, const vector<double> &para) {
+void TPofBCalc::Calculate(const std::string &type, const std::vector<double> &para) {
 
   if (type == "skg"){ // skewed Gaussian
 
@@ -235,7 +235,7 @@ void TPofBCalc::Calculate(const string &type, const vector<double> &para) {
 // Parameters: dt[us], dB[G], Energy[keV], Bbg[G], width[us^{-1}], weight[1]
 //-----------
 
-void TPofBCalc::Calculate(const TBofZCalcInverse *BofZ, const TTrimSPData *dataTrimSP, const vector<double> &para) {
+void TPofBCalc::Calculate(const TBofZCalcInverse *BofZ, const TTrimSPData *dataTrimSP, const std::vector<double> &para) {
 
   if(fPBExists)
     return;
@@ -261,7 +261,7 @@ void TPofBCalc::Calculate(const TBofZCalcInverse *BofZ, const TTrimSPData *dataT
 
   for (i = firstZerosEnd; i <= lastZerosStart; ++i) {
 
-    vector< pair<double, double> > inv;
+    std::vector< std::pair<double, double> > inv;
     inv = BofZ->GetInverseAndDerivative(fB[i]);
 
     for (unsigned int j(0); j < inv.size(); ++j) {
@@ -285,7 +285,7 @@ void TPofBCalc::Calculate(const TBofZCalcInverse *BofZ, const TTrimSPData *dataT
 // Parameters: dt[us], dB[G], Energy[keV]
 //-----------
 
-void TPofBCalc::Calculate(const TBofZCalc *BofZ, const TTrimSPData *dataTrimSP, const vector<double> &para, unsigned int zonk) {
+void TPofBCalc::Calculate(const TBofZCalc *BofZ, const TTrimSPData *dataTrimSP, const std::vector<double> &para, unsigned int zonk) {
 
   if(fPBExists)
     return;
@@ -306,8 +306,8 @@ void TPofBCalc::Calculate(const TBofZCalc *BofZ, const TTrimSPData *dataTrimSP, 
 
   // calculate p(B) from B(z)
 
-  vector<double> *bofzZ = BofZ->DataZ();
-  vector<double> *bofzBZ = BofZ->DataBZ();
+  std::vector<double> *bofzZ = BofZ->DataZ();
+  std::vector<double> *bofzBZ = BofZ->DataBZ();
   double ddZ(BofZ->GetDZ());
 
 /* USED FOR DEBUGGING-----------------------------------
@@ -439,7 +439,7 @@ void TPofBCalc::Calculate(const TBofZCalc *BofZ, const TTrimSPData *dataTrimSP, 
 // Parameters: dt[us], dB[G] [, Bbg[G], width[us^{-1}], weight[1] ]
 //-----------
 
-void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vector<double> &para) {
+void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const std::vector<double> &para) {
 
   if(fPBExists)
     return;
@@ -569,7 +569,7 @@ void TPofBCalc::Calculate(const TBulkVortexFieldCalc *vortexLattice, const vecto
     if (chunk < 10)
       chunk = 10;
 
-    vector< vector<unsigned int> > pBvec(n, vector<unsigned int>(fPBSize, 0));
+    std::vector< std::vector<unsigned int> > pBvec(n, std::vector<unsigned int>(fPBSize, 0));
 
     int indexStep(static_cast<int>(floor(static_cast<float>(numberOfSteps_2)/static_cast<float>(n))));
 

@@ -44,8 +44,6 @@
 #include "BMWStartupHandler.h"
 #include "TLFRelaxation.h"
 
-using namespace std;
-
 #define PI 3.14159265358979323846
 #define TWOPI 6.28318530717958647692
 #define Nsteps 100
@@ -76,7 +74,7 @@ TLFStatGssKT::TLFStatGssKT() {
  */
 TLFStatGssKT::~TLFStatGssKT() {
   delete fIntSinGss;
-  fIntSinGss = 0;
+  fIntSinGss = nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -88,7 +86,7 @@ TLFStatGssKT::~TLFStatGssKT() {
  * \param t time \htmlonly (&#956;s) \endhtmlonly \latexonly ($\mu\mathrm{s}$) \endlatexonly
  * \param par parameters [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), &#963; (&#956;s<sup>-1</sup>)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $\sigma~(\mu\mathrm{s}^{-1})$ \endlatexonly]
  */
-double TLFStatGssKT::operator()(double t, const vector<double> &par) const {
+double TLFStatGssKT::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 2); // two parameters nu=gbar*B,sigma
 
@@ -129,7 +127,7 @@ TLFStatExpKT::TLFStatExpKT() {
  */
 TLFStatExpKT::~TLFStatExpKT() {
   delete fIntBesselJ0Exp;
-  fIntBesselJ0Exp = 0;
+  fIntBesselJ0Exp = nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -141,7 +139,7 @@ TLFStatExpKT::~TLFStatExpKT() {
  * \param t time \htmlonly (&#956;s) \endhtmlonly \latexonly ($\mu\mathrm{s}$) \endlatexonly
  * \param par parameters [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$ \endlatexonly]
  */
-double TLFStatExpKT::operator()(double t, const vector<double> &par) const {
+double TLFStatExpKT::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 2); // two parameters nu=gbar*B,rate
 
@@ -188,13 +186,13 @@ TLFDynGssKT::TLFDynGssKT() : fCalcNeeded(true), fFirstCall(true), fCounter(0) {
 #if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3F_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftwf_init_threads());
   if (!init_threads)
-    cout << "TLFDynGssKT::TLFDynGssKT: Couldn't initialize multiple FFTW-threads ..." << endl;
+    std::cout << "TLFDynGssKT::TLFDynGssKT: Couldn't initialize multiple FFTW-threads ..." << std::endl;
   else
     fftwf_plan_with_nthreads(omp_get_num_procs());
 #endif
 
   // read startup file
-  string startup_path_name("BMW_startup.xml");
+  std::string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -205,9 +203,9 @@ TLFDynGssKT::TLFDynGssKT() : fCalcNeeded(true), fFirstCall(true), fCounter(0) {
   int status = parseXmlFile(saxParser, startup_path_name.c_str());
   // check for parse errors
   if (status) { // error
-    cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
-         << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
-         << endl;
+    std::cerr << std::endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
+         << std::endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+         << std::endl;
     assert(false);
   }
 
@@ -263,7 +261,7 @@ TLFDynGssKT::~TLFDynGssKT() {
     FILE *wordsOfWisdomW;
     wordsOfWisdomW = fopen(fWisdom.c_str(), "w");
     if (wordsOfWisdomW == NULL) {
-      cout << "TLFDynGssKT::~TLFDynGssKT(): Could not open file ... No wisdom is exported..." << endl;
+      std::cout << "TLFDynGssKT::~TLFDynGssKT(): Could not open file ... No wisdom is exported..." << std::endl;
     } else {
       fftwf_export_wisdom_to_file(wordsOfWisdomW);
       fclose(wordsOfWisdomW);
@@ -276,7 +274,7 @@ TLFDynGssKT::~TLFDynGssKT() {
   fftwf_destroy_plan(fFFTplanBACK);
   free(fFFTtime);
   fftwf_free(fFFTfreq);
-  cout << "TLFDynGssKT::~TLFDynGssKT(): " << fCounter << " full FFT cycles needed..." << endl;
+  std::cout << "TLFDynGssKT::~TLFDynGssKT(): " << fCounter << " full FFT cycles needed..." << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -288,7 +286,7 @@ TLFDynGssKT::~TLFDynGssKT() {
  * \param t time \htmlonly (&#956;s) \endhtmlonly \latexonly ($\mu\mathrm{s}$) \endlatexonly
  * \param par parameters [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), &#963; (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $\sigma~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
  */
-double TLFDynGssKT::operator()(double t, const vector<double> &par) const {
+double TLFDynGssKT::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 3); // three parameters nuL=gbar*B,sigma,fluct.rate nu (fourth parameter: t[us] for SG-function)
 
@@ -459,7 +457,7 @@ TLFDynSG::~TLFDynSG() {
  * \param t time \htmlonly (&#956;s) \endhtmlonly \latexonly ($\mu\mathrm{s}$) \endlatexonly
  * \param par parameters [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
  */
-double TLFDynSG::operator()(double t, const vector<double> &par) const {
+double TLFDynSG::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 3); // three parameters nuL=gbar*B, a ,fluct.rate nu
 
@@ -513,13 +511,13 @@ TLFDynExpKT::TLFDynExpKT() : fCalcNeeded(true), fFirstCall(true), fCounter(0), f
 #if !defined(_WIN32GCC) && defined(HAVE_LIBFFTW3F_THREADS) && defined(HAVE_GOMP)
   int init_threads(fftwf_init_threads());
   if (!init_threads)
-    cout << "TLFDynExpKT::TLFDynExpKT: Couldn't initialize multiple FFTW-threads ..." << endl;
+    std::cout << "TLFDynExpKT::TLFDynExpKT: Couldn't initialize multiple FFTW-threads ..." << std::endl;
   else
     fftwf_plan_with_nthreads(omp_get_num_procs());
 #endif
 
   // read startup file
-  string startup_path_name("BMW_startup.xml");
+  std::string startup_path_name("BMW_startup.xml");
 
   TSAXParser *saxParser = new TSAXParser();
   BMWStartupHandler *startupHandler = new BMWStartupHandler();
@@ -530,9 +528,9 @@ TLFDynExpKT::TLFDynExpKT() : fCalcNeeded(true), fFirstCall(true), fCounter(0), f
   int status = parseXmlFile(saxParser, startup_path_name.c_str());
   // check for parse errors
   if (status) { // error
-    cerr << endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
-         << endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
-         << endl;
+    std::cerr << std::endl << "**ERROR** Reading/parsing " << startup_path_name << " failed." \
+         << std::endl << "**ERROR** Please make sure that the file exists in the local directory and it is set up correctly!" \
+         << std::endl;
     assert(false);
   }
 
@@ -588,7 +586,7 @@ TLFDynExpKT::~TLFDynExpKT() {
     FILE *wordsOfWisdomW;
     wordsOfWisdomW = fopen(fWisdom.c_str(), "w");
     if (wordsOfWisdomW == NULL) {
-      cout << "TLFDynExpKT::~TLFDynExpKT(): Could not open file ... No wisdom is exported..." << endl;
+      std::cout << "TLFDynExpKT::~TLFDynExpKT(): Could not open file ... No wisdom is exported..." << std::endl;
     } else {
       fftwf_export_wisdom_to_file(wordsOfWisdomW);
       fclose(wordsOfWisdomW);
@@ -601,7 +599,7 @@ TLFDynExpKT::~TLFDynExpKT() {
   fftwf_destroy_plan(fFFTplanBACK);
   free(fFFTtime);
   fftwf_free(fFFTfreq);
-  cout << "TLFDynExpKT::~TLFDynExpKT(): " << fCounter << " full FFT cyles needed..." << endl;
+  std::cout << "TLFDynExpKT::~TLFDynExpKT(): " << fCounter << " full FFT cyles needed..." << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -613,7 +611,7 @@ TLFDynExpKT::~TLFDynExpKT() {
  * \param t time \htmlonly (&#956;s) \endhtmlonly \latexonly ($\mu\mathrm{s}$) \endlatexonly
  * \param par parameters [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>), &#957; (MHz)\endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$, $\nu~(\mathrm{MHz})$ \endlatexonly]
  */
-double TLFDynExpKT::operator()(double t, const vector<double> &par) const {
+double TLFDynExpKT::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 3); // three parameters nuL=gbar*B,sigma,fluct.rate nu
 
@@ -799,7 +797,7 @@ TLFSGInterpolation::~TLFSGInterpolation() {
  * \param t time \htmlonly (&#956;s) \endhtmlonly \latexonly ($\mu\mathrm{s}$) \endlatexonly
  * \param par parameters [\htmlonly &#957;<sub>L</sub>=<i>B</i>&#947;<sub>&#956;</sub>/2&#960; (MHz), <i>a</i> (&#956;s<sup>-1</sup>), &#955; (&#956;s<sup>-1</sup>), &#946; (1) \endhtmlonly \latexonly $\nu_{\mathrm{L}}=B\gamma_{\mu}/2\pi~(\mathrm{MHz})$, $a~(\mu\mathrm{s}^{-1})$, $\lambda~(\mu\mathrm{s}^{-1})$, $\beta~(1)$ \endlatexonly]
  */
-double TLFSGInterpolation::operator()(double t, const vector<double> &par) const {
+double TLFSGInterpolation::operator()(double t, const std::vector<double> &par) const {
 
   assert(par.size() == 4); // four parameters nu=gbar*B [MHz], a [1/us], lambda [1/us], beta [1]
 
@@ -815,7 +813,7 @@ double TLFSGInterpolation::operator()(double t, const vector<double> &par) const
 
   double omegaL(TMath::TwoPi()*par[0]);
 
-  vector<double> intpar(par);
+  std::vector<double> intpar(par);
   intpar.push_back(t);
   double intValue = fIntegral->IntegrateFunc(0.0, t, intpar);
   intpar.clear();

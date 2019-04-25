@@ -30,7 +30,6 @@
 #define _TBofZCalc_H_
 
 #include <vector>
-using namespace std;
 
 /**
  * <p>Base class for any kind of theory function B(z)
@@ -47,8 +46,8 @@ public:
     fParam.clear();
   }
 
-  virtual vector<double>* DataZ() const {return &fZ;}
-  virtual vector<double>* DataBZ() const {return &fBZ;}
+  virtual std::vector<double>* DataZ() const {return &fZ;}
+  virtual std::vector<double>* DataBZ() const {return &fBZ;}
   virtual void Calculate();
   virtual double GetBofZ(double) const = 0;
   virtual double GetBmin() const = 0;
@@ -58,9 +57,9 @@ public:
 protected:
   int fSteps; ///< number of discrete points where B(z) is calculated
   double fDZ; ///< resolution in z (spacing between two neighboring discrete B(z) points)
-  vector<double> fParam; ///< parameters of the B(z) function
-  mutable vector<double> fZ; ///< vector holding all z-values
-  mutable vector<double> fBZ; ///< vector holding all B(z)-values
+  std::vector<double> fParam; ///< parameters of the B(z) function
+  mutable std::vector<double> fZ; ///< vector holding all z-values
+  mutable std::vector<double> fBZ; ///< vector holding all B(z)-values
 };
 
 /**
@@ -73,7 +72,7 @@ public:
   TBofZCalcInverse() {}
   virtual ~TBofZCalcInverse() {}
 
-  virtual vector< pair<double, double> > GetInverseAndDerivative(double) const = 0;
+  virtual std::vector< std::pair<double, double> > GetInverseAndDerivative(double) const = 0;
 };
 
 /**
@@ -83,11 +82,11 @@ class TLondon1D_HS : public TBofZCalcInverse {
 
 public:
 
-  TLondon1D_HS(const vector<double>&, unsigned int steps = 3000);
+  TLondon1D_HS(const std::vector<double>&, unsigned int steps = 3000);
   double GetBofZ(double) const;
   double GetBmin() const;
   double GetBmax() const;
-  vector< pair<double, double> > GetInverseAndDerivative(double) const;
+  std::vector< std::pair<double, double> > GetInverseAndDerivative(double) const;
 
 };
 
@@ -98,11 +97,11 @@ class TLondon1D_1L : public TBofZCalcInverse {
 
 public:
 
-  TLondon1D_1L(const vector<double>&, unsigned int steps = 3000);
+  TLondon1D_1L(const std::vector<double>&, unsigned int steps = 3000);
   double GetBofZ(double) const;
   double GetBmin() const;
   double GetBmax() const;
-  vector< pair<double, double> > GetInverseAndDerivative(double) const;
+  std::vector< std::pair<double, double> > GetInverseAndDerivative(double) const;
 
 private:
   void SetBmin();
@@ -121,11 +120,11 @@ class TLondon1D_2L : public TBofZCalcInverse {
 
 public:
 
-  TLondon1D_2L(const vector<double>&, unsigned int steps = 3000);
+  TLondon1D_2L(const std::vector<double>&, unsigned int steps = 3000);
   double GetBofZ(double) const;
   double GetBmin() const;
   double GetBmax() const;
-  vector< pair<double, double> > GetInverseAndDerivative(double) const;
+  std::vector< std::pair<double, double> > GetInverseAndDerivative(double) const;
 
 private:
   void SetBmin();
@@ -145,11 +144,11 @@ class TProximity1D_1LHS : public TBofZCalcInverse {
 
 public:
 
-  TProximity1D_1LHS(const vector<double>&, unsigned int steps = 3000);
+  TProximity1D_1LHS(const std::vector<double>&, unsigned int steps = 3000);
   double GetBofZ(double) const;
   double GetBmin() const;
   double GetBmax() const;
-  vector< pair<double, double> > GetInverseAndDerivative(double) const;
+  std::vector< std::pair<double, double> > GetInverseAndDerivative(double) const;
 
 private:
   void SetBmin();
@@ -168,11 +167,11 @@ class TLondon1D_3L : public TBofZCalcInverse {
 
 public:
 
-  TLondon1D_3L(const vector<double>&, unsigned int steps = 3000);
+  TLondon1D_3L(const std::vector<double>&, unsigned int steps = 3000);
   double GetBofZ(double) const;
   double GetBmin() const;
   double GetBmax() const;
-  vector< pair<double, double> > GetInverseAndDerivative(double) const;
+  std::vector< std::pair<double, double> > GetInverseAndDerivative(double) const;
 
 private:
   void SetBmin();
@@ -192,11 +191,11 @@ class TLondon1D_3LS : public TBofZCalcInverse {
 
 public:
 
-  TLondon1D_3LS(const vector<double>&, unsigned int steps = 3000);
+  TLondon1D_3LS(const std::vector<double>&, unsigned int steps = 3000);
   double GetBofZ(double) const;
   double GetBmin() const;
   double GetBmax() const;
-  vector< pair<double, double> > GetInverseAndDerivative(double) const;
+  std::vector< std::pair<double, double> > GetInverseAndDerivative(double) const;
 
 private:
   void SetBmin();
@@ -216,7 +215,7 @@ class TLondon1D_3LwInsulator : public TBofZCalc {
 
 public:
 
-  TLondon1D_3LwInsulator(const vector<double>&, unsigned int steps = 3000);
+  TLondon1D_3LwInsulator(const std::vector<double>&, unsigned int steps = 3000);
   double GetBofZ(double) const;
   double GetBmin() const;
   double GetBmax() const;

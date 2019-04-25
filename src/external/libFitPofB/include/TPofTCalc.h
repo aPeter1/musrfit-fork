@@ -48,14 +48,14 @@ class TPofTCalc {
 
 public:
 
-  TPofTCalc(const TPofBCalc*, const string&, const vector<double>&);
+  TPofTCalc(const TPofBCalc*, const std::string&, const std::vector<double>&);
   ~TPofTCalc();
 
   const double* DataT() const {return fT;}
   const double* DataPT() const {return fPT;}
   void DoFFT();
-  void CalcPol(const vector<double>&);
-  void FakeData(const string&, const vector<double>&, const vector<double>*); 
+  void CalcPol(const std::vector<double>&);
+  void FakeData(const std::string&, const std::vector<double>&, const std::vector<double>*);
   double Eval(double) const;
 
 private:

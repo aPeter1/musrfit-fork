@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2013 by Andreas Suter                                   *
+ *   Copyright (C) 2013-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 #define _PPHOTOMEISSNER_H_
 
 #include <vector>
-using namespace std;
 
 #include "PUserFcnBase.h"
 #include "PStartupHandler_PM.h"
@@ -46,11 +45,11 @@ class PPhotoMeissner : public PUserFcnBase
 
     // global user-function-access functions, here without any functionality
     virtual Bool_t NeedGlobalPart() const { return false; }
-    void SetGlobalPart(vector<void*> &globalPart, UInt_t idx) { }
+    void SetGlobalPart(std::vector<void*> &globalPart, UInt_t idx) { }
     Bool_t GlobalPartIsValid() const { return true; }
 
     // function operator
-    Double_t operator()(Double_t, const vector<Double_t>&) const;
+    Double_t operator()(Double_t, const std::vector<Double_t>&) const;
 
   private:
     PStartupHandler_PM *fStartupHandler;
@@ -61,8 +60,8 @@ class PPhotoMeissner : public PUserFcnBase
     constexpr static const Double_t fTwoPi = 6.28318530717958623;
 
     Double_t InuMinus(const Double_t nu, const Double_t x) const;
-    Double_t FieldFilm(const Double_t z, const vector<Double_t> &par) const;
-    Double_t FieldHalfSpace(const Double_t z, const vector<Double_t> &par) const;
+    Double_t FieldFilm(const Double_t z, const std::vector<Double_t> &par) const;
+    Double_t FieldHalfSpace(const Double_t z, const std::vector<Double_t> &par) const;
 
   // definition of the class for the ROOT dictionary
   ClassDef(PPhotoMeissner, 1)

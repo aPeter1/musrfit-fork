@@ -37,8 +37,6 @@
 #endif
 
 #include <cmath>
-//#include <iostream>
-//#include <algorithm>
 #include <cassert>
 
 //------------------
@@ -122,7 +120,7 @@ void TBofZCalc::Calculate()
 // Parameters: Bext[G], deadlayer[nm], lambda[nm] 
 //------------------
 
-TLondon1D_HS::TLondon1D_HS(const vector<double> &param, unsigned int steps)
+TLondon1D_HS::TLondon1D_HS(const std::vector<double> &param, unsigned int steps)
 {
   fSteps = steps;
   fDZ = 200.0/double(steps);
@@ -149,14 +147,14 @@ double TLondon1D_HS::GetBmin() const
   return fParam[0]*exp((fParam[1]-200.0)/fParam[2]);
 }
 
-vector< pair<double, double> > TLondon1D_HS::GetInverseAndDerivative(double BB) const
+std::vector< std::pair<double, double> > TLondon1D_HS::GetInverseAndDerivative(double BB) const
 {
-  vector< pair<double, double> > inv;
+  std::vector< std::pair<double, double> > inv;
 
   if(BB <= 0.0 || BB > fParam[0])
     return inv;
 
-  pair<double, double> invAndDerivative;
+  std::pair<double, double> invAndDerivative;
 
   invAndDerivative.first = fParam[1] - fParam[2]*log(BB/fParam[0]);
   invAndDerivative.second = -fParam[2]/BB;
@@ -173,7 +171,7 @@ vector< pair<double, double> > TLondon1D_HS::GetInverseAndDerivative(double BB) 
 // Parameters: Bext[G], deadlayer[nm], thickness[nm], lambda[nm] 
 //------------------
 
-TLondon1D_1L::TLondon1D_1L(const vector<double> &param, unsigned int steps)
+TLondon1D_1L::TLondon1D_1L(const std::vector<double> &param, unsigned int steps)
 {
   fSteps = steps;
   fDZ = param[2]/double(steps);
@@ -254,15 +252,15 @@ void TLondon1D_1L::SetBmin()
   return;
 }
 
-vector< pair<double, double> > TLondon1D_1L::GetInverseAndDerivative(double BB) const
+std::vector< std::pair<double, double> > TLondon1D_1L::GetInverseAndDerivative(double BB) const
 {
-  vector< pair<double, double> > inv;
+  std::vector< std::pair<double, double> > inv;
 
   if(BB <= fMinB || BB > fParam[0])
     return inv;
 
   double inverse[2];
-  pair<double, double> invAndDerivative;
+  std::pair<double, double> invAndDerivative;
 
   inverse[0]=fParam[3]*log((BB-sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
   inverse[1]=fParam[3]*log((BB+sqrt(BB*BB-4.0*fCoeff[0]*fCoeff[1]))/(2.0*fCoeff[1]));
@@ -288,7 +286,7 @@ vector< pair<double, double> > TLondon1D_1L::GetInverseAndDerivative(double BB) 
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], lambda1[nm], lambda2[nm] 
 //------------------
 
-TLondon1D_2L::TLondon1D_2L(const vector<double> &param, unsigned int steps)
+TLondon1D_2L::TLondon1D_2L(const std::vector<double> &param, unsigned int steps)
 {
   fSteps = steps;
   fDZ = (param[2]+param[3])/double(steps);
@@ -389,15 +387,15 @@ void TLondon1D_2L::SetBmin()
   return;
 }
 
-vector< pair<double, double> > TLondon1D_2L::GetInverseAndDerivative(double BB) const
+std::vector< std::pair<double, double> > TLondon1D_2L::GetInverseAndDerivative(double BB) const
 {
-  vector< pair<double, double> > inv;
+  std::vector< std::pair<double, double> > inv;
 
   if(BB <= fMinB || BB >= fParam[0])
     return inv;
 
   double inverse[3];
-  pair<double, double> invAndDerivative;
+  std::pair<double, double> invAndDerivative;
 
   switch(fMinTag)
   {
@@ -457,7 +455,7 @@ vector< pair<double, double> > TLondon1D_2L::GetInverseAndDerivative(double BB) 
 // Parameters: Bext[G], B1[G], deadlayer[nm], thickness1[nm], lambda[nm]
 //------------------
 
-TProximity1D_1LHS::TProximity1D_1LHS(const vector<double> &param, unsigned int steps)
+TProximity1D_1LHS::TProximity1D_1LHS(const std::vector<double> &param, unsigned int steps)
 {
   fSteps = steps;
   fDZ = 200./double(steps);
@@ -512,15 +510,15 @@ void TProximity1D_1LHS::SetBmin()
   return;
 }
 
-vector< pair<double, double> > TProximity1D_1LHS::GetInverseAndDerivative(double BB) const
+std::vector< std::pair<double, double> > TProximity1D_1LHS::GetInverseAndDerivative(double BB) const
 {
-  vector< pair<double, double> > inv;
+  std::vector< std::pair<double, double> > inv;
 
   if(BB <= fMinB || BB > fParam[0])
     return inv;
 
   double inverse[2];
-  pair<double, double> invAndDerivative;
+  std::pair<double, double> invAndDerivative;
 
   inverse[0]=(fParam[0]*(fParam[2]+fParam[3])-fParam[1]*fParam[2]-BB*fParam[3])/(fParam[0]-fParam[1]);
   inverse[1]=fParam[2]+fParam[3]-fParam[4]*log(BB/fParam[1]);
@@ -545,7 +543,7 @@ vector< pair<double, double> > TProximity1D_1LHS::GetInverseAndDerivative(double
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm], lambda3[nm]
 //------------------
 
-TLondon1D_3L::TLondon1D_3L(const vector<double> &param, unsigned int steps)
+TLondon1D_3L::TLondon1D_3L(const std::vector<double> &param, unsigned int steps)
 // : fSteps(steps), fDZ((param[2]+param[3]+param[4])/double(steps)), fParam(param), fMinTag(-1), fMinZ(-1.0), fMinB(-1.0)
 {
 // no members of TLondon1D_3L, therefore the initialization list cannot be used!!
@@ -681,15 +679,15 @@ void TLondon1D_3L::SetBmin()
   return;
 }
 
-vector< pair<double, double> > TLondon1D_3L::GetInverseAndDerivative(double BB) const
+std::vector< std::pair<double, double> > TLondon1D_3L::GetInverseAndDerivative(double BB) const
 {
-  vector< pair<double, double> > inv;
+  std::vector< std::pair<double, double> > inv;
 
   if(BB <= fMinB || BB > fParam[0])
     return inv;
 
   double inverse[4];
-  pair<double, double> invAndDerivative;
+  std::pair<double, double> invAndDerivative;
 
   switch(fMinTag)
   {
@@ -791,7 +789,7 @@ vector< pair<double, double> > TLondon1D_3L::GetInverseAndDerivative(double BB) 
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm] 
 //------------------
 
-TLondon1D_3LS::TLondon1D_3LS(const vector<double> &param, unsigned int steps)
+TLondon1D_3LS::TLondon1D_3LS(const std::vector<double> &param, unsigned int steps)
 {
   fSteps = steps;
   fDZ = (param[2]+param[3]+param[4])/double(steps);
@@ -915,15 +913,15 @@ void TLondon1D_3LS::SetBmin()
   return;
 }
 
-vector< pair<double, double> > TLondon1D_3LS::GetInverseAndDerivative(double BB) const
+std::vector< std::pair<double, double> > TLondon1D_3LS::GetInverseAndDerivative(double BB) const
 {
-  vector< pair<double, double> > inv;
+  std::vector< std::pair<double, double> > inv;
 
   if(BB <= fMinB || BB > fParam[0])
     return inv;
 
   double inverse[4];
-  pair<double, double> invAndDerivative;
+  std::pair<double, double> invAndDerivative;
 
   switch(fMinTag)
   {
@@ -1025,7 +1023,7 @@ vector< pair<double, double> > TLondon1D_3LS::GetInverseAndDerivative(double BB)
 // Parameters: Bext[G], deadlayer[nm], thickness1[nm], thickness2[nm], thickness3[nm], lambda1[nm], lambda2[nm] 
 //------------------
 
-TLondon1D_3LwInsulator::TLondon1D_3LwInsulator(const vector<double> &param, unsigned int steps)
+TLondon1D_3LwInsulator::TLondon1D_3LwInsulator(const std::vector<double> &param, unsigned int steps)
 {
   fSteps = steps;
   fDZ = (param[2]+param[3]+param[4])/static_cast<double>(steps);

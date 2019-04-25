@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2013 by Andreas Suter                                   *
+ *   Copyright (C) 2013-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -30,7 +30,6 @@
 #include <cmath>
 #include <cassert>
 #include <iostream>
-using namespace std;
 
 #include <TSAXParser.h>
 
@@ -50,7 +49,7 @@ ClassImp(PSkewedLorentzian) // for ROOT dictionary
 PSkewedLorentzian::PSkewedLorentzian()
 {
   // init
-  fStartupHandler = 0;
+  fStartupHandler = nullptr;
   fNoOfFields = 0;
   fRange = 0;
   fValid = true;
@@ -67,22 +66,22 @@ PSkewedLorentzian::PSkewedLorentzian()
   Int_t status = parseXmlFile(saxParser, startup_path_name);
   // check for parse errors
   if (status) { // error
-    cout << endl << ">> PSkewedLorentzian::PSkewedLorentzian: **WARNING** Reading/parsing skewedLorentzian_startup.xml failed.";
-    cout << endl;
+    std::cout << std::endl << ">> PSkewedLorentzian::PSkewedLorentzian: **WARNING** Reading/parsing skewedLorentzian_startup.xml failed.";
+    std::cout << std::endl;
     fValid = false;
   }
 
   // clean up
   if (saxParser) {
     delete saxParser;
-    saxParser = 0;
+    saxParser = nullptr;
   }
 
   // check if everything went fine with the startup handler
   if (!fStartupHandler->IsValid()) {
-    cout << endl << ">> PSkewedLorentzian::PSkewedLorentzian **PANIC ERROR**";
-    cout << endl << ">>   startup handler too unhappy. Will terminate unfriendly, sorry.";
-    cout << endl;
+    std::cout << std::endl << ">> PSkewedLorentzian::PSkewedLorentzian **PANIC ERROR**";
+    std::cout << std::endl << ">>   startup handler too unhappy. Will terminate unfriendly, sorry.";
+    std::cout << std::endl;
     fValid = false;
   }
 
@@ -92,18 +91,18 @@ PSkewedLorentzian::PSkewedLorentzian()
 
   // check if the parameters potentially make sense
   if (fNoOfFields == 0) {
-    cout << endl << ">> PSkewedLorentzian::PSkewedLorentzian **WARNING**";
-    cout << endl << ">>   Found number of field value == 0. Doesn't make sense, will set it to 101." << endl;
+    std::cout << std::endl << ">> PSkewedLorentzian::PSkewedLorentzian **WARNING**";
+    std::cout << std::endl << ">>   Found number of field value == 0. Doesn't make sense, will set it to 101." << std::endl;
     fNoOfFields = 101;
   } else if (fNoOfFields > 1000) {
-    cout << endl << ">> PSkewedLorentzian::PSkewedLorentzian **WARNING**";
-    cout << endl << ">>   Found number of field value == " << fNoOfFields << ".";
-    cout << endl << ">>   This is a very large number! Are you sure?" << endl;
+    std::cout << std::endl << ">> PSkewedLorentzian::PSkewedLorentzian **WARNING**";
+    std::cout << std::endl << ">>   Found number of field value == " << fNoOfFields << ".";
+    std::cout << std::endl << ">>   This is a very large number! Are you sure?" << std::endl;
   }
 
   if (fRange < 1.0) {
-    cout << endl << ">> PSkewedLorentzian::PSkewedLorentzian **WARNING**";
-    cout << endl << ">>   Found range value < 1.0 (" << fRange << "). Doesn't make sense, will set it to 10.0." << endl;
+    std::cout << std::endl << ">> PSkewedLorentzian::PSkewedLorentzian **WARNING**";
+    std::cout << std::endl << ">>   Found range value < 1.0 (" << fRange << "). Doesn't make sense, will set it to 10.0." << std::endl;
     fRange = 10.0;
   }
 }
@@ -129,7 +128,7 @@ PSkewedLorentzian::~PSkewedLorentzian()
  * \param t
  * \param par
  */
-Double_t PSkewedLorentzian::operator()(Double_t t, const vector<Double_t> &par) const
+Double_t PSkewedLorentzian::operator()(Double_t t, const std::vector<Double_t> &par) const
 {
   // expected parameters: (0) B0: Peak Field, (1) beta: field width, (2) Delta: skewness width, (3) phi: detector phase
   assert(par.size() == 4);
@@ -151,25 +150,25 @@ Double_t PSkewedLorentzian::operator()(Double_t t, const vector<Double_t> &par) 
   if (fNoOfFields % 2 == 0) { // even number of sampling points
     dB = fieldRangeMinus / (fNoOfFields/2 + 0.5);
     for (Int_t j=fNoOfFields/2-1; j>=0; j--) {
-      dval = par[0] - dB*((Double_t)j+0.5);
+      dval = par[0] - dB*(static_cast<Double_t>(j)+0.5);
       if (dval > 0.0)
         BB.push_back(dval); // Bj = B0 - dB*(j+1/2) for Bj < B0
     }
     dB = fieldRangePlus / (fNoOfFields/2 + 0.5);
-    for (Int_t j=0; j<(Int_t)(fNoOfFields/2); j++)
-      BB.push_back(par[0] + dB*((Double_t)j+0.5)); // Bj = B0 + dB*(j+1/2) for Bj > B0
+    for (Int_t j=0; j<static_cast<Int_t>(fNoOfFields/2); j++)
+      BB.push_back(par[0] + dB*(static_cast<Double_t>(j)+0.5)); // Bj = B0 + dB*(j+1/2) for Bj > B0
   } else { // odd number of sampling points
     Int_t halfNoOfPoints = (fNoOfFields-1)/2;
     dB = fieldRangeMinus / halfNoOfPoints;
     for (Int_t j=halfNoOfPoints; j>0; j--) {
-      dval = par[0] - dB*(Double_t)j;
+      dval = par[0] - dB*static_cast<Double_t>(j);
       if (dval > 0.0)
         BB.push_back(dval); // Bj = B0 - dB*j for Bj < B0
     }
     BB.push_back(par[0]); // Bj = B0
     dB = fieldRangePlus / halfNoOfPoints;
     for (Int_t j=1; j<=halfNoOfPoints; j++)
-      BB.push_back(par[0] + dB*(Double_t)j); // Bj = B0 + dB*j for Bj > B0
+      BB.push_back(par[0] + dB*static_cast<Double_t>(j)); // Bj = B0 + dB*j for Bj > B0
   }
 
   // calculate the asymmetry

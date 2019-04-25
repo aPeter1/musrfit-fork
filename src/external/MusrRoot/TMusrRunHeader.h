@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,7 +31,6 @@
 #define TMUSRRUNHEADER_H
 
 #include <vector>
-using namespace std;
 
 #include <TDatime.h>
 #include <TObject.h>
@@ -52,9 +51,9 @@ using namespace std;
 #define MRH_INT_VECTOR                  5
 #define MRH_DOUBLE_VECTOR               6
 
-typedef vector<Int_t> TIntVector;
-typedef vector<Double_t> TDoubleVector;
-typedef vector<TString> TStringVector;
+typedef std::vector<Int_t> TIntVector;
+typedef std::vector<Double_t> TDoubleVector;
+typedef std::vector<TString> TStringVector;
 
 //-------------------------------------------------------------------------
 template <class T> class TMusrRunObject : public TObject
@@ -160,15 +159,15 @@ private:
   TString fFileName;
   TString fVersion;
 
-  vector< TMusrRunObject<TString> >  fStringObj;
-  vector< TMusrRunObject<Int_t> >    fIntObj;
-  vector< TMusrRunObject<Double_t> > fDoubleObj;
-  vector< TMusrRunObject<TMusrRunPhysicalQuantity> > fMusrRunPhysQuantityObj;
-  vector< TMusrRunObject<TStringVector> > fStringVectorObj;
-  vector< TMusrRunObject<TIntVector> > fIntVectorObj;
-  vector< TMusrRunObject<TDoubleVector> > fDoubleVectorObj;
+  std::vector< TMusrRunObject<TString> >  fStringObj;
+  std::vector< TMusrRunObject<Int_t> >    fIntObj;
+  std::vector< TMusrRunObject<Double_t> > fDoubleObj;
+  std::vector< TMusrRunObject<TMusrRunPhysicalQuantity> > fMusrRunPhysQuantityObj;
+  std::vector< TMusrRunObject<TStringVector> > fStringVectorObj;
+  std::vector< TMusrRunObject<TIntVector> > fIntVectorObj;
+  std::vector< TMusrRunObject<TDoubleVector> > fDoubleVectorObj;
 
-  vector< TString > fPathNameOrder; ///< keeps the path-name as they were created in ordered to keep ordering
+  std::vector< TString > fPathNameOrder; ///< keeps the path-name as they were created in ordered to keep ordering
 
   virtual void Init(TString str="n/a");
   virtual void CleanUp();

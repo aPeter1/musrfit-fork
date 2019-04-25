@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -36,7 +36,6 @@
 #include <cstring>
 
 #include <iostream>
-using namespace std;
 
 #include <TROOT.h>
 #include <TFile.h>
@@ -48,9 +47,9 @@ using namespace std;
 
 void write_musrRoot_runHeader_syntax()
 {
-  cout << endl << "usage: write_musrRoot_runHeader [<fileName>] | --version";
-  cout << endl << "       <fileName> is the file name including the extention root, e.g. test.root";
-  cout << endl << endl;
+  std::cout << std::endl << "usage: write_musrRoot_runHeader [<fileName>] | --version";
+  std::cout << std::endl << "       <fileName> is the file name including the extention root, e.g. test.root";
+  std::cout << std::endl << std::endl;
 }
 
 int main(int argc, char *argv[])
@@ -62,9 +61,9 @@ int main(int argc, char *argv[])
 
   if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "write_musrRoot_runHeader version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "write_musrRoot_runHeader version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #else
-      cout << endl << "write_musrRoot_runHeader git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "write_musrRoot_runHeader git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #endif
     return 0;
   }

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2014 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -35,7 +35,6 @@
 #include <fstream>
 #include <vector>
 #include <string>
-using namespace std;
 
 #include "TString.h"
 #include "TFile.h"
@@ -73,7 +72,7 @@ class PMusrRoot2Xml
   private:
     enum EFolderTag {eUnkown, eDecayAnaModule, eSlowControlAnaModule};
 
-    vector<string> fXmlData; ///< keeps the XML structure dump of the ROOT file
+    std::vector<std::string> fXmlData; ///< keeps the XML structure dump of the ROOT file
 
     Bool_t fQuiet; ///< true = suppress output while converting
     Bool_t fKeep;  ///< true = keep the XML dump file
@@ -115,7 +114,7 @@ PMusrRoot2Xml::PMusrRoot2Xml(const char *fileName, bool quiet, bool keep) : fQui
   TFile f(fFileName.Data());
 
   if (f.IsZombie()) {
-    cerr << endl << "**ERROR** couldn't open file " << fFileName << endl;
+    std::cerr << std::endl << "**ERROR** couldn't open file " << fFileName << std::endl;
     return;
   }
 
@@ -129,15 +128,15 @@ PMusrRoot2Xml::PMusrRoot2Xml(const char *fileName, bool quiet, bool keep) : fQui
 
   UInt_t offset = 2;
 
-  while ((key = (TKey*) next()) != 0) {
-    if (!fQuiet) cout << endl << "name: " << key->GetName() << ", class name: " << key->GetClassName();
+  while ((key = dynamic_cast<TKey*>(next())) != nullptr) {
+    if (!fQuiet) std::cout << std::endl << "name: " << key->GetName() << ", class name: " << key->GetClassName();
     str = key->GetClassName();
     if (str == "TFolder") {
-      folder = (TFolder*)key->ReadObj();
+      folder = dynamic_cast<TFolder*>(key->ReadObj());
       CheckClass(folder, str, offset);
     }
   }
-  if (!fQuiet) cout << endl;
+  if (!fQuiet) std::cout << std::endl;
 
   f.Close();
 
@@ -151,10 +150,10 @@ PMusrRoot2Xml::PMusrRoot2Xml(const char *fileName, bool quiet, bool keep) : fQui
   // Hence SCAnaModule has artificially moved up, just to follow DecayAnaModule
   SortHistoFolders();
 
-  ofstream fout(fXmlDumpFileName.Data());
+  std::ofstream fout(fXmlDumpFileName.Data());
 
   for (UInt_t i=0; i<fXmlData.size(); i++)
-    fout << fXmlData[i] << endl;
+    fout << fXmlData[i] << std::endl;
   fout.close();
 
   fValid = true;
@@ -183,7 +182,7 @@ PMusrRoot2Xml::~PMusrRoot2Xml()
  */
 void PMusrRoot2Xml::SortHistoFolders()
 {
-  vector<string> temp_xml_data;
+  std::vector<std::string> temp_xml_data;
 
   // first make a copy of the original fXmlData
   for (unsigned int i=0; i<fXmlData.size(); i++)
@@ -192,9 +191,9 @@ void PMusrRoot2Xml::SortHistoFolders()
   // remove SCAnaModule from temp_xml_data
   unsigned int start = 0, end = 0;
   for (unsigned int i=0; i<temp_xml_data.size(); i++) {
-    if (temp_xml_data[i].find("<SCAnaModule>") != string::npos)
+    if (temp_xml_data[i].find("<SCAnaModule>") != std::string::npos)
       start = i;
-    if (temp_xml_data[i].find("</SCAnaModule>") != string::npos)
+    if (temp_xml_data[i].find("</SCAnaModule>") != std::string::npos)
       end = i+1;
   }
   if ((start > 0) && (end > 0))
@@ -206,7 +205,7 @@ void PMusrRoot2Xml::SortHistoFolders()
   // 1st find end of DecayAnaModule
   unsigned int pos = 0;
   for (unsigned int i=0; i<temp_xml_data.size(); i++) {
-    if (temp_xml_data[i].find("</DecayAnaModule>") != string::npos) {
+    if (temp_xml_data[i].find("</DecayAnaModule>") != std::string::npos) {
       pos = i+1;
       break;
     }
@@ -240,8 +239,8 @@ void PMusrRoot2Xml::DumpFolder(TFolder *folder, UInt_t offset)
   TIter next = folder->GetListOfFolders();
   TObject *obj;
   TString str;
-  while ((obj = (TObject*) next()) != 0) {
-    if (!fQuiet) cout << endl << offsetStr << "name: " << obj->GetName() << ", class name: " << obj->ClassName();
+  while ((obj = dynamic_cast<TObject*>(next())) != nullptr) {
+    if (!fQuiet) std::cout << std::endl << offsetStr << "name: " << obj->GetName() << ", class name: " << obj->ClassName();
     str = obj->ClassName();
     CheckClass(obj, str, offset);
   }
@@ -273,27 +272,27 @@ void PMusrRoot2Xml::DumpObjArray(TObjArray *obj, UInt_t offset)
       xmlLabel = TString(obj->GetName());
   }
 
-  if (!fQuiet) cout << endl << offsetStr << obj->GetName() << " (# " << obj->GetEntries() << ")";
+  if (!fQuiet) std::cout << std::endl << offsetStr << obj->GetName() << " (# " << obj->GetEntries() << ")";
   if (!strcmp(obj->GetName(), "DetectorInfo"))
     fNoOfDetectors = obj->GetEntries();
 
   xmlStr = offsetStr + "<" + xmlLabel + ">";
   fXmlData.push_back(xmlStr.Data());
 
-  for (UInt_t i=0; i<(UInt_t)obj->GetEntries(); i++) {
+  for (UInt_t i=0; i<static_cast<UInt_t>(obj->GetEntries()); i++) {
     // check if entry is a TObjArray
     type = obj->At(i)->ClassName();
     if (type == "TObjArray") {
-      DumpObjArray((TObjArray*)(obj->At(i)), offset+2);
+      DumpObjArray(dynamic_cast<TObjArray*>(obj->At(i)), offset+2);
     } else { // not a TObjArray
-      tstr = (TObjString*) obj->At(i);
+      tstr = static_cast<TObjString*>(obj->At(i));
       str = tstr->GetString();
       str.Remove(TString::kTrailing, '\n');
 
       GetType(str, type);
       GetLabel(str, label);
 
-      if (!fQuiet) cout << endl << offsetStr << i << ": " << str;
+      if (!fQuiet) std::cout << std::endl << offsetStr << i << ": " << str;
 
       // filter out the number of histograms according to the RunInfo
       if (str.Contains("- No of Histos: ")) {
@@ -404,13 +403,13 @@ void PMusrRoot2Xml::CheckClass(TObject *obj, TString str, UInt_t offset)
     str = offsetStr + "<" + xmlTagName + ">";
     fXmlData.push_back(str.Data());
 
-    DumpFolder((TFolder*)obj, offset);
+    DumpFolder(dynamic_cast<TFolder*>(obj), offset);
 
     str = offsetStr + "</" + xmlTagName + ">";
     fXmlData.push_back(str.Data());
   } else if (str == "TObjArray") {
     offset += 2;
-    DumpObjArray((TObjArray*)obj, offset);
+    DumpObjArray(dynamic_cast<TObjArray*>(obj), offset);
   } else {
     // filter out the proper entry tag
     TString entryTag("");
@@ -430,7 +429,7 @@ void PMusrRoot2Xml::CheckClass(TObject *obj, TString str, UInt_t offset)
     offset += 2;
     str = offsetStr + "<" + entryTag + ">";
     fXmlData.push_back(str.Data());
-    DumpEntry((TObjArray*)obj, offset);
+    DumpEntry(dynamic_cast<TObjArray*>(obj), offset);
     str = offsetStr + "</" + entryTag + ">";
     fXmlData.push_back(str.Data());
   }
@@ -511,12 +510,12 @@ void PMusrRoot2Xml::GetLabel(TString entry, TString &label)
  */
 void mrv_syntax()
 {
-  cout << endl << "usage: musrRootValidation <musrRootFile> <musrRootSchema> [--quiet] [--keep] | --help | --version";
-  cout << endl << "   --quiet: do not dump the MusrRoot file info while validating";
-  cout << endl << "   --keep: do NOT delete the intermediate XML-file";
-  cout << endl << "   --help: shows this help";
-  cout << endl << "   --version: shows the current version";
-  cout << endl << endl;
+  std::cout << std::endl << "usage: musrRootValidation <musrRootFile> <musrRootSchema> [--quiet] [--keep] | --help | --version";
+  std::cout << std::endl << "   --quiet: do not dump the MusrRoot file info while validating";
+  std::cout << std::endl << "   --keep: do NOT delete the intermediate XML-file";
+  std::cout << std::endl << "   --help: shows this help";
+  std::cout << std::endl << "   --version: shows the current version";
+  std::cout << std::endl << std::endl;
 }
 
 //-----------------------------------------------------------------------
@@ -528,27 +527,27 @@ void mrv_syntax()
  */
 int is_valid(const xmlDocPtr doc, const char *schema_filename)
 {
-    xmlDocPtr schema_doc = xmlReadFile(schema_filename, NULL, XML_PARSE_NONET);
-    if (schema_doc == NULL) {
-      cerr << endl << "**ERROR** the schema (" << schema_filename << ") cannot be loaded or is not well-formed" << endl << endl;
+    xmlDocPtr schema_doc = xmlReadFile(schema_filename, nullptr, XML_PARSE_NONET);
+    if (schema_doc == nullptr) {
+      std::cerr << std::endl << "**ERROR** the schema (" << schema_filename << ") cannot be loaded or is not well-formed" << std::endl << std::endl;
       return -1;
     }
     xmlSchemaParserCtxtPtr parser_ctxt = xmlSchemaNewDocParserCtxt(schema_doc);
-    if (parser_ctxt == NULL) {
-      cerr << endl << "**ERROR** unable to create a parser context for the schema." << endl << endl;
+    if (parser_ctxt == nullptr) {
+      std::cerr << std::endl << "**ERROR** unable to create a parser context for the schema." << std::endl << std::endl;
       xmlFreeDoc(schema_doc);
       return -2;
     }
     xmlSchemaPtr schema = xmlSchemaParse(parser_ctxt);
-    if (schema == NULL) {
-      cerr << endl << "**ERROR** the schema itself is not valid." << endl << endl;
+    if (schema == nullptr) {
+      std::cerr << std::endl << "**ERROR** the schema itself is not valid." << std::endl << std::endl;
       xmlSchemaFreeParserCtxt(parser_ctxt);
       xmlFreeDoc(schema_doc);
       return -3;
     }
     xmlSchemaValidCtxtPtr valid_ctxt = xmlSchemaNewValidCtxt(schema);
-    if (valid_ctxt == NULL) {
-      cerr << endl << "**ERROR** unable to create a validation context for the schema." << endl << endl;
+    if (valid_ctxt == nullptr) {
+      std::cerr << std::endl << "**ERROR** unable to create a validation context for the schema." << std::endl << std::endl;
       xmlSchemaFree(schema);
       xmlSchemaFreeParserCtxt(parser_ctxt);
       xmlFreeDoc(schema_doc);
@@ -575,9 +574,9 @@ int main(int argc, char *argv[])
   } else if (argc==2) {
     if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "musrRootValidation version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "musrRootValidation version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #else
-      cout << endl << "musrRootValidation git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "musrRootValidation git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #endif
       return 0;
     } else {
@@ -597,36 +596,36 @@ int main(int argc, char *argv[])
 
   PMusrRoot2Xml dump(argv[1], quiet, keep);
   if (!dump.IsValid()) {
-    cerr << endl << "**ERROR** " << argv[1] << " is not a valid MusrRoot file." << endl << endl;
+    std::cerr << std::endl << "**ERROR** " << argv[1] << " is not a valid MusrRoot file." << std::endl << std::endl;
     return -1;
   }
 
   xmlDocPtr doc = xmlParseFile(dump.GetXmlDumpFileName().Data());
-  if (doc == 0) {
-    cerr << endl << "**ERROR** couldn't get xmlDocPtr for xml-file " << argv[1] << "." << endl << endl;
+  if (doc == nullptr) {
+    std::cerr << std::endl << "**ERROR** couldn't get xmlDocPtr for xml-file " << argv[1] << "." << std::endl << std::endl;
     return -1;
   }
 
   if (is_valid(doc, argv[2])) {
-    cout << endl << "xml-file " << argv[1] << " validates against xml-schema " << argv[2] << endl << endl;
+    std::cout << std::endl << "xml-file " << argv[1] << " validates against xml-schema " << argv[2] << std::endl << std::endl;
   } else {
-    cerr << endl << "**ERROR** xml-file " << argv[1] << " fails to validate against xml-schema " << argv[2] << endl << endl;
+    std::cerr << std::endl << "**ERROR** xml-file " << argv[1] << " fails to validate against xml-schema " << argv[2] << std::endl << std::endl;
   }
 
   // do some further consistency checks
   if (dump.GetNoOfDecayHistos() != dump.GetNoOfExpectedHistos()) {
-    cerr << endl << "**ERROR** number of histogram found in the DecayAnaModule is inconsistent";
-    cerr << endl << "  with the header; found " << dump.GetNoOfDecayHistos() << " histograms in the DecayAnaModule,";
-    cerr << endl << "  but in the header: No of Histos = " << dump.GetNoOfHistos() << "; # RedGreen Offsets = " << dump.GetNoOfRedGreenOffsets();
-    cerr << endl << endl;
+    std::cerr << std::endl << "**ERROR** number of histogram found in the DecayAnaModule is inconsistent";
+    std::cerr << std::endl << "  with the header; found " << dump.GetNoOfDecayHistos() << " histograms in the DecayAnaModule,";
+    std::cerr << std::endl << "  but in the header: No of Histos = " << dump.GetNoOfHistos() << "; # RedGreen Offsets = " << dump.GetNoOfRedGreenOffsets();
+    std::cerr << std::endl << std::endl;
   }
 
   if (dump.GetNoOfDecayHistos() != dump.GetNoOfDetectors()) {
-    cerr << endl << "**ERROR** number of histogram found in the DecayAnaModule is inconsistent";
-    cerr << endl << "  with number of Detector entries in the RunHeader.";
-    cerr << endl << "  Found " << dump.GetNoOfDecayHistos() << " histograms in the DecayAnaModule,";
-    cerr << endl << "  but " << dump.GetNoOfDetectors() << " number of Detector entries.";
-    cerr << endl << endl;
+    std::cerr << std::endl << "**ERROR** number of histogram found in the DecayAnaModule is inconsistent";
+    std::cerr << std::endl << "  with number of Detector entries in the RunHeader.";
+    std::cerr << std::endl << "  Found " << dump.GetNoOfDecayHistos() << " histograms in the DecayAnaModule,";
+    std::cerr << std::endl << "  but " << dump.GetNoOfDetectors() << " number of Detector entries.";
+    std::cerr << std::endl << std::endl;
   }
 
   return 0;

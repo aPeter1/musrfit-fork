@@ -26,7 +26,6 @@
 
 
 #include <iostream>
-using namespace std;
 #include <fstream>
 #include <cstring>
 #include <cmath>
@@ -42,7 +41,7 @@ using namespace std;
 
 MuSR_td_PSI_bin::MuSR_td_PSI_bin()
 {
-  histo = NULL;
+  histo = nullptr;
   Clear();
 }
 
@@ -81,13 +80,13 @@ MuSR_td_PSI_bin::MuSR_td_PSI_bin()
 
  int MuSR_td_PSI_bin::read(const char * fileName)
  {
-   ifstream  file_name;
+   std::ifstream  file_name;
 
    Clear();
 
    filename    = fileName;
 
-   file_name.open(fileName, ios_base::binary);  // open file
+   file_name.open(fileName, std::ios_base::binary);  // open file
    if (file_name.fail())
    {
      readstatus  = "ERROR Open "+filename+" failed!";
@@ -158,12 +157,12 @@ MuSR_td_PSI_bin::MuSR_td_PSI_bin()
 
 int MuSR_td_PSI_bin::write(const char *fileName)
 {
-   string fln = fileName;
+   std::string fln = fileName;
    size_t found = fln.find_last_of(".");
    if (found == fln.npos) {
      return 1; // no extension found
    }
-   string ext = fln.substr(found+1);
+   std::string ext = fln.substr(found+1);
    int status = 0;
    if (ext == "bin")
      status = writebin(fileName);
@@ -238,7 +237,7 @@ typedef                 float   Float32;
 
 int MuSR_td_PSI_bin::readbin(const char * fileName)
 {
-  ifstream  file_name;
+  std::ifstream  file_name;
   Int16     *dum_Int16;
   Int32     *dum_Int32;
   Float32   *dum_Float32;
@@ -281,7 +280,7 @@ int MuSR_td_PSI_bin::readbin(const char * fileName)
 
   filename    = fileName;
 
-  file_name.open(fileName, ios_base::binary);  // open PSI bin file
+  file_name.open(fileName, std::ios_base::binary);  // open PSI bin file
   if (file_name.fail())
   {
     readstatus  = "ERROR Open "+filename+" failed!";
@@ -450,8 +449,8 @@ int MuSR_td_PSI_bin::readbin(const char * fileName)
   dum_Int16 = (Int16 *) &buffer_file[134]; // khidaf
   if (*dum_Int16 != 1)
   {
-    cout << "ERROR number of histograms/record not equals 1!"
-        << " Required algorithm is not implemented!" << endl;
+    std::cout << "ERROR number of histograms/record not equals 1!"
+        << " Required algorithm is not implemented!" << std::endl;
     delete [] buffer_file;
     file_name.close();
     readstatus  = "ERROR Algorithm to read multiple histograms in one block -"
@@ -493,7 +492,7 @@ int MuSR_td_PSI_bin::readbin(const char * fileName)
       for (int j=0; j<i; j++)
         delete histo[j];
       delete [] histo;
-      histo = NULL;
+      histo = nullptr;
       Clear();
       file_name.close();
       readstatus = "ERROR Allocating histo[] failed!";
@@ -510,7 +509,7 @@ int MuSR_td_PSI_bin::readbin(const char * fileName)
     readstatus = "ERROR Allocating buffer to read histogram failed!";
     return 3;                                // ERROR allocating histogram buffer
   }
-  file_name.seekg(1024, ios_base::beg);     // beginning of histogram data
+  file_name.seekg(1024, std::ios_base::beg);     // beginning of histogram data
 
   file_name.read(buffer_file_histo, Int32(num_data_records_file)
                  *Int32(length_data_records_bins)*4);
@@ -525,7 +524,7 @@ int MuSR_td_PSI_bin::readbin(const char * fileName)
   file_name.close();
 
   // process histograms
-  vector<double> dummy_vector;
+  std::vector<double> dummy_vector;
 
   histos_vector.clear();
   for (i=0; i<number_histo; i++)
@@ -573,7 +572,7 @@ int MuSR_td_PSI_bin::writebin(const char *fileName)
     return 4;
   }
 
-  ofstream  fout;
+  std::ofstream  fout;
 
   // prepare buffer
   char *buffer = new char[1024];
@@ -586,10 +585,10 @@ int MuSR_td_PSI_bin::writebin(const char *fileName)
 
   // fill header info into the buffer
 
-  fout.open(fileName, ios_base::binary);  // open PSI bin file
+  fout.open(fileName, std::ios_base::binary);  // open PSI bin file
   if (fout.fail())
   {
-    writestatus  = "ERROR Open " + string(fileName) + " failed!";
+    writestatus  = "ERROR Open " + std::string(fileName) + " failed!";
     return 1; // ERROR open failed
   }
 
@@ -1025,7 +1024,7 @@ typedef struct _pTATDC32StatisticRec {
 
 int MuSR_td_PSI_bin::readmdu(const char * fileName)
 {
-  ifstream  file_name;
+  std::ifstream  file_name;
   int       i, j;
 
   Clear();
@@ -1038,7 +1037,7 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
 
   filename    = fileName;
 
-  file_name.open(fileName, ios_base::binary);  // open PSI bin file
+  file_name.open(fileName, std::ios_base::binary);  // open PSI bin file
   if (file_name.fail())
   {
     readstatus  = "ERROR Open "+filename+" failed!";
@@ -1167,11 +1166,11 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
           cout << "Histogram " << it << " is selected " << endl;
 #endif
         } else {
-          cout << "error " << it << " is out of range |0 - " << MAXHISTO-1 << "|"
-              <<endl;
+          std::cout << "error " << it << " is out of range |0 - " << MAXHISTO-1 << "|"
+              << std::endl;
         }
       } else {
-        cout << "error reading " << &gpTAfhead.Header.DetectorNumberList[j] << endl;
+        std::cout << "error reading " << &gpTAfhead.Header.DetectorNumberList[j] << std::endl;
       }
     }
   }
@@ -1298,7 +1297,7 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
             // different histogram length?
             else if (length_histo != nbins+gpTAsetpta.tag[i].Histominb)
             {
-              cout << "Different histogram lengths!" << endl;
+              std::cout << "Different histogram lengths!" << std::endl;
             }
             number_histo++;
           }
@@ -1308,8 +1307,8 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
 
     // check gpTAfhead.Header.NumberOfDetectors
     if (number_histo != gpTAfhead.Header.NumberOfDetectors)
-      cout << "Number of found histos " << number_histo << " and number in header "
-          << gpTAfhead.Header.NumberOfDetectors << " differ!" << endl;
+      std::cout << "Number of found histos " << number_histo << " and number in header "
+          << gpTAfhead.Header.NumberOfDetectors << " differ!" << std::endl;
 
     // special case: subtract 1 from stored histogram to get desired histogram length
     if (length_histo > 0) length_histo -= 1;
@@ -1400,7 +1399,7 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
           // different histogram length?
           else if (length_histo != nbins+gpTAsettdc.tag[i].Histominb)
           {
-            cout << "Different histogram lengths!" << endl;
+            std::cout << "Different histogram lengths!" << std::endl;
           }
           number_histo++;
         }
@@ -1497,7 +1496,7 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
           // different histogram length?
           else if (length_histo != nbins+gpTAsettdc32.tag[i].Histominb)
           {
-            cout << "Different histogram lengths!" << endl;
+            std::cout << "Different histogram lengths!" << std::endl;
           }
           number_histo++;
         }
@@ -1521,8 +1520,8 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
 
   if (tothist > MAXHISTO)
   {
-    cout << "ERROR number of histograms " << tothist << " exceedes maximum "
-        << MAXHISTO << "! - Setting maximum number " << endl;
+    std::cout << "ERROR number of histograms " << tothist << " exceedes maximum "
+        << MAXHISTO << "! - Setting maximum number " << std::endl;
     tothist = MAXHISTO;
   }
 
@@ -1569,8 +1568,8 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
     events_per_histo[i] = 0;
 
   int ihist = 0;
-  Int32 *thist = NULL;
-  vector<double> dummy_vector;
+  Int32 *thist = nullptr;
+  std::vector<double> dummy_vector;
 
   histos_vector.clear();
   for (i=0,ihist=0; i< tothist; i++)
@@ -1580,7 +1579,10 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
     {
       dummy_vector.clear();
       Clear();
-      if (thist != NULL) delete [] thist; thist = NULL;
+      if (thist != nullptr) {
+          delete [] thist;
+          thist = nullptr;
+      }
       file_name.close();
       readstatus  = "ERROR Reading "+filename+" tag failed!";
       return 6;                                  // ERROR reading tag failed
@@ -1597,9 +1599,9 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
       // is a histogram there?
       if ((nbins=(tag.Histomaxb-tag.Histominb + 1))>1)
       {
-        if (thist == NULL) thist = new Int32[nbins];
-        if (thist == NULL)
-        {
+        if (thist == nullptr)
+          thist = new Int32[nbins];
+        if (thist == nullptr) {
           Clear();
           file_name.close();
           readstatus = "ERROR Allocating histogram buffer failed!";
@@ -1610,7 +1612,10 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
         if (file_name.fail())
         {
           Clear();
-          if (thist != NULL) delete [] thist; thist = NULL;
+          if (thist != nullptr) {
+            delete [] thist;
+            thist = nullptr;
+          }
           file_name.close();
           readstatus  = "ERROR Reading "+filename+" hist failed!";
           return 6;                                  // ERROR reading hist failed
@@ -1668,7 +1673,10 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
     }
   }
 
-  if (thist != NULL) delete [] thist; thist = NULL;
+  if (thist != nullptr) {
+    delete [] thist;
+    thist = nullptr;
+  }
 
   file_name.close();
 
@@ -1698,7 +1706,7 @@ int MuSR_td_PSI_bin::readmdu(const char * fileName)
 
 int MuSR_td_PSI_bin::writemdu(const char * fileName)
 {
-  cerr << endl << "MuSR_td_PSI_bin::writemdu - not yet implemented" << endl;
+  std::cerr << std::endl << "MuSR_td_PSI_bin::writemdu - not yet implemented" << std::endl;
   return 0;
 }
 
@@ -1815,7 +1823,7 @@ bool MuSR_td_PSI_bin::CheckDataConsistency(int tag)
  *    - "SUCCESS"         if reading was OK
  *    - "ERROR <message>" if reading was NOT OK
  */
-string MuSR_td_PSI_bin::ReadStatus() const
+std::string MuSR_td_PSI_bin::ReadStatus() const
 {
    return readstatus;
 }
@@ -1830,7 +1838,7 @@ string MuSR_td_PSI_bin::ReadStatus() const
  *    - "SUCCESS"         if writing was OK
  *    - "ERROR <message>" if writing was NOT OK
  */
-string MuSR_td_PSI_bin::WriteStatus() const
+std::string MuSR_td_PSI_bin::WriteStatus() const
 {
    return writestatus;
 }
@@ -1845,7 +1853,7 @@ string MuSR_td_PSI_bin::WriteStatus() const
  *    - "SUCCESS"         if data are consistent OK
  *    - "ERROR <message>" otherwise
  */
-string MuSR_td_PSI_bin::ConsistencyStatus() const
+std::string MuSR_td_PSI_bin::ConsistencyStatus() const
 {
   return consistencyStatus;
 }
@@ -1859,7 +1867,7 @@ string MuSR_td_PSI_bin::ConsistencyStatus() const
  *  This method gives back:
  *    - <filename>
  */
-string MuSR_td_PSI_bin::Filename() const
+std::string MuSR_td_PSI_bin::Filename() const
 {
    return filename;
 }
@@ -1908,7 +1916,7 @@ double MuSR_td_PSI_bin::get_histo(int histo_num, int j)
 #ifdef MIDEBUG
     cout << "histos_vector[0][0] = " << histos_vector[0][0] << endl;
 #endif
-    return (double)histo[histo_num][j];
+    return static_cast<double>(histo[histo_num][j]);
 }
 
 //*******************************
@@ -1929,14 +1937,14 @@ double MuSR_td_PSI_bin::get_histo(int histo_num, int j)
 
 double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 {
-  if (!readingok) return NULL;
+  if (!readingok) return nullptr;
 
   if ( histo_num < 0 || histo_num >= int(number_histo) || binning <= 0 )
-    return NULL;
+    return nullptr;
 
   double *histo_array = new double[int(int(length_histo)/binning)];
 
-  if (!histo_array) return NULL;
+  if (!histo_array) return nullptr;
 
   for (int i = 0; i < int(int(length_histo)/binning); i++)
   {
@@ -1971,7 +1979,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   *  \param tag 0: rebin and zero pad at need, 1: truncate at need
   */
 
- int MuSR_td_PSI_bin::put_histo_array_int(vector< vector<int> > histoData, int tag)
+ int MuSR_td_PSI_bin::put_histo_array_int(std::vector< std::vector<int> > histoData, int tag)
  {
    // check that the number of histograms are within allowed boundaries
    if ((histoData.size() == 0) || (histoData.size() > 32)) {
@@ -1996,7 +2004,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
    }
 
    // overwrite number_histo
-   number_histo = (int)histoData.size();
+   number_histo = static_cast<int>(histoData.size());
 
    // calculate the allowed histo length
    int lengthHisto = (65536 / histoData.size()) - ((65536 / histoData.size()) % 256);
@@ -2025,17 +2033,17 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
    // clean up if needed
    if (histo) {
      for (int i=0; i<number_histo; i++)
-       if (*(histo+i) != NULL) {
+       if (*(histo+i) != nullptr) {
        delete[] *(histo+i);
-       *(histo+i) = 0;
+       *(histo+i) = nullptr;
      }
      delete [] histo;
-     histo = 0;
+     histo = nullptr;
    }
 
    // allocate the necessary memory
    histo = new int* [histoData.size()];
-   if (histo == 0) {
+   if (histo == nullptr) {
      consistencyOk = false;
      consistencyStatus = "**ERROR** failed to allocate memory for the histos!";
      return -4;
@@ -2043,12 +2051,12 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
    for (unsigned int i=0; i<histoData.size(); i++) {
      histo[i] = new int[lengthHisto];
-     if (histo[i] == 0) {
+     if (histo[i] == nullptr) {
        // clean up
        for (unsigned int j=0; j<i; j++)
          delete [] histo[j];
        delete [] histo;
-       histo = 0;
+       histo = nullptr;
 
        consistencyOk = false;
        consistencyStatus = "**ERROR** failed to allocate memory for the histos!";
@@ -2059,7 +2067,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
    // check how the data shall be treated
    if (tag == 0) { // rebin and zero pad at need (strict)
      // rebin data such that it is compatible with PSI-BIN
-     vector< vector<int> > data;
+     std::vector< std::vector<int> > data;
      data.resize(number_histo);
 
      int val = 0;
@@ -2133,9 +2141,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
     representing the desired histogram number and binning.
  */
 
- vector<double> MuSR_td_PSI_bin::get_histo_vector(int histo_num, int binning)
+ std::vector<double> MuSR_td_PSI_bin::get_histo_vector(int histo_num, int binning)
  {
-   vector<double> histo_vector; //(int(length_histo/binning))
+   std::vector<double> histo_vector; //(int(length_histo/binning))
 
    if (!readingok) return histo_vector;
 
@@ -2170,9 +2178,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *  representing the desired histogram number and binning.
  */
 
- vector<double> MuSR_td_PSI_bin::get_histo_vector_no0(int histo_num, int binning)
+ std::vector<double> MuSR_td_PSI_bin::get_histo_vector_no0(int histo_num, int binning)
  {
-   vector<double> histo_vector; //(int(length_histo/binning));
+   std::vector<double> histo_vector; //(int(length_histo/binning));
 
    if (!readingok) return histo_vector;
 
@@ -2214,14 +2222,14 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
  int * MuSR_td_PSI_bin::get_histo_array_int(int histo_num)
  {
-   if (!readingok) return NULL;
+   if (!readingok) return nullptr;
 
    if ( histo_num < 0 || histo_num >= int(number_histo))
-     return NULL;
+     return nullptr;
 
    int *histo_array = new int[length_histo];
 
-   if (!histo_array) return NULL;
+   if (!histo_array) return nullptr;
 
    for (int i = 0; i < int(length_histo); i++)
    {
@@ -2251,15 +2259,15 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
  double * MuSR_td_PSI_bin::get_histo_fromt0_array(int histo_num, int binning, int offset)
  {
-   if (!readingok) return NULL;
+   if (!readingok) return nullptr;
 
    if ( histo_num < 0 || histo_num >= int(number_histo) || binning <= 0 )
-     return NULL;
+     return nullptr;
 
    double *histo_fromt0_array =
        new double[int((int(length_histo)-get_t0_int(histo_num)-offset+1)/binning)];
 
-   if (!histo_fromt0_array) return NULL;
+   if (!histo_fromt0_array) return nullptr;
 
    for (int i = 0; i < int((int(length_histo)-get_t0_int(histo_num)-offset)/binning); i++)
    {
@@ -2289,9 +2297,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *  representing the desired histogram number and binning.
  */
 
- vector<double> MuSR_td_PSI_bin::get_histo_fromt0_vector(int histo_num, int binning, int offset)
+ std::vector<double> MuSR_td_PSI_bin::get_histo_fromt0_vector(int histo_num, int binning, int offset)
  {
-   vector<double> histo_fromt0_vector; // (int((int(length_histo)-get_t0_int(histo_num)+1)/binning));
+   std::vector<double> histo_fromt0_vector; // (int((int(length_histo)-get_t0_int(histo_num)+1)/binning));
 
    if (!readingok) return histo_fromt0_vector;
 
@@ -2330,14 +2338,14 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
  double * MuSR_td_PSI_bin::get_histo_goodBins_array(int histo_num, int binning)
  {
-   if (!readingok) return NULL;
+   if (!readingok) return nullptr;
    if ( histo_num < 0 || histo_num >= int(number_histo) || binning <= 0 )
-     return NULL;
+     return nullptr;
 
    double *histo_goodBins_array =
        new double[int((get_lastGood_int(histo_num)-get_firstGood_int(histo_num)+1)/binning)];
 
-   if (!histo_goodBins_array) return NULL;
+   if (!histo_goodBins_array) return nullptr;
 
    for (int i = 0; i < int((get_lastGood_int(histo_num)-get_firstGood_int(histo_num))/binning); i++)
    {
@@ -2367,9 +2375,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *  representing the desired histogram number and binning.
  */
 
- vector<double> MuSR_td_PSI_bin::get_histo_goodBins_vector(int histo_num, int binning)
+ std::vector<double> MuSR_td_PSI_bin::get_histo_goodBins_vector(int histo_num, int binning)
  {
-   vector<double> histo_goodBins_vector;
+   std::vector<double> histo_goodBins_vector;
 
    if (!readingok) return histo_goodBins_vector;
 
@@ -2416,13 +2424,13 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  double * MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_array(int histo_num,
                                                                int lower_bckgrd, int higher_bckgrd, int binning, int offset)
  {
-   if (!readingok) return NULL;
+   if (!readingok) return nullptr;
 
    if ( histo_num < 0 || histo_num >= int(number_histo) || binning <= 0 )
-     return NULL;
+     return nullptr;
 
    if ( lower_bckgrd < 0 || higher_bckgrd >= int(length_histo) || lower_bckgrd > higher_bckgrd )
-     return NULL;
+     return nullptr;
 
    double bckgrd = 0;
 
@@ -2470,10 +2478,10 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *  between which the background is calculated.
  */
 
- vector<double> MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_vector(int histo_num, int lower_bckgrd,
+ std::vector<double> MuSR_td_PSI_bin::get_histo_fromt0_minus_bckgrd_vector(int histo_num, int lower_bckgrd,
                                                                       int higher_bckgrd, int binning, int offset)
  {
-   vector<double> histo_fromt0_minus_bckgrd_vector; // (int((int(length_histo)-get_t0_int(histo_num)+1)/binning));
+   std::vector<double> histo_fromt0_minus_bckgrd_vector; // (int((int(length_histo)-get_t0_int(histo_num)+1)/binning));
 
    if (!readingok) return histo_fromt0_minus_bckgrd_vector;
 
@@ -2530,13 +2538,13 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  double * MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_array(int histo_num, int lower_bckgrd,
                                                                  int higher_bckgrd, int binning)
  {
-   if (!readingok) return NULL;
+   if (!readingok) return nullptr;
 
    if ( histo_num < 0 || histo_num >= int(number_histo) || binning <= 0 )
-     return NULL;
+     return nullptr;
 
    if ( lower_bckgrd < 0 || higher_bckgrd >= int(length_histo) || lower_bckgrd > higher_bckgrd )
-     return NULL;
+     return nullptr;
 
    double bckgrd = 0;
    for (int k = lower_bckgrd; k <= higher_bckgrd; k++)
@@ -2548,7 +2556,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
    double *histo_goodBins_minus_bckgrd_array =
        new double[int((get_lastGood_int(histo_num)-get_firstGood_int(histo_num)+1)/binning)];
 
-   if (!histo_goodBins_minus_bckgrd_array) return NULL;
+   if (!histo_goodBins_minus_bckgrd_array) return nullptr;
 
    for (int i = 0; i < int((get_lastGood_int(histo_num)-get_firstGood_int(histo_num))/binning); i++)
    {
@@ -2584,10 +2592,10 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *  between which the background is calculated.
  */
 
- vector<double> MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_vector(int histo_num, int lower_bckgrd,
+ std::vector<double> MuSR_td_PSI_bin::get_histo_goodBins_minus_bckgrd_vector(int histo_num, int lower_bckgrd,
                                                                         int higher_bckgrd, int binning)
  {
-   vector<double> histo_goodBins_minus_bckgrd_vector; ;
+   std::vector<double> histo_goodBins_minus_bckgrd_vector; ;
 
    if (!readingok) return histo_goodBins_minus_bckgrd_vector;
 
@@ -2650,36 +2658,36 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  {
    int max_t0 = tmax(get_t0_int(histo_num_plus),get_t0_int(histo_num_minus));
 
-   if (!readingok) return NULL;
+   if (!readingok) return nullptr;
 
    if ( histo_num_plus < 0 || histo_num_plus >= int(number_histo) || binning <= 0 )
-     return NULL;
+     return nullptr;
 
    if ( histo_num_minus < 0 || histo_num_minus >= int(number_histo) )
-     return NULL;
+     return nullptr;
 
    if ( lower_bckgrd_plus < 0 || higher_bckgrd_plus >= int(length_histo) || lower_bckgrd_plus > higher_bckgrd_plus )
-     return NULL;
+     return nullptr;
 
    if ( lower_bckgrd_minus < 0 || higher_bckgrd_minus >= int(length_histo) || lower_bckgrd_minus > higher_bckgrd_minus )
-     return NULL;
+     return nullptr;
 
 
    double *dummy_1 = get_histo_fromt0_minus_bckgrd_array(histo_num_plus, lower_bckgrd_plus,
                                                          higher_bckgrd_plus, binning, offset);
-   if (dummy_1 == NULL) return NULL;
+   if (dummy_1 == nullptr) return nullptr;
 
    double *dummy_2 = get_histo_fromt0_minus_bckgrd_array(histo_num_minus, lower_bckgrd_minus,
                                                          higher_bckgrd_minus, binning, offset);
-   if (dummy_2 == NULL)
+   if (dummy_2 == nullptr)
    {
      delete [] dummy_1;
-     return NULL;
+     return nullptr;
    }
 
    double *asymmetry_array = new double[int((int(length_histo)-max_t0-offset+1)/binning)];
 
-   if (!asymmetry_array) return NULL;
+   if (!asymmetry_array) return nullptr;
 
    for (int i = 0; i < int((int(length_histo)-max_t0)/binning); i++)
    {
@@ -2716,13 +2724,13 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *  Integers for the binning and for the background limits for both histograms.are also required.
  */
 
- vector<double> MuSR_td_PSI_bin::get_asymmetry_vector(int histo_num_plus, int histo_num_minus, double alpha_param,
+ std::vector<double> MuSR_td_PSI_bin::get_asymmetry_vector(int histo_num_plus, int histo_num_minus, double alpha_param,
                                                       int binning, int lower_bckgrd_plus, int higher_bckgrd_plus,
                                                       int lower_bckgrd_minus, int higher_bckgrd_minus, int offset, double y_offset)
  {
    int max_t0 = tmax(get_t0_int(histo_num_plus),get_t0_int(histo_num_minus));
 
-   vector<double> asymmetry_vector; // (int((int(length_histo)-max_t0+1)/binning));
+   std::vector<double> asymmetry_vector; // (int((int(length_histo)-max_t0+1)/binning));
 
    if (!readingok) return asymmetry_vector;
 
@@ -2740,11 +2748,11 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
    double *dummy_1 = get_histo_fromt0_minus_bckgrd_array(histo_num_plus, lower_bckgrd_plus,
                                                          higher_bckgrd_plus, binning, offset);
-   if (dummy_1 == NULL) return asymmetry_vector;
+   if (dummy_1 == nullptr) return asymmetry_vector;
 
    double *dummy_2 = get_histo_fromt0_minus_bckgrd_array(histo_num_minus, lower_bckgrd_minus,
                                                          higher_bckgrd_minus, binning, offset);
-   if (dummy_2 == NULL)
+   if (dummy_2 == nullptr)
    {
      delete [] dummy_1;
      return asymmetry_vector;
@@ -2794,35 +2802,35 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  {
    int max_t0 = tmax(get_t0_int(histo_num_plus),get_t0_int(histo_num_minus));
 
-   if (!readingok) return NULL;
+   if (!readingok) return nullptr;
 
    if ( histo_num_plus < 0 || histo_num_plus >= int(number_histo) || binning <= 0 )
-     return NULL;
+     return nullptr;
 
    if ( histo_num_minus < 0 || histo_num_minus >= int(number_histo) )
-     return NULL;
+     return nullptr;
 
    if ( lower_bckgrd_plus < 0 || higher_bckgrd_plus >= int(length_histo) || lower_bckgrd_plus > higher_bckgrd_plus )
-     return NULL;
+     return nullptr;
 
    if ( lower_bckgrd_minus < 0 || higher_bckgrd_minus >= int(length_histo) || lower_bckgrd_minus > higher_bckgrd_minus )
-     return NULL;
+     return nullptr;
 
    double *dummy_1 = get_histo_fromt0_minus_bckgrd_array(histo_num_plus, lower_bckgrd_plus,
                                                          higher_bckgrd_plus, binning, offset);
-   if (dummy_1 == NULL) return NULL;
+   if (dummy_1 == nullptr) return nullptr;
 
    double *dummy_2 = get_histo_fromt0_minus_bckgrd_array(histo_num_minus, lower_bckgrd_minus,
                                                          higher_bckgrd_minus, binning, offset);
-   if (dummy_2 == NULL)
+   if (dummy_2 == nullptr)
    {
      delete [] dummy_1;
-     return NULL;
+     return nullptr;
    }
 
    double *error_asymmetry_array = new double[int((int(length_histo)-max_t0-offset+1)/binning)];
 
-   if (!error_asymmetry_array) return NULL;
+   if (!error_asymmetry_array) return nullptr;
 
    for (int i = 0; i < int((length_histo-max_t0-offset)/binning); i++)
    {
@@ -2861,13 +2869,13 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *  Integers for the binning and for the background limits for both histograms.are also required.
  */
 
- vector<double> MuSR_td_PSI_bin::get_error_asymmetry_vector(int histo_num_plus, int histo_num_minus, double alpha_param,
+ std::vector<double> MuSR_td_PSI_bin::get_error_asymmetry_vector(int histo_num_plus, int histo_num_minus, double alpha_param,
                                                             int binning, int lower_bckgrd_plus, int higher_bckgrd_plus,
                                                             int lower_bckgrd_minus, int higher_bckgrd_minus, int offset)
  {
    int max_t0 = tmax(get_t0_int(histo_num_plus),get_t0_int(histo_num_minus));
 
-   vector<double> error_asymmetry_vector; //(int((int(length_histo)-max_t0+1)/binning));
+   std::vector<double> error_asymmetry_vector; //(int((int(length_histo)-max_t0+1)/binning));
 
    if (!readingok) return error_asymmetry_vector;
 
@@ -2885,11 +2893,11 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
    double *dummy_1 = get_histo_fromt0_minus_bckgrd_array(histo_num_plus, lower_bckgrd_plus,
                                                          higher_bckgrd_plus, binning, offset);
-   if (dummy_1 == NULL) return error_asymmetry_vector;
+   if (dummy_1 == nullptr) return error_asymmetry_vector;
 
    double *dummy_2 = get_histo_fromt0_minus_bckgrd_array(histo_num_minus, lower_bckgrd_minus,
                                                          higher_bckgrd_minus, binning, offset);
-   if (dummy_2 == NULL)
+   if (dummy_2 == nullptr)
    {
      delete [] dummy_1;
      return error_asymmetry_vector;
@@ -2944,37 +2952,37 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
    int hsize = int((tmin(get_lastGood_int(histo_num_plus)-get_firstGood_int(histo_num_plus),
                          get_lastGood_int(histo_num_minus)-get_firstGood_int(histo_num_minus))+1)/binning);
 
-   if (!readingok) return NULL;
+   if (!readingok) return nullptr;
 
    if ( histo_num_plus < 0 || histo_num_plus >= int(number_histo) || binning <= 0 )
-     return NULL;
+     return nullptr;
 
    if ( histo_num_minus < 0 || histo_num_minus >= int(number_histo) )
-     return NULL;
+     return nullptr;
 
    if ( lower_bckgrd_plus < 0 || higher_bckgrd_plus >= int(length_histo) || lower_bckgrd_plus > higher_bckgrd_plus )
-     return NULL;
+     return nullptr;
 
    if ( lower_bckgrd_minus < 0 || higher_bckgrd_minus >= int(length_histo) || lower_bckgrd_minus > higher_bckgrd_minus )
-     return NULL;
+     return nullptr;
 
    double *dummy_1 = get_histo_fromt0_minus_bckgrd_array(histo_num_plus, lower_bckgrd_plus,
                                                          higher_bckgrd_plus, binning);
-   if (dummy_1 == NULL) return NULL;
+   if (dummy_1 == nullptr) return nullptr;
 
    double *dummy_2 = get_histo_fromt0_minus_bckgrd_array(histo_num_minus, lower_bckgrd_minus,
                                                          higher_bckgrd_minus, binning);
-   if (dummy_2 == NULL)
+   if (dummy_2 == nullptr)
    {
      delete [] dummy_1;
-     return NULL;
+     return nullptr;
    }
 
    int hstart = tmax(get_firstGood_int(histo_num_plus)-get_t0_int(histo_num_plus),get_firstGood_int(histo_num_minus)-get_t0_int(histo_num_minus));
 
    double *asymmetry_goodBins_array = new double[hsize];
 
-   if (!asymmetry_goodBins_array) return NULL;
+   if (!asymmetry_goodBins_array) return nullptr;
 
    for (int i = 0; i < hsize; i++)
    {
@@ -3011,14 +3019,14 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *  Integers for the binning and for the background limits for both histograms.are also required.
  */
 
- vector<double> MuSR_td_PSI_bin::get_asymmetry_goodBins_vector(int histo_num_plus, int histo_num_minus, double alpha_param,
+ std::vector<double> MuSR_td_PSI_bin::get_asymmetry_goodBins_vector(int histo_num_plus, int histo_num_minus, double alpha_param,
                                                                int binning, int lower_bckgrd_plus, int higher_bckgrd_plus,
                                                                int lower_bckgrd_minus, int higher_bckgrd_minus)
  {
    int hsize = int((tmin(get_lastGood_int(histo_num_plus)-get_firstGood_int(histo_num_plus),
                          get_lastGood_int(histo_num_minus)-get_firstGood_int(histo_num_minus))+1)/binning);
 
-   vector<double> asymmetry_goodBins_vector;
+   std::vector<double> asymmetry_goodBins_vector;
 
    if (!readingok) return asymmetry_goodBins_vector;
 
@@ -3036,11 +3044,11 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
    double *dummy_1 = get_histo_fromt0_minus_bckgrd_array(histo_num_plus, lower_bckgrd_plus,
                                                          higher_bckgrd_plus, binning);
-   if (dummy_1 == NULL) return asymmetry_goodBins_vector;
+   if (dummy_1 == nullptr) return asymmetry_goodBins_vector;
 
    double *dummy_2 = get_histo_fromt0_minus_bckgrd_array(histo_num_minus, lower_bckgrd_minus,
                                                          higher_bckgrd_minus, binning);
-   if (dummy_2 == NULL)
+   if (dummy_2 == nullptr)
    {
      delete [] dummy_1;
      return asymmetry_goodBins_vector;
@@ -3094,37 +3102,37 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
                          get_lastGood_int(histo_num_minus)
                          -get_firstGood_int(histo_num_minus))+1)/binning);
 
-   if (!readingok) return NULL;
+   if (!readingok) return nullptr;
 
    if ( histo_num_plus < 0 || histo_num_plus >= int(number_histo) || binning <= 0 )
-     return NULL;
+     return nullptr;
 
    if ( histo_num_minus < 0 || histo_num_minus >= int(number_histo) )
-     return NULL;
+     return nullptr;
 
    if ( lower_bckgrd_plus < 0 || higher_bckgrd_plus >= int(length_histo) || lower_bckgrd_plus > higher_bckgrd_plus )
-     return NULL;
+     return nullptr;
 
    if ( lower_bckgrd_minus < 0 || higher_bckgrd_minus >= int(length_histo) || lower_bckgrd_minus > higher_bckgrd_minus )
-     return NULL;
+     return nullptr;
 
    double *dummy_1 = get_histo_fromt0_minus_bckgrd_array(histo_num_plus,
                                                          lower_bckgrd_plus, higher_bckgrd_plus, binning);
-   if (dummy_1 == NULL) return NULL;
+   if (dummy_1 == nullptr) return nullptr;
 
    double *dummy_2 = get_histo_fromt0_minus_bckgrd_array(histo_num_minus,
                                                          lower_bckgrd_minus, higher_bckgrd_minus, binning);
-   if (dummy_2 == NULL)
+   if (dummy_2 == nullptr)
    {
      delete [] dummy_1;
-     return NULL;
+     return nullptr;
    }
    int hstart = tmax(get_firstGood_int(histo_num_plus)-get_t0_int(histo_num_plus),
                      get_firstGood_int(histo_num_minus)-get_t0_int(histo_num_minus));
 
    double *error_asymmetry_goodBins_array = new double[hsize];
 
-   if (!error_asymmetry_goodBins_array) return NULL;
+   if (!error_asymmetry_goodBins_array) return nullptr;
 
    for (int i = 0; i < hsize; i++)
    {
@@ -3169,7 +3177,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *  Integers for the binning and for the background limits for both histograms.are also required.
  */
 
- vector<double> MuSR_td_PSI_bin::get_error_asymmetry_goodBins_vector(int histo_num_plus,
+ std::vector<double> MuSR_td_PSI_bin::get_error_asymmetry_goodBins_vector(int histo_num_plus,
                                                                      int histo_num_minus, double alpha_param,
                                                                      int binning, int lower_bckgrd_plus,
                                                                      int higher_bckgrd_plus,
@@ -3178,7 +3186,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
    int hsize = int((tmin(get_lastGood_int(histo_num_plus)-get_firstGood_int(histo_num_plus),
                          get_lastGood_int(histo_num_minus)-get_firstGood_int(histo_num_minus))+1)/binning);
 
-   vector<double> error_asymmetry_goodBins_vector;
+   std::vector<double> error_asymmetry_goodBins_vector;
 
    if (!readingok) return error_asymmetry_goodBins_vector;
 
@@ -3196,11 +3204,11 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
    double *dummy_1 = get_histo_fromt0_minus_bckgrd_array(histo_num_plus, lower_bckgrd_plus,
                                                          higher_bckgrd_plus, binning);
-   if (dummy_1 == NULL) return error_asymmetry_goodBins_vector;
+   if (dummy_1 == nullptr) return error_asymmetry_goodBins_vector;
 
    double *dummy_2 = get_histo_fromt0_minus_bckgrd_array(histo_num_minus, lower_bckgrd_minus,
                                                          higher_bckgrd_minus, binning);
-   if (dummy_2 == NULL)
+   if (dummy_2 == nullptr)
    {
      delete [] dummy_1;
      return error_asymmetry_goodBins_vector;
@@ -3270,9 +3278,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method providing a vector of long containing the values of the scalers
  */
 
- vector<long> MuSR_td_PSI_bin::get_scalers_vector()
+ std::vector<long> MuSR_td_PSI_bin::get_scalers_vector()
  {
-   vector<long> scalers_vect(number_scaler);
+   std::vector<long> scalers_vect(number_scaler);
 
    for ( int i = 0; i < number_scaler; i++ )
      scalers_vect[i] = long(scalers[i]);
@@ -3293,7 +3301,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param scalerData vector
   */
 
- int MuSR_td_PSI_bin::put_scalers_vector(vector<int> scalerData)
+ int MuSR_td_PSI_bin::put_scalers_vector(std::vector<int> scalerData)
  {
    if ((int)scalerData.size() > MAXSCALER)
      return -1;
@@ -3525,9 +3533,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a vector of long containing the number of events in the histograms
  */
 
- vector<long> MuSR_td_PSI_bin::get_eventsHisto_vector()
+ std::vector<long> MuSR_td_PSI_bin::get_eventsHisto_vector()
  {
-   vector<long> eventsHisto(number_histo);
+   std::vector<long> eventsHisto(number_histo);
 
    for ( int i = 0; i < number_histo; i++ )
      eventsHisto[i] = long(events_per_histo[i]);
@@ -3616,9 +3624,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a vector of integer containing the t0 values of the histograms specified in the header
  */
 
- vector<int> MuSR_td_PSI_bin::get_t0_vector()
+ std::vector<int> MuSR_td_PSI_bin::get_t0_vector()
  {
-   vector<int> t0(number_histo);
+   std::vector<int> t0(number_histo);
 
    for ( int i = 0; i < int(number_histo); i++ )
      t0[i] = int(integer_t0[i]);
@@ -3637,9 +3645,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   *  - -1 if t0Data is too long (>MAXHISTO)
   */
 
- int MuSR_td_PSI_bin::put_t0_vector(vector<int> &t0Data)
+ int MuSR_td_PSI_bin::put_t0_vector(std::vector<int> &t0Data)
  {
-   if ((int)t0Data.size() >= MAXHISTO)
+   if (static_cast<int>(t0Data.size()) >= MAXHISTO)
      return -1;
 
    for (unsigned int i=0; i<t0Data.size(); i++)
@@ -3696,9 +3704,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a vector of integer containing the first good bin values of the histograms specified in the header
  */
 
- vector<int> MuSR_td_PSI_bin::get_firstGood_vector()
+ std::vector<int> MuSR_td_PSI_bin::get_firstGood_vector()
  {
-   vector<int> firstGood(number_histo);
+   std::vector<int> firstGood(number_histo);
 
    for ( int i = 0; i < number_histo; i++ )
      firstGood[i] = int(first_good[i]);
@@ -3730,9 +3738,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a vector of integer containing the last good bin values of the histograms specified in the header
  */
 
- vector<int> MuSR_td_PSI_bin::get_lastGood_vector()
+ std::vector<int> MuSR_td_PSI_bin::get_lastGood_vector()
  {
-   vector<int> lastGood(number_histo);
+   std::vector<int> lastGood(number_histo);
 
    for ( int i = 0; i < number_histo; i++ )
      lastGood[i] = int(last_good[i]);
@@ -3888,9 +3896,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a string containing the sample name
  */
 
- string MuSR_td_PSI_bin::get_sample()
+ std::string MuSR_td_PSI_bin::get_sample()
  {
-   string strData;
+   std::string strData;
 
    strData = sample;
 
@@ -3910,7 +3918,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param sample string containing the sample information
   */
 
- int MuSR_td_PSI_bin::put_sample(string sampleStr)
+ int MuSR_td_PSI_bin::put_sample(std::string sampleStr)
  {
    if (sampleStr.size() >= 11)
      return -1;
@@ -3927,9 +3935,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a string containing the temperature specified in the title
  */
 
- string MuSR_td_PSI_bin::get_temp()
+ std::string MuSR_td_PSI_bin::get_temp()
  {
-   string strData;
+   std::string strData;
 
    strData = temp;
 
@@ -3949,7 +3957,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param tempStr string containing the sample information
   */
 
- int MuSR_td_PSI_bin::put_temp(string tempStr)
+ int MuSR_td_PSI_bin::put_temp(std::string tempStr)
  {
    if (tempStr.size() >= 11)
      return -1;
@@ -3966,9 +3974,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a string containing the orientation specified in the title
  */
 
- string MuSR_td_PSI_bin::get_orient()
+ std::string MuSR_td_PSI_bin::get_orient()
  {
-   string strData;
+   std::string strData;
 
    strData = orient;
 
@@ -3988,7 +3996,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param orientStr string containing the sample information
   */
 
- int MuSR_td_PSI_bin::put_orient(string orientStr)
+ int MuSR_td_PSI_bin::put_orient(std::string orientStr)
  {
    if (orientStr.size() >= 11)
      return -1;
@@ -4005,9 +4013,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a string containing the field specified in the title
  */
 
- string MuSR_td_PSI_bin::get_field()
+ std::string MuSR_td_PSI_bin::get_field()
  {
-   string strData;
+   std::string strData;
 
    strData = field;
 
@@ -4027,7 +4035,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param fieldStr string containing the field
   */
 
- int MuSR_td_PSI_bin::put_field(string fieldStr)
+ int MuSR_td_PSI_bin::put_field(std::string fieldStr)
  {
    if (fieldStr.size() >= 11)
      return -1;
@@ -4044,9 +4052,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  /*! \brief Method returning a string containing the setup
   */
 
-  string MuSR_td_PSI_bin::get_setup()
+  std::string MuSR_td_PSI_bin::get_setup()
   {
-    string strData;
+    std::string strData;
 
     strData = setup;
 
@@ -4066,7 +4074,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
    * \param commentStr string containing the setup
    */
 
-  int MuSR_td_PSI_bin::put_setup(string setupStr)
+  int MuSR_td_PSI_bin::put_setup(std::string setupStr)
   {
     if (setupStr.size() >= 11)
       return -1;
@@ -4083,9 +4091,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a string containing the comment specified in the title
  */
 
- string MuSR_td_PSI_bin::get_comment()
+ std::string MuSR_td_PSI_bin::get_comment()
  {
-   string strData;
+   std::string strData;
 
    strData = comment;
 
@@ -4104,7 +4112,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param commentStr string containing the comment
   */
 
- int MuSR_td_PSI_bin::put_comment(string commentStr)
+ int MuSR_td_PSI_bin::put_comment(std::string commentStr)
  {
    strncpy(comment, commentStr.c_str(), 62);
    comment[62] = '\0';
@@ -4121,12 +4129,12 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *  returns NULL if the histogram specified is invalid
  */
 
- string MuSR_td_PSI_bin::get_nameHisto(int i)
+ std::string MuSR_td_PSI_bin::get_nameHisto(int i)
  {
-   string strData;
+   std::string strData;
 
    if (i < 0 || i >= int(number_histo))
-     return NULL;
+     return nullptr;
    else
    {
      strData = labels_histo[i];
@@ -4149,12 +4157,12 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param i index of the histogram
   */
 
- int MuSR_td_PSI_bin::put_nameHisto(string histoName, int i)
+ int MuSR_td_PSI_bin::put_nameHisto(std::string histoName, int i)
  {
    if ((i<0) || (i>=number_histo))
      return -1;
 
-   if ((int)histoName.length() >= MAXLABELSIZE)
+   if (static_cast<int>(histoName.length()) >= MAXLABELSIZE)
      return -2;
 
    strcpy(labels_histo[i], histoName.c_str());
@@ -4169,11 +4177,11 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a vector of strings containing the names of the histograms
  */
 
- vector<string> MuSR_td_PSI_bin::get_histoNames_vector()
+ std::vector<std::string> MuSR_td_PSI_bin::get_histoNames_vector()
  {
-   vector <string> str_Vector;
+   std::vector<std::string> str_Vector;
 
-   string strData;
+   std::string strData;
    for (int i = 0; i < number_histo; i++)
    {
      strData = labels_histo[i];
@@ -4197,13 +4205,13 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param histoName name of the histogram
   */
 
- int MuSR_td_PSI_bin::put_histoNames_vector(vector<string> &histoNames)
+ int MuSR_td_PSI_bin::put_histoNames_vector(std::vector<std::string> &histoNames)
  {
-   if ((int)histoNames.size() > number_histo)
+   if (static_cast<int>(histoNames.size()) > number_histo)
      return -1;
 
    for (unsigned int i=0; i<histoNames.size(); i++) {
-     if ((int)histoNames[i].length() >= MAXLABELSIZE)
+     if (static_cast<int>(histoNames[i].length()) >= MAXLABELSIZE)
        return -2;
      else
        strcpy(labels_histo[i], histoNames[i].c_str());
@@ -4219,11 +4227,11 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a vector of strings containing the names of the scalers
  */
 
- vector<string> MuSR_td_PSI_bin::get_scalersNames_vector()
+ std::vector<std::string> MuSR_td_PSI_bin::get_scalersNames_vector()
  {
-   vector <string> str_Vector;
+   std::vector<std::string> str_Vector;
 
-   string strData;
+   std::string strData;
    for (int i = 0; i < number_scaler; i++)
    {
      strData = labels_scalers[i];
@@ -4246,9 +4254,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param scalersName scaler names
   */
 
- int MuSR_td_PSI_bin::put_scalersNames_vector(vector<string> scalersName)
+ int MuSR_td_PSI_bin::put_scalersNames_vector(std::vector<std::string> scalersName)
  {
-   if ((int)scalersName.size() > MAXSCALER)
+   if (static_cast<int>(scalersName.size()) > MAXSCALER)
      return -1;
 
    for (unsigned int i=0; i<scalersName.size(); i++) {
@@ -4301,9 +4309,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a vector of doubles containing monitored values (usually temperatures)
  */
 
- vector<double> MuSR_td_PSI_bin::get_temperatures_vector()
+ std::vector<double> MuSR_td_PSI_bin::get_temperatures_vector()
  {
-   vector <double> dbl_Temper;
+   std::vector<double> dbl_Temper;
 
    for (int i = 0; i < number_temper; i++)
    {
@@ -4326,9 +4334,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param tempVals vector containing the monitored values
   */
 
- int MuSR_td_PSI_bin::put_temperatures_vector(vector<double> &tempVals)
+ int MuSR_td_PSI_bin::put_temperatures_vector(std::vector<double> &tempVals)
  {
-   if ((int)tempVals.size() > MAXTEMPER)
+   if (static_cast<int>(tempVals.size()) > MAXTEMPER)
      return -1;
 
    for (unsigned int i=0; i<tempVals.size(); i++)
@@ -4344,9 +4352,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 /*! \brief Method returning a vector of doubles containing standard deviations of the monitored values (usually temperatures)
  */
 
- vector<double> MuSR_td_PSI_bin::get_devTemperatures_vector()
+ std::vector<double> MuSR_td_PSI_bin::get_devTemperatures_vector()
  {
-   vector <double> dbl_devTemper;
+   std::vector<double> dbl_devTemper;
 
    for (int i = 0; i < number_temper; i++)
    {
@@ -4369,9 +4377,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param devTempVals vector containing standard deviations of the monitored values
   */
 
- int MuSR_td_PSI_bin::put_devTemperatures_vector(vector<double> &devTempVals)
+ int MuSR_td_PSI_bin::put_devTemperatures_vector(std::vector<double> &devTempVals)
  {
-   if ((int)devTempVals.size() > MAXTEMPER)
+   if (static_cast<int>(devTempVals.size()) > MAXTEMPER)
      return -1;
 
    for (unsigned int i=0; i<devTempVals.size(); i++)
@@ -4388,10 +4396,10 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *   started and 2) the time when the run was started
  */
 
- vector<string> MuSR_td_PSI_bin::get_timeStart_vector()
+ std::vector<std::string> MuSR_td_PSI_bin::get_timeStart_vector()
 
  {
-   vector<string> timeStart(2);
+   std::vector<std::string> timeStart(2);
 
    timeStart[0] = date_start;
    timeStart[1] = time_start;
@@ -4415,7 +4423,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param timeStart vector where [0] contains the date, [1] the time string
   */
 
- int MuSR_td_PSI_bin::put_timeStart_vector(vector<string> timeStart)
+ int MuSR_td_PSI_bin::put_timeStart_vector(std::vector<std::string> timeStart)
  {
    if (timeStart.size() != 2)
      return -1;
@@ -4442,9 +4450,9 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
  *   stopped and 2) the time when the run was stopped
  */
 
- vector<string> MuSR_td_PSI_bin::get_timeStop_vector()
+ std::vector<std::string> MuSR_td_PSI_bin::get_timeStop_vector()
  {
-   vector<string> timeStop(2);
+   std::vector<std::string> timeStop(2);
 
    timeStop[0] = date_stop;
    timeStop[1] = time_stop;
@@ -4468,7 +4476,7 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
   * \param timeStop vector where [0] contains the date, [1] the time string
   */
 
- int MuSR_td_PSI_bin::put_timeStop_vector(vector<string> timeStop)
+ int MuSR_td_PSI_bin::put_timeStop_vector(std::vector<std::string> timeStop)
  {
    if (timeStop.size() != 2)
      return -1;
@@ -4501,16 +4509,16 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
    // NIY maybe flag when histo should not be released
 
    // free private histograms
-   if (histo != NULL)
+   if (histo != nullptr)
    {
      for (i=0; i < number_histo; i++)
-       if (*(histo+i) != NULL)
+       if (*(histo+i) != nullptr)
        {
        delete[] *(histo+i);
-       *(histo+i) = NULL;
+       *(histo+i) = nullptr;
      }
      delete [] histo;
-     histo = NULL;
+     histo = nullptr;
    }
 
    // free public vector
@@ -4586,54 +4594,54 @@ double * MuSR_td_PSI_bin::get_histo_array(int histo_num, int binning)
 
  int MuSR_td_PSI_bin::Show()          const
  {
-   cout << "Filename is " << filename << endl;
+   std::cout << "Filename is " << filename << std::endl;
    if (readingok) {
      int i;
 
-     cout << "Format Identifier is " << format_id << endl;
+     std::cout << "Format Identifier is " << format_id << std::endl;
 
-     cout << "Run number is  " << num_run << endl;
-     cout << "Sample is      " << sample  << endl;
-     cout << "Temperature is " << temp    << endl;
-     cout << "Field is       " << field   << endl;
-     cout << "Orientation is " << orient  << endl;
-     cout << "Comment is     " << comment << endl;
+     std::cout << "Run number is  " << num_run << std::endl;
+     std::cout << "Sample is      " << sample  << std::endl;
+     std::cout << "Temperature is " << temp    << std::endl;
+     std::cout << "Field is       " << field   << std::endl;
+     std::cout << "Orientation is " << orient  << std::endl;
+     std::cout << "Comment is     " << comment << std::endl;
 
-     cout << "Start Date is  " << date_start << endl;
-     cout << "Start Time is  " << time_start << endl;
+     std::cout << "Start Date is  " << date_start << std::endl;
+     std::cout << "Start Time is  " << time_start << std::endl;
 
-     cout << "End Date is    " << date_stop << endl;
-     cout << "End Time is    " << time_stop << endl;
+     std::cout << "End Date is    " << date_stop << std::endl;
+     std::cout << "End Time is    " << time_stop << std::endl;
 
-     cout << "Bin width is   " << bin_width << " [usec]" << endl;
-     cout << "Number of histograms is " << number_histo << endl;
-     cout << "Histogram length is     " << length_histo << endl;
-     cout << "Default binning is      " << default_binning << endl;
-     cout << "Total number of events is " << total_events << endl;
+     std::cout << "Bin width is   " << bin_width << " [usec]" << std::endl;
+     std::cout << "Number of histograms is " << number_histo << std::endl;
+     std::cout << "Histogram length is     " << length_histo << std::endl;
+     std::cout << "Default binning is      " << default_binning << std::endl;
+     std::cout << "Total number of events is " << total_events << std::endl;
 
      for (i=0; i < number_histo; i++) {
-       cout << "Histogram " << i << " Name is >" << labels_histo[i]
-           << "<  Events per histogram is " << events_per_histo[i] << endl;
-       cout << "      real t0 is              " << real_t0[i] << endl;
-       cout << "      t0 is                   " << integer_t0[i] << endl;
-       cout << "      first good bin is       " << first_good[i] << endl;
-       cout << "      last good bin is        " << last_good[i] << endl;
+       std::cout << "Histogram " << i << " Name is >" << labels_histo[i]
+           << "<  Events per histogram is " << events_per_histo[i] << std::endl;
+       std::cout << "      real t0 is              " << real_t0[i] << std::endl;
+       std::cout << "      t0 is                   " << integer_t0[i] << std::endl;
+       std::cout << "      first good bin is       " << first_good[i] << std::endl;
+       std::cout << "      last good bin is        " << last_good[i] << std::endl;
      }
 
-     cout << "Number of scalers is " << number_scaler << endl;
+     std::cout << "Number of scalers is " << number_scaler << std::endl;
      for (i=0; i < number_scaler; i++) {
-       cout << "Scaler " << i << " Name is >" << labels_scalers[i]
-           << "<   Value is " << scalers[i] << endl;
+       std::cout << "Scaler " << i << " Name is >" << labels_scalers[i]
+           << "<   Value is " << scalers[i] << std::endl;
      }
 
-     cout << "Number of temperatures is " << number_temper << endl;
+     std::cout << "Number of temperatures is " << number_temper << std::endl;
      for (i=0; i < number_temper; i++) {
-       cout << "Temperature " << i << " is " << temper[i]
-           << "   Deviation is " << temp_deviation[i] << endl;
+       std::cout << "Temperature " << i << " is " << temper[i]
+           << "   Deviation is " << temp_deviation[i] << std::endl;
      }
 
    } else {
-     cout << readstatus << endl;
+     std::cout << readstatus << std::endl;
    }
    return 0;
  }

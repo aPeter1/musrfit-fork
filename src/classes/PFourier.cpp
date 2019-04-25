@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -31,9 +31,7 @@
 
 #include <iostream>
 #include <iomanip>
-using namespace std;
 
-#include "TH1F.h"
 #include "TF1.h"
 #include "TAxis.h"
 
@@ -67,17 +65,18 @@ PFTPhaseCorrection::PFTPhaseCorrection(const Int_t minBin, const Int_t maxBin) :
 /**
  *
  */
-PFTPhaseCorrection::PFTPhaseCorrection(vector<Double_t> &reFT, vector<Double_t> &imFT, const Int_t minBin, const Int_t maxBin) :
+PFTPhaseCorrection::PFTPhaseCorrection(std::vector<Double_t> &reFT, std::vector<Double_t> &imFT, const Int_t minBin, const Int_t maxBin) :
   fReal(reFT), fImag(imFT), fMinBin(minBin), fMaxBin(maxBin)
 {
   Init();
 
+  Int_t realSize = static_cast<Int_t>(fReal.size());
   if (fMinBin == -1)
     fMinBin = 0;
   if (fMaxBin == -1)
-    fMaxBin = fReal.size();
-  if (fMaxBin > fReal.size())
-    fMaxBin = fReal.size();
+    fMaxBin = realSize;
+  if (fMaxBin > realSize)
+    fMaxBin = realSize;
 
   fRealPh.resize(fReal.size());
   fImagPh.resize(fReal.size());
@@ -110,7 +109,7 @@ void PFTPhaseCorrection::Minimize()
   } else {
     fMin = -1.0;
     fValid = false;
-    cout << endl << ">> **WARNING** minimize failed to find a minimum for the real FT phase correction ..." << endl;
+    std::cout << std::endl << ">> **WARNING** minimize failed to find a minimum for the real FT phase correction ..." << std::endl;
     return;
   }
 }
@@ -130,7 +129,7 @@ Double_t PFTPhaseCorrection::GetPhaseCorrectionParam(UInt_t idx)
   else if (idx == 1)
     result = fPh_c1;
   else
-    cerr << ">> **ERROR** requested phase correction parameter with index=" << idx << " does not exist!" << endl;
+    std::cerr << ">> **ERROR** requested phase correction parameter with index=" << idx << " does not exist!" << std::endl;
 
   return result;
 }
@@ -144,7 +143,7 @@ Double_t PFTPhaseCorrection::GetPhaseCorrectionParam(UInt_t idx)
 Double_t PFTPhaseCorrection::GetMinimum()
 {
   if (!fValid) {
-    cerr << ">> **ERROR** requested minimum is invalid!" << endl;
+    std::cerr << ">> **ERROR** requested minimum is invalid!" << std::endl;
     return -1.0;
   }
 
@@ -178,7 +177,7 @@ void PFTPhaseCorrection::CalcPhasedFT() const
   Double_t w=0.0;
 
   for (UInt_t i=0; i<fRealPh.size(); i++) {
-    w = (Double_t)i / (Double_t)fReal.size();
+    w = static_cast<Double_t>(i) / static_cast<Double_t>(fReal.size());
     phi = fPh_c0 + fPh_c1 * w;
     fRealPh[i] = fReal[i]*cos(phi) - fImag[i]*sin(phi);
     fImagPh[i] = fReal[i]*sin(phi) + fImag[i]*cos(phi);
@@ -253,7 +252,7 @@ Double_t PFTPhaseCorrection::Entropy() const
 /**
  *
  */
-double PFTPhaseCorrection::operator()(const vector<double> &par) const
+double PFTPhaseCorrection::operator()(const std::vector<double> &par) const
 {
   // par : [0]: c0, [1]: c1
 
@@ -287,15 +286,15 @@ PFourier::PFourier(TH1F *data, Int_t unitTag, Double_t startTime, Double_t endTi
                    fDCCorrected(dcCorrected), fZeroPaddingPower(zeroPaddingPower)
 {
   // some necessary checks and initialization
-  if (fData == 0) {
-    cerr << endl << "**ERROR** PFourier::PFourier: no valid data" << endl << endl;
+  if (fData == nullptr) {
+    std::cerr << std::endl << "**ERROR** PFourier::PFourier: no valid data" << std::endl << std::endl;
     fValid = false;
     return;
   }
 
   fValid = true;
-  fIn  = 0;
-  fOut = 0;
+  fIn  = nullptr;
+  fOut = nullptr;
 //as  fPhCorrectedReFT = 0;
 
   fApodization = F_APODIZATION_NONE;
@@ -317,7 +316,7 @@ PFourier::PFourier(TH1F *data, Int_t unitTag, Double_t startTime, Double_t endTi
   }
 
   // calculate start and end bin
-  fNoOfData = (UInt_t)((fEndTime-fStartTime)/fTimeResolution);
+  fNoOfData = static_cast<UInt_t>((fEndTime-fStartTime)/fTimeResolution);
 
   // check if zero padding is whished
   if (fZeroPaddingPower > 0) {
@@ -348,21 +347,20 @@ PFourier::PFourier(TH1F *data, Int_t unitTag, Double_t startTime, Double_t endTi
     default:
       fValid = false;
       return;
-      break;
   }
 
   // allocate necessary memory
-  fIn  = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfBins);
-  fOut = (fftw_complex *)fftw_malloc(sizeof(fftw_complex)*fNoOfBins);
+  fIn  = static_cast<fftw_complex *>(fftw_malloc(sizeof(fftw_complex)*fNoOfBins));
+  fOut = static_cast<fftw_complex *>(fftw_malloc(sizeof(fftw_complex)*fNoOfBins));
 
   // check if memory allocation has been successful
-  if ((fIn == 0) || (fOut == 0)) {
+  if ((fIn == nullptr) || (fOut == nullptr)) {
     fValid = false;
     return;
   }
 
   // get the FFTW3 plan (see FFTW3 manual)
-  fFFTwPlan = fftw_plan_dft_1d(fNoOfBins, fIn, fOut, FFTW_FORWARD, FFTW_ESTIMATE);
+  fFFTwPlan = fftw_plan_dft_1d(static_cast<Int_t>(fNoOfBins), fIn, fOut, FFTW_FORWARD, FFTW_ESTIMATE);
 
   // check if a valid plan has been generated
   if (!fFFTwPlan) {
@@ -455,7 +453,7 @@ TH1F* PFourier::GetRealFourier(const Double_t scale)
 {
   // check if valid flag is set
   if (!fValid)
-    return 0;
+    return nullptr;
 
   // invoke realFourier
   Char_t name[256];
@@ -469,15 +467,15 @@ TH1F* PFourier::GetRealFourier(const Double_t scale)
   else
     noOfFourierBins = (fNoOfBins+1)/2;
 
-  TH1F *realFourier = new TH1F(name, title, noOfFourierBins, -fResolution/2.0, (Double_t)(noOfFourierBins-1)*fResolution+fResolution/2.0);
-  if (realFourier == 0) {
+  TH1F *realFourier = new TH1F(name, title, static_cast<Int_t>(noOfFourierBins), -fResolution/2.0, static_cast<Double_t>(noOfFourierBins-1)*fResolution+fResolution/2.0);
+  if (realFourier == nullptr) {
     fValid = false;
-    cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the real part of the Fourier transform." << endl;
-    return 0;
+    std::cerr << std::endl << "**SEVERE ERROR** couldn't allocate memory for the real part of the Fourier transform." << std::endl;
+    return nullptr;
   }
 
   // fill realFourier vector
-  for (UInt_t i=0; i<noOfFourierBins; i++) {
+  for (Int_t i=0; i<static_cast<Int_t>(noOfFourierBins); i++) {
     realFourier->SetBinContent(i+1, scale*fOut[i][0]);
     realFourier->SetBinError(i+1, 0.0);
   }
@@ -499,11 +497,11 @@ TH1F* PFourier::GetRealFourier(const Double_t scale)
  * \param min minimal freq / field from which to optimise. Given in the choosen unit.
  * \param max maximal freq / field up to which to optimise. Given in the choosen unit.
  */
-TH1F* PFourier::GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, vector<Double_t> &phase,
+TH1F* PFourier::GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, std::vector<Double_t> &phase,
                                        const Double_t scale, const Double_t min, const Double_t max)
 {
-  if ((re == 0) || (im == 0))
-    return 0;
+  if ((re == nullptr) || (im == nullptr))
+    return nullptr;
 
   phase.resize(2); // c0, c1
 
@@ -519,7 +517,7 @@ TH1F* PFourier::GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, vector<Do
     minBin = axis->FindFixBin(min);
     if ((minBin == 0) || (minBin > maxBin)) {
       minBin = 1;
-      cerr << "**WARNING** minimum frequency/field out of range. Will adopted it." << endl;
+      std::cerr << "**WARNING** minimum frequency/field out of range. Will adopted it." << std::endl;
     }
   }
 
@@ -528,12 +526,12 @@ TH1F* PFourier::GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, vector<Do
     maxBin = axis->FindFixBin(max);
     if ((maxBin == 0) || (maxBin > axis->GetNbins())) {
       maxBin = axis->GetNbins();
-      cerr << "**WARNING** maximum frequency/field out of range. Will adopted it." << endl;
+      std::cerr << "**WARNING** maximum frequency/field out of range. Will adopted it." << std::endl;
     }
   }
 
   // copy the real/imag Fourier from min to max
-  vector<Double_t> realF, imagF;
+  std::vector<Double_t> realF, imagF;
   for (Int_t i=minBin; i<=maxBin; i++) {
     realF.push_back(re->GetBinContent(i));
     imagF.push_back(im->GetBinContent(i));
@@ -541,15 +539,15 @@ TH1F* PFourier::GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, vector<Do
 
   // optimize real FT phase
   PFTPhaseCorrection *phCorrectedReFT = new PFTPhaseCorrection(realF, imagF);
-  if (phCorrectedReFT == 0) {
-    cerr << endl << "**SEVERE ERROR** couldn't invoke PFTPhaseCorrection object." << endl;
-    return 0;
+  if (phCorrectedReFT == nullptr) {
+    std::cerr << std::endl << "**SEVERE ERROR** couldn't invoke PFTPhaseCorrection object." << std::endl;
+    return nullptr;
   }
 
   phCorrectedReFT->Minimize();
   if (!phCorrectedReFT->IsValid()) {
-    cerr << endl << "**ERROR** could not find a valid phase correction minimum." << endl;
-    return 0;
+    std::cerr << std::endl << "**ERROR** could not find a valid phase correction minimum." << std::endl;
+    return nullptr;
   }
   phase[0] = phCorrectedReFT->GetPhaseCorrectionParam(0);
   phase[1] = phCorrectedReFT->GetPhaseCorrectionParam(1);
@@ -557,7 +555,7 @@ TH1F* PFourier::GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, vector<Do
   // clean up
   if (phCorrectedReFT) {
     delete phCorrectedReFT;
-    phCorrectedReFT = 0;
+    phCorrectedReFT = nullptr;
   }
   realF.clear();
   imagF.clear();
@@ -568,16 +566,16 @@ TH1F* PFourier::GetPhaseOptRealFourier(const TH1F *re, const TH1F *im, vector<Do
   snprintf(name, sizeof(name), "%s_Fourier_PhOptRe", re->GetName());
   snprintf(title, sizeof(title), "%s_Fourier_PhOptRe", re->GetTitle());
 
-  TH1F *realPhaseOptFourier = new TH1F(name, title, noOfBins, -res/2.0, (Double_t)(noOfBins-1)*res+res/2.0);
-  if (realPhaseOptFourier == 0) {
-    cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the real part of the Fourier transform." << endl;
-    return 0;
+  TH1F *realPhaseOptFourier = new TH1F(name, title, noOfBins, -res/2.0, static_cast<Double_t>(noOfBins-1)*res+res/2.0);
+  if (realPhaseOptFourier == nullptr) {
+    std::cerr << std::endl << "**SEVERE ERROR** couldn't allocate memory for the real part of the Fourier transform." << std::endl;
+    return nullptr;
   }
 
   // fill realFourier vector
   Double_t ph;
   for (Int_t i=0; i<noOfBins; i++) {
-    ph = phase[0] + phase[1] * (Double_t)((Int_t)i-(Int_t)minBin) / (Double_t)(maxBin-minBin);
+    ph = phase[0] + phase[1] * static_cast<Double_t>(i-static_cast<Int_t>(minBin)) / static_cast<Double_t>(maxBin-minBin);
     realPhaseOptFourier->SetBinContent(i+1, scale*(re->GetBinContent(i+1)*cos(ph) - im->GetBinContent(i+1)*sin(ph)));
     realPhaseOptFourier->SetBinError(i+1, 0.0);
   }
@@ -597,7 +595,7 @@ TH1F* PFourier::GetImaginaryFourier(const Double_t scale)
 {
   // check if valid flag is set
   if (!fValid)
-    return 0;
+    return nullptr;
 
   // invoke imaginaryFourier
   Char_t name[256];
@@ -611,15 +609,15 @@ TH1F* PFourier::GetImaginaryFourier(const Double_t scale)
   else
     noOfFourierBins = (fNoOfBins+1)/2;
 
-  TH1F* imaginaryFourier = new TH1F(name, title, noOfFourierBins, -fResolution/2.0, (Double_t)(noOfFourierBins-1)*fResolution+fResolution/2.0);
-  if (imaginaryFourier == 0) {
+  TH1F* imaginaryFourier = new TH1F(name, title, static_cast<Int_t>(noOfFourierBins), -fResolution/2.0, static_cast<Double_t>(noOfFourierBins-1)*fResolution+fResolution/2.0);
+  if (imaginaryFourier == nullptr) {
     fValid = false;
-    cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the imaginary part of the Fourier transform." << endl;
-    return 0;
+    std::cerr << std::endl << "**SEVERE ERROR** couldn't allocate memory for the imaginary part of the Fourier transform." << std::endl;
+    return nullptr;
   }
 
   // fill imaginaryFourier vector
-  for (UInt_t i=0; i<noOfFourierBins; i++) {
+  for (Int_t i=0; i<static_cast<Int_t>(noOfFourierBins); i++) {
     imaginaryFourier->SetBinContent(i+1, scale*fOut[i][1]);
     imaginaryFourier->SetBinError(i+1, 0.0);
   }
@@ -639,7 +637,7 @@ TH1F* PFourier::GetPowerFourier(const Double_t scale)
 {
   // check if valid flag is set
   if (!fValid)
-    return 0;
+    return nullptr;
 
   // invoke powerFourier
   Char_t name[256];
@@ -653,15 +651,15 @@ TH1F* PFourier::GetPowerFourier(const Double_t scale)
   else
     noOfFourierBins = (fNoOfBins+1)/2;
 
-  TH1F* pwrFourier = new TH1F(name, title, noOfFourierBins, -fResolution/2.0, (Double_t)(noOfFourierBins-1)*fResolution+fResolution/2.0);
-  if (pwrFourier == 0) {
+  TH1F* pwrFourier = new TH1F(name, title, static_cast<Int_t>(noOfFourierBins), -fResolution/2.0, static_cast<Double_t>(noOfFourierBins-1)*fResolution+fResolution/2.0);
+  if (pwrFourier == nullptr) {
     fValid = false;
-    cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the power part of the Fourier transform." << endl;
-    return 0;
+    std::cerr << std::endl << "**SEVERE ERROR** couldn't allocate memory for the power part of the Fourier transform." << std::endl;
+    return nullptr;
   }
 
   // fill powerFourier vector
-  for (UInt_t i=0; i<noOfFourierBins; i++) {
+  for (Int_t i=0; i<static_cast<Int_t>(noOfFourierBins); i++) {
     pwrFourier->SetBinContent(i+1, scale*sqrt(fOut[i][0]*fOut[i][0]+fOut[i][1]*fOut[i][1]));
     pwrFourier->SetBinError(i+1, 0.0);
   }
@@ -681,7 +679,7 @@ TH1F* PFourier::GetPhaseFourier(const Double_t scale)
 {
   // check if valid flag is set
   if (!fValid)
-    return 0;
+    return nullptr;
 
   // invoke phaseFourier
   Char_t name[256];
@@ -695,18 +693,18 @@ TH1F* PFourier::GetPhaseFourier(const Double_t scale)
   else
     noOfFourierBins = (fNoOfBins+1)/2;
 
-  TH1F* phaseFourier = new TH1F(name, title, noOfFourierBins, -fResolution/2.0, (Double_t)(noOfFourierBins-1)*fResolution+fResolution/2.0);
-  if (phaseFourier == 0) {
+  TH1F* phaseFourier = new TH1F(name, title, static_cast<Int_t>(noOfFourierBins), -fResolution/2.0, static_cast<Double_t>(noOfFourierBins-1)*fResolution+fResolution/2.0);
+  if (phaseFourier == nullptr) {
     fValid = false;
-    cerr << endl << "**SEVERE ERROR** couldn't allocate memory for the phase part of the Fourier transform." << endl;
-    return 0;
+    std::cerr << std::endl << "**SEVERE ERROR** couldn't allocate memory for the phase part of the Fourier transform." << std::endl;
+    return nullptr;
   }
 
   // fill phaseFourier vector
   Double_t value = 0.0;
-  for (UInt_t i=0; i<noOfFourierBins; i++) {
+  for (Int_t i=0; i<static_cast<Int_t>(noOfFourierBins); i++) {
     // calculate the phase
-    if (fOut[i][0] == 0) {
+    if (fOut[i][0] == 0.0) {
       if (fOut[i][1] >= 0.0)
         value = PI_HALF;
       else
@@ -758,14 +756,14 @@ void PFourier::PrepareFFTwInputData(UInt_t apodizationTag)
   Double_t mean = 0.0;
   if (fDCCorrected) {
     for (UInt_t i=0; i<fNoOfData; i++) {
-      mean += fData->GetBinContent(i+start);
+      mean += fData->GetBinContent(static_cast<Int_t>(i+start));
     }
-    mean /= (Double_t)fNoOfData;
+    mean /= static_cast<Double_t>(fNoOfData);
   }
 
   // 2nd fill fIn
   for (UInt_t i=0; i<fNoOfData; i++) {
-    fIn[i][0] = fData->GetBinContent(i+start) - mean;
+    fIn[i][0] = fData->GetBinContent(static_cast<Int_t>(i+start)) - mean;
     fIn[i][1] = 0.0;
   }
   for (UInt_t i=fNoOfData; i<fNoOfBins; i++) {
@@ -774,7 +772,7 @@ void PFourier::PrepareFFTwInputData(UInt_t apodizationTag)
   }
 
   // 3rd apodize data (if wished)
-  ApodizeData(apodizationTag);
+  ApodizeData(static_cast<Int_t>(apodizationTag));
 }
 
 //--------------------------------------------------------------------------
@@ -801,7 +799,6 @@ void PFourier::ApodizeData(Int_t apodizationTag) {
   switch (apodizationTag) {
     case F_APODIZATION_NONE:
       return;
-      break;
     case F_APODIZATION_WEAK:
       c[0] = cweak[0]+cweak[1]+cweak[2];
       c[1] = -(cweak[1]+2.0*cweak[2]);
@@ -820,7 +817,7 @@ void PFourier::ApodizeData(Int_t apodizationTag) {
       c[4] = cstrong[2];
       break;
     default:
-      cerr << endl << ">> **ERROR** User Apodization tag " << apodizationTag << " unknown, sorry ..." << endl;
+      std::cerr << std::endl << ">> **ERROR** User Apodization tag " << apodizationTag << " unknown, sorry ..." << std::endl;
       break;
   }
 
@@ -828,7 +825,7 @@ void PFourier::ApodizeData(Int_t apodizationTag) {
   for (UInt_t i=0; i<fNoOfData; i++) {
     q = c[0];
     for (UInt_t j=1; j<5; j++) {
-      q += c[j] * pow((Double_t)i/(Double_t)fNoOfData, 2.0*(Double_t)j);
+      q += c[j] * pow(static_cast<Double_t>(i)/static_cast<Double_t>(fNoOfData), 2.0*static_cast<Double_t>(j));
     }
     fIn[i][0] *= q;
   }

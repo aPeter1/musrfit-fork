@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -33,7 +33,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include <TObjArray.h>
 #include <TObjString.h>
@@ -61,14 +60,14 @@ ClassImpQ(PStartupHandler)
 int parseXmlFile(TSAXParser *saxParser, const char *startup_path_name)
 {
   int status;
-  fstream xmlFile;
+  std::fstream xmlFile;
   unsigned int xmlSize = 0;
-  char *xmlBuffer = 0;
+  char *xmlBuffer = nullptr;
 
-  xmlFile.open(startup_path_name, ios::in | ios::ate); // open file for reading and go to the end of the file
+  xmlFile.open(startup_path_name, std::ios::in | std::ios::ate); // open file for reading and go to the end of the file
   if (xmlFile.is_open()) { // check if file has been opened successfully
     xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-    xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+    xmlFile.seekg(0, std::ios::beg); // go back to the beginning of the stream
     xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
     xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
     xmlFile.close(); // close the XML file
@@ -78,7 +77,7 @@ int parseXmlFile(TSAXParser *saxParser, const char *startup_path_name)
   } else {
     status = saxParser->ParseBuffer(xmlBuffer, xmlSize); // parse buffer
     delete[] xmlBuffer; // free the buffer memory
-    xmlBuffer = 0;
+    xmlBuffer = nullptr;
   }
 
   return status;
@@ -96,8 +95,8 @@ PStartupHandler::PStartupHandler()
   fStartupFilePath = "";
 
   // get default path (for the moment only linux like)
-  Char_t *pmusrpath=0;
-  Char_t *home=0;
+  Char_t *pmusrpath=nullptr;
+  Char_t *home=nullptr;
   Char_t musrpath[128];
   Char_t startup_path_name[128];
 
@@ -112,7 +111,7 @@ PStartupHandler::PStartupHandler()
   if (!fStartupFileFound) { // startup file not found in the current directory
     // check if the startup file is found under $HOME/.musrfit
     home = getenv("HOME");
-    if (home != 0) {
+    if (home != nullptr) {
       sprintf(startup_path_name, "%s/.musrfit/musrfit_startup.xml", home);
       if (StartupFileExists(startup_path_name)) {
         fStartupFilePath = TString(startup_path_name);
@@ -123,7 +122,7 @@ PStartupHandler::PStartupHandler()
   if (!fStartupFileFound) { // startup file not found in $HOME/.musrfit
     // check if the MUSRFITPATH system variable is set
     pmusrpath = getenv("MUSRFITPATH");
-    if (pmusrpath != 0) {
+    if (pmusrpath != nullptr) {
       sprintf(startup_path_name, "%s/musrfit_startup.xml", pmusrpath);
       if (StartupFileExists(startup_path_name)) {
         fStartupFilePath = TString(startup_path_name);
@@ -133,9 +132,9 @@ PStartupHandler::PStartupHandler()
   }
   if (!fStartupFileFound) { // MUSRFITPATH not set or empty, will try $ROOTSYS/bin
     home = getenv("ROOTSYS");
-    if (home != 0) {
+    if (home != nullptr) {
       sprintf(musrpath, "%s/bin", home);
-      cerr << endl << "**WARNING** MUSRFITPATH environment variable not set will try " << musrpath << endl;
+      std::cerr << std::endl << "**WARNING** MUSRFITPATH environment variable not set will try " << musrpath << std::endl;
       sprintf(startup_path_name, "%s/musrfit_startup.xml", musrpath);
       if (StartupFileExists(startup_path_name)) {
         fStartupFilePath = TString(startup_path_name);
@@ -146,12 +145,12 @@ PStartupHandler::PStartupHandler()
 
   // if musrfit_startup.xml is still not found, will create a default one
   if (!fStartupFileFound) {
-    cout << endl << "**INFO** no musrfit_startup.xml file found, will write a default one." << endl;
+    std::cout << std::endl << "**INFO** no musrfit_startup.xml file found, will write a default one." << std::endl;
     if (!WriteDefaultStartupFile()) {
-      cerr << endl << "**ERROR** couldn't write default musrfit_startup.xml." << endl;
+      std::cerr << std::endl << "**ERROR** couldn't write default musrfit_startup.xml." << std::endl;
     } else {
       home = getenv("HOME");
-      if (home != 0) {
+      if (home != nullptr) {
         sprintf(startup_path_name, "%s/.musrfit/musrfit_startup.xml", home);
         if (StartupFileExists(startup_path_name)) {
           fStartupFilePath = TString(startup_path_name);
@@ -286,8 +285,8 @@ void PStartupHandler::OnCharacters(const Char_t *str)
         // add converted str to the marker list
         fMarkerList.push_back(tstr.Atoi());
       } else {
-        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a number, will ignore it";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** '" << str << "' is not a number, will ignore it";
+        std::cerr << std::endl;
       }
       break;
     case eColor:
@@ -296,14 +295,14 @@ void PStartupHandler::OnCharacters(const Char_t *str)
       tokens = tstr.Tokenize(",");
       // check that there any tokens
       if (!tokens) {
-        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
+        std::cerr << std::endl;
         return;
       }
       // check there is the right number of tokens
       if (tokens->GetEntries() != 3) {
-        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
+        std::cerr << std::endl;
         return;
       }
       // get r
@@ -312,8 +311,8 @@ void PStartupHandler::OnCharacters(const Char_t *str)
       if (tstr.IsDigit()) {
         r = tstr.Atoi();
       } else {
-        cerr << endl << "PStartupHandler **WARNING** r within the rgb code is not a number, will ignore it";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** r within the rgb code is not a number, will ignore it";
+        std::cerr << std::endl;
         return;
       }
       // get g
@@ -322,8 +321,8 @@ void PStartupHandler::OnCharacters(const Char_t *str)
       if (tstr.IsDigit()) {
         g = tstr.Atoi();
       } else {
-        cerr << endl << "PStartupHandler **WARNING** g within the rgb code is not a number, will ignore it";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** g within the rgb code is not a number, will ignore it";
+        std::cerr << std::endl;
         return;
       }
       // get b
@@ -332,14 +331,14 @@ void PStartupHandler::OnCharacters(const Char_t *str)
       if (tstr.IsDigit()) {
         b = tstr.Atoi();
       } else {
-        cerr << endl << "PStartupHandler **WARNING** b within the rgb code is not a number, will ignore it";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** b within the rgb code is not a number, will ignore it";
+        std::cerr << std::endl;
         return;
       }
       // clean up tokens
       if (tokens) {
         delete tokens;
-        tokens = 0;
+        tokens = nullptr;
       }
       // generate the ROOT color code based on str
       color = TColor::GetColor(r,g,b);
@@ -357,8 +356,8 @@ void PStartupHandler::OnCharacters(const Char_t *str)
       } else if (!tstr.CompareTo("mc/s", TString::kIgnoreCase)) {
         fFourierDefaults.fUnits = FOURIER_UNIT_CYCLES;
       } else {
-        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid unit, will ignore it.";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** '" << str << "' is not a valid unit, will ignore it.";
+        std::cerr << std::endl;
       }
       break;
     case eFourierPower:
@@ -368,12 +367,12 @@ void PStartupHandler::OnCharacters(const Char_t *str)
         if ((ival >= 0) && (ival <= 20)) {
           fFourierDefaults.fFourierPower = ival;
         } else {
-          cerr << endl << "PStartupHandler **WARNING** fourier power '" << str << "' is not a valid number (0..20), will ignore it.";
-          cerr << endl;
+          std::cerr << std::endl << "PStartupHandler **WARNING** fourier power '" << str << "' is not a valid number (0..20), will ignore it.";
+          std::cerr << std::endl;
         }
       } else {
-        cerr << endl << "PStartupHandler **WARNING** fourier power '" << str << "' is not a valid number (0..20), will ignore it.";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** fourier power '" << str << "' is not a valid number (0..20), will ignore it.";
+        std::cerr << std::endl;
       }
       break;
     case eApodization:
@@ -387,8 +386,8 @@ void PStartupHandler::OnCharacters(const Char_t *str)
       } else if (!tstr.CompareTo("strong", TString::kIgnoreCase)) {
         fFourierDefaults.fApodization = FOURIER_APOD_STRONG;
       } else {
-        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid apodization, will ignore it.";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** '" << str << "' is not a valid apodization, will ignore it.";
+        std::cerr << std::endl;
       }
       break;
     case ePlot:
@@ -404,8 +403,8 @@ void PStartupHandler::OnCharacters(const Char_t *str)
       } else if (!tstr.CompareTo("phase", TString::kIgnoreCase)) {
         fFourierDefaults.fPlotTag = FOURIER_PLOT_PHASE;
       } else {
-        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid plot option, will ignore it.";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** '" << str << "' is not a valid plot option, will ignore it.";
+        std::cerr << std::endl;
       }
       break;
     case ePhase:
@@ -413,8 +412,8 @@ void PStartupHandler::OnCharacters(const Char_t *str)
       if (tstr.IsFloat()) {
         fFourierDefaults.fPhase.push_back(tstr.Atof());
       } else {
-        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase, will ignore it.";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase, will ignore it.";
+        std::cerr << std::endl;
       }
       break;
     case ePhaseIncrement:
@@ -422,8 +421,8 @@ void PStartupHandler::OnCharacters(const Char_t *str)
       if (tstr.IsFloat()) {
         fFourierDefaults.fPhaseIncrement = tstr.Atof();
       } else {
-        cerr << endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase increment, will ignore it.";
-        cerr << endl;
+        std::cerr << std::endl << "PStartupHandler **WARNING** '" << str << "' is not a valid phase increment, will ignore it.";
+        std::cerr << std::endl;
       }
       break;
     default:
@@ -454,8 +453,8 @@ void PStartupHandler::OnComment(const Char_t *str)
  */
 void PStartupHandler::OnWarning(const Char_t *str)
 {
-  cerr << endl << "PStartupHandler **WARNING** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "PStartupHandler **WARNING** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -468,8 +467,8 @@ void PStartupHandler::OnWarning(const Char_t *str)
  */
 void PStartupHandler::OnError(const Char_t *str)
 {
-  cerr << endl << "PStartupHandler **ERROR** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "PStartupHandler **ERROR** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -482,8 +481,8 @@ void PStartupHandler::OnError(const Char_t *str)
  */
 void PStartupHandler::OnFatalError(const Char_t *str)
 {
-  cerr << endl << "PStartupHandler **FATAL ERROR** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "PStartupHandler **FATAL ERROR** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -573,7 +572,7 @@ Bool_t PStartupHandler::StartupFileExists(Char_t *fln)
 {
   Bool_t result = false;
 
-  ifstream ifile(fln);
+  std::ifstream ifile(fln);
 
   if (ifile.fail()) {
     result = false;
@@ -592,10 +591,10 @@ Bool_t PStartupHandler::WriteDefaultStartupFile()
 {
   // get home
   Char_t startup_path_name[256];
-  Char_t *home=0;
+  Char_t *home = nullptr;
   home = getenv("HOME");
-  if (home == 0) {
-    cerr << endl << "**ERROR** couldn't obtain $HOME." << endl;
+  if (home == nullptr) {
+    std::cerr << std::endl << "**ERROR** couldn't obtain $HOME." << std::endl;
     return false;
   }
 
@@ -608,7 +607,7 @@ Bool_t PStartupHandler::WriteDefaultStartupFile()
       return false;
   } else {
     if (mkdir(startup_path_name, 0777)) {
-      cerr << endl << "**ERROR** couldn't create '" << startup_path_name << "'" << endl;
+      std::cerr << std::endl << "**ERROR** couldn't create '" << startup_path_name << "'" << std::endl;
       return false;
     }
   }
@@ -616,68 +615,68 @@ Bool_t PStartupHandler::WriteDefaultStartupFile()
   // set path-name for musrfit_startup.xml
   sprintf(startup_path_name, "%s/.musrfit/musrfit_startup.xml", home);
 
-  ofstream fout(startup_path_name, ofstream::out);
+  std::ofstream fout(startup_path_name, std::ofstream::out);
   if (!fout.is_open()) {
-    cerr << endl << "**ERROR** couldn't open '" << startup_path_name << "' for writing." << endl;
+    std::cerr << std::endl << "**ERROR** couldn't open '" << startup_path_name << "' for writing." << std::endl;
     return false;
   }
 
   // write default musrfit_startup.xml
-  fout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << endl;
-  fout << "<musrfit xmlns=\"http://lmu.web.psi.ch/musrfit/user/MUSR/WebHome.html\">" << endl;
-  fout << "    <comment>" << endl;
-  fout << "        Defines default settings for the musrfit package" << endl;
-  fout << "    </comment>" << endl;
-  fout << "    <data_path>/afs/psi.ch/project/nemu/data/his</data_path>" << endl;
-  fout << "    <data_path>/afs/psi.ch/project/nemu/data/wkm</data_path>" << endl;
-  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/gps</data_path>" << endl;
-  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/dolly</data_path>" << endl;
-  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/gpd</data_path>" << endl;
-  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/ltf</data_path>" << endl;
-  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/alc</data_path>" << endl;
-  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/hifi</data_path>" << endl;
-  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/lem</data_path>" << endl;
-  fout << "    <fourier_settings>" << endl;
-  fout << "        <units>Gauss</units>" << endl;
-  fout << "        <fourier_power>0</fourier_power>" << endl;
-  fout << "        <apodization>none</apodization>" << endl;
-  fout << "        <plot>real_and_imag</plot>" << endl;
-  fout << "        <phase>0.0</phase>" << endl;
-  fout << "        <phase_increment>1.0</phase_increment>" << endl;
-  fout << "    </fourier_settings>" << endl;
-  fout << "    <root_settings>" << endl;
-  fout << "        <marker_list>" << endl;
-  fout << "            <!-- Root marker numbers -->" << endl;
-  fout << "            <marker>24</marker> <!-- open circle -->" << endl;
-  fout << "            <marker>25</marker> <!-- open square -->" << endl;
-  fout << "            <marker>26</marker> <!-- open triangle -->" << endl;
-  fout << "            <marker>27</marker> <!-- open diamond -->" << endl;
-  fout << "            <marker>28</marker> <!-- open cross -->" << endl;
-  fout << "            <marker>29</marker> <!-- full star -->" << endl;
-  fout << "            <marker>30</marker> <!-- open star -->" << endl;
-  fout << "            <marker>20</marker> <!-- full circle -->" << endl;
-  fout << "            <marker>21</marker> <!-- full square -->" << endl;
-  fout << "            <marker>22</marker> <!-- full triangle -->" << endl;
-  fout << "            <marker>23</marker> <!-- full triangle down -->" << endl;
-  fout << "            <marker>2</marker>  <!-- thin cross -->" << endl;
-  fout << "            <marker>3</marker>  <!-- thin star -->" << endl;
-  fout << "            <marker>5</marker>  <!-- thin x -->" << endl;
-  fout << "        </marker_list>" << endl;
-  fout << "        <color_list>" << endl;
-  fout << "            <!-- Color as RGB coded string -->" << endl;
-  fout << "            <color>0,0,0</color>      <!-- kBlack -->" << endl;
-  fout << "            <color>255,0,0</color>    <!-- kRed -->" << endl;
-  fout << "            <color>0,255,0</color>    <!-- kGreen -->" << endl;
-  fout << "            <color>0,0,255</color>    <!-- kBlue -->" << endl;
-  fout << "            <color>255,0,255</color>  <!-- kMagenta -->" << endl;
-  fout << "            <color>0,255,255</color>  <!-- kCyan -->" << endl;
-  fout << "            <color>153,0,255</color>  <!-- kViolet-3 -->" << endl;
-  fout << "            <color>102,102,51</color> <!-- kYellow-1 -->" << endl;
-  fout << "            <color>51,102,51</color>  <!-- kGreen-1 -->" << endl;
-  fout << "            <color>153,0,0</color>    <!-- kRed+2 -->" << endl;
-  fout << "        </color_list>" << endl;
-  fout << "    </root_settings>" << endl;
-  fout << "</musrfit>" << endl;
+  fout << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << std::endl;
+  fout << "<musrfit xmlns=\"http://lmu.web.psi.ch/musrfit/user/MUSR/WebHome.html\">" << std::endl;
+  fout << "    <comment>" << std::endl;
+  fout << "        Defines default settings for the musrfit package" << std::endl;
+  fout << "    </comment>" << std::endl;
+  fout << "    <data_path>/afs/psi.ch/project/nemu/data/his</data_path>" << std::endl;
+  fout << "    <data_path>/afs/psi.ch/project/nemu/data/wkm</data_path>" << std::endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/gps</data_path>" << std::endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/dolly</data_path>" << std::endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/gpd</data_path>" << std::endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/ltf</data_path>" << std::endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/alc</data_path>" << std::endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/hifi</data_path>" << std::endl;
+  fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/lem</data_path>" << std::endl;
+  fout << "    <fourier_settings>" << std::endl;
+  fout << "        <units>Gauss</units>" << std::endl;
+  fout << "        <fourier_power>0</fourier_power>" << std::endl;
+  fout << "        <apodization>none</apodization>" << std::endl;
+  fout << "        <plot>real_and_imag</plot>" << std::endl;
+  fout << "        <phase>0.0</phase>" << std::endl;
+  fout << "        <phase_increment>1.0</phase_increment>" << std::endl;
+  fout << "    </fourier_settings>" << std::endl;
+  fout << "    <root_settings>" << std::endl;
+  fout << "        <marker_list>" << std::endl;
+  fout << "            <!-- Root marker numbers -->" << std::endl;
+  fout << "            <marker>24</marker> <!-- open circle -->" << std::endl;
+  fout << "            <marker>25</marker> <!-- open square -->" << std::endl;
+  fout << "            <marker>26</marker> <!-- open triangle -->" << std::endl;
+  fout << "            <marker>27</marker> <!-- open diamond -->" << std::endl;
+  fout << "            <marker>28</marker> <!-- open cross -->" << std::endl;
+  fout << "            <marker>29</marker> <!-- full star -->" << std::endl;
+  fout << "            <marker>30</marker> <!-- open star -->" << std::endl;
+  fout << "            <marker>20</marker> <!-- full circle -->" << std::endl;
+  fout << "            <marker>21</marker> <!-- full square -->" << std::endl;
+  fout << "            <marker>22</marker> <!-- full triangle -->" << std::endl;
+  fout << "            <marker>23</marker> <!-- full triangle down -->" << std::endl;
+  fout << "            <marker>2</marker>  <!-- thin cross -->" << std::endl;
+  fout << "            <marker>3</marker>  <!-- thin star -->" << std::endl;
+  fout << "            <marker>5</marker>  <!-- thin x -->" << std::endl;
+  fout << "        </marker_list>" << std::endl;
+  fout << "        <color_list>" << std::endl;
+  fout << "            <!-- Color as RGB coded string -->" << std::endl;
+  fout << "            <color>0,0,0</color>      <!-- kBlack -->" << std::endl;
+  fout << "            <color>255,0,0</color>    <!-- kRed -->" << std::endl;
+  fout << "            <color>0,255,0</color>    <!-- kGreen -->" << std::endl;
+  fout << "            <color>0,0,255</color>    <!-- kBlue -->" << std::endl;
+  fout << "            <color>255,0,255</color>  <!-- kMagenta -->" << std::endl;
+  fout << "            <color>0,255,255</color>  <!-- kCyan -->" << std::endl;
+  fout << "            <color>153,0,255</color>  <!-- kViolet-3 -->" << std::endl;
+  fout << "            <color>102,102,51</color> <!-- kYellow-1 -->" << std::endl;
+  fout << "            <color>51,102,51</color>  <!-- kGreen-1 -->" << std::endl;
+  fout << "            <color>153,0,0</color>    <!-- kRed+2 -->" << std::endl;
+  fout << "        </color_list>" << std::endl;
+  fout << "    </root_settings>" << std::endl;
+  fout << "</musrfit>" << std::endl;
 
   fout.close();
 

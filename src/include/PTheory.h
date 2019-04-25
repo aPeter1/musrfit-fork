@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -290,7 +290,7 @@ class PTheory
     // variables
     Bool_t fValid; ///< flag to tell if the theory is valid
     UInt_t fType; ///< function tag
-    vector<UInt_t> fParamNo; ///< holds the parameter numbers for the theory (including maps and functions, see constructor desciption)
+    std::vector<UInt_t> fParamNo; ///< holds the parameter numbers for the theory (including maps and functions, see constructor desciption)
     UInt_t fNoOfParam; ///< number of parameters for the given function
     PTheory *fAdd, *fMul; ///< pointers to the add-sub-function or the multiply-sub-function
 

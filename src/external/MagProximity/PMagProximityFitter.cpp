@@ -10,7 +10,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2011 by Andreas Suter                                   *
+ *   Copyright (C) 2011-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -33,7 +33,6 @@
 #include <cmath>
 
 #include <iostream>
-using namespace std;
 
 #include <TSAXParser.h>
 #include <TMath.h>
@@ -70,8 +69,8 @@ PMagProximityFitterGlobal::PMagProximityFitterGlobal()
   Int_t status = parseXmlFile(saxParser, startup_path_name);
   // check for parse errors
   if (status) { // error
-    cout << endl << ">> PMagProximityFitterGlobal::PMagProximityFitterGlobal: **WARNING** Reading/parsing mag_proximity_startup.xml failed.";
-    cout << endl;
+    std::cout << std::endl << ">> PMagProximityFitterGlobal::PMagProximityFitterGlobal: **WARNING** Reading/parsing mag_proximity_startup.xml failed.";
+    std::cout << std::endl;
     fValid = false;
   }
 
@@ -83,18 +82,18 @@ PMagProximityFitterGlobal::PMagProximityFitterGlobal()
 
   // check if everything went fine with the startup handler
   if (!fStartupHandler->IsValid()) {
-    cout << endl << ">> PMagProximityFitterGlobal::PMagProximityFitterGlobal **PANIC ERROR**";
-    cout << endl << ">>   startup handler too unhappy. Will terminate unfriendly, sorry.";
-    cout << endl;
+    std::cout << std::endl << ">> PMagProximityFitterGlobal::PMagProximityFitterGlobal **PANIC ERROR**";
+    std::cout << std::endl << ">>   startup handler too unhappy. Will terminate unfriendly, sorry.";
+    std::cout << std::endl;
     fValid = false;
   }
 
   // load all the TRIM.SP rge-files
   fRgeHandler = new PMPRgeHandler(fStartupHandler->GetTrimSpDataPathList(), fStartupHandler->GetTrimSpDataVectorList());
   if (!fRgeHandler->IsValid()) {
-    cout << endl << ">> PMagProximityFitterGlobal::PMagProximityFitterGlobal **PANIC ERROR**";
-    cout << endl << ">>  rge data handler too unhappy. Will terminate unfriendly, sorry.";
-    cout << endl;
+    std::cout << std::endl << ">> PMagProximityFitterGlobal::PMagProximityFitterGlobal **PANIC ERROR**";
+    std::cout << std::endl << ">>  rge data handler too unhappy. Will terminate unfriendly, sorry.";
+    std::cout << std::endl;
     fValid = false;
   }
 }
@@ -113,11 +112,11 @@ PMagProximityFitterGlobal::~PMagProximityFitterGlobal()
 
   if (fRgeHandler) {
     delete fRgeHandler;
-    fRgeHandler = 0;
+    fRgeHandler = nullptr;
   }
   if (fStartupHandler) {
     delete fStartupHandler;
-    fStartupHandler = 0;
+    fStartupHandler = nullptr;
   }
 }
 
@@ -198,19 +197,6 @@ Double_t PMagProximityFitterGlobal::GetMagneticField(const Double_t z) const
     }
   }
 
-/*
-static UInt_t count=0;
-if (count < 10) {
-count++;
-if (idx == fField.size()-1)
-  cout << endl << "debug> z=" << z << ", idx=" << idx << ", fDz=" << fDz << ", fField[idx]=" << fField[idx] << ", result=" << result;
-else
-  cout << endl << "debug> z=" << z << ", idx=" << idx << ", fDz=" << fDz << ", fField[idx]=" << fField[idx] << ", fField[idx+1]=" << fField[idx+1] << ", result=" << result;
-cout << endl;
-}
-*/
-//  cout << endl << z << ", " << result;
-
   return result;
 }
 
@@ -228,7 +214,7 @@ PMagProximityFitter::PMagProximityFitter()
 {
   fValid = false;
   fInvokedGlobal = false;
-  fMagProximityFitterGlobal = 0;
+  fMagProximityFitterGlobal = nullptr;
 }
 
 //--------------------------------------------------------------------------
@@ -241,7 +227,7 @@ PMagProximityFitter::~PMagProximityFitter()
 {
   if ((fMagProximityFitterGlobal != 0) && fInvokedGlobal) {
     delete fMagProximityFitterGlobal;
-    fMagProximityFitterGlobal = 0;
+    fMagProximityFitterGlobal = nullptr;
   }
 }
 
@@ -256,7 +242,7 @@ PMagProximityFitter::~PMagProximityFitter()
  * \param globalPart
  * \param idx
  */
-void PMagProximityFitter::SetGlobalPart(vector<void*> &globalPart, UInt_t idx)
+void PMagProximityFitter::SetGlobalPart(std::vector<void*> &globalPart, UInt_t idx)
 {
   fIdxGlobal = static_cast<Int_t>(idx);
 
@@ -264,10 +250,10 @@ void PMagProximityFitter::SetGlobalPart(vector<void*> &globalPart, UInt_t idx)
     fMagProximityFitterGlobal = new PMagProximityFitterGlobal();
     if (fMagProximityFitterGlobal == 0) {
       fValid = false;
-      cerr << endl << ">> PMagProximityFitter::SetGlobalPart(): **ERROR** Couldn't invoke global user function object, sorry ..." << endl;
+      std::cerr << std::endl << ">> PMagProximityFitter::SetGlobalPart(): **ERROR** Couldn't invoke global user function object, sorry ..." << std::endl;
     } else if (!fMagProximityFitterGlobal->IsValid()) {
       fValid = false;
-      cerr << endl << ">> PMagProximityFitter::SetGlobalPart(): **ERROR** initialization of global user function object failed, sorry ..." << endl;
+      std::cerr << std::endl << ">> PMagProximityFitter::SetGlobalPart(): **ERROR** initialization of global user function object failed, sorry ..." << std::endl;
     } else {
       fValid = true;
       fInvokedGlobal = true;

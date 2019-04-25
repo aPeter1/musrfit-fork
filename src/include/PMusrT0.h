@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -84,7 +84,7 @@ class PMusrT0Data {
     virtual Int_t GetT0BinData() { return fT0Data; }
 
     virtual void SetSingleHisto(const Bool_t flag) { fSingleHisto = flag; }
-    virtual void SetRawRunData(const vector<PRawRunData*> rawRunData) { fRawRunData = rawRunData; }
+    virtual void SetRawRunData(const std::vector<PRawRunData*> rawRunData) { fRawRunData = rawRunData; }
     virtual void SetRunNo(const UInt_t runNo) { fRunNo = runNo; }
     virtual void SetAddRunIdx(const UInt_t addRunIdx) { fAddRunIdx = addRunIdx; }
     virtual void SetHistoNoIdx(const UInt_t histoNoIdx) { fHistoNoIdx = histoNoIdx; }
@@ -97,7 +97,7 @@ class PMusrT0Data {
 
   private:
     Bool_t fSingleHisto;              ///< true if single histo fit, false for asymmetry fit
-    vector<PRawRunData*> fRawRunData; ///< holds the raw data of the needed runs, idx=0 the run, idx>0 the addruns
+    std::vector<PRawRunData*> fRawRunData; ///< holds the raw data of the needed runs, idx=0 the run, idx>0 the addruns
     Int_t fRunNo;                     ///< msr-file run number
     Int_t fAddRunIdx;                 ///< msr-file addrun index
     Int_t fHistoNoIdx;                ///< msr-file histo number index
@@ -105,7 +105,7 @@ class PMusrT0Data {
     Int_t fDetectorTag;               ///< detector tag. forward=0,backward=1
     Int_t fCmdTag;                    ///< command tag. 0=get t0, 1=get data-/bkg-range, 2=get t0, and data-/bkg-range
     PIntVector fT0;                   ///< holding the t0's of the run
-    vector<PIntVector> fAddT0;        ///< holding the t0's of the addruns
+    std::vector<PIntVector> fAddT0;   ///< holding the t0's of the addruns
     Int_t fT0Data;                    ///< holding the t0 found in the current data set
 };
 

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009-2014 by Bastian M. Wojek / Andreas Suter           *
+ *   Copyright (C) 2009-2019 by Bastian M. Wojek / Andreas Suter           *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -46,15 +46,12 @@
 #include <fstream>
 #include <cstdlib>
 #include <limits>
-using namespace std;
-
+#include <string>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/case_conv.hpp> // for to_lower() in std::string
-using namespace boost::algorithm;
 
 #include <boost/lexical_cast.hpp> // for atoi-replacement
-// #include <boost/filesystem.hpp> // for a clean way to check if a file exists
 
 //--------------------------------------------------------------------------
 /**
@@ -66,7 +63,7 @@ using namespace boost::algorithm;
  *
  * \param s string
  */
-bool isNumber(const string &s)
+bool isNumber(const std::string &s)
 {
   unsigned int number(0);
   try {
@@ -84,86 +81,86 @@ bool isNumber(const string &s)
  */
 void msr2data_syntax()
 {
-  cout << endl << "usage 0: msr2data [--version] | [--help]";
-  cout << endl << "usage 1: msr2data <run> <extension> options";
-  cout << endl << "usage 2: msr2data <run1> <run2> <extension> options";
-  cout << endl << "usage 3: msr2data \\[<runList>\\] <extension> options";
-  cout << endl << "usage 4: msr2data <runListFileName> <extension> options";
-  cout << endl;
-  cout << endl << "       <runList> can be:";
-  cout << endl << "         (i)   <run0>, <run1>, <run2>, ... <runN> : run numbers, e.g. 123 124";
-  cout << endl << "         (ii)  <run0>-<runN> : a range, e.g. 123-125 -> 123 124 125";
-  cout << endl << "         (iii) <run0>:<runN>:<step> : a sequence, e.g. 123:127:2 -> 123 125 127";
-  cout << endl << "               <step> will give the step width and has to be a positive number!";
-  cout << endl << "         a <runList> can also combine (i)-(iii), e.g. 123 128-130 133, etc.";
-  cout << endl << "       <runListFileName> : an ASCII file containing a list of run numbers and optional";
-  cout << endl << "                           external parameters is passed to msr2data. For details see";
-  cout << endl << "                           the online documentation: http://lmu.web.psi.ch/musrfit/user/MUSR/Msr2Data.html";
-  cout << endl << "       <extension> : msr-file extension, e.g. _tf_h13 for the file name 8472_tf_h13.msr";
-  cout << endl;
-  cout << endl << "options:";
-  cout << endl << "       -o<outputfile> : specify the name of the DB or column-data output file; default: out.db/out.dat";
-  cout << endl << "                        if the option '-o none' is used, no output file will be written.";
-  cout << endl << "       new : before writing a new output file, delete the contents of any existing file with the same name";
-  cout << endl << "       data : instead of to a DB file the data are written to a simple column structure";
-  cout << endl << "       header : force writing of the file header to the output file";
-  cout << endl << "       noheader : no file header is written to the output file";
-  cout << endl << "              If either none or both of the header options are given, the file header will be written";
-  cout << endl << "              if a new file is created, but not if the output file exists already!";
-  cout << endl << "       nosummary : no additional data from the run data file is written to the output file";
-  cout << endl << "       paramList <param> : option used to select the parameters which shall be exported.";
-  cout << endl << "               <param> is a list of parameter numbers to be exported. Allowed lists are:";
-  cout << endl << "               1-16 will export parameters 1 to 16. 1 3 5 will export parameters 1 3 5.";
-  cout << endl << "               A combination of both is possible, e.g. 1-16 19 31 62, and so on.";
-  cout << endl << "       fit : invoke musrfit to fit the specified runs";
-  cout << endl << "              All msr input files are assumed to be present, none is newly generated!";
-  cout << endl << "       fit-<template>! : generate msr files for the runs to be processed from the <template> run";
-  cout << endl << "              and call musrfit for fitting these runs";
-  cout << endl << "       fit-<template> : same as above, but the <template> run is only used for the first file creation---";
-  cout << endl << "              the successive files are generated using the musrfit output from the preceding runs";
-  cout << endl << "       msr-<template> : same as above without calling musrfit";
-  cout << endl << "              In case any fitting option is present, this option is ignored!";
-  cout << endl << "       -k, --keep-mn2-output : if fitting is used, pass the option --keep-mn2-output to musrfit";
-  cout << endl << "       -t, --title-from-data-file : if fitting is used, pass the option --title-from-data-file to musrfit";
-  cout << endl << "       -e, --estimateN0: estimate N0 for single histogram fits.";
-  cout << endl << "       -p, --per-run-block-chisq: will per run block chisq to the msr-file.";
-  cout << endl;
-  cout << endl << "       global : switch on the global-fit mode";
-  cout << endl << "              Within that mode all specified runs will be united in a single msr file!";
-  cout << endl << "              The fit parameters can be either run specific or common to all runs.";
-  cout << endl << "              For a complete description of this feature please refer to the manual.";
-  cout << endl;
-  cout << endl << "       global+[!] : operate in the global-fit mode, however, in case a global input file is created";
-  cout << endl << "              all specified runs are pre-analyzed first one by one using the given template.";
-  cout << endl << "              For the generation of the global input file, the run-specific parameter values are taken";
-  cout << endl << "              from this pre-analysis for each run---they are not just copied from the template.";
-  cout << endl << "              The specification of '!' determines which fit mode (see above) is used for this pre-analysis.";
-  cout << endl;
-  cout << endl << "    Typical examples:";
-  cout << endl;
-  cout << endl << "       msr2data 2047 2050 _tf_histo fit-2046";
-  cout << endl << "          will use 2046_tf_histo.msr as templete, and subsequently generating 2047_tf_histo.msr until";
-  cout << endl << "          2050_tf_histo.msr and fit them.";
-  cout << endl;
-  cout << endl << "       msr2data 2047 2050 _tf_histo msr-2046";
-  cout << endl << "          will use 2046_tf_histo.msr as templete, and subsequently generating 2047_tf_histo.msr until";
-  cout << endl << "          2050_tf_histo.msr, but NO fitting will be done.";
-  cout << endl;
-  cout << endl << "       msr2data 2046 2050 _tf_histo -o fitParam.db";
-  cout << endl << "          will collect the fit parameters from runs 2046-2050 (msr-files 2046_tf_histo.msr etc.) and";
-  cout << endl << "          write them to the file fitParam.db (DB-format).";
-  cout << endl;
-  cout << endl << "       msr2data [2047:2053:2 2056] _tf_histo fit-2045";
-  cout << endl << "          will use 2045_tf_histo.msr as templete, and subsequently generating msr-files from the run-list:";
-  cout << endl << "          2047 2049 2051 2053 2056 (2047_tf_histo.msr etc.) and fit them.";
-  cout << endl;
-  cout << endl << "       msr2data 2046 2058 _tf_histo paramList 1-12 data -o fitParam.dat";
-  cout << endl << "          will export the parameters number 1 trough 12 in a column like fashion of the runs 2046 to 2058,";
-  cout << endl << "          collected form the msr-files 2046_tf_histo.msr and so on.";
-  cout << endl;
-  cout << endl << "    For further information please refer to";
-  cout << endl << "       http://lmu.web.psi.ch/musrfit/user/html/msr2data.html#msr2data";
-  cout << endl << endl;
+  std::cout << std::endl << "usage 0: msr2data [--version] | [--help]";
+  std::cout << std::endl << "usage 1: msr2data <run> <extension> options";
+  std::cout << std::endl << "usage 2: msr2data <run1> <run2> <extension> options";
+  std::cout << std::endl << "usage 3: msr2data \\[<runList>\\] <extension> options";
+  std::cout << std::endl << "usage 4: msr2data <runListFileName> <extension> options";
+  std::cout << std::endl;
+  std::cout << std::endl << "       <runList> can be:";
+  std::cout << std::endl << "         (i)   <run0>, <run1>, <run2>, ... <runN> : run numbers, e.g. 123 124";
+  std::cout << std::endl << "         (ii)  <run0>-<runN> : a range, e.g. 123-125 -> 123 124 125";
+  std::cout << std::endl << "         (iii) <run0>:<runN>:<step> : a sequence, e.g. 123:127:2 -> 123 125 127";
+  std::cout << std::endl << "               <step> will give the step width and has to be a positive number!";
+  std::cout << std::endl << "         a <runList> can also combine (i)-(iii), e.g. 123 128-130 133, etc.";
+  std::cout << std::endl << "       <runListFileName> : an ASCII file containing a list of run numbers and optional";
+  std::cout << std::endl << "                           external parameters is passed to msr2data. For details see";
+  std::cout << std::endl << "                           the online documentation: http://lmu.web.psi.ch/musrfit/user/MUSR/Msr2Data.html";
+  std::cout << std::endl << "       <extension> : msr-file extension, e.g. _tf_h13 for the file name 8472_tf_h13.msr";
+  std::cout << std::endl;
+  std::cout << std::endl << "options:";
+  std::cout << std::endl << "       -o<outputfile> : specify the name of the DB or column-data output file; default: out.db/out.dat";
+  std::cout << std::endl << "                        if the option '-o none' is used, no output file will be written.";
+  std::cout << std::endl << "       new : before writing a new output file, delete the contents of any existing file with the same name";
+  std::cout << std::endl << "       data : instead of to a DB file the data are written to a simple column structure";
+  std::cout << std::endl << "       header : force writing of the file header to the output file";
+  std::cout << std::endl << "       noheader : no file header is written to the output file";
+  std::cout << std::endl << "              If either none or both of the header options are given, the file header will be written";
+  std::cout << std::endl << "              if a new file is created, but not if the output file exists already!";
+  std::cout << std::endl << "       nosummary : no additional data from the run data file is written to the output file";
+  std::cout << std::endl << "       paramList <param> : option used to select the parameters which shall be exported.";
+  std::cout << std::endl << "               <param> is a list of parameter numbers to be exported. Allowed lists are:";
+  std::cout << std::endl << "               1-16 will export parameters 1 to 16. 1 3 5 will export parameters 1 3 5.";
+  std::cout << std::endl << "               A combination of both is possible, e.g. 1-16 19 31 62, and so on.";
+  std::cout << std::endl << "       fit : invoke musrfit to fit the specified runs";
+  std::cout << std::endl << "              All msr input files are assumed to be present, none is newly generated!";
+  std::cout << std::endl << "       fit-<template>! : generate msr files for the runs to be processed from the <template> run";
+  std::cout << std::endl << "              and call musrfit for fitting these runs";
+  std::cout << std::endl << "       fit-<template> : same as above, but the <template> run is only used for the first file creation---";
+  std::cout << std::endl << "              the successive files are generated using the musrfit output from the preceding runs";
+  std::cout << std::endl << "       msr-<template> : same as above without calling musrfit";
+  std::cout << std::endl << "              In case any fitting option is present, this option is ignored!";
+  std::cout << std::endl << "       -k, --keep-mn2-output : if fitting is used, pass the option --keep-mn2-output to musrfit";
+  std::cout << std::endl << "       -t, --title-from-data-file : if fitting is used, pass the option --title-from-data-file to musrfit";
+  std::cout << std::endl << "       -e, --estimateN0: estimate N0 for single histogram fits.";
+  std::cout << std::endl << "       -p, --per-run-block-chisq: will per run block chisq to the msr-file.";
+  std::cout << std::endl;
+  std::cout << std::endl << "       global : switch on the global-fit mode";
+  std::cout << std::endl << "              Within that mode all specified runs will be united in a single msr file!";
+  std::cout << std::endl << "              The fit parameters can be either run specific or common to all runs.";
+  std::cout << std::endl << "              For a complete description of this feature please refer to the manual.";
+  std::cout << std::endl;
+  std::cout << std::endl << "       global+[!] : operate in the global-fit mode, however, in case a global input file is created";
+  std::cout << std::endl << "              all specified runs are pre-analyzed first one by one using the given template.";
+  std::cout << std::endl << "              For the generation of the global input file, the run-specific parameter values are taken";
+  std::cout << std::endl << "              from this pre-analysis for each run---they are not just copied from the template.";
+  std::cout << std::endl << "              The specification of '!' determines which fit mode (see above) is used for this pre-analysis.";
+  std::cout << std::endl;
+  std::cout << std::endl << "    Typical examples:";
+  std::cout << std::endl;
+  std::cout << std::endl << "       msr2data 2047 2050 _tf_histo fit-2046";
+  std::cout << std::endl << "          will use 2046_tf_histo.msr as templete, and subsequently generating 2047_tf_histo.msr until";
+  std::cout << std::endl << "          2050_tf_histo.msr and fit them.";
+  std::cout << std::endl;
+  std::cout << std::endl << "       msr2data 2047 2050 _tf_histo msr-2046";
+  std::cout << std::endl << "          will use 2046_tf_histo.msr as templete, and subsequently generating 2047_tf_histo.msr until";
+  std::cout << std::endl << "          2050_tf_histo.msr, but NO fitting will be done.";
+  std::cout << std::endl;
+  std::cout << std::endl << "       msr2data 2046 2050 _tf_histo -o fitParam.db";
+  std::cout << std::endl << "          will collect the fit parameters from runs 2046-2050 (msr-files 2046_tf_histo.msr etc.) and";
+  std::cout << std::endl << "          write them to the file fitParam.db (DB-format).";
+  std::cout << std::endl;
+  std::cout << std::endl << "       msr2data [2047:2053:2 2056] _tf_histo fit-2045";
+  std::cout << std::endl << "          will use 2045_tf_histo.msr as templete, and subsequently generating msr-files from the run-list:";
+  std::cout << std::endl << "          2047 2049 2051 2053 2056 (2047_tf_histo.msr etc.) and fit them.";
+  std::cout << std::endl;
+  std::cout << std::endl << "       msr2data 2046 2058 _tf_histo paramList 1-12 data -o fitParam.dat";
+  std::cout << std::endl << "          will export the parameters number 1 trough 12 in a column like fashion of the runs 2046 to 2058,";
+  std::cout << std::endl << "          collected form the msr-files 2046_tf_histo.msr and so on.";
+  std::cout << std::endl;
+  std::cout << std::endl << "    For further information please refer to";
+  std::cout << std::endl << "       http://lmu.web.psi.ch/musrfit/user/html/msr2data.html#msr2data";
+  std::cout << std::endl << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -175,10 +172,10 @@ void msr2data_syntax()
  * \param arg vector containing the command line arguments
  *
  */
-void msr2data_cleanup(PMsr2Data *msr2dataHandler, vector<unsigned int> &run_vec, vector<string> &arg)
+void msr2data_cleanup(PMsr2Data *msr2dataHandler, std::vector<unsigned int> &run_vec, std::vector<std::string> &arg)
 {
   delete msr2dataHandler;
-  msr2dataHandler = 0;
+  msr2dataHandler = nullptr;
   run_vec.clear();
   arg.clear();
   return;
@@ -192,7 +189,7 @@ void msr2data_cleanup(PMsr2Data *msr2dataHandler, vector<unsigned int> &run_vec,
  * \param arg vector containing the command line arguments
  *
  */
-void msr2data_cleanup(PMsr2Data *msr2dataHandler, vector<string> &arg)
+void msr2data_cleanup(PMsr2Data *msr2dataHandler, std::vector<std::string> &arg)
 {
   delete msr2dataHandler;
   msr2dataHandler = 0;
@@ -211,11 +208,11 @@ void msr2data_cleanup(PMsr2Data *msr2dataHandler, vector<string> &arg)
  * \param arg list of arguments
  *
  */
-string msr2data_validArguments(const vector<string> &arg)
+std::string msr2data_validArguments(const std::vector<std::string> &arg)
 {
-  string word;
+  std::string word;
 
-  for (vector<string>::const_iterator iter(arg.begin()); iter != arg.end(); ++iter) {
+  for (std::vector<std::string>::const_iterator iter(arg.begin()); iter != arg.end(); ++iter) {
     if ( (!iter->compare("header")) || (!iter->compare("noheader")) || (!iter->compare("nosummary")) \
       || (!iter->substr(0,3).compare("fit")) || (!iter->compare("-k")) || (!iter->compare("--keep-mn2-output")) \
       || (!iter->compare("-t")) || (!iter->compare("--title-from-data-file")) \
@@ -254,16 +251,16 @@ string msr2data_validArguments(const vector<string> &arg)
  * \param arg argument string list from the msr2data call
  * \param db true if output file is a db-file
  */
-string msr2data_outputfile(vector<string> &arg, bool db = true)
+std::string msr2data_outputfile(std::vector<std::string> &arg, bool db = true)
 {
-  string outputFile;
+  std::string outputFile;
   if (db)
     outputFile = "out.db";
   else
     outputFile = "out.dat";
 
-  vector<string>::iterator iterNext(arg.begin());
-  for (vector<string>::iterator iter(arg.begin()); iter != arg.end(); ++iter) {
+  std::vector<std::string>::iterator iterNext(arg.begin());
+  for (std::vector<std::string>::iterator iter(arg.begin()); iter != arg.end(); ++iter) {
     iterNext = iter + 1;
     if (!iter->substr(0,2).compare("-o")) {
       if (!iter->compare("-o")) {
@@ -277,8 +274,8 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
           arg.erase(iter);
           break;
         } else {
-          cout << endl;
-          cout << ">> msr2data: **WARNING** You did not specify an output file! The default one (" << outputFile << ") will be used." << endl;
+          std::cout << std::endl;
+          std::cout << ">> msr2data: **WARNING** You did not specify an output file! The default one (" << outputFile << ") will be used." << std::endl;
           arg.erase(iter);
           break;
         }
@@ -304,11 +301,11 @@ string msr2data_outputfile(vector<string> &arg, bool db = true)
  * \param arg list of arguments
  * \param s option string
  */
-bool msr2data_useOption(vector<string> &arg, const string &s)
+bool msr2data_useOption(std::vector<std::string> &arg, const std::string &s)
 {
   bool option(true);
 
-  vector<string>::iterator iter;
+  std::vector<std::string>::iterator iter;
   iter = find(arg.begin(), arg.end(), s);
 
   if (iter != arg.end()) {
@@ -333,12 +330,12 @@ bool msr2data_useOption(vector<string> &arg, const string &s)
  * \param chainfit if true
  *
  */
-int msr2data_doFitting(vector<string> &arg, bool &chainfit)
+int msr2data_doFitting(std::vector<std::string> &arg, bool &chainfit)
 {
   int temp(0);
 
-  string s;
-  vector<string>::iterator iter(arg.begin());
+  std::string s;
+  std::vector<std::string>::iterator iter(arg.begin());
   while (iter != arg.end()) {
     if (!iter->compare("fit")) { // fit found
       if (temp) { // temp already found previously
@@ -353,8 +350,8 @@ int msr2data_doFitting(vector<string> &arg, bool &chainfit)
         return -2; // fatal error - another fit option is specified
       }
       s = iter->substr(4);
-      string::size_type loc = s.rfind('!');
-      if (loc != string::npos) {
+      std::string::size_type loc = s.rfind('!');
+      if (loc != std::string::npos) {
         chainfit = false;
         s.erase(loc);
       }
@@ -386,12 +383,12 @@ int msr2data_doFitting(vector<string> &arg, bool &chainfit)
  * \param arg list of arguments
  * \param inputOnly flag, if true create msr-files only (no fitting)
  */
-int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
+int msr2data_doInputCreation(std::vector<std::string> &arg, bool &inputOnly)
 {
   int temp(0);
 
-  string s;
-  for (vector<string>::iterator iter(arg.begin()); iter != arg.end(); ++iter) {
+  std::string s;
+  for (std::vector<std::string>::iterator iter(arg.begin()); iter != arg.end(); ++iter) {
     if (!iter->substr(0,4).compare("msr-")) {
       s = iter->substr(4);
       try {
@@ -414,7 +411,7 @@ int msr2data_doInputCreation(vector<string> &arg, bool &inputOnly)
  * <p>
  *
  */
-int msr2data_paramList(vector<string> &arg, vector<unsigned int> &paramList)
+int msr2data_paramList(std::vector<std::string> &arg, std::vector<unsigned int> &paramList)
 {
   paramList.clear(); // make sure paramList is empty
 
@@ -433,24 +430,24 @@ int msr2data_paramList(vector<string> &arg, vector<unsigned int> &paramList)
 
   // make sure there are parameter list elements to follow
   if (idx == arg.size()) {
-    cerr << endl << "**ERROR** found paramList without any arguments!" << endl;
+    std::cerr << std::endl << "**ERROR** found paramList without any arguments!" << std::endl;
     msr2data_syntax();
     return -1;
   }
 
   // paramList tag present and further elements present: collect them
-  vector<string> str;
+  std::vector<std::string> str;
   unsigned int idx_end=0;
-  size_t pos=string::npos;
+  size_t pos=std::string::npos;
   for (unsigned int i=idx; i<arg.size(); i++) {
     pos = arg[i].find("-");
     if (pos == 0) { // likely something like -o, -k, etc.
       idx_end = i;
       break;
-    } else if (pos != string::npos) { // looks like a parameter list like n0-n1
+    } else if (pos != std::string::npos) { // looks like a parameter list like n0-n1
       boost::split(str, arg[i], boost::is_any_of("-"));
       if (str.size() != 2) { // something is wrong, since the structure n0-n1 is expected
-        cerr << endl << "**ERROR** found token " << arg[i] << " in paramList command which cannot be handled." << endl;
+        std::cerr << std::endl << "**ERROR** found token " << arg[i] << " in paramList command which cannot be handled." << std::endl;
         msr2data_syntax();
         return -1;
       }
@@ -459,7 +456,7 @@ int msr2data_paramList(vector<string> &arg, vector<unsigned int> &paramList)
         break;
       }
       if (!isNumber(str[0]) || !isNumber(str[1])) {
-        cerr << endl << "**ERROR** found token " << arg[i] << " in paramList command which cannot be handled." << endl;
+        std::cerr << std::endl << "**ERROR** found token " << arg[i] << " in paramList command which cannot be handled." << std::endl;
         msr2data_syntax();
         return -1;
       }
@@ -484,7 +481,7 @@ int msr2data_paramList(vector<string> &arg, vector<unsigned int> &paramList)
   for (unsigned int i=0; i<paramList.size(); i++) {
     for (unsigned int j=i+1; j<paramList.size(); j++) {
       if (paramList[i] == paramList[j]) {
-        cerr << endl << "**ERROR** the parameter list numbers have to be unique. Found " << paramList[i] << " at least 2 times." << endl;
+        std::cerr << std::endl << "**ERROR** the parameter list numbers have to be unique. Found " << paramList[i] << " at least 2 times." << std::endl;
         msr2data_syntax();
         return -1;
       }
@@ -501,7 +498,7 @@ int msr2data_paramList(vector<string> &arg, vector<unsigned int> &paramList)
  * \htmlonly <a href="http://lmu.web.psi.ch/musrfit/user/html/msr2data.html#msr2data">musr2data online help</a>
  * \endhtmlonly
  * \latexonly msr2data online help: \texttt{http://lmu.web.psi.ch/musrfit/user/html/msr2data.html#msr2data}
- * \endlatexonly
+ * \std::endlatexonly
  *
  * \param argc number of arguments
  * \param argv list of arguments
@@ -515,9 +512,9 @@ int main(int argc, char *argv[])
       return 0;
     } else if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
-      cout << endl << "msr2data version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "msr2data version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #else
-      cout << endl << "msr2data git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << endl << endl;
+      std::cout << std::endl << "msr2data git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #endif
       return 0;
     } else {
@@ -533,23 +530,23 @@ int main(int argc, char *argv[])
   }
 
   // use a string-vector for the arguments to get rid of char* as far as possible...
-  vector<string> arg;
+  std::vector<std::string> arg;
   for (int i(1); i<argc; ++i) {
     arg.push_back(argv[i]);
   }
 
   unsigned int runTAG;
-  vector<unsigned int> run_vec;
-  string run_list;
-  string msrExtension;
-  vector<unsigned int> param_vec;
+  std::vector<unsigned int> run_vec;
+  std::string run_list;
+  std::string msrExtension;
+  std::vector<unsigned int> param_vec;
 
   try {
     if (arg[0].at(0) == '[') { // In case a list of runs is given by [...]
       runTAG = 1;
 
       unsigned int firstRunNumberInArg(0), lastRunNumberInArg(0);
-      unsigned int rightbracket(numeric_limits<unsigned int>::max());
+      unsigned int rightbracket(std::numeric_limits<unsigned int>::max());
 
       if (!arg[0].compare("["))
         firstRunNumberInArg = 1;
@@ -557,8 +554,8 @@ int main(int argc, char *argv[])
         arg[0]=arg[0].substr(1);
 
       for (unsigned int i(firstRunNumberInArg); i<arg.size(); ++i) {
-        string::size_type loc = arg[i].rfind(']');
-        if ( loc != string::npos ) {
+        std::string::size_type loc = arg[i].rfind(']');
+        if ( loc != std::string::npos ) {
           rightbracket = i;
           if (!arg[i].compare("]") && i > 0)
             lastRunNumberInArg = i-1;
@@ -569,9 +566,9 @@ int main(int argc, char *argv[])
           break;
         }
       }
-      if (rightbracket == numeric_limits<unsigned int>::max()) {
-        cerr << endl;
-        cerr << ">> msr2data: **ERROR** You used the list specification without closing bracket (])! Quitting now." << endl;
+      if (rightbracket == std::numeric_limits<unsigned int>::max()) {
+        std::cerr << std::endl;
+        std::cerr << ">> msr2data: **ERROR** You used the list specification without closing bracket (])! Quitting now." << std::endl;
         return 0;
       }
 
@@ -582,14 +579,14 @@ int main(int argc, char *argv[])
       // parse run_list string
       PStringNumberList *nl = new PStringNumberList(run_list);
       if (nl == 0) { // couldn't invoke object
-        cerr << endl;
-        cerr << ">> msr2data: **ERROR** Couldn't invoke run_list parser object! Quitting now." << endl;
+        std::cerr << std::endl;
+        std::cerr << ">> msr2data: **ERROR** Couldn't invoke run_list parser object! Quitting now." << std::endl;
         return 0;
       }
-      string errorMsg("");
+      std::string errorMsg("");
       if (!nl->Parse(errorMsg)) {
-        cerr << endl;
-        cerr << ">> msr2data: " << errorMsg << " - Quitting now." << endl;
+        std::cerr << std::endl;
+        std::cerr << ">> msr2data: " << errorMsg << " - Quitting now." << std::endl;
         return 0;
       }
       // get run list vector
@@ -598,7 +595,7 @@ int main(int argc, char *argv[])
 
       msrExtension = arg[rightbracket + 1];
 
-      vector<string>::iterator iter(arg.begin());
+      std::vector<std::string>::iterator iter(arg.begin());
       for (unsigned int i(0); i<rightbracket + 2; ++i) {
         arg.erase(iter);
         iter = arg.begin();
@@ -611,8 +608,8 @@ int main(int argc, char *argv[])
         runTAG = 2;
 
         if (arg.size() < 3) {
-          cerr << endl;
-          cerr << ">> msr2data: **ERROR** No msr-file extension specified! Quitting now..." << endl;
+          std::cerr << std::endl;
+          std::cerr << ">> msr2data: **ERROR** No msr-file extension specified! Quitting now..." << std::endl;
           run_vec.clear();
           arg.clear();
           return 0;
@@ -623,7 +620,7 @@ int main(int argc, char *argv[])
 
         msrExtension = arg[2];
 
-        vector<string>::iterator iter(arg.begin());
+        std::vector<std::string>::iterator iter(arg.begin());
         for (unsigned int i(0); i < 3; i++) {
           arg.erase(iter);
           iter = arg.begin();
@@ -633,7 +630,7 @@ int main(int argc, char *argv[])
         run_vec.push_back(boost::lexical_cast<unsigned int>(arg[0]));
         msrExtension = arg[1];
 
-        vector<string>::iterator iter(arg.begin());
+        std::vector<std::string>::iterator iter(arg.begin());
         for (unsigned int i(0); i < 2; i++) {
           arg.erase(iter);
           iter = arg.begin();
@@ -643,7 +640,7 @@ int main(int argc, char *argv[])
         run_list = arg[0];
         msrExtension = arg[1];
 
-        vector<string>::iterator iter(arg.begin());
+        std::vector<std::string>::iterator iter(arg.begin());
         for (unsigned int i(0); i < 2; i++) {
           arg.erase(iter);
           iter = arg.begin();
@@ -652,8 +649,8 @@ int main(int argc, char *argv[])
     }
   }
   catch(boost::bad_lexical_cast &) {
-    cerr << endl;
-    cerr << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << endl;
+    std::cerr << std::endl;
+    std::cerr << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << std::endl;
     run_vec.clear();
     arg.clear();
     return -1;
@@ -667,10 +664,10 @@ int main(int argc, char *argv[])
   }
 
   // check the validity of the command line given command line arguments
-  string wrongArgument(msr2data_validArguments(arg));
+  std::string wrongArgument(msr2data_validArguments(arg));
   if (!wrongArgument.empty()) {
-    cerr << endl;
-    cerr << ">> msr2data: **ERROR** Unknown argument: " << wrongArgument << ". Quitting..." << endl;
+    std::cerr << std::endl;
+    std::cerr << ">> msr2data: **ERROR** Unknown argument: " << wrongArgument << ". Quitting..." << std::endl;
     run_vec.clear();
     arg.clear();
     return -1;
@@ -680,11 +677,11 @@ int main(int argc, char *argv[])
   bool db(msr2data_useOption(arg, "data"));
 
   // check the arguments for the "-o" option and set the output filename
-  string outputFile(msr2data_outputfile(arg, db));
+  std::string outputFile(msr2data_outputfile(arg, db));
 
   // introduce check, if no output should be generated - in that case we do not need msrfile and rundata handlers later
   bool realOutput(true);
-  if (!to_lower_copy(outputFile).compare("none"))
+  if (!boost::algorithm::to_lower_copy(outputFile).compare("none"))
     realOutput = false;
 
   // create the msr2data-object and set the run numbers according to the runTAG above
@@ -706,15 +703,15 @@ int main(int argc, char *argv[])
       status = msr2dataHandler->SetRunNumbers(run_list);
       break;
     default:
-      cerr << endl;
-      cerr << ">> msr2data: **ERROR** None of the possible run list specifications has been detected! Quitting now..." << endl;
+      std::cerr << std::endl;
+      std::cerr << ">> msr2data: **ERROR** None of the possible run list specifications has been detected! Quitting now..." << std::endl;
       msr2data_cleanup(msr2dataHandler, run_vec, arg);
       return 0;
   }
 
   if (status == 1) {
-    cerr << endl;
-    cerr << ">> msr2data: **ERROR** The run numbers are out of range! Quitting..." << endl;
+    std::cerr << std::endl;
+    std::cerr << ">> msr2data: **ERROR** The run numbers are out of range! Quitting..." << std::endl;
     msr2data_cleanup(msr2dataHandler, run_vec, arg);
     return status;
   } else if (status == -1) {
@@ -727,18 +724,18 @@ int main(int argc, char *argv[])
   // check if fitting should be done and in case, which template run number to use
   int temp(0);
   bool chainfit(true), onlyInputCreation(false);
-  string musrfitOptions;
+  std::string musrfitOptions;
 
   temp = msr2data_doFitting(arg, chainfit);
 
   if (temp == -2) {
-    cerr << endl;
-    cerr << ">> msr2data: **ERROR** More than one fitting options are specified! Quitting..." << endl;
+    std::cerr << std::endl;
+    std::cerr << ">> msr2data: **ERROR** More than one fitting options are specified! Quitting..." << std::endl;
     msr2data_cleanup(msr2dataHandler, arg);
     return temp;
   } else if (temp == -3) {
-    cerr << endl;
-    cerr << ">> msr2data: **ERROR** The given template has not a valid run number! Quitting..." << endl;
+    std::cerr << std::endl;
+    std::cerr << ">> msr2data: **ERROR** The given template has not a valid run number! Quitting..." << std::endl;
     msr2data_cleanup(msr2dataHandler, arg);
     return temp;
   }
@@ -765,8 +762,8 @@ int main(int argc, char *argv[])
       outputFile = "none";
     }
     if (temp == -3) {
-      cerr << endl;
-      cerr << ">> msr2data: **ERROR** The given template has not a valid run number! Quitting..." << endl;
+      std::cerr << std::endl;
+      std::cerr << ">> msr2data: **ERROR** The given template has not a valid run number! Quitting..." << std::endl;
       msr2data_cleanup(msr2dataHandler, arg);
       return temp;
     }
@@ -800,8 +797,8 @@ int main(int argc, char *argv[])
   // Check if all given run numbers are covered by the formatting of the data file name
   status = msr2dataHandler->CheckRunNumbersInRange();
   if(status) {
-    cerr << endl;
-    cerr << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << endl;
+    std::cerr << std::endl;
+    std::cerr << ">> msr2data: **ERROR** At least one given run number is out of range! Quitting..." << std::endl;
     msr2data_cleanup(msr2dataHandler, arg);
     return status;
   }
@@ -812,7 +809,7 @@ int main(int argc, char *argv[])
   //              1 - write header explicitly (even if the file is present already)
   //              2 - write header automatically if a new file is created and do not if the data is appended to an existing file
 
-  fstream *fileOutput = 0;
+  std::fstream *fileOutput = nullptr;
   if (realOutput) {
     // check the arguments for the "header" and "noheader" options
     if (!msr2data_useOption(arg, "header")) {
@@ -830,15 +827,15 @@ int main(int argc, char *argv[])
 
     // delete old db/data file if the "new" option is given
     if (!msr2data_useOption(arg, "new")) {
-      fileOutput = new fstream;
-      fileOutput->open(outputFile.c_str(), ios::in);
+      fileOutput = new std::fstream;
+      fileOutput->open(outputFile.c_str(), std::ios::in);
       if (fileOutput->is_open()) {
-        cout << endl << ">> msr2data: **INFO** Deleting output file " << outputFile << endl;
+        std::cout << std::endl << ">> msr2data: **INFO** Deleting output file " << outputFile << std::endl;
         fileOutput->close();
-        fileOutput->open(outputFile.c_str(), ios::out | ios::trunc);
+        fileOutput->open(outputFile.c_str(), std::ios::out | std::ios::trunc);
         fileOutput->close();
       } else {
-        cout << endl << ">> msr2data: **INFO** Ignoring the 'new' option since " << outputFile << " does not exist yet." << endl;
+        std::cout << std::endl << ">> msr2data: **INFO** Ignoring the 'new' option since " << outputFile << " does not exist yet." << std::endl;
       }
       delete fileOutput;
       fileOutput = 0;
@@ -850,7 +847,7 @@ int main(int argc, char *argv[])
 
   // GLOBAL MODE
   if (!setNormalMode) {
-    ostringstream strInfile;
+    std::ostringstream strInfile;
     strInfile << msr2dataHandler->GetPresentRun() << "+global" << msrExtension << ".msr";
 
     // if fitting should be done, prepare a new input file
@@ -859,7 +856,7 @@ int main(int argc, char *argv[])
         bool success(msr2dataHandler->PrepareGlobalInputFile(temp, strInfile.str(), globalMode));
 
         if (!success) {
-          cerr << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
+          std::cerr << std::endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << std::endl;
           msr2data_cleanup(msr2dataHandler, arg);
           return -1;
         }
@@ -868,23 +865,23 @@ int main(int argc, char *argv[])
       // and do the fitting
       if (!onlyInputCreation) {
         // check if MUSRFITPATH is set, if not issue a warning
-        string path("");
+        std::string path("");
         bool pathSet(false);
         char *pathPtr(getenv("MUSRFITPATH"));
         if (pathPtr) {
-          path = boost::lexical_cast<string>(pathPtr);
+          path = boost::lexical_cast<std::string>(pathPtr);
           if (!path.empty()) {
             pathSet = true;
             path.append("/");
           }
         }
         if (!pathSet) {
-          cerr << endl << ">> msr2data: **WARNING** The MUSRFITPATH environment variable is not set!";
-          cerr << endl << ">> msr2data: **WARNING** Please set it or at least ensure that musrfit can be found on the PATH!" << endl;
+          std::cerr << std::endl << ">> msr2data: **WARNING** The MUSRFITPATH environment variable is not set!";
+          std::cerr << std::endl << ">> msr2data: **WARNING** Please set it or at least ensure that musrfit can be found on the PATH!" << std::endl;
         }
-        ostringstream oss;
+        std::ostringstream oss;
         oss << path << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
-        cout << endl << ">> msr2data: **INFO** Calling " << oss.str() << endl;
+        std::cout << std::endl << ">> msr2data: **INFO** Calling " << oss.str() << std::endl;
         system(oss.str().c_str());
       }
     }
@@ -928,7 +925,7 @@ int main(int argc, char *argv[])
     // Processing the run list, do the fitting and write the data to the DB or data output file
     bool firstrun(true);
     unsigned int oldtemp(0); // should be accessed only when updated before...
-    ostringstream strInfile;
+    std::ostringstream strInfile;
 
     while (msr2dataHandler->GetPresentRun()) {
       strInfile.clear();
@@ -948,7 +945,7 @@ int main(int argc, char *argv[])
           oldtemp = msr2dataHandler->GetPresentRun();
 
           if (!success) {
-            cerr << endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << endl;
+            std::cerr << std::endl << ">> msr2data: **ERROR** Input file generation has not been successful! Quitting..." << std::endl;
             msr2data_cleanup(msr2dataHandler, arg);
             return -1;
           }
@@ -957,23 +954,23 @@ int main(int argc, char *argv[])
         // and do the fitting
         if (!onlyInputCreation) {
           // check if MUSRFITPATH is set, if not issue a warning
-          string path("");
+          std::string path("");
           bool pathSet(false);
           char *pathPtr(getenv("MUSRFITPATH"));
           if (pathPtr) {
-            path = boost::lexical_cast<string>(pathPtr);
+            path = boost::lexical_cast<std::string>(pathPtr);
             if (!path.empty()) {
               pathSet = true;
               path.append("/");
             }
           }
           if (!pathSet) {
-            cerr << endl << ">> msr2data: **WARNING** The MUSRFITPATH environment variable is not set!";
-            cerr << endl << ">> msr2data: **WARNING** Please set it or at least ensure that musrfit can be found on the PATH!" << endl;
+            std::cerr << std::endl << ">> msr2data: **WARNING** The MUSRFITPATH environment variable is not set!";
+            std::cerr << std::endl << ">> msr2data: **WARNING** Please set it or at least ensure that musrfit can be found on the PATH!" << std::endl;
           }
-          ostringstream oss;
+          std::ostringstream oss;
           oss << path << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
-          cout << endl << ">> msr2data: **INFO** Calling " << oss.str() << endl;
+          std::cout << std::endl << ">> msr2data: **INFO** Calling " << oss.str() << std::endl;
           system(oss.str().c_str());
         }
       }
@@ -1012,37 +1009,37 @@ int main(int argc, char *argv[])
   // Unfortunately, there are also problems with boost::filesystem::exists(outputFile)
   // Therefore, first try to open the file for reading and if this works, write to it - not clean but it works
   if (realOutput) {
-    fileOutput = new fstream;
-    fileOutput->open(outputFile.c_str(), ios::in);
+    fileOutput = new std::fstream;
+    fileOutput->open(outputFile.c_str(), std::ios::in);
     if (fileOutput->is_open()) {
       fileOutput->close();
-      fileOutput->open(outputFile.c_str(), ios::out | ios::app);
+      fileOutput->open(outputFile.c_str(), std::ios::out | std::ios::app);
       if (fileOutput->is_open()) {
-        *fileOutput << endl << endl;
+        *fileOutput << std::endl << std::endl;
         fileOutput->close();
       } else {
-        cerr << endl << ">> msr2data: **ERROR** The output file " << outputFile << " cannot be opened! Please check!";
-        cerr << endl;
+        std::cerr << std::endl << ">> msr2data: **ERROR** The output file " << outputFile << " cannot be opened! Please check!";
+        std::cerr << std::endl;
       }
     } else {
-      cerr << endl << ">> msr2data: **WARNING** No output has been written to the file " << outputFile << "!";
-      cerr << endl << ">> msr2data: **WARNING** Please check the range of runs and the specified options!" << endl;
+      std::cerr << std::endl << ">> msr2data: **WARNING** No output has been written to the file " << outputFile << "!";
+      std::cerr << std::endl << ">> msr2data: **WARNING** Please check the range of runs and the specified options!" << std::endl;
     }
     delete fileOutput;
     fileOutput = 0;
   }
 
   if (!arg.empty()) {
-    cout << endl << ">> msr2data: **INFO** The following command line arguments have been specified but not been used: " << endl;
-    cout << ">> msr2data: **INFO**";
+    std::cout << std::endl << ">> msr2data: **INFO** The following command line arguments have been specified but not been used: " << std::endl;
+    std::cout << ">> msr2data: **INFO**";
     for (unsigned int i(0); i<arg.size(); ++i)
-      cout << " " << arg[i];
-    cout << endl;
+      std::cout << " " << arg[i];
+    std::cout << std::endl;
   }
 
   msr2data_cleanup(msr2dataHandler, arg);
 
-  cout << endl << ">> msr2data: done ..." << endl;
+  std::cout << std::endl << ">> msr2data: done ..." << std::endl;
 
   return 1;
 }

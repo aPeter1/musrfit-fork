@@ -44,22 +44,22 @@ public:
   ~TBulkTriVortexLondon();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
-  mutable vector<double> fPar; ///< parameters of the model
+  mutable std::vector<double> fPar; ///< parameters of the model
   TBulkTriVortexLondonFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
   mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
   mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
-  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
-  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
-  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
-  string fWisdom; ///< file name of the FFTW wisdom file
+  mutable std::vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable std::vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable std::vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  std::string fWisdom; ///< file name of the FFTW wisdom file
   unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkTriVortexLondon,1)
@@ -77,22 +77,22 @@ public:
   ~TBulkSqVortexLondon();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
-  mutable vector<double> fPar; ///< parameters of the model
+  mutable std::vector<double> fPar; ///< parameters of the model
   TBulkSqVortexLondonFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
   mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
   mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
-  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
-  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
-  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
-  string fWisdom; ///< file name of the FFTW wisdom file
+  mutable std::vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable std::vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable std::vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  std::string fWisdom; ///< file name of the FFTW wisdom file
   unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkSqVortexLondon,1)
@@ -110,22 +110,22 @@ public:
   ~TBulkTriVortexML();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
-  mutable vector<double> fPar; ///< parameters of the model
+  mutable std::vector<double> fPar; ///< parameters of the model
   TBulkTriVortexMLFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
   mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
   mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
-  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
-  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
-  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
-  string fWisdom; ///< file name of the FFTW wisdom file
+  mutable std::vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable std::vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable std::vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  std::string fWisdom; ///< file name of the FFTW wisdom file
   unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkTriVortexML,1)
@@ -143,22 +143,22 @@ public:
   ~TBulkTriVortexAGL();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
-  mutable vector<double> fPar; ///< parameters of the model
+  mutable std::vector<double> fPar; ///< parameters of the model
   TBulkTriVortexAGLFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
   mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
   mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
-  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
-  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
-  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
-  string fWisdom; ///< file name of the FFTW wisdom file
+  mutable std::vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable std::vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable std::vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  std::string fWisdom; ///< file name of the FFTW wisdom file
   unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkTriVortexAGL,1)
@@ -176,22 +176,22 @@ public:
   ~TBulkTriVortexAGLII();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
-  mutable vector<double> fPar; ///< parameters of the model
+  mutable std::vector<double> fPar; ///< parameters of the model
   TBulkTriVortexAGLIIFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
   mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
   mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
-  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
-  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
-  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
-  string fWisdom; ///< file name of the FFTW wisdom file
+  mutable std::vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable std::vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable std::vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  std::string fWisdom; ///< file name of the FFTW wisdom file
   unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkTriVortexAGLII,1)
@@ -209,22 +209,22 @@ public:
   ~TBulkTriVortexNGL();
 
   virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, UInt_t idx) { }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
   virtual Bool_t GlobalPartIsValid() const { return true; }
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
-  mutable vector<double> fPar; ///< parameters of the model
+  mutable std::vector<double> fPar; ///< parameters of the model
   TBulkTriVortexNGLFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
   mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
   mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
-  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
-  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
-  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
-  string fWisdom; ///< file name of the FFTW wisdom file
+  mutable std::vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable std::vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable std::vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  std::string fWisdom; ///< file name of the FFTW wisdom file
   unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   ClassDef(TBulkTriVortexNGL,1)
@@ -245,22 +245,22 @@ public:
 
   bool IsValid() { return fValid; }
 
-  void Calc(const vector<double>&) const;
+  void Calc(const std::vector<double>&) const;
 
   const TPofTCalc* GetPolarizationPointer() const { return fPofT; }
 
 private:
   mutable bool fValid; ///< tag indicating if the global part has been calculated
-  mutable vector<double> fPar; ///< parameter vector
+  mutable std::vector<double> fPar; ///< parameter vector
   TBulkAnisotropicTriVortexLondonFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
   mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
   mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
-  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
-  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
-  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
-  string fWisdom; ///< file name of the FFTW wisdom file
+  mutable std::vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable std::vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable std::vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  std::string fWisdom; ///< file name of the FFTW wisdom file
   unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   // definition of the class for the ROOT-dictionary
@@ -280,10 +280,10 @@ public:
   ~TBulkAnisotropicTriVortexLondon();
 
   virtual bool NeedGlobalPart() const { return true; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, unsigned int idx);
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, unsigned int idx);
   virtual bool GlobalPartIsValid() const;
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
   bool fValid;
@@ -309,22 +309,22 @@ public:
 
   bool IsValid() { return fValid; }
 
-  void Calc(const vector<double>&) const;
+  void Calc(const std::vector<double>&) const;
 
   const TPofTCalc* GetPolarizationPointer() const { return fPofT; }
 
 private:
   mutable bool fValid; ///< tag indicating if the global part has been calculated
-  mutable vector<double> fPar; ///< parameter vector
+  mutable std::vector<double> fPar; ///< parameter vector
   TBulkAnisotropicTriVortexMLFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
   mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
   mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
-  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
-  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
-  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
-  string fWisdom; ///< file name of the FFTW wisdom file
+  mutable std::vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable std::vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable std::vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  std::string fWisdom; ///< file name of the FFTW wisdom file
   unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   // definition of the class for the ROOT-dictionary
@@ -344,10 +344,10 @@ public:
   ~TBulkAnisotropicTriVortexML();
 
   virtual bool NeedGlobalPart() const { return true; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, unsigned int idx);
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, unsigned int idx);
   virtual bool GlobalPartIsValid() const;
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
   bool fValid;
@@ -373,22 +373,22 @@ public:
 
   bool IsValid() { return fValid; }
 
-  void Calc(const vector<double>&) const;
+  void Calc(const std::vector<double>&) const;
 
   const TPofTCalc* GetPolarizationPointer() const { return fPofT; }
 
 private:
   mutable bool fValid; ///< tag indicating if the global part has been calculated
-  mutable vector<double> fPar; ///< parameter vector
+  mutable std::vector<double> fPar; ///< parameter vector
   TBulkAnisotropicTriVortexAGLFieldCalc *fVortex; ///< spatial field distribution B(x,y) within the vortex lattice
   TPofBCalc *fPofB; ///< static field distribution P(B)
   TPofTCalc *fPofT; ///< muon spin polarization p(t)
   mutable bool fCalcNeeded; ///< tag needed to avoid unnecessary calculations if the core parameters were unchanged
   mutable bool fFirstCall; ///< tag for checking if the function operator is called the first time
-  mutable vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
-  mutable vector<double> fParForPofB; ///< parameters for the calculation of P(B)
-  mutable vector<double> fParForPofT; ///< parameters for the calculation of p(t)
-  string fWisdom; ///< file name of the FFTW wisdom file
+  mutable std::vector<double> fParForVortex; ///< parameters for the calculation of B(x,y)
+  mutable std::vector<double> fParForPofB; ///< parameters for the calculation of P(B)
+  mutable std::vector<double> fParForPofT; ///< parameters for the calculation of p(t)
+  std::string fWisdom; ///< file name of the FFTW wisdom file
   unsigned int fGridSteps; ///< number of points in x- and y-direction for which B(x,y) is calculated
 
   // definition of the class for the ROOT-dictionary
@@ -408,10 +408,10 @@ public:
   ~TBulkAnisotropicTriVortexAGL();
 
   virtual bool NeedGlobalPart() const { return true; }
-  virtual void SetGlobalPart(vector<void *> &globalPart, unsigned int idx);
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, unsigned int idx);
   virtual bool GlobalPartIsValid() const;
 
-  double operator()(double, const vector<double>&) const;
+  double operator()(double, const std::vector<double>&) const;
 
 private:
   bool fValid;

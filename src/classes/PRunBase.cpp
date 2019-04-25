@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -47,8 +47,8 @@
 PRunBase::PRunBase()
 {
   fRunNo = -1;
-  fRunInfo = 0;
-  fRawData = 0;
+  fRunInfo = nullptr;
+  fRawData = nullptr;
   fTimeResolution = -1.0;
 
   fFitStartTime = PMUSR_UNDEFINED;
@@ -76,7 +76,7 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
 
   fRunNo = static_cast<Int_t>(runNo);
   if (runNo > fMsrInfo->GetMsrRunList()->size()) {
-    fRunInfo = 0;
+    fRunInfo = nullptr;
     return;
   }
 
@@ -84,8 +84,8 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
   fRunInfo = &(*fMsrInfo->GetMsrRunList())[runNo];
 
   // check the parameter and map range of the functions
-  if (!fMsrInfo->CheckMapAndParamRange(fRunInfo->GetMap()->size(), fMsrInfo->GetNoOfParams())) {
-    cerr << endl << "**SEVERE ERROR** PRunBase::PRunBase: map and/or parameter out of range in FUNCTIONS." << endl;
+  if (!fMsrInfo->CheckMapAndParamRange(static_cast<UInt_t>(fRunInfo->GetMap()->size()), fMsrInfo->GetNoOfParams())) {
+    std::cerr << std::endl << "**SEVERE ERROR** PRunBase::PRunBase: map and/or parameter out of range in FUNCTIONS." << std::endl;
     exit(0);
   }
 
@@ -96,12 +96,12 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
 
   // generate theory
   fTheory = new PTheory(fMsrInfo, runNo);
-  if (fTheory == 0) {
-    cerr << endl << "**SEVERE ERROR** PRunBase::PRunBase: Couldn't create an instance of PTheory :-(, will quit" << endl;
+  if (fTheory == nullptr) {
+    std::cerr << std::endl << "**SEVERE ERROR** PRunBase::PRunBase: Couldn't create an instance of PTheory :-(, will quit" << std::endl;
     exit(0);
   }
   if (!fTheory->IsValid()) {
-    cerr << endl << "**SEVERE ERROR** PRunBase::PRunBase: Theory is not valid :-(, will quit" << endl;
+    std::cerr << std::endl << "**SEVERE ERROR** PRunBase::PRunBase: Theory is not valid :-(, will quit" << std::endl;
     exit(0);
   }
 
@@ -146,20 +146,21 @@ void PRunBase::SetFitRange(PDoublePairVector fitRange)
     end   = fitRange[0].second;
   } else {
     // check that fRunNo is found within fitRange
-    if (fRunNo < static_cast<Int_t>(fitRange.size())) { // fRunNo present
-      start = fitRange[fRunNo].first;
-      end   = fitRange[fRunNo].second;
+    UInt_t idx=static_cast<UInt_t>(fRunNo);
+    if (idx < fitRange.size()) { // fRunNo present
+      start = fitRange[idx].first;
+      end   = fitRange[idx].second;
     } else { // fRunNo NOT present
-      cerr << endl << ">> PRunBase::SetFitRange(): **ERROR** msr-file run entry " << fRunNo << " not present in fit range vector.";
-      cerr << endl << ">>    Will not do anything! Please check, this shouldn't happen." << endl;
+      std::cerr << std::endl << ">> PRunBase::SetFitRange(): **ERROR** msr-file run entry " << fRunNo << " not present in fit range vector.";
+      std::cerr << std::endl << ">>    Will not do anything! Please check, this shouldn't happen." << std::endl;
       return;
     }
   }
 
   // check that start is before end
   if (start > end) {
-    cerr << endl << ">> PRunBase::SetFitRange(): **WARNING** start=" << start << " is > as end=" << end;
-    cerr << endl << ">>    Will swap them, since otherwise chisq/logLH == 0.0" << endl;
+    std::cerr << std::endl << ">> PRunBase::SetFitRange(): **WARNING** start=" << start << " is > as end=" << end;
+    std::cerr << std::endl << ">>    Will swap them, since otherwise chisq/logLH == 0.0" << std::endl;
     fFitStartTime = end;
     fFitEndTime   = start;
   } else {
@@ -178,7 +179,7 @@ void PRunBase::CleanUp()
 {
   if (fTheory) {
     delete fTheory;
-    fTheory = 0;
+    fTheory = nullptr;
   }
 }
 
@@ -199,7 +200,7 @@ void PRunBase::CalculateKaiserFilterCoeff(Double_t wc, Double_t A, Double_t dw)
 {
   Double_t beta;
   Double_t dt = fData.GetTheoryTimeStep();
-  UInt_t m;
+  Int_t m;
 
   // estimate beta (see reference above, p.574ff)
   if (A > 50.0) {
@@ -218,13 +219,13 @@ void PRunBase::CalculateKaiserFilterCoeff(Double_t wc, Double_t A, Double_t dw)
   Double_t alpha = static_cast<Double_t>(m)/2.0;
   Double_t dval;
   Double_t dsum = 0.0;
-  for (UInt_t i=0; i<=m; i++) {
+  for (Int_t i=0; i<=m; i++) {
     dval  = TMath::Sin(wc*(i-alpha)*dt)/(TMath::Pi()*(i-alpha)*dt);
     dval *= TMath::BesselI0(beta*TMath::Sqrt(1.0-TMath::Power((i-alpha)*dt/alpha, 2.0)))/TMath::BesselI0(beta);
     dsum += dval;
     fKaiserFilter.push_back(dval);
   }  
-  for (UInt_t i=0; i<=m; i++) {
+  for (UInt_t i=0; i<=static_cast<UInt_t>(m); i++) {
     fKaiserFilter[i] /= dsum;
   }
 }
