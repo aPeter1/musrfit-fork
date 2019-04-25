@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010-2016 by Andreas Suter                              *
+ *   Copyright (C) 2010-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -39,6 +39,7 @@
 #include <QVector>
 #include <QProcess>
 #include <QFileInfo>
+#include <QByteArray>
 
 #include <QtDebug>
 
@@ -63,7 +64,7 @@ class PTextEdit : public QMainWindow
   Q_OBJECT
 
 public:
-  PTextEdit( QWidget *parent = 0, Qt::WindowFlags f = 0 );
+  PTextEdit( QWidget *parent = nullptr, Qt::WindowFlags f = nullptr );
   virtual ~PTextEdit() {}
 
 public slots:
@@ -132,6 +133,7 @@ private slots:
   void musrFit();
   void musrMsr2Data();
   void musrView();
+  void musrViewFinished(int, QProcess::ExitStatus);
   void musrT0();
   void musrFT();
   void musrPrefs();

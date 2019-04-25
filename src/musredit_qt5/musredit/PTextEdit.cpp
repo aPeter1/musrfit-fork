@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010-2016 by Andreas Suter                              *
+ *   Copyright (C) 2010-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include <QString>
 #include <QStringList>
@@ -94,17 +93,17 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   // enable file system watcher. Needed to get notification if the msr-file is changed outside of musrfit at runtime
   fFileSystemWatcherActive = true;
   fFileSystemWatcher = new QFileSystemWatcher();
-  if (fFileSystemWatcher == 0) {
+  if (fFileSystemWatcher == nullptr) {
     QMessageBox::information(this, "**ERROR**", "Couldn't invoke QFileSystemWatcher!");
   } else {
     connect( fFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(fileChanged(const QString&)));
   }
 
   // initialize stuff
-  fMusrT0Action = 0;
+  fMusrT0Action = nullptr;
 
-  fMsr2DataParam = 0;
-  fFindReplaceData = 0,
+  fMsr2DataParam = nullptr;
+  fFindReplaceData = nullptr;
 
   // setup menus
   setupFileActions();
@@ -150,19 +149,19 @@ void PTextEdit::aboutToQuit()
 {
   if (fAdmin) {
     delete fAdmin;
-    fAdmin = 0;
+    fAdmin = nullptr;
   }
   if (fMusrT0Action) {
     delete fMusrT0Action;
-    fMusrT0Action = 0;
+    fMusrT0Action = nullptr;
   }
   if (fMsr2DataParam) {
     delete fMsr2DataParam;
-    fMsr2DataParam = 0;
+    fMsr2DataParam = nullptr;
   }
   if (fFindReplaceData) {
     delete fFindReplaceData;
-    fFindReplaceData = 0;
+    fFindReplaceData = nullptr;
   }
 }
 
@@ -580,7 +579,7 @@ void PTextEdit::setupTextActions()
   connect( fComboFont, SIGNAL( activated( const QString & ) ),
            this, SLOT( textFamily( const QString & ) ) );
   QLineEdit *edit = fComboFont->lineEdit();
-  if (edit == 0) {
+  if (edit == nullptr) {
     return;
   }
   edit->setText( fAdmin->getFontName() );
@@ -595,7 +594,7 @@ void PTextEdit::setupTextActions()
   connect( fComboSize, SIGNAL( activated( const QString & ) ),
            this, SLOT( textSize( const QString & ) ) );
   edit = fComboSize->lineEdit();
-  if (edit == 0) {
+  if (edit == nullptr) {
     return;
   }
   edit->setText( QString("%1").arg(fAdmin->getFontSize()) );
@@ -900,11 +899,11 @@ PSubTextEdit *PTextEdit::currentEditor() const
 {
   if ( fTabWidget->currentWidget() ) {
     if (fTabWidget->currentWidget()->inherits( "PSubTextEdit" )) {
-      return (PSubTextEdit*)fTabWidget->currentWidget();
+      return dynamic_cast<PSubTextEdit*>(fTabWidget->currentWidget());
     }
   }
 
-  return 0;
+  return nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1190,7 +1189,7 @@ void PTextEdit::fileOpenPrefs()
 
   if (fAdmin->loadPrefs(fln)) {
     msg = QString("Prefs from '") + fln + QString("' loaded.");
-    QMessageBox::information(0, "Info", msg);
+    QMessageBox::information(nullptr, "Info", msg);
   }
 }
 
@@ -1277,7 +1276,7 @@ void PTextEdit::fileSavePrefs()
   if ( !fln.isEmpty() ) {
     fAdmin->savePrefs(fln);
     msg = QString("Prefs to '") + fln + QString("' saved.");
-    QMessageBox::information(0, "Info", msg);
+    QMessageBox::information(nullptr, "Info", msg);
   }
 }
 
@@ -1308,7 +1307,7 @@ void PTextEdit::filePrint()
     int yPos        = 0;                  // y-position for each line
     QFontMetrics fm = p.fontMetrics();
     int dpiy = printer.logicalDpiY();
-    int margin = (int) ( (2/2.54)*dpiy ); // 2 cm margins
+    int margin = static_cast<int>( (2/2.54)*dpiy ); // 2 cm margins
 
     // print msr-file
     QString fln = *fFilenames.find(currentEditor());
@@ -1568,7 +1567,7 @@ void PTextEdit::editFind()
     return;
 
   // check if first time called, and if yes create find and replace data structure
-  if (fFindReplaceData == 0) {
+  if (fFindReplaceData == nullptr) {
     fFindReplaceData = new PFindReplaceData();
     fFindReplaceData->findText = QString("");
     fFindReplaceData->replaceText = QString("");
@@ -1580,13 +1579,13 @@ void PTextEdit::editFind()
     fFindReplaceData->promptOnReplace = true;
   }
 
-  if (fFindReplaceData == 0) {
+  if (fFindReplaceData == nullptr) {
     QMessageBox::critical(this, "**ERROR**", "Couldn't invoke find data structure, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
     return;
   }
 
   PFindDialog *dlg = new PFindDialog(fFindReplaceData, currentEditor()->textCursor().hasSelection());
-  if (dlg == 0) {
+  if (dlg == nullptr) {
     QMessageBox::critical(this, "**ERROR**", "Couldn't invoke find dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
     return;
   }
@@ -1601,13 +1600,13 @@ void PTextEdit::editFind()
   fFindReplaceData = dlg->getData();
 
   delete dlg;
-  dlg = 0;
+  dlg = nullptr;
 
   // try to find the search text
   if (!fFindReplaceData->fromCursor)
     currentEditor()->textCursor().setPosition(0);
 
-  QTextDocument::FindFlags flags = 0;
+  QTextDocument::FindFlags flags = nullptr;
   if (fFindReplaceData->caseSensitive)
     flags |= QTextDocument::FindCaseSensitively;
   else if (fFindReplaceData->findBackwards)
@@ -1624,7 +1623,7 @@ void PTextEdit::editFind()
  */
 void PTextEdit::editFindNext()
 {
-  QTextDocument::FindFlags flags = 0;
+  QTextDocument::FindFlags flags = nullptr;
   if (fFindReplaceData->caseSensitive)
     flags |= QTextDocument::FindCaseSensitively;
   else if (fFindReplaceData->wholeWordsOnly)
@@ -1639,7 +1638,7 @@ void PTextEdit::editFindNext()
  */
 void PTextEdit::editFindPrevious()
 {
-  QTextDocument::FindFlags flags = 0;
+  QTextDocument::FindFlags flags = nullptr;
   if (fFindReplaceData->caseSensitive)
     flags |= QTextDocument::FindCaseSensitively;
   else if (fFindReplaceData->wholeWordsOnly)
@@ -1660,7 +1659,7 @@ void PTextEdit::editFindAndReplace()
     return;
 
   // check if first time called, and if yes create find and replace data structure
-  if (fFindReplaceData == 0) {
+  if (fFindReplaceData == nullptr) {
     fFindReplaceData = new PFindReplaceData();
     fFindReplaceData->findText = QString("");
     fFindReplaceData->replaceText = QString("");
@@ -1672,13 +1671,13 @@ void PTextEdit::editFindAndReplace()
     fFindReplaceData->promptOnReplace = true;
   }
 
-  if (fFindReplaceData == 0) {
+  if (fFindReplaceData == nullptr) {
     QMessageBox::critical(this, "**ERROR**", "Couldn't invoke find&replace data structure, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
     return;
   }
 
   PReplaceDialog *dlg = new PReplaceDialog(fFindReplaceData, currentEditor()->textCursor().hasSelection());
-  if (dlg == 0) {
+  if (dlg == nullptr) {
     QMessageBox::critical(this, "**ERROR**", "Couldn't invoke find&replace dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
     return;
   }
@@ -1693,7 +1692,7 @@ void PTextEdit::editFindAndReplace()
   fFindReplaceData = dlg->getData();
 
   delete dlg;
-  dlg = 0;
+  dlg = nullptr;
 
   if (fFindReplaceData->promptOnReplace)  {
     editFindNext();
@@ -1853,7 +1852,7 @@ void PTextEdit::musrWiz()
 
   QProcess *proc = new QProcess(this);
   if (proc == nullptr) {
-    QMessageBox::critical(0, "**ERROR**", "Couldn't invoke QProcess!");
+    QMessageBox::critical(nullptr, "**ERROR**", "Couldn't invoke QProcess!");
     return;
   }
 
@@ -1870,10 +1869,10 @@ void PTextEdit::musrWiz()
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( 0,
-                          tr("Fatal error"),
-                          msg,
-                          tr("Quit") );
+    QMessageBox::critical( nullptr,
+                           tr("Fatal error"),
+                           msg,
+                           tr("Quit") );
     return;
   }
 }
@@ -2033,7 +2032,7 @@ void PTextEdit::musrFit()
  */
 void PTextEdit::musrMsr2Data()
 {
-  if (fMsr2DataParam == 0) {
+  if (fMsr2DataParam == nullptr) {
     fMsr2DataParam = new PMsr2DataParam();
     *fMsr2DataParam = fAdmin->getMsr2DataParam();
   }
@@ -2046,7 +2045,7 @@ void PTextEdit::musrMsr2Data()
 
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam, fAdmin->getHelpUrl("msr2data"));
 
-  if (dlg == 0) {
+  if (dlg == nullptr) {
     QMessageBox::critical(this, "**ERROR**", "Couldn't invoke msr2data dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
     return;
   }
@@ -2361,7 +2360,7 @@ void PTextEdit::musrMsr2Data()
   }
 
   delete dlg;
-  dlg = 0;
+  dlg = nullptr;
 
   fileSystemWatcherActivation();
 }
@@ -2410,6 +2409,7 @@ void PTextEdit::musrView()
     arg << "-a";
 
   QProcess *proc = new QProcess(this);
+  connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(musrViewFinished(int, QProcess::ExitStatus)));
 
   // make sure that the system environment variables are properly set
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -2420,17 +2420,34 @@ void PTextEdit::musrView()
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( 0,
-                          tr("Fatal error"),
-                          msg,
-                          tr("Quit") );
+    QMessageBox::critical( nullptr,
+                           tr("Fatal error"),
+                           msg,
+                           tr("Quit") );
     return;
   }
 }
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Callse musrt0 <msr-file>.
+ * <p>Checks if musrview terminated with error, and if yes pop up a message box.
+ * @param exitCode
+ */
+void PTextEdit::musrViewFinished(int exitCode, QProcess::ExitStatus)
+{
+  if (exitCode != 0) {
+    QString msg = QString("musrview failed. Possible reasons:\n");
+    msg += QString("* corrupted msr-file.\n");
+    msg += QString("* cannot read data-file.\n");
+    msg += QString("* many more things can go wrong.\n");
+    msg += QString("Please check!");
+    QMessageBox::critical(nullptr, tr("Fatal Error"), msg, tr("Quit"));
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>Calls musrt0 <msr-file>.
  */
 void PTextEdit::musrT0()
 {
@@ -2474,10 +2491,10 @@ void PTextEdit::musrT0()
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( 0,
-                          tr("Fatal error"),
-                          msg,
-                          tr("Quit") );
+    QMessageBox::critical( nullptr,
+                           tr("Fatal error"),
+                           msg,
+                           tr("Quit") );
     return;
   }
 }
@@ -2492,7 +2509,7 @@ void PTextEdit::musrFT()
 
   PGetMusrFTOptionsDialog *dlg = new PGetMusrFTOptionsDialog(*fFilenames.find( currentEditor() ), fMusrFTPrevCmd, fAdmin->getHelpUrl("musrFT"));
 
-  if (dlg == 0) {
+  if (dlg == nullptr) {
     QMessageBox::critical(this, "**ERROR** musrFT", "Couldn't invoke musrFT Options Dialog.");
     return;
   }
@@ -2510,16 +2527,16 @@ void PTextEdit::musrFT()
     if (!proc->waitForStarted()) {
       // error handling
       QString msg(tr("Could not execute the output command: ")+cmd[0]);
-      QMessageBox::critical( 0,
-                            tr("Fatal error"),
-                            msg,
-                            tr("Quit") );
+      QMessageBox::critical( nullptr,
+                             tr("Fatal error"),
+                             msg,
+                             tr("Quit") );
       return;
     }
   }
 
   delete dlg;
-  dlg = 0;
+  dlg = nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2530,7 +2547,7 @@ void PTextEdit::musrPrefs()
 {
   PPrefsDialog *dlg = new PPrefsDialog(fAdmin);
 
-  if (dlg == 0) {
+  if (dlg == nullptr) {
     QMessageBox::critical(this, "**ERROR** musrPrefs", "Couldn't invoke Preferences Dialog.");
     return;
   }
@@ -2558,7 +2575,7 @@ void PTextEdit::musrPrefs()
   }
 
   delete dlg;
-  dlg = 0;
+  dlg = nullptr;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -2599,7 +2616,7 @@ void PTextEdit::musrSetSteps()
 
   QProcess *proc = new QProcess(this);
   if (proc == nullptr) {
-    QMessageBox::critical(0, "**ERROR**", "Couldn't invoke QProcess!");
+    QMessageBox::critical(nullptr, "**ERROR**", "Couldn't invoke QProcess!");
     return;
   }
 
@@ -2616,10 +2633,10 @@ void PTextEdit::musrSetSteps()
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( 0,
-                          tr("Fatal error"),
-                          msg,
-                          tr("Quit") );
+    QMessageBox::critical( nullptr,
+                           tr("Fatal error"),
+                           msg,
+                           tr("Quit") );
     return;
   }
 }
@@ -2668,42 +2685,42 @@ void PTextEdit::musrSwapMsrMlog()
     fileSave();
   }
 
-  QMessageBox::information(0, "INFO", QString("Will now swap files: %1 <-> %2").arg(currentFileName).arg(swapFileName));
+  QMessageBox::information(nullptr, "INFO", QString("Will now swap files: %1 <-> %2").arg(currentFileName).arg(swapFileName));
 
   // swap files
 
   // copy currentFile -> tempFile
   if (QFile::exists(tempFileName)) {
     if (!QFile::remove(tempFileName)) {
-      QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(tempFileName));
+      QMessageBox::critical(nullptr, "ERROR", QString("failed to remove %1").arg(tempFileName));
       return;
     }
   }
   if (!QFile::copy(currentFileName, tempFileName)) {
-    QMessageBox::critical(0, "ERROR", QString("failed to copy %1 -> %2").arg(currentFileName).arg(tempFileName));
+    QMessageBox::critical(nullptr, "ERROR", QString("failed to copy %1 -> %2").arg(currentFileName).arg(tempFileName));
     return;
   }
   // copy swapFile -> currentFile
   if (!QFile::remove(currentFileName)) {
-    QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(currentFileName));
+    QMessageBox::critical(nullptr, "ERROR", QString("failed to remove %1").arg(currentFileName));
     return;
   }
   if (!QFile::copy(swapFileName, currentFileName)) {
-    QMessageBox::critical(0, "ERROR", QString("failed to copy %1 -> %2").arg(swapFileName).arg(currentFileName));
+    QMessageBox::critical(nullptr, "ERROR", QString("failed to copy %1 -> %2").arg(swapFileName).arg(currentFileName));
     return;
   }
   // copy tempFile -> swapFile
   if (!QFile::remove(swapFileName)) {
-    QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(swapFileName));
+    QMessageBox::critical(nullptr, "ERROR", QString("failed to remove %1").arg(swapFileName));
     return;
   }
   if (!QFile::copy(tempFileName, swapFileName)) {
-    QMessageBox::critical(0, "ERROR", QString("failed to copy %1 -> %2").arg(tempFileName).arg(swapFileName));
+    QMessageBox::critical(nullptr, "ERROR", QString("failed to copy %1 -> %2").arg(tempFileName).arg(swapFileName));
     return;
   }
   // clean up
   if (!QFile::remove(tempFileName)) {
-    QMessageBox::critical(0, "ERROR", QString("failed to remove %1").arg(tempFileName));
+    QMessageBox::critical(nullptr, "ERROR", QString("failed to remove %1").arg(tempFileName));
     return;
   }
 
@@ -2777,10 +2794,10 @@ void PTextEdit::mupp()
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd);
-    QMessageBox::critical( 0,
-                          tr("Fatal error"),
-                          msg,
-                          tr("Quit") );
+    QMessageBox::critical( nullptr,
+                           tr("Fatal error"),
+                           msg,
+                           tr("Quit") );
     return;
   }
 }
@@ -2824,7 +2841,7 @@ void PTextEdit::helpAboutQt()
 void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
 {
   if (exitStatus == QProcess::CrashExit) {
-    QMessageBox::critical(0, "**FATAL**", "musrWiz returned CrashExit.");
+    QMessageBox::critical(nullptr, "**FATAL**", "musrWiz returned CrashExit.");
     return;
   }
 
@@ -2837,10 +2854,10 @@ void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
   QString pathName = procEnv.value("HOME", "");
   pathName += "/.musrfit/musredit/musrWiz.log";
   QString errMsg;
-  ifstream fin(pathName.toLatin1().data(), ifstream::in);
+  std::ifstream fin(pathName.toLatin1().data(), std::ifstream::in);
   if (!fin.is_open()) {
     errMsg = QString("PTextEdit::exitStatusMusrWiz: couldn't read %1 file.").arg(pathName);
-    QMessageBox::critical(0, "**ERROR**", errMsg);
+    QMessageBox::critical(nullptr, "**ERROR**", errMsg);
     return;
   }
   char line[128];
@@ -2875,7 +2892,7 @@ void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
   QFile logFile(pathName);
   if (!logFile.remove()) {
     errMsg = QString("PTextEdit::exitStatusMusrWiz: couldn't delete %1 file.").arg(pathName);
-    QMessageBox::critical(0, "**ERROR**", errMsg);
+    QMessageBox::critical(nullptr, "**ERROR**", errMsg);
   }
 }
 
@@ -2888,7 +2905,7 @@ void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
 void PTextEdit::exitStatusMusrSetSteps(int exitCode, QProcess::ExitStatus exitStatus)
 {
   if (exitStatus == QProcess::CrashExit) {
-    QMessageBox::critical(0, "**FATAL**", "musrStep returned CrashExit.");
+    QMessageBox::critical(nullptr, "**FATAL**", "musrStep returned CrashExit.");
     return;
   }
 
