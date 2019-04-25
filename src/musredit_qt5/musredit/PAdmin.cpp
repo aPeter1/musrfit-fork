@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010-2016 by Andreas Suter                              *
+ *   Copyright (C) 2010-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -29,7 +29,6 @@
 
 #include <cstdlib>
 #include <iostream>
-using namespace std;
 
 #include <QMessageBox>
 #include <QString>
@@ -800,7 +799,7 @@ int PAdmin::savePrefs(QString pref_fln)
     QVector<QString> data;
     QFile file(fln);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      cerr << endl << ">> PAdmin::savePrefs: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << endl;
+      std::cerr << std::endl << ">> PAdmin::savePrefs: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << std::endl;
       return 1;
     }
     QTextStream fin(&file);
@@ -879,7 +878,7 @@ int PAdmin::savePrefs(QString pref_fln)
     // write prefs
     file.setFileName(pref_fln);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      cerr << endl << ">> PAdmin::savePrefs: **ERROR** Cannot open " << pref_fln.toLatin1().data() << " for writing." << endl;
+      std::cerr << std::endl << ">> PAdmin::savePrefs: **ERROR** Cannot open " << pref_fln.toLatin1().data() << " for writing." << std::endl;
       return 0;
     }
     fin.setDevice(&file);
@@ -933,7 +932,7 @@ void PAdmin::saveRecentFiles()
     QVector<QString> data;
     QFile file(fln);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      cerr << endl << ">> PAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << endl;
+      std::cerr << std::endl << ">> PAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << std::endl;
       return;
     }
     QTextStream fin(&file);
@@ -958,7 +957,7 @@ void PAdmin::saveRecentFiles()
     }
 
     if (i == data.size()) {
-      cerr << endl << ">> PAdmin::saveRecentFile: **ERROR** " << fln.toLatin1().data() << " seems to be corrupt." << endl;
+      std::cerr << std::endl << ">> PAdmin::saveRecentFile: **ERROR** " << fln.toLatin1().data() << " seems to be corrupt." << std::endl;
       return;
     }
     i++;
@@ -968,7 +967,7 @@ void PAdmin::saveRecentFiles()
     }
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      cerr << endl << ">> PAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << endl;
+      std::cerr << std::endl << ">> PAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << std::endl;
       return;
     }
     fin.setDevice(&file);
