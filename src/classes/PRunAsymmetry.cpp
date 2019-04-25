@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
+ *   Copyright (C) 2007-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -38,7 +38,6 @@
 #include <stdio.h>
 
 #include <iostream>
-using namespace std;
 
 #include <TString.h>
 #include <TObjArray.h>
@@ -93,9 +92,9 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UIn
     fPacking = fMsrInfo->GetMsrGlobal()->GetPacking();
   }
   if (fPacking == -1) { // this should NOT happen, somethin is severely wrong
-    cerr << endl << ">> PRunAsymmetry::PRunAsymmetry(): **SEVERE ERROR**: Couldn't find any packing information!";
-    cerr << endl << ">> This is very bad :-(, will quit ...";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::PRunAsymmetry(): **SEVERE ERROR**: Couldn't find any packing information!";
+    std::cerr << std::endl << ">> This is very bad :-(, will quit ...";
+    std::cerr << std::endl;
     fValid = false;
     return;
   }
@@ -106,16 +105,16 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UIn
 
   // check if alpha is given
   if (fRunInfo->GetAlphaParamNo() == -1) { // no alpha given
-    cerr << endl << ">> PRunAsymmetry::PRunAsymmetry(): **ERROR** no alpha parameter given! This is needed for an asymmetry fit!";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::PRunAsymmetry(): **ERROR** no alpha parameter given! This is needed for an asymmetry fit!";
+    std::cerr << std::endl;
     fValid = false;
     return;
   }
   // check if alpha parameter is within proper bounds
-  if ((fRunInfo->GetAlphaParamNo() < 0) || (fRunInfo->GetAlphaParamNo() > (Int_t)param->size())) {
-    cerr << endl << ">> PRunAsymmetry::PRunAsymmetry(): **ERROR** alpha parameter no = " << fRunInfo->GetAlphaParamNo();
-    cerr << endl << ">> This is out of bound, since there are only " << param->size() << " parameters.";
-    cerr << endl;
+  if ((fRunInfo->GetAlphaParamNo() < 0) || (fRunInfo->GetAlphaParamNo() > static_cast<Int_t>(param->size()))) {
+    std::cerr << std::endl << ">> PRunAsymmetry::PRunAsymmetry(): **ERROR** alpha parameter no = " << fRunInfo->GetAlphaParamNo();
+    std::cerr << std::endl << ">> This is out of bound, since there are only " << param->size() << " parameters.";
+    std::cerr << std::endl;
     fValid = false;
     return;
   }
@@ -129,10 +128,10 @@ PRunAsymmetry::PRunAsymmetry(PMsrHandler *msrInfo, PRunDataHandler *rawData, UIn
   Bool_t betaFixedToOne = false;
   if (fRunInfo->GetBetaParamNo() == -1) { // no beta given hence assuming beta == 1
     betaFixedToOne = true;
-  } else if ((fRunInfo->GetBetaParamNo() < 0) || (fRunInfo->GetBetaParamNo() > (Int_t)param->size())) { // check if beta parameter is within proper bounds
-    cerr << endl << ">> PRunAsymmetry::PRunAsymmetry(): **ERROR** beta parameter no = " << fRunInfo->GetBetaParamNo();
-    cerr << endl << ">> This is out of bound, since there are only " << param->size() << " parameters.";
-    cerr << endl;
+  } else if ((fRunInfo->GetBetaParamNo() < 0) || (fRunInfo->GetBetaParamNo() > static_cast<Int_t>(param->size()))) { // check if beta parameter is within proper bounds
+    std::cerr << std::endl << ">> PRunAsymmetry::PRunAsymmetry(): **ERROR** beta parameter no = " << fRunInfo->GetBetaParamNo();
+    std::cerr << std::endl << ">> This is out of bound, since there are only " << param->size() << " parameters.";
+    std::cerr << std::endl;
     fValid = false;
     return;
   } else { // check if beta is fixed
@@ -210,7 +209,7 @@ Double_t PRunAsymmetry::CalcChiSquare(const std::vector<Double_t>& par)
   #pragma omp parallel for default(shared) private(i,time,diff,asymFcnValue,a,b,f) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
   for (i=fStartTimeBin; i<fEndTimeBin; ++i) {
-    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+    time = fData.GetDataTimeStart() + static_cast<Double_t>(i)*fData.GetDataTimeStep();
     switch (fAlphaBetaTag) {
       case 1: // alpha == 1, beta == 1
         asymFcnValue = fTheory->Func(time, par, fFuncValues);
@@ -268,7 +267,7 @@ Double_t PRunAsymmetry::CalcChiSquareExpected(const std::vector<Double_t>& par)
  */
 Double_t PRunAsymmetry::CalcMaxLikelihood(const std::vector<Double_t>& par)
 {
-  cout << endl << "PRunAsymmetry::CalcMaxLikelihood(): not implemented yet ..." << endl;
+  std::cout << std::endl << "PRunAsymmetry::CalcMaxLikelihood(): not implemented yet ..." << std::endl;
 
   return 1.0;
 }
@@ -304,8 +303,8 @@ UInt_t PRunAsymmetry::GetNoOfFitBins()
  */
 void PRunAsymmetry::SetFitRangeBin(const TString fitRange)
 {
-  TObjArray *tok = 0;
-  TObjString *ostr = 0;
+  TObjArray *tok = nullptr;
+  TObjString *ostr = nullptr;
   TString str;
   Ssiz_t idx = -1;
   Int_t offset = 0;
@@ -314,7 +313,7 @@ void PRunAsymmetry::SetFitRangeBin(const TString fitRange)
 
   if (tok->GetEntries() == 3) { // structure FIT_RANGE fgb+n0 lgb-n1
     // handle fgb+n0 entry
-    ostr = (TObjString*) tok->At(1);
+    ostr = dynamic_cast<TObjString*>(tok->At(1));
     str = ostr->GetString();
     // check if there is an offset present
     idx = str.First("+");
@@ -326,7 +325,7 @@ void PRunAsymmetry::SetFitRangeBin(const TString fitRange)
     fFitStartTime = (fGoodBins[0] + offset - fT0s[0]) * fTimeResolution;
 
     // handle lgb-n1 entry
-    ostr = (TObjString*) tok->At(2);
+    ostr = dynamic_cast<TObjString*>(tok->At(2));
     str = ostr->GetString();
     // check if there is an offset present
     idx = str.First("-");
@@ -340,11 +339,11 @@ void PRunAsymmetry::SetFitRangeBin(const TString fitRange)
     Int_t pos = 2*(fRunNo+1)-1;
 
     if (pos + 1 >= tok->GetEntries()) {
-      cerr << endl << ">> PRunAsymmetry::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
-      cerr << endl << ">> will ignore it. Sorry ..." << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+      std::cerr << std::endl << ">> will ignore it. Sorry ..." << std::endl;
     } else {
       // handle fgb+n0 entry
-      ostr = (TObjString*) tok->At(pos);
+      ostr = static_cast<TObjString*>(tok->At(pos));
       str = ostr->GetString();
       // check if there is an offset present
       idx = str.First("+");
@@ -356,7 +355,7 @@ void PRunAsymmetry::SetFitRangeBin(const TString fitRange)
       fFitStartTime = (fGoodBins[0] + offset - fT0s[0]) * fTimeResolution;
 
       // handle lgb-n1 entry
-      ostr = (TObjString*) tok->At(pos+1);
+      ostr = static_cast<TObjString*>(tok->At(pos+1));
       str = ostr->GetString();
       // check if there is an offset present
       idx = str.First("-");
@@ -368,8 +367,8 @@ void PRunAsymmetry::SetFitRangeBin(const TString fitRange)
       fFitEndTime = (fGoodBins[1] - offset - fT0s[0]) * fTimeResolution;
     }
   } else { // error
-    cerr << endl << ">> PRunAsymmetry::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
-    cerr << endl << ">> will ignore it. Sorry ..." << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::SetFitRangeBin(): **ERROR** invalid FIT_RANGE command found: '" << fitRange << "'";
+    std::cerr << std::endl << ">> will ignore it. Sorry ..." << std::endl;
   }
 
   // clean up
@@ -395,7 +394,7 @@ void PRunAsymmetry::CalcNoOfFitBins()
     fEndTimeBin = fData.GetValue()->size();
 
   if (fEndTimeBin > fStartTimeBin)
-    fNoOfFitBins = fEndTimeBin - fStartTimeBin;
+    fNoOfFitBins = static_cast<UInt_t>(fEndTimeBin - fStartTimeBin);
   else
     fNoOfFitBins = 0;
 }
@@ -424,7 +423,7 @@ void PRunAsymmetry::CalcTheory()
   Double_t a, b, f;
   Double_t time;
   for (UInt_t i=0; i<fData.GetValue()->size(); i++) {
-    time = fData.GetDataTimeStart() + (Double_t)i*fData.GetDataTimeStep();
+    time = fData.GetDataTimeStart() + static_cast<Double_t>(i)*fData.GetDataTimeStep();
     switch (fAlphaBetaTag) {
       case 1: // alpha == 1, beta == 1
         asymFcnValue = fTheory->Func(time, par, fFuncValues);
@@ -487,8 +486,8 @@ Bool_t PRunAsymmetry::PrepareData()
   // get the correct run
   PRawRunData *runData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
   if (!runData) { // run not found
-    cerr << endl << ">> PRunAsymmetry::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->GetRunName()->Data() << "!";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::PrepareData(): **ERROR** Couldn't get run " << fRunInfo->GetRunName()->Data() << "!";
+    std::cerr << std::endl;
     return false;
   }
 
@@ -499,10 +498,10 @@ Bool_t PRunAsymmetry::PrepareData()
     forwardHistoNo.push_back(fRunInfo->GetForwardHistoNo(i));
 
     if (!runData->IsPresent(forwardHistoNo[i])) {
-      cerr << endl << ">> PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
-      cerr << endl << ">> forwardHistoNo found = " << forwardHistoNo[i] << ", which is NOT present in the data file!?!?";
-      cerr << endl << ">> Will quit :-(";
-      cerr << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
+      std::cerr << std::endl << ">> forwardHistoNo found = " << forwardHistoNo[i] << ", which is NOT present in the data file!?!?";
+      std::cerr << std::endl << ">> Will quit :-(";
+      std::cerr << std::endl;
       // clean up
       forwardHistoNo.clear();
       backwardHistoNo.clear();
@@ -513,10 +512,10 @@ Bool_t PRunAsymmetry::PrepareData()
     backwardHistoNo.push_back(fRunInfo->GetBackwardHistoNo(i));
 
     if (!runData->IsPresent(backwardHistoNo[i])) {
-      cerr << endl << ">> PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
-      cerr << endl << ">> backwardHistoNo found = " << backwardHistoNo[i] << ", which is NOT present in the data file!?!?";
-      cerr << endl << ">> Will quit :-(";
-      cerr << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
+      std::cerr << std::endl << ">> backwardHistoNo found = " << backwardHistoNo[i] << ", which is NOT present in the data file!?!?";
+      std::cerr << std::endl << ">> Will quit :-(";
+      std::cerr << std::endl;
       // clean up
       forwardHistoNo.clear();
       backwardHistoNo.clear();
@@ -524,10 +523,10 @@ Bool_t PRunAsymmetry::PrepareData()
     }
   }
   if (forwardHistoNo.size() != backwardHistoNo.size()) {
-    cerr << endl << ">> PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
-    cerr << endl << ">> # of forward histograms different from # of backward histograms.";
-    cerr << endl << ">> Will quit :-(";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::PrepareData(): **PANIC ERROR**:";
+    std::cerr << std::endl << ">> # of forward histograms different from # of backward histograms.";
+    std::cerr << std::endl << ">> Will quit :-(";
+    std::cerr << std::endl;
     // clean up
     forwardHistoNo.clear();
     backwardHistoNo.clear();
@@ -536,8 +535,8 @@ Bool_t PRunAsymmetry::PrepareData()
 
   // keep the time resolution in (us)
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
-  cout.precision(10);
-  cout << endl << ">> PRunAsymmetry::PrepareData(): time resolution=" << fixed << runData->GetTimeResolution() << "(ns)" << endl;
+  std::cout.precision(10);
+  std::cout << std::endl << ">> PRunAsymmetry::PrepareData(): time resolution=" << std::fixed << runData->GetTimeResolution() << "(ns)" << std::endl;
 
   // get all the proper t0's and addt0's for the current RUN block
   if (!GetProperT0(runData, globalBlock, forwardHistoNo, backwardHistoNo)) {
@@ -545,7 +544,7 @@ Bool_t PRunAsymmetry::PrepareData()
   }
 
   // keep the histo of each group at this point (addruns handled below)
-  vector<PDoubleVector> forward, backward;
+  std::vector<PDoubleVector> forward, backward;
   forward.resize(forwardHistoNo.size());   // resize to number of groups
   backward.resize(backwardHistoNo.size()); // resize to numer of groups
   for (UInt_t i=0; i<forwardHistoNo.size(); i++) {
@@ -562,9 +561,9 @@ Bool_t PRunAsymmetry::PrepareData()
     for (UInt_t i=1; i<fRunInfo->GetRunNameSize(); i++) {
       // get run to be added to the main one
       addRunData = fRawData->GetRunData(*(fRunInfo->GetRunName(i)));
-      if (addRunData == 0) { // couldn't get run
-        cerr << endl << ">> PRunAsymmetry::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
-        cerr << endl;
+      if (addRunData == nullptr) { // couldn't get run
+        std::cerr << std::endl << ">> PRunAsymmetry::PrepareData(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
+        std::cerr << std::endl;
         return false;
       }
 
@@ -574,8 +573,9 @@ Bool_t PRunAsymmetry::PrepareData()
         addRunSize = addRunData->GetDataBin(forwardHistoNo[k])->size();
         for (UInt_t j=0; j<addRunData->GetDataBin(forwardHistoNo[k])->size(); j++) { // loop over the bin indices
           // make sure that the index stays in the proper range
-          if (((Int_t)j+(Int_t)fAddT0s[i-1][2*k]-(Int_t)fT0s[2*k] >= 0) && (j+(Int_t)fAddT0s[i-1][2*k]-(Int_t)fT0s[2*k] < addRunSize)) {
-            forward[k][j] += addRunData->GetDataBin(forwardHistoNo[k])->at(j+(Int_t)fAddT0s[i-1][2*k]-(Int_t)fT0s[2*k]);
+          if ((static_cast<Int_t>(j)+static_cast<Int_t>(fAddT0s[i-1][2*k])-static_cast<Int_t>(fT0s[2*k]) >= 0) &&
+              (j+static_cast<Int_t>(fAddT0s[i-1][2*k])-static_cast<Int_t>(fT0s[2*k]) < addRunSize)) {
+            forward[k][j] += addRunData->GetDataBin(forwardHistoNo[k])->at(j+static_cast<Int_t>(fAddT0s[i-1][2*k])-static_cast<Int_t>(fT0s[2*k]));
           }
         }
       }
@@ -585,8 +585,9 @@ Bool_t PRunAsymmetry::PrepareData()
         addRunSize = addRunData->GetDataBin(backwardHistoNo[k])->size();
         for (UInt_t j=0; j<addRunData->GetDataBin(backwardHistoNo[k])->size(); j++) { // loop over the bin indices
           // make sure that the index stays in the proper range
-          if (((Int_t)j+(Int_t)fAddT0s[i-1][2*k+1]-(Int_t)fT0s[2*k+1] >= 0) && (j+(Int_t)fAddT0s[i-1][2*k+1]-(Int_t)fT0s[2*k+1] < addRunSize)) {
-            backward[k][j] += addRunData->GetDataBin(backwardHistoNo[k])->at(j+(Int_t)fAddT0s[i-1][2*k+1]-(Int_t)fT0s[2*k+1]);
+          if ((static_cast<Int_t>(j)+static_cast<Int_t>(fAddT0s[i-1][2*k+1])-static_cast<Int_t>(fT0s[2*k+1]) >= 0) &&
+              (j+static_cast<Int_t>(fAddT0s[i-1][2*k+1])-static_cast<Int_t>(fT0s[2*k+1]) < addRunSize)) {
+            backward[k][j] += addRunData->GetDataBin(backwardHistoNo[k])->at(j+static_cast<Int_t>(fAddT0s[i-1][2*k+1])-static_cast<Int_t>(fT0s[2*k+1]));
           }
         }
       }
@@ -606,7 +607,7 @@ Bool_t PRunAsymmetry::PrepareData()
     for (UInt_t j=0; j<runData->GetDataBin(forwardHistoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
       if ((j+fT0s[2*i]-fT0s[0] >= 0) && (j+fT0s[2*i]-fT0s[0] < runData->GetDataBin(forwardHistoNo[i])->size())) {
-        fForward[j] += forward[i][j+(Int_t)fT0s[2*i]-(Int_t)fT0s[0]];
+        fForward[j] += forward[i][j+static_cast<Int_t>(fT0s[2*i])-static_cast<Int_t>(fT0s[0])];
       }
     }
   }
@@ -616,7 +617,7 @@ Bool_t PRunAsymmetry::PrepareData()
     for (UInt_t j=0; j<runData->GetDataBin(backwardHistoNo[i])->size(); j++) { // loop over the bin indices
       // make sure that the index stays within proper range
       if ((j+fT0s[2*i+1]-fT0s[1] >= 0) && (j+fT0s[2*i+1]-fT0s[1] < runData->GetDataBin(backwardHistoNo[i])->size())) {
-        fBackward[j] += backward[i][j+(Int_t)fT0s[2*i+1]-(Int_t)fT0s[1]];
+        fBackward[j] += backward[i][j+static_cast<Int_t>(fT0s[2*i+1])-static_cast<Int_t>(fT0s[1])];
       }
     }
   }
@@ -631,12 +632,12 @@ Bool_t PRunAsymmetry::PrepareData()
       fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[0]*0.6), 1);
       fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[1]*0.1), 2);
       fRunInfo->SetBkgRange(static_cast<Int_t>(fT0s[1]*0.6), 3);
-      cerr << endl << ">> PRunAsymmetry::PrepareData(): **WARNING** Neither fix background nor background bins are given!";
-      cerr << endl << ">> Will try the following:";
-      cerr << endl << ">> forward:  bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
-      cerr << endl << ">> backward: bkg start = " << fRunInfo->GetBkgRange(2) << ", bkg end = " << fRunInfo->GetBkgRange(3);
-      cerr << endl << ">> NO GUARANTEE THAT THIS MAKES ANY SENSE! Better check ...";
-      cerr << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareData(): **WARNING** Neither fix background nor background bins are given!";
+      std::cerr << std::endl << ">> Will try the following:";
+      std::cerr << std::endl << ">> forward:  bkg start = " << fRunInfo->GetBkgRange(0) << ", bkg end = " << fRunInfo->GetBkgRange(1);
+      std::cerr << std::endl << ">> backward: bkg start = " << fRunInfo->GetBkgRange(2) << ", bkg end = " << fRunInfo->GetBkgRange(3);
+      std::cerr << std::endl << ">> NO WARRANTY THAT THIS MAKES ANY SENSE! Better check ...";
+      std::cerr << std::endl;
       if (!SubtractEstimatedBkg())
         return false;
     }
@@ -761,7 +762,7 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
   Int_t end[2]   = {fRunInfo->GetBkgRange(1), fRunInfo->GetBkgRange(3)};
   for (UInt_t i=0; i<2; i++) {
     if (end[i] < start[i]) {
-      cout << endl << "PRunAsymmetry::SubtractEstimatedBkg(): end = " << end[i] << " > start = " << start[i] << "! Will swap them!";
+      std::cout << std::endl << "PRunAsymmetry::SubtractEstimatedBkg(): end = " << end[i] << " > start = " << start[i] << "! Will swap them!";
       UInt_t keep = end[i];
       end[i] = start[i];
       start[i] = keep;
@@ -771,11 +772,11 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
   // calculate proper background range
   for (UInt_t i=0; i<2; i++) {
     if (beamPeriod != 0.0) {
-      Double_t timeBkg = (Double_t)(end[i]-start[i])*(fTimeResolution*fPacking); // length of the background intervall in time
-      UInt_t fullCycles = (UInt_t)(timeBkg/beamPeriod); // how many proton beam cylces can be placed within the proposed background intervall
+      Double_t timeBkg = static_cast<Double_t>(end[i]-start[i])*(fTimeResolution*fPacking); // length of the background intervall in time
+      UInt_t fullCycles = static_cast<UInt_t>(timeBkg/beamPeriod); // how many proton beam cylces can be placed within the proposed background intervall
       // correct the end of the background intervall such that the background is as close as possible to a multiple of the proton cylce
-      end[i] = start[i] + (UInt_t) ((fullCycles*beamPeriod)/(fTimeResolution*fPacking));
-      cout << "PRunAsymmetry::SubtractEstimatedBkg(): Background " << start[i] << ", " << end[i] << endl;
+      end[i] = start[i] + static_cast<UInt_t>((fullCycles*beamPeriod)/(fTimeResolution*fPacking));
+      std::cout << "PRunAsymmetry::SubtractEstimatedBkg(): Background " << start[i] << ", " << end[i] << std::endl;
       if (end[i] == start[i])
         end[i] = fRunInfo->GetBkgRange(2*i+1);
     }
@@ -784,18 +785,18 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
   // check if start is within histogram bounds
   if ((start[0] < 0) || (start[0] >= fForward.size()) ||
       (start[1] < 0) || (start[1] >= fBackward.size())) {
-    cerr << endl << ">> PRunAsymmetry::SubtractEstimatedBkg(): **ERROR** background bin values out of bound!";
-    cerr << endl << ">> histo lengths (f/b)  = (" << fForward.size() << "/" << fBackward.size() << ").";
-    cerr << endl << ">> background start (f/b) = (" << start[0] << "/" << start[1] << ").";
+    std::cerr << std::endl << ">> PRunAsymmetry::SubtractEstimatedBkg(): **ERROR** background bin values out of bound!";
+    std::cerr << std::endl << ">> histo lengths (f/b)  = (" << fForward.size() << "/" << fBackward.size() << ").";
+    std::cerr << std::endl << ">> background start (f/b) = (" << start[0] << "/" << start[1] << ").";
     return false;
   }
 
   // check if end is within histogram bounds
   if ((end[0] < 0) || (end[0] >= fForward.size()) ||
       (end[1] < 0) || (end[1] >= fBackward.size())) {
-    cerr << endl << ">> PRunAsymmetry::SubtractEstimatedBkg(): **ERROR** background bin values out of bound!";
-    cerr << endl << ">> histo lengths (f/b)  = (" << fForward.size() << "/" << fBackward.size() << ").";
-    cerr << endl << ">> background end (f/b) = (" << end[0] << "/" << end[1] << ").";
+    std::cerr << std::endl << ">> PRunAsymmetry::SubtractEstimatedBkg(): **ERROR** background bin values out of bound!";
+    std::cerr << std::endl << ">> histo lengths (f/b)  = (" << fForward.size() << "/" << fBackward.size() << ").";
+    std::cerr << std::endl << ">> background end (f/b) = (" << end[0] << "/" << end[1] << ").";
     return false;
   }
 
@@ -808,14 +809,14 @@ Bool_t PRunAsymmetry::SubtractEstimatedBkg()
     bkg[0] += fForward[i];
   errBkg[0] = TMath::Sqrt(bkg[0])/(end[0] - start[0] + 1);
   bkg[0] /= static_cast<Double_t>(end[0] - start[0] + 1);
-  cout << endl << ">> estimated forward histo background: " << bkg[0];
+  std::cout << std::endl << ">> estimated forward histo background: " << bkg[0];
 
   // backward
   for (UInt_t i=start[1]; i<=end[1]; i++)
     bkg[1] += fBackward[i];
   errBkg[1] = TMath::Sqrt(bkg[1])/(end[1] - start[1] + 1);
   bkg[1] /= static_cast<Double_t>(end[1] - start[1] + 1);
-  cout << endl << ">> estimated backward histo background: " << bkg[1] << endl;
+  std::cout << std::endl << ">> estimated backward histo background: " << bkg[1] << std::endl;
 
   // correct error for forward, backward
   Double_t errVal = 0.0;
@@ -925,8 +926,8 @@ Bool_t PRunAsymmetry::PrepareFitData()
   Double_t f, b, ef, eb;
   // fill data time start, and step
   // data start at data_start-t0 shifted by (pack-1)/2
-  fData.SetDataTimeStart(fTimeResolution*((Double_t)fGoodBins[0]-fT0s[0]+(Double_t)(fPacking-1)/2.0));
-  fData.SetDataTimeStep(fTimeResolution*(Double_t)fPacking);
+  fData.SetDataTimeStart(fTimeResolution*(static_cast<Double_t>(fGoodBins[0])-fT0s[0]+static_cast<Double_t>(fPacking-1)/2.0));
+  fData.SetDataTimeStep(fTimeResolution*static_cast<Double_t>(fPacking));
   for (UInt_t i=0; i<noOfBins; i++) {
     // to make the formulae more readable
     f  = forwardPacked.GetValue()->at(i);
@@ -997,7 +998,7 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   // first get start data, end data, and t0
   Int_t start[2] = {fGoodBins[0], fGoodBins[2]};
   Int_t end[2] = {fGoodBins[1], fGoodBins[3]};
-  Int_t t0[2] = {(Int_t)fT0s[0], (Int_t)fT0s[1]};
+  Int_t t0[2] = {static_cast<Int_t>(fT0s[0]), static_cast<Int_t>(fT0s[1])};
 
   // check if the data ranges and t0's between forward/backward are compatible
   Int_t fgb[2];
@@ -1005,13 +1006,13 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
     if (abs(start[0]-t0[0]) > abs(start[1]-t0[1])) {
       fgb[0] = start[0];
       fgb[1] = t0[1] + start[0]-t0[0];
-      cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** needed to shift backward fgb from ";
-      cerr << start[1] << " to " << fgb[1] << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** needed to shift backward fgb from ";
+      std::cerr << start[1] << " to " << fgb[1] << std::endl;
     } else {
       fgb[0] = t0[0] + start[1]-t0[1];
       fgb[1] = start[1];
-      cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** needed to shift forward fgb from ";
-      cerr << start[0] << " to " << fgb[0] << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareViewData(): **WARNING** needed to shift forward fgb from ";
+      std::cerr << start[0] << " to " << fgb[0] << std::endl;
     }
   } else { // fgb aligning is correct
     fgb[0] = start[0];
@@ -1044,21 +1045,21 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
       start[i] = keep;
     }
     // 2nd check if start is within proper bounds
-    if ((start[i] < 0) || (start[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **ERROR** start data bin doesn't make any sense!";
-      cerr << endl;
+    if ((start[i] < 0) || (start[i] > static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareViewData(): **ERROR** start data bin doesn't make any sense!";
+      std::cerr << std::endl;
       return false;
     }
     // 3rd check if end is within proper bounds
-    if ((end[i] < 0) || (end[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **ERROR** end data bin doesn't make any sense!";
-      cerr << endl;
+    if ((end[i] < 0) || (end[i] > static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareViewData(): **ERROR** end data bin doesn't make any sense!";
+      std::cerr << std::endl;
       return false;
     }
     // 4th check if t0 is within proper bounds
-    if ((t0[i] < 0) || (t0[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetry::PrepareViewData(): **ERROR** t0 data bin doesn't make any sense!";
-      cerr << endl;
+    if ((t0[i] < 0) || (t0[i] > static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareViewData(): **ERROR** t0 data bin doesn't make any sense!";
+      std::cerr << std::endl;
       return false;
     }
   }
@@ -1127,8 +1128,8 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   Double_t f, b, ef, eb, alpha = 1.0, beta = 1.0;
   // set data time start, and step
   // data start at data_start-t0
-  fData.SetDataTimeStart(fTimeResolution*((Double_t)start[0]-t0[0]+(Double_t)(packing-1)/2.0));
-  fData.SetDataTimeStep(fTimeResolution*(Double_t)packing);
+  fData.SetDataTimeStart(fTimeResolution*(static_cast<Double_t>(start[0])-t0[0]+static_cast<Double_t>(packing-1)/2.0));
+  fData.SetDataTimeStep(fTimeResolution*static_cast<Double_t>(packing));
 
   // get the proper alpha and beta
   switch (fAlphaBetaTag) {
@@ -1192,12 +1193,12 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   Double_t factor = 1.0;
   if (fData.GetValue()->size() * 10 > runData->GetDataBin(histoNo[0])->size()) {
     size = fData.GetValue()->size() * 10;
-    factor = (Double_t)runData->GetDataBin(histoNo[0])->size() / (Double_t)size;
+    factor = static_cast<Double_t>(runData->GetDataBin(histoNo[0])->size()) / static_cast<Double_t>(size);
   }
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
   fData.SetTheoryTimeStep(fTimeResolution*factor);
   for (UInt_t i=0; i<size; i++) {
-    time = fData.GetTheoryTimeStart() + (Double_t)i*fTimeResolution*factor;
+    time = fData.GetTheoryTimeStart() + static_cast<Double_t>(i)*fTimeResolution*factor;
     value = fTheory->Func(time, par, fFuncValues);
     if (fabs(value) > 10.0) {  // dirty hack needs to be fixed!!
       value = 0.0;
@@ -1244,7 +1245,7 @@ Bool_t PRunAsymmetry::PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]
   // first get start data, end data, and t0
   Int_t start[2] = {fGoodBins[0], fGoodBins[2]};
   Int_t end[2] = {fGoodBins[1], fGoodBins[3]};
-  Int_t t0[2] = {(Int_t)fT0s[0], (Int_t)fT0s[1]};
+  Int_t t0[2] = {static_cast<Int_t>(fT0s[0]), static_cast<Int_t>(fT0s[1])};
   UInt_t packing = fMsrInfo->GetMsrPlotList()->at(0).fRRFPacking;
 
   // check if the data ranges and t0's between forward/backward are compatible
@@ -1253,13 +1254,13 @@ Bool_t PRunAsymmetry::PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]
     if (abs(start[0]-t0[0]) > abs(start[1]-t0[1])) {
       fgb[0] = start[0];
       fgb[1] = t0[1] + start[0]-t0[0];
-      cerr << endl << ">> PRunAsymmetry::PrepareRRFViewData(): **WARNING** needed to shift backward fgb from ";
-      cerr << start[1] << " to " << fgb[1] << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareRRFViewData(): **WARNING** needed to shift backward fgb from ";
+      std::cerr << start[1] << " to " << fgb[1] << std::endl;
     } else {
       fgb[0] = t0[0] + start[1]-t0[1];
       fgb[1] = start[1];
-      cerr << endl << ">> PRunAsymmetry::PrepareRRFViewData(): **WARNING** needed to shift forward fgb from ";
-      cerr << start[1] << " to " << fgb[0] << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareRRFViewData(): **WARNING** needed to shift forward fgb from ";
+      std::cerr << start[1] << " to " << fgb[0] << std::endl;
     }
   } else { // fgb aligning is correct
     fgb[0] = start[0];
@@ -1292,21 +1293,21 @@ Bool_t PRunAsymmetry::PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]
       start[i] = keep;
     }
     // 2nd check if start is within proper bounds
-    if ((start[i] < 0) || (start[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetry::PrepareRRFViewData(): **ERROR** start data bin doesn't make any sense!";
-      cerr << endl;
+    if ((start[i] < 0) || (start[i] > static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareRRFViewData(): **ERROR** start data bin doesn't make any sense!";
+      std::cerr << std::endl;
       return false;
     }
     // 3rd check if end is within proper bounds
-    if ((end[i] < 0) || (end[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetry::PrepareRRFViewData(): **ERROR** end data bin doesn't make any sense!";
-      cerr << endl;
+    if ((end[i] < 0) || (end[i] > static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareRRFViewData(): **ERROR** end data bin doesn't make any sense!";
+      std::cerr << std::endl;
       return false;
     }
     // 4th check if t0 is within proper bounds
-    if ((t0[i] < 0) || (t0[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetry::PrepareRRFViewData(): **ERROR** t0 data bin doesn't make any sense!";
-      cerr << endl;
+    if ((t0[i] < 0) || (t0[i] > static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareRRFViewData(): **ERROR** t0 data bin doesn't make any sense!";
+      std::cerr << std::endl;
       return false;
     }
   }
@@ -1582,11 +1583,11 @@ Bool_t PRunAsymmetry::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalB
       fT0s[2*i] = runData->GetT0BinEstimated(forwardHistoNo[i]);
       fRunInfo->SetT0Bin(fT0s[2*i], 2*i);
 
-      cerr << endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-      cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-      cerr << endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(forwardHistoNo[i]);
-      cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-      cerr << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+      std::cerr << std::endl << ">> run: " << fRunInfo->GetRunName()->Data();
+      std::cerr << std::endl << ">> will try the estimated one: forward t0 = " << runData->GetT0BinEstimated(forwardHistoNo[i]);
+      std::cerr << std::endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+      std::cerr << std::endl;
     }
   }
   for (UInt_t i=0; i<backwardHistoNo.size(); i++) {
@@ -1594,26 +1595,26 @@ Bool_t PRunAsymmetry::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalB
       fT0s[2*i+1] = runData->GetT0BinEstimated(backwardHistoNo[i]);
       fRunInfo->SetT0Bin(fT0s[2*i+1], 2*i+1);
 
-      cerr << endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-      cerr << endl << ">> run: " << fRunInfo->GetRunName()->Data();
-      cerr << endl << ">> will try the estimated one: backward t0 = " << runData->GetT0BinEstimated(backwardHistoNo[i]);
-      cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-      cerr << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+      std::cerr << std::endl << ">> run: " << fRunInfo->GetRunName()->Data();
+      std::cerr << std::endl << ">> will try the estimated one: backward t0 = " << runData->GetT0BinEstimated(backwardHistoNo[i]);
+      std::cerr << std::endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+      std::cerr << std::endl;
     }
   }
 
   // check if t0 is within proper bounds
   for (UInt_t i=0; i<forwardHistoNo.size(); i++) {
-    if ((fT0s[2*i] < 0) || (fT0s[2*i] > (Int_t)runData->GetDataBin(forwardHistoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetry::GetProperT0(): **ERROR** t0 data bin (" << fT0s[2*i] << ") doesn't make any sense!";
-      cerr << endl << ">> forwardHistoNo " << forwardHistoNo[i];
-      cerr << endl;
+    if ((fT0s[2*i] < 0) || (fT0s[2*i] > static_cast<Int_t>(runData->GetDataBin(forwardHistoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunAsymmetry::GetProperT0(): **ERROR** t0 data bin (" << fT0s[2*i] << ") doesn't make any sense!";
+      std::cerr << std::endl << ">> forwardHistoNo " << forwardHistoNo[i];
+      std::cerr << std::endl;
       return false;
     }
-    if ((fT0s[2*i+1] < 0) || (fT0s[2*i+1] > (Int_t)runData->GetDataBin(backwardHistoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetry::PrepareData(): **ERROR** t0 data bin (" << fT0s[2*i+1] << ") doesn't make any sense!";
-      cerr << endl << ">> backwardHistoNo " << backwardHistoNo[i];
-      cerr << endl;
+    if ((fT0s[2*i+1] < 0) || (fT0s[2*i+1] > static_cast<Int_t>(runData->GetDataBin(backwardHistoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunAsymmetry::PrepareData(): **ERROR** t0 data bin (" << fT0s[2*i+1] << ") doesn't make any sense!";
+      std::cerr << std::endl << ">> backwardHistoNo " << backwardHistoNo[i];
+      std::cerr << std::endl;
       return false;
     }
   }
@@ -1626,8 +1627,8 @@ Bool_t PRunAsymmetry::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalB
       // get run to be added to the main one
       addRunData = fRawData->GetRunData(*(fRunInfo->GetRunName(i)));
       if (addRunData == 0) { // couldn't get run
-        cerr << endl << ">> PRunAsymmetry::GetProperT0(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
-        cerr << endl;
+        std::cerr << std::endl << ">> PRunAsymmetry::GetProperT0(): **ERROR** Couldn't get addrun " << fRunInfo->GetRunName(i)->Data() << "!";
+        std::cerr << std::endl;
         return false;
       }
 
@@ -1666,11 +1667,11 @@ Bool_t PRunAsymmetry::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalB
           fAddT0s[i-1][2*j] = addRunData->GetT0BinEstimated(forwardHistoNo[j]);
           fRunInfo->SetAddT0Bin(fAddT0s[i-1][2*j], i-1, 2*j);
 
-          cerr << endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-          cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
-          cerr << endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(forwardHistoNo[j]);
-          cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-          cerr << endl;
+          std::cerr << std::endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+          std::cerr << std::endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
+          std::cerr << std::endl << ">> will try the estimated one: forward t0 = " << addRunData->GetT0BinEstimated(forwardHistoNo[j]);
+          std::cerr << std::endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+          std::cerr << std::endl;
         }
       }
       for (UInt_t j=0; j<backwardHistoNo.size(); j++) {
@@ -1678,11 +1679,11 @@ Bool_t PRunAsymmetry::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *globalB
           fAddT0s[i-1][2*j+1] = addRunData->GetT0BinEstimated(backwardHistoNo[j]);
           fRunInfo->SetAddT0Bin(fAddT0s[i-1][2*j+1], i-1, 2*j+1);
 
-          cerr << endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
-          cerr << endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
-          cerr << endl << ">> will try the estimated one: backward t0 = " << runData->GetT0BinEstimated(backwardHistoNo[j]);
-          cerr << endl << ">> NO GUARANTEE THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
-          cerr << endl;
+          std::cerr << std::endl << ">> PRunAsymmetry::GetProperT0(): **WARRNING** NO t0's found, neither in the run data nor in the msr-file!";
+          std::cerr << std::endl << ">> run: " << fRunInfo->GetRunName(i)->Data();
+          std::cerr << std::endl << ">> will try the estimated one: backward t0 = " << runData->GetT0BinEstimated(backwardHistoNo[j]);
+          std::cerr << std::endl << ">> NO WARRANTY THAT THIS OK!! For instance for LEM this is almost for sure rubbish!";
+          std::cerr << std::endl;
         }
       }
     }
@@ -1727,36 +1728,36 @@ Bool_t PRunAsymmetry::GetProperDataRange(PRawRunData* runData, UInt_t histoNo[2]
   }
 
   Double_t t0[2] = {fT0s[0], fT0s[1]};
-  Int_t offset = (Int_t)(10.0e-3/fTimeResolution); // needed in case first good bin is not given, default = 10ns
+  Int_t offset = static_cast<Int_t>((10.0e-3/fTimeResolution)); // needed in case first good bin is not given, default = 10ns
 
   // check if data range has been provided, and if not try to estimate them
   if (start[0] < 0) {
-    start[0] = (Int_t)t0[0]+offset;
+    start[0] = static_cast<Int_t>(t0[0])+offset;
     fRunInfo->SetDataRange(start[0], 0);
-    cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (forward) was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start[0] << ".";
-    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (forward) was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start[0] << ".";
+    std::cerr << std::endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    std::cerr << std::endl;
   }
   if (start[1] < 0) {
-    start[1] = (Int_t)t0[1]+offset;
+    start[1] = static_cast<Int_t>(t0[1])+offset;
     fRunInfo->SetDataRange(start[1], 2);
-    cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (backward) was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start[1] << ".";
-    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (backward) was not provided, will try data range start = t0+" << offset << "(=10ns) = " << start[1] << ".";
+    std::cerr << std::endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    std::cerr << std::endl;
   }
   if (end[0] < 0) {
     end[0] = runData->GetDataBin(histoNo[0])->size();
     fRunInfo->SetDataRange(end[0], 1);
-    cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (forward) was not provided, will try data range end = " << end[0] << ".";
-    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (forward) was not provided, will try data range end = " << end[0] << ".";
+    std::cerr << std::endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    std::cerr << std::endl;
   }
   if (end[1] < 0) {
     end[1] = runData->GetDataBin(histoNo[1])->size();
     fRunInfo->SetDataRange(end[1], 3);
-    cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (backward) was not provided, will try data range end = " << end[1] << ".";
-    cerr << endl << ">> NO GUARANTEE THAT THIS DOES MAKE ANY SENSE.";
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** data range (backward) was not provided, will try data range end = " << end[1] << ".";
+    std::cerr << std::endl << ">> NO WARRANTY THAT THIS DOES MAKE ANY SENSE.";
+    std::cerr << std::endl;
   }
 
   // check if start, end, and t0 make any sense
@@ -1768,27 +1769,27 @@ Bool_t PRunAsymmetry::GetProperDataRange(PRawRunData* runData, UInt_t histoNo[2]
       start[i] = keep;
     }
     // 2nd check if start is within proper bounds
-    if ((start[i] < 0) || (start[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **ERROR** start data bin doesn't make any sense!";
-      cerr << endl;
+    if ((start[i] < 0) || (start[i] > static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunAsymmetry::GetProperDataRange(): **ERROR** start data bin doesn't make any sense!";
+      std::cerr << std::endl;
       return false;
     }
     // 3rd check if end is within proper bounds
     if (end[i] < 0) {
-      cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **ERROR** end data bin (" << end[i] << ") doesn't make any sense!";
-      cerr << endl;
+      std::cerr << std::endl << ">> PRunAsymmetry::GetProperDataRange(): **ERROR** end data bin (" << end[i] << ") doesn't make any sense!";
+      std::cerr << std::endl;
       return false;
     }
-    if (end[i] > (Int_t)runData->GetDataBin(histoNo[i])->size()) {
-      cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** end data bin (" << end[i] << ") > histo length (" << (Int_t)runData->GetDataBin(histoNo[i])->size() << ").";
-      cerr << endl << ">>    Will set end = (histo length - 1). Consider to change it in the msr-file." << endl;
-      cerr << endl;
-      end[i] = (Int_t)runData->GetDataBin(histoNo[i])->size()-1;
+    if (end[i] > static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size())) {
+      std::cerr << std::endl << ">> PRunAsymmetry::GetProperDataRange(): **WARNING** end data bin (" << end[i] << ") > histo length (" << static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size()) << ").";
+      std::cerr << std::endl << ">>    Will set end = (histo length - 1). Consider to change it in the msr-file." << std::endl;
+      std::cerr << std::endl;
+      end[i] = static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size())-1;
     }
     // 4th check if t0 is within proper bounds
-    if ((t0[i] < 0) || (t0[i] > (Int_t)runData->GetDataBin(histoNo[i])->size())) {
-      cerr << endl << ">> PRunAsymmetry::GetProperDataRange(): **ERROR** t0 data bin doesn't make any sense!";
-      cerr << endl;
+    if ((t0[i] < 0) || (t0[i] > static_cast<Int_t>(runData->GetDataBin(histoNo[i])->size()))) {
+      std::cerr << std::endl << ">> PRunAsymmetry::GetProperDataRange(): **ERROR** t0 data bin doesn't make any sense!";
+      std::cerr << std::endl;
       return false;
     }
   }
@@ -1797,18 +1798,18 @@ Bool_t PRunAsymmetry::GetProperDataRange(PRawRunData* runData, UInt_t histoNo[2]
   if (fabs(static_cast<Double_t>(start[0])-t0[0]) > fabs(static_cast<Double_t>(start[1])-t0[1])){
     start[1] = static_cast<Int_t>(t0[1] + static_cast<Double_t>(start[0]) - t0[0]);
     end[1] = static_cast<Int_t>(t0[1] + static_cast<Double_t>(end[0]) - t0[0]);
-    cerr << endl << ">> PRunAsymmetry::GetProperDataRange **WARNING** needed to shift backward data range.";
-    cerr << endl << ">> given: " << fRunInfo->GetDataRange(2) << ", " << fRunInfo->GetDataRange(3);
-    cerr << endl << ">> used : " << start[1] << ", " << end[1];
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::GetProperDataRange **WARNING** needed to shift backward data range.";
+    std::cerr << std::endl << ">> given: " << fRunInfo->GetDataRange(2) << ", " << fRunInfo->GetDataRange(3);
+    std::cerr << std::endl << ">> used : " << start[1] << ", " << end[1];
+    std::cerr << std::endl;
   }
   if (fabs(static_cast<Double_t>(start[0])-t0[0]) < fabs(static_cast<Double_t>(start[1])-t0[1])){
     start[0] = static_cast<Int_t>(t0[0] + static_cast<Double_t>(start[1]) - t0[1]);
     end[0] = static_cast<Int_t>(t0[0] + static_cast<Double_t>(end[1]) - t0[1]);
-    cerr << endl << ">> PRunAsymmetry::GetProperDataRange **WARNING** needed to shift forward data range.";
-    cerr << endl << ">> given: " << fRunInfo->GetDataRange(0) << ", " << fRunInfo->GetDataRange(1);
-    cerr << endl << ">> used : " << start[0] << ", " << end[0];
-    cerr << endl;
+    std::cerr << std::endl << ">> PRunAsymmetry::GetProperDataRange **WARNING** needed to shift forward data range.";
+    std::cerr << std::endl << ">> given: " << fRunInfo->GetDataRange(0) << ", " << fRunInfo->GetDataRange(1);
+    std::cerr << std::endl << ">> used : " << start[0] << ", " << end[0];
+    std::cerr << std::endl;
   }
 
   // keep good bins for potential latter use
@@ -1863,7 +1864,7 @@ void PRunAsymmetry::GetProperFitRange(PMsrGlobalBlock *globalBlock)
   if ((fFitStartTime == PMUSR_UNDEFINED) || (fFitEndTime == PMUSR_UNDEFINED)) {
     fFitStartTime = (fGoodBins[0] - fT0s[0]) * fTimeResolution; // (fgb-t0)*dt
     fFitEndTime = (fGoodBins[1] - fT0s[0]) * fTimeResolution;   // (lgb-t0)*dt
-    cerr << ">> PRunSingleHisto::GetProperFitRange(): **WARNING** Couldn't get fit start/end time!" << endl;
-    cerr << ">>    Will set it to fgb/lgb which given in time is: " << fFitStartTime << "..." << fFitEndTime << " (usec)" << endl;
+    std::cerr << ">> PRunSingleHisto::GetProperFitRange(): **WARNING** Couldn't get fit start/end time!" << std::endl;
+    std::cerr << ">>    Will set it to fgb/lgb which given in time is: " << fFitStartTime << "..." << fFitEndTime << " (usec)" << std::endl;
   }
 }
