@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2010-2016 by Andreas Suter                              *
+ *   Copyright (C) 2010-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -28,7 +28,6 @@
  ***************************************************************************/
 
 #include <iostream>
-using namespace std;
 
 #include <QApplication>
 
@@ -49,12 +48,12 @@ int main( int argc, char ** argv )
 
   if (argc == 2) {
     if (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h")) {
-      cout << endl << "usage: musredit [<msr-files>] | -h, --help | -v, --version";
-      cout << endl << endl;
+      std::cout << std::endl << "usage: musredit [<msr-files>] | -h, --help | -v, --version";
+      std::cout << std::endl << std::endl;
       return 0;
     } else if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")) {
-      cout << endl << "musredit git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1;
-      cout << endl << endl;
+      std::cout << std::endl << "musredit git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1;
+      std::cout << std::endl << std::endl;
       return 0;
     }
   }

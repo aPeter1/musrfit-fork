@@ -98,6 +98,7 @@ void musrview_syntax()
  */
 int main(int argc, char *argv[])
 {
+  int result = PMUSR_SUCCESS;
   bool show_syntax = false;
   int  status;
   bool success = true;
@@ -119,7 +120,7 @@ int main(int argc, char *argv[])
   // check input arguments
   if (argc == 1) {
     musrview_syntax();
-    return PMUSR_SUCCESS;
+    return PMUSR_SYNTAX_REQUEST;
   }
   for (int i=1; i<argc; i++) {
     if (strstr(argv[i], ".msr") || strstr(argv[i], ".mlog")) {
@@ -272,11 +273,12 @@ int main(int argc, char *argv[])
   success = dataHandler->IsAllDataAvailable();
   if (!success) {
     std::cerr << std::endl << ">> musrview **ERROR** Couldn't read all data files, will quit ..." << std::endl;
+    result = PMUSR_DATA_FILE_READ_ERROR;
   }
 
   // generate the necessary histogramms for the view
   PRunListCollection *runListCollection = nullptr;
-  if (success) {
+  if (result == PMUSR_SUCCESS) {
     // feed all the necessary histogramms for the view
     runListCollection = new PRunListCollection(msrHandler, dataHandler);
     for (unsigned int i=0; i<msrHandler->GetMsrRunList()->size(); i++) {
@@ -293,13 +295,14 @@ int main(int argc, char *argv[])
         if (!success) {
           std::cerr << std::endl << ">> musrview **ERROR** Couldn't handle run no " << i << " ";
           std::cerr << (*msrHandler->GetMsrRunList())[i].GetRunName()->Data();
+          result = PMUSR_MSR_RUN_ERROR;
           break;
         }
       }
     }
   }
 
-  if (success) {
+  if (result == PMUSR_SUCCESS) {
     // generate Root application needed for PMusrCanvas
     if (graphicsOutput || asciiOutput) {
       argv[argc] = (char*)malloc(16*sizeof(char));
@@ -409,5 +412,5 @@ int main(int argc, char *argv[])
     runListCollection = nullptr;
   }
 
-  return PMUSR_SUCCESS;
+  return result;
 }

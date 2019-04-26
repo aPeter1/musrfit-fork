@@ -8,7 +8,7 @@
 *****************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2009-2016 by Andreas Suter                              *
+ *   Copyright (C) 2009-2019 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -83,7 +83,7 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QVector<QString> 
   if ( !fProc->waitForStarted() ) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( 0,
+    QMessageBox::critical( nullptr,
                 tr("Fatal error"),
                 msg,
                 tr("Quit") );
@@ -114,7 +114,7 @@ PFitOutputHandler::~PFitOutputHandler()
   }
   if (fProc) {
     delete fProc;
-    fProc = 0;
+    fProc = nullptr;
   }
 }
 

@@ -41,15 +41,17 @@
 //#endif
 #include "fftw3.h"
 
-#define PMUSR_SUCCESS                   0
-#define PMUSR_WRONG_STARTUP_SYNTAX     -1
-#define PMUSR_MSR_FILE_NOT_FOUND       -2
-#define PMUSR_MSR_ALLOCATION_ERROR     -3
-#define PMUSR_MSR_SYNTAX_ERROR         -4
-#define PMUSR_TOKENIZE_ERROR           -5
-#define PMUSR_MSR_LOG_FILE_WRITE_ERROR -6
-#define PMUSR_MSR_FILE_WRITE_ERROR     -7
-#define PMUSR_DATA_FILE_READ_ERROR     -8
+#define PMUSR_SUCCESS                    0
+#define PMUSR_SYNTAX_REQUEST            -1
+#define PMUSR_WRONG_STARTUP_SYNTAX      -2
+#define PMUSR_MSR_FILE_NOT_FOUND        -3
+#define PMUSR_MSR_ALLOCATION_ERROR      -4
+#define PMUSR_MSR_SYNTAX_ERROR          -5
+#define PMUSR_TOKENIZE_ERROR            -6
+#define PMUSR_MSR_LOG_FILE_WRITE_ERROR  -7
+#define PMUSR_MSR_FILE_WRITE_ERROR      -8
+#define PMUSR_DATA_FILE_READ_ERROR      -9
+#define PMUSR_MSR_RUN_ERROR            -10
 
 #define PRUN_SINGLE_HISTO     0
 #define PRUN_SINGLE_HISTO_RRF 1
