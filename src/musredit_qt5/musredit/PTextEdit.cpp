@@ -90,6 +90,9 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   // reads and manages the conents of the xml-startup (musredit_startup.xml) file
   fAdmin = new PAdmin();
 
+  // set default setting of the fDarkThemeIcons
+  fAdmin->setDarkThemeIconsFlag(fDarkToolBarIcon);
+
   // enable file system watcher. Needed to get notification if the msr-file is changed outside of musrfit at runtime
   fFileSystemWatcherActive = true;
   fFileSystemWatcher = new QFileSystemWatcher();
@@ -179,8 +182,9 @@ void PTextEdit::setupFileActions()
   menuBar()->addMenu( menu );
 
   QAction *a;
-
   QString iconName("");
+
+  // New
   if (fDarkTheme)
     iconName = QString(":/icons/document-new-dark.svg");
   else
@@ -190,6 +194,8 @@ void PTextEdit::setupFileActions()
   a->setStatusTip( tr("Create a new msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileNew() ) );
   menu->addAction(a);
+  fActions["New"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/document-new-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&New..." ), this );
@@ -197,6 +203,7 @@ void PTextEdit::setupFileActions()
   }
   tb->addAction(a);
 
+  // Open
   if (fDarkTheme)
     iconName = QString(":/icons/document-open-dark.svg");
   else
@@ -206,6 +213,8 @@ void PTextEdit::setupFileActions()
   a->setStatusTip( tr("Opens a msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileOpen() ) );
   menu->addAction(a);
+  fActions["Open"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/document-open-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Open..." ), this );
@@ -213,6 +222,7 @@ void PTextEdit::setupFileActions()
   }
   tb->addAction(a);
 
+  // Recent Files
   fRecentFilesMenu = menu->addMenu( tr("Recent Files") );
   for (int i=0; i<MAX_RECENT_FILES; i++) {
     fRecentFilesAction[i] = new QAction(fRecentFilesMenu);
@@ -222,6 +232,7 @@ void PTextEdit::setupFileActions()
   }
   fillRecentFiles();
 
+  // Reload
   if (fDarkTheme)
     iconName = QString(":/icons/view-refresh-dark.svg");
   else
@@ -231,6 +242,8 @@ void PTextEdit::setupFileActions()
   a->setStatusTip( tr("Reload msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileReload() ) );
   menu->addAction(a);
+  fActions["Reload"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/view-refresh-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "Reload..." ), this );
@@ -244,6 +257,7 @@ void PTextEdit::setupFileActions()
 
   menu->addSeparator();
 
+  // Save
   if (fDarkTheme)
     iconName = QString(":/icons/document-save-dark.svg");
   else
@@ -253,6 +267,8 @@ void PTextEdit::setupFileActions()
   a->setStatusTip( tr("Save msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileSave() ) );
   menu->addAction(a);
+  fActions["Save"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/document-save-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Save..." ), this );
@@ -260,17 +276,20 @@ void PTextEdit::setupFileActions()
   }
   tb->addAction(a);
 
+  // Save As
   a = new QAction( tr( "Save &As..." ), this );
   a->setStatusTip( tr("Save msr-file As") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileSaveAs() ) );
   menu->addAction(a);
 
+  // Save Prefs
   a = new QAction( tr( "Save Prefs..." ), this );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileSavePrefs() ) );
   menu->addAction(a);
 
   menu->addSeparator();
 
+  // Print
   if (fDarkTheme)
     iconName = QString(":/icons/document-print-dark.svg");
   else
@@ -280,6 +299,8 @@ void PTextEdit::setupFileActions()
   a->setStatusTip( tr("Print msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( filePrint() ) );
   menu->addAction(a);
+  fActions["Print"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/document-print-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Print..." ), this );
@@ -289,16 +310,19 @@ void PTextEdit::setupFileActions()
 
   menu->addSeparator();
 
+  // Close
   a = new QAction( tr( "&Close" ), this );
   a->setShortcut( tr("Ctrl+W") );
   a->setStatusTip( tr("Close msr-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileClose() ) );
   menu->addAction(a);
 
+  // Close All
   a = new QAction( tr( "Close &All" ), this );
   connect( a, SIGNAL( triggered() ), this, SLOT( fileCloseAll() ) );
   menu->addAction(a);
 
+  // Close All Others
   a = new QAction( tr( "Clo&se All Others" ), this );
   a->setShortcut( tr("Ctrl+Shift+W") );
   a->setStatusTip( tr("Close All Other Tabs") );
@@ -307,6 +331,7 @@ void PTextEdit::setupFileActions()
 
   menu->addSeparator();
 
+  // Exit
   a = new QAction( tr( "E&xit" ), this );
   a->setShortcut( tr("Ctrl+Q") );
   a->setStatusTip( tr("Exit Program") );
@@ -330,6 +355,7 @@ void PTextEdit::setupEditActions()
   QAction *a;
   QString iconName("");
 
+  // Undo
   if (fDarkTheme)
     iconName = QString(":/icons/edit-undo-dark.svg");
   else
@@ -339,6 +365,8 @@ void PTextEdit::setupEditActions()
   a->setStatusTip( tr("Edit Undo") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editUndo() ) );
   menu->addAction(a);
+  fActions["Undo"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/edit-undo-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Undo" ), this );
@@ -346,6 +374,7 @@ void PTextEdit::setupEditActions()
   }
   tb->addAction(a);
 
+  // Redo
   if (fDarkTheme)
     iconName = QString(":/icons/edit-redo-dark.svg");
   else
@@ -355,6 +384,8 @@ void PTextEdit::setupEditActions()
   a->setStatusTip( tr("Edit Redo") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editRedo() ) );
   menu->addAction(a);
+  fActions["Redo"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/edit-redo-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Redo" ), this );
@@ -364,6 +395,7 @@ void PTextEdit::setupEditActions()
 
   menu->addSeparator();
 
+  // Select All
   a = new QAction( tr( "Select &All" ), this );
   a->setShortcut( tr("Ctrl+A") );
   a->setStatusTip( tr("Edit Select All") );
@@ -373,6 +405,7 @@ void PTextEdit::setupEditActions()
   menu->addSeparator();
   tb->addSeparator();
 
+  // Copy
   if (fDarkTheme)
     iconName = QString(":/icons/edit-copy-dark.svg");
   else
@@ -382,6 +415,8 @@ void PTextEdit::setupEditActions()
   a->setStatusTip( tr("Edit Copy") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editCopy() ) );
   menu->addAction(a);
+  fActions["Copy"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/edit-copy-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Copy" ), this );
@@ -389,6 +424,7 @@ void PTextEdit::setupEditActions()
   }
   tb->addAction(a);
 
+  // Cut
   if (fDarkTheme)
     iconName = QString(":/icons/edit-cut-dark.svg");
   else
@@ -398,6 +434,8 @@ void PTextEdit::setupEditActions()
   a->setStatusTip( tr("Edit Cut") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editCut() ) );
   menu->addAction(a);
+  fActions["Cut"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/edit-cut-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "Cu&t" ), this );
@@ -405,6 +443,7 @@ void PTextEdit::setupEditActions()
   }
   tb->addAction(a);
 
+  // Paste
   if (fDarkTheme)
     iconName = QString(":/icons/edit-paste-dark.svg");
   else
@@ -414,6 +453,8 @@ void PTextEdit::setupEditActions()
   a->setStatusTip( tr("Edit Paste") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editPaste() ) );
   menu->addAction(a);
+  fActions["Paste"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/edit-paste-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Paste" ), this );
@@ -424,6 +465,7 @@ void PTextEdit::setupEditActions()
   menu->addSeparator();
   tb->addSeparator();
 
+  // Find
   if (fDarkTheme)
     iconName = QString(":/icons/edit-find-dark.svg");
   else
@@ -433,6 +475,8 @@ void PTextEdit::setupEditActions()
   a->setStatusTip( tr("Edit Find") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editFind() ) );
   menu->addAction(a);
+  fActions["Find"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/edit-find-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Find" ), this );
@@ -440,6 +484,7 @@ void PTextEdit::setupEditActions()
   }
   tb->addAction(a);
 
+  // Find Next
   if (fDarkTheme)
     iconName = QString(":/icons/go-next-use-dark.svg");
   else
@@ -449,6 +494,8 @@ void PTextEdit::setupEditActions()
   a->setStatusTip( tr("Edit Find Next") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editFindNext() ) );
   menu->addAction(a);
+  fActions["Find Next"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/go-next-use-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "Find &Next" ), this );
@@ -456,6 +503,7 @@ void PTextEdit::setupEditActions()
   }
   tb->addAction(a);
 
+  // Find Previous
   if (fDarkTheme)
     iconName = QString(":/icons/go-previous-use-dark.svg");
   else
@@ -465,6 +513,8 @@ void PTextEdit::setupEditActions()
   a->setStatusTip( tr("Edit Find Previous") );
   connect( a, SIGNAL( triggered() ), this, SLOT( editFindPrevious() ) );
   menu->addAction(a);
+  fActions["Find Previous"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/go-previous-use-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "Find Pre&vious" ), this );
@@ -472,6 +522,7 @@ void PTextEdit::setupEditActions()
   }
   tb->addAction(a);
 
+  // Replace
   a = new QAction( tr( "Replace..." ), this );
   a->setShortcut( tr("Ctrl+R") );
   a->setStatusTip( tr("Edit Replace") );
@@ -618,6 +669,8 @@ void PTextEdit::setupMusrActions()
 
   QAction *a;
   QString iconName("");
+
+  // musrWiz
   if (fDarkTheme)
     iconName = QString(":/icons/musrWiz-32x32-dark.svg");
   else
@@ -627,6 +680,8 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Call musrWiz which helps to create msr-files") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrWiz() ) );
   menu->addAction(a);
+  fActions["musrWiz"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/musrWiz-32x32.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "musr&Wiz" ), this );
@@ -637,6 +692,7 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
+  // Calculate Chisq
   if (fDarkTheme)
     iconName = QString(":/icons/musrchisq-dark.svg");
   else
@@ -646,6 +702,8 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Calculate Chi Square (Log Max Likelihood)") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrCalcChisq() ) );
   menu->addAction(a);
+  fActions["calcChisq"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/musrchisq-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "Calculate &Chisq" ), this );
@@ -653,6 +711,7 @@ void PTextEdit::setupMusrActions()
   }
   tb->addAction(a);
 
+  // musrfit
   if (fDarkTheme)
     iconName = QString(":/icons/musrfit-dark.svg");
   else
@@ -662,6 +721,8 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Fit") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrFit() ) );
   menu->addAction(a);
+  fActions["musrfit"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/musrfit-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Fit" ), this );
@@ -669,6 +730,7 @@ void PTextEdit::setupMusrActions()
   }
   tb->addAction(a);
 
+  // Swap Msr/Mlog
   if (fDarkTheme)
     iconName = QString(":/icons/musrswap-dark.svg");
   else
@@ -678,6 +740,8 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Swap msr-file <-> mlog-file") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrSwapMsrMlog() ) );
   menu->addAction(a);
+  fActions["Swap Msr/Mlog"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/musrswap-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Swap Msr <-> Mlog" ), this );
@@ -685,6 +749,7 @@ void PTextEdit::setupMusrActions()
   }
   tb->addAction(a);
 
+  // musrStep
   if (fDarkTheme)
     iconName = QString(":/icons/musrStep-32x32-dark.svg");
   else
@@ -694,6 +759,8 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Set Steps") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrSetSteps() ) );
   menu->addAction(a);
+  fActions["musrStep"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/musrStep-32x32.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "Set Ste&ps" ), this );
@@ -701,6 +768,7 @@ void PTextEdit::setupMusrActions()
   }
   tb->addAction(a);
 
+  // msr2data
   if (fDarkTheme)
     iconName = QString(":/icons/msr2data-dark.svg");
   else
@@ -710,6 +778,8 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Start msr2data interface") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrMsr2Data() ) );
   menu->addAction(a);
+  fActions["msr2data"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/msr2data-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Msr2Data" ), this );
@@ -717,6 +787,7 @@ void PTextEdit::setupMusrActions()
   }
   tb->addAction(a);
 
+  // mupp
   if (fDarkTheme)
     iconName = QString(":/icons/mupp-dark.svg");
   else
@@ -726,6 +797,8 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Start mupp, the muSR parameter plotter") );
   connect( a, SIGNAL( triggered() ), this, SLOT( mupp() ) );
   menu->addAction(a);
+  fActions["mupp"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/mupp-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "m&upp" ), this );
@@ -736,6 +809,7 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
+  // musrview
   if (fDarkTheme)
     iconName = QString(":/icons/musrview-dark.svg");
   else
@@ -745,6 +819,8 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Start musrview") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrView() ) );
   menu->addAction(a);
+  fActions["musrview"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/musrview-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&View" ), this );
@@ -752,6 +828,7 @@ void PTextEdit::setupMusrActions()
   }
   tb->addAction(a);
 
+  // musrt0
   if (fDarkTheme)
     iconName = QString(":/icons/musrt0-dark.svg");
   else
@@ -760,6 +837,7 @@ void PTextEdit::setupMusrActions()
   fMusrT0Action->setStatusTip( tr("Start musrt0") );
   connect( fMusrT0Action, SIGNAL( triggered() ), this, SLOT( musrT0() ) );
   menu->addAction(fMusrT0Action);
+  fActions["musrt0"] = fMusrT0Action;
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/musrt0-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&T0" ), this );
@@ -768,6 +846,7 @@ void PTextEdit::setupMusrActions()
   tb->addAction(fMusrT0Action);
   fMusrT0Action->setEnabled(fAdmin->getEnableMusrT0Flag());
 
+  // musrFT
   if (fDarkTheme)
     iconName = QString(":/icons/musrFT-dark.svg");
   else
@@ -776,6 +855,8 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Start musrFT") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrFT() ) );
   menu->addAction(a);
+  fActions["musrFT"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/musrFT-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "Raw Fourier" ), this );
@@ -783,6 +864,7 @@ void PTextEdit::setupMusrActions()
   }
   tb->addAction(a);
 
+  // musrprefs
   if (fDarkTheme)
     iconName = QString(":/icons/musrprefs-dark.svg");
   else
@@ -791,6 +873,8 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Show Preferences") );
   connect( a, SIGNAL( triggered() ), this, SLOT( musrPrefs() ) );
   menu->addAction(a);
+  fActions["musrprefs"] = a;
+
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/musrprefs-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Preferences" ), this );
@@ -801,6 +885,7 @@ void PTextEdit::setupMusrActions()
   menu->addSeparator();
   tb->addSeparator();
 
+  // musrdump
   if (fDarkTheme)
     iconName = QString(":/icons/musrdump-dark.svg");
   else
@@ -809,6 +894,7 @@ void PTextEdit::setupMusrActions()
   a->setStatusTip( tr("Dumps muSR File Header Information") );
   connect( a, SIGNAL(triggered()), this, SLOT(musrDump()));
   menu->addAction(a);
+  fActions["musrdump"] = a;
   if (!fDarkToolBarIcon) { // tool bar icon is not dark, even though the theme is (ubuntu)
     iconName = QString(":/icons/musrdump-plain.svg");
     a = new QAction( QIcon( QPixmap(iconName) ), tr( "&Dump Header" ), this );
@@ -2553,6 +2639,7 @@ void PTextEdit::musrPrefs()
   }
 
   if (dlg->exec() == QDialog::Accepted) {
+    fAdmin->setDarkThemeIconsFlag(dlg->getDarkThemeIconsFlag());
     fAdmin->setMusrviewShowFourierFlag(dlg->getMusrviewShowFourierFlag());
     fAdmin->setMusrviewShowAvgFlag(dlg->getMusrviewShowAvgFlag());
     fAdmin->setKeepMinuit2OutputFlag(dlg->getKeepMinuit2OutputFlag());
@@ -2576,6 +2663,13 @@ void PTextEdit::musrPrefs()
 
   delete dlg;
   dlg = nullptr;
+
+  // check if the dark theme icons flag has changed
+  if (fAdmin->getDarkThemeIconsFlag() != fDarkToolBarIcon) {
+    fDarkTheme = !fDarkTheme;
+    fDarkToolBarIcon = !fDarkToolBarIcon;
+    switchIcons();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -3252,6 +3346,67 @@ bool PTextEdit::fileAlreadyOpen(QFileInfo &finfo, int &idx)
   }
 
   return result;
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>Switch icons according to the fAdmin settings
+ */
+void PTextEdit::switchIcons()
+{
+  if (fAdmin->getDarkThemeIconsFlag()) { // dark theme icons
+    fActions["New"]->setIcon(QIcon(":/icons/document-new-dark.svg"));
+    fActions["Open"]->setIcon(QIcon(":/icons/document-open-dark.svg"));
+    fActions["Reload"]->setIcon(QIcon(":/icons/view-refresh-dark.svg"));
+    fActions["Save"]->setIcon(QIcon(":/icons/document-save-dark.svg"));
+    fActions["Print"]->setIcon(QIcon(":/icons/document-print-dark.svg"));
+    fActions["Undo"]->setIcon(QIcon(":/icons/edit-undo-dark.svg"));
+    fActions["Redo"]->setIcon(QIcon(":/icons/edit-redo-dark.svg"));
+    fActions["Copy"]->setIcon(QIcon(":/icons/edit-copy-dark.svg"));
+    fActions["Cut"]->setIcon(QIcon(":/icons/edit-cut-dark.svg"));
+    fActions["Paste"]->setIcon(QIcon(":/icons/edit-paste-dark.svg"));
+    fActions["Find"]->setIcon(QIcon(":/icons/edit-find-dark.svg"));
+    fActions["Find Next"]->setIcon(QIcon(":/icons/go-next-use-dark.svg"));
+    fActions["Find Previous"]->setIcon(QIcon(":/icons/go-previous-use-dark.svg"));
+    fActions["musrWiz"]->setIcon(QIcon(":/icons/musrWiz-32x32-dark.svg"));
+    fActions["calcChisq"]->setIcon(QIcon(":/icons/musrchisq-dark.svg"));
+    fActions["musrfit"]->setIcon(QIcon(":/icons/musrfit-dark.svg"));
+    fActions["Swap Msr/Mlog"]->setIcon(QIcon(":/icons/musrswap-dark.svg"));
+    fActions["musrStep"]->setIcon(QIcon(":/icons/musrStep-32x32-dark.svg"));
+    fActions["msr2data"]->setIcon(QIcon(":/icons/msr2data-dark.svg"));
+    fActions["mupp"]->setIcon(QIcon(":/icons/mupp-dark.svg"));
+    fActions["musrview"]->setIcon(QIcon(":/icons/musrview-dark.svg"));
+    fActions["musrt0"]->setIcon(QIcon(":/icons/musrt0-dark.svg"));
+    fActions["musrFT"]->setIcon(QIcon(":/icons/musrFT-dark.svg"));
+    fActions["musrprefs"]->setIcon(QIcon(":/icons/musrprefs-dark.svg"));
+    fActions["musrdump"]->setIcon(QIcon(":/icons/musrdump-dark.svg"));
+  } else { // plain theme icons
+    fActions["New"]->setIcon(QIcon(":/icons/document-new-plain.svg"));
+    fActions["Open"]->setIcon(QIcon(":/icons/document-open-plain.svg"));
+    fActions["Reload"]->setIcon(QIcon(":/icons/view-refresh-plain.svg"));
+    fActions["Save"]->setIcon(QIcon(":/icons/document-save-plain.svg"));
+    fActions["Print"]->setIcon(QIcon(":/icons/document-print-plain.svg"));
+    fActions["Undo"]->setIcon(QIcon(":/icons/edit-undo-plain.svg"));
+    fActions["Redo"]->setIcon(QIcon(":/icons/edit-redo-plain.svg"));
+    fActions["Copy"]->setIcon(QIcon(":/icons/edit-copy-plain.svg"));
+    fActions["Cut"]->setIcon(QIcon(":/icons/edit-cut-plain.svg"));
+    fActions["Paste"]->setIcon(QIcon(":/icons/edit-paste-plain.svg"));
+    fActions["Find"]->setIcon(QIcon(":/icons/edit-find-plain.svg"));
+    fActions["Find Next"]->setIcon(QIcon(":/icons/go-next-use-plain.svg"));
+    fActions["Find Previous"]->setIcon(QIcon(":/icons/go-previous-use-plain.svg"));
+    fActions["musrWiz"]->setIcon(QIcon(":/icons/musrWiz-32x32.svg"));
+    fActions["calcChisq"]->setIcon(QIcon(":/icons/musrchisq-plain.svg"));
+    fActions["musrfit"]->setIcon(QIcon(":/icons/musrfit-plain.svg"));
+    fActions["Swap Msr/Mlog"]->setIcon(QIcon(":/icons/musrswap-plain.svg"));
+    fActions["musrStep"]->setIcon(QIcon(":/icons/musrStep-32x32.svg"));
+    fActions["msr2data"]->setIcon(QIcon(":/icons/msr2data-plain.svg"));
+    fActions["mupp"]->setIcon(QIcon(":/icons/mupp-plain.svg"));
+    fActions["musrview"]->setIcon(QIcon(":/icons/musrview-plain.svg"));
+    fActions["musrt0"]->setIcon(QIcon(":/icons/musrt0-plain.svg"));
+    fActions["musrFT"]->setIcon(QIcon(":/icons/musrFT-plain.svg"));
+    fActions["musrprefs"]->setIcon(QIcon(":/icons/musrprefs-plain.svg"));
+    fActions["musrdump"]->setIcon(QIcon(":/icons/musrdump-plain.svg"));
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

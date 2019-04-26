@@ -53,6 +53,7 @@ class PPrefsDialog : public QDialog, private Ui::PPrefsDialog
     bool getEnableMusrT0Flag()      { return fEnableMusrT0_checkBox->isChecked(); }
     bool getKeepRunPerBlockChisqFlag() { return fPerRunBlockChisq_checkBox->isChecked(); }
     bool getEstimateN0Flag()        { return fEstimateN0_checkBox->isChecked(); }
+    bool getDarkThemeIconsFlag()    { return fDarkThemeIcons_checkBox->isChecked(); }
     int  getDump();    
     int  getTimeout() { return fTimeout_lineEdit->text().toInt(); }
 

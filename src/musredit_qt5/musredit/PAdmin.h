@@ -127,6 +127,7 @@ class PAdmin : public QObject
     bool    getDumpRootFlag() { return fDumpRoot; }
     bool    getEstimateN0Flag() { return fEstimateN0; }
     bool    getChisqPerRunBlockFlag() { return fChisqPreRunBlock; }
+    bool    getDarkThemeIconsFlag() { return fDarkThemeIcons; }
     QString getBeamline() { return fBeamline; }
     QString getInstitute() { return fInstitute; }
     QString getFileFormat() { return fFileFormat; }
@@ -150,6 +151,7 @@ class PAdmin : public QObject
     void setDumpRootFlag(const bool flag) { fDumpRoot = flag; }
     void setEstimateN0Flag(const bool flag) { fEstimateN0 = flag; }
     void setChisqPerRunBlockFlag(const bool flag) { fChisqPreRunBlock = flag; }
+    void setDarkThemeIconsFlag(const bool flag) { fDarkThemeIcons = flag; }
 
     void setFontName(const QString str) { fFontName = str; }
     void setFontSize(const int ival) { fFontSize = ival; }
@@ -193,6 +195,7 @@ class PAdmin : public QObject
     bool fChisqPreRunBlock;    ///< flag indicating if musrfit shall write 'per run block' chisq to the msr-file (default: no).
     bool fEstimateN0;          ///< flag indicating if musrfit shall estimate N0 for single histogram fits (default: yes).
     bool fEnableMusrT0;        ///< flag indicating if musrT0 shall be enabled at startup from within musredit (default: yes).
+    bool fDarkThemeIcons;      ///< flag indicating if dark theme icons shall be used (default: no)
 
     QString fBeamline;   ///< name of the beamline. Used to generate default run header lines.
     QString fInstitute;  ///< name of the institute. Used to generate default run header lines.
