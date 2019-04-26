@@ -643,6 +643,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             case MSR_FITTYPE_BNMR:
               fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
               break;
+            case MSR_FITTYPE_BNMR:
+              fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
+              break;
             case MSR_FITTYPE_NON_MUSR:
               fout << std::left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << std::endl ;
               break;
@@ -806,6 +809,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             break;
           case MSR_FITTYPE_MU_MINUS:
             fout << std::left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << std::endl ;
+            break;
+          case MSR_FITTYPE_BNMR:
+            fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
             break;
           case MSR_FITTYPE_BNMR:
             fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
@@ -1172,6 +1178,9 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
             break;
           case MSR_PLOT_MU_MINUS:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (mu minus plot)" << std::endl;
+            break;
+          case MSR_PLOT_BNMR:
+            fout << "PLOT " << fPlots[plotNo].fPlotType << "   (beta-NMR asymmetry plot)" << endl;
             break;
           case MSR_PLOT_BNMR:
             fout << "PLOT " << fPlots[plotNo].fPlotType << "   (beta-NMR asymmetry plot)" << endl;
@@ -1728,6 +1737,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, std::map<UInt_t, TString
       case MSR_FITTYPE_BNMR:
         fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
         break;
+      case MSR_FITTYPE_BNMR:
+        fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
+        break;
       case MSR_FITTYPE_NON_MUSR:
         fout << std::left << "fittype" << MSR_FITTYPE_NON_MUSR << "         (non muSR fit)" << std::endl ;
         break;
@@ -1918,6 +1930,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, std::map<UInt_t, TString
         break;
       case MSR_FITTYPE_MU_MINUS:
         fout << std::left << "fittype" << MSR_FITTYPE_MU_MINUS << "         (mu minus fit)" << std::endl ;
+        break;
+      case MSR_FITTYPE_BNMR:
+        fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
         break;
       case MSR_FITTYPE_BNMR:
         fout << left << "fittype" << MSR_FITTYPE_BNMR << "         (beta-NMR fit)" << endl ;
@@ -2277,6 +2292,9 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, std::map<UInt_t, TString
         break;
       case MSR_PLOT_MU_MINUS:
         fout << "PLOT " << fPlots[i].fPlotType << "   (mu minus plot)" << std::endl;
+        break;
+      case MSR_PLOT_BNMR:
+        fout << "PLOT " << fPlots[i].fPlotType << "   (beta-NMR asymmetry plot)" << endl;
         break;
       case MSR_PLOT_BNMR:
         fout << "PLOT " << fPlots[i].fPlotType << "   (beta-NMR asymmetry plot)" << endl;
@@ -5876,6 +5894,58 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
         if ((fRuns[i].GetPacking() == -1) && (fGlobal.GetPacking() == -1)) {
           std::cerr << std::endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
           std::cerr << std::endl << ">>   Packing is neither defined here, nor in the GLOBAL block, will set it to 1." << std::endl;
+          fRuns[i].SetPacking(1);
+        }
+        break;
+      case PRUN_ASYMMETRY_BNMR:
+        // check alpha
+        // if ((fRuns[i].GetAlphaParamNo() == -1) && !fFourierOnly) {
+        //   cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+        //   cerr << endl << ">>   alpha parameter number missing which is needed for an asymmetry fit.";
+        //   cerr << endl << ">>   Consider to check the manual ;-)" << endl;
+        //   return false;
+        // }
+        // check that there is a forward parameter number
+        if (fRuns[i].GetForwardHistoNo() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   forward histogram number not defined. Necessary for asymmetry fits." << endl;
+          return false;
+        }
+        // check that there is a backward parameter number
+        if (fRuns[i].GetBackwardHistoNo() == -1) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   backward histogram number not defined. Necessary for asymmetry fits." << endl;
+          return false;
+        }
+        // check fit range
+        if (!fRuns[i].IsFitRangeInBin()) { // fit range given as times in usec
+          if ((fRuns[i].GetFitRange(0) == PMUSR_UNDEFINED) || (fRuns[i].GetFitRange(1) == PMUSR_UNDEFINED)) {
+            if ((fGlobal.GetFitRange(0) == PMUSR_UNDEFINED) || (fGlobal.GetFitRange(1) == PMUSR_UNDEFINED)) {
+              cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+              cerr << endl << ">>   Fit range is not defined, also NOT present in the GLOBAL block. Necessary for asymmetry fits." << endl;
+              return false;
+            }
+          }
+        }
+        // check number of T0's provided
+        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize())) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << " in forward. Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << endl;
+          return false;
+        }
+        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize()) &&
+            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize())) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
+          cerr << endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << " in backward. Needs to be fixed." << endl;
+          cerr << endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << ". Needs to be fixed." << endl;
+          return false;
+        }
+        // check packing
+        if ((fRuns[i].GetPacking() == -1) && (fGlobal.GetPacking() == -1)) {
+          cerr << endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
+          cerr << endl << ">>   Packing is neither defined here, nor in the GLOBAL block, will set it to 1." << endl;
           fRuns[i].SetPacking(1);
         }
         break;
