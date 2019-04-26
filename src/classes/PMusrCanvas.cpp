@@ -722,18 +722,6 @@ void PMusrCanvas::UpdateDataTheoryPad()
         // handle data
         HandleDataSet(i, runNo, data);
         break;
-      case MSR_FITTYPE_BNMR:
-        data = fRunList->GetAsymmetryBNMR(runNo, PRunListCollection::kRunNo);
-        if (!data) { // something wrong
-          fValid = false;
-          // error message
-          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a beta-NMR asymmetry plot";
-          cerr << endl;
-          return;
-        }
-        // handle data
-        HandleDataSet(i, runNo, data);
-        break;
       case MSR_FITTYPE_ASYM_RRF:
         data = fRunList->GetAsymmetryRRF(runNo, PRunListCollection::kRunNo);
         if (!data) { // something wrong
@@ -751,8 +739,8 @@ void PMusrCanvas::UpdateDataTheoryPad()
         if (!data) { // something wrong
           fValid = false;
           // error message
-          cerr << endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a mu minus single histogram plot";
-          cerr << endl;
+          std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a mu minus single histogram plot";
+          std::cerr << std::endl;
           return;
         }
         // handle data

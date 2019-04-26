@@ -988,8 +988,8 @@ PRunData* PRunListCollection::GetAsymmetryBNMR(UInt_t index, EDataSwitch tag)
   switch (tag) {
     case kIndex: // called from musrfit when dumping the data
       if (index > fRunAsymmetryBNMRList.size()) {
-        cerr << endl << ">> PRunListCollection::GetAsymmetryBNMR(): **ERROR** index = " << index << " out of bounds";
-        cerr << endl;
+	std::cerr << std::endl << ">> PRunListCollection::GetAsymmetryBNMR(): **ERROR** index = " << index << " out of bounds";
+        std::cerr << std::endl;
         return 0;
       }
 
