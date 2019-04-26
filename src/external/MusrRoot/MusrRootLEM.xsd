@@ -6,7 +6,7 @@
        In the following it will be called MusrRootLEM.
        It is an extension of MusrRoot.xsd and describes the additional LEM specific entries.
           
-        Author: Andreas Suter, andreas.suter@psi.ch          
+       Author: Andreas Suter, andreas.suter@psi.ch          
     </xs:documentation>
   </xs:annotation>
     
@@ -101,24 +101,26 @@
       <xs:element name="Generic_Validator_URL" type="TString"/>
       <xs:element name="Specific_Validator_URL" type="TString"/>
       <xs:element name="Generator" type="TString"/>
+      <xs:element name="Proposal Number" type="Int_t" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Main Proposer" type="TString" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="File_Name" type="TString"/>
       <xs:element name="Run_Title" type="TString"/>
-    	<xs:element name="Run_Number" type="Int_t"/>
-    	<xs:element name="Run_Start_Time" type="TString"/>
-    	<xs:element name="Run_Stop_Time" type="TString"/>
-    	<xs:element name="Run_Duration" type="TMusrRunPhysicalQuantity"/>
-    	<xs:element name="Laboratory" type="TString"/>
-    	<xs:element name="Instrument" type="TString"/>
-    	<xs:element name="Muon_Beam_Momentum" type="TMusrRunPhysicalQuantity"/>
-    	<xs:element name="Muon_Species" type="TString"/>
-    	<xs:element name="Muon_Source" type="TString"/>
-    	<xs:element name="Setup" type="TString"/>
-    	<xs:element name="Comment" type="TString"/>
-    	<xs:element name="Sample_Name" type="TString"/>
-    	<xs:element name="Sample_Temperature" type="TMusrRunPhysicalQuantity"/>
-    	<xs:element name="Sample_Magnetic_Field" type="TMusrRunPhysicalQuantity"/>
-    	<xs:element name="No_of_Histos" type="Int_t"/>
-    	<xs:element name="Time_Resolution" type="TMusrRunPhysicalQuantity"/>
+      <xs:element name="Run_Number" type="Int_t"/>
+      <xs:element name="Run_Start_Time" type="TString"/>
+      <xs:element name="Run_Stop_Time" type="TString"/>
+      <xs:element name="Run_Duration" type="TMusrRunPhysicalQuantity"/>
+      <xs:element name="Laboratory" type="TString"/>
+      <xs:element name="Instrument" type="TString"/>
+      <xs:element name="Muon_Beam_Momentum" type="TMusrRunPhysicalQuantity"/>
+      <xs:element name="Muon_Species" type="TString"/>
+      <xs:element name="Muon_Source" type="TString"/>
+      <xs:element name="Setup" type="TString"/>
+      <xs:element name="Comment" type="TString"/>
+      <xs:element name="Sample_Name" type="TString"/>
+      <xs:element name="Sample_Temperature" type="TMusrRunPhysicalQuantity"/>
+      <xs:element name="Sample_Magnetic_Field" type="TMusrRunPhysicalQuantity"/>
+      <xs:element name="No_of_Histos" type="Int_t"/>
+      <xs:element name="Time_Resolution" type="TMusrRunPhysicalQuantity"/>
       <xs:element name="RedGreen_Offsets" type="TIntVector"/>
       <xs:element name="Moderator" type="TString"/>
       <xs:element name="Moderator_HV" type="TMusrRunPhysicalQuantity"/>
