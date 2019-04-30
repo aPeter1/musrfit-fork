@@ -202,6 +202,7 @@ void PTextEdit::setupFileActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( fileNew() ) );
   }
   tb->addAction(a);
+  fActions["New-tb"] = a;
 
   // Open
   if (fDarkTheme)
@@ -221,6 +222,7 @@ void PTextEdit::setupFileActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( fileOpen() ) );
   }
   tb->addAction(a);
+  fActions["Open-tb"] = a;
 
   // Recent Files
   fRecentFilesMenu = menu->addMenu( tr("Recent Files") );
@@ -250,6 +252,7 @@ void PTextEdit::setupFileActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( fileReload() ) );
   }
   tb->addAction(a);
+  fActions["Reload-tb"] = a;
 
   a = new QAction( tr( "Open Prefs..." ), this);
   connect( a, SIGNAL( triggered() ), this, SLOT( fileOpenPrefs() ) );
@@ -275,6 +278,7 @@ void PTextEdit::setupFileActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( fileSave() ) );
   }
   tb->addAction(a);
+  fActions["Save-tb"] = a;
 
   // Save As
   a = new QAction( tr( "Save &As..." ), this );
@@ -307,6 +311,7 @@ void PTextEdit::setupFileActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( filePrint() ) );
   }
   tb->addAction(a);
+  fActions["Print-tb"] = a;
 
   menu->addSeparator();
 
@@ -373,6 +378,7 @@ void PTextEdit::setupEditActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( editUndo() ) );
   }
   tb->addAction(a);
+  fActions["Undo-tb"] = a;
 
   // Redo
   if (fDarkTheme)
@@ -392,6 +398,7 @@ void PTextEdit::setupEditActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( editRedo() ) );
   }
   tb->addAction(a);
+  fActions["Redo-tb"] = a;
 
   menu->addSeparator();
 
@@ -423,6 +430,7 @@ void PTextEdit::setupEditActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( editCopy() ) );
   }
   tb->addAction(a);
+  fActions["Copy-tb"] = a;
 
   // Cut
   if (fDarkTheme)
@@ -442,6 +450,7 @@ void PTextEdit::setupEditActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( editCut() ) );
   }
   tb->addAction(a);
+  fActions["Cut-tb"] = a;
 
   // Paste
   if (fDarkTheme)
@@ -461,6 +470,7 @@ void PTextEdit::setupEditActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( editPaste() ) );
   }
   tb->addAction(a);
+  fActions["Paste-tb"] = a;
 
   menu->addSeparator();
   tb->addSeparator();
@@ -483,6 +493,7 @@ void PTextEdit::setupEditActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( editFind() ) );
   }
   tb->addAction(a);
+  fActions["Find-tb"] = a;
 
   // Find Next
   if (fDarkTheme)
@@ -502,6 +513,7 @@ void PTextEdit::setupEditActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( editFindNext() ) );
   }
   tb->addAction(a);
+  fActions["Find Next-tb"] = a;
 
   // Find Previous
   if (fDarkTheme)
@@ -521,6 +533,7 @@ void PTextEdit::setupEditActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( editFindPrevious() ) );
   }
   tb->addAction(a);
+  fActions["Find Previous-tb"] = a;
 
   // Replace
   a = new QAction( tr( "Replace..." ), this );
@@ -688,6 +701,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( musrWiz() ) );
   }
   tb->addAction(a);
+  fActions["musrWiz-tb"] = a;
 
   menu->addSeparator();
   tb->addSeparator();
@@ -710,6 +724,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( musrCalcChisq() ) );
   }
   tb->addAction(a);
+  fActions["calcChisq-tb"] = a;
 
   // musrfit
   if (fDarkTheme)
@@ -729,6 +744,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( musrFit() ) );
   }
   tb->addAction(a);
+  fActions["musrfit-tb"] = a;
 
   // Swap Msr/Mlog
   if (fDarkTheme)
@@ -748,6 +764,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( musrSwapMsrMlog() ) );
   }
   tb->addAction(a);
+  fActions["Swap Msr/Mlog-tb"] = a;
 
   // musrStep
   if (fDarkTheme)
@@ -767,6 +784,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( musrSetSteps() ) );
   }
   tb->addAction(a);
+  fActions["musrStep-tb"] = a;
 
   // msr2data
   if (fDarkTheme)
@@ -786,6 +804,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( musrMsr2Data() ) );
   }
   tb->addAction(a);
+  fActions["msr2data-tb"] = a;
 
   // mupp
   if (fDarkTheme)
@@ -805,6 +824,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( mupp() ) );
   }
   tb->addAction(a);
+  fActions["mupp-tb"] = a;
 
   menu->addSeparator();
   tb->addSeparator();
@@ -827,6 +847,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( musrView() ) );
   }
   tb->addAction(a);
+  fActions["musrview-tb"] = a;
 
   // musrt0
   if (fDarkTheme)
@@ -845,6 +866,7 @@ void PTextEdit::setupMusrActions()
   }
   tb->addAction(fMusrT0Action);
   fMusrT0Action->setEnabled(fAdmin->getEnableMusrT0Flag());
+  fActions["musrt0-tb"] = fMusrT0Action;
 
   // musrFT
   if (fDarkTheme)
@@ -863,6 +885,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( musrFT() ) );
   }
   tb->addAction(a);
+  fActions["musrFT-tb"] = a;
 
   // musrprefs
   if (fDarkTheme)
@@ -881,6 +904,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( musrPrefs() ) );
   }
   tb->addAction(a);
+  fActions["musrprefs-tb"] = a;
 
   menu->addSeparator();
   tb->addSeparator();
@@ -901,6 +925,7 @@ void PTextEdit::setupMusrActions()
     connect( a, SIGNAL( triggered() ), this, SLOT( musrDump() ) );
   }
   tb->addAction(a);
+  fActions["musrdump-tb"] = a;
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -3356,56 +3381,106 @@ void PTextEdit::switchIcons()
 {
   if (fAdmin->getDarkThemeIconsFlag()) { // dark theme icons
     fActions["New"]->setIcon(QIcon(":/icons/document-new-dark.svg"));
+    fActions["New-tb"]->setIcon(QIcon(":/icons/document-new-dark.svg"));
     fActions["Open"]->setIcon(QIcon(":/icons/document-open-dark.svg"));
+    fActions["Open-tb"]->setIcon(QIcon(":/icons/document-open-dark.svg"));
     fActions["Reload"]->setIcon(QIcon(":/icons/view-refresh-dark.svg"));
+    fActions["Reload-tb"]->setIcon(QIcon(":/icons/view-refresh-dark.svg"));
     fActions["Save"]->setIcon(QIcon(":/icons/document-save-dark.svg"));
+    fActions["Save-tb"]->setIcon(QIcon(":/icons/document-save-dark.svg"));
     fActions["Print"]->setIcon(QIcon(":/icons/document-print-dark.svg"));
+    fActions["Print-tb"]->setIcon(QIcon(":/icons/document-print-dark.svg"));
     fActions["Undo"]->setIcon(QIcon(":/icons/edit-undo-dark.svg"));
+    fActions["Undo-tb"]->setIcon(QIcon(":/icons/edit-undo-dark.svg"));
     fActions["Redo"]->setIcon(QIcon(":/icons/edit-redo-dark.svg"));
+    fActions["Redo-tb"]->setIcon(QIcon(":/icons/edit-redo-dark.svg"));
     fActions["Copy"]->setIcon(QIcon(":/icons/edit-copy-dark.svg"));
+    fActions["Copy-tb"]->setIcon(QIcon(":/icons/edit-copy-dark.svg"));
     fActions["Cut"]->setIcon(QIcon(":/icons/edit-cut-dark.svg"));
+    fActions["Cut-tb"]->setIcon(QIcon(":/icons/edit-cut-dark.svg"));
     fActions["Paste"]->setIcon(QIcon(":/icons/edit-paste-dark.svg"));
+    fActions["Paste-tb"]->setIcon(QIcon(":/icons/edit-paste-dark.svg"));
     fActions["Find"]->setIcon(QIcon(":/icons/edit-find-dark.svg"));
+    fActions["Find-tb"]->setIcon(QIcon(":/icons/edit-find-dark.svg"));
     fActions["Find Next"]->setIcon(QIcon(":/icons/go-next-use-dark.svg"));
+    fActions["Find Next-tb"]->setIcon(QIcon(":/icons/go-next-use-dark.svg"));
     fActions["Find Previous"]->setIcon(QIcon(":/icons/go-previous-use-dark.svg"));
+    fActions["Find Previous-tb"]->setIcon(QIcon(":/icons/go-previous-use-dark.svg"));
     fActions["musrWiz"]->setIcon(QIcon(":/icons/musrWiz-32x32-dark.svg"));
+    fActions["musrWiz-tb"]->setIcon(QIcon(":/icons/musrWiz-32x32-dark.svg"));
     fActions["calcChisq"]->setIcon(QIcon(":/icons/musrchisq-dark.svg"));
+    fActions["calcChisq-tb"]->setIcon(QIcon(":/icons/musrchisq-dark.svg"));
     fActions["musrfit"]->setIcon(QIcon(":/icons/musrfit-dark.svg"));
+    fActions["musrfit-tb"]->setIcon(QIcon(":/icons/musrfit-dark.svg"));
     fActions["Swap Msr/Mlog"]->setIcon(QIcon(":/icons/musrswap-dark.svg"));
+    fActions["Swap Msr/Mlog-tb"]->setIcon(QIcon(":/icons/musrswap-dark.svg"));
     fActions["musrStep"]->setIcon(QIcon(":/icons/musrStep-32x32-dark.svg"));
+    fActions["musrStep-tb"]->setIcon(QIcon(":/icons/musrStep-32x32-dark.svg"));
     fActions["msr2data"]->setIcon(QIcon(":/icons/msr2data-dark.svg"));
+    fActions["msr2data-tb"]->setIcon(QIcon(":/icons/msr2data-dark.svg"));
     fActions["mupp"]->setIcon(QIcon(":/icons/mupp-dark.svg"));
+    fActions["mupp-tb"]->setIcon(QIcon(":/icons/mupp-dark.svg"));
     fActions["musrview"]->setIcon(QIcon(":/icons/musrview-dark.svg"));
+    fActions["musrview-tb"]->setIcon(QIcon(":/icons/musrview-dark.svg"));
     fActions["musrt0"]->setIcon(QIcon(":/icons/musrt0-dark.svg"));
+    fActions["musrt0-tb"]->setIcon(QIcon(":/icons/musrt0-dark.svg"));
     fActions["musrFT"]->setIcon(QIcon(":/icons/musrFT-dark.svg"));
+    fActions["musrFT-tb"]->setIcon(QIcon(":/icons/musrFT-dark.svg"));
     fActions["musrprefs"]->setIcon(QIcon(":/icons/musrprefs-dark.svg"));
+    fActions["musrprefs-tb"]->setIcon(QIcon(":/icons/musrprefs-dark.svg"));
     fActions["musrdump"]->setIcon(QIcon(":/icons/musrdump-dark.svg"));
+    fActions["musrdump-tb"]->setIcon(QIcon(":/icons/musrdump-dark.svg"));
   } else { // plain theme icons
     fActions["New"]->setIcon(QIcon(":/icons/document-new-plain.svg"));
+    fActions["New-tb"]->setIcon(QIcon(":/icons/document-new-plain.svg"));
     fActions["Open"]->setIcon(QIcon(":/icons/document-open-plain.svg"));
+    fActions["Open-tb"]->setIcon(QIcon(":/icons/document-open-plain.svg"));
     fActions["Reload"]->setIcon(QIcon(":/icons/view-refresh-plain.svg"));
+    fActions["Reload-tb"]->setIcon(QIcon(":/icons/view-refresh-plain.svg"));
     fActions["Save"]->setIcon(QIcon(":/icons/document-save-plain.svg"));
+    fActions["Save-tb"]->setIcon(QIcon(":/icons/document-save-plain.svg"));
     fActions["Print"]->setIcon(QIcon(":/icons/document-print-plain.svg"));
+    fActions["Print-tb"]->setIcon(QIcon(":/icons/document-print-plain.svg"));
     fActions["Undo"]->setIcon(QIcon(":/icons/edit-undo-plain.svg"));
+    fActions["Undo-tb"]->setIcon(QIcon(":/icons/edit-undo-plain.svg"));
     fActions["Redo"]->setIcon(QIcon(":/icons/edit-redo-plain.svg"));
+    fActions["Redo-tb"]->setIcon(QIcon(":/icons/edit-redo-plain.svg"));
     fActions["Copy"]->setIcon(QIcon(":/icons/edit-copy-plain.svg"));
+    fActions["Copy-tb"]->setIcon(QIcon(":/icons/edit-copy-plain.svg"));
     fActions["Cut"]->setIcon(QIcon(":/icons/edit-cut-plain.svg"));
+    fActions["Cut-tb"]->setIcon(QIcon(":/icons/edit-cut-plain.svg"));
     fActions["Paste"]->setIcon(QIcon(":/icons/edit-paste-plain.svg"));
+    fActions["Paste-tb"]->setIcon(QIcon(":/icons/edit-paste-plain.svg"));
     fActions["Find"]->setIcon(QIcon(":/icons/edit-find-plain.svg"));
+    fActions["Find-tb"]->setIcon(QIcon(":/icons/edit-find-plain.svg"));
     fActions["Find Next"]->setIcon(QIcon(":/icons/go-next-use-plain.svg"));
+    fActions["Find Next-tb"]->setIcon(QIcon(":/icons/go-next-use-plain.svg"));
     fActions["Find Previous"]->setIcon(QIcon(":/icons/go-previous-use-plain.svg"));
+    fActions["Find Previous-tb"]->setIcon(QIcon(":/icons/go-previous-use-plain.svg"));
     fActions["musrWiz"]->setIcon(QIcon(":/icons/musrWiz-32x32.svg"));
+    fActions["musrWiz-tb"]->setIcon(QIcon(":/icons/musrWiz-32x32.svg"));
     fActions["calcChisq"]->setIcon(QIcon(":/icons/musrchisq-plain.svg"));
+    fActions["calcChisq-tb"]->setIcon(QIcon(":/icons/musrchisq-plain.svg"));
     fActions["musrfit"]->setIcon(QIcon(":/icons/musrfit-plain.svg"));
+    fActions["musrfit-tb"]->setIcon(QIcon(":/icons/musrfit-plain.svg"));
     fActions["Swap Msr/Mlog"]->setIcon(QIcon(":/icons/musrswap-plain.svg"));
+    fActions["Swap Msr/Mlog-tb"]->setIcon(QIcon(":/icons/musrswap-plain.svg"));
     fActions["musrStep"]->setIcon(QIcon(":/icons/musrStep-32x32.svg"));
+    fActions["musrStep-tb"]->setIcon(QIcon(":/icons/musrStep-32x32.svg"));
     fActions["msr2data"]->setIcon(QIcon(":/icons/msr2data-plain.svg"));
+    fActions["msr2data-tb"]->setIcon(QIcon(":/icons/msr2data-plain.svg"));
     fActions["mupp"]->setIcon(QIcon(":/icons/mupp-plain.svg"));
+    fActions["mupp-tb"]->setIcon(QIcon(":/icons/mupp-plain.svg"));
     fActions["musrview"]->setIcon(QIcon(":/icons/musrview-plain.svg"));
+    fActions["musrview-tb"]->setIcon(QIcon(":/icons/musrview-plain.svg"));
     fActions["musrt0"]->setIcon(QIcon(":/icons/musrt0-plain.svg"));
+    fActions["musrt0-tb"]->setIcon(QIcon(":/icons/musrt0-plain.svg"));
     fActions["musrFT"]->setIcon(QIcon(":/icons/musrFT-plain.svg"));
+    fActions["musrFT-tb"]->setIcon(QIcon(":/icons/musrFT-plain.svg"));
     fActions["musrprefs"]->setIcon(QIcon(":/icons/musrprefs-plain.svg"));
+    fActions["musrprefs-tb"]->setIcon(QIcon(":/icons/musrprefs-plain.svg"));
     fActions["musrdump"]->setIcon(QIcon(":/icons/musrdump-plain.svg"));
+    fActions["musrdump-tb"]->setIcon(QIcon(":/icons/musrdump-plain.svg"));
   }
 }
 
