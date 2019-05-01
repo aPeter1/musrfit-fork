@@ -17,6 +17,7 @@
     <musrview_show_fourier>n</musrview_show_fourier>
     <musrview_show_avg>n</musrview_show_avg>
     <enable_musrt0>y</enable_musrt0>
+    <dark_theme_icons>n</dark_theme_icons>
   </general>
   <recent_files>
     <path_file_name>@DOCDIR@/examples/test-histo-PSI-BIN.msr</path_file_name>
@@ -248,13 +249,13 @@
       <label>polynom</label>
       <pixmap>polynom.png</pixmap>
       <params>4</params>
-    </func> 
+    </func>
     <func>
       <name>userFcn</name>
       <comment></comment>
       <label>user function</label>
       <pixmap></pixmap>
       <params>0</params>
-    </func> 
+    </func>
   </theory_functions>
 </musredit_startup>
