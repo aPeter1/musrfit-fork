@@ -85,13 +85,19 @@
 PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
     : QMainWindow( parent, f )
 {
-  getTheme();
+  bool gotTheme = getTheme();
 
   // reads and manages the conents of the xml-startup (musredit_startup.xml) file
   fAdmin = new PAdmin();
 
-  // set default setting of the fDarkThemeIcons
-  fAdmin->setDarkThemeIconsFlag(fDarkToolBarIcon);
+  // set default setting of the fDarkThemeIcons only if a theme has been recognized, otherwise take the
+  // one from the xml startup file.
+  if (gotTheme) {
+    fAdmin->setDarkThemeIconsFlag(fDarkToolBarIcon);
+  } else {
+    fDarkTheme = fAdmin->getDarkThemeIconsFlag();
+    fDarkToolBarIcon = fAdmin->getDarkThemeIconsFlag();
+  }
 
   // enable file system watcher. Needed to get notification if the msr-file is changed outside of musrfit at runtime
   fFileSystemWatcherActive = true;
@@ -3238,23 +3244,22 @@ void PTextEdit::setFileSystemWatcherActive()
 /**
  * @brief PTextEdit::getTheme
  */
-void PTextEdit::getTheme()
+bool PTextEdit::getTheme()
 {
   fDarkTheme = false; // true if theme is dark
   fDarkToolBarIcon = false; // needed for ubuntu dark since there the menu icons are dark, however the toolbar icons are plain!
 
   QString str = QIcon::themeName();
-  qDebug() << "debug> theme name=" << str << endl;
 
   if (str.isEmpty()) { // this is ugly and eventually needs to be fixed in a more coherent way
     str = QProcessEnvironment::systemEnvironment().value("HOME", QString("??"));
     str += "/.kde4/share/config/kdeglobals";
+    bool done = false;
     if (QFile::exists(str)) {
       QFile fln(str);
       fln.open(QIODevice::ReadOnly | QIODevice::Text);
       QTextStream fin(&fln);
       QString line("");
-      bool done = false;
       while (!fin.atEnd() && !done) {
         line = fin.readLine();
         if (line.contains("ColorScheme")) {
@@ -3267,7 +3272,7 @@ void PTextEdit::getTheme()
       }
       fln.close();
     }
-    return;
+    return done;
   }
 
   if (str.contains("dark", Qt::CaseInsensitive)) {
@@ -3281,6 +3286,8 @@ void PTextEdit::getTheme()
       fDarkToolBarIcon = true;
     }
   }
+  
+  return true;
 }
 
 //----------------------------------------------------------------------------------------------------

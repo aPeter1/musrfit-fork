@@ -187,7 +187,7 @@ private:
   QMenu *fRecentFilesMenu;   ///< recent file menu
   QAction *fRecentFilesAction[MAX_RECENT_FILES]; ///< array of the recent file actions
 
-  void getTheme();
+  bool getTheme();
   void fillRecentFiles();
   QStringList getRunList(QString runListStr, bool &ok);
   bool fileAlreadyOpen(QFileInfo &finfo, int &idx);

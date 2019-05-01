@@ -94,6 +94,8 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eMusrviewShowAvg;
   } else if (qName == "enable_musrt0") {
     fKeyWord = eEnableMusrT0;
+  } else if (qName == "dark_theme_icons") {
+    fKeyWord = eDarkThemeIcons;
   } else if (qName == "keep_minuit2_output") {
     fKeyWord = eKeepMinuit2Output;
   } else if (qName == "dump_ascii") {
@@ -267,6 +269,13 @@ bool PAdminXMLParser::characters(const QString& str)
       else
         flag = false;
       fAdmin->setEnableMusrT0Flag(flag);
+      break;
+    case eDarkThemeIcons:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setDarkThemeIconsFlag(flag);
       break;
     case eKeepMinuit2Output:
       if (str == "y")
@@ -866,6 +875,12 @@ int PAdmin::savePrefs(QString pref_fln)
           data[i] = "    <enable_musrt0>y</enable_musrt0>";
         else
           data[i] = "    <enable_musrt0>n</enable_musrt0>";
+      }
+      if (data[i].contains("<dark_theme_icons>") && data[i].contains("</dark_theme_icons>")) {
+        if (fDarkThemeIcons)
+          data[i] = "     <dark_theme_icons>y</dark_theme_icons>";
+        else
+          data[i] = "     <dark_theme_icons>n</dark_theme_icons>";
       }
       if (data[i].contains("<font_name>") && data[i].contains("</font_name>")) {
         data[i] = QString("    <font_name>%1</font_name>").arg(fFontName);

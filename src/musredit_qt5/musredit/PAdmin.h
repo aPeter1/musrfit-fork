@@ -70,7 +70,7 @@ class PAdminXMLParser : public QXmlDefaultHandler
   private:
     enum EAdminKeyWords {eEmpty, eTimeout, eKeepMinuit2Output, eDumpAscii, eDumpRoot,
                          eTitleFromDataFile, eChisqPreRunBlock, eEstimateN0,
-                         eMusrviewShowFourier, eMusrviewShowAvg, eEnableMusrT0,
+                         eMusrviewShowFourier, eMusrviewShowAvg, eEnableMusrT0, eDarkThemeIcons,
                          eFontName, eFontSize, eExecPath, eDefaultSavePath,
                          eRecentFile, eBeamline, eInstitute, eFileFormat, eLifetimeCorrection,
                          eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
