@@ -246,11 +246,13 @@ void TMusrRunHeader::Init(TString fileName)
   TMusrRunPhysicalQuantity prop;
 
   fFileName = fileName;
-  fVersion = TString("$Id: TMusrRunHeader.cpp 5092 2012-03-13 07:47:00Z nemu $");
+  fVersion = TString("git-sha: dae9ef0ffba4");
   Set("RunInfo/Version", fVersion);
   Set("RunInfo/Generic Validator URL", "http://lmu.web.psi.ch/facilities/software/MusrRoot/validation/MusrRoot.xsd");
   Set("RunInfo/Specific Validator URL", "n/a");
   Set("RunInfo/Generator", "n/a");
+  Set("RunInfo/Proposal Number", -1);
+  Set("RunInfo/Main Proposer", "n/a");
   Set("RunInfo/File Name", "n/a");
   Set("RunInfo/Run Title", "n/a");
   Set("RunInfo/Run Number", -1);

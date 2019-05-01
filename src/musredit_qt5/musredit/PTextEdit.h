@@ -171,6 +171,7 @@ private:
   QString fLastDirInUse; ///< string holding the path from where the last file was loaded.
   QStringList fMusrFTPrevCmd;
 
+  QMap<QString, QAction*> fActions;
   QAction *fMusrT0Action;
 
   PMsr2DataParam *fMsr2DataParam; ///< structure holding the necessary input information for msr2data
@@ -190,6 +191,8 @@ private:
   void fillRecentFiles();
   QStringList getRunList(QString runListStr, bool &ok);
   bool fileAlreadyOpen(QFileInfo &finfo, int &idx);
+
+  void switchIcons();
 };
 
 
