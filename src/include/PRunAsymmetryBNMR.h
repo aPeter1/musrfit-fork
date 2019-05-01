@@ -2,14 +2,15 @@
 
   PRunAsymmetry.h
 
-  Author: Andreas Suter
-  e-mail: andreas.suter@psi.ch
+  Author: Zaher Salman
+  Based on PRunAsymmetry.h by Andreas Suter
+  e-mail: zaher.salman@psi.ch
 
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2016 by Andreas Suter                              *
- *   andreas.suter@psi.ch                                                  *
+ *   Copyright (C) 2018-2019 by Zaher Salman                               *
+ *   zaher.salman@psi.ch                                                   *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
