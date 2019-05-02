@@ -70,7 +70,8 @@ class PAdminXMLParser : public QXmlDefaultHandler
   private:
     enum EAdminKeyWords {eEmpty, eTimeout, eKeepMinuit2Output, eDumpAscii, eDumpRoot,
                          eTitleFromDataFile, eChisqPreRunBlock, eEstimateN0,
-                         eMusrviewShowFourier, eMusrviewShowAvg, eEnableMusrT0, eDarkThemeIcons,
+                         eMusrviewShowFourier, eMusrviewShowAvg, eEnableMusrT0,
+                         eDarkThemeIconsMenu, eDarkThemeIconsToolbar,
                          eFontName, eFontSize, eExecPath, eDefaultSavePath,
                          eRecentFile, eBeamline, eInstitute, eFileFormat, eLifetimeCorrection,
                          eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
@@ -127,7 +128,8 @@ class PAdmin : public QObject
     bool    getDumpRootFlag() { return fDumpRoot; }
     bool    getEstimateN0Flag() { return fEstimateN0; }
     bool    getChisqPerRunBlockFlag() { return fChisqPreRunBlock; }
-    bool    getDarkThemeIconsFlag() { return fDarkThemeIcons; }
+    bool    getDarkThemeIconsMenuFlag() { return fDarkThemeIconsMenu; }
+    bool    getDarkThemeIconsToolbarFlag() { return fDarkThemeIconsToolbar; }
     QString getBeamline() { return fBeamline; }
     QString getInstitute() { return fInstitute; }
     QString getFileFormat() { return fFileFormat; }
@@ -151,7 +153,8 @@ class PAdmin : public QObject
     void setDumpRootFlag(const bool flag) { fDumpRoot = flag; }
     void setEstimateN0Flag(const bool flag) { fEstimateN0 = flag; }
     void setChisqPerRunBlockFlag(const bool flag) { fChisqPreRunBlock = flag; }
-    void setDarkThemeIconsFlag(const bool flag) { fDarkThemeIcons = flag; }
+    void setDarkThemeIconsMenuFlag(const bool flag) { fDarkThemeIconsMenu = flag; }
+    void setDarkThemeIconsToolbarFlag(const bool flag) { fDarkThemeIconsToolbar = flag; }
 
     void setFontName(const QString str) { fFontName = str; }
     void setFontSize(const int ival) { fFontSize = ival; }
@@ -195,7 +198,8 @@ class PAdmin : public QObject
     bool fChisqPreRunBlock;    ///< flag indicating if musrfit shall write 'per run block' chisq to the msr-file (default: no).
     bool fEstimateN0;          ///< flag indicating if musrfit shall estimate N0 for single histogram fits (default: yes).
     bool fEnableMusrT0;        ///< flag indicating if musrT0 shall be enabled at startup from within musredit (default: yes).
-    bool fDarkThemeIcons;      ///< flag indicating if dark theme icons shall be used (default: no)
+    bool fDarkThemeIconsMenu;  ///< flag indicating if dark theme icons shall be used in the menu (default: no)
+    bool fDarkThemeIconsToolbar; ///< flag indicating if dark theme icons shall be used in the toolbar (default: no)
 
     QString fBeamline;   ///< name of the beamline. Used to generate default run header lines.
     QString fInstitute;  ///< name of the institute. Used to generate default run header lines.

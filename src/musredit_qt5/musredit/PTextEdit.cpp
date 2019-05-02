@@ -90,13 +90,14 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   // reads and manages the conents of the xml-startup (musredit_startup.xml) file
   fAdmin = new PAdmin();
 
-  // set default setting of the fDarkThemeIcons only if a theme has been recognized, otherwise take the
+  // set default setting of the fDarkMenuIconIcons only if a theme has been recognized, otherwise take the
   // one from the xml startup file.
   if (gotTheme) {
-    fAdmin->setDarkThemeIconsFlag(fDarkToolBarIcon);
+    fAdmin->setDarkThemeIconsMenuFlag(fDarkMenuIcon);
+    fAdmin->setDarkThemeIconsToolbarFlag(fDarkToolBarIcon);
   } else {
-    fDarkTheme = fAdmin->getDarkThemeIconsFlag();
-    fDarkToolBarIcon = fAdmin->getDarkThemeIconsFlag();
+    fDarkMenuIcon = fAdmin->getDarkThemeIconsMenuFlag();
+    fDarkToolBarIcon = fAdmin->getDarkThemeIconsToolbarFlag();
   }
 
   // enable file system watcher. Needed to get notification if the msr-file is changed outside of musrfit at runtime
@@ -130,7 +131,7 @@ PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
   fFontChanging = false;
 
   QString iconName("");
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrfit-dark.svg");
   else
     iconName = QString(":/icons/musrfit-plain.svg");
@@ -191,7 +192,7 @@ void PTextEdit::setupFileActions()
   QString iconName("");
 
   // New
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/document-new-dark.svg");
   else
     iconName = QString(":/icons/document-new-plain.svg");
@@ -211,7 +212,7 @@ void PTextEdit::setupFileActions()
   fActions["New-tb"] = a;
 
   // Open
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/document-open-dark.svg");
   else
     iconName = QString(":/icons/document-open-plain.svg");
@@ -241,7 +242,7 @@ void PTextEdit::setupFileActions()
   fillRecentFiles();
 
   // Reload
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/view-refresh-dark.svg");
   else
     iconName = QString(":/icons/view-refresh-plain.svg");
@@ -267,7 +268,7 @@ void PTextEdit::setupFileActions()
   menu->addSeparator();
 
   // Save
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/document-save-dark.svg");
   else
     iconName = QString(":/icons/document-save-plain.svg");
@@ -300,7 +301,7 @@ void PTextEdit::setupFileActions()
   menu->addSeparator();
 
   // Print
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/document-print-dark.svg");
   else
     iconName = QString(":/icons/document-print-plain.svg");
@@ -367,7 +368,7 @@ void PTextEdit::setupEditActions()
   QString iconName("");
 
   // Undo
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/edit-undo-dark.svg");
   else
     iconName = QString(":/icons/edit-undo-plain.svg");
@@ -387,7 +388,7 @@ void PTextEdit::setupEditActions()
   fActions["Undo-tb"] = a;
 
   // Redo
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/edit-redo-dark.svg");
   else
     iconName = QString(":/icons/edit-redo-plain.svg");
@@ -419,7 +420,7 @@ void PTextEdit::setupEditActions()
   tb->addSeparator();
 
   // Copy
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/edit-copy-dark.svg");
   else
     iconName = QString(":/icons/edit-copy-plain.svg");
@@ -439,7 +440,7 @@ void PTextEdit::setupEditActions()
   fActions["Copy-tb"] = a;
 
   // Cut
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/edit-cut-dark.svg");
   else
     iconName = QString(":/icons/edit-cut-plain.svg");
@@ -459,7 +460,7 @@ void PTextEdit::setupEditActions()
   fActions["Cut-tb"] = a;
 
   // Paste
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/edit-paste-dark.svg");
   else
     iconName = QString(":/icons/edit-paste-plain.svg");
@@ -482,7 +483,7 @@ void PTextEdit::setupEditActions()
   tb->addSeparator();
 
   // Find
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/edit-find-dark.svg");
   else
     iconName = QString(":/icons/edit-find-plain.svg");
@@ -502,7 +503,7 @@ void PTextEdit::setupEditActions()
   fActions["Find-tb"] = a;
 
   // Find Next
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/go-next-use-dark.svg");
   else
     iconName = QString(":/icons/go-next-use-plain.svg");
@@ -522,7 +523,7 @@ void PTextEdit::setupEditActions()
   fActions["Find Next-tb"] = a;
 
   // Find Previous
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/go-previous-use-dark.svg");
   else
     iconName = QString(":/icons/go-previous-use-plain.svg");
@@ -690,7 +691,7 @@ void PTextEdit::setupMusrActions()
   QString iconName("");
 
   // musrWiz
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrWiz-32x32-dark.svg");
   else
     iconName = QString(":/icons/musrWiz-32x32.svg");
@@ -713,7 +714,7 @@ void PTextEdit::setupMusrActions()
   tb->addSeparator();
 
   // Calculate Chisq
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrchisq-dark.svg");
   else
     iconName = QString(":/icons/musrchisq-plain.svg");
@@ -733,7 +734,7 @@ void PTextEdit::setupMusrActions()
   fActions["calcChisq-tb"] = a;
 
   // musrfit
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrfit-dark.svg");
   else
     iconName = QString(":/icons/musrfit-plain.svg");
@@ -753,7 +754,7 @@ void PTextEdit::setupMusrActions()
   fActions["musrfit-tb"] = a;
 
   // Swap Msr/Mlog
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrswap-dark.svg");
   else
     iconName = QString(":/icons/musrswap-plain.svg");
@@ -773,7 +774,7 @@ void PTextEdit::setupMusrActions()
   fActions["Swap Msr/Mlog-tb"] = a;
 
   // musrStep
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrStep-32x32-dark.svg");
   else
     iconName = QString(":/icons/musrStep-32x32.svg");
@@ -793,7 +794,7 @@ void PTextEdit::setupMusrActions()
   fActions["musrStep-tb"] = a;
 
   // msr2data
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/msr2data-dark.svg");
   else
     iconName = QString(":/icons/msr2data-plain.svg");
@@ -813,7 +814,7 @@ void PTextEdit::setupMusrActions()
   fActions["msr2data-tb"] = a;
 
   // mupp
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/mupp-dark.svg");
   else
     iconName = QString(":/icons/mupp-plain.svg");
@@ -836,7 +837,7 @@ void PTextEdit::setupMusrActions()
   tb->addSeparator();
 
   // musrview
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrview-dark.svg");
   else
     iconName = QString(":/icons/musrview-plain.svg");
@@ -856,7 +857,7 @@ void PTextEdit::setupMusrActions()
   fActions["musrview-tb"] = a;
 
   // musrt0
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrt0-dark.svg");
   else
     iconName = QString(":/icons/musrt0-plain.svg");
@@ -875,7 +876,7 @@ void PTextEdit::setupMusrActions()
   fActions["musrt0-tb"] = fMusrT0Action;
 
   // musrFT
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrFT-dark.svg");
   else
     iconName = QString(":/icons/musrFT-plain.svg");
@@ -894,7 +895,7 @@ void PTextEdit::setupMusrActions()
   fActions["musrFT-tb"] = a;
 
   // musrprefs
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrprefs-dark.svg");
   else
     iconName = QString(":/icons/musrprefs-plain.svg");
@@ -916,7 +917,7 @@ void PTextEdit::setupMusrActions()
   tb->addSeparator();
 
   // musrdump
-  if (fDarkTheme)
+  if (fDarkMenuIcon)
     iconName = QString(":/icons/musrdump-dark.svg");
   else
     iconName = QString(":/icons/musrdump-plain.svg");
@@ -2670,7 +2671,8 @@ void PTextEdit::musrPrefs()
   }
 
   if (dlg->exec() == QDialog::Accepted) {
-    fAdmin->setDarkThemeIconsFlag(dlg->getDarkThemeIconsFlag());
+    fAdmin->setDarkThemeIconsMenuFlag(dlg->getDarkThemeIconsMenuFlag());
+    fAdmin->setDarkThemeIconsToolbarFlag(dlg->getDarkThemeIconsToolbarFlag());
     fAdmin->setMusrviewShowFourierFlag(dlg->getMusrviewShowFourierFlag());
     fAdmin->setMusrviewShowAvgFlag(dlg->getMusrviewShowAvgFlag());
     fAdmin->setKeepMinuit2OutputFlag(dlg->getKeepMinuit2OutputFlag());
@@ -2695,11 +2697,15 @@ void PTextEdit::musrPrefs()
   delete dlg;
   dlg = nullptr;
 
-  // check if the dark theme icons flag has changed
-  if (fAdmin->getDarkThemeIconsFlag() != fDarkToolBarIcon) {
-    fDarkTheme = !fDarkTheme;
+  // check if the dark theme menu icons flag has changed
+  if (fAdmin->getDarkThemeIconsMenuFlag() != fDarkMenuIcon) {
+    fDarkMenuIcon = !fDarkMenuIcon;
+    switchMenuIcons();
+  }
+  // check if the dark theme toolbar icons flag has changed
+  if (fAdmin->getDarkThemeIconsToolbarFlag() != fDarkToolBarIcon) {
     fDarkToolBarIcon = !fDarkToolBarIcon;
-    switchIcons();
+    switchToolbarIcons();
   }
 }
 
@@ -2933,7 +2939,7 @@ void PTextEdit::mupp()
  */
 void PTextEdit::helpContents()
 {
-  PHelp *help = new PHelp(fAdmin->getHelpUrl("main"), fDarkTheme);
+  PHelp *help = new PHelp(fAdmin->getHelpUrl("main"), fDarkMenuIcon);
   help->show();
 }
 
@@ -3246,7 +3252,7 @@ void PTextEdit::setFileSystemWatcherActive()
  */
 bool PTextEdit::getTheme()
 {
-  fDarkTheme = false; // true if theme is dark
+  fDarkMenuIcon = false; // true if theme is dark
   fDarkToolBarIcon = false; // needed for ubuntu dark since there the menu icons are dark, however the toolbar icons are plain!
 
   QString str = QIcon::themeName();
@@ -3264,7 +3270,7 @@ bool PTextEdit::getTheme()
         line = fin.readLine();
         if (line.contains("ColorScheme")) {
           if (line.contains("dark", Qt::CaseInsensitive)) {
-            fDarkTheme = true;
+            fDarkMenuIcon = true;
             fDarkToolBarIcon = true;
           }
           done = true;
@@ -3276,11 +3282,11 @@ bool PTextEdit::getTheme()
   }
 
   if (str.contains("dark", Qt::CaseInsensitive)) {
-    fDarkTheme = true;
+    fDarkMenuIcon = true;
     if (str.contains("ubuntu", Qt::CaseInsensitive)) {
-      fDarkToolBarIcon = false;
+      fDarkToolBarIcon = true;
     } else if (str.contains("xfce", Qt::CaseInsensitive)) {
-      fDarkTheme = false;
+      fDarkMenuIcon = false;
       fDarkToolBarIcon = false;
     } else {
       fDarkToolBarIcon = true;
@@ -3382,111 +3388,122 @@ bool PTextEdit::fileAlreadyOpen(QFileInfo &finfo, int &idx)
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>Switch icons according to the fAdmin settings
+ * <p>Switch menu icons according to the fAdmin settings
  */
-void PTextEdit::switchIcons()
+void PTextEdit::switchMenuIcons()
 {
-  if (fAdmin->getDarkThemeIconsFlag()) { // dark theme icons
+  if (fAdmin->getDarkThemeIconsMenuFlag()) { // dark theme icons
     fActions["New"]->setIcon(QIcon(QPixmap(":/icons/document-new-dark.svg")));
-    fActions["New-tb"]->setIcon(QIcon(QPixmap(":/icons/document-new-dark.svg")));
     fActions["Open"]->setIcon(QIcon(QPixmap(":/icons/document-open-dark.svg")));
-    fActions["Open-tb"]->setIcon(QIcon(QPixmap(":/icons/document-open-dark.svg")));
     fActions["Reload"]->setIcon(QIcon(QPixmap(":/icons/view-refresh-dark.svg")));
-    fActions["Reload-tb"]->setIcon(QIcon(QPixmap(":/icons/view-refresh-dark.svg")));
     fActions["Save"]->setIcon(QIcon(QPixmap(":/icons/document-save-dark.svg")));
-    fActions["Save-tb"]->setIcon(QIcon(QPixmap(":/icons/document-save-dark.svg")));
     fActions["Print"]->setIcon(QIcon(QPixmap(":/icons/document-print-dark.svg")));
-    fActions["Print-tb"]->setIcon(QIcon(QPixmap(":/icons/document-print-dark.svg")));
     fActions["Undo"]->setIcon(QIcon(QPixmap(":/icons/edit-undo-dark.svg")));
-    fActions["Undo-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-undo-dark.svg")));
     fActions["Redo"]->setIcon(QIcon(QPixmap(":/icons/edit-redo-dark.svg")));
-    fActions["Redo-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-redo-dark.svg")));
     fActions["Copy"]->setIcon(QIcon(QPixmap(":/icons/edit-copy-dark.svg")));
-    fActions["Copy-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-copy-dark.svg")));
     fActions["Cut"]->setIcon(QIcon(QPixmap(":/icons/edit-cut-dark.svg")));
-    fActions["Cut-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-cut-dark.svg")));
     fActions["Paste"]->setIcon(QIcon(QPixmap(":/icons/edit-paste-dark.svg")));
-    fActions["Paste-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-paste-dark.svg")));
     fActions["Find"]->setIcon(QIcon(QPixmap(":/icons/edit-find-dark.svg")));
-    fActions["Find-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-find-dark.svg")));
     fActions["Find Next"]->setIcon(QIcon(QPixmap(":/icons/go-next-use-dark.svg")));
-    fActions["Find Next-tb"]->setIcon(QIcon(QPixmap(":/icons/go-next-use-dark.svg")));
     fActions["Find Previous"]->setIcon(QIcon(QPixmap(":/icons/go-previous-use-dark.svg")));
-    fActions["Find Previous-tb"]->setIcon(QIcon(QPixmap(":/icons/go-previous-use-dark.svg")));
     fActions["musrWiz"]->setIcon(QIcon(QPixmap(":/icons/musrWiz-32x32-dark.svg")));
-    fActions["musrWiz-tb"]->setIcon(QIcon(QPixmap(":/icons/musrWiz-32x32-dark.svg")));
     fActions["calcChisq"]->setIcon(QIcon(QPixmap(":/icons/musrchisq-dark.svg")));
-    fActions["calcChisq-tb"]->setIcon(QIcon(QPixmap(":/icons/musrchisq-dark.svg")));
     fActions["musrfit"]->setIcon(QIcon(QPixmap(":/icons/musrfit-dark.svg")));
-    fActions["musrfit-tb"]->setIcon(QIcon(QPixmap(":/icons/musrfit-dark.svg")));
     fActions["Swap Msr/Mlog"]->setIcon(QIcon(QPixmap(":/icons/musrswap-dark.svg")));
-    fActions["Swap Msr/Mlog-tb"]->setIcon(QIcon(QPixmap(":/icons/musrswap-dark.svg")));
     fActions["musrStep"]->setIcon(QIcon(QPixmap(":/icons/musrStep-32x32-dark.svg")));
-    fActions["musrStep-tb"]->setIcon(QIcon(QPixmap(":/icons/musrStep-32x32-dark.svg")));
     fActions["msr2data"]->setIcon(QIcon(QPixmap(":/icons/msr2data-dark.svg")));
-    fActions["msr2data-tb"]->setIcon(QIcon(QPixmap(":/icons/msr2data-dark.svg")));
     fActions["mupp"]->setIcon(QIcon(QPixmap(":/icons/mupp-dark.svg")));
-    fActions["mupp-tb"]->setIcon(QIcon(QPixmap(":/icons/mupp-dark.svg")));
     fActions["musrview"]->setIcon(QIcon(QPixmap(":/icons/musrview-dark.svg")));
-    fActions["musrview-tb"]->setIcon(QIcon(QPixmap(":/icons/musrview-dark.svg")));
     fActions["musrt0"]->setIcon(QIcon(QPixmap(":/icons/musrt0-dark.svg")));
-    fActions["musrt0-tb"]->setIcon(QIcon(QPixmap(":/icons/musrt0-dark.svg")));
     fActions["musrFT"]->setIcon(QIcon(QPixmap(":/icons/musrFT-dark.svg")));
-    fActions["musrFT-tb"]->setIcon(QIcon(QPixmap(":/icons/musrFT-dark.svg")));
     fActions["musrprefs"]->setIcon(QIcon(QPixmap(":/icons/musrprefs-dark.svg")));
-    fActions["musrprefs-tb"]->setIcon(QIcon(QPixmap(":/icons/musrprefs-dark.svg")));
     fActions["musrdump"]->setIcon(QIcon(QPixmap(":/icons/musrdump-dark.svg")));
-    fActions["musrdump-tb"]->setIcon(QIcon(QPixmap(":/icons/musrdump-dark.svg")));
   } else { // plain theme icons
     fActions["New"]->setIcon(QIcon(QPixmap(":/icons/document-new-plain.svg")));
-    fActions["New-tb"]->setIcon(QIcon(QPixmap(":/icons/document-new-plain.svg")));
     fActions["Open"]->setIcon(QIcon(QPixmap(":/icons/document-open-plain.svg")));
-    fActions["Open-tb"]->setIcon(QIcon(QPixmap(":/icons/document-open-plain.svg")));
     fActions["Reload"]->setIcon(QIcon(QPixmap(":/icons/view-refresh-plain.svg")));
-    fActions["Reload-tb"]->setIcon(QIcon(QPixmap(":/icons/view-refresh-plain.svg")));
     fActions["Save"]->setIcon(QIcon(QPixmap(":/icons/document-save-plain.svg")));
-    fActions["Save-tb"]->setIcon(QIcon(QPixmap(":/icons/document-save-plain.svg")));
     fActions["Print"]->setIcon(QIcon(QPixmap(":/icons/document-print-plain.svg")));
-    fActions["Print-tb"]->setIcon(QIcon(QPixmap(":/icons/document-print-plain.svg")));
     fActions["Undo"]->setIcon(QIcon(QPixmap(":/icons/edit-undo-plain.svg")));
-    fActions["Undo-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-undo-plain.svg")));
     fActions["Redo"]->setIcon(QIcon(QPixmap(":/icons/edit-redo-plain.svg")));
-    fActions["Redo-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-redo-plain.svg")));
     fActions["Copy"]->setIcon(QIcon(QPixmap(":/icons/edit-copy-plain.svg")));
-    fActions["Copy-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-copy-plain.svg")));
     fActions["Cut"]->setIcon(QIcon(QPixmap(":/icons/edit-cut-plain.svg")));
-    fActions["Cut-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-cut-plain.svg")));
     fActions["Paste"]->setIcon(QIcon(QPixmap(":/icons/edit-paste-plain.svg")));
-    fActions["Paste-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-paste-plain.svg")));
     fActions["Find"]->setIcon(QIcon(QPixmap(":/icons/edit-find-plain.svg")));
-    fActions["Find-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-find-plain.svg")));
     fActions["Find Next"]->setIcon(QIcon(QPixmap(":/icons/go-next-use-plain.svg")));
-    fActions["Find Next-tb"]->setIcon(QIcon(QPixmap(":/icons/go-next-use-plain.svg")));
     fActions["Find Previous"]->setIcon(QIcon(QPixmap(":/icons/go-previous-use-plain.svg")));
-    fActions["Find Previous-tb"]->setIcon(QIcon(QPixmap(":/icons/go-previous-use-plain.svg")));
     fActions["musrWiz"]->setIcon(QIcon(QPixmap(":/icons/musrWiz-32x32.svg")));
-    fActions["musrWiz-tb"]->setIcon(QIcon(QPixmap(":/icons/musrWiz-32x32.svg")));
     fActions["calcChisq"]->setIcon(QIcon(QPixmap(":/icons/musrchisq-plain.svg")));
-    fActions["calcChisq-tb"]->setIcon(QIcon(QPixmap(":/icons/musrchisq-plain.svg")));
     fActions["musrfit"]->setIcon(QIcon(QPixmap(":/icons/musrfit-plain.svg")));
-    fActions["musrfit-tb"]->setIcon(QIcon(QPixmap(":/icons/musrfit-plain.svg")));
     fActions["Swap Msr/Mlog"]->setIcon(QIcon(QPixmap(":/icons/musrswap-plain.svg")));
-    fActions["Swap Msr/Mlog-tb"]->setIcon(QIcon(QPixmap(":/icons/musrswap-plain.svg")));
     fActions["musrStep"]->setIcon(QIcon(QPixmap(":/icons/musrStep-32x32.svg")));
-    fActions["musrStep-tb"]->setIcon(QIcon(QPixmap(":/icons/musrStep-32x32.svg")));
     fActions["msr2data"]->setIcon(QIcon(QPixmap(":/icons/msr2data-plain.svg")));
-    fActions["msr2data-tb"]->setIcon(QIcon(QPixmap(":/icons/msr2data-plain.svg")));
     fActions["mupp"]->setIcon(QIcon(QPixmap(":/icons/mupp-plain.svg")));
-    fActions["mupp-tb"]->setIcon(QIcon(QPixmap(":/icons/mupp-plain.svg")));
     fActions["musrview"]->setIcon(QIcon(QPixmap(":/icons/musrview-plain.svg")));
-    fActions["musrview-tb"]->setIcon(QIcon(QPixmap(":/icons/musrview-plain.svg")));
     fActions["musrt0"]->setIcon(QIcon(QPixmap(":/icons/musrt0-plain.svg")));
-    fActions["musrt0-tb"]->setIcon(QIcon(QPixmap(":/icons/musrt0-plain.svg")));
     fActions["musrFT"]->setIcon(QIcon(QPixmap(":/icons/musrFT-plain.svg")));
-    fActions["musrFT-tb"]->setIcon(QIcon(QPixmap(":/icons/musrFT-plain.svg")));
     fActions["musrprefs"]->setIcon(QIcon(QPixmap(":/icons/musrprefs-plain.svg")));
-    fActions["musrprefs-tb"]->setIcon(QIcon(QPixmap(":/icons/musrprefs-plain.svg")));
     fActions["musrdump"]->setIcon(QIcon(QPixmap(":/icons/musrdump-plain.svg")));
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+/**
+ * <p>Switch toolbar icons according to the fAdmin settings
+ */
+void PTextEdit::switchToolbarIcons()
+{
+  if (fAdmin->getDarkThemeIconsToolbarFlag()) { // dark theme icons
+    fActions["New-tb"]->setIcon(QIcon(QPixmap(":/icons/document-new-dark.svg")));
+    fActions["Open-tb"]->setIcon(QIcon(QPixmap(":/icons/document-open-dark.svg")));
+    fActions["Reload-tb"]->setIcon(QIcon(QPixmap(":/icons/view-refresh-dark.svg")));
+    fActions["Save-tb"]->setIcon(QIcon(QPixmap(":/icons/document-save-dark.svg")));
+    fActions["Print-tb"]->setIcon(QIcon(QPixmap(":/icons/document-print-dark.svg")));
+    fActions["Undo-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-undo-dark.svg")));
+    fActions["Redo-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-redo-dark.svg")));
+    fActions["Copy-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-copy-dark.svg")));
+    fActions["Cut-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-cut-dark.svg")));
+    fActions["Paste-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-paste-dark.svg")));
+    fActions["Find-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-find-dark.svg")));
+    fActions["Find Next-tb"]->setIcon(QIcon(QPixmap(":/icons/go-next-use-dark.svg")));
+    fActions["Find Previous-tb"]->setIcon(QIcon(QPixmap(":/icons/go-previous-use-dark.svg")));
+    fActions["musrWiz-tb"]->setIcon(QIcon(QPixmap(":/icons/musrWiz-32x32-dark.svg")));
+    fActions["calcChisq-tb"]->setIcon(QIcon(QPixmap(":/icons/musrchisq-dark.svg")));
+    fActions["musrfit-tb"]->setIcon(QIcon(QPixmap(":/icons/musrfit-dark.svg")));
+    fActions["Swap Msr/Mlog-tb"]->setIcon(QIcon(QPixmap(":/icons/musrswap-dark.svg")));
+    fActions["musrStep-tb"]->setIcon(QIcon(QPixmap(":/icons/musrStep-32x32-dark.svg")));
+    fActions["msr2data-tb"]->setIcon(QIcon(QPixmap(":/icons/msr2data-dark.svg")));
+    fActions["mupp-tb"]->setIcon(QIcon(QPixmap(":/icons/mupp-dark.svg")));
+    fActions["musrview-tb"]->setIcon(QIcon(QPixmap(":/icons/musrview-dark.svg")));
+    fActions["musrt0-tb"]->setIcon(QIcon(QPixmap(":/icons/musrt0-dark.svg")));
+    fActions["musrFT-tb"]->setIcon(QIcon(QPixmap(":/icons/musrFT-dark.svg")));
+    fActions["musrprefs-tb"]->setIcon(QIcon(QPixmap(":/icons/musrprefs-dark.svg")));
+    fActions["musrdump-tb"]->setIcon(QIcon(QPixmap(":/icons/musrdump-dark.svg")));
+  } else { // plain theme icons
+    fActions["New-tb"]->setIcon(QIcon(QPixmap(":/icons/document-new-plain.svg")));
+    fActions["Open-tb"]->setIcon(QIcon(QPixmap(":/icons/document-open-plain.svg")));
+    fActions["Reload-tb"]->setIcon(QIcon(QPixmap(":/icons/view-refresh-plain.svg")));
+    fActions["Save-tb"]->setIcon(QIcon(QPixmap(":/icons/document-save-plain.svg")));
+    fActions["Print-tb"]->setIcon(QIcon(QPixmap(":/icons/document-print-plain.svg")));
+    fActions["Undo-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-undo-plain.svg")));
+    fActions["Redo-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-redo-plain.svg")));
+    fActions["Copy-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-copy-plain.svg")));
+    fActions["Cut-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-cut-plain.svg")));
+    fActions["Paste-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-paste-plain.svg")));
+    fActions["Find-tb"]->setIcon(QIcon(QPixmap(":/icons/edit-find-plain.svg")));
+    fActions["Find Next-tb"]->setIcon(QIcon(QPixmap(":/icons/go-next-use-plain.svg")));
+    fActions["Find Previous-tb"]->setIcon(QIcon(QPixmap(":/icons/go-previous-use-plain.svg")));
+    fActions["musrWiz-tb"]->setIcon(QIcon(QPixmap(":/icons/musrWiz-32x32.svg")));
+    fActions["calcChisq-tb"]->setIcon(QIcon(QPixmap(":/icons/musrchisq-plain.svg")));
+    fActions["musrfit-tb"]->setIcon(QIcon(QPixmap(":/icons/musrfit-plain.svg")));
+    fActions["Swap Msr/Mlog-tb"]->setIcon(QIcon(QPixmap(":/icons/musrswap-plain.svg")));
+    fActions["musrStep-tb"]->setIcon(QIcon(QPixmap(":/icons/musrStep-32x32.svg")));
+    fActions["msr2data-tb"]->setIcon(QIcon(QPixmap(":/icons/msr2data-plain.svg")));
+    fActions["mupp-tb"]->setIcon(QIcon(QPixmap(":/icons/mupp-plain.svg")));
+    fActions["musrview-tb"]->setIcon(QIcon(QPixmap(":/icons/musrview-plain.svg")));
+    fActions["musrt0-tb"]->setIcon(QIcon(QPixmap(":/icons/musrt0-plain.svg")));
+    fActions["musrFT-tb"]->setIcon(QIcon(QPixmap(":/icons/musrFT-plain.svg")));
+    fActions["musrprefs-tb"]->setIcon(QIcon(QPixmap(":/icons/musrprefs-plain.svg")));
     fActions["musrdump-tb"]->setIcon(QIcon(QPixmap(":/icons/musrdump-plain.svg")));
   }
 }

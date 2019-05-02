@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>452</width>
-    <height>168</height>
+    <height>180</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,7 +26,7 @@
      <x>0</x>
      <y>5</y>
      <width>451</width>
-     <height>161</height>
+     <height>171</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -43,7 +43,7 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>50</y>
+          <y>70</y>
           <width>421</width>
           <height>31</height>
          </rect>
@@ -52,13 +52,13 @@
          <string>Change Default Search Paths</string>
         </property>
        </widget>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="">
         <property name="geometry">
          <rect>
-          <x>11</x>
-          <y>11</y>
-          <width>421</width>
-          <height>33</height>
+          <x>12</x>
+          <y>10</y>
+          <width>415</width>
+          <height>52</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -86,11 +86,22 @@
           </spacer>
          </item>
          <item>
-          <widget class="QCheckBox" name="fDarkThemeIcons_checkBox">
-           <property name="text">
-            <string>Dark Theme Icons</string>
-           </property>
-          </widget>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QCheckBox" name="fDarkThemeIconsMenu_checkBox">
+             <property name="text">
+              <string>Dark Theme Icons Menu</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="fDarkThemeIconsToolbar_checkBox">
+             <property name="text">
+              <string>Dark Theme Icons Toolbar</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
