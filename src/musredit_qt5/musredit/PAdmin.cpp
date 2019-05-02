@@ -94,6 +94,10 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eMusrviewShowAvg;
   } else if (qName == "enable_musrt0") {
     fKeyWord = eEnableMusrT0;
+  } else if (qName == "dark_theme_icons_menu") {
+    fKeyWord = eDarkThemeIconsMenu;
+  } else if (qName == "dark_theme_icons_toolbar") {
+    fKeyWord = eDarkThemeIconsToolbar;
   } else if (qName == "keep_minuit2_output") {
     fKeyWord = eKeepMinuit2Output;
   } else if (qName == "dump_ascii") {
@@ -267,6 +271,20 @@ bool PAdminXMLParser::characters(const QString& str)
       else
         flag = false;
       fAdmin->setEnableMusrT0Flag(flag);
+      break;
+    case eDarkThemeIconsMenu:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setDarkThemeIconsMenuFlag(flag);
+      break;
+    case eDarkThemeIconsToolbar:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setDarkThemeIconsToolbarFlag(flag);
       break;
     case eKeepMinuit2Output:
       if (str == "y")
@@ -866,6 +884,18 @@ int PAdmin::savePrefs(QString pref_fln)
           data[i] = "    <enable_musrt0>y</enable_musrt0>";
         else
           data[i] = "    <enable_musrt0>n</enable_musrt0>";
+      }
+      if (data[i].contains("<dark_theme_icons_menu>") && data[i].contains("</dark_theme_icons_menu>")) {
+        if (fDarkThemeIconsMenu)
+          data[i] = "     <dark_theme_icons_menu>y</dark_theme_icons_menu>";
+        else
+          data[i] = "     <dark_theme_icons_menu>n</dark_theme_icons_menu>";
+      }
+      if (data[i].contains("<dark_theme_icons_toolbar>") && data[i].contains("</dark_theme_icons_toolbar>")) {
+        if (fDarkThemeIconsToolbar)
+          data[i] = "     <dark_theme_icons_toolbar>y</dark_theme_icons_toolbar>";
+        else
+          data[i] = "     <dark_theme_icons_toolbar>n</dark_theme_icons_toolbar>";
       }
       if (data[i].contains("<font_name>") && data[i].contains("</font_name>")) {
         data[i] = QString("    <font_name>%1</font_name>").arg(fFontName);

@@ -45,10 +45,16 @@ PPrefsDialog::PPrefsDialog(PAdmin *admin) : fAdmin(admin)
 
   setModal(true);
 
-  if (fAdmin->getDarkThemeIconsFlag()) {
-    fDarkThemeIcons_checkBox->setCheckState(Qt::Checked);
+  if (fAdmin->getDarkThemeIconsMenuFlag()) {
+    fDarkThemeIconsMenu_checkBox->setCheckState(Qt::Checked);
   } else {
-    fDarkThemeIcons_checkBox->setCheckState(Qt::Unchecked);
+    fDarkThemeIconsMenu_checkBox->setCheckState(Qt::Unchecked);
+  }
+
+  if (fAdmin->getDarkThemeIconsToolbarFlag()) {
+    fDarkThemeIconsToolbar_checkBox->setCheckState(Qt::Checked);
+  } else {
+    fDarkThemeIconsToolbar_checkBox->setCheckState(Qt::Unchecked);
   }
 
   fKeepMn2Output_checkBox->setChecked(fAdmin->getKeepMinuit2OutputFlag());
