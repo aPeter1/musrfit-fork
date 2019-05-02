@@ -1309,6 +1309,22 @@ void PTextEdit::fileOpenPrefs()
     msg = QString("Prefs from '") + fln + QString("' loaded.");
     QMessageBox::information(nullptr, "Info", msg);
   }
+
+  // make sure that dark/plain icon scheme is properly loaded
+  if (getTheme()) {
+    switchMenuIcons();
+    switchToolbarIcons();
+  }
+
+  if (fAdmin->getDarkThemeIconsMenuFlag() != fDarkMenuIcon) {
+    fDarkMenuIcon = !fDarkMenuIcon;
+    switchMenuIcons();
+  }
+
+  if (fAdmin->getDarkThemeIconsToolbarFlag() != fDarkToolBarIcon) {
+    fDarkToolBarIcon = !fDarkToolBarIcon;
+    switchToolbarIcons();
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
