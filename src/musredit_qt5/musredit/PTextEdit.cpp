@@ -3300,7 +3300,8 @@ bool PTextEdit::getTheme()
   if (str.contains("dark", Qt::CaseInsensitive)) {
     fDarkMenuIcon = true;
     if (str.contains("ubuntu", Qt::CaseInsensitive)) {
-      fDarkToolBarIcon = true;
+      fDarkMenuIcon = false;
+      fDarkToolBarIcon = false;
     } else if (str.contains("xfce", Qt::CaseInsensitive)) {
       fDarkMenuIcon = false;
       fDarkToolBarIcon = false;
