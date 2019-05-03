@@ -4,17 +4,17 @@ FITPARAMETER
 ###############################################################
 #     No     Name       Value    Err     Min  Max                  
         1 Alpha       1.11592   0.00035     none        
-        2 Asy         0.05869   0.00091     none        0       0.2     
+        2 Asy         0.05868   0.00091     none        0       0.2     
         3 T           1         0           none        
         4 Rlx         1.142     0.023       none        0       15000   
         5 One         1         0           none        
-        6 FlHel       -1.047    0.022       none        -2      0       
+        6 FlHel       -1.048    0.022       none        -2      0       
 
 ###############################################################
 THEORY
 ###############################################################
 asymmetry   fun1
-userFcn  .libs/libBNMR.so ExpRlx 3 4
+userFcn  libBNMR.so ExpRlx 3 4
 
 ###############################################################
 FUNCTIONS
@@ -27,7 +27,7 @@ fittype         2         (asymmetry fit)
 alpha           1
 forward         3 
 backward        4 
-data            11      1000    11      1000    
+data            11      910     11      910     
 background      1       9       1       9          # estimated bkg: 8.0000 / 9.6250
 t0              10.0    10.0    10.0    10.0    
 map             2    5    0    0    0    0    0    0    0    0
@@ -39,7 +39,7 @@ fittype         2         (asymmetry fit)
 alpha           1
 forward         5 
 backward        6 
-data            11      1000    11      1000    
+data            11      910     11      910     
 background      1       9       1       9          # estimated bkg: 11.6250 / 15.6250
 t0              10.0    10.0    10.0    10.0    
 map             2    6    0    0    0    0    0    0    0    0
@@ -68,5 +68,5 @@ plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_RE
 phase            8
 #range            FRQMIN  FRQMAX
 ###############################################################
-STATISTIC --- 2018-08-20 22:01:15
+STATISTIC --- 2019-05-03 17:05:58
   chisq = 566.6, NDF = 346, chisq/NDF = 1.637584

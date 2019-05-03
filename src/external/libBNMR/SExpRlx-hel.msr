@@ -15,7 +15,7 @@ FITPARAMETER
 THEORY
 ###############################################################
 asymmetry   fun1
-userFcn  .libs/libBNMR.so SExpRlx 3 4 5
+userFcn  /usr/local/lib/libBNMR.so SExpRlx 3 4 5
 
 ###############################################################
 FUNCTIONS
@@ -69,5 +69,5 @@ plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_RE
 phase            8
 #range            FRQMIN  FRQMAX
 ###############################################################
-STATISTIC --- 2018-08-20 21:59:04
+STATISTIC --- 2019-05-01 11:29:06
   chisq = 358.6, NDF = 345, chisq/NDF = 1.039300
