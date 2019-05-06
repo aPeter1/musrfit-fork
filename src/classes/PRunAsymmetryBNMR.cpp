@@ -570,8 +570,7 @@ Bool_t PRunAsymmetryBNMR::PrepareData()
     return false;
   }
 
-  // keep the time resolution in (ms)
-  // possibility to rescale for betaNMR
+  // keep the time resolution in (s)
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
   std::cout.precision(10);
   std::cout << std::endl << ">> PRunAsymmetryBNMR::PrepareData(): time resolution=" << std::fixed << runData->GetTimeResolution() << "(ms)" << std::endl;
