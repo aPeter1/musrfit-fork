@@ -12,7 +12,7 @@ FITPARAMETER
 THEORY
 ###############################################################
 asymmetry      2
-userFcn  libBNMR.so ExpRlx 3 4
+userFcn  libBNMR ExpRlx 3 4
 
 ###############################################################
 RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)

@@ -15,7 +15,7 @@ FITPARAMETER
 THEORY
 ###############################################################
 asymmetry   fun1
-userFcn  /usr/local/lib/libBNMR.so SExpRlx 3 4 5
+userFcn  libBNMR SExpRlx 3 4 5
 
 ###############################################################
 FUNCTIONS
