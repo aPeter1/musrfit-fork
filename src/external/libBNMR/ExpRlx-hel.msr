@@ -29,7 +29,7 @@ forward         3
 backward        4 
 data            11      910     11      910     
 background      1       9       1       9          # estimated bkg: 8.0000 / 9.6250
-t0              10.0    10.0    10.0    10.0    
+t0              10.0    10.0    
 map             2    5    0    0    0    0    0    0    0    0
 fit             0.2     9      
 packing         5
@@ -41,7 +41,7 @@ forward         5
 backward        6 
 data            11      910     11      910     
 background      1       9       1       9          # estimated bkg: 11.6250 / 15.6250
-t0              10.0    10.0    10.0    10.0    
+t0              10.0    10.0    
 map             2    6    0    0    0    0    0    0    0    0
 fit             0.2     9      
 packing         5
