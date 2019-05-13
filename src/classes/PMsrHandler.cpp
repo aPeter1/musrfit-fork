@@ -5689,6 +5689,7 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
     }
 
     // check for the different fittypes differently
+    Int_t detectorGroups = 1; // number of detectors tp be grouped
     switch (fitType) {
       case PRUN_SINGLE_HISTO:
         // check of norm is present
@@ -5744,13 +5745,17 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           }
         }
         // check number of T0's provided
-        if ((fRuns[i].GetT0BinSize() > fRuns[i].GetForwardHistoNoSize()) &&
-            (fGlobal.GetT0BinSize() > fRuns[i].GetForwardHistoNoSize())) {
+        detectorGroups = fRuns[i].GetForwardHistoNoSize();
+        if ((fRuns[i].GetT0BinSize() > detectorGroups) || (fGlobal.GetT0BinSize() > detectorGroups)) {
           std::cerr << std::endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          std::cerr << std::endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << std::endl;
-          std::cerr << std::endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << std::endl;
+          if (fRuns[i].GetT0BinSize() > detectorGroups)
+            std::cerr << std::endl << ">>   In RUN Block " << i+1 << ": found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting max. " << detectorGroups << " entries.";
+          if (fGlobal.GetT0BinSize() > 1)
+            std::cerr << std::endl << ">>   In GLOBAL block: found " << fGlobal.GetT0BinSize() << " T0 entries. Expecting max. " << detectorGroups << " entries. Needs to be fixed.";
+          std::cerr << std::endl << ">>   In case you added runs, please use the key word 'addt0' to add the t0's of the runs to be added." << std::endl;
           return false;
         }
+
         // check packing
         if ((fRuns[i].GetPacking() == -1) && (fGlobal.GetPacking() == -1)) {
           std::cerr << std::endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **WARNING** in RUN block number " << i+1;
@@ -5787,11 +5792,14 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           }
         }
         // check number of T0's provided
-        if ((fRuns[i].GetT0BinSize() > fRuns[i].GetForwardHistoNoSize()) &&
-            (fGlobal.GetT0BinSize() > fRuns[i].GetForwardHistoNoSize())) {
+        detectorGroups = fRuns[i].GetForwardHistoNoSize();
+        if ((fRuns[i].GetT0BinSize() > detectorGroups) || (fGlobal.GetT0BinSize() > detectorGroups)) {
           std::cerr << std::endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          std::cerr << std::endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << std::endl;
-          std::cerr << std::endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << std::endl;
+          if (fRuns[i].GetT0BinSize() > detectorGroups)
+            std::cerr << std::endl << ">>   In RUN Block " << i+1 << ": found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting max. " << detectorGroups << " entries.";
+          if (fGlobal.GetT0BinSize() > 1)
+            std::cerr << std::endl << ">>   In GLOBAL block: found " << fGlobal.GetT0BinSize() << " T0 entries. Expecting max. " << detectorGroups << " entries. Needs to be fixed.";
+          std::cerr << std::endl << ">>   In case you added runs, please use the key word 'addt0' to add the t0's of the runs to be added." << std::endl;
           return false;
         }
         // check that RRF frequency is given
@@ -5836,18 +5844,16 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           }
         }
         // check number of T0's provided
-        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize()) &&
-            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize())) {
+        detectorGroups = 2*fRuns[i].GetForwardHistoNoSize();
+        if (detectorGroups < 2*fRuns[i].GetBackwardHistoNoSize())
+          detectorGroups = 2*fRuns[i].GetBackwardHistoNoSize();
+        if ((fRuns[i].GetT0BinSize() > detectorGroups) || (fGlobal.GetT0BinSize() > detectorGroups)) {
           std::cerr << std::endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          std::cerr << std::endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << " in forward. Needs to be fixed." << std::endl;
-          std::cerr << std::endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << std::endl;
-          return false;
-        }
-        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize()) &&
-            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize())) {
-          std::cerr << std::endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          std::cerr << std::endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << " in backward. Needs to be fixed." << std::endl;
-          std::cerr << std::endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << ". Needs to be fixed." << std::endl;
+          if (fRuns[i].GetT0BinSize() > detectorGroups)
+            std::cerr << std::endl << ">>   In RUN Block " << i+1 << ": found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting max. " << detectorGroups << " entries.";
+          if (fGlobal.GetT0BinSize() > 1)
+            std::cerr << std::endl << ">>   In GLOBAL block: found " << fGlobal.GetT0BinSize() << " T0 entries. Expecting max. " << detectorGroups << " entries. Needs to be fixed.";
+          std::cerr << std::endl << ">>   In case you added runs, please use the key word 'addt0' to add the t0's of the runs to be added." << std::endl;
           return false;
         }
         // check packing
@@ -5888,18 +5894,16 @@ Bool_t PMsrHandler::CheckRunBlockIntegrity()
           }
         }
         // check number of T0's provided
-        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize()) &&
-            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetForwardHistoNoSize())) {
+        detectorGroups = 2*fRuns[i].GetForwardHistoNoSize();
+        if (detectorGroups < 2*fRuns[i].GetBackwardHistoNoSize())
+          detectorGroups = 2*fRuns[i].GetBackwardHistoNoSize();
+        if ((fRuns[i].GetT0BinSize() > detectorGroups) || (fGlobal.GetT0BinSize() > detectorGroups)) {
           std::cerr << std::endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          std::cerr << std::endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << " in forward. Needs to be fixed." << std::endl;
-          std::cerr << std::endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetForwardHistoNoSize() << ". Needs to be fixed." << std::endl;
-          return false;
-        }
-        if ((fRuns[i].GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize()) &&
-            (fGlobal.GetT0BinSize() > 2*fRuns[i].GetBackwardHistoNoSize())) {
-          std::cerr << std::endl << ">> PMsrHandler::CheckRunBlockIntegrity(): **ERROR** in RUN block number " << i+1;
-          std::cerr << std::endl << ">>   Found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << " in backward. Needs to be fixed." << std::endl;
-          std::cerr << std::endl << ">>   In GLOBAL block: " << fGlobal.GetT0BinSize() << " T0 entries. Expecting only " << 2*fRuns[i].GetBackwardHistoNoSize() << ". Needs to be fixed." << std::endl;
+          if (fRuns[i].GetT0BinSize() > detectorGroups)
+            std::cerr << std::endl << ">>   In RUN Block " << i+1 << ": found " << fRuns[i].GetT0BinSize() << " T0 entries. Expecting max. " << detectorGroups << " entries.";
+          if (fGlobal.GetT0BinSize() > 1)
+            std::cerr << std::endl << ">>   In GLOBAL block: found " << fGlobal.GetT0BinSize() << " T0 entries. Expecting max. " << detectorGroups << " entries. Needs to be fixed.";
+          std::cerr << std::endl << ">>   In case you added runs, please use the key word 'addt0' to add the t0's of the runs to be added." << std::endl;
           return false;
         }
         // check that RRF frequency is given
