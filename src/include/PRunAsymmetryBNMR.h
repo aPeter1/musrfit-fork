@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PRunAsymmetry.h
+  PRunAsymmetryBNMR.h
 
   Author: Zaher Salman
   Based on PRunAsymmetry.h by Andreas Suter
