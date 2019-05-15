@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>User manual &mdash; musrfit 1.4.2 documentation</title>
+    <title>User manual &mdash; musrfit 1.5.0 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.4.2',
+        VERSION:     '1.5.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="musrfit 1.4.2 documentation" href="index.html" />
+    <link rel="top" title="musrfit 1.5.0 documentation" href="index.html" />
     <link rel="next" title="Documentation of user libs (user functions)" href="user-libs.html" />
     <link rel="prev" title="Tutorial for musrfit" href="tutorial.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="tutorial.html" title="Tutorial for musrfit"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">musrfit 1.4.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -1023,7 +1023,7 @@ Therefore, this block is only present to potentially shorten the msr file and to
 <li><tt class="docutils literal"><span class="pre">rrf_freq</span></tt> for fittype 1, 3</li>
 <li><tt class="docutils literal"><span class="pre">rrf_packing</span></tt> for fittype 1, 3</li>
 <li><tt class="docutils literal"><span class="pre">rrf_phase</span></tt> for fittype 1, 3</li>
-<li><tt class="docutils literal"><span class="pre">packing</span></tt> for fittype 0, 2, 4</li>
+<li><tt class="docutils literal"><span class="pre">packing</span></tt> for fittype 0, 2, 4, 5</li>
 </ul>
 <p>For a detailed discussion of these entries see the section <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>.</p>
 <p>The single histo RRF fit and asymmetry RRF fit related entries (fittype 1 and 3 only) have the following syntax:</p>
@@ -1217,6 +1217,8 @@ etc.
 <dd>Asymmetry RRF Fit (only for online analysis)</dd>
 <dt><strong>4</strong></dt>
 <dd>MuMinus Fit. This is a single histogram fit especially for negative muon μSR</dd>
+<dt><strong>5</strong></dt>
+<dd>beta-NMR Asymmetry Fit</dd>
 <dt><strong>8</strong></dt>
 <dd>Non-μSR Fit</dd>
 </dl>
@@ -1227,8 +1229,8 @@ etc.
 </dd>
 </dl>
 <span id="index-20"></span><dl class="docutils" id="msr-alpha-beta">
-<dt><strong>alpha, beta</strong> (fit type 2, 3)</dt>
-<dd><p class="first">These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as <span class="math">\(\alpha = N_{0,b}/N_{0,f}\)</span> and <span class="math">\(\beta = A_{0,b}/A_{0,f}\)</span>. If the parameters are not specified in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>, for each one the value of 1 is assumed. Example for alpha with fit parameter number 1:</p>
+<dt><strong>alpha, beta</strong> (fit type 2, 3, 5)</dt>
+<dd><p class="first">These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as <span class="math">\(\alpha = N_{0,b}/N_{0,f}\)</span> and <span class="math">\(\beta = A_{0,b}/A_{0,f}\)</span>. If the parameters are not specified in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>, for each one the value of 1 is assumed (for fittype 5 alpha is estimated from the ration of sum of Bp+Bm and Fp+Fm). Example for alpha with fit parameter number 1:</p>
 <div class="last highlight-python"><div class="highlight"><pre><span></span>alpha 1
 </pre></div>
 </div>
@@ -1291,9 +1293,17 @@ backward  7-9
 </pre></div>
 </div>
 </dd>
+<dt><strong>forward, backward</strong> (fit type 5)</dt>
+<dd><p class="first">Numbers of the histograms in the data file that should be taken to calculate the asymmetry. Two forward and backward histograms should be given indicationg positive and negative helicities. The asymmetry from opposite helicities will be subtracted. Examples:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span># build forward/backward asymmetry with histogram 1 and 3 then subtract asymmetry built with histograms 2 and 4
+forward  1 2
+backward 3 4
+</pre></div>
+</div>
+</dd>
 </dl>
 <span id="index-27"></span><dl class="docutils" id="msr-backgr-fix">
-<dt><strong>backgr.fix</strong> (fit types 0, 1, 2, 3)</dt>
+<dt><strong>backgr.fix</strong> (fit types 0, 1, 2, 3, 5)</dt>
 <dd>A fixed constant background in counts per nanosecond or per bin (see <a class="reference internal" href="#msr-commands-block"><em>below</em></a>) may be given at this point.
 The background is specified for all histograms in the order <span class="math">\(B_f B_b [B_r B_l]\)</span>. If this keyword is present, <em>any</em> information on a <tt class="docutils literal"><span class="pre">background</span></tt> line is ignored.</dd>
 </dl>
@@ -1307,7 +1317,7 @@ In case histograms are being grouped, the specified channels are interpreted wit
 </dd>
 </dl>
 <span id="index-29"></span><dl class="docutils" id="msr-background-asymmetry">
-<dt><strong>background</strong> (fit types 2, 3)</dt>
+<dt><strong>background</strong> (fit types 2, 3, 5)</dt>
 <dd><p class="first">The numbers of the first and the last channel of an interval from which the constant background should be calculated are specified here.
 For all the histograms this is done together in the following order: <span class="math">\(k_{f,\rm first} k_{f,\rm last} k_{b,\rm first} k_{b, \rm last} [k_{r,\rm first} k_{r,\rm last} k_{l,\rm first} k_{l,\rm last}]\)</span>.
 In case histograms are being grouped, the specified channels are interpreted with respect to the first histograms. Example:</p>
@@ -1327,7 +1337,7 @@ Typically these channels are referred to as <tt class="docutils literal"><span c
 </dd>
 </dl>
 <span id="index-31"></span><dl class="docutils" id="msr-data-asymmetry">
-<dt><strong>data</strong> (fit type 2, 3)</dt>
+<dt><strong>data</strong> (fit type 2, 3, 5)</dt>
 <dd><p class="first">The numbers of the first and the last channel of an interval from which the data is taken are specified here.
 Typically these channels are referred to as first good bin / last good bin (fgb/lgb). For all the histograms this is
 done together in the following order: <span class="math">\(k_{f,\rm first} k_{f,\rm last} k_{b,\rm first} k_{b, \rm last} [k_{r,\rm first} k_{r,\rm last} k_{l,\rm first} k_{l,\rm last}]\)</span>.
@@ -1347,8 +1357,8 @@ t0 3419 3434   # t0 channels for groupings: forward f1 f2. 3419 t0 for f1, 3434 
 </dd>
 </dl>
 <span id="index-33"></span><dl class="docutils" id="msr-t0-asymmetry">
-<dt><strong>t0</strong> (fit type 2, 3)</dt>
-<dd><p class="first">The numbers of time-zero channels of the histograms in the order <span class="math">\(t_{0,f} t_{0,b}\)</span>. Example:</p>
+<dt><strong>t0</strong> (fit type 2, 3, 5)</dt>
+<dd><p class="first">The numbers of time-zero channels of the histograms in the order <span class="math">\(t_{0,f} t_{0,b}\)</span>. For fit type 5, the time-zero is the channel of the start of beam pulse. Example:</p>
 <div class="last highlight-python"><div class="highlight"><pre><span></span>t0 3419 3418           # t0 channels: forward (3419), backward (3418)
 t0 3419 3418 3417 3416 # t0 channels (assuming forward f1 f2, backward b1 b2): forward (3419, f1), backward (3418, b1); forward (3417, f2), backward (3416, b2)
 </pre></div>
@@ -1362,7 +1372,7 @@ same syntax as for <a class="reference internal" href="#msr-t0-single-histo"><em
 the total number of <a class="reference internal" href="#msr-addrun"><em>ADDRUN</em></a>&#8216;s!</dd>
 </dl>
 <span id="index-35"></span><dl class="docutils" id="msr-addt0-asymmetry">
-<dt><strong>addt0</strong> (fit type 2, 3)</dt>
+<dt><strong>addt0</strong> (fit type 2, 3, 5)</dt>
 <dd>The numbers of time-zero channels of the histograms in the order <span class="math">\(t_{0,f} t_{0,b} [t_{0,r} t_{0,l}]\)</span>.
 If grouping of histograms is present (see <a class="reference internal" href="#msr-forward-backward"><em>forward</em></a>) the same syntax as for <a class="reference internal" href="#msr-t0-asymmetry"><em>t0</em></a> applies.
 If one addt0 is given, the total number of addt0&#8217;s needs to be equal to the total number of <a class="reference internal" href="#msr-addrun"><em>ADDRUN</em></a>&#8216;s!</dd>
@@ -1868,8 +1878,47 @@ the single histogram RRF fit apply: <strong>if you not urgently need it: do not 
 </div></blockquote>
 <p>Since MuMinus is quite generic, the full functional depends has to be written in the <a class="reference internal" href="#msr-theory-block"><em>THEORY Block</em></a>.</p>
 </div>
+<div class="section" id="beta-nmr-asymmetry-fit-fit-type-5">
+<span id="bnmr-asymmetry-fit"></span><span id="index-69"></span><h3>beta-NMR Asymmetry Fit (fit type 5)<a class="headerlink" href="#beta-nmr-asymmetry-fit-fit-type-5" title="Permalink to this headline">¶</a></h3>
+<p>For a beta-NMR asymmetry fit (fit type 5) four histograms are needed, two for positive and two for negative helicities. These are given by the <a class="reference internal" href="#msr-forward-backward"><em>forward</em></a> and <a class="reference internal" href="#msr-forward-backward"><em>backward</em></a> keywords
+in the <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a>. Additionally, the parameters <a class="reference internal" href="#msr-alpha-beta"><em>alpha</em></a> and <a class="reference internal" href="#msr-alpha-beta"><em>beta</em></a> which relate the detector
+efficiencies, solid angles and initial asymmetries of the two detectors can be supplied. The constant background for the two histograms is either given by
+<a class="reference internal" href="#msr-background-asymmetry"><em>background-determined intervals</em></a> or specified through <a class="reference internal" href="#msr-backgr-fix"><em>backgr.fix</em></a> in the <a class="reference internal" href="#msr-run-block"><em>RUN-block</em></a>.</p>
+<p>The experimental asymmetry <span class="math">\(a(k)\)</span> then is calculated from the four histograms:</p>
+<div class="math">
+\[a(k)=\frac{\left[N_{\mathrm{fp}}(k)-B_{\mathrm{fp}}\right]-\left[N_{\mathrm{bp}}(k)-B_{\mathrm{bp}}\right]}{\left[N_{\mathrm{fp}}(k)-B_{\mathrm{fp}}\right]+\left[N_{\mathrm{bp}}(k)-B_{\mathrm{bp}}\right]}
+- \frac{\left[N_{\mathrm{fm}}(k)-B_{\mathrm{fm}}\right]-\left[N_{\mathrm{bm}}(k)-B_{\mathrm{bm}}\right]}{\left[N_{\mathrm{fm}}(k)-B_{\mathrm{fm}}\right]+\left[N_{\mathrm{bm}}(k)-B_{\mathrm{bm}}\right]},\]</div>
+<p>with</p>
+<blockquote>
+<div><ul class="simple">
+<li><span class="math">\(N_{\mathrm{fp}}(k)\)</span>: counts in the <strong>forward</strong> histogram channel with positive helicity <span class="math">\(k\)</span></li>
+<li><span class="math">\(N_{\mathrm{bp}}(k)\)</span>: counts in the <strong>backward</strong> histogram channel with positive helicity <span class="math">\(k\)</span></li>
+<li>:math:` B_{mathrm{fp}}`: constant background in the <strong>forward</strong> histogram with positive helicity (RUN block: <a class="reference internal" href="#msr-backgr-fix"><em>backgr.fix</em></a> or <a class="reference internal" href="#msr-background-asymmetry"><em>background</em></a>)</li>
+<li>:math:` B_{mathrm{bp}}`: constant background in the <strong>backward</strong> histogram with positive helicity (RUN block: <a class="reference internal" href="#msr-backgr-fix"><em>backgr.fix</em></a> or <a class="reference internal" href="#msr-background-asymmetry"><em>background</em></a>)</li>
+<li><span class="math">\(N_{\mathrm{fm}}(k)\)</span>: counts in the <strong>forward</strong> histogram channel with negative helicity <span class="math">\(k\)</span></li>
+<li><span class="math">\(N_{\mathrm{bm}}(k)\)</span>: counts in the <strong>backward</strong> histogram channel with negative helicity <span class="math">\(k\)</span></li>
+<li>:math:` B_{mathrm{fm}}`: constant background in the <strong>forward</strong> histogram with negative helicity (RUN block: <a class="reference internal" href="#msr-backgr-fix"><em>backgr.fix</em></a> or <a class="reference internal" href="#msr-background-asymmetry"><em>background</em></a>)</li>
+<li>:math:` B_{mathrm{bm}}`: constant background in the <strong>backward</strong> histogram with negative helicity (RUN block: <a class="reference internal" href="#msr-backgr-fix"><em>backgr.fix</em></a> or <a class="reference internal" href="#msr-background-asymmetry"><em>background</em></a>)</li>
+</ul>
+</div></blockquote>
+<p>This theoretical asymmetry <span class="math">\(a(t)\)</span> is used to fit the function</p>
+<div class="math">
+\[a(t)=\frac{(\alpha\beta +1)A(t)-(\alpha -1)}{(\alpha +1)-(\alpha\beta -1)A(t)} - \frac{(\alpha -1)-(\alpha\beta 1)A(t)}{(\alpha +1)+(\alpha\beta -1)Am(t)},\]</div>
+<p>where</p>
+<blockquote>
+<div><ul class="simple">
+<li><span class="math">\(\alpha\)</span>: accounts for the different detector efficiencies and solid angles (RUN block: <a class="reference internal" href="#msr-alpha-beta"><em>alpha</em></a>).</li>
+<li><span class="math">\(\beta\)</span>: accounts for the different detector asymmetries (RUN block: <a class="reference internal" href="#msr-alpha-beta"><em>beta</em></a>).</li>
+<li><span class="math">\(A(t)\)</span>: is the depolarization function as given in the <a class="reference internal" href="#msr-theory-block"><em>THEORY block</em></a>.</li>
+</ul>
+</div></blockquote>
+<p>For the graphical representation in plot type 5 the equation above is rearranged to get <span class="math">\(A(t)\)</span>:</p>
+<div class="math">
+\[A(t)=\frac{(\alpha -1)+(\alpha +1)a(t)}{(\alpha\beta +1)+(\alpha\beta -1)a(t)}-\frac{(\alpha +1)a(t)-(\alpha -1)}{(\alpha\beta +1)+(1-\alpha\beta)a(t)}=\frac{\alpha\left[N_{\mathrm{fp}}(t)-B_{\mathrm{fp}}\right]-\left[N_{\mathrm{bp}}(t)-B_{\mathrm{bp}}\right]}{\alpha\beta\left[N_{\mathrm{fp}}(t)-B_{\mathrm{fp}}\right]+\left[N_{\mathrm{bp}}(t)-B_{\mathrm{bp}}\right]} -\frac{\alpha\left[N_{\mathrm{fm}}(t)-B_{\mathrm{fm}}\right]-\left[N_{\mathrm{bm}}(t)-B_{\mathrm{bm}}\right]}{\alpha\beta\left[N_{\mathrm{fm}}(t)-B_{\mathrm{fm}}\right]+\left[N_{\mathrm{bm}}(t)-B_{\mathrm{bm}}\right]}\]</div>
+<p>and plotted together with the function given in the THEORY block.</p>
+</div>
 <div class="section" id="non-mgrsr-fit-fit-type-8">
-<span id="non-musr-fit"></span><span id="index-69"></span><h3>Non-μSR Fit (fit type 8)<a class="headerlink" href="#non-mgrsr-fit-fit-type-8" title="Permalink to this headline">¶</a></h3>
+<span id="non-musr-fit"></span><span id="index-70"></span><h3>Non-μSR Fit (fit type 8)<a class="headerlink" href="#non-mgrsr-fit-fit-type-8" title="Permalink to this headline">¶</a></h3>
 <p>In the case of a non-μSR fit (fit type 8) the fitting function is</p>
 <div class="math">
 \[y = f(x),\]</div>
@@ -1878,7 +1927,7 @@ the single histogram RRF fit apply: <strong>if you not urgently need it: do not 
 </div>
 </div>
 <div class="section" id="id22">
-<span id="index-70"></span><span id="id23"></span><h2>User Functions<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h2>
+<span id="index-71"></span><span id="id23"></span><h2>User Functions<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h2>
 <p><tt class="docutils literal"><span class="pre">musrfit</span></tt> offers the possibility to plug-in user-defined functions implemented in <tt class="docutils literal"><span class="pre">C++</span></tt> classes to the fitting and plotting routines.
 In order to do so, basically two things are needed:</p>
 <blockquote>
@@ -1896,7 +1945,7 @@ In order to do so, basically two things are needed:</p>
 </div></blockquote>
 <p>Since the first is simpler this will be explained using an explicit example, before it is discussed why the second option is needed and how it can be used.</p>
 <div class="section" id="user-function-without-global-user-function-object-access">
-<span id="user-functions-without-global-part"></span><span id="index-71"></span><h3>User Function without global user-function-object access<a class="headerlink" href="#user-function-without-global-user-function-object-access" title="Permalink to this headline">¶</a></h3>
+<span id="user-functions-without-global-part"></span><span id="index-72"></span><h3>User Function without global user-function-object access<a class="headerlink" href="#user-function-without-global-user-function-object-access" title="Permalink to this headline">¶</a></h3>
 <p>In the following it is explained in detail how the implementation of a user function is done using the simple example of <span class="math">\(f_a(x) = \sin(a x)/(a x)\)</span>,
 where the parameter <span class="math">\(a\)</span> should be determined by the fit. Although not necessary for this simple example, the source code is split into two parts,
 namely a header file <tt class="docutils literal"><span class="pre">TMyFunction.h</span></tt> containing the class declaration and a second file <tt class="docutils literal"><span class="pre">TMyFunction.cpp</span></tt> including the function implementation
@@ -1999,7 +2048,7 @@ refer to the <a class="reference external" href="https://root.cern.ch/interactin
 <p>Finally, please be aware of the <a class="reference internal" href="#user-function-important"><em>remark</em></a> at the end of this section.</p>
 </div>
 <div class="section" id="user-function-with-global-user-function-object-access">
-<span id="user-functions-with-global-part"></span><span id="index-72"></span><h3>User Function with global user-function-object access<a class="headerlink" href="#user-function-with-global-user-function-object-access" title="Permalink to this headline">¶</a></h3>
+<span id="user-functions-with-global-part"></span><span id="index-73"></span><h3>User Function with global user-function-object access<a class="headerlink" href="#user-function-with-global-user-function-object-access" title="Permalink to this headline">¶</a></h3>
 <p>Before explaining how to use global objects within user functions, it will be shortly explained where is the problem and why this might be a sensible approach.
 In <tt class="docutils literal"><span class="pre">musrfit</span></tt> each <a class="reference internal" href="#msr-run-block"><em>RUN block</em></a> (histogram, asymmetry, ...) is owning its own theory-function tree. An example is shown in the figure below.
 The bluish nodes are default musrfit functions, whereas the red nodes represent user functions (here labeled by <tt class="docutils literal"><span class="pre">uF1</span></tt> and <tt class="docutils literal"><span class="pre">uF2</span></tt>). Without global user-function
@@ -2139,7 +2188,7 @@ In case this cannot be ensured, the parallelization can be disabled by <em>&#821
 </div>
 </div>
 <div class="section" id="technical-description-of-the-musrfit-framework">
-<span id="technical-musrfit"></span><span id="index-73"></span><h2>Technical Description of the musrfit framework<a class="headerlink" href="#technical-description-of-the-musrfit-framework" title="Permalink to this headline">¶</a></h2>
+<span id="technical-musrfit"></span><span id="index-74"></span><h2>Technical Description of the musrfit framework<a class="headerlink" href="#technical-description-of-the-musrfit-framework" title="Permalink to this headline">¶</a></h2>
 <p>A technical description of the musrfit framework can be found on its own <a class="reference external" href="http://lmu.web.psi.ch/musrfit/technical/index.html">docu</a>.</p>
 </div>
 </div>
@@ -2185,6 +2234,7 @@ In case this cannot be ensured, the parallelization can be disabled by <em>&#821
 <li><a class="reference internal" href="#asymmetry-fit-fit-type-2">Asymmetry Fit (fit type 2)</a></li>
 <li><a class="reference internal" href="#asymmetry-rrf-fit-fit-type-3">Asymmetry RRF Fit (fit type 3)</a></li>
 <li><a class="reference internal" href="#negative-muon-mgrsr-fit-fit-type-4">Negative Muon μSR Fit (fit type 4)</a></li>
+<li><a class="reference internal" href="#beta-nmr-asymmetry-fit-fit-type-5">beta-NMR Asymmetry Fit (fit type 5)</a></li>
 <li><a class="reference internal" href="#non-mgrsr-fit-fit-type-8">Non-μSR Fit (fit type 8)</a></li>
 </ul>
 </li>
@@ -2238,12 +2288,12 @@ In case this cannot be ensured, the parallelization can be disabled by <em>&#821
         <li class="right" >
           <a href="tutorial.html" title="Tutorial for musrfit"
              >previous</a> |</li>
-        <li><a href="index.html">musrfit 1.4.2 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.5.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2018, Andreas Suter.
-      Last updated on Mar 08, 2019.
+        &copy; Copyright 2019, Andreas Suter.
+      Last updated on May 15, 2019.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>

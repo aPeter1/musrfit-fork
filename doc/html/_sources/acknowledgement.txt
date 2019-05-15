@@ -13,4 +13,10 @@ Acknowledgements
 
 **Uldis Locans**
   I am very much indebted to Uldis work on :ref:`DKS <setup-dks>` enabling the GPU support for ``musrfit``. His kind, calm, and 
-  extremely competent way to deal with his projects as well as to deal with the chaos of physicists way to think is admirable. Many thanks Uldis! 
+  extremely competent way to deal with his projects as well as to deal with the chaos of physicists way to think is admirable. Many thanks Uldis!
+
+**Zaher Salman**
+  Thanks for his beta-NMR and web-interface contributions to ``musrfit``!
+
+**Robert Scheuermann**
+  Thanks for his constant contructive input on ``musrfit``! 

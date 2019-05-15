@@ -34,16 +34,17 @@ An example with NeXus support and BMWlibs needed would look like this
    make install                              (as superuser -- maybe)
    /sbin/ldconfig                            (as superuser)
 
-If all goes well, you should be good to go ;-)
+In the optimal case everything is ready to be used ;-)
 
 #----------------------------------
 # Link to the documentation
 #----------------------------------
 
-More information regarding software requirements and installation can be found at
+More information regarding software requirements and the installation process 
+can be found here:
 
    http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html
 
 #---------------------------------------------------------------------
-# good luck ...
+# this is the end ...
 #---------------------------------------------------------------------

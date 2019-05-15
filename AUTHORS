@@ -1,7 +1,5 @@
 #---------------------------------------------------------------------
 # AUTHORS
-# Andreas Suter, 2009/06/21
-# $Id: AUTHORS 4013 2009-06-21
 #---------------------------------------------------------------------
 
 Andreas Suter <andreas.suter@psi.ch>
@@ -9,6 +7,9 @@ Andreas Suter <andreas.suter@psi.ch>
 
 Bastian M. Wojek
   msr2data; initial testing; full initial documentation; BMWlibs;
+
+Zaher Salman <zaher.salman@psi.ch>
+  beta-NMR and web-interface
 
 #---------------------------------------------------------------------
 # this is the end ...

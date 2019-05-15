@@ -1,13 +1,13 @@
 README
 ------
 
-musrfit - muSR data analysis package
+musrfit - muSR and beta-NMR data analysis package
 
 Contents
 --------
 
 This is a data analysis package to analyze time differential muSR and beta-NMR data. 
-Currently it allows the following,
+Currently it allows the following:
 
 * set up most commonly used fitting functions for muSR and beta-NMR
 * fit data, including global fits
@@ -24,16 +24,20 @@ Currently supported platforms
 
 * Linux
 * Mac OS X
-* Windows - not really, only for experts
+* Windows 10 1809 or newer - current state is for the commited ones
 * Web based implementation - http://musruser.psi.ch/cgi-bin/musrfit.cgi
 
 Documentation
 -------------
 
-For a more extensive user documentation see:
+For a more exhaustive user documentation see:
 
   http://lmu.web.psi.ch/musrfit/user/html/index.html
 
-Contact
+Contacts
 
-<zaher.salman@psi.ch>
+  <andreas.suter@psi.ch>
+
+  For the beta-NMR related parts, please contact
+
+  <zaher.salman@psi.ch>
