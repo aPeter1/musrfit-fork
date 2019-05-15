@@ -2,24 +2,25 @@
 
 ### Contents ###
 
-This is a data analysis package to analyze time differential muSR and beta-NMR data. 
-Currently it allows the following things:
+This is a data analysis package to analyze time differential muSR and beta-NMR data.
+Currently it allows the following:
 
-* setting up most commonly used fitting functions for muSR and beta-NMR
-* fitting data, including global fits
-* showing the fit results and the residuals
-* showing the Fourier transform of the data
-* extracting easily the fitting parameters to be used in other programs (gnuplot, qtiplot/origin, ...)
-* allows to generate fitting input files for follow-up runs
-* allows to generate global fitting input files based on a single run template
-* allows to implement more sophisticated user functions 
+* set up most commonly used fitting functions for muSR and beta-NMR
+* fit data, including global fits
+* show the fit results and the residuals
+* show the Fourier transform of the data
+* easily extract the fit parameters and import in other programs (gnuplot, qtiplot/origin, ...)
+* generate input fitting files for follow-up runs
+* generate global input fitting files based on a single run template
+* implement more sophisticated user functions
   (e.g. GL vortex lattice, Meissner screening including low-energy muon stopping profiles)
 
 ### Currently supported platforms: ###
 
 * Linux
 * Mac OS X
-* Windows - not really, but possible.
+* Windows 10 1809 or newer - current state is for the commited ones
+* Web based implementation - http://musruser.psi.ch/cgi-bin/musrfit.cgi
 
 ### Documentation ####
 
@@ -27,6 +28,11 @@ For a more exhaustive user documentation see:
 
   http://lmu.web.psi.ch/musrfit/user/html/index.html
 
-### Contact ###
+### Contacts ###
+
+<andreas.suter@psi.ch>
+
+For the beta-NMR related parts, please contact
 
 <zaher.salman@psi.ch>
+

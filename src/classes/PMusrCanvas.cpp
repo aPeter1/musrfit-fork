@@ -710,6 +710,18 @@ void PMusrCanvas::UpdateDataTheoryPad()
         // handle data
         HandleDataSet(i, runNo, data);
         break;
+      case MSR_FITTYPE_BNMR:
+        data = fRunList->GetAsymmetryBNMR(runNo, PRunListCollection::kRunNo);
+        if (!data) { // something wrong
+          fValid = false;
+          // error message
+          std::cerr << std::endl << ">> PMusrCanvas::UpdateDataTheoryPad(): **ERROR** couldn't obtain run no " << runNo << " for a beta-NMR asymmetry plot";
+          std::cerr << std::endl;
+          return;
+        }
+        // handle data
+        HandleDataSet(i, runNo, data);
+        break;
       case MSR_FITTYPE_ASYM_RRF:
         data = fRunList->GetAsymmetryRRF(runNo, PRunListCollection::kRunNo);
         if (!data) { // something wrong
@@ -902,7 +914,8 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += grouping;
       tstr += TString(",");
     } else if ((runs[runNo].GetFitType() == MSR_FITTYPE_ASYM) ||
-               (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM_RRF)) {
+               (runs[runNo].GetFitType() == MSR_FITTYPE_ASYM_RRF) ||
+	       (runs[runNo].GetFitType() == MSR_FITTYPE_BNMR)) {
       tstr += TString("h:");
       TString grouping;
       fMsrHandler->GetGroupingString(runNo, "forward", grouping);
@@ -1597,6 +1610,7 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
     case MSR_PLOT_SINGLE_HISTO:
     case MSR_PLOT_SINGLE_HISTO_RRF:
     case MSR_PLOT_ASYM:
+    case MSR_PLOT_BNMR:
     case MSR_PLOT_ASYM_RRF:
     case MSR_PLOT_MU_MINUS:
       if (fDifferenceView) { // difference view plot
@@ -2756,7 +2770,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
   size  = data->GetValue()->size();
   dataSet.dataRange->SetXRange(start, end); // full possible range
   // make sure that for asymmetry the y-range is initialized reasonably
-  if (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM)
+  if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM) || (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_BNMR))
     dataSet.dataRange->SetYRange(-0.4, 0.4);
   // extract necessary range information
   if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fTmin.size() == 0) &&
@@ -2772,6 +2786,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
       fXmax = end;
     }
     if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM) ||
+        (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_BNMR) ||
         (fMsrHandler->GetMsrRunList()->at(runNo).IsLifetimeCorrected())) {
       fYRangePresent = true;
       fYmin = -0.4;
@@ -2820,6 +2835,7 @@ void PMusrCanvas::HandleDataSet(UInt_t plotNo, UInt_t runNo, PRunData *data)
 
     // make sure that for asymmetry the y-range is initialized reasonably
     if ((fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_ASYM) ||
+        (fMsrHandler->GetMsrPlotList()->at(fPlotNumber).fPlotType == MSR_PLOT_BNMR) ||
         (fMsrHandler->GetMsrRunList()->at(runNo).IsLifetimeCorrected())) {
       dataSet.dataRange->SetYRange(-0.4, 0.4);
     }
@@ -4679,9 +4695,8 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
         fDataTheoryPad->SetLogy(1);
 
       // set x-axis label
-      PMsrRunList runs = *fMsrHandler->GetMsrRunList();
-      TString setup = fRunList->GetSetup(*runs[0].GetRunName());
-      if (strcmp(setup, "TRIUMF/BNQR") || strcmp(setup, "TRIUMF/BNMR")) {
+      if (fPlotType == MSR_PLOT_BNMR ) {
+	// For BNMR/BNQR runs use seconds
 	fHistoFrame->GetXaxis()->SetTitle("time (s)");
       } else {
 	fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
@@ -4706,6 +4721,9 @@ void PMusrCanvas::PlotData(Bool_t unzoom)
           yAxisTitle = "RRF Asymmetry";
           break;
         case MSR_PLOT_ASYM:
+          yAxisTitle = "Asymmetry";
+          break;
+        case MSR_PLOT_BNMR:
           yAxisTitle = "Asymmetry";
           break;
         case MSR_PLOT_MU_MINUS:
@@ -4970,9 +4988,8 @@ void PMusrCanvas::PlotDifference(Bool_t unzoom)
     fHistoFrame->SetBins(noOfPoints, dataXmin, dataXmax);
 
     // set x-axis label
-    PMsrRunList runs = *fMsrHandler->GetMsrRunList();
-    TString setup = fRunList->GetSetup(*runs[0].GetRunName());
-    if (strcmp(setup, "TRIUMF/BNQR") || strcmp(setup, "TRIUMF/BNMR")) {
+    if (fPlotType == MSR_PLOT_BNMR) {
+      // For BNMR/BNQR runs use seconds
       fHistoFrame->GetXaxis()->SetTitle("time (s)");
     } else {
     fHistoFrame->GetXaxis()->SetTitle("time (#mus)");
@@ -6094,9 +6111,8 @@ void PMusrCanvas::PlotAverage(Bool_t unzoom)
   // define x-axis title
   TString xAxisTitle("");
   if (fCurrentPlotView == PV_DATA) {
-    PMsrRunList runs = *fMsrHandler->GetMsrRunList();
-    TString setup = fRunList->GetSetup(*runs[0].GetRunName());
-    if (strcmp(setup, "TRIUMF/BNQR") || strcmp(setup, "TRIUMF/BNMR")) {
+    if (fPlotType == MSR_PLOT_BNMR) {
+      // For BNMR/BNQR runs use seconds
       xAxisTitle = TString("time (s)");
     } else {
     xAxisTitle = TString("time (#mus)");
@@ -6131,6 +6147,9 @@ void PMusrCanvas::PlotAverage(Bool_t unzoom)
           }
           break;
         case MSR_PLOT_ASYM:
+          yAxisTitle = "<asymmetry>";
+          break;
+        case MSR_PLOT_BNMR:
           yAxisTitle = "<asymmetry>";
           break;
         case MSR_PLOT_MU_MINUS:
