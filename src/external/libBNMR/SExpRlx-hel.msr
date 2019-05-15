@@ -1,21 +1,21 @@
-
-# Run Numbers: 1111
+LaAlO3,  SLR, 30G, 150K, Bias=23 kV, Ix=0A, Iy=+3A, aligned, beam on=1s
 ###############################################################
 FITPARAMETER
 ###############################################################
 #     No     Name       Value    Err     Min  Max                  
-        1 Alpha       1.11587   0.00038     none        
-        2 Asy         0.0570    0.0011      none        
+        1 Alpha       1.11589   0.00037     none        
+        2 Asy         0.1121    0.0094      none        0       0.2     
         3 T           1         0           none        
-        4 Rlx         1.015     0.023       none        
-        5 One         1         0           none        
-        6 Bet         -1.052    0.027       none        
+        4 Rlx         4.12      0.87        none        0       15000   
+        5 Beta        0.434     0.031       none        0.3     2       
+        6 One         1         0           none        
+        7 FlHel       -1.048    0.023       none        -2      0       
 
 ###############################################################
 THEORY
 ###############################################################
 asymmetry   fun1
-userFcn  .libs/libBNMR.so ExpRlx 3 4
+userFcn  libBNMR SExpRlx 3 4 5
 
 ###############################################################
 FUNCTIONS
@@ -28,12 +28,11 @@ fittype         2         (asymmetry fit)
 alpha           1
 forward         3 
 backward        4 
-data            11      800     11      800     
-#backgr.fix 0
+data            11      1000    11      1000    
 background      1       9       1       9          # estimated bkg: 8.0000 / 9.6250
-t0              10.0    10.0    
-map             2    5    0    0    0    0    0    0    0    0
-fit             0.5     8      
+t0              10.0    10.0   
+map             2    6    0    0    0    0    0    0    0    0
+fit             0.2     9      
 packing         5
 
 RUN 045674 BNMR TRIUMF MUD   (name beamline institute data-file-format)
@@ -41,14 +40,12 @@ fittype         2         (asymmetry fit)
 alpha           1
 forward         5 
 backward        6 
-data            11      800     11      800     
-#backgr.fix 0
+data            11      1000    11      1000    
 background      1       9       1       9          # estimated bkg: 11.6250 / 15.6250
 t0              10.0    10.0    
-map             2    6    0    0    0    0    0    0    0    0
-fit             0.5     8      
+map             2    7    0    0    0    0    0    0    0    0
+fit             0.2     9      
 packing         5
-
 
 ###############################################################
 COMMANDS
@@ -68,9 +65,9 @@ FOURIER
 units            MHz    # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
 fourier_power    12
 apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
-plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL
 phase            8
 #range            FRQMIN  FRQMAX
 ###############################################################
-STATISTIC --- 2015-04-14 11:00:19
-  chisq = 399.5, NDF = 290, chisq/NDF = 1.377736
+STATISTIC --- 2019-05-01 11:29:06
+  chisq = 358.6, NDF = 345, chisq/NDF = 1.039300

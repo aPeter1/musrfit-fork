@@ -39,6 +39,7 @@
 #include "PRunSingleHistoRRF.h"
 #include "PRunAsymmetry.h"
 #include "PRunAsymmetryRRF.h"
+#include "PRunAsymmetryBNMR.h"
 #include "PRunMuMinus.h"
 #include "PRunNonMusr.h"
 
@@ -62,6 +63,7 @@ class PRunListCollection
     virtual Double_t GetSingleHistoRRFChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetAsymmetryChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetAsymmetryRRFChisq(const std::vector<Double_t>& par) const;
+    virtual Double_t GetAsymmetryBNMRChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetMuMinusChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetNonMusrChisq(const std::vector<Double_t>& par) const;
 
@@ -72,6 +74,7 @@ class PRunListCollection
     virtual Double_t GetSingleHistoRRFMaximumLikelihood(const std::vector<Double_t>& par) const;
     virtual Double_t GetAsymmetryMaximumLikelihood(const std::vector<Double_t>& par) const;
     virtual Double_t GetAsymmetryRRFMaximumLikelihood(const std::vector<Double_t>& par) const;
+    virtual Double_t GetAsymmetryBNMRMaximumLikelihood(const std::vector<Double_t>& par) const;
     virtual Double_t GetMuMinusMaximumLikelihood(const std::vector<Double_t>& par) const;
     virtual Double_t GetNonMusrMaximumLikelihood(const std::vector<Double_t>& par) const;
 
@@ -85,6 +88,7 @@ class PRunListCollection
     virtual UInt_t GetNoOfSingleHistoRRF() const { return fRunSingleHistoRRFList.size(); } ///< returns the number of single histogram RRF data sets present in the msr-file
     virtual UInt_t GetNoOfAsymmetry() const { return fRunAsymmetryList.size(); }     ///< returns the number of asymmetry data sets present in the msr-file
     virtual UInt_t GetNoOfAsymmetryRRF() const { return fRunAsymmetryRRFList.size(); }  ///< returns the number of asymmetry RRF data sets present in the msr-file
+    virtual UInt_t GetNoOfAsymmetryBNMR() const { return fRunAsymmetryBNMRList.size(); }  ///< returns the number of asymmetry BNMR data sets present in the msr-file
     virtual UInt_t GetNoOfMuMinus() const { return fRunMuMinusList.size(); }         ///< returns the number of mu minus data sets present in the msr-file
     virtual UInt_t GetNoOfNonMusr() const { return fRunNonMusrList.size(); }         ///< returns the number of non-muSR data sets present in the msr-file
 
@@ -92,6 +96,7 @@ class PRunListCollection
     virtual PRunData* GetSingleHistoRRF(UInt_t index, EDataSwitch tag=kIndex);
     virtual PRunData* GetAsymmetry(UInt_t index, EDataSwitch tag=kIndex);
     virtual PRunData* GetAsymmetryRRF(UInt_t index, EDataSwitch tag=kIndex);
+    virtual PRunData* GetAsymmetryBNMR(UInt_t index, EDataSwitch tag=kIndex);
     virtual PRunData* GetMuMinus(UInt_t index, EDataSwitch tag=kIndex);
     virtual PRunData* GetNonMusr(UInt_t index, EDataSwitch tag=kIndex);
 
@@ -110,6 +115,7 @@ class PRunListCollection
     std::vector<PRunSingleHistoRRF*> fRunSingleHistoRRFList; ///< stores all processed single histogram RRF data
     std::vector<PRunAsymmetry*>      fRunAsymmetryList;      ///< stores all processed asymmetry data
     std::vector<PRunAsymmetryRRF*>   fRunAsymmetryRRFList;   ///< stores all processed asymmetry RRF data
+    std::vector<PRunAsymmetryBNMR*>  fRunAsymmetryBNMRList;  ///< stores all processed asymmetry BNMR data
     std::vector<PRunMuMinus*>        fRunMuMinusList;        ///< stores all processed mu-minus data
     std::vector<PRunNonMusr*>        fRunNonMusrList;        ///< stores all processed non-muSR data
 };

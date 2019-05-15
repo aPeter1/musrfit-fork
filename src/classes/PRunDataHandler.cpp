@@ -3045,8 +3045,9 @@ Bool_t PRunDataHandler::ReadMudFile()
     setup += TString(str) + TString("/");
     if (TString(str) == "BNQR" || TString(str) == "BNMR") {
       std::cerr << "PRunDataHandler::ReadMudFile: **INFORMATION** this run was performed on " << str << std::endl;
+      std::cerr << "PRunDataHandler::ReadMudFile: **INFORMATION** apply correction to time resolution" << std::endl;
       // identified BNMR/BNQR, correct time resolution.
-      timeResMultiplier = 1.0e15;
+      timeResMultiplier = 1.0e9;
     }
   }
   success = MUD_getApparatus( fh, str, sizeof(str) );
@@ -3128,8 +3129,8 @@ Bool_t PRunDataHandler::ReadMudFile()
     }
   }
 
-  runData.SetTimeResolution(static_cast<Double_t>(timeResolution) * timeResMultiplier); // s -> ns
-  // An additional factor of 1e6 needed for bNMR
+  runData.SetTimeResolution(static_cast<Double_t>(timeResolution) * timeResMultiplier); // s -> ns or s -> ms for bNMR
+  // Other possibility:
   // Check if it is a bNMR run and fix it or check if "timeres" line
   // was introduced in the msr file
 

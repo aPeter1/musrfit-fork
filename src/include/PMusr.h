@@ -58,6 +58,7 @@
 #define PRUN_ASYMMETRY        2
 #define PRUN_ASYMMETRY_RRF    3
 #define PRUN_MU_MINUS         4
+#define PRUN_ASYMMETRY_BNMR   5
 #define PRUN_NON_MUSR         8
 
 // muon life time in (us), see PRL99, 032001 (2007)
@@ -100,6 +101,7 @@
 #define MSR_FITTYPE_ASYM             2
 #define MSR_FITTYPE_ASYM_RRF         3
 #define MSR_FITTYPE_MU_MINUS         4
+#define MSR_FITTYPE_BNMR             5
 #define MSR_FITTYPE_NON_MUSR         8
 
 //-------------------------------------------------------------
@@ -109,6 +111,7 @@
 #define MSR_PLOT_ASYM             2
 #define MSR_PLOT_ASYM_RRF         3
 #define MSR_PLOT_MU_MINUS         4
+#define MSR_PLOT_BNMR             5
 #define MSR_PLOT_NON_MUSR         8
 
 //-------------------------------------------------------------
@@ -568,6 +571,7 @@ class PMsrGlobalBlock {
     virtual Double_t GetFitRange(UInt_t idx);
     virtual Int_t GetFitRangeOffset(UInt_t idx);
     virtual Int_t GetPacking() { return fPacking; }
+    virtual Double_t GetEstimatedAlpha() { return fAlpha; }
 
     virtual void SetGlobalPresent(Bool_t bval) { fGlobalPresent = bval; }
     virtual void SetRRFFreq(Double_t freq, const char *unit);
@@ -596,6 +600,7 @@ class PMsrGlobalBlock {
     Double_t fFitRange[2];    ///< fit range in (us)
     Int_t fFitRangeOffset[2]; ///< if fit range is given in bins it can have the form fit fgb+n0 lgb-n1. This variable holds the n0 and n1.
     Int_t fPacking;           ///< packing/rebinning
+    Double_t fAlpha;          ///< estimated alpha value from F/B counts
 };
 
 //-------------------------------------------------------------
@@ -643,6 +648,7 @@ class PMsrRunBlock {
     virtual Double_t GetFitRange(UInt_t idx);
     virtual Int_t GetFitRangeOffset(UInt_t idx);
     virtual Int_t GetPacking() { return fPacking; }
+    virtual Double_t GetEstimatedAlpha() { return fAlpha; }
     virtual Int_t GetXDataIndex() { return fXYDataIndex[0]; }
     virtual Int_t GetYDataIndex() { return fXYDataIndex[1]; }
     virtual TString* GetXDataLabel() { return &fXYDataLabel[0]; }
@@ -665,6 +671,7 @@ class PMsrRunBlock {
     virtual void SetForwardHistoNo(Int_t histoNo, Int_t idx=-1);
     virtual void SetBackwardHistoNo(Int_t histoNo, Int_t idx=-1);
     virtual void SetBkgEstimated(Double_t dval, Int_t idx);
+    virtual void SetEstimatedAlpha(Double_t dval);
     virtual void SetBkgFix(Double_t dval, Int_t idx);
     virtual void SetBkgRange(Int_t ival, Int_t idx);
     virtual void SetDataRange(Int_t ival, Int_t idx);
@@ -705,6 +712,7 @@ class PMsrRunBlock {
     Bool_t fFitRangeInBins;         ///< flag telling if fit range is given in time or in bins
     Double_t fFitRange[2];          ///< fit range in (us)
     Int_t fFitRangeOffset[2];       ///< if fit range is given in bins it can have the form fit fgb+n0 lgb-n1. This variable holds the n0 and n1.
+    Double_t fAlpha;                ///< estimated alpha value from F/B counts
     Int_t fPacking;                 ///< packing/rebinning
     Int_t fXYDataIndex[2];          ///< used to get the data indices when using db-files (fit type 8)
     TString fXYDataLabel[2];        ///< used to get the indices via labels when using db-files  (fit type 8)

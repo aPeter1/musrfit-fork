@@ -21,8 +21,7 @@ directory and
    make install                              (as superuser -- maybe)
    /sbin/ldconfig                            (as superuser)
     
-cmake configuration allows a couple of switches.  For details check the user
-docu under 
+cmake configuration allows a couple of switches.  For details check the documentation at 
 
    http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html
 
@@ -35,16 +34,16 @@ An example with NeXus support and BMWlibs needed would look like this
    make install                              (as superuser -- maybe)
    /sbin/ldconfig                            (as superuser)
 
-In the optimal case, everything is set up ;-)
+If all goes well, you should be good to go ;-)
 
 #----------------------------------
-# Link to the docu
+# Link to the documentation
 #----------------------------------
 
-More information about the software requirements and the installation can be found at:
+More information regarding software requirements and installation can be found at
 
-http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html
+   http://lmu.web.psi.ch/musrfit/user/MUSR/MusrFitSetup.html
 
 #---------------------------------------------------------------------
-# this is the end ...
+# good luck ...
 #---------------------------------------------------------------------

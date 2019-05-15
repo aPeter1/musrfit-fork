@@ -1878,6 +1878,19 @@ void PMsrRunBlock::SetMapGlobal(UInt_t idx, Int_t ival)
   return;
 }
 
+//--------------------------------------------------------------------------
+// SetEstimatedAlpha (public)
+//--------------------------------------------------------------------------
+/**
+ * <p> set the value of estimated alpha at position idx
+ *
+ * \param alpha is the estimated value
+ */
+void PMsrRunBlock::SetEstimatedAlpha(Double_t dval)
+{
+  fAlpha = dval;
+}
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implementation PStringNumberList
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
