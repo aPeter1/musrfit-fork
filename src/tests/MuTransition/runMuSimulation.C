@@ -91,7 +91,7 @@ void runMuSimulation()
   
   TTimeStamp *timeStampStart = new TTimeStamp();
   cout << endl << "Simulation started on:" << endl;
-  timeStampStart->Print("l);
+  timeStampStart->Print("l");
   cout << endl;
   
   histogramFileName  = TString("0");
