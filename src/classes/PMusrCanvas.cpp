@@ -1911,7 +1911,7 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
             xmax = fMultiGraphData->GetXaxis()->GetBinCenter(xmaxBin);
 
             // fill ascii dump data
-            for (UInt_t i=0; i<fNonMusrData.size(); i++) { // go through all the histogramms
+            for (UInt_t i=0; i<fNonMusrData.size(); i++) { // go through all the graphs
               // clean up dump
               dump.dataX.clear();
               dump.data.clear();
@@ -1928,6 +1928,15 @@ void PMusrCanvas::ExportData(const Char_t *fileName)
                   dump.dataErr.push_back(fNonMusrData[i].data->GetErrorY(j));
                 }
               }
+
+              // if anything found keep it
+              if (dump.dataX.size() > 0)
+                dumpVector.push_back(dump);
+
+              // clean up dump
+              dump.dataX.clear();
+              dump.data.clear();
+              dump.dataErr.clear();
 
               // go through all theory bins
               for (Int_t j=0; j<fNonMusrData[i].theory->GetN(); j++) {
