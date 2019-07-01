@@ -2,13 +2,18 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRROOT_INC ${CMAKE_SOURCE_DIR}/src/external/MusrRoot)
-set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 root_generate_dictionary(
   TMusrRunHeaderDict 
-  -I${MUSRROOT_INC} -I${PREFIX_INC} TMusrRunHeader.h 
+  TMusrRunHeader.h 
+  OPTIONS 
+    -I${MUSRROOT_INC}
+    -inlineInputHeader
   LINKDEF TMusrRunHeaderLinkDef.h
-  OPTIONS -inlineInputHeader
   MODULE TMusrRunHeader
 )
 

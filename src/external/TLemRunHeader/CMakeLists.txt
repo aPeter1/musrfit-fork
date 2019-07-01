@@ -1,21 +1,27 @@
 # -TLemRunHeader library ------------------------------------------------------
 
 #--- generate necessary dictionaries ------------------------------------------
-set(TLEMRUNHEADER_INC ${CMAKE_SOURCE_DIR}/src/external/TLemRunHeader)
-set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 root_generate_dictionary(
   TLemRunHeaderDict 
-  -I${TLEMRUNHEADER_INC} -I${PREFIX_INC} TLemRunHeader.h 
+  TLemRunHeader.h 
+  OPTIONS
+    -I${CMAKE_CURRENT_SOURCE_DIR} 
+    -inlineInputHeader
   LINKDEF TLemRunHeaderLinkDef.h
-  OPTIONS -inlineInputHeader
   MODULE TLemRunHeader
 )
 root_generate_dictionary(
   TLemStatsDict 
-  -I${TLEMRUNHEADER_INC} -I${PREFIX_INC} TLemStats.h 
+  TLemStats.h 
+  OPTIONS 
+    -I${CMAKE_CURRENT_SOURCE_DIR} 
+    -inlineInputHeader
   LINKDEF TLemStatsLinkDef.h
-  OPTIONS -inlineInputHeader
   MODULE TLemStats 
 )
 

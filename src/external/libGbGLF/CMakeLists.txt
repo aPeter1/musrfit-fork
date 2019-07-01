@@ -2,18 +2,20 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
-set(GBGLF_INC ${CMAKE_SOURCE_DIR}/src/external/libGbGLF)
-set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 root_generate_dictionary(
   PGbGLFDict 
-  -I${GBGLF_INC} 
-  -I${MUSRFIT_INC}
-  -I${CMAKE_CURRENT_SOURCE_DIR}
-  -I${PREFIX_INC} 
   PGbGLF.h 
+  OPTIONS
+    -I${MUSRFIT_INC}
+    -I${CMAKE_CURRENT_SOURCE_DIR}
+    -inlineInputHeader
   LINKDEF PGbGLFLinkDef.h
-  OPTIONS -inlineInputHeader
   MODULE PGbGLF
 )
 

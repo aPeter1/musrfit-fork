@@ -2,41 +2,54 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
-set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${MUSRFIT_INC})
 
 root_generate_dictionary(
   PFourierCanvasDict 
-  -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} PFourierCanvas.h 
+  PFourierCanvas.h 
+  OPTIONS 
+    -I${MUSRFIT_REL_INC} -I${FFTW3_INCLUDE_DIR}
+    -inlineInputHeader
   LINKDEF ${MUSRFIT_INC}/PFourierCanvasLinkDef.h
-  OPTIONS -inlineInputHeader
   MODULE PFourierCanvas
 )
 root_generate_dictionary(
-  PMusrCanvasDict 
-  -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} PMusrCanvas.h 
+  PMusrCanvasDict
+  PMusrCanvas.h  
   LINKDEF ${MUSRFIT_INC}/PMusrCanvasLinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS 
+    -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC}
+    -inlineInputHeader
   MODULE PMusrCanvas
 )
 root_generate_dictionary(
   PMusrT0Dict 
-  -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} PMusrT0.h 
+  PMusrT0.h
   LINKDEF ${MUSRFIT_INC}/PMusrT0LinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS 
+    -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC}
+    -inlineInputHeader
   MODULE PMusrT0
 )
 root_generate_dictionary(
   PStartupHandlerDict 
-  -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} PStartupHandler.h 
+  PStartupHandler.h 
   LINKDEF ${MUSRFIT_INC}/PStartupHandlerLinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS 
+    -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC}
+    -inlineInputHeader
   MODULE PStartupHandler
 )
 root_generate_dictionary(
-  PUserFcnBaseDict 
-  -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} PUserFcnBase.h 
+  PUserFcnBaseDict
+  PUserFcnBase.h  
   LINKDEF ${MUSRFIT_INC}/PUserFcnBaseLinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS
+    -inlineInputHeader
+    -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC}
   MODULE PUserFcnBase
 )
 

@@ -3,46 +3,47 @@
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 set(BMW_TOOLS_INC ${CMAKE_SOURCE_DIR}/src/external/BMWtools)
-set(POFB_INC ${CMAKE_SOURCE_DIR}/src/external/libFitPofB/include)
-set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+set(FIT_P_OF_B_INC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${FIT_P_OF_B_INC})
 
 root_generate_dictionary(
   TLondon1DDict 
-  -I${FFTW3_INCLUDE_DIR} 
-  -I${MUSRFIT_INC}
-  -I${BMW_TOOLS_INC}
-  -I${POFB_INC}
-  -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
-  -I${PREFIX_INC}
   TLondon1D.h 
-  LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/TLondon1DLinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS
+    -I${FFTW3_INCLUDE_DIR} 
+    -I${MUSRFIT_INC}
+    -I${BMW_TOOLS_INC}
+    -I${FIT_P_OF_B_INC}
+    -inlineInputHeader
+  LINKDEF ${FIT_P_OF_B_INC}/TLondon1DLinkDef.h
   MODULE TLondon1D
 )
 root_generate_dictionary(
   TVortexDict 
-  -I${FFTW3_INCLUDE_DIR} 
-  -I${MUSRFIT_INC}
-  -I${BMW_TOOLS_INC}
-  -I${POFB_INC}
-  -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
-  -I${PREFIX_INC}
   TVortex.h 
-  LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/TVortexLinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS 
+    -I${FFTW3_INCLUDE_DIR} 
+    -I${MUSRFIT_INC}
+    -I${BMW_TOOLS_INC}
+    -I${FIT_P_OF_B_INC}
+    -inlineInputHeader
+  LINKDEF ${FIT_P_OF_B_INC}/TVortexLinkDef.h
   MODULE TVortex
 )
 root_generate_dictionary(
   TSkewedGssDict 
-  -I${FFTW3_INCLUDE_DIR} 
-  -I${MUSRFIT_INC}
-  -I${BMW_TOOLS_INC}
-  -I${POFB_INC}
-  -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
-  -I${PREFIX_INC}
   TSkewedGss.h 
-  LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/TSkewedGssLinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS 
+    -I${FFTW3_INCLUDE_DIR} 
+    -I${MUSRFIT_INC}
+    -I${BMW_TOOLS_INC}
+    -I${POFB_INC}
+    -I${FIT_P_OF_B_INC}
+    -inlineInputHeader
+  LINKDEF ${FIT_P_OF_B_INC}/TSkewedGssLinkDef.h
   MODULE TSkewedGss
 )
 

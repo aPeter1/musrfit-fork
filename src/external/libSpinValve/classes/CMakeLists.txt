@@ -2,26 +2,30 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
-set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+set(SPIN_VALVE_INC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${SPIN_VALVE_INC})
 
 root_generate_dictionary(
   PSkewedLorentzianDict 
-  -I${FFTW3_INCLUDE_DIR} 
-  -I${MUSRFIT_INC}
-  -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
-  -I${PREFIX_INC}
   PSkewedLorentzian.h 
-  LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PSkewedLorentzianLinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS 
+    -I${FFTW3_INCLUDE_DIR} 
+    -I${MUSRFIT_INC}
+    -I${SPIN_VALVE_INC}
+    -inlineInputHeader
+  LINKDEF ${SPIN_VALVE_INC}/PSkewedLorentzianLinkDef.h
   MODULE PSkewedLorentzian
 )
 root_generate_dictionary(
   PStartupHandler_SVDict 
-  -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
-  -I${PREFIX_INC}
   PStartupHandler_SV.h
-  LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PStartupHandler_SVLinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS 
+    -I${SPIN_VALVE_INC}
+    -inlineInputHeader
+  LINKDEF ${SPIN_VALVE_INC}/PStartupHandler_SVLinkDef.h
   MODULE PStartupHandler_SV
 )
 
