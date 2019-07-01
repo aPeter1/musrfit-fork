@@ -11,7 +11,8 @@ root_generate_dictionary(
   PFourierCanvasDict 
   PFourierCanvas.h 
   OPTIONS 
-    -I${MUSRFIT_REL_INC} -I${FFTW3_INCLUDE_DIR}
+    -I${MUSRFIT_INC} 
+    -I${FFTW3_INCLUDE_DIR}
     -inlineInputHeader
   LINKDEF ${MUSRFIT_INC}/PFourierCanvasLinkDef.h
   MODULE PFourierCanvas
