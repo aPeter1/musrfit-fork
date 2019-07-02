@@ -5,13 +5,19 @@ add_subdirectory(libLineProfile)
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
-set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 root_generate_dictionary(
   TBNMRDict 
-  -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC} -I${PREFIX_INC} TBNMR.h 
+  TBNMR.h 
+  OPTIONS 
+    -I${FFTW3_INCLUDE_DIR} 
+    -I${MUSRFIT_INC}
+    -inlineInputHeader
   LINKDEF TBNMRLinkDef.h
-  OPTIONS -inlineInputHeader
   MODULE TBNMR
 )
 

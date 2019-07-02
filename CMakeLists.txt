@@ -1,7 +1,7 @@
 # - musrfit 
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.9)
 
-project(musrfit VERSION 1.5.0 LANGUAGES C CXX)
+project(musrfit VERSION 1.5.1 LANGUAGES C CXX)
 
 #--- musrfit specific options -------------------------------------------------
 option(nexus "build optional NeXus support. Needed for ISIS" OFF)
@@ -67,7 +67,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 find_package(Git REQUIRED)
 
 #--- check for ROOT -----------------------------------------------------------
-find_package(ROOT 6.06 REQUIRED COMPONENTS Gui MathMore Minuit2 XMLParser)
+find_package(ROOT 6.18 REQUIRED COMPONENTS Gui MathMore Minuit2 XMLParser)
 if (ROOT_mathmore_FOUND)
   execute_process(COMMAND root-config --bindir OUTPUT_VARIABLE ROOT_BINDIR)
   string(STRIP ${ROOT_BINDIR} ROOT_BINDIR)

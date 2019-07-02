@@ -3,28 +3,31 @@
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 set(NONLOCAL_INC ${CMAKE_SOURCE_DIR}/src/external/Nonlocal)
-set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${MUSRFIT_INC} ${NONLOCAL_INC})
 
 root_generate_dictionary(
   PNL_PippardFitterDict 
-  -I${FFTW3_INCLUDE_DIR} 
-  -I${MUSRFIT_INC} 
-  -I${NONLOCAL_INC} 
-  -I${CMAKE_CURRENT_SOURCE_DIR}
-  -I${PREFIX_INC} 
   PNL_PippardFitter.h 
+  OPTIONS
+    -I${FFTW3_INCLUDE_DIR} 
+    -I${MUSRFIT_INC} 
+    -I${NONLOCAL_INC} 
+    -I${CMAKE_CURRENT_SOURCE_DIR}
+    -inlineInputHeader
   LINKDEF PNL_PippardFitterLinkDef.h
-  OPTIONS -inlineInputHeader
   MODULE PNL_PippardFitter
 )
 root_generate_dictionary(
   PNL_StartupHandlerDict 
-  -I${NONLOCAL_INC} 
-  -I${CMAKE_CURRENT_SOURCE_DIR}
-  -I${PREFIX_INC} 
   PNL_StartupHandler.h 
+  OPTIONS 
+    -I${NONLOCAL_INC} 
+    -I${CMAKE_CURRENT_SOURCE_DIR}
+    -inlineInputHeader
   LINKDEF PNL_StartupHandlerLinkDef.h
-  OPTIONS -inlineInputHeader
   MODULE PNL_StartupHandler
 )
 

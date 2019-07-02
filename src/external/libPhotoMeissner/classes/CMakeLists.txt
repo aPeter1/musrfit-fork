@@ -2,29 +2,33 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
-set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+set(PHOTO_MEISSNER_INC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${PHOTO_MEISSNER_INC})
 
 root_generate_dictionary(
   PPhotoMeissnerDict
-  -I${FFTW3_INCLUDE_DIR} 
-  -I${GSL_INCLUDE_DIRS} 
-  -I${ROOT_INCLUDE_DIRS}
-  -I${MUSRFIT_INC}
-  -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
-  -I${PREFIX_INC}
   PPhotoMeissner.h 
-  LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PPhotoMeissnerLinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS 
+    -I${FFTW3_INCLUDE_DIR} 
+    -I${GSL_INCLUDE_DIRS} 
+    -I${ROOT_INCLUDE_DIRS}
+    -I${MUSRFIT_INC}
+    -I${PHOTO_MEISSNER_INC}
+    -inlineInputHeader
+  LINKDEF ${PHOTO_MEISSNER_INC}/PPhotoMeissnerLinkDef.h
   MODULE PPhotoMeissner
 )
 root_generate_dictionary(
   PStartupHandler_PMDict 
-  -I${MUSRFIT_INC}
-  -I${CMAKE_CURRENT_SOURCE_DIR}/../include 
-  -I${PREFIX_INC}
   PStartupHandler_PM.h 
-  LINKDEF ${CMAKE_CURRENT_SOURCE_DIR}/../include/PStartupHandler_PMLinkDef.h
-  OPTIONS -inlineInputHeader
+  OPTIONS
+    -I${MUSRFIT_INC}
+    -I${PHOTO_MEISSNER_INC}
+    -inlineInputHeader
+  LINKDEF ${PHOTO_MEISSNER_INC}/PStartupHandler_PMLinkDef.h
   MODULE PStartupHandler_PM
 )
 

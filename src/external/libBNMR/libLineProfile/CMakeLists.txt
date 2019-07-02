@@ -2,12 +2,17 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 root_generate_dictionary(
   LineProfileDict 
-  -I${FFTW3_INCLUDE_DIR} 
-  -I${MUSRFIT_INC}
   LineProfile.h 
+  OPTIONS
+    -I${FFTW3_INCLUDE_DIR} 
+    -I${MUSRFIT_INC}
   LINKDEF LineProfileLinkDef.h
   MODULE LineProfile
 )

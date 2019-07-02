@@ -24,28 +24,30 @@ set(SOURCE
 set ( PLOT_DIR
   ${CMAKE_CURRENT_BINARY_DIR}
 )
-
-set(PREFIX_INC ${CMAKE_INSTALL_PREFIX}/include)
+# ROOT requires that the dictonary header files are found at configuration time.
+# Hence, target_include_directories cannot be used here because, targets are 
+# setup only afterwards.
+include_directories(${PLOT_DIR})
 
 #--- generate necessary dictionaries ------------------------------------------
 root_generate_dictionary(
   PMuppCanvasDict 
-  -I${CMAKE_CURRENT_SOURCE_DIR}
-  -I${CMAKE_CURRENT_SOURCE_DIR}/..
-  -I${PREFIX_INC}
   PMuppCanvas.h
+  OPTIONS 
+    -I${CMAKE_CURRENT_SOURCE_DIR}
+    -I${CMAKE_CURRENT_SOURCE_DIR}/..
+    -inlineInputHeader
   LINKDEF PMuppCanvasLinkDef.h
-  OPTIONS -inlineInputHeader
   MODULE PMuppCanvas
 )
 root_generate_dictionary(
   PMuppStartupHandlerDict 
-  -I${CMAKE_CURRENT_SOURCE_DIR}
-  -I${CMAKE_CURRENT_SOURCE_DIR}/..
-  -I${PREFIX_INC}
   PMuppStartupHandler.h
+  OPTIONS 
+    -I${CMAKE_CURRENT_SOURCE_DIR}
+    -I${CMAKE_CURRENT_SOURCE_DIR}/..
+    -inlineInputHeader
   LINKDEF PMuppStartupHandlerLinkDef.h
-  OPTIONS -inlineInputHeader
   MODULE PMuppStartupHandler
 )
 
