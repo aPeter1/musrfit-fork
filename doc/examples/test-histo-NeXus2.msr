@@ -54,20 +54,20 @@ SAVE
 
 ###############################################################
 FOURIER
-units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
-fourier_power    10
+units            Gauss   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
+fourier_power    11
 apodization      STRONG  # NONE, WEAK, MEDIUM, STRONG
-plot             REAL    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+plot             REAL    # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL
 range            0    200
-phase            par2
+phase            parR2 par11
 
 ###############################################################
 PLOT 0   (single histo plot)
 lifetimecorrection
-runs     1   2   
+runs        1   2
 range    0   14   -0.22   0.22
 view_packing 2
 
 ###############################################################
-STATISTIC --- 2013-11-12 10:25:57
+STATISTIC --- 2019-03-12 18:08:05
   maxLH = 2585.1, NDF = 1696, maxLH/NDF = 1.524236
