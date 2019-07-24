@@ -1064,7 +1064,7 @@ In order to describe the operations needed for fitting and plotting, quite some 
 .. _msr-alpha-beta:
 
 **alpha, beta** (fit type 2, 3, 5)
-  These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as :math:`\alpha = N_{0,b}/N_{0,f}` and :math:`\beta = A_{0,b}/A_{0,f}`. If the parameters are not specified in the :ref:`RUN block <msr-run-block>`, for each one the value of 1 is assumed (for fittype 5 alpha is estimated from the ration of sum of Bp+Bm and Fp+Fm). Example for alpha with fit parameter number 1:
+  These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as :math:`\alpha = N_{0,b}/N_{0,f}` and :math:`\beta = A_{0,b}/A_{0,f}`. If the parameters are not specified in the :ref:`RUN block <msr-run-block>`, for each one the value of 1 is assumed (for fittype 5, alpha is estimated from the ratio of :math:`\sum_i \left( N_{\mathrm{bp}}(i)+N_{\mathrm{bm}}(i) \right)` and :math:`\sum_i \left( N_{\mathrm{fp}}(i)+N_{\mathrm{fm}}(i) \right)`). Example for alpha with fit parameter number 1:
 
   ::
 
@@ -1868,12 +1868,12 @@ Since MuMinus is quite generic, the full functional depends has to be written in
 beta-NMR Asymmetry Fit (fit type 5)
 +++++++++++++++++++++++++++++++++++
 
-For a beta-NMR asymmetry fit (fit type 5) four histograms are needed, two for positive and two for negative helicities. These are given by the :ref:`forward <msr-forward-backward>` and :ref:`backward <msr-forward-backward>` keywords 
+Four histograms are needed for a beta-NMR asymmetry fit (fit type 5), two for positive helecity and two for negative. These are given by the :ref:`forward <msr-forward-backward>` and :ref:`backward <msr-forward-backward>` keywords 
 in the :ref:`RUN block <msr-run-block>`. Additionally, the parameters :ref:`alpha <msr-alpha-beta>` and :ref:`beta <msr-alpha-beta>` which relate the detector 
 efficiencies, solid angles and initial asymmetries of the two detectors can be supplied. The constant background for the two histograms is either given by 
 :ref:`background-determined intervals <msr-background-asymmetry>` or specified through :ref:`backgr.fix <msr-backgr.fix>` in the :ref:`RUN-block <msr-run-block>`. 
 
-The experimental asymmetry :math:`a(k)` then is calculated from the four histograms:
+The experimental asymmetry :math:`a(k)` is then calculated from the four histograms:
 
 .. math::
 
@@ -1884,12 +1884,12 @@ with
 
    * :math:`N_{\mathrm{fp}}(k)`: counts in the **forward** histogram channel with positive helicity :math:`k`
    * :math:`N_{\mathrm{bp}}(k)`: counts in the **backward** histogram channel with positive helicity :math:`k`
-   * :math:` B_{\mathrm{fp}}`: constant background in the **forward** histogram with positive helicity (RUN block: :ref:`backgr.fix <msr-backgr.fix>` or :ref:`background <msr-background-asymmetry>`) 
-   * :math:` B_{\mathrm{bp}}`: constant background in the **backward** histogram with positive helicity (RUN block: :ref:`backgr.fix <msr-backgr.fix>` or :ref:`background <msr-background-asymmetry>`) 
+   * :math:`B_{\mathrm{fp}}`: constant background in the **forward** histogram with positive helicity (RUN block: :ref:`backgr.fix <msr-backgr.fix>` or :ref:`background <msr-background-asymmetry>`) 
+   * :math:`B_{\mathrm{bp}}`: constant background in the **backward** histogram with positive helicity (RUN block: :ref:`backgr.fix <msr-backgr.fix>` or :ref:`background <msr-background-asymmetry>`) 
    * :math:`N_{\mathrm{fm}}(k)`: counts in the **forward** histogram channel with negative helicity :math:`k`
    * :math:`N_{\mathrm{bm}}(k)`: counts in the **backward** histogram channel with negative helicity :math:`k`
-   * :math:` B_{\mathrm{fm}}`: constant background in the **forward** histogram with negative helicity (RUN block: :ref:`backgr.fix <msr-backgr.fix>` or :ref:`background <msr-background-asymmetry>`) 
-   * :math:` B_{\mathrm{bm}}`: constant background in the **backward** histogram with negative helicity (RUN block: :ref:`backgr.fix <msr-backgr.fix>` or :ref:`background <msr-background-asymmetry>`) 
+   * :math:`B_{\mathrm{fm}}`: constant background in the **forward** histogram with negative helicity (RUN block: :ref:`backgr.fix <msr-backgr.fix>` or :ref:`background <msr-background-asymmetry>`) 
+   * :math:`B_{\mathrm{bm}}`: constant background in the **backward** histogram with negative helicity (RUN block: :ref:`backgr.fix <msr-backgr.fix>` or :ref:`background <msr-background-asymmetry>`) 
    
 This theoretical asymmetry :math:`a(t)` is used to fit the function   
 
@@ -1907,7 +1907,8 @@ For the graphical representation in plot type 5 the equation above is rearranged
 
 .. math::
 
-    A(t)=\frac{(\alpha -1)+(\alpha +1)a(t)}{(\alpha\beta +1)+(\alpha\beta -1)a(t)}-\frac{(\alpha +1)a(t)-(\alpha -1)}{(\alpha\beta +1)+(1-\alpha\beta)a(t)}=\frac{\alpha\left[N_{\mathrm{fp}}(t)-B_{\mathrm{fp}}\right]-\left[N_{\mathrm{bp}}(t)-B_{\mathrm{bp}}\right]}{\alpha\beta\left[N_{\mathrm{fp}}(t)-B_{\mathrm{fp}}\right]+\left[N_{\mathrm{bp}}(t)-B_{\mathrm{bp}}\right]} -\frac{\alpha\left[N_{\mathrm{fm}}(t)-B_{\mathrm{fm}}\right]-\left[N_{\mathrm{bm}}(t)-B_{\mathrm{bm}}\right]}{\alpha\beta\left[N_{\mathrm{fm}}(t)-B_{\mathrm{fm}}\right]+\left[N_{\mathrm{bm}}(t)-B_{\mathrm{bm}}\right]}
+    A(t) &= \frac{(\alpha -1)+(\alpha +1)a(t)}{(\alpha\beta+1)+(\alpha\beta -1)a(t)}-\frac{(\alpha +1)a(t)-(\alpha-1)}{(\alpha\beta +1)+(1-\alpha\beta)a(t)} \\
+    &= \frac{\alpha\left[N_{\mathrm{fp}}(t)-B_{\mathrm{fp}}\right]-\left[N_{\mathrm{bp}}(t)-B_{\mathrm{bp}}\right]}{\alpha\beta\left[N_{\mathrm{fp}}(t)-B_{\mathrm{fp}}\right]+\left[N_{\mathrm{bp}}(t)-B_{\mathrm{bp}}\right]} -\frac{\alpha\left[N_{\mathrm{fm}}(t)-B_{\mathrm{fm}}\right]-\left[N_{\mathrm{bm}}(t)-B_{\mathrm{bm}}\right]}{\alpha\beta\left[N_{\mathrm{fm}}(t)-B_{\mathrm{fm}}\right]+\left[N_{\mathrm{bm}}(t)-B_{\mathrm{bm}}\right]}
     
 and plotted together with the function given in the THEORY block.     
 
