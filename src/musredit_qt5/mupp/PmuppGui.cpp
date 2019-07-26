@@ -369,6 +369,10 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
 
   fCentralWidget->setLayout(fBoxLayout_Main);
   setCentralWidget(fCentralWidget);
+
+  // in case there is no db/dat file list given open the db/dat file open menu automatically.
+  if (fln.size() == 0)
+    fileOpen();
 }
 
 //----------------------------------------------------------------------------------------------------
