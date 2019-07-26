@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Setting up musrfit on Different Platforms &mdash; musrfit 1.5.0 documentation</title>
+    <title>Setting up musrfit on Different Platforms &mdash; musrfit 1.5.1 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.5.0',
+        VERSION:     '1.5.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="musrfit 1.5.0 documentation" href="index.html" />
+    <link rel="top" title="musrfit 1.5.1 documentation" href="index.html" />
     <link rel="next" title="Setting up musrfit / DKS: High Speed Fitting with GPU’s" href="setup-dks.html" />
     <link rel="prev" title="Documentation of user libs (user functions)" href="user-libs.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="user-libs.html" title="Documentation of user libs (user functions)"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">musrfit 1.5.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.5.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -96,7 +96,8 @@ their header packages:</p>
 </dl>
 <dl class="docutils" id="index-9">
 <dt><strong>minixml</strong></dt>
-<dd>A small <tt class="docutils literal"><span class="pre">XML</span></tt> library that can be used to read and write <tt class="docutils literal"><span class="pre">XML</span></tt> and <tt class="docutils literal"><span class="pre">XML</span></tt>-like data files. <em>Required version ≥ 2.2</em> (see <a class="reference external" href="http://www.minixml.org/">minixml</a>).</dd>
+<dd>A small <tt class="docutils literal"><span class="pre">XML</span></tt> library that can be used to read and write <tt class="docutils literal"><span class="pre">XML</span></tt> and <tt class="docutils literal"><span class="pre">XML</span></tt>-like data files. <em>Required version ≥ 2.2</em> (see <a class="reference external" href="http://www.minixml.org/">minixml</a>).
+Currently the <tt class="docutils literal"><span class="pre">MXML</span></tt> support in <tt class="docutils literal"><span class="pre">NeXus</span></tt> is broken and hence you will <strong>not</strong> need to install <tt class="docutils literal"><span class="pre">minixml</span></tt> for the time being.</dd>
 </dl>
 <dl class="docutils" id="index-10">
 <dt><strong>NeXus</strong></dt>
@@ -177,24 +178,21 @@ the source code from the corresponding website, or to clone the git repo. If you
 <span id="index-15"></span><h4>Installation of NeXus requirements (optional)<a class="headerlink" href="#installation-of-nexus-requirements-optional" title="Permalink to this headline">¶</a></h4>
 <p><em>Only</em> if <tt class="docutils literal"><span class="pre">musrfit</span></tt> should support reading/writing data files in the <tt class="docutils literal"><span class="pre">NeXus</span></tt> format the further required
 software has to be set up. The required libraries and header files could either be available through the user&#8217;s
-GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. The necessary
-packages to build <tt class="docutils literal"><span class="pre">NeXus</span></tt> are <tt class="docutils literal"><span class="pre">MXML</span></tt>, (<tt class="docutils literal"><span class="pre">HDF4</span></tt>), and <tt class="docutils literal"><span class="pre">HDF5</span></tt>. This means, for a rpm-package based distro try something like:</p>
+GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. In principle
+NeXus should support <tt class="docutils literal"><span class="pre">MXML</span></tt>, <tt class="docutils literal"><span class="pre">HDF4</span></tt>, and <tt class="docutils literal"><span class="pre">HDF5</span></tt>. At the time of this writing, the <tt class="docutils literal"><span class="pre">MXML</span></tt> support in the
+NeXus project is broken, and <tt class="docutils literal"><span class="pre">HDF4</span></tt> is outdated on most platforms, hence currently only the <tt class="docutils literal"><span class="pre">HDF5</span></tt> binding is
+used. Hence, the necessary package to build <tt class="docutils literal"><span class="pre">NeXus</span></tt> is <tt class="docutils literal"><span class="pre">HDF5</span></tt>. This means, for a rpm-package based distro try something like:</p>
 <blockquote>
-<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ yum install mxml-devel hdf-devel hdf5-devel
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ yum install hdf5-devel
 </pre></div>
 </div>
 </div></blockquote>
 <p>and on a deb-package based distro try something like:</p>
 <blockquote>
-<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install libmxml-dev libhdf4-dev libhdf5-dev
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install libhdf5-dev
 </pre></div>
 </div>
 </div></blockquote>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last"><tt class="docutils literal"><span class="pre">HDF4</span></tt> support within <tt class="docutils literal"><span class="pre">NeXus</span></tt> will be dropped by <tt class="docutils literal"><span class="pre">musrfit</span></tt> in the near future. If you <em>not</em> urgently need
-to read old <tt class="docutils literal"><span class="pre">ISIS</span> <span class="pre">NeXus</span></tt> files, you safely can drop it.</p>
-</div>
 <p><strong>Only NeXus Version ≥ 4.4 is support!</strong></p>
 <p>Even though there might exist binary packages for the <tt class="docutils literal"><span class="pre">NeXus</span></tt> library, it is best to build and
 install it directly from the source code which can be found <a class="reference external" href="https://github.com/nexusformat/code">here</a>.</p>
@@ -208,10 +206,7 @@ $ git clone https://github.com/nexusformat/code.git
 $ <span class="c1"># next we will build NeXus out-of-source</span>
 $ mkdir build
 $ <span class="nb">cd</span> build
-$ <span class="c1"># The next line only if HDF4 support is needed</span>
-$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">1</span> -DENABLE_MXML<span class="o">=</span><span class="m">1</span> ../code
-$ <span class="c1"># The next line if HDF4 support is NOT needed</span>
-$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_MXML<span class="o">=</span><span class="m">1</span> ../code
+$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">0</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span> ../code
 $ cmake --build ./ --clean-first
 $ <span class="c1"># make install needs either to be carried out as root or sudo depending on your linux flavour.</span>
 $ sudo make install
@@ -500,28 +495,13 @@ the later handling will be easier if a symbolic link to these files is created n
 to be set up. Under <tt class="docutils literal"><span class="pre">Cygwin</span></tt> of all the required libraries only <tt class="docutils literal"><span class="pre">HDF5</span></tt> is available. The packages <tt class="docutils literal"><span class="pre">hdf5</span></tt> and
 <tt class="docutils literal"><span class="pre">libhdf5-devel</span></tt> can be installed through the <tt class="docutils literal"><span class="pre">Cygwin</span></tt> setup. One should also make sure that <tt class="docutils literal"><span class="pre">bison</span></tt>, <tt class="docutils literal"><span class="pre">flex</span></tt>
 and a package containing <tt class="docutils literal"><span class="pre">/usr/lib/librpc.a</span></tt> (<em>e.g.</em> <tt class="docutils literal"><span class="pre">sunrpc</span> <span class="pre">=</span> <span class="pre">4.0-3</span></tt>, but <em>not</em> <tt class="docutils literal"><span class="pre">sunrpc</span> <span class="pre">=</span> <span class="pre">4.0-4</span></tt>) are installed.</p>
-<p>All other libraries have to be built from the sources. The following lines will track the installation of <tt class="docutils literal"><span class="pre">JPEG</span> <span class="pre">6b</span></tt>,
-<tt class="docutils literal"><span class="pre">MXML</span> <span class="pre">2.9</span></tt>, <tt class="docutils literal"><span class="pre">HDF</span> <span class="pre">4.2.7-patch1</span></tt>, and <tt class="docutils literal"><span class="pre">NeXus</span> <span class="pre">4.3.2</span></tt>. The version numbers and source-code locations might of
-course change with time but should be easily adjustable.</p>
-<p><em>Only</em> <tt class="docutils literal"><span class="pre">NeXus</span></tt> version ≥ 4.4 is support!</p>
+<p><strong>Only NeXus Version ≥ 4.4 is support!</strong></p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span>
 $ mkdir nexus
 $ <span class="nb">cd</span> nexus
 $ curl http://www.hdfgroup.org/ftp/lib-external/jpeg/src/jpegsrc.v6b.tar.gz -G <span class="p">|</span> tar xz
 $ <span class="nb">cd</span> jpeg-6b
 $ ./configure --prefix<span class="o">=</span>/usr/local --enable-static
-$ make
-$ make install
-$ <span class="nb">cd</span> ..
-$ curl www.msweet.org/files/project3/mxml-2.9.tar.gz -G <span class="p">|</span> tar xz
-$ <span class="nb">cd</span> mxml-2.9
-$ ./configure --prefix<span class="o">=</span>/usr/local --enable-static
-$ make
-$ make install
-$ <span class="nb">cd</span> ..
-$ curl http://www.hdfgroup.org/ftp/HDF/HDF_Current/src/hdf-4.2.7-patch1.tar.gz -G <span class="p">|</span> tar xz
-$ <span class="nb">cd</span> hdf-4.2.7-patch1
-$ ./configure --prefix<span class="o">=</span>/usr/local --enable-static --disable-fortran --with-jpeg<span class="o">=</span>/usr/local
 $ make
 $ make install
 $ <span class="nb">cd</span> ..
@@ -533,7 +513,7 @@ $ git clone https://github.com/nexusformat/code.git
 $ <span class="c1"># next we will build NeXus out-of-source</span>
 $ mkdir build
 $ <span class="nb">cd</span> build
-$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">1</span> -DENABLE_MXML<span class="o">=</span><span class="m">1</span> ../code
+$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">0</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span> ../code
 $ make
 $ make install
 </pre></div>
@@ -770,20 +750,12 @@ please change over to <tt class="docutils literal"><span class="pre">musredit</s
 <div class="section" id="index-28">
 <span id="id14"></span><h4>Installation of NeXus requirements (optional)<a class="headerlink" href="#index-28" title="Permalink to this headline">¶</a></h4>
 <p><em>Only</em> if <tt class="docutils literal"><span class="pre">musrfit</span></tt> should support reading data files in the <tt class="docutils literal"><span class="pre">NeXus</span></tt> format the further required packages are set up:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port -v install hdf4 hdf5
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port -v install hdf5
 </pre></div>
 </div>
-<p>Unfortunately, the <tt class="docutils literal"><span class="pre">minixml</span></tt> and <tt class="docutils literal"><span class="pre">NeXus</span></tt> libraries have to be compiled and installed directly from the source code.
-Given the respective version numbers of 2.9 and 4.4.2 (which are subject to change with time.
-Only <tt class="docutils literal"><span class="pre">NeXus</span></tt> Version ≥ 4.4 is support!) this can be achieved for example by:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="c1"># get and instal Mini-XML</span>
-$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Applications
-$ git clone https://github.com/michaelrsweet/mxml.git
-$ <span class="nb">cd</span> mxml
-$ ./configure --prefix<span class="o">=</span>/usr/local
-$ make
-$ sudo make install
-$ <span class="c1"># get and install NeXus</span>
+<p><strong>Only NeXus Version ≥ 4.4 is support!</strong></p>
+<p>To get things compiled do:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="c1"># get and install NeXus</span>
 $ <span class="nb">cd</span> <span class="nv">$HOME</span>/Applications
 $ <span class="c1"># get the source code from the master repository</span>
 $ git clone https://github.com/nexusformat/code.git nexus/code
@@ -791,7 +763,7 @@ $ <span class="c1"># next we will build NeXus out-of-source</span>
 $ <span class="nb">cd</span> nexus
 $ mkdir build
 $ <span class="nb">cd</span> build
-$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">1</span> -DENABLE_MXML<span class="o">=</span><span class="m">1</span> ../code
+$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">0</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span> ../code
 $ make
 $ sudo make install
 </pre></div>
@@ -956,24 +928,17 @@ packages can be installed through Fink (check for the most recent versions):</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span>libjpeg hdf hdf5-cpp11 hdf5-cpp11-shlibs
 </pre></div>
 </div>
-<p>Unfortunately, the <tt class="docutils literal"><span class="pre">minixml</span></tt> and <tt class="docutils literal"><span class="pre">NeXus</span></tt> libraries have to be compiled and installed directly from
-the source code. Given the respective version numbers of 2.9 and 4.3.2 (which are subject to change with time)
+<p>Unfortunately, the <tt class="docutils literal"><span class="pre">NeXus</span></tt> libraries have to be compiled and installed directly from
+the source code. Given the respective version number 4.4 (which are subject to change with time)
 this can be achieved for example by:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="c1"># first build Mini-XML</span>
-$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Applications
-$ git clone https://github.com/michaelrsweet/mxml.git
-$ <span class="nb">cd</span> mxml
-$ ./configure --prefix<span class="o">=</span>/usr/local
-$ make
-$ sudo make install
-$ <span class="c1"># second build NeXus</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="c1"># build NeXus</span>
 $ <span class="nb">cd</span> ..
 $ git clone https://github.com/nexusformat/code.git nexus/code
 $ <span class="nb">cd</span> nexus
 $ <span class="c1"># build NeXus out-of-source</span>
 $ mkdir build
 $ <span class="nb">cd</span> build
-$ cmake ../code -DENABLE_HDF4<span class="o">=</span><span class="m">1</span> -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_MXML<span class="o">=</span><span class="m">1</span>
+$ cmake ../code -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">0</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span>
 $ cmake --build ./ --clean-first -- -j8
 $ sudo make install
 </pre></div>
@@ -1315,12 +1280,12 @@ $ musrview test-histo-ROOT-NPP.msr
         <li class="right" >
           <a href="user-libs.html" title="Documentation of user libs (user functions)"
              >previous</a> |</li>
-        <li><a href="index.html">musrfit 1.5.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.5.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2019, Andreas Suter.
-      Last updated on May 15, 2019.
+      Last updated on Jul 24, 2019.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>

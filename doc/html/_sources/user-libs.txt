@@ -449,7 +449,7 @@ where :math:`\tau_{\mathrm{Li}}=1.21`\ s is the :math:`^8`\ Li lifetime.
 
 Functions
 ^^^^^^^^^^^^
-The ``libLineProfile`` library currently contains the following functions:
+The ``libBNMR`` library currently contains the following functions:
 
 
 
@@ -464,10 +464,10 @@ The ``libLineProfile`` library currently contains the following functions:
 
 The parameters are:
 
-#. pulse length :math:`t_0` (ms)
-#. relaxation rate :math:`\sigma` (ms\ :math:`^{-1}`\ )
+#. pulse length :math:`t_0` (s)
+#. relaxation rate :math:`\lambda` (s\ :math:`^{-1}`\ )
 
-This function implements :math:`f(t)=e^{-\sigma t}`.
+This function implements :math:`f(t)=e^{-\lambda t}`.
 
 .. index:: SExpRlx
 
@@ -479,11 +479,11 @@ This function implements :math:`f(t)=e^{-\sigma t}`.
 
 The parameters are:
 
-#. pulse length :math:`t_0` (ms)
-#. relaxation rate :math:`\sigma` (ms\ :math:`^{-1}`\ )
+#. pulse length :math:`t_0` (s)
+#. relaxation rate :math:`\lambda` (s\ :math:`^{-1}`\ )
 #. stretching exponent :math:`\beta`
 
-This function implements :math:`f(t)=e^{-(\sigma t)^{\beta}}`.
+This function implements :math:`f(t)=e^{-(\lambda t)^{\beta}}`.
 
 
   

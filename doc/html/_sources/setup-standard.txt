@@ -67,7 +67,8 @@ Additionally, *only* if ``musrfit`` should support reading of data files in the 
 .. index:: minixml
 
 **minixml**
-  A small ``XML`` library that can be used to read and write ``XML`` and ``XML``-like data files. *Required version ≥ 2.2* (see `minixml <http://www.minixml.org/>`_).   
+  A small ``XML`` library that can be used to read and write ``XML`` and ``XML``-like data files. *Required version ≥ 2.2* (see `minixml <http://www.minixml.org/>`_).
+  Currently the ``MXML`` support in ``NeXus`` is broken and hence you will **not** need to install ``minixml`` for the time being. 
 
 .. index:: nexus
 
@@ -172,23 +173,20 @@ Installation of NeXus requirements (optional)
 
 *Only* if ``musrfit`` should support reading/writing data files in the ``NeXus`` format the further required 
 software has to be set up. The required libraries and header files could either be available through the user's 
-GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. The necessary
-packages to build ``NeXus`` are ``MXML``, (``HDF4``), and ``HDF5``. This means, for a rpm-package based distro try something like:
+GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. In principle
+NeXus should support ``MXML``, ``HDF4``, and ``HDF5``. At the time of this writing, the ``MXML`` support in the
+NeXus project is broken, and ``HDF4`` is outdated on most platforms, hence currently only the ``HDF5`` binding is
+used. Hence, the necessary package to build ``NeXus`` is ``HDF5``. This means, for a rpm-package based distro try something like:
 
   .. code-block:: bash
   
-    $ yum install mxml-devel hdf-devel hdf5-devel
+    $ yum install hdf5-devel
     
 and on a deb-package based distro try something like:
 
   .. code-block:: bash
   
-    $ apt-get install libmxml-dev libhdf4-dev libhdf5-dev
-
-.. note::
-
-  ``HDF4`` support within ``NeXus`` will be dropped by ``musrfit`` in the near future. If you *not* urgently need 
-  to read old ``ISIS NeXus`` files, you safely can drop it.
+    $ apt-get install libhdf5-dev
 
 **Only NeXus Version ≥ 4.4 is support!**  
 
@@ -208,10 +206,7 @@ A brief instruction how to get ``NeXus`` compiled from source (lines starting wi
   $ # next we will build NeXus out-of-source
   $ mkdir build
   $ cd build
-  $ # The next line only if HDF4 support is needed
-  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=1 -DENABLE_MXML=1 ../code
-  $ # The next line if HDF4 support is NOT needed
-  $ cmake -DENABLE_HDF5=1 -DENABLE_MXML=1 ../code
+  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=0 -DENABLE_MXML=0 ../code
   $ cmake --build ./ --clean-first
   $ # make install needs either to be carried out as root or sudo depending on your linux flavour.
   $ sudo make install
@@ -550,11 +545,7 @@ to be set up. Under ``Cygwin`` of all the required libraries only ``HDF5`` is av
 ``libhdf5-devel`` can be installed through the ``Cygwin`` setup. One should also make sure that ``bison``, ``flex`` 
 and a package containing ``/usr/lib/librpc.a`` (*e.g.* ``sunrpc = 4.0-3``, but *not* ``sunrpc = 4.0-4``) are installed. 
 
-All other libraries have to be built from the sources. The following lines will track the installation of ``JPEG 6b``, 
-``MXML 2.9``, ``HDF 4.2.7-patch1``, and ``NeXus 4.3.2``. The version numbers and source-code locations might of 
-course change with time but should be easily adjustable.
-
-*Only* ``NeXus`` version ≥ 4.4 is support!
+**Only NeXus Version ≥ 4.4 is support!**  
 
 .. code-block:: bash
 
@@ -567,18 +558,6 @@ course change with time but should be easily adjustable.
   $ make
   $ make install
   $ cd ..
-  $ curl www.msweet.org/files/project3/mxml-2.9.tar.gz -G | tar xz
-  $ cd mxml-2.9
-  $ ./configure --prefix=/usr/local --enable-static
-  $ make
-  $ make install
-  $ cd ..
-  $ curl http://www.hdfgroup.org/ftp/HDF/HDF_Current/src/hdf-4.2.7-patch1.tar.gz -G | tar xz
-  $ cd hdf-4.2.7-patch1
-  $ ./configure --prefix=/usr/local --enable-static --disable-fortran --with-jpeg=/usr/local
-  $ make
-  $ make install
-  $ cd ..
   $ # create a directory for the NeXus source code
   $ mkdir nexus
   $ cd nexus
@@ -587,7 +566,7 @@ course change with time but should be easily adjustable.
   $ # next we will build NeXus out-of-source
   $ mkdir build
   $ cd build
-  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=1 -DENABLE_MXML=1 ../code
+  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=0 -DENABLE_MXML=0 ../code
   $ make
   $ make install
 
@@ -876,21 +855,14 @@ Installation of NeXus requirements (optional)
 
 .. code-block:: bash
 
-  $ sudo port -v install hdf4 hdf5
+  $ sudo port -v install hdf5
 
-Unfortunately, the ``minixml`` and ``NeXus`` libraries have to be compiled and installed directly from the source code. 
-Given the respective version numbers of 2.9 and 4.4.2 (which are subject to change with time. 
-Only ``NeXus`` Version ≥ 4.4 is support!) this can be achieved for example by:   
+**Only NeXus Version ≥ 4.4 is support!**  
+
+To get things compiled do:
 
 .. code-block:: bash
 
-  $ # get and instal Mini-XML
-  $ cd $HOME/Applications
-  $ git clone https://github.com/michaelrsweet/mxml.git
-  $ cd mxml
-  $ ./configure --prefix=/usr/local
-  $ make
-  $ sudo make install
   $ # get and install NeXus
   $ cd $HOME/Applications
   $ # get the source code from the master repository
@@ -899,7 +871,7 @@ Only ``NeXus`` Version ≥ 4.4 is support!) this can be achieved for example by:
   $ cd nexus
   $ mkdir build
   $ cd build
-  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=1 -DENABLE_MXML=1 ../code
+  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=0 -DENABLE_MXML=0 ../code
   $ make
   $ sudo make install
   
@@ -1101,27 +1073,20 @@ packages can be installed through Fink (check for the most recent versions):
 
   libjpeg hdf hdf5-cpp11 hdf5-cpp11-shlibs
   
-Unfortunately, the ``minixml`` and ``NeXus`` libraries have to be compiled and installed directly from 
-the source code. Given the respective version numbers of 2.9 and 4.3.2 (which are subject to change with time) 
+Unfortunately, the ``NeXus`` libraries have to be compiled and installed directly from 
+the source code. Given the respective version number 4.4 (which are subject to change with time) 
 this can be achieved for example by:   
 
 .. code-block:: bash
 
-  $ # first build Mini-XML
-  $ cd $HOME/Applications
-  $ git clone https://github.com/michaelrsweet/mxml.git
-  $ cd mxml
-  $ ./configure --prefix=/usr/local
-  $ make
-  $ sudo make install
-  $ # second build NeXus
+  $ # build NeXus
   $ cd ..
   $ git clone https://github.com/nexusformat/code.git nexus/code
   $ cd nexus
   $ # build NeXus out-of-source
   $ mkdir build
   $ cd build
-  $ cmake ../code -DENABLE_HDF4=1 -DENABLE_HDF5=1 -DENABLE_MXML=1
+  $ cmake ../code -DENABLE_HDF5=1 -DENABLE_HDF4=0 -DENABLE_MXML=0
   $ cmake --build ./ --clean-first -- -j8
   $ sudo make install
 
