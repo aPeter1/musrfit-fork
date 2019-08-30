@@ -299,32 +299,36 @@ sub CreateMSRUni {
 	    }
 
 	    $FRANGE_Line = "fit             TINI    TFIN";
-	    $PAC_Line    = "packing         BINNING";
+            $PAC_Line    = "packing         BINNING";
 
-	    $Single_RUN =
-		"$RUN_Line\n$Type_Line\n$Alpha_Line$Hist_Lines\n$T0DataBg$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
+            $Single_RUN =
+                "$RUN_Line\n$Alpha_Line$Hist_Lines\n$T0DataBg$MAP_Line\n";
         
-	    # This is from CreateRUNBlk
-	    #$DEBUG =~s /T0LINE/$T0_Line/;
-	    #$DEBUG =~s /BGLINE/$Bg_Line/;
-	    #$DEBUG =~s /DATALINE/$Data_Line/;
-
-	    # Now add the appropriate values of fit range and packing
-	    my $Range_Min = 8;
-	    my $Range_Max = 0;
-	    my $k         = 0;
+            # Now add the appropriate values of fit range and packing
+            # If there no multiple ranges/packing then simply use GLOBAL block
+            if ($#TiVals == 0) {
+                $GLOBAL_Block = "GLOBAL\n$Type_Line\n$FRANGE_Line\n$PAC_Line\n\n";
+            } else {
+                $GLOBAL_Block = "GLOBAL\n$Type_Line\n\n";
+                $Single_RUN = $Single_RUN."$FRANGE_Line\n$PAC_Line\n";
+            }
+            my $Range_Min = 8;
+            my $Range_Max = 0;
+            my $k         = 0;
 	    foreach my $Ti (@TiVals) {
 		my $Tf        = $TfVals[$k];
 		my $BIN       = $BINVals[$k];
 		$RUN_Block = $RUN_Block . $Single_RUN;
-		$RUN_Block =~ s/TINI/$Ti/g;
-		$RUN_Block =~ s/TFIN/$Tf/g;
-		$RUN_Block =~ s/BINNING/$BIN/g;
-		
-		# For multiple ranges use this
-		if ( $Ti < $Range_Min ) { $Range_Min = $Ti; }
+                $RUN_Block =~ s/TINI/$Ti/g;
+                $RUN_Block =~ s/TFIN/$Tf/g;
+                $RUN_Block =~ s/BINNING/$BIN/g;
+                $GLOBAL_Block =~ s/TINI/$Ti/g;
+                $GLOBAL_Block =~ s/TFIN/$Tf/g;
+                $GLOBAL_Block =~ s/BINNING/$BIN/g;
+                
+                # For multiple ranges use this
+                if ( $Ti < $Range_Min ) { $Range_Min = $Ti; }
 		if ( $Tf > $Range_Max ) { $Range_Max = $Tf; }
-		
 		$RUNS_Line = "$RUNS_Line " . $Range_Order;
 		++$k;
 		++$Range_Order;
@@ -404,17 +408,12 @@ sub CreateMSRUni {
 			    if ($Shared) {
 				$NoBg_Line = "norm            1\n";
 			    }
-			    else {
-				$NoBg_Line = "norm            $PCount\n";
-			    }
-			
-			    # Optional - add lifetime correction for SingleHist fits
-			    if ( $All{"ltc"} eq "y" ) {
-				$NoBg_Line = $NoBg_Line . "lifetimecorrection\n";
-			    }
-			}
-			# If you encounter NBg in the parameters list make sure
-			# to fill this line for the RUN block.
+                            else {
+                                $NoBg_Line = "norm            $PCount\n";
+                            }
+                        }
+                        # If you encounter NBg in the parameters list make sure
+                        # to fill this line for the RUN block.
 			elsif ( $Param_ORG eq "NBg" ) {
 			    if ($Shared) {
 				$NoBg_Line = $NoBg_Line . "backgr.fit      2\n";
@@ -484,34 +483,38 @@ sub CreateMSRUni {
 		    $Data_Line=$Data_Line."\nt0       ".$All{"t0$Hist"};  
 		}
 	    
-		$FRANGE_Line = "fit             TINI    TFIN";
-		$PAC_Line    = "packing         BINNING";
-		
-		$Single_RUN = $EMPTY;
-		$Tmp_Hist_Line = $Hist_Lines;
-		$Tmp_Hist_Line =~ s/HIST/$Hist/g;
-		$Single_RUN = $Single_RUN
-		    . "$RUN_Line\n$Type_Line\n$NoBg_Line$Tmp_Hist_Line\n$Data_Line\n$MAP_Line\n$FRANGE_Line\n$PAC_Line\n\n";
-	    
-		# This is from CreateRUNBlk
-		#$DEBUG =~s /T0LINE/$T0_Line/;
-		#$DEBUG =~s /BGLINE/$Bg_Line/;
-		#$DEBUG =~s /DATALINE/$Data_Line/;
-		
-		# Now add the appropriate values of fit range and packing
-		my $Range_Min = 8;
-		my $Range_Max = 0;
-		my $k         = 0;
+                $FRANGE_Line = "fit             TINI    TFIN";
+                $PAC_Line    = "packing         BINNING";
+                
+                $Tmp_Hist_Line = $Hist_Lines;
+                $Tmp_Hist_Line =~ s/HIST/$Hist/g;
+                $Single_RUN = "$RUN_Line\n$NoBg_Line$Tmp_Hist_Line\n$Data_Line\n$MAP_Line\n";
+                
+                # Now add the appropriate values of fit range and packing
+                # If there no multiple ranges/packing then simply use GLOBAL block
+                if ($#TiVals == 0) {
+                    $GLOBAL_Block = "GLOBAL\n$Type_Line\n$FRANGE_Line\n$PAC_Line\n\n";
+                } else {
+                    $GLOBAL_Block = "GLOBAL\n$Type_Line\n\n";
+                    $Single_RUN = $Single_RUN."$FRANGE_Line\n$PAC_Line\n";
+                }
+
+                my $Range_Min = 8;
+                my $Range_Max = 0;
+                my $k         = 0;
 		foreach my $Ti (@TiVals) {
 		    my $Tf        = $TfVals[$k];
 		    my $BIN       = $BINVals[$k];
 		    $RUN_Block = $RUN_Block . $Single_RUN;
-		    $RUN_Block =~ s/TINI/$Ti/g;
-		    $RUN_Block =~ s/TFIN/$Tf/g;
-		    $RUN_Block =~ s/BINNING/$BIN/g;
-		
-		    # For multiple ranges use this
-		    if ( $Ti < $Range_Min ) { $Range_Min = $Ti; }
+                    $RUN_Block =~ s/TINI/$Ti/g;
+                    $RUN_Block =~ s/TFIN/$Tf/g;
+                    $RUN_Block =~ s/BINNING/$BIN/g;
+                    $GLOBAL_Block =~ s/TINI/$Ti/g;
+                    $GLOBAL_Block =~ s/TFIN/$Tf/g;
+                    $GLOBAL_Block =~ s/BINNING/$BIN/g;
+                
+                    # For multiple ranges use this
+                    if ( $Ti < $Range_Min ) { $Range_Min = $Ti; }
 		    if ( $Tf > $Range_Max ) { $Range_Max = $Tf; }
 		    $RUNS_Line = "$RUNS_Line " . $Range_Order;
 		    ++$k;
@@ -546,7 +549,7 @@ sub CreateMSRUni {
       $PCount      $Param    $value     $error    $error    $minvalue    $maxvalue";
     }
 
-    $Full_T_Block = "THEORY\n###############################################################\n$Full_T_Block\n";
+    $Full_T_Block = "THEORY\n$Full_T_Block\n";
 
     # COMMAND Block
     $COMMANDS_Block = "COMMANDS\nFITMINTYPE\nSAVE\n";
@@ -558,6 +561,8 @@ sub CreateMSRUni {
     my $logxy = $EMPTY;
     if ( $All{"logx"} eq "y" ) { $logxy = $logxy . "logx\n"; }
     if ( $All{"logy"} eq "y" ) { $logxy = $logxy . "logy\n"; }
+    # Optional - add lifetime correction for SingleHist fits
+    if ( $All{"ltc"} eq "y" ) { $logxy = $logxy . "lifetimecorrection"; }
 
     # Check if a plot range is defined (i.e. different from fit)
     $PRANGE_Line = "use_fit_ranges";
@@ -573,7 +578,7 @@ sub CreateMSRUni {
     if ( $All{"ViewBin"}!=0 ) { $VIEWBIN_Line = "view_packing ".$All{"ViewBin"};}
 
     my $RRFBlock=MSR::CreateRRFBlk(\%All);
-    $PLOT_Block = "PLOT $PLT\nruns     $RUNS_Line\n$PRANGE_Line\n$VIEWBIN_Line\n$RRFBlock\n$logxy";
+    $PLOT_Block = "PLOT $PLT\n$logxy\nruns     $RUNS_Line\n$PRANGE_Line\n$VIEWBIN_Line\n$RRFBlock";
     #END - PLOT Block
 
     # FFT Block
@@ -593,6 +598,8 @@ $FitParaBlk
 $Full_T_Block
 ###############################################################
 $FUNCTIONS_Block
+###############################################################
+$GLOBAL_Block
 ###############################################################
 $RUN_Block
 ###############################################################
