@@ -2337,6 +2337,11 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, std::map<UInt_t, TString
       fout << "logy" << std::endl;
     }
 
+    // lifetimecorrection
+    if (fPlots[i].fLifeTimeCorrection) {
+      fout << "lifetimecorrection" << std::endl;
+    }
+    
     // rrf_packing
     if (fPlots[i].fRRFPacking) {
       fout << "rrf_packing " << fPlots[i].fRRFPacking << std::endl;
@@ -4797,6 +4802,8 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
         param.fLogX = true;
       } else if (iter1->fLine.Contains("logy", TString::kIgnoreCase)) {
         param.fLogY = true;
+      } else if (iter1->fLine.Contains("lifetimecorrection", TString::kIgnoreCase)) {
+        param.fLifeTimeCorrection = true;
       } else if (iter1->fLine.Contains("view_packing", TString::kIgnoreCase)) {
         tokens = iter1->fLine.Tokenize(" \t");
         if (!tokens) {
