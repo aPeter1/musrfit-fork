@@ -196,6 +196,7 @@ install(
         ${MUSRFIT_INC}/PMusrT0.h
         ${MUSRFIT_INC}/PPrepFourier.h
         ${MUSRFIT_INC}/PRunAsymmetry.h
+        ${MUSRFIT_INC}/PRunAsymmetryBNMR.h
         ${MUSRFIT_INC}/PRunAsymmetryRRF.h
         ${MUSRFIT_INC}/PRunBase.h
         ${MUSRFIT_INC}/PRunDataHandler.h
