@@ -398,7 +398,8 @@ Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Doubl
   // count how many entries of this fit-type are present up to idx
   UInt_t subIdx = 0;
   for (UInt_t i=0; i<idx; i++) {
-    if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+    if ((fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type) ||
+        (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == -1)) // the -1 is needed if there is a global section
       subIdx++;
   }
 
