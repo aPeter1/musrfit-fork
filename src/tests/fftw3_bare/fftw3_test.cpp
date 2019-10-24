@@ -3,8 +3,30 @@
 
 #include <fftw3.h>
 
+void fftw3_test_syntax() {
+  std::cout << "fftw3_test [N]" << std::endl;
+  std::cout << "  N: 2^N Fourier Power" << std::endl;
+  std::cout << "     default value if not given: N=13 (2^13 = 8192)" << std::endl;
+}
+
 int main(int argc, char *argv[]) {
-    const unsigned int N=8192;
+    unsigned int N=8192;
+    
+    if (argc > 2) {
+      fftw3_test_syntax();
+      return 1;
+    }
+    
+    if (argc == 2) {
+      int a = -1.0;
+      int status = sscanf(argv[1], "%d", &a);
+      if (status != 1) {
+        fftw3_test_syntax();
+        return 2;
+      }
+      N = (int)pow(2.0, a);
+    }
+  std::cout << "debug> N=" << N << std::endl;
     
     fftw_complex *in, *out;
     fftw_plan my_plan;
