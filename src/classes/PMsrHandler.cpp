@@ -1818,7 +1818,12 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, std::map<UInt_t, TString
           if (fGlobal.GetFitRange(j) == -1)
             break;
           UInt_t neededWidth = 7;
-          UInt_t neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
+          UInt_t neededPrec = 2;
+          if (fGlobal.GetFitRange(j) > 0.0) { // global fit range present
+            LastSignificant(fGlobal.GetFitRange(j));
+          } else { // global fit range absent
+            neededPrec = LastSignificant(fRuns[i].GetFitRange(j));
+          }
           fout.width(neededWidth);
           fout.precision(neededPrec);
           fout << std::left << std::fixed << fGlobal.GetFitRange(j);
