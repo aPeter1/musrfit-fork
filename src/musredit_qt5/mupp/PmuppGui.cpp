@@ -371,8 +371,12 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
   setCentralWidget(fCentralWidget);
 
   // in case there is no db/dat file list given open the db/dat file open menu automatically.
-  if (fln.size() == 0)
+  if (fln.size() == 0) {
     fileOpen();
+    if (fParamDataHandler->GetNoOfCollections() == 0) { // file open dialog has been cancelled
+      exit(0);
+    }
+  }
 }
 
 //----------------------------------------------------------------------------------------------------
