@@ -57,7 +57,7 @@ Additionally, *only* if ``musrfit`` should support reading of data files in the 
 .. index:: hdf4    
 
 **HDF4**
-  A library and multi-object file format for storing and managing data (see `HDF4 <http://www.hdfgroup.org/products/hdf4/>`_). ``HDF4`` is "outdated" and its support will soon be dropped.   
+  A library and multi-object file format for storing and managing data (see `HDF4 <http://www.hdfgroup.org/products/hdf4/>`_). ``HDF4`` is "outdated" and its support will soon be dropped. The single only reason why it is still required is that ISIS is not able to cope to implement HDF5 V2 of the NeXus muon instrument specification which has been agreed in 2012!   
 
 .. index:: hdf5  
 
@@ -175,18 +175,18 @@ Installation of NeXus requirements (optional)
 software has to be set up. The required libraries and header files could either be available through the user's 
 GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. In principle
 NeXus should support ``MXML``, ``HDF4``, and ``HDF5``. At the time of this writing, the ``MXML`` support in the
-NeXus project is broken, and ``HDF4`` is outdated on most platforms, hence currently only the ``HDF5`` binding is
-used. Hence, the necessary package to build ``NeXus`` is ``HDF5``. This means, for a rpm-package based distro try something like:
+NeXus project is broken, and ``HDF4`` is outdated on most platforms, yet since ISIS/RAL is still **not** up-to-date ``HDF4`` still
+needs to be dragged on (comment: if you are a ISIS user, please complain about ``HDF4``). Hence, the necessary packages to build ``NeXus`` are ``HDF4`` and ``HDF5``. This means, for a rpm-package based distro try something like:
 
   .. code-block:: bash
   
-    $ yum install hdf5-devel
+    $ yum install hdf-devel hdf5-devel
     
 and on a deb-package based distro try something like:
 
   .. code-block:: bash
   
-    $ apt-get install libhdf5-dev
+    $ apt-get install libhdf4-dev libhdf5-dev
 
 **Only NeXus Version ≥ 4.4 is support!**  
 
@@ -206,7 +206,7 @@ A brief instruction how to get ``NeXus`` compiled from source (lines starting wi
   $ # next we will build NeXus out-of-source
   $ mkdir build
   $ cd build
-  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=0 -DENABLE_MXML=0 ../code
+  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=1 -DENABLE_MXML=0 ../code
   $ cmake --build ./ --clean-first
   $ # make install needs either to be carried out as root or sudo depending on your linux flavour.
   $ sudo make install
@@ -566,7 +566,7 @@ and a package containing ``/usr/lib/librpc.a`` (*e.g.* ``sunrpc = 4.0-3``, but *
   $ # next we will build NeXus out-of-source
   $ mkdir build
   $ cd build
-  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=0 -DENABLE_MXML=0 ../code
+  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=1 -DENABLE_MXML=0 ../code
   $ make
   $ make install
 
@@ -770,6 +770,11 @@ and ``C:\cygwin\bin\bash.exe`` so that they are executed with administrator priv
 Mac OS X / macOS
 ----------------
 
+.. warning::
+
+  2019-10-10: macOS 10.15 Catalina: ``macport``/``fink``/``homebrew`` and hence ``musrfit`` are not yet ready for 
+  this version of macOS. Likely to be ready by end of November 2019.
+
 .. _MacPorts: https://www.macports.org/
 .. _Fink: http://www.finkproject.org/
 
@@ -778,6 +783,12 @@ Mac OS X is a UNIX system. The similarity is that also on OS X a helping framewo
 or `Fink`_ —  which provides open-source software is employed to fulfill the basic software requirements of ``musrfit``. 
 In the following, both possibilities (using MacPorts or Fink) are described but it is emphasized here that 
 it should be followed only *one* of the possible routes . 
+
+.. warning::
+  
+  If you decide to upgrade your macOS, e.g. from ``High Sierra`` to ``Mojave``, you will typically need to 
+  unistall ``musrfit``, ``ROOT``, and `MacPorts`_ / `Fink`_ first, do the upgrade of the macOS and start the 
+  installation of `MacPorts`_ / `Fink`_ , ``ROOT``, and ``musrfit`` from scratch!
 
 .. index:: macports
 
@@ -871,7 +882,7 @@ To get things compiled do:
   $ cd nexus
   $ mkdir build
   $ cd build
-  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=0 -DENABLE_MXML=0 ../code
+  $ cmake -DENABLE_HDF5=1 -DENABLE_HDF4=1 -DENABLE_MXML=0 ../code
   $ make
   $ sudo make install
   
@@ -1086,7 +1097,7 @@ this can be achieved for example by:
   $ # build NeXus out-of-source
   $ mkdir build
   $ cd build
-  $ cmake ../code -DENABLE_HDF5=1 -DENABLE_HDF4=0 -DENABLE_MXML=0
+  $ cmake ../code -DENABLE_HDF5=1 -DENABLE_HDF4=1 -DENABLE_MXML=0
   $ cmake --build ./ --clean-first -- -j8
   $ sudo make install
 

@@ -632,7 +632,7 @@ name         abbr.   parameters                                      mathematica
 const        c       const(1)                                        const
 asymmetry    a       A(1)                                            :math:`A`
 simplExpo    se      :math:`\lambda (\mu \mathrm{s}^{-1})`           :math:`\exp(-\lambda t)`
-generExpo    ge      :math:`\lambda (\mu \mathrm{s}^{-1}) \beta(1)`  :math:`\exp\left[(-\lambda t)^\beta\right]`
+generExpo    ge      :math:`\lambda (\mu \mathrm{s}^{-1}) \beta(1)`  :math:`\exp\left[-(\lambda t)^\beta\right]`
 simpleGss    sg      :math:`\sigma (\mu \mathrm{s}^{-1})`            :math:`\exp\left[-\frac{1}{2} (\sigma t)^2\right]`
 statGssKT    stg     :math:`\sigma (\mu \mathrm{s}^{-1})`            :math:`\frac{1}{3} + \frac{2}{3} \left[ 1 - (\sigma t)^2\right] \exp\left[-\frac{1}{2} (\sigma t)^2\right]`
 statGssKTLF  sgktlf  :math:`\nu` (MHz), \                            :math:`G_{\rm G}^{\rm LF}(t) = 1-\frac{2\sigma^2}{(2\pi\nu)^2} \left[ 1-\exp\left(- \frac{1}{2}\sigma^2t^2\right)\cos(2\pi\nu t)\right]`                                                                                                                     [#n1]_

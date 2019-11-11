@@ -88,7 +88,7 @@ their header packages:</p>
 <p>Additionally, <em>only</em> if <tt class="docutils literal"><span class="pre">musrfit</span></tt> should support reading of data files in the <cite>NeXus</cite> format the following libraries are needed:</p>
 <dl class="docutils" id="index-7">
 <dt><strong>HDF4</strong></dt>
-<dd>A library and multi-object file format for storing and managing data (see <a class="reference external" href="http://www.hdfgroup.org/products/hdf4/">HDF4</a>). <tt class="docutils literal"><span class="pre">HDF4</span></tt> is &#8220;outdated&#8221; and its support will soon be dropped.</dd>
+<dd>A library and multi-object file format for storing and managing data (see <a class="reference external" href="http://www.hdfgroup.org/products/hdf4/">HDF4</a>). <tt class="docutils literal"><span class="pre">HDF4</span></tt> is &#8220;outdated&#8221; and its support will soon be dropped. The single only reason why it is still required is that ISIS is not able to cope to implement HDF5 V2 of the NeXus muon instrument specification which has been agreed in 2012!</dd>
 </dl>
 <dl class="docutils" id="index-8">
 <dt><strong>HDF5</strong></dt>
@@ -180,16 +180,16 @@ the source code from the corresponding website, or to clone the git repo. If you
 software has to be set up. The required libraries and header files could either be available through the user&#8217;s
 GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. In principle
 NeXus should support <tt class="docutils literal"><span class="pre">MXML</span></tt>, <tt class="docutils literal"><span class="pre">HDF4</span></tt>, and <tt class="docutils literal"><span class="pre">HDF5</span></tt>. At the time of this writing, the <tt class="docutils literal"><span class="pre">MXML</span></tt> support in the
-NeXus project is broken, and <tt class="docutils literal"><span class="pre">HDF4</span></tt> is outdated on most platforms, hence currently only the <tt class="docutils literal"><span class="pre">HDF5</span></tt> binding is
-used. Hence, the necessary package to build <tt class="docutils literal"><span class="pre">NeXus</span></tt> is <tt class="docutils literal"><span class="pre">HDF5</span></tt>. This means, for a rpm-package based distro try something like:</p>
+NeXus project is broken, and <tt class="docutils literal"><span class="pre">HDF4</span></tt> is outdated on most platforms, yet since ISIS/RAL is still <strong>not</strong> up-to-date <tt class="docutils literal"><span class="pre">HDF4</span></tt> still
+needs to be dragged on (comment: if you are a ISIS user, please complain about <tt class="docutils literal"><span class="pre">HDF4</span></tt>). Hence, the necessary packages to build <tt class="docutils literal"><span class="pre">NeXus</span></tt> are <tt class="docutils literal"><span class="pre">HDF4</span></tt> and <tt class="docutils literal"><span class="pre">HDF5</span></tt>. This means, for a rpm-package based distro try something like:</p>
 <blockquote>
-<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ yum install hdf5-devel
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ yum install hdf-devel hdf5-devel
 </pre></div>
 </div>
 </div></blockquote>
 <p>and on a deb-package based distro try something like:</p>
 <blockquote>
-<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install libhdf5-dev
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install libhdf4-dev libhdf5-dev
 </pre></div>
 </div>
 </div></blockquote>
@@ -206,7 +206,7 @@ $ git clone https://github.com/nexusformat/code.git
 $ <span class="c1"># next we will build NeXus out-of-source</span>
 $ mkdir build
 $ <span class="nb">cd</span> build
-$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">0</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span> ../code
+$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">1</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span> ../code
 $ cmake --build ./ --clean-first
 $ <span class="c1"># make install needs either to be carried out as root or sudo depending on your linux flavour.</span>
 $ sudo make install
@@ -513,7 +513,7 @@ $ git clone https://github.com/nexusformat/code.git
 $ <span class="c1"># next we will build NeXus out-of-source</span>
 $ mkdir build
 $ <span class="nb">cd</span> build
-$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">0</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span> ../code
+$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">1</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span> ../code
 $ make
 $ make install
 </pre></div>
@@ -684,11 +684,22 @@ and <tt class="docutils literal"><span class="pre">C:\cygwin\bin\bash.exe</span>
 </div>
 <div class="section" id="mac-os-x-macos">
 <h2>Mac OS X / macOS<a class="headerlink" href="#mac-os-x-macos" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">2019-10-10: macOS 10.15 Catalina: <tt class="docutils literal"><span class="pre">macport</span></tt>/<tt class="docutils literal"><span class="pre">fink</span></tt>/<tt class="docutils literal"><span class="pre">homebrew</span></tt> and hence <tt class="docutils literal"><span class="pre">musrfit</span></tt> are not yet ready for
+this version of macOS. Likely to be ready by end of November 2019.</p>
+</div>
 <p>With Mac OS X / macOS the situation is up to some extent similar like on MS Windows but still different since
 Mac OS X is a UNIX system. The similarity is that also on OS X a helping framework — either <a class="reference external" href="https://www.macports.org/">MacPorts</a>
 or <a class="reference external" href="http://www.finkproject.org/">Fink</a> —  which provides open-source software is employed to fulfill the basic software requirements of <tt class="docutils literal"><span class="pre">musrfit</span></tt>.
 In the following, both possibilities (using MacPorts or Fink) are described but it is emphasized here that
 it should be followed only <em>one</em> of the possible routes .</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">If you decide to upgrade your macOS, e.g. from <tt class="docutils literal"><span class="pre">High</span> <span class="pre">Sierra</span></tt> to <tt class="docutils literal"><span class="pre">Mojave</span></tt>, you will typically need to
+unistall <tt class="docutils literal"><span class="pre">musrfit</span></tt>, <tt class="docutils literal"><span class="pre">ROOT</span></tt>, and <a class="reference external" href="https://www.macports.org/">MacPorts</a> / <a class="reference external" href="http://www.finkproject.org/">Fink</a> first, do the upgrade of the macOS and start the
+installation of <a class="reference external" href="https://www.macports.org/">MacPorts</a> / <a class="reference external" href="http://www.finkproject.org/">Fink</a> , <tt class="docutils literal"><span class="pre">ROOT</span></tt>, and <tt class="docutils literal"><span class="pre">musrfit</span></tt> from scratch!</p>
+</div>
 <div class="section" id="requirements-macports">
 <span id="index-27"></span><h3>Requirements (MacPorts)<a class="headerlink" href="#requirements-macports" title="Permalink to this headline">¶</a></h3>
 <p>Before proceeding with the usage of the <tt class="docutils literal"><span class="pre">MacPorts</span></tt> system first a few useful tools provided by Apple together
@@ -763,7 +774,7 @@ $ <span class="c1"># next we will build NeXus out-of-source</span>
 $ <span class="nb">cd</span> nexus
 $ mkdir build
 $ <span class="nb">cd</span> build
-$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">0</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span> ../code
+$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">1</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span> ../code
 $ make
 $ sudo make install
 </pre></div>
@@ -938,7 +949,7 @@ $ <span class="nb">cd</span> nexus
 $ <span class="c1"># build NeXus out-of-source</span>
 $ mkdir build
 $ <span class="nb">cd</span> build
-$ cmake ../code -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">0</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span>
+$ cmake ../code -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">1</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span>
 $ cmake --build ./ --clean-first -- -j8
 $ sudo make install
 </pre></div>
@@ -1285,7 +1296,7 @@ $ musrview test-histo-ROOT-NPP.msr
     </div>
     <div class="footer">
         &copy; Copyright 2019, Andreas Suter.
-      Last updated on Jul 24, 2019.
+      Last updated on Oct 10, 2019.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
