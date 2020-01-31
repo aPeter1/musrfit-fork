@@ -67,6 +67,110 @@
 
 #include "PFitter.h"
 
+
+//+++ PSectorChisq class +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//--------------------------------------------------------------------------
+// Constructor
+//--------------------------------------------------------------------------
+/**
+ * <p>Constructor.
+ */
+PSectorChisq::PSectorChisq(UInt_t noOfRuns) : fNoOfRuns(noOfRuns)
+{
+  // init
+  fFirst = 0.0;
+  fLast  = 0.0;
+  fChisq = 0.0;
+  fNDF   = 0;
+  fChisqRun.resize(fNoOfRuns);
+  fNDFRun.resize(fNoOfRuns);
+  for (UInt_t i=0; i<fNoOfRuns; i++) {
+    fChisqRun[i] = 0.0;
+    fNDFRun[i] = 0;
+  }
+}
+
+//--------------------------------------------------------------------------
+// SetTimeRange
+//--------------------------------------------------------------------------
+/**
+ * <p>Set the time range for one sector
+ *
+ * @param first time stamp of the fgb
+ * @param last time stamp of the requested sector end
+ */
+void PSectorChisq::SetTimeRange(Double_t first, Double_t last)
+{
+  // NOT YET IMPLEMENTED //as35
+}
+
+//--------------------------------------------------------------------------
+// SetChisq
+//--------------------------------------------------------------------------
+/**
+ * <p>Set the chisq/maxLH for a given detector with index idx.
+ *
+ * @param chisq chisq/maxLH to be set
+ * @param idx index of the run to be set
+ */
+void PSectorChisq::SetChisq(Double_t chisq, UInt_t idx)
+{
+  // NOT YET IMPLEMENTED //as35
+}
+
+//--------------------------------------------------------------------------
+// SetNDF
+//--------------------------------------------------------------------------
+/**
+ * <p>Set the NDF for a given detector with index idx.
+ *
+ * @param ndf to be set
+ * @param idx index of the run to be set
+ */
+void PSectorChisq::SetNDF(Double_t ndf, UInt_t idx)
+{
+  // NOT YET IMPLEMENTED //as35
+}
+
+//--------------------------------------------------------------------------
+// GetChisq
+//--------------------------------------------------------------------------
+/**
+ * <p>chisq/maxLH of the run with index idx
+ *
+ * @param idx index of the run
+ *
+ * <b>return:</b> chisq/maxLH of the requested run or -1.0 if the idx is out-of-range.
+ */
+Double_t PSectorChisq::GetChisq(UInt_t idx)
+{
+  if (idx >= fNoOfRuns)
+    return -1.0;
+
+  return fChisqRun[idx];
+}
+
+//--------------------------------------------------------------------------
+// GetChisq
+//--------------------------------------------------------------------------
+/**
+ * <p>NDF of the run with index idx
+ *
+ * @param idx index of the run
+ *
+ * <b>return:</b> NDF of the requested run or 0.0 if the idx is out-of-range.
+ */
+UInt_t PSectorChisq::GetNDF(UInt_t idx)
+{
+  if (idx >= fNoOfRuns)
+    return 0;
+
+  return fNDFRun[idx];
+}
+
+//+++ PFitter class ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 //--------------------------------------------------------------------------
 // Constructor
 //--------------------------------------------------------------------------
@@ -103,12 +207,20 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bo
   fPrintLevel = 1.0;
 
   // keep all the fit ranges in case RANGE command is present
+  PDoublePair rangeGlob;
+  PMsrGlobalBlock *global = fRunInfo->GetMsrGlobal();
+  rangeGlob.first  = global->GetFitRange(0);
+  rangeGlob.second = global->GetFitRange(1);
+
   PMsrRunList *runs = fRunInfo->GetMsrRunList();
   PDoublePair range;
   for (UInt_t i=0; i<runs->size(); i++) {
     range.first  = (*runs)[i].GetFitRange(0);
     range.second = (*runs)[i].GetFitRange(1);
-    fOriginalFitRange.push_back(range);
+    if (range.first == PMUSR_UNDEFINED)
+      fOriginalFitRange.push_back(rangeGlob);
+    else
+      fOriginalFitRange.push_back(range);
   }
 
   // check msr minuit commands
@@ -338,28 +450,37 @@ Bool_t PFitter::CheckCommands()
   PIntPair cmd;
   PMsrLines::iterator it;
   UInt_t cmdLineNo = 0;
+  TString line;
+  Ssiz_t pos;
   for (it = fCmdLines.begin(); it != fCmdLines.end(); ++it) {
     if (it == fCmdLines.begin())
       cmdLineNo = 0;
     else
       cmdLineNo++;
-    if (it->fLine.Contains("COMMANDS", TString::kIgnoreCase)) {
+
+    // strip potential comments
+    line = it->fLine;
+    pos = line.First('#');
+    if (pos > 0) // comment present
+      line.Remove(pos,line.Length()-pos);
+
+    if (line.Contains("COMMANDS", TString::kIgnoreCase)) {
       continue;
-    } else if (it->fLine.Contains("SET BATCH", TString::kIgnoreCase)) { // needed for backward compatibility
+    } else if (line.Contains("SET BATCH", TString::kIgnoreCase)) { // needed for backward compatibility
       continue;
-    } else if (it->fLine.Contains("END RETURN", TString::kIgnoreCase)) {  // needed for backward compatibility
+    } else if (line.Contains("END RETURN", TString::kIgnoreCase)) {  // needed for backward compatibility
       continue;
-    } else if (it->fLine.Contains("CHI_SQUARE", TString::kIgnoreCase)) {
+    } else if (line.Contains("CHI_SQUARE", TString::kIgnoreCase)) {
       continue;
-    } else if (it->fLine.Contains("MAX_LIKELIHOOD", TString::kIgnoreCase)) {
+    } else if (line.Contains("MAX_LIKELIHOOD", TString::kIgnoreCase)) {
       continue;
-    } else if (it->fLine.Contains("SCALE_N0_BKG", TString::kIgnoreCase)) {
+    } else if (line.Contains("SCALE_N0_BKG", TString::kIgnoreCase)) {
       continue;
-    } else if (it->fLine.Contains("INTERACTIVE", TString::kIgnoreCase)) {
+    } else if (line.Contains("INTERACTIVE", TString::kIgnoreCase)) {
       cmd.first  = PMN_INTERACTIVE;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("CONTOURS", TString::kIgnoreCase)) {
+    } else if (line.Contains("CONTOURS", TString::kIgnoreCase)) {
       cmd.first  = PMN_CONTOURS;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
@@ -369,7 +490,7 @@ Bool_t PFitter::CheckCommands()
       TString str;
       UInt_t ival;
 
-      tokens = it->fLine.Tokenize(", \t");
+      tokens = line.Tokenize(", \t");
 
       for (Int_t i=0; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
@@ -379,7 +500,7 @@ Bool_t PFitter::CheckCommands()
           // check that token is a UInt_t
           if (!str.IsDigit()) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> parameter number is not number!";
             std::cerr  << std::endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
             std::cerr  << std::endl;
@@ -394,7 +515,7 @@ Bool_t PFitter::CheckCommands()
           // check that parameter is within range
           if ((ival < 1) || (ival > fParams.size())) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> parameter number is out of range [1," << fParams.size() << "]!";
             std::cerr  << std::endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
             std::cerr  << std::endl;
@@ -414,7 +535,7 @@ Bool_t PFitter::CheckCommands()
           // check that token is a UInt_t
           if (!str.IsDigit()) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> number of points is not number!";
             std::cerr  << std::endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
             std::cerr  << std::endl;
@@ -428,7 +549,7 @@ Bool_t PFitter::CheckCommands()
           ival = str.Atoi();
           if ((ival < 1) || (ival > 100)) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> number of scan points is out of range [1,100]!";
             std::cerr  << std::endl << ">> command syntax for CONTOURS is: CONTOURS parameter-X parameter-Y [# of points]";
             std::cerr  << std::endl;
@@ -447,11 +568,11 @@ Bool_t PFitter::CheckCommands()
         delete tokens;
         tokens = nullptr;
       }
-    } else if (it->fLine.Contains("EIGEN", TString::kIgnoreCase)) {
+    } else if (line.Contains("EIGEN", TString::kIgnoreCase)) {
       cmd.first  = PMN_EIGEN;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("FIT_RANGE", TString::kIgnoreCase)) {
+    } else if (line.Contains("FIT_RANGE", TString::kIgnoreCase)) {
       // check the 5 options:
       // (i)   FIT_RANGE RESET,
       // (ii)  FIT_RANGE start end,
@@ -462,7 +583,7 @@ Bool_t PFitter::CheckCommands()
       TObjString *ostr;
       TString str;
 
-      tokens = it->fLine.Tokenize(", \t");
+      tokens = line.Tokenize(", \t");
 
       if (tokens->GetEntries() == 2) { // should only be RESET
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
@@ -473,7 +594,7 @@ Bool_t PFitter::CheckCommands()
           fCmdList.push_back(cmd);
         } else {
           std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-          std::cerr  << std::endl << ">> " << it->fLine.Data();
+          std::cerr  << std::endl << ">> " << line.Data();
           std::cerr  << std::endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE start end | FIT_RANGE s1 e1 s2 e2 .. sN eN,";
           std::cerr  << std::endl << ">>         with N the number of runs in the msr-file." << std::endl;
           std::cerr  << std::endl << ">>         Found " << str.Data() << ", instead of RESET" << std::endl;
@@ -487,7 +608,7 @@ Bool_t PFitter::CheckCommands()
       } else if ((tokens->GetEntries() > 1) && (static_cast<UInt_t>(tokens->GetEntries()) % 2) == 1) {
         if ((tokens->GetEntries() > 3) && ((static_cast<UInt_t>(tokens->GetEntries())-1)) != 2*fRunInfo->GetMsrRunList()->size()) {
           std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-          std::cerr  << std::endl << ">> " << it->fLine.Data();
+          std::cerr  << std::endl << ">> " << line.Data();
           std::cerr  << std::endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
           std::cerr  << std::endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
           std::cerr  << std::endl << ">>         with N the number of runs in the msr-file.";
@@ -520,7 +641,7 @@ Bool_t PFitter::CheckCommands()
             fCmdList.push_back(cmd);
           } else {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
             std::cerr  << std::endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
             std::cerr  << std::endl << ">>         with N the number of runs in the msr-file.";
@@ -535,7 +656,7 @@ Bool_t PFitter::CheckCommands()
         }
       } else {
         std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-        std::cerr  << std::endl << ">> " << it->fLine.Data();
+        std::cerr  << std::endl << ">> " << line.Data();
         std::cerr  << std::endl << ">> Syntax: FIT_RANGE RESET | FIT_RANGE <start> <end> | FIT_RANGE <s1> <e1> <s2> <e2> .. <sN> <eN> |";
         std::cerr  << std::endl << ">>         FIT_RANGE fgb+<n0> lgb-<n1> | FIT_RANGE fgb+<n00> lgb-<n01> fgb+<n10> lgb-<n11> ... fgb+<nN0> lgb-<nN1>,";
         std::cerr  << std::endl << ">>         with N the number of runs in the msr-file.";
@@ -551,14 +672,14 @@ Bool_t PFitter::CheckCommands()
         delete tokens;
         tokens = nullptr;
       }
-    } else if (it->fLine.Contains("FIX", TString::kIgnoreCase)) {
+    } else if (line.Contains("FIX", TString::kIgnoreCase)) {
       // check if the given set of parameters (number or names) is present
       TObjArray *tokens = nullptr;
       TObjString *ostr;
       TString str;
       UInt_t ival;
 
-      tokens = it->fLine.Tokenize(", \t");
+      tokens = line.Tokenize(", \t");
 
       for (Int_t i=1; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
@@ -569,7 +690,7 @@ Bool_t PFitter::CheckCommands()
           // check that ival is in the parameter list
           if (ival > fParams.size()) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> Parameter " << ival << " is out of the Parameter Range [1," << fParams.size() << "]";
             std::cerr  << std::endl;
             fIsValid = false;
@@ -590,7 +711,7 @@ Bool_t PFitter::CheckCommands()
           }
           if (!found) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> Parameter '" << str.Data() << "' is NOT present as a parameter name";
             std::cerr  << std::endl;
             fIsValid = false;
@@ -612,46 +733,46 @@ Bool_t PFitter::CheckCommands()
       cmd.first  = PMN_FIX;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("HESSE", TString::kIgnoreCase)) {
+    } else if (line.Contains("HESSE", TString::kIgnoreCase)) {
       fIsScanOnly = false;
       cmd.first  = PMN_HESSE;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("MACHINE_PRECISION", TString::kIgnoreCase)) {
+    } else if (line.Contains("MACHINE_PRECISION", TString::kIgnoreCase)) {
       cmd.first  = PMN_MACHINE_PRECISION;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("MIGRAD", TString::kIgnoreCase)) {
+    } else if (line.Contains("MIGRAD", TString::kIgnoreCase)) {
       fIsScanOnly = false;
       cmd.first  = PMN_MIGRAD;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("MINIMIZE", TString::kIgnoreCase)) {
+    } else if (line.Contains("MINIMIZE", TString::kIgnoreCase)) {
       fIsScanOnly = false;
       cmd.first  = PMN_MINIMIZE;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("MINOS", TString::kIgnoreCase)) {
+    } else if (line.Contains("MINOS", TString::kIgnoreCase)) {
       fIsScanOnly = false;
       cmd.first  = PMN_MINOS;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("MNPLOT", TString::kIgnoreCase)) {
+    } else if (line.Contains("MNPLOT", TString::kIgnoreCase)) {
       cmd.first  = PMN_PLOT;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("PRINT_LEVEL", TString::kIgnoreCase)) {
+    } else if (line.Contains("PRINT_LEVEL", TString::kIgnoreCase)) {
       cmd.first = PMN_PRINT;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("RELEASE", TString::kIgnoreCase)) {
+    } else if (line.Contains("RELEASE", TString::kIgnoreCase)) {
       // check if the given set of parameters (number or names) is present
       TObjArray *tokens = nullptr;
       TObjString *ostr;
       TString str;
       UInt_t ival;
 
-      tokens = it->fLine.Tokenize(", \t");
+      tokens = line.Tokenize(", \t");
 
       for (Int_t i=1; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
@@ -662,7 +783,7 @@ Bool_t PFitter::CheckCommands()
           // check that ival is in the parameter list
           if (ival > fParams.size()) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> Parameter " << ival << " is out of the Parameter Range [1," << fParams.size() << "]";
             std::cerr  << std::endl;
             fIsValid = false;
@@ -683,7 +804,7 @@ Bool_t PFitter::CheckCommands()
           }
           if (!found) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> Parameter '" << str.Data() << "' is NOT present as a parameter name";
             std::cerr  << std::endl;
             fIsValid = false;
@@ -703,15 +824,15 @@ Bool_t PFitter::CheckCommands()
       cmd.first  = PMN_RELEASE;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("RESTORE", TString::kIgnoreCase)) {
+    } else if (line.Contains("RESTORE", TString::kIgnoreCase)) {
       cmd.first  = PMN_RESTORE;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("SAVE", TString::kIgnoreCase)) {
+    } else if (line.Contains("SAVE", TString::kIgnoreCase)) {
       cmd.first  = PMN_SAVE;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("SCAN", TString::kIgnoreCase)) {
+    } else if (line.Contains("SCAN", TString::kIgnoreCase)) {
       cmd.first  = PMN_SCAN;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
@@ -721,7 +842,7 @@ Bool_t PFitter::CheckCommands()
       TString str;
       UInt_t ival;
 
-      tokens = it->fLine.Tokenize(", \t");
+      tokens = line.Tokenize(", \t");
 
       for (Int_t i=0; i<tokens->GetEntries(); i++) {
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
@@ -730,7 +851,7 @@ Bool_t PFitter::CheckCommands()
           // check that token is a UInt_t
           if (!str.IsDigit()) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> parameter number is not number!";
             std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             std::cerr  << std::endl;
@@ -745,7 +866,7 @@ Bool_t PFitter::CheckCommands()
           // check that parameter is within range
           if ((ival < 1) || (ival > fParams.size())) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> parameter number is out of range [1," << fParams.size() << "]!";
             std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             std::cerr  << std::endl;
@@ -765,7 +886,7 @@ Bool_t PFitter::CheckCommands()
           // check that token is a UInt_t
           if (!str.IsDigit()) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> number of points is not number!";
             std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             std::cerr  << std::endl;
@@ -779,7 +900,7 @@ Bool_t PFitter::CheckCommands()
           ival = str.Atoi();
           if ((ival < 1) || (ival > 100)) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> number of scan points is out of range [1,100]!";
             std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             std::cerr  << std::endl;
@@ -797,7 +918,7 @@ Bool_t PFitter::CheckCommands()
           // check that token is a Double_t
           if (!str.IsFloat()) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> low is not a floating point number!";
             std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             std::cerr  << std::endl;
@@ -815,7 +936,7 @@ Bool_t PFitter::CheckCommands()
           // check that token is a Double_t
           if (!str.IsFloat()) {
             std::cerr  << std::endl << ">> PFitter::CheckCommands: **ERROR** in line " << it->fLineNo;
-            std::cerr  << std::endl << ">> " << it->fLine.Data();
+            std::cerr  << std::endl << ">> " << line.Data();
             std::cerr  << std::endl << ">> high is not a floating point number!";
             std::cerr  << std::endl << ">> command syntax for SCAN is: SCAN [parameter no [# of points [low high]]]";
             std::cerr  << std::endl;
@@ -834,16 +955,16 @@ Bool_t PFitter::CheckCommands()
         delete tokens;
         tokens = nullptr;
       }
-    } else if (it->fLine.Contains("SIMPLEX", TString::kIgnoreCase)) {
+    } else if (line.Contains("SIMPLEX", TString::kIgnoreCase)) {
       cmd.first  = PMN_SIMPLEX;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("STRATEGY", TString::kIgnoreCase)) {
+    } else if (line.Contains("STRATEGY", TString::kIgnoreCase)) {
       TObjArray *tokens = nullptr;
       TObjString *ostr;
       TString str;
 
-      tokens = it->fLine.Tokenize(" \t");
+      tokens = line.Tokenize(" \t");
       if (tokens->GetEntries() == 2) {
         ostr = dynamic_cast<TObjString*>(tokens->At(1));
         str = ostr->GetString();
@@ -866,19 +987,89 @@ Bool_t PFitter::CheckCommands()
         delete tokens;
         tokens = nullptr;
       }
-    } else if (it->fLine.Contains("USER_COVARIANCE", TString::kIgnoreCase)) {
+    } else if (line.Contains("USER_COVARIANCE", TString::kIgnoreCase)) {
       cmd.first  = PMN_USER_COVARIANCE;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
-    } else if (it->fLine.Contains("USER_PARAM_STATE", TString::kIgnoreCase)) {
+    } else if (line.Contains("USER_PARAM_STATE", TString::kIgnoreCase)) {
       cmd.first  = PMN_USER_PARAM_STATE;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
+    } else if (line.Contains("SECTOR", TString::kIgnoreCase)) {
+      cmd.first  = PMN_SECTOR;
+      cmd.second = cmdLineNo;
+      fCmdList.push_back(cmd);
+
+      // check if the given sector arguments are valid time stamps, i.e. doubles and value < lgb time stamp
+      TObjArray *tokens = nullptr;
+      TObjString *ostr;
+      TString str;
+
+      tokens = line.Tokenize(" ,\t");
+
+      if (tokens->GetEntries() == 1) { // no sector time stamps given -> issue an error
+        std::cerr << std::endl << ">> PFitter::CheckCommands(): **FATAL ERROR** in line " << it->fLineNo;
+        std::cerr << std::endl << ">> " << line.Data();
+        std::cerr << std::endl << ">> At least one sector time stamp is expected.";
+        std::cerr << std::endl << ">> Will stop ...";
+        std::cerr << std::endl;
+        // cleanup
+        if (tokens) {
+          delete tokens;
+          tokens = nullptr;
+        }
+        fIsValid = false;
+        break;
+      }
+
+      Double_t dval;
+      for (Int_t i=1; i<tokens->GetEntries(); i++) {
+        ostr = dynamic_cast<TObjString*>(tokens->At(i));
+        str = ostr->GetString();
+        if (str.IsFloat()) {
+          dval = str.Atof();
+          // check that the sector time stamp is smaller than all lgb time stamps
+          for (UInt_t j=0; j<fOriginalFitRange.size(); j++) {
+            if (dval > fOriginalFitRange[j].second) {
+              std::cerr << std::endl << ">> PFitter::CheckCommands(): **FATAL ERROR** in line " << it->fLineNo;
+              std::cerr << std::endl << ">> " << line.Data();
+              std::cerr << std::endl << ">> The sector time stamp " << dval << " is > as the lgb time stamp (" << fOriginalFitRange[j].second << ") of run " << j << ".";
+              std::cerr << std::endl << ">> Will stop ...";
+              std::cerr << std::endl;
+              // cleanup
+              if (tokens) {
+                delete tokens;
+                tokens = nullptr;
+              }
+              fIsValid = false;
+              return fIsValid;
+            }
+          }
+        } else { // sector element is NOT a float
+          std::cerr << std::endl << ">> PFitter::CheckCommands(): **FATAL ERROR** in line " << it->fLineNo;
+          std::cerr << std::endl << ">> " << line.Data();
+          std::cerr << std::endl << ">> The sector time stamp '" << str << "' is not a number.";
+          std::cerr << std::endl << ">> Will stop ...";
+          std::cerr << std::endl;
+          // cleanup
+          if (tokens) {
+            delete tokens;
+            tokens = nullptr;
+          }
+          fIsValid = false;
+          break;
+        }
+      }
+
+      if (tokens) {
+        delete tokens;
+        tokens = nullptr;
+      }
     } else { // unkown command
-      std::cerr  << std::endl << ">> PFitter::CheckCommands(): **FATAL ERROR** in line " << it->fLineNo << " an unkown command is found:";
-      std::cerr  << std::endl << ">> " << it->fLine.Data();
-      std::cerr  << std::endl << ">> Will stop ...";
-      std::cerr  << std::endl;
+      std::cerr << std::endl << ">> PFitter::CheckCommands(): **FATAL ERROR** in line " << it->fLineNo << " an unkown command is found:";
+      std::cerr << std::endl << ">> " << line.Data();
+      std::cerr << std::endl << ">> Will stop ...";
+      std::cerr << std::endl;
       fIsValid = false;
       break;
     }
@@ -890,17 +1081,17 @@ Bool_t PFitter::CheckCommands()
   Bool_t releaseFlag = false;
   Bool_t minimizerFlag = false;
   for (it = fCmdLines.begin(); it != fCmdLines.end(); ++it) {
-    if (it->fLine.Contains("FIX", TString::kIgnoreCase))
+    if (line.Contains("FIX", TString::kIgnoreCase))
       fixFlag = true;
-    else if (it->fLine.Contains("RELEASE", TString::kIgnoreCase) ||
-             it->fLine.Contains("RESTORE", TString::kIgnoreCase))
+    else if (line.Contains("RELEASE", TString::kIgnoreCase) ||
+             line.Contains("RESTORE", TString::kIgnoreCase))
       releaseFlag = true;
-    else if (it->fLine.Contains("MINIMIZE", TString::kIgnoreCase) ||
-             it->fLine.Contains("MIGRAD", TString::kIgnoreCase) ||
-             it->fLine.Contains("SIMPLEX", TString::kIgnoreCase)) {
+    else if (line.Contains("MINIMIZE", TString::kIgnoreCase) ||
+             line.Contains("MIGRAD", TString::kIgnoreCase) ||
+             line.Contains("SIMPLEX", TString::kIgnoreCase)) {
       if (releaseFlag)
         minimizerFlag = true;
-    } else if (it->fLine.Contains("MINOS", TString::kIgnoreCase)) {
+    } else if (line.Contains("MINOS", TString::kIgnoreCase)) {
       if (fixFlag && releaseFlag && !minimizerFlag) {
         std::cerr  << std::endl << ">> PFitter::CheckCommands(): **WARNING** RELEASE/RESTORE command present";
         std::cerr  << std::endl << ">> without minimizer command (MINIMIZE/MIGRAD/SIMPLEX) between";
@@ -1965,6 +2156,21 @@ Bool_t PFitter::ExecuteSimplex()
 
   if (fPrintLevel >= 2)
     std::cout << *fFcnMin << std::endl;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
+// ExecuteSector
+//--------------------------------------------------------------------------
+/**
+ * <p>Collects all the necessary chisq/maxLH for the given sectors.
+ *
+ * <b>return:</b> if the sector command was successful, otherwise return flase.
+ */
+Bool_t PFitter::ExecuteSector()
+{
+  // NOT YET IMPLEMENTED //as35
 
   return true;
 }

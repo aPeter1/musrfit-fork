@@ -58,7 +58,44 @@
 #define PMN_USER_COVARIANCE   17
 #define PMN_USER_PARAM_STATE  18
 #define PMN_PRINT             19
+#define PMN_SECTOR            20
 
+//-----------------------------------------------------------------------------
+/**
+ * <p>The PSectorChisq class is needed to store the chisq/maxLH of a sector.
+ * A sector is a time window from fgb to fLast (fLast < lgb). It also stores
+ * these information for each run of the msr-file.
+ */
+class PSectorChisq
+{
+  public:
+    PSectorChisq(UInt_t noOfRuns);
+
+    void SetTimeRange(Double_t first, Double_t last);
+    void SetChisq(Double_t chisq) { fChisq = chisq; }
+    void SetChisq(Double_t chisq, UInt_t idx);
+    void SetNDF(Double_t ndf) { fNDF = ndf; }
+    void SetNDF(Double_t ndf, UInt_t idx);
+
+    Double_t GetTimeRangeFirst() { return fFirst; }
+    Double_t GetTimeRangeLast() { return fLast; }
+    Double_t GetChisq() { return fChisq; }
+    UInt_t   GetNDF() { return fNDF; }
+    UInt_t   GetNoRuns() { return fNoOfRuns; }
+    Double_t GetChisq(UInt_t idx);
+    UInt_t   GetNDF(UInt_t idx);
+
+  private:
+    UInt_t   fNoOfRuns; ///< number of runs presesent
+    Double_t fFirst; ///< time stamp for fgb
+    Double_t fLast;  ///< requested time stamp
+    Double_t fChisq; ///< chisq or maxLH for the sector
+    UInt_t   fNDF;   ///< NDF for the sector
+    std::vector<Double_t> fChisqRun; ///< chisq or maxLH for the sector and run
+    std::vector<UInt_t> fNDFRun; ///< NDF for the sector and run
+};
+
+//-----------------------------------------------------------------------------
 /**
  * <p>Interface class to minuit2.
  */
@@ -108,6 +145,8 @@ class PFitter
 
     PStringVector fElapsedTime;
 
+    std::vector<PSectorChisq> fSector; ///< stores all chisq/maxLH sector information
+
     // commands
     Bool_t CheckCommands();
     Bool_t SetParameters();
@@ -126,6 +165,7 @@ class PFitter
     Bool_t ExecuteScan();
     Bool_t ExecuteSave(Bool_t first);
     Bool_t ExecuteSimplex();
+    Bool_t ExecuteSector();
 
     Double_t MilliTime();
 };
