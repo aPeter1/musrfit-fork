@@ -770,10 +770,10 @@ and ``C:\cygwin\bin\bash.exe`` so that they are executed with administrator priv
 Mac OS X / macOS
 ----------------
 
-.. warning::
+.. note::
 
-  2019-10-10: macOS 10.15 Catalina: ``macport``/``fink``/``homebrew`` and hence ``musrfit`` are not yet ready for 
-  this version of macOS. Likely to be ready by end of November 2019.
+  macOS Catalina is slightly different in some aspects, so if it happens that you have it installed, please
+  first check :ref:`note-on-catalina` before you proceed.
 
 .. _MacPorts: https://www.macports.org/
 .. _Fink: http://www.finkproject.org/
@@ -866,7 +866,7 @@ Installation of NeXus requirements (optional)
 
 .. code-block:: bash
 
-  $ sudo port -v install hdf5
+  $ sudo port -v install hdf4 hdf5
 
 **Only NeXus Version ≥ 4.4 is support!**  
 
@@ -996,6 +996,26 @@ After this you will need to "execute" ``.profile`` before proceeding:
 .. code-block:: bash
 
   $ source $HOME/.profile
+
+.. _note-on-catalina:
+
+Notes on macOS Catalina
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Apple introduced a couple of changes on macOS Catalina compared to its previous versions of macOS which might
+be a stumble block. Here I **very** briefly try to add some notes in order to get a smooth installation for 
+``musrfit``.
+
+1. You should switch from the bash to the zsh. Please check, e.g. `Moving to zsh <https://scriptingosx.com/2019/06/moving-to-zsh/>`_. 
+2. Instead of ``.profile`` you will need to setup a ``.zprofile``.
+3. macports: currently there is a little nuisance with the ``fftw-3`` port. My bug report is already out since a while 
+   but no proper fix is available. The workaround to get it right is to install the port from source which is done by
+
+   .. code-block:: bash
+
+     $ port -s install fftw-3 
+
+   If you fail to do so, you might trigger a crash in the Fourier transform for 2^N, N=12.
 
 .. index:: fink
 
@@ -1246,6 +1266,8 @@ As an alternative (*if git is not available*), the source code can also be downl
 web-page: `musrfit at bitbucket`_.   
    
 .. index:: musrfit-build-cmake-macos
+
+
 
 musrfit build with cmake
 ^^^^^^^^^^^^^^^^^^^^^^^^

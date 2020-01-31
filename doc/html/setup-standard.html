@@ -684,10 +684,10 @@ and <tt class="docutils literal"><span class="pre">C:\cygwin\bin\bash.exe</span>
 </div>
 <div class="section" id="mac-os-x-macos">
 <h2>Mac OS X / macOS<a class="headerlink" href="#mac-os-x-macos" title="Permalink to this headline">¶</a></h2>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">2019-10-10: macOS 10.15 Catalina: <tt class="docutils literal"><span class="pre">macport</span></tt>/<tt class="docutils literal"><span class="pre">fink</span></tt>/<tt class="docutils literal"><span class="pre">homebrew</span></tt> and hence <tt class="docutils literal"><span class="pre">musrfit</span></tt> are not yet ready for
-this version of macOS. Likely to be ready by end of November 2019.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">macOS Catalina is slightly different in some aspects, so if it happens that you have it installed, please
+first check <a class="reference internal" href="#note-on-catalina"><em>Notes on macOS Catalina</em></a> before you proceed.</p>
 </div>
 <p>With Mac OS X / macOS the situation is up to some extent similar like on MS Windows but still different since
 Mac OS X is a UNIX system. The similarity is that also on OS X a helping framework — either <a class="reference external" href="https://www.macports.org/">MacPorts</a>
@@ -761,7 +761,7 @@ please change over to <tt class="docutils literal"><span class="pre">musredit</s
 <div class="section" id="index-28">
 <span id="id14"></span><h4>Installation of NeXus requirements (optional)<a class="headerlink" href="#index-28" title="Permalink to this headline">¶</a></h4>
 <p><em>Only</em> if <tt class="docutils literal"><span class="pre">musrfit</span></tt> should support reading data files in the <tt class="docutils literal"><span class="pre">NeXus</span></tt> format the further required packages are set up:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port -v install hdf5
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port -v install hdf4 hdf5
 </pre></div>
 </div>
 <p><strong>Only NeXus Version ≥ 4.4 is support!</strong></p>
@@ -871,6 +871,25 @@ launchctl setenv LD_LIBRARY_PATH <span class="nv">$LD_LIBRARY_PATH</span>
 </pre></div>
 </div>
 </div>
+</div>
+<div class="section" id="notes-on-macos-catalina">
+<span id="note-on-catalina"></span><h4>Notes on macOS Catalina<a class="headerlink" href="#notes-on-macos-catalina" title="Permalink to this headline">¶</a></h4>
+<p>Apple introduced a couple of changes on macOS Catalina compared to its previous versions of macOS which might
+be a stumble block. Here I <strong>very</strong> briefly try to add some notes in order to get a smooth installation for
+<tt class="docutils literal"><span class="pre">musrfit</span></tt>.</p>
+<ol class="arabic">
+<li><p class="first">You should switch from the bash to the zsh. Please check, e.g. <a class="reference external" href="https://scriptingosx.com/2019/06/moving-to-zsh/">Moving to zsh</a>.</p>
+</li>
+<li><p class="first">Instead of <tt class="docutils literal"><span class="pre">.profile</span></tt> you will need to setup a <tt class="docutils literal"><span class="pre">.zprofile</span></tt>.</p>
+</li>
+<li><p class="first">macports: currently there is a little nuisance with the <tt class="docutils literal"><span class="pre">fftw-3</span></tt> port. My bug report is already out since a while
+but no proper fix is available. The workaround to get it right is to install the port from source which is done by</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ port -s install fftw-3
+</pre></div>
+</div>
+<p>If you fail to do so, you might trigger a crash in the Fourier transform for 2^N, N=12.</p>
+</li>
+</ol>
 </div>
 </div>
 <div class="section" id="requirements-fink">
@@ -1230,6 +1249,7 @@ $ musrview test-histo-ROOT-NPP.msr
 <li><a class="reference internal" href="#requirements-macports">Requirements (MacPorts)</a><ul>
 <li><a class="reference internal" href="#index-28">Installation of NeXus requirements (optional)</a></li>
 <li><a class="reference internal" href="#index-29">ROOT</a></li>
+<li><a class="reference internal" href="#notes-on-macos-catalina">Notes on macOS Catalina</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#requirements-fink">Requirements (Fink)</a><ul>
@@ -1296,7 +1316,7 @@ $ musrview test-histo-ROOT-NPP.msr
     </div>
     <div class="footer">
         &copy; Copyright 2019, Andreas Suter.
-      Last updated on Oct 10, 2019.
+      Last updated on Jan 30, 2020.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
