@@ -378,7 +378,7 @@ void PRunAsymmetry::SetFitRangeBin(const TString fitRange)
 }
 
 //--------------------------------------------------------------------------
-// CalcNoOfFitBins (protected)
+// CalcNoOfFitBins (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculate the number of fitted bins for the current fit range.

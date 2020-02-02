@@ -55,8 +55,9 @@ class PRunAsymmetryRRF : public PRunBase
     virtual Int_t GetStartTimeBin() { return fStartTimeBin; }
     virtual Int_t GetEndTimeBin() { return fEndTimeBin; }
 
-  protected:
     virtual void CalcNoOfFitBins();
+
+  protected:
     virtual Bool_t PrepareData();
     virtual Bool_t PrepareFitData();
     virtual Bool_t PrepareViewData(PRawRunData* runData, UInt_t histoNo[2]);

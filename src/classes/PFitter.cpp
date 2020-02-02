@@ -79,30 +79,38 @@
 PSectorChisq::PSectorChisq(UInt_t noOfRuns) : fNoOfRuns(noOfRuns)
 {
   // init
-  fFirst = 0.0;
   fLast  = 0.0;
   fChisq = 0.0;
   fNDF   = 0;
+  fFirst.resize(fNoOfRuns);
   fChisqRun.resize(fNoOfRuns);
   fNDFRun.resize(fNoOfRuns);
   for (UInt_t i=0; i<fNoOfRuns; i++) {
+    fFirst[i] = 0.0;
     fChisqRun[i] = 0.0;
     fNDFRun[i] = 0;
   }
 }
 
 //--------------------------------------------------------------------------
-// SetTimeRange
+// SetRunFirstTime
 //--------------------------------------------------------------------------
 /**
- * <p>Set the time range for one sector
+ * <p>Set the time of the fgb of a given RUN
  *
  * @param first time stamp of the fgb
- * @param last time stamp of the requested sector end
+ * @param idx index of the RUN
  */
-void PSectorChisq::SetTimeRange(Double_t first, Double_t last)
+void PSectorChisq::SetRunFirstTime(Double_t first, UInt_t idx)
 {
-  // NOT YET IMPLEMENTED //as35
+  if (idx > fNoOfRuns) {
+    std::cerr << "**WARNING** from PSectorChisq::SetRunFirstTime. It tries to set" << std::endl;
+    std::cerr << "    a fgb time stamp with idx=" << idx << " which is larger than #RUNS=" << fNoOfRuns << "." << std::endl;
+    std::cerr << "    Will ignore it, but you better check what is going on!" << std::endl;
+    return;
+  }
+
+  fFirst[idx] = first;
 }
 
 //--------------------------------------------------------------------------
@@ -116,7 +124,14 @@ void PSectorChisq::SetTimeRange(Double_t first, Double_t last)
  */
 void PSectorChisq::SetChisq(Double_t chisq, UInt_t idx)
 {
-  // NOT YET IMPLEMENTED //as35
+  if (idx > fNoOfRuns) {
+    std::cerr << "**WARNING** from PSectorChisq::SetChisq. It tries to set" << std::endl;
+    std::cerr << "    a chisq with idx=" << idx << " which is larger than #RUNS=" << fNoOfRuns << "." << std::endl;
+    std::cerr << "    Will ignore it, but you better check what is going on!" << std::endl;
+    return;
+  }
+
+  fChisqRun[idx] = chisq;
 }
 
 //--------------------------------------------------------------------------
@@ -130,7 +145,33 @@ void PSectorChisq::SetChisq(Double_t chisq, UInt_t idx)
  */
 void PSectorChisq::SetNDF(Double_t ndf, UInt_t idx)
 {
-  // NOT YET IMPLEMENTED //as35
+  if (idx > fNoOfRuns) {
+    std::cerr << "**WARNING** from PSectorChisq::SetNDF. It tries to set" << std::endl;
+    std::cerr << "    a NDF with idx=" << idx << " which is larger than #RUNS=" << fNoOfRuns << "." << std::endl;
+    std::cerr << "    Will ignore it, but you better check what is going on!" << std::endl;
+    return;
+  }
+
+  fNDFRun[idx] = ndf;
+}
+
+//--------------------------------------------------------------------------
+// GetTimeRangeFirst
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the fgb time of RUN with index idx. If idx is out-of-range
+ * PMUSR_UNDEFINED is returned.
+ *
+ * @param idx index of the RUN
+ *
+ * <b>return:</b> return the fgb time of RUN with index idx.
+ */
+Double_t PSectorChisq::GetTimeRangeFirst(UInt_t idx)
+{
+  if (idx > fNoOfRuns)
+    return PMUSR_UNDEFINED;
+
+  return fFirst[idx];
 }
 
 //--------------------------------------------------------------------------
@@ -190,6 +231,8 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bo
   fUseChi2 = true; // chi^2 is the default
 
   fStrategy = 1; // 0=low, 1=default, 2=high
+
+  fSectorFlag = false;
 
   fParams = *(runInfo->GetMsrParamList());
   fCmdLines = *runInfo->GetMsrCommands();
@@ -276,6 +319,11 @@ Bool_t PFitter::DoFit()
 
   // check if only chisq/maxLH shall be calculated once
   if (fChisqOnly) {
+
+    // check for sector command
+    if (fSectorFlag)
+      PrepareSector();
+
     std::vector<Double_t> param = fMnUserParams.Params();
     std::vector<Double_t> error = fMnUserParams.Errors();
     Int_t usedParams = 0;
@@ -288,12 +336,12 @@ Bool_t PFitter::DoFit()
     if (fUseChi2) {
       // calculate expected chisq
       Double_t totalExpectedChisq = 0.0;
-      std::vector<Double_t> expectedChisqPerHisto;
-      fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerHisto);
+      std::vector<Double_t> expectedChisqPerRun;
+      fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerRun);
       // calculate chisq per run
-      std::vector<Double_t> chisqPerHisto;
+      std::vector<Double_t> chisqPerRun;
       for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
-        chisqPerHisto.push_back(fRunListCollection->GetSingleRunChisq(param, i));
+        chisqPerRun.push_back(fRunListCollection->GetSingleRunChisq(param, i));
       }
 
       std::cout << std::endl << std::endl << ">> chisq = " << val << ", NDF = " << ndf << ", chisq/NDF = " << val/ndf;
@@ -301,25 +349,137 @@ Bool_t PFitter::DoFit()
       if (totalExpectedChisq != 0.0) {
         std::cout << std::endl << ">> expected chisq = " << totalExpectedChisq << ", NDF = " << ndf << ", expected chisq/NDF = " << totalExpectedChisq/ndf;
         UInt_t ndf_histo = 0;
-        for (UInt_t i=0; i<expectedChisqPerHisto.size(); i++) {
+        for (UInt_t i=0; i<expectedChisqPerRun.size(); i++) {
           ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
           if (ndf_histo > 0)
-            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq/red.chisq_e) = (" << ndf_histo << "/" << chisqPerHisto[i]/ndf_histo << "/" << expectedChisqPerHisto[i]/ndf_histo << ")";
+            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq/red.chisq_e) = (" << ndf_histo << "/" << chisqPerRun[i]/ndf_histo << "/" << expectedChisqPerRun[i]/ndf_histo << ")";
         }
-      } else if (chisqPerHisto.size() > 0) { // in case expected chisq is not applicable like for asymmetry fits
+      } else if (chisqPerRun.size() > 0) { // in case expected chisq is not applicable like for asymmetry fits
         UInt_t ndf_histo = 0;
-        for (UInt_t i=0; i<chisqPerHisto.size(); i++) {
+        for (UInt_t i=0; i<chisqPerRun.size(); i++) {
           ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
           if (ndf_histo > 0)
-            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq) = (" << ndf_histo << "/" << chisqPerHisto[i]/ndf_histo << ")";
+            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq) = (" << ndf_histo << "/" << chisqPerRun[i]/ndf_histo << ")";
         }
       }
 
       // clean up
-      chisqPerHisto.clear();
-      expectedChisqPerHisto.clear();
+      chisqPerRun.clear();
+      expectedChisqPerRun.clear();
+
+      if (fSectorFlag) {
+        PDoublePairVector secFitRange;
+        secFitRange.resize(1);
+        for (UInt_t k=0; k<fSector.size(); k++) {
+          // set sector fit range
+          secFitRange[0].first = fSector[k].GetTimeRangeFirst(0);
+          secFitRange[0].second = fSector[k].GetTimeRangeLast();
+          fRunListCollection->SetFitRange(secFitRange);
+          // calculate chisq
+          val = (*fFitterFcn)(param);
+          // calculate NDF
+          ndf = static_cast<int>(fFitterFcn->GetTotalNoOfFittedBins()) - usedParams;
+          // calculate expected chisq
+          totalExpectedChisq = 0.0;
+          fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerRun);
+          // calculate chisq per run
+          for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
+            chisqPerRun.push_back(fRunListCollection->GetSingleRunChisq(param, i));
+          }
+
+          std::cout << std::endl;
+          std::cout << "++++" << std::endl;
+          std::cout << ">> Sector " << k << ": FitRange: " << secFitRange[0].first << ", " << secFitRange[0].second << std::endl;
+          std::cout << ">> chisq = " << val << ", NDF = " << ndf << ", chisq/NDF = " << val/ndf;
+
+          if (totalExpectedChisq != 0.0) {
+            std::cout << std::endl << ">> expected chisq = " << totalExpectedChisq << ", NDF = " << ndf << ", expected chisq/NDF = " << totalExpectedChisq/ndf;
+            UInt_t ndf_histo = 0;
+            for (UInt_t i=0; i<expectedChisqPerRun.size(); i++) {
+              ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+              if (ndf_histo > 0)
+                std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq/red.chisq_e) = (" << ndf_histo << "/" << chisqPerRun[i]/ndf_histo << "/" << expectedChisqPerRun[i]/ndf_histo << ")";
+            }
+          } else if (chisqPerRun.size() > 0) { // in case expected chisq is not applicable like for asymmetry fits
+            UInt_t ndf_histo = 0;
+            for (UInt_t i=0; i<chisqPerRun.size(); i++) {
+              ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+              if (ndf_histo > 0)
+                std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq) = (" << ndf_histo << "/" << chisqPerRun[i]/ndf_histo << ")";
+            }
+          }
+          // clean up
+          chisqPerRun.clear();
+          expectedChisqPerRun.clear();
+        }
+      }
     } else { // max. log likelihood
+      // calculate expected maxLH
+      Double_t totalExpectedMaxLH = 0.0;
+      std::vector<Double_t> expectedMaxLHPerRun;
+      fFitterFcn->CalcExpectedChiSquare(param, totalExpectedMaxLH, expectedMaxLHPerRun);
+      // calculate maxLH per run
+      std::vector<Double_t> maxLHPerRun;
+      for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
+        maxLHPerRun.push_back(fRunListCollection->GetSingleRunMaximumLikelihood(param, i));
+      }
+
       std::cout << std::endl << std::endl << ">> maxLH = " << val << ", NDF = " << ndf << ", maxLH/NDF = " << val/ndf;
+
+      if (totalExpectedMaxLH != 0.0) {
+        std::cout << std::endl << ">> expected maxLH = " << totalExpectedMaxLH << ", NDF = " << ndf << ", expected maxLH/NDF = " << totalExpectedMaxLH/ndf;
+        UInt_t ndf_histo = 0;
+        for (UInt_t i=0; i<expectedMaxLHPerRun.size(); i++) {
+          ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+          if (ndf_histo > 0)
+            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/maxLH.chisq/maxLH.chisq_e) = (" << ndf_histo << "/" << maxLHPerRun[i]/ndf_histo << "/" << expectedMaxLHPerRun[i]/ndf_histo << ")";
+        }
+      }
+
+      // clean up
+      maxLHPerRun.clear();
+      expectedMaxLHPerRun.clear();
+
+      if (fSectorFlag) {
+        PDoublePairVector secFitRange;
+        secFitRange.resize(1);
+        for (UInt_t k=0; k<fSector.size(); k++) {
+          // set sector fit range
+          secFitRange[0].first = fSector[k].GetTimeRangeFirst(0);
+          secFitRange[0].second = fSector[k].GetTimeRangeLast();
+          fRunListCollection->SetFitRange(secFitRange);
+          // calculate maxLH
+          val = (*fFitterFcn)(param);
+          // calculate NDF
+          ndf = static_cast<int>(fFitterFcn->GetTotalNoOfFittedBins()) - usedParams;
+          // calculate expected maxLH
+          totalExpectedMaxLH = 0.0;
+          fFitterFcn->CalcExpectedChiSquare(param, totalExpectedMaxLH, expectedMaxLHPerRun);
+          // calculate maxLH per run
+          for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
+            maxLHPerRun.push_back(fRunListCollection->GetSingleRunMaximumLikelihood(param, i));
+          }
+
+          std::cout << std::endl;
+          std::cout << "++++" << std::endl;
+          std::cout << ">> Sector " << k << ": FitRange: " << secFitRange[0].first << ", " << secFitRange[0].second << std::endl;
+          std::cout << ">> maxLH = " << val << ", NDF = " << ndf << ", maxLH/NDF = " << val/ndf;
+
+          if (totalExpectedMaxLH != 0.0) {
+            std::cout << std::endl << ">> expected maxLH = " << totalExpectedMaxLH << ", NDF = " << ndf << ", expected maxLH/NDF = " << totalExpectedMaxLH/ndf;
+            UInt_t ndf_histo = 0;
+            for (UInt_t i=0; i<expectedMaxLHPerRun.size(); i++) {
+              ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+              if (ndf_histo > 0)
+                std::cout << std::endl << ">> run block " << i+1 << ": (NDF/maxLH.chisq/maxLH.chisq_e) = (" << ndf_histo << "/" << maxLHPerRun[i]/ndf_histo << "/" << expectedMaxLHPerRun[i]/ndf_histo << ")";
+            }
+          }
+
+          // clean up
+          maxLHPerRun.clear();
+          expectedMaxLHPerRun.clear();
+        }
+      }
     }
     std::cout << std::endl << std::endl;
     return true;
@@ -395,6 +555,9 @@ Bool_t PFitter::DoFit()
         break;
       case PMN_SCAN:
         status = ExecuteScan();
+        break;
+      case PMN_SECTOR:
+        // nothing to be done here
         break;
       case PMN_SIMPLEX:
         status = ExecuteSimplex();
@@ -996,6 +1159,7 @@ Bool_t PFitter::CheckCommands()
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
     } else if (line.Contains("SECTOR", TString::kIgnoreCase)) {
+      fSectorFlag = true;
       cmd.first  = PMN_SECTOR;
       cmd.second = cmdLineNo;
       fCmdList.push_back(cmd);
@@ -1019,11 +1183,15 @@ Bool_t PFitter::CheckCommands()
           tokens = nullptr;
         }
         fIsValid = false;
+        fSectorFlag = false;
         break;
       }
 
       Double_t dval;
       for (Int_t i=1; i<tokens->GetEntries(); i++) {
+        // keep time range of sector
+        PSectorChisq sec(fRunInfo->GetNoOfRuns());
+        // get parse tokens
         ostr = dynamic_cast<TObjString*>(tokens->At(i));
         str = ostr->GetString();
         if (str.IsFloat()) {
@@ -1042,9 +1210,13 @@ Bool_t PFitter::CheckCommands()
                 tokens = nullptr;
               }
               fIsValid = false;
+              fSectorFlag = false;
               return fIsValid;
             }
+            sec.SetRunFirstTime(fOriginalFitRange[j].first, j); // keep fgb time stamp for sector
           }
+          sec.SetSectorTime(dval);
+          fSector.push_back(sec);
         } else { // sector element is NOT a float
           std::cerr << std::endl << ">> PFitter::CheckCommands(): **FATAL ERROR** in line " << it->fLineNo;
           std::cerr << std::endl << ">> " << line.Data();
@@ -1057,6 +1229,7 @@ Bool_t PFitter::CheckCommands()
             tokens = nullptr;
           }
           fIsValid = false;
+          fSectorFlag = false;
           break;
         }
       }
@@ -1216,7 +1389,7 @@ Bool_t PFitter::ExecuteFitRange(UInt_t lineNo)
 
   PMsrRunList *runList = fRunInfo->GetMsrRunList();
 
-  // execute command, no error  checking needed since this has been already carried out in CheckCommands()
+  // execute command, no error checking needed since this has been already carried out in CheckCommands()
   if (tokens->GetEntries() == 2) { // reset command
     fRunListCollection->SetFitRange(fOriginalFitRange);
   } else if (tokens->GetEntries() == 3) { // single fit range for all runs    
@@ -2161,10 +2334,35 @@ Bool_t PFitter::ExecuteSimplex()
 }
 
 //--------------------------------------------------------------------------
+// PrepareSector
+//--------------------------------------------------------------------------
+/**
+ * <p>Collect all the necessary chisq/maxLH sector information.
+ */
+void PFitter::PrepareSector()
+{
+  // NOT YET IMPLEMENTED //as35
+
+/*
+  for (UInt_t i=0; i<fSector.size(); i++) {
+    std::cout << "debug> +++++" << std::endl;
+    std::cout << "debug> sector " << i << std::endl;
+    std::cout << "debug>   noOfRuns: " << fSector[i].GetNoRuns() << std::endl;
+    for (UInt_t j=0; j<fSector[i].GetNoRuns(); j++) {
+      std::cout << "debug> ----" << std::endl;
+      std::cout << "debug> RUN BLOCK " << j << std::endl;
+      std::cout << "debug> Sector Time Range: " << fSector[i].GetTimeRangeFirst(j) << ", " << fSector[i].GetTimeRangeLast() << std::endl;
+    }
+  }
+*/
+}
+
+//--------------------------------------------------------------------------
 // ExecuteSector
 //--------------------------------------------------------------------------
 /**
- * <p>Collects all the necessary chisq/maxLH for the given sectors.
+ * <p>Write all chisq/maxLH sector information to MINUIT.OUTPUT and dump it
+ * to stdout.
  *
  * <b>return:</b> if the sector command was successful, otherwise return flase.
  */

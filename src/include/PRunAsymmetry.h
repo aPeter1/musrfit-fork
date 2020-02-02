@@ -56,8 +56,9 @@ class PRunAsymmetry : public PRunBase
     virtual Int_t GetEndTimeBin() { return fEndTimeBin; }
     virtual Int_t GetPacking() { return fPacking; }
 
-  protected:
     virtual void CalcNoOfFitBins();
+
+  protected:
     virtual Bool_t PrepareData();
     virtual Bool_t PrepareFitData();
     virtual Bool_t PrepareViewData(PRawRunData* runData, UInt_t histoNo[2]);

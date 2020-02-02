@@ -55,8 +55,9 @@ class PRunMuMinus : public PRunBase
     virtual Int_t GetEndTimeBin() { return fEndTimeBin; }
     virtual Int_t GetPacking() { return fPacking; }
 
-  protected:
     virtual void CalcNoOfFitBins();
+
+  protected:
     virtual Bool_t PrepareData();
     virtual Bool_t PrepareFitData(PRawRunData* runData, const UInt_t histoNo);
     virtual Bool_t PrepareRawViewData(PRawRunData* runData, const UInt_t histoNo);

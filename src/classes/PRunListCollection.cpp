@@ -206,18 +206,30 @@ void PRunListCollection::SetFitRange(const TString fitRange)
  */
 void PRunListCollection::SetFitRange(const PDoublePairVector fitRange)
 {
-  for (UInt_t i=0; i<fRunSingleHistoList.size(); i++)
+  for (UInt_t i=0; i<fRunSingleHistoList.size(); i++) {
     fRunSingleHistoList[i]->SetFitRange(fitRange);
-  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++)
+    fRunSingleHistoList[i]->CalcNoOfFitBins(); // needed to update fStartTimeBin, fEndTimeBin
+  }
+  for (UInt_t i=0; i<fRunSingleHistoRRFList.size(); i++) {
     fRunSingleHistoRRFList[i]->SetFitRange(fitRange);
-  for (UInt_t i=0; i<fRunAsymmetryList.size(); i++)
+    fRunSingleHistoRRFList[i]->CalcNoOfFitBins(); // needed to update fStartTimeBin, fEndTimeBin
+  }
+  for (UInt_t i=0; i<fRunAsymmetryList.size(); i++) {
     fRunAsymmetryList[i]->SetFitRange(fitRange);
-  for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++)
+    fRunAsymmetryList[i]->CalcNoOfFitBins(); // needed to update fStartTimeBin, fEndTimeBin
+  }
+  for (UInt_t i=0; i<fRunAsymmetryRRFList.size(); i++) {
     fRunAsymmetryRRFList[i]->SetFitRange(fitRange);
-  for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++)
+    fRunAsymmetryRRFList[i]->CalcNoOfFitBins(); // needed to update fStartTimeBin, fEndTimeBin
+  }
+  for (UInt_t i=0; i<fRunAsymmetryBNMRList.size(); i++) {
     fRunAsymmetryBNMRList[i]->SetFitRange(fitRange);
-  for (UInt_t i=0; i<fRunMuMinusList.size(); i++)
+    fRunAsymmetryBNMRList[i]->CalcNoOfFitBins(); // needed to update fStartTimeBin, fEndTimeBin
+  }
+  for (UInt_t i=0; i<fRunMuMinusList.size(); i++) {
     fRunMuMinusList[i]->SetFitRange(fitRange);
+    fRunMuMinusList[i]->CalcNoOfFitBins(); // needed to update fStartTimeBin, fEndTimeBin
+  }
   for (UInt_t i=0; i<fRunNonMusrList.size(); i++)
     fRunNonMusrList[i]->SetFitRange(fitRange);
 }

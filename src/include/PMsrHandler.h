@@ -66,6 +66,8 @@ class PMsrHandler
 
     virtual TString* GetMsrFileDirectoryPath() { return &fMsrFileDirectoryPath; }
 
+    virtual UInt_t GetNoOfRuns() { return fRuns.size(); }
+
     virtual UInt_t GetNoOfParams() { return fParam.size(); }
     virtual const TString& GetFileName() const { return fFileName; }
 

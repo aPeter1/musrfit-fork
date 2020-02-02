@@ -382,7 +382,7 @@ void PRunMuMinus::SetFitRangeBin(const TString fitRange)
 }
 
 //--------------------------------------------------------------------------
-// CalcNoOfFitBins (private)
+// CalcNoOfFitBins (public)
 //--------------------------------------------------------------------------
 /**
  * <p>Calculate the number of fitted bins for the current fit range.

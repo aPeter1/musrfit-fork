@@ -54,8 +54,9 @@ class PRunSingleHistoRRF : public PRunBase
     virtual Int_t GetStartTimeBin() { return fStartTimeBin; }
     virtual Int_t GetEndTimeBin() { return fEndTimeBin; }
 
-  protected:
     virtual void CalcNoOfFitBins();
+
+  protected:
     virtual Bool_t PrepareData();
     virtual Bool_t PrepareFitData(PRawRunData* runData, const UInt_t histoNo);
     virtual Bool_t PrepareViewData(PRawRunData* runData, const UInt_t histoNo);

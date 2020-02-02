@@ -71,13 +71,14 @@ class PSectorChisq
   public:
     PSectorChisq(UInt_t noOfRuns);
 
-    void SetTimeRange(Double_t first, Double_t last);
+    void SetRunFirstTime(Double_t first, UInt_t idx);
+    void SetSectorTime(Double_t last) { fLast = last; }
     void SetChisq(Double_t chisq) { fChisq = chisq; }
     void SetChisq(Double_t chisq, UInt_t idx);
     void SetNDF(Double_t ndf) { fNDF = ndf; }
     void SetNDF(Double_t ndf, UInt_t idx);
 
-    Double_t GetTimeRangeFirst() { return fFirst; }
+    Double_t GetTimeRangeFirst(UInt_t idx);
     Double_t GetTimeRangeLast() { return fLast; }
     Double_t GetChisq() { return fChisq; }
     UInt_t   GetNDF() { return fNDF; }
@@ -87,10 +88,10 @@ class PSectorChisq
 
   private:
     UInt_t   fNoOfRuns; ///< number of runs presesent
-    Double_t fFirst; ///< time stamp for fgb
     Double_t fLast;  ///< requested time stamp
     Double_t fChisq; ///< chisq or maxLH for the sector
     UInt_t   fNDF;   ///< NDF for the sector
+    std::vector<Double_t> fFirst; ///< time stamp for fgb for a given run
     std::vector<Double_t> fChisqRun; ///< chisq or maxLH for the sector and run
     std::vector<UInt_t> fNDFRun; ///< NDF for the sector and run
 };
@@ -145,6 +146,7 @@ class PFitter
 
     PStringVector fElapsedTime;
 
+    Bool_t fSectorFlag; ///< sector command present flag
     std::vector<PSectorChisq> fSector; ///< stores all chisq/maxLH sector information
 
     // commands
@@ -165,6 +167,7 @@ class PFitter
     Bool_t ExecuteScan();
     Bool_t ExecuteSave(Bool_t first);
     Bool_t ExecuteSimplex();
+    void   PrepareSector();
     Bool_t ExecuteSector();
 
     Double_t MilliTime();
