@@ -12,6 +12,12 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.5.2, 2020/02/03
+=============================
+
+Implemented a SECTOR command. It allows to get chisq/maxLH information from 
+different time sector slots.
+
 Release of V1.5.0, 2019/05/15
 =============================
 
