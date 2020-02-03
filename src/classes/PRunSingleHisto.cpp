@@ -276,9 +276,9 @@ Double_t PRunSingleHisto::CalcChiSquareExpected(const std::vector<Double_t>& par
   Int_t chunk = (fEndTimeBin - fStartTimeBin)/omp_get_num_procs();
   if (chunk < 10)
     chunk = 10;
-  #pragma omp parallel for default(shared) private(i,time,diff) schedule(dynamic,chunk) reduction(+:chisq)
+  #pragma omp parallel for default(shared) private(i,time,theo,diff) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
-  for (i=fStartTimeBin; i < fEndTimeBin; ++i) {
+  for (i=fStartTimeBin; i<fEndTimeBin; ++i) {
     time = fData.GetDataTimeStart() + static_cast<Double_t>(i)*fData.GetDataTimeStep();
     theo = N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg;
     diff = fData.GetValue()->at(i) - theo;
@@ -373,9 +373,8 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
     time = fData.GetDataTimeStart() + static_cast<Double_t>(i)*fData.GetDataTimeStep();
     // calculate theory for the given parameter set
     theo = N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg;
-    theo *= normalizer;
 
-    data = normalizer*fData.GetValue()->at(i);
+    data = fData.GetValue()->at(i);
 
     if (theo <= 0.0) {
       std::cerr << ">> PRunSingleHisto::CalcMaxLikelihood: **WARNING** NEGATIVE theory!!" << std::endl;
@@ -389,7 +388,7 @@ Double_t PRunSingleHisto::CalcMaxLikelihood(const std::vector<Double_t>& par)
     }
   }
 
-  return 2.0*mllh;
+  return normalizer*2.0*mllh;
 }
 
 //--------------------------------------------------------------------------
@@ -472,9 +471,8 @@ Double_t PRunSingleHisto::CalcMaxLikelihoodExpected(const std::vector<Double_t>&
     time = fData.GetDataTimeStart() + static_cast<Double_t>(i)*fData.GetDataTimeStep();
     // calculate theory for the given parameter set
     theo = N0*TMath::Exp(-time/tau)*(1.0+fTheory->Func(time, par, fFuncValues))+bkg;
-    theo *= normalizer;
 
-    data = normalizer*fData.GetValue()->at(i);
+    data = fData.GetValue()->at(i);
 
     if (theo <= 0.0) {
       std::cerr << ">> PRunSingleHisto::CalcMaxLikelihood: **WARNING** NEGATIVE theory!!" << std::endl;
@@ -486,7 +484,7 @@ Double_t PRunSingleHisto::CalcMaxLikelihoodExpected(const std::vector<Double_t>&
     }
   }
 
-  return 2.0*mllh;
+  return normalizer*2.0*mllh;
 }
 
 //--------------------------------------------------------------------------

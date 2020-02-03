@@ -113,14 +113,14 @@ void PFitterFcn::CalcExpectedChiSquare(const std::vector<Double_t> &par, Double_
   if (fUseChi2) {
     // single histo
     for (UInt_t i=0; i<fRunListCollection->GetNoOfSingleHisto(); i++) {
-      value = fRunListCollection->GetSingleHistoChisqExpected(par, i); // calculate the expected chisq for single histo run block 'i'
+      value = fRunListCollection->GetSingleRunChisqExpected(par, i); // calculate the expected chisq for single histo run block 'i'
       expectedChisqPerRun.push_back(value);
       totalExpectedChisq += value;
     }
   } else { // log max. likelihood
     // single histo
     for (UInt_t i=0; i<fRunListCollection->GetNoOfSingleHisto(); i++) {
-      value = fRunListCollection->GetSingleHistoMaximumLikelihoodExpected(par, i); // calculate the expected mlh for single histo run block 'i'
+      value = fRunListCollection->GetSingleRunMaximumLikelihoodExpected(par, i); // calculate the expected mlh for single histo run block 'i'
       expectedChisqPerRun.push_back(value);
       totalExpectedChisq += value;
     }

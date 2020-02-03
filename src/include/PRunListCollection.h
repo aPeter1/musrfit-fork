@@ -67,7 +67,7 @@ class PRunListCollection
     virtual Double_t GetMuMinusChisq(const std::vector<Double_t>& par) const;
     virtual Double_t GetNonMusrChisq(const std::vector<Double_t>& par) const;
 
-    virtual Double_t GetSingleHistoChisqExpected(const std::vector<Double_t>& par, const UInt_t idx) const;
+    virtual Double_t GetSingleRunChisqExpected(const std::vector<Double_t>& par, const UInt_t idx) const;
     virtual Double_t GetSingleRunChisq(const std::vector<Double_t>& par, const UInt_t idx) const;
 
     virtual Double_t GetSingleHistoMaximumLikelihood(const std::vector<Double_t>& par) const;
@@ -78,7 +78,7 @@ class PRunListCollection
     virtual Double_t GetMuMinusMaximumLikelihood(const std::vector<Double_t>& par) const;
     virtual Double_t GetNonMusrMaximumLikelihood(const std::vector<Double_t>& par) const;
 
-    virtual Double_t GetSingleHistoMaximumLikelihoodExpected(const std::vector<Double_t>& par, const UInt_t idx) const;
+    virtual Double_t GetSingleRunMaximumLikelihoodExpected(const std::vector<Double_t>& par, const UInt_t idx) const;
     virtual Double_t GetSingleRunMaximumLikelihood(const std::vector<Double_t>& par, const UInt_t idx) const;
 
     virtual UInt_t GetNoOfBinsFitted(const UInt_t idx) const;

@@ -382,38 +382,39 @@ Double_t PRunListCollection::GetNonMusrChisq(const std::vector<Double_t>& par) c
 }
 
 //--------------------------------------------------------------------------
-// GetSingleHistoChisqExpected (public)
+// GetSingleRunChisqExpected (public)
 //--------------------------------------------------------------------------
 /**
- * <p>Calculates expected chi-square of the single histogram with run block index idx of a msr-file.
+ * <p>Calculates expected chi-square of the run block index idx of a msr-file.
  *
  * <b>return:</b>
- * - expected chi-square of for a single histogram
+ * - expected chi-square of for a single run block
  *
  * \param par fit parameter vector
  * \param idx run block index
  */
-Double_t PRunListCollection::GetSingleHistoChisqExpected(const std::vector<Double_t>& par, const UInt_t idx) const
+Double_t PRunListCollection::GetSingleRunChisqExpected(const std::vector<Double_t>& par, const UInt_t idx) const
 {
   Double_t expectedChisq = 0.0;
 
   if (idx > fMsrInfo->GetMsrRunList()->size()) {
-    std::cerr << ">> PRunListCollection::GetSingleHistoChisqExpected() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << std::endl << std::endl;
+    std::cerr << ">> PRunListCollection::GetSingleRunChisqExpected() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << std::endl << std::endl;
     return expectedChisq;
   }
 
+  UInt_t subIdx = 0;
   Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
   if (type == -1) { // i.e. not found in the RUN block, try the GLOBAL block
     type = fMsrInfo->GetMsrGlobal()->GetFitType();
+    subIdx = idx;
+  } else { // found in the RUN block
+    // count how many entries of this fit-type are present up to idx
+    for (UInt_t i=0; i<idx; i++) {
+      if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+        subIdx++;
+    }
   }
 
-  // count how many entries of this fit-type are present up to idx
-  UInt_t subIdx = 0;
-  for (UInt_t i=0; i<idx; i++) {
-    if ((fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type) ||
-        (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == -1)) // the -1 is needed if there is a global section
-      subIdx++;
-  }
 
   // return the chisq of the single run
   switch (type) {
@@ -661,36 +662,37 @@ Double_t PRunListCollection::GetNonMusrMaximumLikelihood(const std::vector<Doubl
 }
 
 //--------------------------------------------------------------------------
-// GetSingleHistoMaximumLikelihoodExpected (public)
+// GetSingleRunMaximumLikelihoodExpected (public)
 //--------------------------------------------------------------------------
 /**
- * <p>Calculates expected mlh of the single histogram with run block index idx of a msr-file.
+ * <p>Calculates expected mlh of the run block index idx of a msr-file.
  *
  * <b>return:</b>
- * - expected mlh of for a single histogram
+ * - expected mlh of for a single run block
  *
  * \param par fit parameter vector
  * \param idx run block index
  */
-Double_t PRunListCollection::GetSingleHistoMaximumLikelihoodExpected(const std::vector<Double_t>& par, const UInt_t idx) const
+Double_t PRunListCollection::GetSingleRunMaximumLikelihoodExpected(const std::vector<Double_t>& par, const UInt_t idx) const
 {
   Double_t expected_mlh = 0.0;
 
   if (idx > fMsrInfo->GetMsrRunList()->size()) {
-    std::cerr << ">> PRunListCollection::GetSingleHistoMaximumLikelihoodExpected() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << std::endl << std::endl;
+    std::cerr << ">> PRunListCollection::GetSingleRunMaximumLikelihoodExpected() **ERROR** idx=" << idx << " is out of range [0.." << fMsrInfo->GetMsrRunList()->size() << "[" << std::endl << std::endl;
     return expected_mlh;
   }
 
+  UInt_t subIdx = 0;
   Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
   if (type == -1) { // i.e. not found in the RUN block, try the GLOBAL block
     type = fMsrInfo->GetMsrGlobal()->GetFitType();
-  }
-
-  // count how many entries of this fit-type are present up to idx
-  UInt_t subIdx = 0;
-  for (UInt_t i=0; i<idx; i++) {
-    if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
-      subIdx++;
+    subIdx = idx;
+  } else { // found in the RUN block
+    // count how many entries of this fit-type are present up to idx
+    for (UInt_t i=0; i<idx; i++) {
+      if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+        subIdx++;
+    }
   }
 
   // return the mlh of the single run
@@ -772,16 +774,17 @@ UInt_t PRunListCollection::GetNoOfBinsFitted(const UInt_t idx) const
     return result;
   }
 
-  Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
-  if (type == -1) { // i.e. not forun in the RUN block, try the GLOBAL block
-    type = fMsrInfo->GetMsrGlobal()->GetFitType();
-  }
-
-  // count how many entries of this fit-type are present up to idx
   UInt_t subIdx = 0;
-  for (UInt_t i=0; i<idx; i++) {
-    if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
-      subIdx++;
+  Int_t type = fMsrInfo->GetMsrRunList()->at(idx).GetFitType();
+  if (type == -1) { // i.e. not found in the RUN block, try the GLOBAL block
+    type = fMsrInfo->GetMsrGlobal()->GetFitType();
+    subIdx = idx;
+  } else { // found in the RUN block
+    // count how many entries of this fit-type are present up to idx
+    for (UInt_t i=0; i<idx; i++) {
+      if (fMsrInfo->GetMsrRunList()->at(i).GetFitType() == type)
+        subIdx++;
+    }
   }
 
   // return the chisq of the single run

@@ -81,13 +81,16 @@ PSectorChisq::PSectorChisq(UInt_t noOfRuns) : fNoOfRuns(noOfRuns)
   // init
   fLast  = 0.0;
   fChisq = 0.0;
+  fExpectedChisq = 0.0;
   fNDF   = 0;
   fFirst.resize(fNoOfRuns);
   fChisqRun.resize(fNoOfRuns);
+  fExpectedChisqRun.resize(fNoOfRuns);
   fNDFRun.resize(fNoOfRuns);
   for (UInt_t i=0; i<fNoOfRuns; i++) {
     fFirst[i] = 0.0;
     fChisqRun[i] = 0.0;
+    fExpectedChisqRun[i] = 0.0;
     fNDFRun[i] = 0;
   }
 }
@@ -135,6 +138,27 @@ void PSectorChisq::SetChisq(Double_t chisq, UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
+// SetExpectedChisq
+//--------------------------------------------------------------------------
+/**
+ * <p>Set the expected chisq/maxLH for a given detector with index idx.
+ *
+ * @param chisq expected chisq/maxLH to be set
+ * @param idx index of the run to be set
+ */
+void PSectorChisq::SetExpectedChisq(Double_t chisq, UInt_t idx)
+{
+  if (idx > fNoOfRuns) {
+    std::cerr << "**WARNING** from PSectorChisq::SetExpectedChisq. It tries to set" << std::endl;
+    std::cerr << "    a chisq with idx=" << idx << " which is larger than #RUNS=" << fNoOfRuns << "." << std::endl;
+    std::cerr << "    Will ignore it, but you better check what is going on!" << std::endl;
+    return;
+  }
+
+  fExpectedChisqRun[idx] = chisq;
+}
+
+//--------------------------------------------------------------------------
 // SetNDF
 //--------------------------------------------------------------------------
 /**
@@ -143,7 +167,7 @@ void PSectorChisq::SetChisq(Double_t chisq, UInt_t idx)
  * @param ndf to be set
  * @param idx index of the run to be set
  */
-void PSectorChisq::SetNDF(Double_t ndf, UInt_t idx)
+void PSectorChisq::SetNDF(UInt_t ndf, UInt_t idx)
 {
   if (idx > fNoOfRuns) {
     std::cerr << "**WARNING** from PSectorChisq::SetNDF. It tries to set" << std::endl;
@@ -178,7 +202,7 @@ Double_t PSectorChisq::GetTimeRangeFirst(UInt_t idx)
 // GetChisq
 //--------------------------------------------------------------------------
 /**
- * <p>chisq/maxLH of the run with index idx
+ * <p>Get chisq/maxLH of the run with index idx
  *
  * @param idx index of the run
  *
@@ -193,10 +217,28 @@ Double_t PSectorChisq::GetChisq(UInt_t idx)
 }
 
 //--------------------------------------------------------------------------
-// GetChisq
+// GetExpectedChisq
 //--------------------------------------------------------------------------
 /**
- * <p>NDF of the run with index idx
+ * <p>Get expected chisq/maxLH of the run with index idx
+ *
+ * @param idx index of the run
+ *
+ * <b>return:</b> chisq/maxLH of the requested run or -1.0 if the idx is out-of-range.
+ */
+Double_t PSectorChisq::GetExpectedChisq(UInt_t idx)
+{
+  if (idx >= fNoOfRuns)
+    return -1.0;
+
+  return fExpectedChisqRun[idx];
+}
+
+//--------------------------------------------------------------------------
+// GetNDF
+//--------------------------------------------------------------------------
+/**
+ * <p>Get NDF of the run with index idx
  *
  * @param idx index of the run
  *
@@ -319,11 +361,6 @@ Bool_t PFitter::DoFit()
 
   // check if only chisq/maxLH shall be calculated once
   if (fChisqOnly) {
-
-    // check for sector command
-    if (fSectorFlag)
-      PrepareSector();
-
     std::vector<Double_t> param = fMnUserParams.Params();
     std::vector<Double_t> error = fMnUserParams.Errors();
     Int_t usedParams = 0;
@@ -331,12 +368,12 @@ Bool_t PFitter::DoFit()
       if (error[i] != 0.0)
         usedParams++;
     }
-    Int_t ndf = static_cast<int>(fFitterFcn->GetTotalNoOfFittedBins()) - usedParams;
+    UInt_t ndf = static_cast<int>(fFitterFcn->GetTotalNoOfFittedBins()) - usedParams;
     Double_t val = (*fFitterFcn)(param);
     if (fUseChi2) {
       // calculate expected chisq
       Double_t totalExpectedChisq = 0.0;
-      std::vector<Double_t> expectedChisqPerRun;
+      PDoubleVector expectedChisqPerRun;
       fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerRun);
       // calculate chisq per run
       std::vector<Double_t> chisqPerRun;
@@ -348,18 +385,18 @@ Bool_t PFitter::DoFit()
 
       if (totalExpectedChisq != 0.0) {
         std::cout << std::endl << ">> expected chisq = " << totalExpectedChisq << ", NDF = " << ndf << ", expected chisq/NDF = " << totalExpectedChisq/ndf;
-        UInt_t ndf_histo = 0;
+        UInt_t ndf_run = 0;
         for (UInt_t i=0; i<expectedChisqPerRun.size(); i++) {
-          ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
-          if (ndf_histo > 0)
-            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq/red.chisq_e) = (" << ndf_histo << "/" << chisqPerRun[i]/ndf_histo << "/" << expectedChisqPerRun[i]/ndf_histo << ")";
+          ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+          if (ndf_run > 0)
+            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq/red.chisq_e) = (" << ndf_run << "/" << chisqPerRun[i]/ndf_run << "/" << expectedChisqPerRun[i]/ndf_run << ")";
         }
       } else if (chisqPerRun.size() > 0) { // in case expected chisq is not applicable like for asymmetry fits
-        UInt_t ndf_histo = 0;
+        UInt_t ndf_run = 0;
         for (UInt_t i=0; i<chisqPerRun.size(); i++) {
-          ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
-          if (ndf_histo > 0)
-            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq) = (" << ndf_histo << "/" << chisqPerRun[i]/ndf_histo << ")";
+          ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+          if (ndf_run > 0)
+            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq) = (" << ndf_run << "/" << chisqPerRun[i]/ndf_run << ")";
         }
       }
 
@@ -378,7 +415,7 @@ Bool_t PFitter::DoFit()
           // calculate chisq
           val = (*fFitterFcn)(param);
           // calculate NDF
-          ndf = static_cast<int>(fFitterFcn->GetTotalNoOfFittedBins()) - usedParams;
+          ndf = static_cast<UInt_t>(fFitterFcn->GetTotalNoOfFittedBins()) - usedParams;
           // calculate expected chisq
           totalExpectedChisq = 0.0;
           fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerRun);
@@ -389,23 +426,23 @@ Bool_t PFitter::DoFit()
 
           std::cout << std::endl;
           std::cout << "++++" << std::endl;
-          std::cout << ">> Sector " << k << ": FitRange: " << secFitRange[0].first << ", " << secFitRange[0].second << std::endl;
+          std::cout << ">> Sector " << k+1 << ": FitRange: " << secFitRange[0].first << ", " << secFitRange[0].second << std::endl;
           std::cout << ">> chisq = " << val << ", NDF = " << ndf << ", chisq/NDF = " << val/ndf;
 
           if (totalExpectedChisq != 0.0) {
             std::cout << std::endl << ">> expected chisq = " << totalExpectedChisq << ", NDF = " << ndf << ", expected chisq/NDF = " << totalExpectedChisq/ndf;
-            UInt_t ndf_histo = 0;
+            UInt_t ndf_run = 0;
             for (UInt_t i=0; i<expectedChisqPerRun.size(); i++) {
-              ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
-              if (ndf_histo > 0)
-                std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq/red.chisq_e) = (" << ndf_histo << "/" << chisqPerRun[i]/ndf_histo << "/" << expectedChisqPerRun[i]/ndf_histo << ")";
+              ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+              if (ndf_run > 0)
+                std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq/red.chisq_e) = (" << ndf_run << "/" << chisqPerRun[i]/ndf_run << "/" << expectedChisqPerRun[i]/ndf_run << ")";
             }
           } else if (chisqPerRun.size() > 0) { // in case expected chisq is not applicable like for asymmetry fits
-            UInt_t ndf_histo = 0;
+            UInt_t ndf_run = 0;
             for (UInt_t i=0; i<chisqPerRun.size(); i++) {
-              ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
-              if (ndf_histo > 0)
-                std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq) = (" << ndf_histo << "/" << chisqPerRun[i]/ndf_histo << ")";
+              ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+              if (ndf_run > 0)
+                std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.chisq) = (" << ndf_run << "/" << chisqPerRun[i]/ndf_run << ")";
             }
           }
           // clean up
@@ -428,11 +465,11 @@ Bool_t PFitter::DoFit()
 
       if (totalExpectedMaxLH != 0.0) {
         std::cout << std::endl << ">> expected maxLH = " << totalExpectedMaxLH << ", NDF = " << ndf << ", expected maxLH/NDF = " << totalExpectedMaxLH/ndf;
-        UInt_t ndf_histo = 0;
+        UInt_t ndf_run = 0;
         for (UInt_t i=0; i<expectedMaxLHPerRun.size(); i++) {
-          ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
-          if (ndf_histo > 0)
-            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/maxLH.chisq/maxLH.chisq_e) = (" << ndf_histo << "/" << maxLHPerRun[i]/ndf_histo << "/" << expectedMaxLHPerRun[i]/ndf_histo << ")";
+          ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+          if (ndf_run > 0)
+            std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.maxLH/red.maxLH_e) = (" << ndf_run << "/" << maxLHPerRun[i]/ndf_run << "/" << expectedMaxLHPerRun[i]/ndf_run << ")";
         }
       }
 
@@ -462,16 +499,16 @@ Bool_t PFitter::DoFit()
 
           std::cout << std::endl;
           std::cout << "++++" << std::endl;
-          std::cout << ">> Sector " << k << ": FitRange: " << secFitRange[0].first << ", " << secFitRange[0].second << std::endl;
+          std::cout << ">> Sector " << k+1 << ": FitRange: " << secFitRange[0].first << ", " << secFitRange[0].second << std::endl;
           std::cout << ">> maxLH = " << val << ", NDF = " << ndf << ", maxLH/NDF = " << val/ndf;
 
           if (totalExpectedMaxLH != 0.0) {
             std::cout << std::endl << ">> expected maxLH = " << totalExpectedMaxLH << ", NDF = " << ndf << ", expected maxLH/NDF = " << totalExpectedMaxLH/ndf;
-            UInt_t ndf_histo = 0;
+            UInt_t ndf_run = 0;
             for (UInt_t i=0; i<expectedMaxLHPerRun.size(); i++) {
-              ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
-              if (ndf_histo > 0)
-                std::cout << std::endl << ">> run block " << i+1 << ": (NDF/maxLH.chisq/maxLH.chisq_e) = (" << ndf_histo << "/" << maxLHPerRun[i]/ndf_histo << "/" << expectedMaxLHPerRun[i]/ndf_histo << ")";
+              ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+              if (ndf_run > 0)
+                std::cout << std::endl << ">> run block " << i+1 << ": (NDF/red.maxLH/red.maxLH_e) = (" << ndf_run << "/" << maxLHPerRun[i]/ndf_run << "/" << expectedMaxLHPerRun[i]/ndf_run << ")";
             }
           }
 
@@ -1938,60 +1975,69 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
   // calculate expected chisq
   std::vector<Double_t> param;
   Double_t totalExpectedChisq = 0.0;
-  std::vector<Double_t> expectedChisqPerHisto;
+  std::vector<Double_t> expectedchisqPerRun;
   std::vector<UInt_t> ndfPerHisto;
 
   for (UInt_t i=0; i<fParams.size(); i++)
     param.push_back(fParams[i].fValue);
 
   // CalcExpectedChiSquare handles both, chisq and mlh
-  fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerHisto);
+  fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedchisqPerRun);
 
   // calculate chisq per run
-  std::vector<Double_t> chisqPerHisto;
+  std::vector<Double_t> chisqPerRun;
   for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
     if (fUseChi2)
-      chisqPerHisto.push_back(fRunListCollection->GetSingleRunChisq(param, i));
+      chisqPerRun.push_back(fRunListCollection->GetSingleRunChisq(param, i));
     else
-      chisqPerHisto.push_back(fRunListCollection->GetSingleRunMaximumLikelihood(param, i));
+      chisqPerRun.push_back(fRunListCollection->GetSingleRunMaximumLikelihood(param, i));
   }
 
   if (totalExpectedChisq != 0.0) { // i.e. applicable for single histogram fits only
     // get the ndf's of the histos
-    UInt_t ndf_histo;
-    for (UInt_t i=0; i<expectedChisqPerHisto.size(); i++) {
-      ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
-      ndfPerHisto.push_back(ndf_histo);
+    UInt_t ndf_run;
+    for (UInt_t i=0; i<expectedchisqPerRun.size(); i++) {
+      ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+      ndfPerHisto.push_back(ndf_run);
     }
 
     // feed the msr-file handler
     PMsrStatisticStructure *statistics = fRunInfo->GetMsrStatistic();
     if (statistics) {
-      statistics->fMinPerHisto = chisqPerHisto;
+      statistics->fMinPerHisto = chisqPerRun;
       statistics->fMinExpected = totalExpectedChisq;
-      statistics->fMinExpectedPerHisto = expectedChisqPerHisto;
+      statistics->fMinExpectedPerHisto = expectedchisqPerRun;
       statistics->fNdfPerHisto = ndfPerHisto;
     }
-  } else if (chisqPerHisto.size() > 1) { // in case expected chisq is not applicable like for asymmetry fits
-    UInt_t ndf_histo = 0;
-    for (UInt_t i=0; i<chisqPerHisto.size(); i++) {
-      ndf_histo = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
-      ndfPerHisto.push_back(ndf_histo);
+  } else if (chisqPerRun.size() > 1) { // in case expected chisq is not applicable like for asymmetry fits
+    UInt_t ndf_run = 0;
+    for (UInt_t i=0; i<chisqPerRun.size(); i++) {
+      ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+      ndfPerHisto.push_back(ndf_run);
     }
 
     // feed the msr-file handler
     PMsrStatisticStructure *statistics = fRunInfo->GetMsrStatistic();
     if (statistics) {
-      statistics->fMinPerHisto = chisqPerHisto;
+      statistics->fMinPerHisto = chisqPerRun;
       statistics->fNdfPerHisto = ndfPerHisto;
     }
   }
 
+  // check if sector command has been requested
+  if (fSectorFlag) {
+    PDoubleVector error;
+    for (UInt_t i=0; i<fParams.size(); i++)
+      error.push_back(fParams[i].fStep);
+
+    PrepareSector(param, error);
+  }
+
   // clean up
   param.clear();
-  expectedChisqPerHisto.clear();
+  expectedchisqPerRun.clear();
   ndfPerHisto.clear();
-  chisqPerHisto.clear();
+  chisqPerRun.clear();
 
   std::cout << ">> PFitter::ExecuteSave(): will write minuit2 output file ..." << std::endl;
 
@@ -2026,7 +2072,7 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
   fout << std::endl;
   fElapsedTime.clear();
 
-  // write global informations
+  // write global information
   fout << std::endl << " Fval() = " << mnState.Fval() << ", Edm() = " << mnState.Edm() << ", NFcn() = " << mnState.NFcn();
   fout << std::endl;
   fout << std::endl << "*************************************************************************";
@@ -2246,6 +2292,41 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
   } else {
     fout << std::endl << " no correlation coefficients available";
   }
+
+  fout << std::endl;
+  fout << std::endl << "*************************************************************************";
+  fout << std::endl << " chisq/maxLH RESULT ";
+  fout << std::endl << "*************************************************************************";
+  PMsrStatisticStructure *statistics = fRunInfo->GetMsrStatistic();
+
+  // get time range and write it
+  Double_t fitStartTime = PMUSR_UNDEFINED, fitEndTime = PMUSR_UNDEFINED;
+  // first check if there is a global block with a valid time range
+  PMsrGlobalBlock *global = fRunInfo->GetMsrGlobal();
+  fitStartTime = global->GetFitRange(0);
+  fitEndTime = global->GetFitRange(1);
+  if (fitStartTime == PMUSR_UNDEFINED) { // no global time range, hence take the one from the first run block
+    PMsrRunList *run = fRunInfo->GetMsrRunList();
+    fitStartTime = run->at(0).GetFitRange(0);
+    fitEndTime = run->at(0).GetFitRange(1);
+  }
+  fout.setf(std::ios::floatfield);
+  fout << std::endl << " Time Range: " << fitStartTime << ", " << fitEndTime << std::endl;
+  if (fUseChi2) {
+    fout.setf(std::ios::fixed, std::ios::floatfield);
+    fout << std::endl << " chisq   = " << std::setprecision(4) << statistics->fMin << ", NDF = " << statistics->fNdf << ", chisq/NDF   = " << std::setprecision(6) << statistics->fMin/statistics->fNdf;
+    if (statistics->fMinExpected > 0)
+      fout << std::endl << " chisq_e = " << std::setprecision(4) << statistics->fMinExpected << ", NDF = " << statistics->fNdf << ", chisq_e/NDF = " << std::setprecision(6) << statistics->fMinExpected/statistics->fNdf;
+  } else { // maxLH
+    fout.setf(std::ios::fixed, std::ios::floatfield);
+    fout << std::endl << " maxLH   = " << std::setprecision(4) << statistics->fMin << ", NDF = " << statistics->fNdf << ", maxLH/NDF   = " << std::setprecision(6) << statistics->fMin/statistics->fNdf;
+    if (statistics->fMinExpected > 0)
+      fout << std::endl << " maxLH_e = " << std::setprecision(4) << statistics->fMinExpected << ", NDF = " << statistics->fNdf << ", maxLH_e/NDF = " << std::setprecision(6) << statistics->fMinExpected/statistics->fNdf;
+  }
+
+  if (fSectorFlag)
+    ExecuteSector(fout);
+
   fout << std::endl;
   fout << std::endl << "*************************************************************************";
   fout << std::endl << " DONE ";
@@ -2338,23 +2419,112 @@ Bool_t PFitter::ExecuteSimplex()
 //--------------------------------------------------------------------------
 /**
  * <p>Collect all the necessary chisq/maxLH sector information.
+ *
+ * @param param parameter value vector of the converged fit.
+ * @param error step value vector of the converged fit.
  */
-void PFitter::PrepareSector()
+void PFitter::PrepareSector(PDoubleVector &param, PDoubleVector &error)
 {
-  // NOT YET IMPLEMENTED //as35
+  Double_t val;
+  UInt_t ndf;
 
-/*
-  for (UInt_t i=0; i<fSector.size(); i++) {
-    std::cout << "debug> +++++" << std::endl;
-    std::cout << "debug> sector " << i << std::endl;
-    std::cout << "debug>   noOfRuns: " << fSector[i].GetNoRuns() << std::endl;
-    for (UInt_t j=0; j<fSector[i].GetNoRuns(); j++) {
-      std::cout << "debug> ----" << std::endl;
-      std::cout << "debug> RUN BLOCK " << j << std::endl;
-      std::cout << "debug> Sector Time Range: " << fSector[i].GetTimeRangeFirst(j) << ", " << fSector[i].GetTimeRangeLast() << std::endl;
+  Int_t usedParams = 0;
+  for (UInt_t i=0; i<error.size(); i++) {
+    if (error[i] != 0.0)
+      usedParams++;
+  }
+
+  PDoublePairVector secFitRange;
+  secFitRange.resize(1);
+
+  if (fUseChi2) {
+    Double_t totalExpectedChisq = 0.0;
+    PDoubleVector expectedChisqPerRun;
+    PDoubleVector chisqPerRun;
+    for (UInt_t k=0; k<fSector.size(); k++) {
+      // set sector fit range
+      secFitRange[0].first = fSector[k].GetTimeRangeFirst(0);
+      secFitRange[0].second = fSector[k].GetTimeRangeLast();
+      fRunListCollection->SetFitRange(secFitRange);
+      // calculate chisq
+      val = (*fFitterFcn)(param);
+      fSector[k].SetChisq(val);
+      // calculate NDF
+      ndf = static_cast<UInt_t>(fFitterFcn->GetTotalNoOfFittedBins()) - usedParams;
+      fSector[k].SetNDF(ndf);
+      // calculate expected chisq
+      totalExpectedChisq = 0.0;
+      fFitterFcn->CalcExpectedChiSquare(param, totalExpectedChisq, expectedChisqPerRun);
+      fSector[k].SetExpectedChisq(totalExpectedChisq);
+      // calculate chisq per run
+      for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
+        chisqPerRun.push_back(fRunListCollection->GetSingleRunChisq(param, i));
+        fSector[k].SetChisq(chisqPerRun[i], i);
+        fSector[k].SetExpectedChisq(expectedChisqPerRun[i], i);
+      }
+
+      if (totalExpectedChisq != 0.0) {
+        UInt_t ndf_run = 0;
+        for (UInt_t i=0; i<expectedChisqPerRun.size(); i++) {
+          ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+          if (ndf_run > 0) {
+            fSector[k].SetNDF(ndf_run, i);
+          }
+        }
+      } else if (chisqPerRun.size() > 0) { // in case expected chisq is not applicable like for asymmetry fits
+        UInt_t ndf_run = 0;
+        for (UInt_t i=0; i<chisqPerRun.size(); i++) {
+          ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+          if (ndf_run > 0) {
+            fSector[k].SetNDF(ndf_run, i);
+          }
+        }
+      }
+      // clean up
+      chisqPerRun.clear();
+      expectedChisqPerRun.clear();
+    }
+  } else {
+    Double_t totalExpectedMaxLH = 0.0;
+    PDoubleVector expectedMaxLHPerRun;
+    PDoubleVector maxLHPerRun;
+    for (UInt_t k=0; k<fSector.size(); k++) {
+      // set sector fit range
+      secFitRange[0].first = fSector[k].GetTimeRangeFirst(0);
+      secFitRange[0].second = fSector[k].GetTimeRangeLast();
+      fRunListCollection->SetFitRange(secFitRange);
+      // calculate maxLH
+      val = (*fFitterFcn)(param);
+      fSector[k].SetChisq(val);
+      // calculate NDF
+      ndf = static_cast<UInt_t>(fFitterFcn->GetTotalNoOfFittedBins()) - usedParams;
+      fSector[k].SetNDF(ndf);
+      // calculate expected maxLH
+      totalExpectedMaxLH = 0.0;
+      fFitterFcn->CalcExpectedChiSquare(param, totalExpectedMaxLH, expectedMaxLHPerRun);
+      fSector[k].SetExpectedChisq(totalExpectedMaxLH);
+      // calculate maxLH per run
+      for (UInt_t i=0; i<fRunInfo->GetMsrRunList()->size(); i++) {
+        maxLHPerRun.push_back(fRunListCollection->GetSingleRunMaximumLikelihood(param, i));
+        fSector[k].SetChisq(maxLHPerRun[i], i);
+        fSector[k].SetExpectedChisq(expectedMaxLHPerRun[i], i);
+      }
+
+      if (totalExpectedMaxLH != 0.0) {
+        UInt_t ndf_run = 0;
+        for (UInt_t i=0; i<expectedMaxLHPerRun.size(); i++) {
+          ndf_run = fFitterFcn->GetNoOfFittedBins(i) - fRunInfo->GetNoOfFitParameters(i);
+          if (ndf_run > 0) {
+            fSector[k].SetNDF(ndf_run, i);
+          }
+        }
+      }
+
+      // clean up
+      maxLHPerRun.clear();
+      expectedMaxLHPerRun.clear();
     }
   }
-*/
 }
 
 //--------------------------------------------------------------------------
@@ -2366,9 +2536,50 @@ void PFitter::PrepareSector()
  *
  * <b>return:</b> if the sector command was successful, otherwise return flase.
  */
-Bool_t PFitter::ExecuteSector()
+Bool_t PFitter::ExecuteSector(std::ofstream &fout)
 {
-  // NOT YET IMPLEMENTED //as35
+  fout << std::endl;
+  fout << std::endl << "*************************************************************************";
+  fout << std::endl << " SECTOR RESULTS";
+  fout << std::endl << "*************************************************************************";
+
+  if (fUseChi2) {
+    for (UInt_t i=0; i<fSector.size(); i++) {
+      fout << std::endl;
+      fout << " Sector " << i+1 << ": FitRange: " << fSector[i].GetTimeRangeFirst(0) << ", " << fSector[i].GetTimeRangeLast() << std::endl;
+      fout << " chisq = " << fSector[i].GetChisq() << ", NDF = " << fSector[i].GetNDF() << ", chisq/NDF = " << fSector[i].GetChisq()/fSector[i].GetNDF();
+
+      if (fSector[i].GetExpectedChisq() > 0) {
+        fout << std::endl << " expected chisq = " << fSector[i].GetExpectedChisq() << ", NDF = " << fSector[i].GetNDF() << ", expected chisq/NDF = " << fSector[i].GetExpectedChisq()/fSector[i].GetNDF();
+        for (UInt_t j=0; j<fSector[i].GetNoRuns(); j++) {
+          fout << std::endl << " run block " << j+1 << " (NDF/red.chisq/red.chisq_e) = (" << fSector[i].GetNDF(j) << "/" << fSector[i].GetChisq(j)/fSector[i].GetNDF(j) << "/" << fSector[i].GetExpectedChisq(j)/fSector[i].GetNDF(j) << ")";
+        }
+      } else if (fSector[i].GetNoRuns() > 0) { // in case expected chisq is not applicable like for asymmetry fits
+        for (UInt_t j=0; j<fSector[i].GetNoRuns(); j++) {
+          fout << std::endl << " run block " << j+1 << " (NDF/red.chisq) = (" << fSector[i].GetNDF(j) << "/" << fSector[i].GetChisq(j)/fSector[i].GetNDF(j) << ")";
+        }
+      }
+      fout << std::endl << "++++";
+    }
+  } else { // max log likelihood
+    for (UInt_t i=0; i<fSector.size(); i++) {
+      fout << std::endl;
+      fout << " Sector " << i+1 << ": FitRange: " << fSector[i].GetTimeRangeFirst(0) << ", " << fSector[i].GetTimeRangeLast() << std::endl;
+      fout << " maxLH = " << fSector[i].GetChisq() << ", NDF = " << fSector[i].GetNDF() << ", maxLH/NDF = " << fSector[i].GetChisq()/fSector[i].GetNDF();
+
+      if (fSector[i].GetExpectedChisq() > 0) {
+        fout << std::endl << " expected maxLH = " << fSector[i].GetExpectedChisq() << ", NDF = " << fSector[i].GetNDF() << ", expected maxLH/NDF = " << fSector[i].GetExpectedChisq()/fSector[i].GetNDF();
+        for (UInt_t j=0; j<fSector[i].GetNoRuns(); j++) {
+          fout << std::endl << " run block " << j+1 << " (NDF/red.maxLH/red.maxLH_e) = (" << fSector[i].GetNDF(j) << "/" << fSector[i].GetChisq(j)/fSector[i].GetNDF(j) << "/" << fSector[i].GetExpectedChisq(j)/fSector[i].GetNDF(j) << ")";
+        }
+      } else if (fSector[i].GetNoRuns() > 0) { // in case expected chisq is not applicable like for asymmetry fits
+        for (UInt_t j=0; j<fSector[i].GetNoRuns(); j++) {
+          fout << std::endl << " run block " << j+1 << " (NDF/red.maxLH) = (" << fSector[i].GetNDF(j) << "/" << fSector[i].GetChisq(j)/fSector[i].GetNDF(j) << ")";
+        }
+      }
+      fout << std::endl << "++++";
+    }
+  }
 
   return true;
 }

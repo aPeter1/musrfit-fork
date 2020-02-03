@@ -75,25 +75,31 @@ class PSectorChisq
     void SetSectorTime(Double_t last) { fLast = last; }
     void SetChisq(Double_t chisq) { fChisq = chisq; }
     void SetChisq(Double_t chisq, UInt_t idx);
-    void SetNDF(Double_t ndf) { fNDF = ndf; }
-    void SetNDF(Double_t ndf, UInt_t idx);
+    void SetExpectedChisq(Double_t expChisq) { fExpectedChisq = expChisq; }
+    void SetExpectedChisq(Double_t chisq, UInt_t idx);
+    void SetNDF(UInt_t ndf) { fNDF = ndf; }
+    void SetNDF(UInt_t ndf, UInt_t idx);
 
     Double_t GetTimeRangeFirst(UInt_t idx);
     Double_t GetTimeRangeLast() { return fLast; }
     Double_t GetChisq() { return fChisq; }
-    UInt_t   GetNDF() { return fNDF; }
-    UInt_t   GetNoRuns() { return fNoOfRuns; }
     Double_t GetChisq(UInt_t idx);
+    Double_t GetExpectedChisq() { return fExpectedChisq; }
+    Double_t GetExpectedChisq(UInt_t idx);
+    UInt_t   GetNDF() { return fNDF; }
     UInt_t   GetNDF(UInt_t idx);
+    UInt_t   GetNoRuns() { return fNoOfRuns; }
 
   private:
     UInt_t   fNoOfRuns; ///< number of runs presesent
     Double_t fLast;  ///< requested time stamp
     Double_t fChisq; ///< chisq or maxLH for the sector
+    Double_t fExpectedChisq; ///< keep the expected chisq or maxLH for the sector
     UInt_t   fNDF;   ///< NDF for the sector
-    std::vector<Double_t> fFirst; ///< time stamp for fgb for a given run
-    std::vector<Double_t> fChisqRun; ///< chisq or maxLH for the sector and run
-    std::vector<UInt_t> fNDFRun; ///< NDF for the sector and run
+    PDoubleVector fFirst; ///< time stamp for fgb for a given run
+    PDoubleVector fChisqRun; ///< chisq or maxLH for the sector and run
+    PDoubleVector fExpectedChisqRun; ///< expected chisq or maxLH for the sector and run
+    PUIntVector fNDFRun; ///< NDF for the sector and run
 };
 
 //-----------------------------------------------------------------------------
@@ -146,7 +152,7 @@ class PFitter
 
     PStringVector fElapsedTime;
 
-    Bool_t fSectorFlag; ///< sector command present flag
+    Bool_t fSectorFlag; ///< sector command present flag    
     std::vector<PSectorChisq> fSector; ///< stores all chisq/maxLH sector information
 
     // commands
@@ -167,8 +173,8 @@ class PFitter
     Bool_t ExecuteScan();
     Bool_t ExecuteSave(Bool_t first);
     Bool_t ExecuteSimplex();
-    void   PrepareSector();
-    Bool_t ExecuteSector();
+    void   PrepareSector(PDoubleVector &param, PDoubleVector &error);
+    Bool_t ExecuteSector(std::ofstream &fout);
 
     Double_t MilliTime();
 };
