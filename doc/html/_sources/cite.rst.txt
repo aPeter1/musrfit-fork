@@ -1,0 +1,18 @@
+.. include:: <isogrk1.txt>
+.. index:: cite
+.. _cite:
+
+How to Cite ``musrfit``?
+========================
+
+Since quite some effort is going into the development and maintenance of the ``musrfit`` package, you should at least acknowledge it in your publication if you have used it to analyze your data. Even better of course is to cite it properly by the reference given beneath 
+
+ * A.\  Suter, B.M. Wojek, "Musrfit: A Free Platform-Independent Framework for |mgr|\SR Data Analysis", Physics Procedia **30**, 69 (2012). `<http://dx.doi.org/10.1016/j.phpro.2012.04.042>`_
+
+The GPU high speed ``musrfit`` version is utilizing ``DKS``. In case you are using this version, please also add the following citations
+
+ * A.\  Adelmann, U. Locans, A. Suter, "The Dynamic Kernel Scheduler—Part 1", Computer Physics Communications **207**, 83 (2016). `<https://doi.org/10.1016/j.cpc.2016.05.013>`_
+ * U.\  Locans, *et al.*, "Real-time computation of parameter fitting and image reconstruction using graphical processing units", Computer Physics Communications **215**, 71 (2017). `<https://doi.org/10.1016/j.cpc.2017.02.007>`_
+ * U.\ Locans and A.\ Suter, "Musrfit – Real Time Parameter Fitting Using GPUs", JPS Conf. Proc. *21*, 011051 (2018). `<http://dx.doi.org/10.7566/JPSCP.21.011051>`_
+
+

@@ -1,35 +1,24 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>musredit: the GUI Based Interface to musrfit &mdash; musrfit 1.5.1 documentation</title>
-    
+    <meta charset="utf-8" />
+    <title>musredit: the GUI Based Interface to musrfit &#8212; musrfit 1.5.2 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.5.1',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="musrfit 1.5.1 documentation" href="index.html" />
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="mupp - μSR Parameter Plotter" href="mupp.html" />
     <link rel="prev" title="Setting up musrfit / DKS: High Speed Fitting with GPU’s" href="setup-dks.html" /> 
-  </head>
-  <body>
-    <div class="related">
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -41,167 +30,160 @@
         <li class="right" >
           <a href="setup-dks.html" title="Setting up musrfit / DKS: High Speed Fitting with GPU’s"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">musrfit 1.5.1 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.5.2 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body">
+          <div class="body" role="main">
             
   <div class="section" id="musredit-the-gui-based-interface-to-musrfit">
-<span id="musredit-sec"></span><span id="index-0"></span><h1><tt class="docutils literal"><span class="pre">musredit</span></tt>: the GUI Based Interface to <tt class="docutils literal"><span class="pre">musrfit</span></tt><a class="headerlink" href="#musredit-the-gui-based-interface-to-musrfit" title="Permalink to this headline">¶</a></h1>
+<span id="musredit-sec"></span><span id="index-0"></span><h1><code class="docutils literal notranslate"><span class="pre">musredit</span></code>: the GUI Based Interface to <code class="docutils literal notranslate"><span class="pre">musrfit</span></code><a class="headerlink" href="#musredit-the-gui-based-interface-to-musrfit" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="introduction">
 <h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">musredit</span></tt> is an editor which also provide a graphical user interface to the programs contained in the <tt class="docutils literal"><span class="pre">musrfit</span></tt> suite and are intended
-to help the user handle <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr files. It is implemented in <tt class="docutils literal"><span class="pre">C++</span></tt> and use the <a class="reference external" href="https://qt.io">Qt</a> framework. <tt class="docutils literal"><span class="pre">musredit</span></tt> is based on Qt 4.6 or Qt 5.6 (or above).
-The Qt 5.6 version of <tt class="docutils literal"><span class="pre">musredit</span></tt> will be actively developed, whereas the Qt 4.x version will only get bug fixing and eventually will be dropped.
-On this documentation page only the features related to <tt class="docutils literal"><span class="pre">musrfit</span></tt> are described — the basic editor functions which should be self-explanatory are <em>not</em>.
-<tt class="docutils literal"><span class="pre">musrgui</span></tt> is an outdated early version of <tt class="docutils literal"><span class="pre">musredit</span></tt> and will not described anymore. If still in use, the user is urged to switch to <tt class="docutils literal"><span class="pre">musredit</span></tt>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">musredit</span></code> is an editor which also provide a graphical user interface to the programs contained in the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> suite and are intended
+to help the user handle <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> msr files. It is implemented in <code class="docutils literal notranslate"><span class="pre">C++</span></code> and use the <a class="reference external" href="https://qt.io">Qt</a> framework. <code class="docutils literal notranslate"><span class="pre">musredit</span></code> is based on Qt 4.6 or Qt 5.6 (or above).
+The Qt 5.6 version of <code class="docutils literal notranslate"><span class="pre">musredit</span></code> will be actively developed, whereas the Qt 4.x version will only get bug fixing and eventually will be dropped.
+On this documentation page only the features related to <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> are described — the basic editor functions which should be self-explanatory are <em>not</em>.
+<code class="docutils literal notranslate"><span class="pre">musrgui</span></code> is an outdated early version of <code class="docutils literal notranslate"><span class="pre">musredit</span></code> and will not described anymore. If still in use, the user is urged to switch to <code class="docutils literal notranslate"><span class="pre">musredit</span></code>.</p>
 <div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Before going on using <tt class="docutils literal"><span class="pre">musredit</span></tt> it is strongly recommended to read the <a class="reference internal" href="user-manual.html#user-manual"><em>manual of musrfit</em></a> first!</p>
+<p class="admonition-title">Note</p>
+<p>Before going on using <code class="docutils literal notranslate"><span class="pre">musredit</span></code> it is strongly recommended to read the <a class="reference internal" href="user-manual.html#user-manual"><span class="std std-ref">manual of musrfit</span></a> first!</p>
 </div>
 </div>
 <div class="section" id="available-executable-configuration-files-and-their-basic-usage">
 <h2>Available Executable, Configuration Files and their Basic Usage<a class="headerlink" href="#available-executable-configuration-files-and-their-basic-usage" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="musredit-musrgui">
 <h3>musredit (musrgui)<a class="headerlink" href="#musredit-musrgui" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">musredit</span></tt> (<tt class="docutils literal"><span class="pre">musrgui</span></tt>) is the editor executable. If called from within a shell it accepts a few optional parameters:</p>
-<dl class="docutils">
-<dt><strong>&lt;msr-files&gt;</strong></dt>
-<dd>File names of the msr files that should be opened in separate editor tabs on startup of <tt class="docutils literal"><span class="pre">musredit</span></tt>.</dd>
-<dt><strong>- -help</strong></dt>
-<dd>Displays a small help notice in the shell explaining the basic usage of the program.</dd>
-<dt><strong>- -version</strong></dt>
-<dd>Prints the version number of <tt class="docutils literal"><span class="pre">musredit</span></tt>.</dd>
+<p><code class="docutils literal notranslate"><span class="pre">musredit</span></code> (<code class="docutils literal notranslate"><span class="pre">musrgui</span></code>) is the editor executable. If called from within a shell it accepts a few optional parameters:</p>
+<dl class="simple">
+<dt><strong>&lt;msr-files&gt;</strong></dt><dd><p>File names of the msr files that should be opened in separate editor tabs on startup of <code class="docutils literal notranslate"><span class="pre">musredit</span></code>.</p>
+</dd>
+<dt><strong>- -help</strong></dt><dd><p>Displays a small help notice in the shell explaining the basic usage of the program.</p>
+</dd>
+<dt><strong>- -version</strong></dt><dd><p>Prints the version number of <code class="docutils literal notranslate"><span class="pre">musredit</span></code>.</p>
+</dd>
 </dl>
 <p>If called without any parameters an empty editor window opens.</p>
 </div>
 <div class="section" id="musredit-startup-xml">
 <span id="index-1"></span><h3>musredit_startup.xml<a class="headerlink" href="#musredit-startup-xml" title="Permalink to this headline">¶</a></h3>
-<p><tt class="docutils literal"><span class="pre">musredit_startup.xml</span></tt> is the configuration file located under <tt class="docutils literal"><span class="pre">$HOME\.musrfit\musredit</span></tt>. It is also possible to have another version
+<p><code class="docutils literal notranslate"><span class="pre">musredit_startup.xml</span></code> is the configuration file located under <code class="docutils literal notranslate"><span class="pre">$HOME\.musrfit\musredit</span></code>. It is also possible to have another version
 of this file in the working directory which then will be used!</p>
-<p>In this file the following <tt class="docutils literal"><span class="pre">XML</span></tt> tags are allowed to define settings and might proof useful for all users of <tt class="docutils literal"><span class="pre">musredit</span></tt>:</p>
-<dl class="docutils">
-<dt><strong>&lt;general&gt;&lt;/general&gt;</strong></dt>
-<dd><p class="first">set the default paths to executable and files in this environment</p>
-<dl class="last docutils">
-<dt><strong>&lt;exec_path&gt;PATH_TO_EXEC&lt;/exec_path&gt;</strong></dt>
-<dd>set the path <tt class="docutils literal"><span class="pre">PATH_TO_EXEC</span></tt> where the executable <tt class="docutils literal"><span class="pre">musrfit</span></tt>, <tt class="docutils literal"><span class="pre">musrview</span></tt>, <tt class="docutils literal"><span class="pre">musrt0</span></tt>, etc. can be found (inside the <tt class="docutils literal"><span class="pre">&lt;general&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;default_save_path&gt;SAVE_PATH&lt;/default_save_path&gt;</strong></dt>
-<dd>specify the path <tt class="docutils literal"><span class="pre">SAVE_PATH</span></tt> where <tt class="docutils literal"><span class="pre">musredit</span></tt> point by default when opening and saving msr files (inside the <tt class="docutils literal"><span class="pre">&lt;general&gt;</span></tt> environment). Default is the current directory.</dd>
-<dt><strong>&lt;msr_default_file_path&gt;MSR_DEF_PATH&lt;/msr_default_file_path&gt;</strong></dt>
-<dd>set the path <tt class="docutils literal"><span class="pre">MSR_DEF_PATH</span></tt> where the default msr files provided by <tt class="docutils literal"><span class="pre">musredit</span></tt> are stored (inside the <tt class="docutils literal"><span class="pre">&lt;general&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;timeout&gt;3600&lt;/timeout&gt;</strong></dt>
-<dd>timeout in seconds after which <a class="reference internal" href="user-manual.html#musrview"><em>musrview</em></a> canvas will automatically quit. A value of 0 or
-a negative number will keep the <tt class="docutils literal"><span class="pre">musrview</span></tt> canvas open without self-determination.</dd>
-<dt><strong>&lt;keep_minuit2_output&gt;y/n&lt;/keep_minuit2_output&gt;</strong></dt>
-<dd>flag indicating if the <tt class="docutils literal"><span class="pre">MINUIT2</span></tt> output shall be kept per msr-file (&#8216;y&#8217;) or only for the current msr-file (&#8216;n&#8217;).</dd>
-<dt><strong>&lt;dump_ascii&gt;y/n&lt;/dump_ascii&gt;</strong></dt>
-<dd>flag indicating if <tt class="docutils literal"><span class="pre">musrfit</span></tt> shall dump fit data into ascii format. See help of <a class="reference internal" href="user-manual.html#musrfit"><em>musrfit</em></a>.</dd>
-<dt><strong>&lt;dump_root&gt;y/n&lt;/dump_root&gt;</strong></dt>
-<dd>flag indicating if <tt class="docutils literal"><span class="pre">musrfit</span></tt> shall dump fit data into root format. See help of <a class="reference internal" href="user-manual.html#musrfit"><em>musrfit</em></a>.</dd>
-<dt><strong>&lt;title_from_data_file&gt;y/n&lt;/title_from_data_file&gt;</strong></dt>
-<dd>specify if <tt class="docutils literal"><span class="pre">musrfit</span></tt> should be called with the <tt class="docutils literal"><span class="pre">-t</span></tt> option by default (inside the <tt class="docutils literal"><span class="pre">&lt;general&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;chisq_pre_run_block&gt;y/n&lt;/chisq_pre_run_block&gt;</strong></dt>
-<dd>flag indicating if per-run chisq shall be written into the msr-output-file.</dd>
-<dt><strong>&lt;estimate_n0&gt;y/n&lt;/estimate_n0&gt;</strong></dt>
-<dd>flag indicating if for a single histogram fit <span class="math">\(N_0\)</span> shall be estimated before the fit procedure starts.</dd>
-<dt><strong>&lt;musrview_show_fourier&gt;y/n&lt;/musrview_show_fourier&gt;</strong></dt>
-<dd>flag indicating if <tt class="docutils literal"><span class="pre">musrview</span></tt> will directly present the Fourier transform rather than the time domain data.</dd>
-<dt><strong>&lt;musrview_show_avg&gt;y/n&lt;/musrview_show_avg&gt;</strong></dt>
-<dd>flag indicating if <tt class="docutils literal"><span class="pre">musrview</span></tt> will directly present averaged data, typically used for Fourier power spectra.</dd>
-<dt><strong>&lt;enable_musrt0&gt;y/n&lt;/enable_musrt0&gt;</strong></dt>
-<dd>specify if <a class="reference internal" href="user-manual.html#musrt0"><em>musrt0</em></a> can be called from within <tt class="docutils literal"><span class="pre">musredit</span></tt> (inside the <tt class="docutils literal"><span class="pre">&lt;general&gt;</span></tt> environment)</dd>
+<p>In this file the following <code class="docutils literal notranslate"><span class="pre">XML</span></code> tags are allowed to define settings and might proof useful for all users of <code class="docutils literal notranslate"><span class="pre">musredit</span></code>:</p>
+<dl>
+<dt><strong>&lt;general&gt;&lt;/general&gt;</strong></dt><dd><p>set the default paths to executable and files in this environment</p>
+<dl class="simple">
+<dt><strong>&lt;exec_path&gt;PATH_TO_EXEC&lt;/exec_path&gt;</strong></dt><dd><p>set the path <code class="docutils literal notranslate"><span class="pre">PATH_TO_EXEC</span></code> where the executable <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>, <code class="docutils literal notranslate"><span class="pre">musrview</span></code>, <code class="docutils literal notranslate"><span class="pre">musrt0</span></code>, etc. can be found (inside the <code class="docutils literal notranslate"><span class="pre">&lt;general&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;default_save_path&gt;SAVE_PATH&lt;/default_save_path&gt;</strong></dt><dd><p>specify the path <code class="docutils literal notranslate"><span class="pre">SAVE_PATH</span></code> where <code class="docutils literal notranslate"><span class="pre">musredit</span></code> point by default when opening and saving msr files (inside the <code class="docutils literal notranslate"><span class="pre">&lt;general&gt;</span></code> environment). Default is the current directory.</p>
+</dd>
+<dt><strong>&lt;msr_default_file_path&gt;MSR_DEF_PATH&lt;/msr_default_file_path&gt;</strong></dt><dd><p>set the path <code class="docutils literal notranslate"><span class="pre">MSR_DEF_PATH</span></code> where the default msr files provided by <code class="docutils literal notranslate"><span class="pre">musredit</span></code> are stored (inside the <code class="docutils literal notranslate"><span class="pre">&lt;general&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;timeout&gt;3600&lt;/timeout&gt;</strong></dt><dd><p>timeout in seconds after which <a class="reference internal" href="user-manual.html#musrview"><span class="std std-ref">musrview</span></a> canvas will automatically quit. A value of 0 or
+a negative number will keep the <code class="docutils literal notranslate"><span class="pre">musrview</span></code> canvas open without self-determination.</p>
+</dd>
+<dt><strong>&lt;keep_minuit2_output&gt;y/n&lt;/keep_minuit2_output&gt;</strong></dt><dd><p>flag indicating if the <code class="docutils literal notranslate"><span class="pre">MINUIT2</span></code> output shall be kept per msr-file (‘y’) or only for the current msr-file (‘n’).</p>
+</dd>
+<dt><strong>&lt;dump_ascii&gt;y/n&lt;/dump_ascii&gt;</strong></dt><dd><p>flag indicating if <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> shall dump fit data into ascii format. See help of <a class="reference internal" href="user-manual.html#musrfit"><span class="std std-ref">musrfit</span></a>.</p>
+</dd>
+<dt><strong>&lt;dump_root&gt;y/n&lt;/dump_root&gt;</strong></dt><dd><p>flag indicating if <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> shall dump fit data into root format. See help of <a class="reference internal" href="user-manual.html#musrfit"><span class="std std-ref">musrfit</span></a>.</p>
+</dd>
+<dt><strong>&lt;title_from_data_file&gt;y/n&lt;/title_from_data_file&gt;</strong></dt><dd><p>specify if <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> should be called with the <code class="docutils literal notranslate"><span class="pre">-t</span></code> option by default (inside the <code class="docutils literal notranslate"><span class="pre">&lt;general&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;chisq_pre_run_block&gt;y/n&lt;/chisq_pre_run_block&gt;</strong></dt><dd><p>flag indicating if per-run chisq shall be written into the msr-output-file.</p>
+</dd>
+<dt><strong>&lt;estimate_n0&gt;y/n&lt;/estimate_n0&gt;</strong></dt><dd><p>flag indicating if for a single histogram fit <span class="math notranslate nohighlight">\(N_0\)</span> shall be estimated before the fit procedure starts.</p>
+</dd>
+<dt><strong>&lt;musrview_show_fourier&gt;y/n&lt;/musrview_show_fourier&gt;</strong></dt><dd><p>flag indicating if <code class="docutils literal notranslate"><span class="pre">musrview</span></code> will directly present the Fourier transform rather than the time domain data.</p>
+</dd>
+<dt><strong>&lt;musrview_show_avg&gt;y/n&lt;/musrview_show_avg&gt;</strong></dt><dd><p>flag indicating if <code class="docutils literal notranslate"><span class="pre">musrview</span></code> will directly present averaged data, typically used for Fourier power spectra.</p>
+</dd>
+<dt><strong>&lt;enable_musrt0&gt;y/n&lt;/enable_musrt0&gt;</strong></dt><dd><p>specify if <a class="reference internal" href="user-manual.html#musrt0"><span class="std std-ref">musrt0</span></a> can be called from within <code class="docutils literal notranslate"><span class="pre">musredit</span></code> (inside the <code class="docutils literal notranslate"><span class="pre">&lt;general&gt;</span></code> environment)</p>
+</dd>
 </dl>
 </dd>
-<dt><strong>&lt;font_settings&gt;&lt;/font_settings&gt;</strong></dt>
-<dd><p class="first">set the default font in this environment</p>
-<dl class="last docutils">
-<dt><strong>&lt;font_name&gt;FONT&lt;/font_name&gt;</strong></dt>
-<dd>specify the name of the font <tt class="docutils literal"><span class="pre">FONT</span></tt> to be used by default in <tt class="docutils literal"><span class="pre">musredit</span></tt> (inside the <tt class="docutils literal"><span class="pre">&lt;font_settings&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;font_size&gt;N&lt;/font_size&gt;</strong></dt>
-<dd>specify the size <tt class="docutils literal"><span class="pre">N</span></tt> of the font to be used by default in <tt class="docutils literal"><span class="pre">musredit</span></tt> (inside the <tt class="docutils literal"><span class="pre">&lt;font_settings&gt;</span></tt> environment)</dd>
+<dt><strong>&lt;font_settings&gt;&lt;/font_settings&gt;</strong></dt><dd><p>set the default font in this environment</p>
+<dl class="simple">
+<dt><strong>&lt;font_name&gt;FONT&lt;/font_name&gt;</strong></dt><dd><p>specify the name of the font <code class="docutils literal notranslate"><span class="pre">FONT</span></code> to be used by default in <code class="docutils literal notranslate"><span class="pre">musredit</span></code> (inside the <code class="docutils literal notranslate"><span class="pre">&lt;font_settings&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;font_size&gt;N&lt;/font_size&gt;</strong></dt><dd><p>specify the size <code class="docutils literal notranslate"><span class="pre">N</span></code> of the font to be used by default in <code class="docutils literal notranslate"><span class="pre">musredit</span></code> (inside the <code class="docutils literal notranslate"><span class="pre">&lt;font_settings&gt;</span></code> environment)</p>
+</dd>
 </dl>
 </dd>
-<dt><strong>&lt;msr_file_defaults&gt;&lt;/msr_file_defaults&gt;</strong></dt>
-<dd><p class="first">put the default settings for newly created msr files in this environment</p>
-<dl class="last docutils">
-<dt><strong>&lt;beamline&gt;BL&lt;/beamline&gt;</strong></dt>
-<dd>set the name of the muon beamline <tt class="docutils literal"><span class="pre">BL</span></tt> here (inside a <tt class="docutils literal"><span class="pre">&lt;msr_file_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;institute&gt;INST&lt;/institute&gt;</strong></dt>
-<dd>set the name of the facility <tt class="docutils literal"><span class="pre">INST</span></tt> where the beamline <tt class="docutils literal"><span class="pre">BL</span></tt> is located. Valid settings are <tt class="docutils literal"><span class="pre">PSI</span></tt>, <tt class="docutils literal"><span class="pre">RAL</span></tt>, <tt class="docutils literal"><span class="pre">JPARC</span></tt>, and <tt class="docutils literal"><span class="pre">TRIUMF</span></tt> (inside a <tt class="docutils literal"><span class="pre">&lt;msr_file_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;file_format&gt;FF&lt;/file_format&gt;</strong></dt>
-<dd>specify the default data file format <tt class="docutils literal"><span class="pre">FF</span></tt> here. Valid formats are <tt class="docutils literal"><span class="pre">NEXUS</span></tt>, <tt class="docutils literal"><span class="pre">MUSR-ROOT</span></tt>, <tt class="docutils literal"><span class="pre">ROOT-NPP</span></tt>, <tt class="docutils literal"><span class="pre">ROOT-PPC</span></tt>, <tt class="docutils literal"><span class="pre">PSI-BIN</span></tt>, <tt class="docutils literal"><span class="pre">PSI-MDU</span></tt>, <tt class="docutils literal"><span class="pre">MDU-ASCII</span></tt>, <tt class="docutils literal"><span class="pre">WKM</span></tt>, <tt class="docutils literal"><span class="pre">MUD</span></tt>, <tt class="docutils literal"><span class="pre">ASCII</span></tt>, and <tt class="docutils literal"><span class="pre">DB</span></tt> (inside a <tt class="docutils literal"><span class="pre">&lt;msr_file_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;lifetime_correction&gt;y/n&lt;/lifetime_correction&gt;</strong></dt>
-<dd>choose if by default the <tt class="docutils literal"><span class="pre">lifetimecorrection</span></tt> option should be set (inside a <tt class="docutils literal"><span class="pre">&lt;msr_file_defaults&gt;</span></tt> environment)</dd>
+<dt><strong>&lt;msr_file_defaults&gt;&lt;/msr_file_defaults&gt;</strong></dt><dd><p>put the default settings for newly created msr files in this environment</p>
+<dl class="simple">
+<dt><strong>&lt;beamline&gt;BL&lt;/beamline&gt;</strong></dt><dd><p>set the name of the muon beamline <code class="docutils literal notranslate"><span class="pre">BL</span></code> here (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr_file_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;institute&gt;INST&lt;/institute&gt;</strong></dt><dd><p>set the name of the facility <code class="docutils literal notranslate"><span class="pre">INST</span></code> where the beamline <code class="docutils literal notranslate"><span class="pre">BL</span></code> is located. Valid settings are <code class="docutils literal notranslate"><span class="pre">PSI</span></code>, <code class="docutils literal notranslate"><span class="pre">RAL</span></code>, <code class="docutils literal notranslate"><span class="pre">JPARC</span></code>, and <code class="docutils literal notranslate"><span class="pre">TRIUMF</span></code> (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr_file_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;file_format&gt;FF&lt;/file_format&gt;</strong></dt><dd><p>specify the default data file format <code class="docutils literal notranslate"><span class="pre">FF</span></code> here. Valid formats are <code class="docutils literal notranslate"><span class="pre">NEXUS</span></code>, <code class="docutils literal notranslate"><span class="pre">MUSR-ROOT</span></code>, <code class="docutils literal notranslate"><span class="pre">ROOT-NPP</span></code>, <code class="docutils literal notranslate"><span class="pre">ROOT-PPC</span></code>, <code class="docutils literal notranslate"><span class="pre">PSI-BIN</span></code>, <code class="docutils literal notranslate"><span class="pre">PSI-MDU</span></code>, <code class="docutils literal notranslate"><span class="pre">MDU-ASCII</span></code>, <code class="docutils literal notranslate"><span class="pre">WKM</span></code>, <code class="docutils literal notranslate"><span class="pre">MUD</span></code>, <code class="docutils literal notranslate"><span class="pre">ASCII</span></code>, and <code class="docutils literal notranslate"><span class="pre">DB</span></code> (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr_file_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;lifetime_correction&gt;y/n&lt;/lifetime_correction&gt;</strong></dt><dd><p>choose if by default the <code class="docutils literal notranslate"><span class="pre">lifetimecorrection</span></code> option should be set (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr_file_defaults&gt;</span></code> environment)</p>
+</dd>
 </dl>
 </dd>
-<dt><strong>&lt;msr2data_defaults&gt;&lt;/msr2data_defaults&gt;</strong></dt>
-<dd><p class="first">define the default options for calling <a class="reference internal" href="msr2data.html#msr2data"><em>msr2data</em></a> in this environment; the options set here are ticked by default in the graphical interface of <tt class="docutils literal"><span class="pre">musredit</span></tt>.</p>
-<dl class="last docutils">
-<dt><strong>&lt;chain_fit&gt;y/n&lt;/chain_fit&gt;</strong></dt>
-<dd>(un)set the chain fit (!) option (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;write_data_header&gt;y/n&lt;/write_data_header&gt;</strong></dt>
-<dd>(un)set the noheader option (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;ignore_data_header_info&gt;y/n&lt;/ignore_data_header_info&gt;</strong></dt>
-<dd>(un)set the nosummary option (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;keep_minuit2_output&gt;y/n&lt;/keep_minuit2_output&gt;</strong></dt>
-<dd>(un)set the <tt class="docutils literal"><span class="pre">-k</span></tt> option (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;write_column_data&gt;y/n&lt;/write_column_data&gt;</strong></dt>
-<dd>(un)set the <tt class="docutils literal"><span class="pre">data</span></tt> option (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;create_msr_file_only&gt;y/n&lt;/create_msr_file_only&gt;</strong></dt>
-<dd>(un)set the <tt class="docutils literal"><span class="pre">msr</span></tt> option in case a template run is specified (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;fit_only&gt;y/n&lt;/fit_only&gt;</strong></dt>
-<dd>(un)set the <tt class="docutils literal"><span class="pre">fit</span></tt> option in case no template run is specified (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;global&gt;y/n&lt;/global&gt;</strong></dt>
-<dd>(un)set the <tt class="docutils literal"><span class="pre">global</span></tt> option (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;global_plus&gt;y/n&lt;/global_plus&gt;</strong></dt>
-<dd>(un)set the <tt class="docutils literal"><span class="pre">global+</span></tt> option (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;recreate_data_file&gt;y/n&lt;/recreate_data_file&gt;</strong></dt>
-<dd>(un)set the <tt class="docutils literal"><span class="pre">musredit</span></tt> option for recreating the output file (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;open_file_after_fitting&gt;y/n&lt;/open_file_after_fitting&gt;</strong></dt>
-<dd>(un)set the <tt class="docutils literal"><span class="pre">musredit</span></tt> option for opening msr files after fitting (inside a <tt class="docutils literal"><span class="pre">&lt;msr2data_defaults&gt;</span></tt> environment)</dd>
+<dt><strong>&lt;msr2data_defaults&gt;&lt;/msr2data_defaults&gt;</strong></dt><dd><p>define the default options for calling <a class="reference internal" href="msr2data.html#msr2data"><span class="std std-ref">msr2data</span></a> in this environment; the options set here are ticked by default in the graphical interface of <code class="docutils literal notranslate"><span class="pre">musredit</span></code>.</p>
+<dl class="simple">
+<dt><strong>&lt;chain_fit&gt;y/n&lt;/chain_fit&gt;</strong></dt><dd><p>(un)set the chain fit (!) option (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;write_data_header&gt;y/n&lt;/write_data_header&gt;</strong></dt><dd><p>(un)set the noheader option (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;ignore_data_header_info&gt;y/n&lt;/ignore_data_header_info&gt;</strong></dt><dd><p>(un)set the nosummary option (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;keep_minuit2_output&gt;y/n&lt;/keep_minuit2_output&gt;</strong></dt><dd><p>(un)set the <code class="docutils literal notranslate"><span class="pre">-k</span></code> option (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;write_column_data&gt;y/n&lt;/write_column_data&gt;</strong></dt><dd><p>(un)set the <code class="docutils literal notranslate"><span class="pre">data</span></code> option (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;create_msr_file_only&gt;y/n&lt;/create_msr_file_only&gt;</strong></dt><dd><p>(un)set the <code class="docutils literal notranslate"><span class="pre">msr</span></code> option in case a template run is specified (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;fit_only&gt;y/n&lt;/fit_only&gt;</strong></dt><dd><p>(un)set the <code class="docutils literal notranslate"><span class="pre">fit</span></code> option in case no template run is specified (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;global&gt;y/n&lt;/global&gt;</strong></dt><dd><p>(un)set the <code class="docutils literal notranslate"><span class="pre">global</span></code> option (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;global_plus&gt;y/n&lt;/global_plus&gt;</strong></dt><dd><p>(un)set the <code class="docutils literal notranslate"><span class="pre">global+</span></code> option (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;recreate_data_file&gt;y/n&lt;/recreate_data_file&gt;</strong></dt><dd><p>(un)set the <code class="docutils literal notranslate"><span class="pre">musredit</span></code> option for recreating the output file (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;open_file_after_fitting&gt;y/n&lt;/open_file_after_fitting&gt;</strong></dt><dd><p>(un)set the <code class="docutils literal notranslate"><span class="pre">musredit</span></code> option for opening msr files after fitting (inside a <code class="docutils literal notranslate"><span class="pre">&lt;msr2data_defaults&gt;</span></code> environment)</p>
+</dd>
 </dl>
 </dd>
 </dl>
-<p>Additionally, there are some settings defined in this XML file which should be only changed by experienced users who like to add new features to <tt class="docutils literal"><span class="pre">musredit</span></tt>:</p>
-<dl class="docutils">
-<dt><strong>&lt;help_section&gt;&lt;/help_section&gt;</strong></dt>
-<dd><p class="first">define various help messages in this environment</p>
-<dl class="last docutils">
-<dt><strong>&lt;musr_web_X&gt;LINK&lt;/musr_web_X&gt;</strong></dt>
-<dd>define the <tt class="docutils literal"><span class="pre">LINK</span></tt> to the help page <tt class="docutils literal"><span class="pre">musr_web_X</span></tt>, where <tt class="docutils literal"><span class="pre">X</span></tt> is <tt class="docutils literal"><span class="pre">main</span></tt>, <tt class="docutils literal"><span class="pre">title</span></tt>, <tt class="docutils literal"><span class="pre">parameters</span></tt>, <tt class="docutils literal"><span class="pre">theory</span></tt>, <tt class="docutils literal"><span class="pre">functions</span></tt>, <tt class="docutils literal"><span class="pre">run</span></tt>,
-<tt class="docutils literal"><span class="pre">command</span></tt>, <tt class="docutils literal"><span class="pre">fourier</span></tt>, <tt class="docutils literal"><span class="pre">plot</span></tt>, <tt class="docutils literal"><span class="pre">statistics</span></tt>, <tt class="docutils literal"><span class="pre">msr2data</span></tt>, or <tt class="docutils literal"><span class="pre">musrFT</span></tt> (inside a <tt class="docutils literal"><span class="pre">&lt;help_section&gt;</span></tt> environment)</dd>
+<p>Additionally, there are some settings defined in this XML file which should be only changed by experienced users who like to add new features to <code class="docutils literal notranslate"><span class="pre">musredit</span></code>:</p>
+<dl>
+<dt><strong>&lt;help_section&gt;&lt;/help_section&gt;</strong></dt><dd><p>define various help messages in this environment</p>
+<dl class="simple">
+<dt><strong>&lt;musr_web_X&gt;LINK&lt;/musr_web_X&gt;</strong></dt><dd><p>define the <code class="docutils literal notranslate"><span class="pre">LINK</span></code> to the help page <code class="docutils literal notranslate"><span class="pre">musr_web_X</span></code>, where <code class="docutils literal notranslate"><span class="pre">X</span></code> is <code class="docutils literal notranslate"><span class="pre">main</span></code>, <code class="docutils literal notranslate"><span class="pre">title</span></code>, <code class="docutils literal notranslate"><span class="pre">parameters</span></code>, <code class="docutils literal notranslate"><span class="pre">theory</span></code>, <code class="docutils literal notranslate"><span class="pre">functions</span></code>, <code class="docutils literal notranslate"><span class="pre">run</span></code>,
+<code class="docutils literal notranslate"><span class="pre">command</span></code>, <code class="docutils literal notranslate"><span class="pre">fourier</span></code>, <code class="docutils literal notranslate"><span class="pre">plot</span></code>, <code class="docutils literal notranslate"><span class="pre">statistics</span></code>, <code class="docutils literal notranslate"><span class="pre">msr2data</span></code>, or <code class="docutils literal notranslate"><span class="pre">musrFT</span></code> (inside a <code class="docutils literal notranslate"><span class="pre">&lt;help_section&gt;</span></code> environment)</p>
+</dd>
 </dl>
 </dd>
-<dt><strong>&lt;func_pixmap_path&gt;PIX_PATH&lt;/func_pixmap_path&gt;</strong></dt>
-<dd>set the path <tt class="docutils literal"><span class="pre">PIX_PATH</span></tt> to LaTeX pixmaps visualizing the various supported theory functions</dd>
-<dt><strong>&lt;theory_functions&gt;&lt;/theory_functions&gt;</strong></dt>
-<dd><p class="first">define the functions for a msr file&#8217;s <a class="reference internal" href="user-manual.html#msr-theory-block"><em>THEORY block</em></a> according to the correct syntax in this environment</p>
-<dl class="last docutils">
-<dt><strong>&lt;func&gt;&lt;/func&gt;</strong></dt>
-<dd><p class="first">specify a function here (inside a <tt class="docutils literal"><span class="pre">&lt;theory_functions&gt;</span></tt> environment)</p>
-<dl class="last docutils">
-<dt><strong>&lt;name&gt;NAME&lt;/name&gt;</strong></dt>
-<dd>the <tt class="docutils literal"><span class="pre">NAME</span></tt> of the function in the msr file (inside a <tt class="docutils literal"><span class="pre">&lt;func&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;comment&gt;COMMENT&lt;/comment&gt;</strong></dt>
-<dd>description of the used parameters (inside a <tt class="docutils literal"><span class="pre">&lt;func&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;label&gt;LABEL&lt;/label&gt;</strong></dt>
-<dd><tt class="docutils literal"><span class="pre">LABEL</span></tt> of the function in the <tt class="docutils literal"><span class="pre">musredit</span></tt> menu (inside a <tt class="docutils literal"><span class="pre">&lt;func&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;pixmap&gt;PIXMAP&lt;/pixmap&gt;</strong></dt>
-<dd>LaTeX picture used to describe the function and stored in the <tt class="docutils literal"><span class="pre">PIX_PATH</span></tt> (inside a <tt class="docutils literal"><span class="pre">&lt;func&gt;</span></tt> environment)</dd>
-<dt><strong>&lt;params&gt;N&lt;/params&gt;</strong></dt>
-<dd>number of parameters <tt class="docutils literal"><span class="pre">N</span></tt> used by the function (inside a <tt class="docutils literal"><span class="pre">&lt;func&gt;</span></tt> environment)</dd>
+<dt><strong>&lt;func_pixmap_path&gt;PIX_PATH&lt;/func_pixmap_path&gt;</strong></dt><dd><p>set the path <code class="docutils literal notranslate"><span class="pre">PIX_PATH</span></code> to LaTeX pixmaps visualizing the various supported theory functions</p>
+</dd>
+<dt><strong>&lt;theory_functions&gt;&lt;/theory_functions&gt;</strong></dt><dd><p>define the functions for a msr file’s <a class="reference internal" href="user-manual.html#msr-theory-block"><span class="std std-ref">THEORY block</span></a> according to the correct syntax in this environment</p>
+<dl>
+<dt><strong>&lt;func&gt;&lt;/func&gt;</strong></dt><dd><p>specify a function here (inside a <code class="docutils literal notranslate"><span class="pre">&lt;theory_functions&gt;</span></code> environment)</p>
+<dl class="simple">
+<dt><strong>&lt;name&gt;NAME&lt;/name&gt;</strong></dt><dd><p>the <code class="docutils literal notranslate"><span class="pre">NAME</span></code> of the function in the msr file (inside a <code class="docutils literal notranslate"><span class="pre">&lt;func&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;comment&gt;COMMENT&lt;/comment&gt;</strong></dt><dd><p>description of the used parameters (inside a <code class="docutils literal notranslate"><span class="pre">&lt;func&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;label&gt;LABEL&lt;/label&gt;</strong></dt><dd><p><code class="docutils literal notranslate"><span class="pre">LABEL</span></code> of the function in the <code class="docutils literal notranslate"><span class="pre">musredit</span></code> menu (inside a <code class="docutils literal notranslate"><span class="pre">&lt;func&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;pixmap&gt;PIXMAP&lt;/pixmap&gt;</strong></dt><dd><p>LaTeX picture used to describe the function and stored in the <code class="docutils literal notranslate"><span class="pre">PIX_PATH</span></code> (inside a <code class="docutils literal notranslate"><span class="pre">&lt;func&gt;</span></code> environment)</p>
+</dd>
+<dt><strong>&lt;params&gt;N&lt;/params&gt;</strong></dt><dd><p>number of parameters <code class="docutils literal notranslate"><span class="pre">N</span></code> used by the function (inside a <code class="docutils literal notranslate"><span class="pre">&lt;func&gt;</span></code> environment)</p>
+</dd>
 </dl>
 </dd>
 </dl>
 </dd>
 </dl>
-<p>An example of the <tt class="docutils literal"><span class="pre">musredit_startup.xml</span></tt> looks like:</p>
-<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<p>An example of the <code class="docutils literal notranslate"><span class="pre">musredit_startup.xml</span></code> looks like:</p>
+<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 <span class="nt">&lt;musredit_startup</span> <span class="na">xmlns=</span><span class="s">&quot;http://lmu.web.psi.ch/musrfit/user/MUSR/MusrGui.html&quot;</span><span class="nt">&gt;</span>
   <span class="nt">&lt;comment&gt;</span>
     This is handling default setting parameters for the musredit.
@@ -285,196 +267,196 @@ a negative number will keep the <tt class="docutils literal"><span class="pre">m
 </div>
 <div class="section" id="musredit-features">
 <span id="index-2"></span><h2>musredit Features<a class="headerlink" href="#musredit-features" title="Permalink to this headline">¶</a></h2>
-<p>The features of <tt class="docutils literal"><span class="pre">musrfit</span></tt> which can be accessed by the graphical front ends <tt class="docutils literal"><span class="pre">musredit</span></tt> will be described in the following. All functions
+<p>The features of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> which can be accessed by the graphical front ends <code class="docutils literal notranslate"><span class="pre">musredit</span></code> will be described in the following. All functions
 can either be called by choosing them from the <em>MusrFit menu</em>, by clicking the respective button in the <em>MusrFit bar</em>, or by using a <em>keyboard shortcut</em>.</p>
 <p><strong>musrWiz</strong></p>
 <blockquote>
-<div><img src="_images/musrWiz.svg" /><p><tt class="docutils literal"><span class="pre">musrWiz</span></tt> is a helper programs which allows to create a msr-file from scratch without too much a priori knowledge. For details see <a class="reference internal" href="#musrwiz"><em>musrWiz</em></a>.</p>
+<div><img alt="_images/musrWiz.svg" src="_images/musrWiz.svg" /><p><code class="docutils literal notranslate"><span class="pre">musrWiz</span></code> is a helper programs which allows to create a msr-file from scratch without too much a priori knowledge. For details see <a class="reference internal" href="#musrwiz"><span class="std std-ref">musrWiz</span></a>.</p>
 </div></blockquote>
 <p id="musrwiz"><span id="index-3"></span><strong>Calculate Chisq</strong></p>
 <blockquote>
-<div><img src="_images/musrchisq.svg" /><p>Calls <tt class="docutils literal"><span class="pre">musrfit</span></tt> with the option <tt class="docutils literal"><span class="pre">-c</span></tt>, <em>i.e.</em> calculates the <span class="math">\(\chi^2\)</span> or log max-likelihood for the active msr file tab. Shortcut-key: <tt class="docutils literal"><span class="pre">Alt+C</span></tt>.
+<div><img alt="_images/musrchisq.svg" src="_images/musrchisq.svg" /><p>Calls <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> with the option <code class="docutils literal notranslate"><span class="pre">-c</span></code>, <em>i.e.</em> calculates the <span class="math notranslate nohighlight">\(\chi^2\)</span> or log max-likelihood for the active msr file tab. Shortcut-key: <code class="docutils literal notranslate"><span class="pre">Alt+C</span></code>.
 The equivalent call on the command line would be</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrfit -c &lt;msr-file&gt;
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ musrfit -c &lt;msr-file&gt;
 </pre></div>
 </div>
 </div></blockquote>
 <p><strong>Fit</strong></p>
 <blockquote>
-<div><img src="_images/musrfit.svg" /><p>Calls <tt class="docutils literal"><span class="pre">musrfit</span></tt> for fitting of the active msr file in the currently active tab. Shortcut-key: <tt class="docutils literal"><span class="pre">Alt+F</span></tt>.
+<div><img alt="_images/musrfit.svg" src="_images/musrfit.svg" /><p>Calls <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> for fitting of the active msr file in the currently active tab. Shortcut-key: <code class="docutils literal notranslate"><span class="pre">Alt+F</span></code>.
 The equivalent call on the command line could look like</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrfit &lt;msr-file&gt; <span class="o">[</span>optional parameters<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ musrfit &lt;msr-file&gt; <span class="o">[</span>optional parameters<span class="o">]</span>
 </pre></div>
 </div>
-<p>The optional parameters may be chosen under <a class="reference internal" href="#musredit-prefs"><em>Preferences</em></a>. For further information refer to the manual of <a class="reference internal" href="user-manual.html#user-manual"><em>musrfit</em></a>.</p>
+<p>The optional parameters may be chosen under <a class="reference internal" href="#musredit-prefs"><span class="std std-ref">Preferences</span></a>. For further information refer to the manual of <a class="reference internal" href="user-manual.html#user-manual"><span class="std std-ref">musrfit</span></a>.</p>
 </div></blockquote>
 <p><strong>Swap Msr &lt;-&gt; Mlog</strong></p>
 <blockquote>
-<div><img src="_images/musrswap.svg" /><p>Swap the msr and mlog files. <em>E.g.</em>, for a file called <tt class="docutils literal"><span class="pre">8472_zf.msr</span></tt>, this is copied to <tt class="docutils literal"><span class="pre">8472_zf.mlog</span></tt> and vice versa. Shortcut-key: <tt class="docutils literal"><span class="pre">Alt+S</span></tt>.</p>
+<div><img alt="_images/musrswap.svg" src="_images/musrswap.svg" /><p>Swap the msr and mlog files. <em>E.g.</em>, for a file called <code class="docutils literal notranslate"><span class="pre">8472_zf.msr</span></code>, this is copied to <code class="docutils literal notranslate"><span class="pre">8472_zf.mlog</span></code> and vice versa. Shortcut-key: <code class="docutils literal notranslate"><span class="pre">Alt+S</span></code>.</p>
 </div></blockquote>
 <p><strong>Set Steps</strong></p>
 <blockquote>
-<div><img src="_images/musrStep.svg" /><p><tt class="docutils literal"><span class="pre">musrStep</span></tt> allows to adjust the step size, <em>i.e.</em> the initial steps for the fitter. Shortcut-key: <tt class="docutils literal"><span class="pre">Alt+P</span></tt>.</p>
+<div><img alt="_images/musrStep.svg" src="_images/musrStep.svg" /><p><code class="docutils literal notranslate"><span class="pre">musrStep</span></code> allows to adjust the step size, <em>i.e.</em> the initial steps for the fitter. Shortcut-key: <code class="docutils literal notranslate"><span class="pre">Alt+P</span></code>.</p>
 </div></blockquote>
 <p><strong>Msr2Data</strong></p>
 <blockquote>
-<div><img src="_images/msr2data.svg" /><p>Opens a graphical interface to the <tt class="docutils literal"><span class="pre">msr2data</span></tt> program described in detail in its <a class="reference internal" href="msr2data.html#msr2data"><em>own manual</em></a>. Shortcut-key: <tt class="docutils literal"><span class="pre">Alt+2</span></tt>.</p>
+<div><img alt="_images/msr2data.svg" src="_images/msr2data.svg" /><p>Opens a graphical interface to the <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> program described in detail in its <a class="reference internal" href="msr2data.html#msr2data"><span class="std std-ref">own manual</span></a>. Shortcut-key: <code class="docutils literal notranslate"><span class="pre">Alt+2</span></code>.</p>
 </div></blockquote>
 <p><strong>mupp</strong></p>
 <blockquote>
-<div><img src="_images/mupp.svg" /><p>Application which allows to plot <tt class="docutils literal"><span class="pre">*.db</span></tt> and <tt class="docutils literal"><span class="pre">*.dat</span></tt> parameter files. Shortcut-key: <tt class="docutils literal"><span class="pre">Alt+U</span></tt>.
-For a detailed description see the <a class="reference internal" href="mupp.html#mupp"><em>mupp docu</em></a>.</p>
+<div><img alt="_images/mupp.svg" src="_images/mupp.svg" /><p>Application which allows to plot <code class="docutils literal notranslate"><span class="pre">*.db</span></code> and <code class="docutils literal notranslate"><span class="pre">*.dat</span></code> parameter files. Shortcut-key: <code class="docutils literal notranslate"><span class="pre">Alt+U</span></code>.
+For a detailed description see the <a class="reference internal" href="mupp.html#mupp"><span class="std std-ref">mupp docu</span></a>.</p>
 </div></blockquote>
 <p><strong>View</strong></p>
 <blockquote>
-<div><img src="_images/musrview.svg" /><p>Calls <tt class="docutils literal"><span class="pre">musrview</span></tt> from the active tab of <tt class="docutils literal"><span class="pre">musredit</span></tt>. For more details see the <a class="reference internal" href="user-manual.html#musrview"><em>musrview</em></a> docu. Shortcut-key: <tt class="docutils literal"><span class="pre">Alt+V</span></tt>.
+<div><img alt="_images/musrview.svg" src="_images/musrview.svg" /><p>Calls <code class="docutils literal notranslate"><span class="pre">musrview</span></code> from the active tab of <code class="docutils literal notranslate"><span class="pre">musredit</span></code>. For more details see the <a class="reference internal" href="user-manual.html#musrview"><span class="std std-ref">musrview</span></a> docu. Shortcut-key: <code class="docutils literal notranslate"><span class="pre">Alt+V</span></code>.
 The equivalent call on the command line could look like</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrview &lt;msr-file&gt; <span class="o">[</span>optional parameters<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ musrview &lt;msr-file&gt; <span class="o">[</span>optional parameters<span class="o">]</span>
 </pre></div>
 </div>
 </div></blockquote>
 <p><strong>T0</strong></p>
 <blockquote>
-<div><img src="_images/musrt0-icon.svg" /><p>Calls <tt class="docutils literal"><span class="pre">musrt0</span></tt> which allows to set the <tt class="docutils literal"><span class="pre">T0</span></tt> values for all the runs. For more details see the <a class="reference internal" href="user-manual.html#musrt0"><em>musrt0</em></a> docu.
+<div><img alt="_images/musrt0-icon.svg" src="_images/musrt0-icon.svg" /><p>Calls <code class="docutils literal notranslate"><span class="pre">musrt0</span></code> which allows to set the <code class="docutils literal notranslate"><span class="pre">T0</span></code> values for all the runs. For more details see the <a class="reference internal" href="user-manual.html#musrt0"><span class="std std-ref">musrt0</span></a> docu.
 The equivalent call on the command line could look like</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrt0 &lt;msr-file&gt; <span class="o">[</span>optional parameters<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ musrt0 &lt;msr-file&gt; <span class="o">[</span>optional parameters<span class="o">]</span>
 </pre></div>
 </div>
 </div></blockquote>
 <p><strong>Raw Fourier</strong></p>
 <blockquote>
-<div><img src="_images/musrFT.svg" /><p>Calls <tt class="docutils literal"><span class="pre">musrFT</span></tt> which allows to perform a Fourier transform of the raw data. For more details see the <a class="reference internal" href="user-manual.html#musrft"><em>musrFT</em></a> docu.
+<div><img alt="_images/musrFT.svg" src="_images/musrFT.svg" /><p>Calls <code class="docutils literal notranslate"><span class="pre">musrFT</span></code> which allows to perform a Fourier transform of the raw data. For more details see the <a class="reference internal" href="user-manual.html#musrft"><span class="std std-ref">musrFT</span></a> docu.
 The equivalent call on the command line could look like</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrFT &lt;msr-file&gt; <span class="o">[</span>optional parameters<span class="o">]</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ musrFT &lt;msr-file&gt; <span class="o">[</span>optional parameters<span class="o">]</span>
 </pre></div>
 </div>
 </div></blockquote>
 <p id="musredit-prefs"><strong>Preferences</strong></p>
 <blockquote>
-<div><img src="_images/musrprefs.svg" /><p>Opens a window in which the optional parameters that should be passed to musrfit can be chosen.
-For further information refer to the manual of <a class="reference internal" href="user-manual.html#musrfit"><em>musrfit</em></a>.</p>
+<div><img alt="_images/musrprefs.svg" src="_images/musrprefs.svg" /><p>Opens a window in which the optional parameters that should be passed to musrfit can be chosen.
+For further information refer to the manual of <a class="reference internal" href="user-manual.html#musrfit"><span class="std std-ref">musrfit</span></a>.</p>
 </div></blockquote>
 <p><strong>Dump Header</strong></p>
 <blockquote>
-<div><img src="_images/musrdump.svg" /><p>Opens a file dialog which allows to select a μSR data file. When this file can be read, the run header info is dumped into a dialog window.
-Essentially this calls <tt class="docutils literal"><span class="pre">dump_header</span></tt> internally.</p>
+<div><img alt="_images/musrdump.svg" src="_images/musrdump.svg" /><p>Opens a file dialog which allows to select a μSR data file. When this file can be read, the run header info is dumped into a dialog window.
+Essentially this calls <code class="docutils literal notranslate"><span class="pre">dump_header</span></code> internally.</p>
 </div></blockquote>
 </div>
 <div class="section" id="id1">
 <h2>musrWiz<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">musrWiz</span></tt> is a helper program which allows to easily create the necessary msr-file needed as an input for <tt class="docutils literal"><span class="pre">musrfit</span></tt>.
-<tt class="docutils literal"><span class="pre">musrWiz</span></tt> is still in it&#8217;s early stage; not all options are already implemented and here and there you will likely find some bugs.
-From <tt class="docutils literal"><span class="pre">musredit</span></tt> it can be accessed via the MusrFit menu or the wand</p>
-<img src="_images/musredit-musrWiz.svg" /><p>The <tt class="docutils literal"><span class="pre">musrWiz</span></tt> GUI is organized in a couple of different dialogues which some information needs to be provided by the user.
+<p><code class="docutils literal notranslate"><span class="pre">musrWiz</span></code> is a helper program which allows to easily create the necessary msr-file needed as an input for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>.
+<code class="docutils literal notranslate"><span class="pre">musrWiz</span></code> is still in it’s early stage; not all options are already implemented and here and there you will likely find some bugs.
+From <code class="docutils literal notranslate"><span class="pre">musredit</span></code> it can be accessed via the MusrFit menu or the wand</p>
+<img alt="_images/musredit-musrWiz.svg" src="_images/musredit-musrWiz.svg" /><p>The <code class="docutils literal notranslate"><span class="pre">musrWiz</span></code> GUI is organized in a couple of different dialogues which some information needs to be provided by the user.
 In the following these different dialogues will be discussed briefly.</p>
 <div class="section" id="musrwiz-introduction">
 <span id="index-4"></span><h3>musrWiz-Introduction<a class="headerlink" href="#musrwiz-introduction" title="Permalink to this headline">¶</a></h3>
 <p>The introduction dialogue</p>
-<img src="_images/musrWiz-Intro.svg" /><ol class="arabic simple">
-<li>an explicit msr-file name can be provided here. More often the msr-file name is generated out of the run number.</li>
-<li>year of the run data.</li>
-<li>run number. If no explicit msr-file is provided, the run number together with fit type and type of measurement will be used to generate the msr-file name.</li>
-<li>from the pull down menu the institute (for which a necessary <tt class="docutils literal"><span class="pre">xml</span></tt>-file is provided) has to be choosen.</li>
-<li>from the pull down menu the the instrument can be chosen.</li>
-<li>the fit type has to be chosen. Possible fit types are: <tt class="docutils literal"><span class="pre">Single</span> <span class="pre">Histo</span></tt> / <tt class="docutils literal"><span class="pre">Single</span> <span class="pre">Histo</span> <span class="pre">RRF</span></tt> / <tt class="docutils literal"><span class="pre">Asymmetry</span></tt> / <tt class="docutils literal"><span class="pre">Asymmetry</span> <span class="pre">RRF</span></tt> / <tt class="docutils literal"><span class="pre">Mu</span> <span class="pre">Minus</span></tt> / <tt class="docutils literal"><span class="pre">None</span> <span class="pre">muSR</span></tt></li>
-<li>type of measurement is essentially needed for the grouping of the detectors. Possible are: <tt class="docutils literal"><span class="pre">ZF</span></tt> for zero field measurements / <tt class="docutils literal"><span class="pre">TF</span></tt> for transverse field measurements / <tt class="docutils literal"><span class="pre">LF</span></tt> for longitudinal field measurements.
-Depending on the choice and instrument some additional question might be asked, <em>e.g.</em> which magnet has been used.</li>
-<li><tt class="docutils literal"><span class="pre">T0</span></tt>&#8216;s: this last menu defines from where to get the t0&#8217;s. The options are: <tt class="docutils literal"><span class="pre">from</span> <span class="pre">data</span> <span class="pre">file</span></tt>, <em>i.e.</em> the t0 are assumed to be correctly set
-in the provided data file <tt class="docutils literal"><span class="pre">call</span> <span class="pre">musrT0</span></tt>, <em>i.e.</em> after the msr-file is generated, <tt class="docutils literal"><span class="pre">musrt0</span></tt> will be called which allows the user to find the
-proper t0 from the prompt peak <tt class="docutils literal"><span class="pre">enter</span> <span class="pre">here</span></tt> will provide a pop-up menu where the t0 parameter can be given explicitly.</li>
+<img alt="_images/musrWiz-Intro.svg" src="_images/musrWiz-Intro.svg" /><ol class="arabic simple">
+<li><p>an explicit msr-file name can be provided here. More often the msr-file name is generated out of the run number.</p></li>
+<li><p>year of the run data.</p></li>
+<li><p>run number. If no explicit msr-file is provided, the run number together with fit type and type of measurement will be used to generate the msr-file name.</p></li>
+<li><p>from the pull down menu the institute (for which a necessary <code class="docutils literal notranslate"><span class="pre">xml</span></code>-file is provided) has to be choosen.</p></li>
+<li><p>from the pull down menu the the instrument can be chosen.</p></li>
+<li><p>the fit type has to be chosen. Possible fit types are: <code class="docutils literal notranslate"><span class="pre">Single</span> <span class="pre">Histo</span></code> / <code class="docutils literal notranslate"><span class="pre">Single</span> <span class="pre">Histo</span> <span class="pre">RRF</span></code> / <code class="docutils literal notranslate"><span class="pre">Asymmetry</span></code> / <code class="docutils literal notranslate"><span class="pre">Asymmetry</span> <span class="pre">RRF</span></code> / <code class="docutils literal notranslate"><span class="pre">Mu</span> <span class="pre">Minus</span></code> / <code class="docutils literal notranslate"><span class="pre">None</span> <span class="pre">muSR</span></code></p></li>
+<li><p>type of measurement is essentially needed for the grouping of the detectors. Possible are: <code class="docutils literal notranslate"><span class="pre">ZF</span></code> for zero field measurements / <code class="docutils literal notranslate"><span class="pre">TF</span></code> for transverse field measurements / <code class="docutils literal notranslate"><span class="pre">LF</span></code> for longitudinal field measurements.
+Depending on the choice and instrument some additional question might be asked, <em>e.g.</em> which magnet has been used.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">T0</span></code>’s: this last menu defines from where to get the t0’s. The options are: <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">data</span> <span class="pre">file</span></code>, <em>i.e.</em> the t0 are assumed to be correctly set
+in the provided data file <code class="docutils literal notranslate"><span class="pre">call</span> <span class="pre">musrT0</span></code>, <em>i.e.</em> after the msr-file is generated, <code class="docutils literal notranslate"><span class="pre">musrt0</span></code> will be called which allows the user to find the
+proper t0 from the prompt peak <code class="docutils literal notranslate"><span class="pre">enter</span> <span class="pre">here</span></code> will provide a pop-up menu where the t0 parameter can be given explicitly.</p></li>
 </ol>
-<p>If all this information have been provided <tt class="docutils literal"><span class="pre">Next&gt;</span></tt> will lead you the the theory dialogue.</p>
+<p>If all this information have been provided <code class="docutils literal notranslate"><span class="pre">Next&gt;</span></code> will lead you the the theory dialogue.</p>
 </div>
 <div class="section" id="musrwiz-theory">
 <span id="index-5"></span><h3>musrWiz - Theory<a class="headerlink" href="#musrwiz-theory" title="Permalink to this headline">¶</a></h3>
 <p>The theory dialogue is used to define the fitting function. There are two ways of using it:</p>
 <ol class="arabic simple">
-<li>choose a template theory function. This option has the advantage that the next steps will be very easy because
+<li><p>choose a template theory function. This option has the advantage that the next steps will be very easy because
 within the template almost everything is already pre-defined. The disadvantage is that you are not free in setting
-up your theory function as you would like to have.</li>
-<li>freely write your theory function. The advantage here is that you can customize your theory function at your needs.
-This will come at the cost that you also will need to define <tt class="docutils literal"><span class="pre">maps</span></tt>, <tt class="docutils literal"><span class="pre">functions</span></tt>, etc. yourself. The good thing
-though is that at the very end you can save this as a template for future re-use.</li>
+up your theory function as you would like to have.</p></li>
+<li><p>freely write your theory function. The advantage here is that you can customize your theory function at your needs.
+This will come at the cost that you also will need to define <code class="docutils literal notranslate"><span class="pre">maps</span></code>, <code class="docutils literal notranslate"><span class="pre">functions</span></code>, etc. yourself. The good thing
+though is that at the very end you can save this as a template for future re-use.</p></li>
 </ol>
 <p>First the template path will be described. The theory dialogue looks like this</p>
-<img src="_images/musrWiz-Theory.svg" /><ol class="arabic simple">
-<li>This is a text edit field were you can enter the theory fit function as you would like to have it. In the example
-given the theory reads <span class="math">\(p1 \exp(-p2\, t) \cos(2 \pi\, f1 + m1)\)</span>, where <tt class="docutils literal"><span class="pre">pX</span></tt> stands for parameter, <tt class="docutils literal"><span class="pre">fX</span></tt> for function,
-<tt class="docutils literal"><span class="pre">mX</span></tt> for map, and <tt class="docutils literal"><span class="pre">X</span></tt> for the corresponding number.</li>
-<li>The <tt class="docutils literal"><span class="pre">Clear</span> <span class="pre">All</span></tt> button will clear whatever you entered in the text field above.</li>
-<li>This pull-down menu allows to select a theory function which will be added to the text field above by pressing
-the <tt class="docutils literal"><span class="pre">Add</span></tt> button. Pre defined theory function starting with a <tt class="docutils literal"><span class="pre">T</span></tt> are templates rather than only theory function strings.</li>
-<li>The <tt class="docutils literal"><span class="pre">Add</span></tt> button is used to add the chosen theory function / template from the pull-down menu to its left.</li>
-<li>The <tt class="docutils literal"><span class="pre">Check</span></tt> button is used to make a syntactical check of whatever is written in the text edit field.</li>
+<img alt="_images/musrWiz-Theory.svg" src="_images/musrWiz-Theory.svg" /><ol class="arabic simple">
+<li><p>This is a text edit field were you can enter the theory fit function as you would like to have it. In the example
+given the theory reads <span class="math notranslate nohighlight">\(p1 \exp(-p2\, t) \cos(2 \pi\, f1 + m1)\)</span>, where <code class="docutils literal notranslate"><span class="pre">pX</span></code> stands for parameter, <code class="docutils literal notranslate"><span class="pre">fX</span></code> for function,
+<code class="docutils literal notranslate"><span class="pre">mX</span></code> for map, and <code class="docutils literal notranslate"><span class="pre">X</span></code> for the corresponding number.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Clear</span> <span class="pre">All</span></code> button will clear whatever you entered in the text field above.</p></li>
+<li><p>This pull-down menu allows to select a theory function which will be added to the text field above by pressing
+the <code class="docutils literal notranslate"><span class="pre">Add</span></code> button. Pre defined theory function starting with a <code class="docutils literal notranslate"><span class="pre">T</span></code> are templates rather than only theory function strings.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Add</span></code> button is used to add the chosen theory function / template from the pull-down menu to its left.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Check</span></code> button is used to make a syntactical check of whatever is written in the text edit field.</p></li>
 </ol>
 </div>
 <div class="section" id="musrwiz-functions">
 <span id="index-6"></span><h3>musrWiz - Functions<a class="headerlink" href="#musrwiz-functions" title="Permalink to this headline">¶</a></h3>
 <p>In the Functions dialogue all the necessary functions can be entered. A function operates <em>only</em> on fitting parameters.
 This is different to the theory function which operates on the fitting parameters and the time. The dialogue looks like this</p>
-<img src="_images/musrWiz-Functions.svg" /><ol class="arabic simple">
-<li>a text edit field in which the various needed functions can be entered. In case a template theory is used, the appropriate function should be shown here and <em>no</em> editing will be needed here.</li>
-<li>pressing <tt class="docutils literal"><span class="pre">Show</span> <span class="pre">Theory</span></tt> button will pop-up a little window showing the previously entered theory function. This is handy when defining its own theory, <em>i.e.</em> not working with a template.</li>
+<img alt="_images/musrWiz-Functions.svg" src="_images/musrWiz-Functions.svg" /><ol class="arabic simple">
+<li><p>a text edit field in which the various needed functions can be entered. In case a template theory is used, the appropriate function should be shown here and <em>no</em> editing will be needed here.</p></li>
+<li><p>pressing <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">Theory</span></code> button will pop-up a little window showing the previously entered theory function. This is handy when defining its own theory, <em>i.e.</em> not working with a template.</p></li>
 </ol>
-<img src="_images/musrWiz-Functions-and-Theory.svg" /></div>
+<img alt="_images/musrWiz-Functions-and-Theory.svg" src="_images/musrWiz-Functions-and-Theory.svg" /></div>
 <div class="section" id="musrwiz-maps">
 <span id="index-7"></span><h3>musrWiz - Maps<a class="headerlink" href="#musrwiz-maps" title="Permalink to this headline">¶</a></h3>
-<img src="_images/musrWiz-Maps.svg" /><p>The map dialogue will list the maps previously used in the theory and functions blocks/dialogues before. Again, if a template is used, nothing needs to be entered here.</p>
+<img alt="_images/musrWiz-Maps.svg" src="_images/musrWiz-Maps.svg" /><p>The map dialogue will list the maps previously used in the theory and functions blocks/dialogues before. Again, if a template is used, nothing needs to be entered here.</p>
 <ol class="arabic simple">
-<li>The <tt class="docutils literal"><span class="pre">Show</span> <span class="pre">Theory</span></tt> button allows to show the currently defined theory and the functions.</li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">Theory</span></code> button allows to show the currently defined theory and the functions.</p></li>
 </ol>
 </div>
 <div class="section" id="musrwiz-fit-parameters">
 <span id="index-8"></span><h3>musrWiz - Fit Parameters<a class="headerlink" href="#musrwiz-fit-parameters" title="Permalink to this headline">¶</a></h3>
-<img src="_images/musrWiz-FitParam.svg" /><p>In the fit parameter dialogue all parameter names can be defined. Furthermore the starting values for the parameters, the step
+<img alt="_images/musrWiz-FitParam.svg" src="_images/musrWiz-FitParam.svg" /><p>In the fit parameter dialogue all parameter names can be defined. Furthermore the starting values for the parameters, the step
 (initial step size for the parameter fit), and any boundaries can be defined here.</p>
 <ol class="arabic simple">
-<li>The <tt class="docutils literal"><span class="pre">Show</span> <span class="pre">Theory</span></tt> button allows to show the currently defined theory and the functions.</li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">Theory</span></code> button allows to show the currently defined theory and the functions.</p></li>
 </ol>
 </div>
 <div class="section" id="musrwiz-fit-info">
 <span id="index-9"></span><h3>musrWiz - Fit Info<a class="headerlink" href="#musrwiz-fit-info" title="Permalink to this headline">¶</a></h3>
-<p>Collects all the <tt class="docutils literal"><span class="pre">musrfit</span></tt> and <tt class="docutils literal"><span class="pre">MINUIT2</span></tt> specific fit commands.</p>
-<img src="_images/musrWiz-FitInfo.svg" /><ol class="arabic simple">
-<li>allows to define the time fit range (start time, end time).</li>
-<li>packing defines how many bins of the original data shall be combined (added, also called re-binning).</li>
-<li>in this text field to fitting commands are given (see the <tt class="docutils literal"><span class="pre">MINUIT</span></tt> and <a class="reference internal" href="user-manual.html#msr-commands-block"><em>musrfit</em></a> manual for details).</li>
+<p>Collects all the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> and <code class="docutils literal notranslate"><span class="pre">MINUIT2</span></code> specific fit commands.</p>
+<img alt="_images/musrWiz-FitInfo.svg" src="_images/musrWiz-FitInfo.svg" /><ol class="arabic simple">
+<li><p>allows to define the time fit range (start time, end time).</p></li>
+<li><p>packing defines how many bins of the original data shall be combined (added, also called re-binning).</p></li>
+<li><p>in this text field to fitting commands are given (see the <code class="docutils literal notranslate"><span class="pre">MINUIT</span></code> and <a class="reference internal" href="user-manual.html#msr-commands-block"><span class="std std-ref">musrfit</span></a> manual for details).</p></li>
 </ol>
 </div>
 <div class="section" id="musrwiz-create">
 <span id="index-10"></span><h3>musrWiz - Create<a class="headerlink" href="#musrwiz-create" title="Permalink to this headline">¶</a></h3>
 <p>Collects the last necessary information before creating the msr-file.</p>
-<img src="_images/musrWiz-Create.svg" /><ol class="arabic simple">
-<li>shows the path where the msr-file will be saved. If you would like to save it somewhere else press the <tt class="docutils literal"><span class="pre">Save</span> <span class="pre">As</span> <span class="pre">(msr-file</span> <span class="pre">path)</span></tt> button.</li>
-<li>pressing this button will allow you to find the path where to save the msr-file.</li>
-<li>pressing this button will save to current configuration as a template for future re-use.</li>
+<img alt="_images/musrWiz-Create.svg" src="_images/musrWiz-Create.svg" /><ol class="arabic simple">
+<li><p>shows the path where the msr-file will be saved. If you would like to save it somewhere else press the <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">As</span> <span class="pre">(msr-file</span> <span class="pre">path)</span></code> button.</p></li>
+<li><p>pressing this button will allow you to find the path where to save the msr-file.</p></li>
+<li><p>pressing this button will save to current configuration as a template for future re-use.</p></li>
 </ol>
 </div>
 </div>
 <div class="section" id="musrstep">
 <span id="index-11"></span><h2>musrStep<a class="headerlink" href="#musrstep" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">musrStep</span></tt> is a little helper program which allows to reset the initial step size. This sometimes comes very handy if working on an instrument
+<p><code class="docutils literal notranslate"><span class="pre">musrStep</span></code> is a little helper program which allows to reset the initial step size. This sometimes comes very handy if working on an instrument
 with many detectors after a fit slightly went wrong leaving you with a far too small initial step size for further iterations. To edit all the steps
-individually is tedious and error prone. Here <tt class="docutils literal"><span class="pre">musrStep</span></tt> can help.</p>
-<img src="_images/musrStep-GUI.svg" /><p>When invoking <tt class="docutils literal"><span class="pre">musrStep</span></tt> the above dialogue will popup</p>
+individually is tedious and error prone. Here <code class="docutils literal notranslate"><span class="pre">musrStep</span></code> can help.</p>
+<img alt="_images/musrStep-GUI.svg" src="_images/musrStep-GUI.svg" /><p>When invoking <code class="docutils literal notranslate"><span class="pre">musrStep</span></code> the above dialogue will popup</p>
 <ol class="arabic simple">
-<li>shows the relevant parts of the FITPARAMETER block. The only editable column is step.</li>
-<li><tt class="docutils literal"><span class="pre">Check</span> <span class="pre">Specific</span></tt> will popup a dialogue where a template string can be entered, <em>e.g.</em> <tt class="docutils literal"><span class="pre">Asym</span></tt>. As a result all fit parameters containing the template string will be selected.</li>
-<li><tt class="docutils literal"><span class="pre">Check</span> <span class="pre">All</span></tt> will select all fit parameters.</li>
-<li><tt class="docutils literal"><span class="pre">Uncheck</span> <span class="pre">All</span></tt> will unselect all fit parameters.</li>
-<li><tt class="docutils literal"><span class="pre">Modify</span> <span class="pre">Automatic</span></tt> will change all the step values automatically. It basically sets all the step sizes to 1% of
-the corresponding fit parameter value, except the phases where the step will be set to a value of 5 degrees.</li>
-<li><tt class="docutils literal"><span class="pre">Modify</span> <span class="pre">Selected</span></tt> will start the dialogue shown beneath. Follow the description there.</li>
-<li><tt class="docutils literal"><span class="pre">Save&amp;Quit</span></tt> will save the current step values, close the dialogue and reload the modified msr-file.</li>
-<li><tt class="docutils literal"><span class="pre">Cancel</span></tt> will cancel the <tt class="docutils literal"><span class="pre">musrStep</span></tt> dialogue without modifying anything.</li>
+<li><p>shows the relevant parts of the FITPARAMETER block. The only editable column is step.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Check</span> <span class="pre">Specific</span></code> will popup a dialogue where a template string can be entered, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">Asym</span></code>. As a result all fit parameters containing the template string will be selected.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Check</span> <span class="pre">All</span></code> will select all fit parameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Uncheck</span> <span class="pre">All</span></code> will unselect all fit parameters.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Modify</span> <span class="pre">Automatic</span></code> will change all the step values automatically. It basically sets all the step sizes to 1% of
+the corresponding fit parameter value, except the phases where the step will be set to a value of 5 degrees.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Modify</span> <span class="pre">Selected</span></code> will start the dialogue shown beneath. Follow the description there.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Save&amp;Quit</span></code> will save the current step values, close the dialogue and reload the modified msr-file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cancel</span></code> will cancel the <code class="docutils literal notranslate"><span class="pre">musrStep</span></code> dialogue without modifying anything.</p></li>
 </ol>
-<img src="_images/musrStep-Modify-Selected.svg" /><p>When clicking on <tt class="docutils literal"><span class="pre">Modify</span> <span class="pre">Selected</span></tt> the above dialogue will be presented. It allows to manipulate all selected fit parameter step values according to the following rules</p>
+<img alt="_images/musrStep-Modify-Selected.svg" src="_images/musrStep-Modify-Selected.svg" /><p>When clicking on <code class="docutils literal notranslate"><span class="pre">Modify</span> <span class="pre">Selected</span></code> the above dialogue will be presented. It allows to manipulate all selected fit parameter step values according to the following rules</p>
 <ol class="arabic simple">
-<li><tt class="docutils literal"><span class="pre">Scale</span> <span class="pre">by</span> <span class="pre">Factor</span></tt> will scale the step value by the factor given in the field (2). If the <tt class="docutils literal"><span class="pre">Absolute</span> <span class="pre">Value</span></tt> check box is selected, rather than scaling the factor value will be used to modify the step value.</li>
-<li>scaling factor or absolute value to modify the step values of the selected fit parameters.</li>
-<li>checking the <tt class="docutils literal"><span class="pre">Absolute</span> <span class="pre">Value</span></tt> check box will change the meaning from <em>Scale by Factor</em> to <em>Copy Factor Value</em>.</li>
-<li><tt class="docutils literal"><span class="pre">Scale</span> <span class="pre">Automatically</span></tt> will modify the step values of the selected fit parameters according to the rules described before.</li>
-<li><tt class="docutils literal"><span class="pre">Cancel</span></tt> will cancel the dialogue.</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Scale</span> <span class="pre">by</span> <span class="pre">Factor</span></code> will scale the step value by the factor given in the field (2). If the <code class="docutils literal notranslate"><span class="pre">Absolute</span> <span class="pre">Value</span></code> check box is selected, rather than scaling the factor value will be used to modify the step value.</p></li>
+<li><p>scaling factor or absolute value to modify the step values of the selected fit parameters.</p></li>
+<li><p>checking the <code class="docutils literal notranslate"><span class="pre">Absolute</span> <span class="pre">Value</span></code> check box will change the meaning from <em>Scale by Factor</em> to <em>Copy Factor Value</em>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Scale</span> <span class="pre">Automatically</span></code> will modify the step values of the selected fit parameters according to the rules described before.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cancel</span></code> will cancel the dialogue.</p></li>
 </ol>
 </div>
 </div>
@@ -483,11 +465,11 @@ the corresponding fit parameter value, except the phases where the step will be 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar">
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table Of Contents</a></h3>
+  <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#"><tt class="docutils literal"><span class="pre">musredit</span></tt>: the GUI Based Interface to <tt class="docutils literal"><span class="pre">musrfit</span></tt></a><ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">musredit</span></code>: the GUI Based Interface to <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></a><ul>
 <li><a class="reference internal" href="#introduction">Introduction</a></li>
 <li><a class="reference internal" href="#available-executable-configuration-files-and-their-basic-usage">Available Executable, Configuration Files and their Basic Usage</a><ul>
 <li><a class="reference internal" href="#musredit-musrgui">musredit (musrgui)</a></li>
@@ -512,33 +494,32 @@ the corresponding fit parameter value, except the phases where the step will be 
 
   <h4>Previous topic</h4>
   <p class="topless"><a href="setup-dks.html"
-                        title="previous chapter">Setting up <tt class="docutils literal"><span class="pre">musrfit</span></tt> / <tt class="docutils literal"><span class="pre">DKS</span></tt>: High Speed Fitting with GPU&#8217;s</a></p>
+                        title="previous chapter">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> / <code class="docutils literal notranslate"><span class="pre">DKS</span></code>: High Speed Fitting with GPU’s</a></p>
   <h4>Next topic</h4>
   <p class="topless"><a href="mupp.html"
                         title="next chapter">mupp - μSR Parameter Plotter</a></p>
-  <h3>This Page</h3>
-  <ul class="this-page-menu">
-    <li><a href="_sources/musredit.txt"
-           rel="nofollow">Show Source</a></li>
-  </ul>
-<div id="searchbox" style="display: none">
-  <h3>Quick search</h3>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/musredit.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" />
+      <input type="text" name="q" aria-labelledby="searchlabel" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
-    <p class="searchtip" style="font-size: 90%">
-    Enter search terms or a module, class or function name.
-    </p>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related">
+    <div class="related" role="navigation" aria-label="related navigation">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -550,13 +531,13 @@ the corresponding fit parameter value, except the phases where the step will be 
         <li class="right" >
           <a href="setup-dks.html" title="Setting up musrfit / DKS: High Speed Fitting with GPU’s"
              >previous</a> |</li>
-        <li><a href="index.html">musrfit 1.5.1 documentation</a> &raquo;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.5.2 documentation</a> &#187;</li> 
       </ul>
     </div>
-    <div class="footer">
-        &copy; Copyright 2019, Andreas Suter.
-      Last updated on Jul 24, 2019.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2020, Andreas Suter.
+      Last updated on Feb 04, 2020.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
     </div>
   </body>
 </html>

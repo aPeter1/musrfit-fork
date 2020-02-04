@@ -1,0 +1,22 @@
+.. include:: <isogrk1.txt>
+.. index:: acknowledgment
+
+.. _acknowledgment:
+
+Acknowledgements
+================
+
+
+**Bastian M. Wojek**
+  I am very much indebted to BMW for his rigorous testing of ``musrfit``, his many useful suggestions, contributions, and for the 
+  largest part of the user manual of ``musrfit`` which makes it accessible to a broader audience! Many thanks Bastian! 
+
+**Uldis Locans**
+  I am very much indebted to Uldis work on :ref:`DKS <setup-dks>` enabling the GPU support for ``musrfit``. His kind, calm, and 
+  extremely competent way to deal with his projects as well as to deal with the chaos of physicists way to think is admirable. Many thanks Uldis!
+
+**Zaher Salman**
+  Thanks for his beta-NMR and web-interface contributions to ``musrfit``!
+
+**Robert Scheuermann**
+  Thanks for his constant contructive input on ``musrfit``! 
