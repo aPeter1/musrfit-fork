@@ -30,7 +30,6 @@
  ***************************************************************************/
 
 #include <iostream>
-using namespace std;
 
 #include "TApplication.h"
 
@@ -42,7 +41,7 @@ int main(int argc, char *argv[])
 
   PEventHandlerTest *eht = new PEventHandlerTest();
   if (eht == 0) {
-    cerr << endl << "**ERROR** couldn't invoke eht ..." << endl;
+    std::cerr << std::endl << "**ERROR** couldn't invoke eht ..." << std::endl;
     return 0;
   }
 
