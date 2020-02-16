@@ -386,7 +386,7 @@ int main(int argc, char *argv[])
         canvasVector[i]->~PMusrCanvas();
       }
     }
-    canvasVector.empty();
+    canvasVector.clear();
   }
 
   // clean up
