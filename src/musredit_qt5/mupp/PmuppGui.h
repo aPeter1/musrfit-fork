@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2017 by Andreas Suter                              *
+ *   Copyright (C) 2007-2020 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -114,6 +114,8 @@ public slots:
 
   void toolDumpCollections();
   void toolDumpXY();
+  void normalize();
+  void normVal();
 
   void helpCmds();
   void helpAbout();
@@ -128,6 +130,8 @@ private:
   PmuppAdmin *fAdmin;
   bool fDarkTheme;
   bool fDarkToolBarIcon;
+  bool fNormalize;
+  double fNormVal;
 
   uint fDatime;
   uint fMuppInstance;
@@ -142,6 +146,7 @@ private:
 
   QMenu *fRecentFilesMenu;   ///< recent file menu
   QAction *fRecentFilesAction[MAX_RECENT_FILES]; ///< array of the recent file actions
+  QAction *fNormalizeAction;
 
   QBoxLayout  *fBoxLayout_Main;     // top->bottom (0)
   QBoxLayout  *fBoxLayout_Top;      // left->right (1)

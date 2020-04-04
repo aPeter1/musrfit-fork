@@ -60,6 +60,7 @@ using namespace std;
 
 #include "mupp_version.h"
 #include "PmuppGui.h"
+#include "PGetNormValDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
@@ -207,7 +208,11 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
   fDatime = dt.toTime_t();
   fMuppInstance = -1;
 
-  fMuppPlot = 0;
+  fMuppPlot = nullptr;
+  fNormalizeAction = nullptr;
+
+  fNormalize = false;
+  fNormVal = 0.0;
 
   fMacroPath = QString("./");
   fMacroName = QString("");
@@ -526,6 +531,19 @@ void PmuppGui::setupToolActions()
   a->setStatusTip( tr("Dump XY parameter list") );
   connect( a, SIGNAL( triggered() ), this, SLOT( toolDumpXY() ) );
   menu->addAction(a);
+
+  menu->addSeparator();
+
+  fNormalizeAction = new QAction(tr( "Normalize" ), this);
+  fNormalizeAction->setStatusTip( tr("Plot Data Normalized (y-axis)") );
+  fNormalizeAction->setCheckable(true);
+  connect( fNormalizeAction, SIGNAL( changed() ), this, SLOT( normalize() ) );
+  menu->addAction(fNormalizeAction);
+
+  a = new QAction(tr( "Normalize by Value" ), this);
+  a->setStatusTip( tr("Normalize by Value") );
+  connect( a, SIGNAL( triggered() ), this, SLOT( normVal() ) );
+  menu->addAction(a);
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -664,6 +682,33 @@ void PmuppGui::toolDumpXY()
   } else {
     QMessageBox::warning(this, "dump XY", "no XY list present yet");
   }
+}
+
+//----------------------------------------------------------------------------------------------------
+void PmuppGui::normalize()
+{
+  fNormalize = fNormalizeAction->isChecked();
+}
+
+//----------------------------------------------------------------------------------------------------
+void PmuppGui::normVal()
+{
+  PGetNormValDialog *dlg = new PGetNormValDialog(fNormVal);
+  if (dlg == nullptr) {
+    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
+    return;
+  }
+
+  dlg->exec();
+
+  if (dlg->result() != QDialog::Accepted) {
+    delete dlg;
+    return;
+  }
+
+  fNormVal = dlg->getValue();
+
+  delete dlg;
 }
 
 //----------------------------------------------------------------------------------------------------

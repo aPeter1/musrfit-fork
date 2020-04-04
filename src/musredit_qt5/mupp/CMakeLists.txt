@@ -48,6 +48,7 @@ set(SOURCE_FILES
   Pmupp.cpp
   PmuppScript.cpp 
   PmuppGui.cpp
+  PGetNormValDialog.cpp
 )
 
 if (APPLE)
