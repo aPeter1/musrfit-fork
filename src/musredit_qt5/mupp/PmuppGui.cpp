@@ -1702,6 +1702,27 @@ void PmuppGui::plot()
     yLabel = substituteDefaultLabels(yLabel);
     fout << "yLabel: " << yLabel << endl;
 
+    // normalize if wished
+    if (fNormalize) {
+      double max=0.0;
+      for (int k=0; k<yyy.size(); k++) {
+        max=0.0;
+        if (fNormVal == 0.0) {
+          for (int j=0; j<xx.size(); j++) {
+            if (yyy[k][j] > max)
+              max = yyy[k][j];
+          }
+        } else {
+          max = fNormVal;
+        }
+        for (int j=0; j<xx.size(); j++) {
+          yyy[k][j] /= max;
+          yyyPosErr[k][j] /= max;
+          yyyNegErr[k][j] /= max;
+        }
+      }
+    }
+
     // data
     for (int j=0; j<xx.size(); j++) {
       fout << xx[j] << ", ";
@@ -2057,22 +2078,62 @@ void PmuppGui::getMinMax(QVector<double> &data, double &min, double &max)
  */
 QString PmuppGui::substituteDefaultLabels(QString label)
 {
-  if (label == "dataT")
-    return QString("T (K)");
-  else if (label == "dataB")
-    return QString("B (G)");
-  else if (label == "dataE")
-    return QString("E (keV)");
-  else if (!label.compare("sigma", Qt::CaseInsensitive))
-    return QString("#sigma (1/#mus)");
-  else if (!label.compare("lambda", Qt::CaseInsensitive))
-    return QString("#lambda (1/#mus)");
-  else if (!label.compare("alpha_LR", Qt::CaseInsensitive))
-    return QString("#alpha_{LR}");
-  else if (!label.compare("alpha_TB", Qt::CaseInsensitive))
-    return QString("#alpha_{TB}");
-  else
-    return label;
+  QString result(label);
+
+  if (label == "dataT") {
+    result = QString("T (K)");
+  } else if (label == "dataB") {
+    result = QString("B (G)");
+  } else if (label == "dataE") {
+    result =QString("E (keV)");
+  } else if (!label.compare("sigma", Qt::CaseInsensitive)) {
+    if (fNormalize) {
+      if (fNormVal == 0.0)
+        result = QString("#sigma/max(#sigma)");
+      else
+        result = QString("#sigma/%1 (1/#mus)").arg(fNormVal);
+    } else {
+      result = QString("#sigma (1/#mus)");
+    }
+  } else if (!label.compare("lambda", Qt::CaseInsensitive)) {
+    if (fNormalize) {
+      if (fNormVal == 0.0)
+        result = QString("#lambda/max(#lambda)");
+      else
+        result = QString("#lambda/%1 (1/#mus)").arg(fNormVal);
+    } else {
+      result = QString("#lambda (1/#mus)");
+    }
+  } else if (!label.compare("alpha_LR", Qt::CaseInsensitive)) {
+    if (fNormalize) {
+      if (fNormVal == 0.0)
+        result = QString("#alpha_{LR}/max(#alpha_{LR})");
+      else
+        result = QString("#alpha_{LR}/%1").arg(fNormVal);
+    } else {
+      result = QString("#alpha_{LR}");
+    }
+  } else if (!label.compare("alpha_TB", Qt::CaseInsensitive)) {
+    if (fNormalize) {
+      if (fNormVal == 0.0)
+        result = QString("#alpha_{TB}/max(#alpha_{TB})");
+      else
+        result = QString("#alpha_{TB}/%1").arg(fNormVal);
+    } else {
+      result = QString("#alpha_{TB}");
+    }
+  } else {
+    if (fNormalize) {
+      if (fNormVal == 0.0) {
+        result = QString("Normalized ");
+        result += label;
+      } else {
+        result = QString("%1/%2").arg(label).arg(fNormVal);
+      }
+    }
+  }
+
+  return result;
 }
 
 //----------------------------------------------------------------------------------------------------
