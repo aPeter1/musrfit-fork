@@ -990,9 +990,11 @@ void PmuppGui::remove()
   updateXYList(fColList->currentRow());
 
   // if there no collections left remove all the parameters from the X/Y list
+  // remove all fXY as well
   if (fColList->count() == 0) {
     fViewX->clear();
     fViewY->clear();
+    fXY.clear();
     return;
   }
 
