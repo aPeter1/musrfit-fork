@@ -262,7 +262,6 @@ bool PParamDataHandler::analyzeFileList(const QStringList &fln, QString &collect
 bool PParamDataHandler::ReadParamFile(const QStringList fln, QString &errorMsg)
 {
   bool valid = true;
-  PmuppRun run;
   PmuppCollection collection;
   QString collName("");
 
