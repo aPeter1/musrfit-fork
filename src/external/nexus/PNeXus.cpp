@@ -2045,7 +2045,14 @@ int PNeXus::ReadFile(const char *fileName)
   // close file
   NXclose(&fFileHandle);
 
+  std::stringstream ss;
   switch (fIdfVersion) {
+  case 0:
+    fErrorCode = PNEXUS_IDF_NOT_IMPLEMENTED;
+    ss << ">> **ERROR** update of the HDF4/HDF5 libs without recompilation of the NeXus lib?";
+    fErrorMsg = ss.str();
+    status = NX_ERROR;
+    break;
   case 1:
     status = ReadFileIdf1();
     if (status != NX_OK) {
@@ -2062,7 +2069,6 @@ int PNeXus::ReadFile(const char *fileName)
     break;
   default:
     fErrorCode = PNEXUS_IDF_NOT_IMPLEMENTED;
-    std::stringstream ss;
     ss << ">> **ERROR** idf_version=" << fIdfVersion << " not yet implemented.";
     fErrorMsg = ss.str();
     status = NX_ERROR;
