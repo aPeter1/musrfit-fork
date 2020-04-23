@@ -256,7 +256,7 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
 
   // setup widgets
   fBoxLayout_Main = new QBoxLayout(QBoxLayout::TopToBottom);
-  fBoxLayout_Main->setGeometry(QRect(10, 40, 600, 400));
+  fBoxLayout_Main->setGeometry(QRect(10, 40, 600, 500));
 
   fBoxLayout_Top = new QBoxLayout(QBoxLayout::LeftToRight);
   fGridLayout_Left = new QGridLayout();
@@ -329,23 +329,39 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
   fBoxLayout_Top->addLayout(fGridLayout_Left);
   fBoxLayout_Top->addLayout(fGridLayout_Right);
 
+  fCmdLineHistory = new QPlainTextEdit(this);
+  fCmdLineHistory->setReadOnly(true);
+  fCmdLineHistory->setMaximumBlockCount(50);
+  // fill cmd history
+  for (int i=0; i<fCmdHistory.size(); i++)
+    fCmdLineHistory->insertPlainText(QString("%1\n").arg(fCmdHistory[i]));
   fCmdLine = new QLineEdit(this);
   fCmdLine->installEventFilter(this);
   fCmdLine->setText("$ ");
   fCmdLine->setFocus(); // sets the keyboard focus
   fExitButton = new QPushButton("E&xit", this);
 
+  QVBoxLayout *cmdLayout = new QVBoxLayout;
+  QLabel *cmdLabel = new QLabel("History:");
+  cmdLayout->addWidget(cmdLabel);
+  cmdLayout->addWidget(fCmdLineHistory);
+  cmdLayout->addWidget(fCmdLine);
+
   fBoxLayout_Cmd = new QBoxLayout(QBoxLayout::LeftToRight);
-  fBoxLayout_Cmd->addWidget(fCmdLine);
+  fBoxLayout_Cmd->addLayout(cmdLayout);
   fBoxLayout_Cmd->addWidget(fExitButton);
+  fBoxLayout_Cmd->setAlignment(fCmdLine, Qt::AlignBottom);
+  fBoxLayout_Cmd->setAlignment(fExitButton, Qt::AlignBottom);
 
-  QFrame* hline = new QFrame();
-  hline->setFrameShape(QFrame::HLine);
-  hline->setFrameShadow(QFrame::Sunken);
+  fCmdSplitter = new QSplitter(Qt::Vertical, this);
+  QWidget *topWidget = new QWidget(this); // only needed since splitter needs a QWidget
+  topWidget->setLayout(fBoxLayout_Top);
+  QWidget *cmdWidget = new QWidget(this); // only needed since splitter needs a QWidget
+  cmdWidget->setLayout(fBoxLayout_Cmd);
+  fCmdSplitter->addWidget(topWidget);
+  fCmdSplitter->addWidget(cmdWidget);
 
-  fBoxLayout_Main->addLayout(fBoxLayout_Top);
-  fBoxLayout_Main->addWidget(hline);
-  fBoxLayout_Main->addLayout(fBoxLayout_Cmd);
+  fBoxLayout_Main->addWidget(fCmdSplitter);
 
   // establish all the necessary signal/slots
   connect(fRefreshCollection, SIGNAL( pressed() ), this, SLOT( refresh() ));
@@ -718,16 +734,19 @@ void PmuppGui::normVal()
 void PmuppGui::helpCmds()
 {
   QMessageBox::information(this, "cmd help", "<b>help:</b> this help.<br>"\
-                           "<b>exit/quit:</b> close mupp.<br>"\
-                           "<b>load:</b> calls the open file dialog.<br>"\
+                           "<b>ditto</b>: addX/Y for the new selection as for the previous ones.<br>"\
                            "<b>dump collections:</b> dumps all currently loaded collections.<br>"\
                            "<b>dump XY:</b> dumps X/Y tree.<br>"\
-                           "<b>refresh:</b> refresh the currently selected collection.<br>"\
-                           "<b>plot:</b> plot the X/Y data.<br>"\
+                           "<b>exit/quit:</b> close mupp.<br>"\
+                           "<b>load:</b> calls the open file dialog.<br>"\
+                           "<b>norm &lt;flag&gt;:</b> normalize plots to maximum if &lt;flag&gt; is true<br>"\
                            "<b>macro &lt;fln&gt;:</b> saves the X/Y data as a ROOT macro (*.C).<br>"\
                            "<b>path &lt;macroPath&gt;:</b> sets the path to the place where the macros will be saved.<br>"\
-                           "<b>select collection &lt;nn&gt;:</b> select collection in GUI.<br>"\
+                           "<b>plot:</b> plot the X/Y data.<br>"\
+                           "<b>refresh:</b> refresh the currently selected collection.<br>"\
+                           "<b>select &lt;nn&gt;:</b> select collection in GUI.<br>"\
                            "&nbsp;&nbsp;&nbsp;&nbsp;&lt;nn&gt; is either the collection name or the row number.<br>"\
+                           "<b>x &lt;param_name&gt; / y &lt;param_name&gt;:</b> add the parameter to the select axis.<br>"\
                            "<b>flush:</b> flush the history buffer.");
 }
 
@@ -787,6 +806,7 @@ bool PmuppGui::eventFilter(QObject *o, QEvent *e)
         if (fCmdHistory.size() >= 50)
           fCmdHistory.removeFirst();
         fCmdHistory.push_back(cmd);
+        fCmdLineHistory->insertPlainText(QString("%1\n").arg(cmd));
       }
     }
     return false;
@@ -866,9 +886,6 @@ void PmuppGui::readCmdHistory()
 //----------------------------------------------------------------------------------------------------
 void PmuppGui::writeCmdHistory()
 {
-  if (fCmdHistory.size() == 0)
-    return;
-
   QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
   QString home = procEnv.value("HOME", "");
   if (home.isEmpty())
@@ -877,7 +894,7 @@ void PmuppGui::writeCmdHistory()
   QString pathName = home + "/.musrfit/mupp/";
   QDir dir(pathName);
   if (!dir.exists()) {
-    // directory $HOME/.musrfit/musredit does not exist hence create it
+    // directory $HOME/.musrfit/mupp does not exist hence create it
     dir.mkpath(pathName);
   }
   pathName += "mupp_history.txt";
@@ -1014,13 +1031,23 @@ void PmuppGui::remove()
 /**
  * @brief PmuppGui::addX
  */
-void PmuppGui::addX()
+void PmuppGui::addX(QString param)
 {
-  // get the parameter name from the parameter list widget
-  QListWidgetItem *item = fParamList->currentItem();
-  if (item == 0)
-    return;
-  QString paramName = item->text();
+  QString paramName("");
+  if (!param.isEmpty()) {
+    // check that param exists
+    if (fParamList->findItems(param, Qt::MatchFixedString).empty()) {
+      QMessageBox::critical(this, "**ERROR**", QString("Parameter X '%1' not found").arg(param));
+      return;
+    }
+    paramName = param;
+  } else {
+    // get the parameter name from the parameter list widget
+    QListWidgetItem *item = fParamList->currentItem();
+    if (item == 0)
+      return;
+    paramName = item->text();
+  }
   int idx = fColList->currentRow();
   QString xLabel = QString("%1 (-%2-)").arg(paramName).arg(idx);
 
@@ -1046,13 +1073,23 @@ void PmuppGui::addX()
 /**
  * @brief PmuppGui::addY
  */
-void PmuppGui::addY()
-{
-  // get the parameter name from the parameter list widget
-  QListWidgetItem *item = fParamList->currentItem();
-  if (item == 0)
-    return;
-  QString paramName = item->text();
+void PmuppGui::addY(QString param)
+{  
+  QString paramName("");
+  if (!param.isEmpty()) {
+    // check that param exists
+    if (fParamList->findItems(param, Qt::MatchFixedString).empty()) {
+      QMessageBox::critical(this, "**ERROR**", QString("Parameter Y '%1' not found").arg(param));
+      return;
+    }
+    paramName = param;
+  } else {
+    // get the parameter name from the parameter list widget
+    QListWidgetItem *item = fParamList->currentItem();
+    if (item == 0)
+      return;
+    paramName = item->text();
+  }
   int idx = fColList->currentRow();
   QString yLabel = QString("%1 (-%2-)").arg(paramName).arg(idx);
 
@@ -1900,12 +1937,38 @@ void PmuppGui::handleCmds()
       }
       fMacroPath.replace(envVar.prepend("$"), fullPath);
     }
-  } else if (cmd.startsWith("select collection") || cmd.startsWith("sc")) {
+  } else if (cmd.startsWith("select") || cmd.startsWith("sc")) {
     selectCollection(cmd);
+  } else if (cmd.startsWith("x")) {
+    QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+    addX(tok[1]);
+  } else if (cmd.startsWith("y")) {
+    QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+    addY(tok[1]);
+  } else if (cmd.startsWith("ditto")) {
+    addDitto();
+  } else if (cmd.startsWith("norm")) {
+    QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+    if (tok.size() != 2) {
+      QMessageBox::critical(this, "**ERROR**", "found wrong norm cmd, will ignore it.");
+      return;
+    }
+    if (!tok[1].trimmed().compare("true", Qt::CaseInsensitive)) {
+      fNormalizeAction->setChecked(true);
+    } else if (!tok[1].trimmed().compare("false", Qt::CaseInsensitive)) {
+      fNormalizeAction->setChecked(false);
+    } else {
+      QMessageBox::critical(this, "**ERROR**", "found wrong norm cmd, will ignore it.");
+      return;
+    }
   } else if (cmd.startsWith("flush")) {
     fCmdHistory.clear();
     fCmdLine->setText("$ ");
+    fCmdLineHistory->clear();
+    fCmdLineHistory->insertPlainText("$");
   } else if (cmd.startsWith("help")) {
+    helpCmds();
+  } else {
     helpCmds();
   }
 }
@@ -2148,8 +2211,8 @@ void PmuppGui::selectCollection(QString cmd)
   bool ok;
   int ival, pos=-1;
   QString str = cmd;
-  if (cmd.contains("select collection")) {
-    str.remove("select collection");
+  if (cmd.contains("select")) {
+    str.remove("select");
     str = str.trimmed();
   } else if (cmd.contains("sc")) {
     pos = cmd.indexOf("sc");
@@ -2163,6 +2226,9 @@ void PmuppGui::selectCollection(QString cmd)
   if (ok) { // it is a number
     if (ival < fColList->count())
       fColList->setCurrentRow(ival);
+    else
+      QMessageBox::critical(this, "**ERROR**",
+            QString("Found Row Selection %1 which is > #Selections=%2").arg(ival).arg(fColList->count()));
   } else { // assume it is a collection name
     for (int i=0; i<fColList->count(); i++) {
       if (fColList->item(i)->text() == str) {

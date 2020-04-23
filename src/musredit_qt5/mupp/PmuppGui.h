@@ -41,6 +41,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QPlainTextEdit>
 #include <QEvent>
 #include <QProcess>
 
@@ -170,6 +171,8 @@ private:
   QPushButton *fRemoveX;
   QPushButton *fRemoveY;
   QPushButton *fPlot;
+  QSplitter   *fCmdSplitter;
+  QPlainTextEdit *fCmdLineHistory;
   QLineEdit   *fCmdLine;
   QPushButton *fExitButton;
 
@@ -198,8 +201,8 @@ private:
 private slots:
   void refresh();
   void remove();
-  void addX();
-  void addY();
+  void addX(QString param="");
+  void addY(QString param="");
   void removeX();
   void removeY();
   void addDitto();

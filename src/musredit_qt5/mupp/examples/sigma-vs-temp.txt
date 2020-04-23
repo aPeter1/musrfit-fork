@@ -1,0 +1,18 @@
+# This is a comment
+
+loadPath ./
+
+load YBCO-40nm-FC-E3p8keV-B10mT-Tscan.db
+load YBCO-40nm-FC-E3p8keV-B150mT-Tscan.db
+
+selectAll
+
+x dataT
+y Sigma
+
+savePath ./
+plot SigmaVsTemp.pdf
+
+macro SigmaVsTemp.C
+
+# end

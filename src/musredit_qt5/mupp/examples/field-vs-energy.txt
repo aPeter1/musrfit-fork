@@ -9,8 +9,8 @@ load YBCO-40nm-T120K-FC150mT-Escan.db
 
 selectAll
 
-addX dataE
-addY Field
+x dataE
+y Field
 
 savePath ./
 plot FieldVsEnergy.pdf

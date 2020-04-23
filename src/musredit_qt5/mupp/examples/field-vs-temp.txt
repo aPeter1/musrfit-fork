@@ -1,0 +1,19 @@
+# This is a comment
+
+loadPath ./
+
+load YBCO-40nm-FC-E3p8keV-B10mT-Tscan.db
+load YBCO-40nm-FC-E3p8keV-B150mT-Tscan.db
+
+selectAll
+
+norm
+x dataT
+y Field
+
+savePath ./
+plot FieldVsTemp.pdf
+
+macro FieldVsTemp.C
+
+# end

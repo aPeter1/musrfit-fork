@@ -51,6 +51,7 @@ PmuppScript::PmuppScript(QStringList script) :
   fLoadPath = QString("./");
   fSavePath = QString("./");
   fSelected = -2; // nothing selected
+  fNorm = false;
 
   fAdmin = new PmuppAdmin();
 }
@@ -98,10 +99,12 @@ int PmuppScript::executeScript()
       status = selectAll();
     } else if (cmd.startsWith("select ")) {
       status = select(cmd);
-    } else if (cmd.startsWith("addX")) {
+    } else if (cmd.startsWith("x")) {
       status = addX(cmd);
-    } else if (cmd.startsWith("addY")) {
+    } else if (cmd.startsWith("y")) {
       status = addY(cmd);
+    } else if (cmd.startsWith("norm")) {
+      fNorm = true;
     } else if (cmd.startsWith("plot")) {
       status = plot(cmd);
     } else if (cmd.startsWith("macro")) {
@@ -504,6 +507,7 @@ int PmuppScript::macro(const QString str, const QString plotFln)
   QString collName;
   int count=0;
   double x_min=0.0, x_max=0.0, x_min_new=0.0, x_max_new=0.0, y_min=0.0, y_max=0.0, y_min_new=0.0, y_max_new=0.0;
+  double dval, y_min_norm=1.0e10;
   for (int i=0; i<fPlotInfo.size(); i++) {
     // get collection name
     collName = fParamDataHandler->GetCollectionName(i);
@@ -547,15 +551,27 @@ int PmuppScript::macro(const QString str, const QString plotFln)
       }
       fout << "  // y-values" << endl;
       for (int k=0; k<yy.size(); k++) {
-        fout << "  yy[" << k << "]=" << yy[k] << ";" << endl;
+        dval = yy[k];
+        if (fNorm) {
+          dval /= y_max;
+          if (dval < y_min_norm)
+            y_min_norm = dval;
+        }
+        fout << "  yy[" << k << "]=" << dval << ";" << endl;
       }
       fout << "  // yyNegErr-values" << endl;
       for (int k=0; k<yyNegErr.size(); k++) {
-        fout << "  yyNegErr[" << k << "]=" << fabs(yyNegErr[k]) << ";" << endl;
+        dval = fabs(yyNegErr[k]);
+        if (fNorm)
+          dval /= fabs(y_max);
+        fout << "  yyNegErr[" << k << "]=" << dval << ";" << endl;
       }
       fout << "  // yyPosErr-values" << endl;
       for (int k=0; k<yyPosErr.size(); k++) {
-        fout << "  yyPosErr[" << k << "]=" << yyPosErr[k] << ";" << endl;
+        dval = fabs(yyPosErr[k]);
+        if (fNorm)
+          dval /= fabs(y_max);
+        fout << "  yyPosErr[" << k << "]=" << dval << ";" << endl;
       }
       fout << endl;
       fout << "  TGraphAsymmErrors *g_" << i << "_" << j << " = new TGraphAsymmErrors(nn, xx, yy, null, null, yyNegErr, yyPosErr);" << endl;
@@ -570,10 +586,15 @@ int PmuppScript::macro(const QString str, const QString plotFln)
   else
     x_min = x_min_new;
   diff = x_max-x_min;
-  x_max = x_max_new + 0.05*diff;
+  x_max = x_max_new + 0.05*diff;  
   diff = y_max_new - y_min_new;
   y_min = y_min_new - 0.05 * diff;
   y_max = y_max_new + 0.05 * diff;
+  if (fNorm) {
+    diff = 1.0 - y_min_norm;
+    y_min = y_min_norm - 0.05 * diff;
+    y_max = 1.0 + 0.05 * diff;
+  }
 
   // plotting
   fout << "  //**********" << endl;
@@ -686,22 +707,42 @@ QString PmuppScript::getNicerLabel(const QString label)
 {
   QString nice = label;
 
-  if (label == "dataE")
+  if (label == "dataE") {
     nice = "E (keV)";
-  else if (label == "dataT")
+  } else if (label == "dataT") {
     nice = "T (K)";
-  else if (label == "dataB")
+  } else if (label == "dataB") {
     nice = "B (G)";
-  else if (!label.compare("sigma", Qt::CaseInsensitive))
-    nice = "#sigma (1/#mus)";
-  else if (!label.compare("lambda", Qt::CaseInsensitive))
-    nice = "#lambda (1/#mus)";
-  else if (!label.compare("rate", Qt::CaseInsensitive))
-    nice = "Rate (1/#mus)";
-  else if (!label.compare("alpha_LR", Qt::CaseInsensitive))
-    nice = "#alpha_{LR}";
-  else if (!label.compare("alpha_TB", Qt::CaseInsensitive))
-    nice = "#alpha_{TB}";
+  } else if (!label.compare("sigma", Qt::CaseInsensitive)) {
+    if (fNorm)
+      nice = "#sigma/max(#sigma)";
+    else
+      nice = "#sigma (1/#mus)";
+  } else if (!label.compare("lambda", Qt::CaseInsensitive)) {
+    if (fNorm)
+      nice = "#lambda/max(#lambda)";
+    else
+      nice = "#lambda (1/#mus)";
+  } else if (!label.compare("rate", Qt::CaseInsensitive)) {
+    if (fNorm)
+      nice = "Rate/max(Rate)";
+    else
+      nice = "Rate (1/#mus)";
+  } else if (!label.compare("alpha_LR", Qt::CaseInsensitive)) {
+    if (fNorm)
+      nice = "#alpha_{LR}/max(#alpha_{LR})";
+    else
+      nice = "#alpha_{LR}";
+  } else if (!label.compare("alpha_TB", Qt::CaseInsensitive)) {
+    if (fNorm)
+      nice = "#alpha_{TB}/max(#alpha_{TB})";
+    else
+      nice = "#alpha_{TB}";
+  } else {
+    if (fNorm) {
+      nice = label + "/ max(" + label + ")";
+    }
+  }
 
   return nice;
 }

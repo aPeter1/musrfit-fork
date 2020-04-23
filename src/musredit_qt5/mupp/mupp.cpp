@@ -72,8 +72,9 @@ void mupp_syntax()
   cout << "  select <nn>    : selects collection <nn>, where <nn> is either the number" << endl;
   cout << "                   of the collections, or its name, e.g. " << endl;
   cout << "                   select YBCO-40nm-T5K-FC150mT-Escan.db" << endl;
-  cout << "  addX <label>   : add <label> as a x-variable. Only one is allowed." << endl;
-  cout << "  addY <label(s)>: add <label(s)> as y-variable. Multiple labls are possible." << endl;
+  cout << "  x <label>      : add <label> as a x-variable. Only one is allowed." << endl;
+  cout << "  y <label(s)>   : add <label(s)> as y-variable. Multiple labls are possible." << endl;
+  cout << "  norm           : normalize data to maximum." << endl;
   cout << "  savePath <dir> : set the save path to <dir>. The place where the macros," << endl;
   cout << "                   and/or the plot output will be saved." << endl;
   cout << "  plot <fln>     : where <fln> is the file name with extension under which" << endl;
@@ -195,7 +196,7 @@ int mupp_script_syntax_check(QStringList &list)
         cerr << "****************" << endl;
         return -1;
       }
-    } else if (str.startsWith("addX")) {
+    } else if (str.startsWith("x")) {
       tok = str.split(' ', QString::SkipEmptyParts);
       if (tok.size() != 2) {
         cerr << endl;
@@ -204,7 +205,7 @@ int mupp_script_syntax_check(QStringList &list)
         cerr << "****************" << endl;
         return -1;
       }
-    } else if (str.startsWith("addY")) {
+    } else if (str.startsWith("y")) {
       tok = str.split(' ', QString::SkipEmptyParts);
       if (tok.size() < 2) {
         cerr << endl;
@@ -283,21 +284,23 @@ int mupp_script_syntax_check(QStringList &list)
         cerr << "****************" << endl;
         return -2;
       }
+    } else if (str.startsWith("norm")) {
+      // nothing-to-be-done
     } else {
       cerr << endl;
       cerr << "*********" << endl;
       cerr << "**ERROR** found unrecognized script command: '" << str.toLatin1().constData() << "'." << endl;
       cerr << "*********" << endl;
       cerr << " Currently supported:" << endl;
-      cerr << "   load <coll(s)>,  where <coll(s)> is a file-name-list of collections (*.db, *.dat)" << endl;
-      cerr << "   loadPath <path>, where <path> is the load path accepting bash variables like $HOME, etc." << endl;
-      cerr << "   addX <var-name>, where <var-name> is a data tag of the db/dat-file." << endl;
-      cerr << "   addY <var-name>, where <var-name> is a data tag of the db/dat-file." << endl;
-      cerr << "   select <nn>,     where <nn> is the row-number or collection name of the collection to be selected." << endl;
-      cerr << "   selectAll,       i.e. already set addX, addY will apply to ALL collections present." << endl;
-      cerr << "   savePath <path>, where <path> is the save path accepting bash variables like $HOME, etc." << endl;
-      cerr << "   plot <fln>,      where <fln> is the file name with extension under which the plot should be saved." << endl;
-      cerr << "   macro <fln>,     where <fln> is the file name under which the root macro should be saved." << endl;
+      cerr << "   load <coll(s)>  : where <coll(s)> is a file-name-list of collections (*.db, *.dat)" << endl;
+      cerr << "   loadPath <path> : where <path> is the load path accepting bash variables like $HOME, etc." << endl;
+      cerr << "   x <var-name>    : where <var-name> is a data tag of the db/dat-file." << endl;
+      cerr << "   y <var-name>    : where <var-name> is a data tag of the db/dat-file." << endl;
+      cerr << "   select <nn>     : where <nn> is the row-number or collection name of the collection to be selected." << endl;
+      cerr << "   selectAll       : i.e. already set addX, addY will apply to ALL collections present." << endl;
+      cerr << "   savePath <path> : where <path> is the save path accepting bash variables like $HOME, etc." << endl;
+      cerr << "   plot <fln>      : where <fln> is the file name with extension under which the plot should be saved." << endl;
+      cerr << "   macro <fln>     : where <fln> is the file name under which the root macro should be saved." << endl;
       cerr << endl;
       return -3;
     }

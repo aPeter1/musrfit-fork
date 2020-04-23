@@ -80,6 +80,7 @@ class PmuppScript : public QObject
     PmuppPlotEntry fPlotEntry;
     QVector<PmuppPlotEntry> fPlotInfo;
 
+    bool fNorm;
     QString fLoadPath;
     QString fSavePath;
 
