@@ -31,7 +31,7 @@
 #define _MUPP_PLOT_H_
 
 #include <vector>
-using namespace std;
+#include <utility>
 
 #include <TROOT.h>
 #include <TString.h>
@@ -40,54 +40,54 @@ using namespace std;
 /**
  * <p>typedef to make to code more readable. Definition of a bool vector.
  */
-typedef vector<Bool_t> PBoolVector;
+typedef std::vector<Bool_t> PBoolVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of an unsigned int vector
  */
-typedef vector<UInt_t> PUIntVector;
+typedef std::vector<UInt_t> PUIntVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of an int vector
  */
-typedef vector<Int_t> PIntVector;
+typedef std::vector<Int_t> PIntVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of an int pair
  */
-typedef pair<Int_t, Int_t> PIntPair;
+typedef std::pair<Int_t, Int_t> PIntPair;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of an int pair vector
  */
-typedef vector<PIntPair> PIntPairVector;
+typedef std::vector<PIntPair> PIntPairVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of a double vector
  */
-typedef vector<Double_t> PDoubleVector;
+typedef std::vector<Double_t> PDoubleVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of a double pair
  */
-typedef pair<Double_t, Double_t> PDoublePair;
+typedef std::pair<Double_t, Double_t> PDoublePair;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of a double pair vector
  */
-typedef vector<PDoublePair> PDoublePairVector;
+typedef std::vector<PDoublePair> PDoublePairVector;
 
 //-------------------------------------------------------------
 /**
  * <p>typedef to make to code more readable. Definition of a string vector
  */
-typedef vector<TString> PStringVector;
+typedef std::vector<TString> PStringVector;
 
 #endif // _MUPP_PLOT_H_

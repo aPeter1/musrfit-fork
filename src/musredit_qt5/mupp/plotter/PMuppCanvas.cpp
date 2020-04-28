@@ -30,7 +30,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include <TColor.h>
 #include <TROOT.h>
@@ -104,7 +103,7 @@ PMuppCanvas::PMuppCanvas(const Char_t *title, Int_t wtopx, Int_t wtopy,
   fCheckMsgQueue = new TTimer();
   if (fCheckMsgQueue == 0) {
     fValid = false;
-    cerr << "**ERROR** couldn't start IPC message queue timer..." << endl;
+    std::cerr << "**ERROR** couldn't start IPC message queue timer..." << std::endl;
     return;
   }
   fCheckMsgQueue->Connect("Timeout()", "PMuppCanvas", this, "CheckIPCMsgQueue()");
@@ -199,7 +198,6 @@ void PMuppCanvas::HandleMenuPopup(Int_t id)
  */
 void PMuppCanvas::LastCanvasClosed()
 {
-//  cout << endl << ">> in last canvas closed check ...";
   if (gROOT->GetListOfCanvases()->IsEmpty()) {
     Done(0);
   }
@@ -255,8 +253,8 @@ void PMuppCanvas::InitMuppCanvas(const Char_t *title, Int_t wtopx, Int_t wtopy, 
   TString canvasName = TString("fMuppCanvas");
   fMainCanvas = new TCanvas(canvasName.Data(), title, wtopx, wtopy, ww, wh);
   if (fMainCanvas == 0) {
-    cerr << endl << ">> PMuppCanvas::InitMuppCanvas(): **PANIC ERROR** Couldn't invoke " << canvasName.Data();
-    cerr << endl;
+    std::cerr << std::endl << ">> PMuppCanvas::InitMuppCanvas(): **PANIC ERROR** Couldn't invoke " << canvasName.Data();
+    std::cerr << std::endl;
     return;
   }
 
@@ -301,16 +299,16 @@ void PMuppCanvas::CheckIPCMsgQueue()
   if (fFtokName.IsWhitespace()) {
     strncpy(str, getenv("HOME"), sizeof(str)-1);
     if (strlen(str) == 0) {
-      cerr << endl;
-      cerr << "**ERROR** couldn't get value of the environment variable HOME." << endl << endl;
+      std::cerr << std::endl;
+      std::cerr << "**ERROR** couldn't get value of the environment variable HOME." << std::endl << std::endl;
       return;
     }
     memset(str, '\0', sizeof(str));
     snprintf(str, sizeof(str), "%s/.musrfit/mupp/_mupp_ftok_%d.dat", getenv("HOME"), fMuppInstance);
-    ifstream fin(str, ifstream::in);
+    std::ifstream fin(str, std::ifstream::in);
     if (!fin.is_open()) {
-      cerr << endl;
-      cerr << "**ERROR** couldn't open " << str << endl;
+      std::cerr << std::endl;
+      std::cerr << "**ERROR** couldn't open " << str << std::endl;
       return;
     }
     fin.getline(str, 1024);
@@ -322,8 +320,8 @@ void PMuppCanvas::CheckIPCMsgQueue()
   flags = IPC_CREAT;
   msqid = msgget(key, flags | S_IRUSR | S_IWUSR);
   if (msqid == -1) {
-    cerr << endl;
-    cerr << "**ERROR** couldn't get msqid." << endl << endl;
+    std::cerr << std::endl;
+    std::cerr << "**ERROR** couldn't get msqid." << std::endl << std::endl;
     return;
   }
 
@@ -335,7 +333,7 @@ void PMuppCanvas::CheckIPCMsgQueue()
   if (msgLen > 0) {
     status = ReadPlotData(msg.mtext);
     if (status != 0) {
-      cerr << "**ERROR** reading " << msg.mtext << endl;
+      std::cerr << "**ERROR** reading " << msg.mtext << std::endl;
     }
   }
 }
@@ -348,11 +346,11 @@ void PMuppCanvas::CheckIPCMsgQueue()
  */
 int PMuppCanvas::ReadPlotData(const Char_t *fln)
 {
-  ifstream fin(fln, ifstream::in);
+  std::ifstream fin(fln, std::ifstream::in);
   char line[1024];
 
   if (!fin.is_open()) {
-    cerr << "**ERROR** Couldn't open " << fln << endl;
+    std::cerr << "**ERROR** Couldn't open " << fln << std::endl;
     return -1;
   }
 
@@ -383,12 +381,12 @@ int PMuppCanvas::ReadPlotData(const Char_t *fln)
       str = line;
       tok = str.Tokenize(":,");
       if (tok == 0) {
-        cerr << "**ERROR** Couldn't tokenize the label line." << endl;
+        std::cerr << "**ERROR** Couldn't tokenize the label line." << std::endl;
         fin.close();
         return -2;
       }
       if (tok->GetEntries() < 4) {
-        cerr << "**ERROR** label line doesn't contain sufficient information." << endl;
+        std::cerr << "**ERROR** label line doesn't contain sufficient information." << std::endl;
         fin.close();
         return -3;
       }
@@ -408,12 +406,12 @@ int PMuppCanvas::ReadPlotData(const Char_t *fln)
       str = line;
       tok = str.Tokenize(", ");
       if (tok == 0) {
-        cerr << "**ERROR** Couldn't tokenize data line." << endl;
+        std::cerr << "**ERROR** Couldn't tokenize data line." << std::endl;
         fin.close();
         return -4;
       }
       if (tok->GetEntries() != (noOfDataTokens-1)*3+1) {
-        cerr << "**ERROR** number of token in data line (" << tok->GetEntries() << ") is inconsistent with no of labels (" << noOfDataTokens << ")." << endl;
+        std::cerr << "**ERROR** number of token in data line (" << tok->GetEntries() << ") is inconsistent with no of labels (" << noOfDataTokens << ")." << std::endl;
         fin.close();
         return -4;
       }
@@ -426,7 +424,7 @@ int PMuppCanvas::ReadPlotData(const Char_t *fln)
       ostr = dynamic_cast<TObjString*>(tok->At(0));
       str = ostr->GetString();
       if (!str.IsFloat()) {
-        cerr << "**ERROR** token found in data line is not a number (" << str << ")." << endl;
+        std::cerr << "**ERROR** token found in data line is not a number (" << str << ")." << std::endl;
         fin.close();
         return -5;
       }
@@ -439,7 +437,7 @@ int PMuppCanvas::ReadPlotData(const Char_t *fln)
         ostr = dynamic_cast<TObjString*>(tok->At(i));
         str = ostr->GetString();
         if (!str.IsFloat()) {
-          cerr << "**ERROR** token found in data line is not a number (" << str << ")." << endl;
+          std::cerr << "**ERROR** token found in data line is not a number (" << str << ")." << std::endl;
           fin.close();
           return -5;
         }
@@ -449,7 +447,7 @@ int PMuppCanvas::ReadPlotData(const Char_t *fln)
         ostr = dynamic_cast<TObjString*>(tok->At(i+1));
         str = ostr->GetString();
         if (!str.IsFloat()) {
-          cerr << "**ERROR** token found in data line is not a number (" << str << ")." << endl;
+          std::cerr << "**ERROR** token found in data line is not a number (" << str << ")." << std::endl;
           fin.close();
           return -5;
         }
@@ -459,7 +457,7 @@ int PMuppCanvas::ReadPlotData(const Char_t *fln)
         ostr = dynamic_cast<TObjString*>(tok->At(i+2));
         str = ostr->GetString();
         if (!str.IsFloat()) {
-          cerr << "**ERROR** token found in data line is not a number (" << str << ")." << endl;
+          std::cerr << "**ERROR** token found in data line is not a number (" << str << ")." << std::endl;
           fin.close();
           return -5;
         }
@@ -480,23 +478,23 @@ int PMuppCanvas::ReadPlotData(const Char_t *fln)
 
   // check if data structure makes sense
   for (UInt_t i=0; i<fPlotData.size(); i++) {
-    cerr << "debug> collection " << i << endl;
-    cerr << "debug> name    : " << fPlotData[i].name << endl;
-    cerr << "debug> x-label : " << fPlotData[i].xLabel << endl;
-    cerr << "debug> x-vales : " << endl;
-    cerr << "debug> ";
+    std::cerr << "debug> collection " << i << std::endl;
+    std::cerr << "debug> name    : " << fPlotData[i].name << std::endl;
+    std::cerr << "debug> x-label : " << fPlotData[i].xLabel << std::endl;
+    std::cerr << "debug> x-vales : " << std::endl;
+    std::cerr << "debug> ";
     for (UInt_t j=0; j<fPlotData[i].xValue.size(); j++) {
-      cerr << fPlotData[i].xValue[j] << ", ";
+      std::cerr << fPlotData[i].xValue[j] << ", ";
     }
-    cerr << endl;
+    std::cerr << std::endl;
     for (UInt_t j=0; j<fPlotData[i].yValue.size(); j++) {
-      cerr << "debug> y-label : " << fPlotData[i].yLabel[j] << endl;
-      cerr << "debug> y-values " << j << ": " << endl;
+      std::cerr << "debug> y-label : " << fPlotData[i].yLabel[j] << std::endl;
+      std::cerr << "debug> y-values " << j << ": " << std::endl;
       for (UInt_t k=0; k<fPlotData[i].yValue[j].size(); k++) {
-        cerr << "debug> " << k << ": " << fPlotData[i].yValue[j][k].y << "(" << fPlotData[i].yValue[j][k].eYneg << "/" << fPlotData[i].yValue[j][k].eYpos << ")" << endl;
+        std::cerr << "debug> " << k << ": " << fPlotData[i].yValue[j][k].y << "(" << fPlotData[i].yValue[j][k].eYneg << "/" << fPlotData[i].yValue[j][k].eYpos << ")" << std::endl;
       }
     }
-    cerr << endl;
+    std::cerr << std::endl;
   }
 
   // feed graph objects
@@ -591,12 +589,12 @@ void PMuppCanvas::UpdateGraphs()
 
     fMultiGraph = new TMultiGraph();
     if (fMultiGraph == 0) {
-      cerr << "**ERROR** couldn't create necessary TMultiGraph object." << endl;
+      std::cerr << "**ERROR** couldn't create necessary TMultiGraph object." << std::endl;
       return;
     }
 
     if (fGraphE.size() == 0) {
-      cerr << "**ERROR** NO graphs present! This should never happen." << endl;
+      std::cerr << "**ERROR** NO graphs present! This should never happen." << std::endl;
       return;
     }
 

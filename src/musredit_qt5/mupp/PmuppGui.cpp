@@ -34,7 +34,6 @@
 
 #include <cmath>
 #include <iostream>
-using namespace std;
 
 #include <QApplication>
 #include <QToolBar>
@@ -437,7 +436,7 @@ void PmuppGui::aboutToQuit()
     msqid = msgget(key, flags | S_IRUSR | S_IWUSR);
     if (msqid != -1) {
       if (msgctl(msqid, IPC_RMID, NULL) == -1) {
-        cerr << "**ERROR** couldn't removed the message queue (msqid=" << msqid << ")." << endl << endl;
+        std::cerr << "**ERROR** couldn't removed the message queue (msqid=" << msqid << ")." << std::endl << std::endl;
       }
     }
   }  
@@ -865,10 +864,10 @@ void PmuppGui::readCmdHistory()
 
   QFile file(pathName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    cerr << endl;
-    cerr << "***********" << endl;
-    cerr << "**WARNING** readCmdHistory(): couldn't open mupp_history.txt for reading ..." << endl;;
-    cerr << "***********" << endl;
+    std::cerr << std::endl;
+    std::cerr << "***********" << std::endl;
+    std::cerr << "**WARNING** readCmdHistory(): couldn't open mupp_history.txt for reading ..." << std::endl;;
+    std::cerr << "***********" << std::endl;
     return;
   }
 

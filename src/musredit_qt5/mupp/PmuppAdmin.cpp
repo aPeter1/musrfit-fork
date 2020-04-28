@@ -29,7 +29,6 @@
 
 #include <cstdlib>
 #include <iostream>
-using namespace std;
 
 #include <QMessageBox>
 #include <QString>
@@ -501,7 +500,7 @@ void PmuppAdmin::saveRecentFiles()
     QVector<QString> data;
     QFile file(fln);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-      cerr << endl << ">> PmuppAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << endl;
+      std::cerr << std::endl << ">> PmuppAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << std::endl;
       return;
     }
     QTextStream fin(&file);
@@ -526,7 +525,7 @@ void PmuppAdmin::saveRecentFiles()
     }
 
     if (i == data.size()) {
-      cerr << endl << ">> PmuppAdmin::saveRecentFile: **ERROR** " << fln.toLatin1().data() << " seems to be corrupt." << endl;
+      std::cerr << std::endl << ">> PmuppAdmin::saveRecentFile: **ERROR** " << fln.toLatin1().data() << " seems to be corrupt." << std::endl;
       return;
     }
     i++;
@@ -536,7 +535,7 @@ void PmuppAdmin::saveRecentFiles()
     }
 
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      cerr << endl << ">> PmuppAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << endl;
+      std::cerr << std::endl << ">> PmuppAdmin::saveRecentFile: **ERROR** Cannot open " << fln.toLatin1().data() << " for reading." << std::endl;
       return;
     }
     fin.setDevice(&file);

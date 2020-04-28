@@ -31,7 +31,6 @@
 #define _PMUPPCANVAS_H_
 
 #include <vector>
-using namespace std;
 
 #include <TObject.h>
 #include <TQObject.h>
@@ -63,7 +62,7 @@ typedef struct {
   TString xLabel;
   PStringVector yLabel;
   PDoubleVector xValue;
-  vector< vector<PDataPoint> > yValue;
+  std::vector< std::vector<PDataPoint> > yValue;
 } PDataCollection;
 
 //--------------------------------------------------------------------------
@@ -95,7 +94,7 @@ private:
   TString fFtokName;
   TTimer *fCheckMsgQueue; ///< timer needed to check if a message in the IPC message queue is pending
 
-  vector<PDataCollection> fPlotData;
+  std::vector<PDataCollection> fPlotData;
 
   TStyle    *fStyle; ///< A collection of all graphics attributes
 
@@ -107,7 +106,7 @@ private:
   // canvas related variables
   TCanvas   *fMainCanvas;            ///< main canvas
   TMultiGraph *fMultiGraph;          ///< main multi graph
-  vector<TGraphAsymmErrors*> fGraphE; ///< all error graphs
+  std::vector<TGraphAsymmErrors*> fGraphE; ///< all error graphs
 
   // perdefined markers, colors
   PIntVector    fMarkerStyleList;

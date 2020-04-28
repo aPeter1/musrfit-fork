@@ -29,7 +29,6 @@
 
 #include <iostream>
 #include <fstream>
-using namespace std;
 
 #include "PMuppStartupHandler.h"
 
@@ -53,14 +52,14 @@ ClassImpQ(PMuppStartupHandler)
 int parseXmlFile(TSAXParser *saxParser, const char *startup_path_name)
 {
   int status;
-  fstream xmlFile;
+  std::fstream xmlFile;
   unsigned int xmlSize = 0;
   char *xmlBuffer = 0;
 
-  xmlFile.open(startup_path_name, ios::in | ios::ate); // open file for reading and go to the end of the file
+  xmlFile.open(startup_path_name, std::ios::in | std::ios::ate); // open file for reading and go to the end of the file
   if (xmlFile.is_open()) { // check if file has been opened successfully
     xmlSize = xmlFile.tellg(); // get the position within the stream == size of the file (since we are at the end)
-    xmlFile.seekg(0, ios::beg); // go back to the beginning of the stream
+    xmlFile.seekg(0, std::ios::beg); // go back to the beginning of the stream
     xmlBuffer = new char[xmlSize]; // allocate buffer memory for the whole XML file
     xmlFile.read(xmlBuffer, xmlSize); // read in the whole XML file into the buffer
     xmlFile.close(); // close the XML file
@@ -203,13 +202,13 @@ void PMuppStartupHandler::OnCharacters(const Char_t *str)
     tstr = TString(str);
     tokens = tstr.Tokenize(",");
     if (tokens == 0) {
-      cerr << endl << "PMuppStartupHandler **WARNING** '" << str << "' is not a marker code, will ignore it";
-      cerr << endl;
+      std::cerr << std::endl << "PMuppStartupHandler **WARNING** '" << str << "' is not a marker code, will ignore it";
+      std::cerr << std::endl;
       return;
     }
     if (tokens->GetEntries() != 2) {
-      cerr << endl << "PMuppStartupHandler **WARNING** '" << str << "' is not a marker code, will ignore it";
-      cerr << endl;
+      std::cerr << std::endl << "PMuppStartupHandler **WARNING** '" << str << "' is not a marker code, will ignore it";
+      std::cerr << std::endl;
       return;
     }
     // get marker style
@@ -218,8 +217,8 @@ void PMuppStartupHandler::OnCharacters(const Char_t *str)
     if (tstr.IsDigit()) {
       fMarkerStyleList.push_back(tstr.Atoi());
     } else {
-      cerr << endl << "PMuppStartupHandler **WARNING** marker style '" << str << "' is not a number, will ignore it";
-      cerr << endl;
+      std::cerr << std::endl << "PMuppStartupHandler **WARNING** marker style '" << str << "' is not a number, will ignore it";
+      std::cerr << std::endl;
     }
     // get marker size
     ostr = dynamic_cast<TObjString*>(tokens->At(1));
@@ -227,8 +226,8 @@ void PMuppStartupHandler::OnCharacters(const Char_t *str)
     if (tstr.IsFloat()) {
       fMarkerSizeList.push_back(tstr.Atof());
     } else {
-      cerr << endl << "PMuppStartupHandler **WARNING** marker size '" << str << "' is not a float, will ignore it";
-      cerr << endl;
+      std::cerr << std::endl << "PMuppStartupHandler **WARNING** marker size '" << str << "' is not a float, will ignore it";
+      std::cerr << std::endl;
     }
     // clean up tokens
     if (tokens) {
@@ -242,14 +241,14 @@ void PMuppStartupHandler::OnCharacters(const Char_t *str)
     tokens = tstr.Tokenize(",");
     // check that there any tokens
     if (tokens == 0) {
-      cerr << endl << "PMuppStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
-      cerr << endl;
+      std::cerr << std::endl << "PMuppStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
+      std::cerr << std::endl;
       return;
     }
     // check there is the right number of tokens
     if (tokens->GetEntries() < 3) {
-      cerr << endl << "PMuppStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
-      cerr << endl;
+      std::cerr << std::endl << "PMuppStartupHandler **WARNING** '" << str << "' is not a rbg code, will ignore it";
+      std::cerr << std::endl;
       return;
     }
     // get r
@@ -258,8 +257,8 @@ void PMuppStartupHandler::OnCharacters(const Char_t *str)
     if (tstr.IsDigit()) {
       r = tstr.Atoi();
     } else {
-      cerr << endl << "PMuppStartupHandler **WARNING** r within the rgb code is not a number, will ignore it";
-      cerr << endl;
+      std::cerr << std::endl << "PMuppStartupHandler **WARNING** r within the rgb code is not a number, will ignore it";
+      std::cerr << std::endl;
       return;
     }
     // get g
@@ -268,8 +267,8 @@ void PMuppStartupHandler::OnCharacters(const Char_t *str)
     if (tstr.IsDigit()) {
       g = tstr.Atoi();
     } else {
-      cerr << endl << "PMuppStartupHandler **WARNING** g within the rgb code is not a number, will ignore it";
-      cerr << endl;
+      std::cerr << std::endl << "PMuppStartupHandler **WARNING** g within the rgb code is not a number, will ignore it";
+      std::cerr << std::endl;
       return;
     }
     // get b
@@ -278,8 +277,8 @@ void PMuppStartupHandler::OnCharacters(const Char_t *str)
     if (tstr.IsDigit()) {
       b = tstr.Atoi();
     } else {
-      cerr << endl << "PMuppStartupHandler **WARNING** b within the rgb code is not a number, will ignore it";
-      cerr << endl;
+      std::cerr << std::endl << "PMuppStartupHandler **WARNING** b within the rgb code is not a number, will ignore it";
+      std::cerr << std::endl;
       return;
     }
     // clean up tokens
@@ -320,8 +319,8 @@ void PMuppStartupHandler::OnComment(const Char_t *str)
  */
 void PMuppStartupHandler::OnWarning(const Char_t *str)
 {
-  cerr << endl << "PMuppStartupHandler **WARNING** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "PMuppStartupHandler **WARNING** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -334,8 +333,8 @@ void PMuppStartupHandler::OnWarning(const Char_t *str)
  */
 void PMuppStartupHandler::OnError(const Char_t *str)
 {
-  cerr << endl << "PMuppStartupHandler **ERROR** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "PMuppStartupHandler **ERROR** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -348,8 +347,8 @@ void PMuppStartupHandler::OnError(const Char_t *str)
  */
 void PMuppStartupHandler::OnFatalError(const Char_t *str)
 {
-  cerr << endl << "PMuppStartupHandler **FATAL ERROR** " << str;
-  cerr << endl;
+  std::cerr << std::endl << "PMuppStartupHandler **FATAL ERROR** " << str;
+  std::cerr << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -444,7 +443,7 @@ Bool_t PMuppStartupHandler::StartupFileExists(Char_t *fln)
 {
   Bool_t result = false;
 
-  ifstream ifile(fln);
+  std::ifstream ifile(fln);
 
   if (ifile.fail()) {
     result = false;

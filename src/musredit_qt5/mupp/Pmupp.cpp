@@ -29,7 +29,6 @@
 
 #include <iostream>
 #include <cmath>
-using namespace std;
 
 #include <QFile>
 #include <QTextStream>
@@ -314,10 +313,10 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln, QString &errorMsg)
     // since the db-file should now be present, just load it
     collection = ReadDbFile(pathName, valid, errorMsg);
     if (!valid) {      
-      cerr << endl;
-      cerr << "----" << endl;
-      cerr << "**ERROR** read db-file failure (" << pathName.toLatin1().data() << "." << endl;
-      cerr << "----" << endl;
+      std::cerr << std::endl;
+      std::cerr << "----" << std::endl;
+      std::cerr << "**ERROR** read db-file failure (" << pathName.toLatin1().data() << "." << std::endl;
+      std::cerr << "----" << std::endl;
       return false;
     }
     collName.remove(".db");
@@ -336,10 +335,10 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln, QString &errorMsg)
             int idx = fln[i].lastIndexOf("/");
             if (idx == -1) { // should never happen
               errorMsg = QString("found '%1' which shouldn't be possible!").arg(fln[i]);
-              cerr << endl;
-              cerr << "----" << endl;
-              cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
-              cerr << "----" << endl;
+              std::cerr << std::endl;
+              std::cerr << "----" << std::endl;
+              std::cerr << "**ERROR** " << errorMsg.toLatin1().data() << std::endl;
+              std::cerr << "----" << std::endl;
               return false;
             }
             QString relPath = fln[i].left(idx);
@@ -369,10 +368,10 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln, QString &errorMsg)
         fCollection.push_back(collection);
       } else {
         errorMsg = QString("unkown file type for ")+fln[i];
-        cerr << endl;
-        cerr << "*********" << endl;
-        cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
-        cerr << "*********" << endl;
+        std::cerr << std::endl;
+        std::cerr << "*********" << std::endl;
+        std::cerr << "**ERROR** " << errorMsg.toLatin1().data() << std::endl;
+        std::cerr << "*********" << std::endl;
         return false;
       }
     }
@@ -399,10 +398,10 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QS
   QFile file(fln);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     errorMsg = QString("couldn't open ") + fln;
-    cerr << endl;
-    cerr << "----" << endl;
-    cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
-    cerr << "----" << endl;
+    std::cerr << std::endl;
+    std::cerr << "----" << std::endl;
+    std::cerr << "**ERROR** " << errorMsg.toLatin1().data() << std::endl;
+    std::cerr << "----" << std::endl;
     valid = false;
     return collection;
   }
@@ -428,10 +427,10 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QS
       token = line.split(",", QString::SkipEmptyParts);
       if (token.size()==0) {
         errorMsg = fln + QString(". No parameter tokens.");
-        cerr << endl;
-        cerr << "----" << endl;
-        cerr << "**ERROR** in " << errorMsg.toLatin1().data() << endl;
-        cerr << "----" << endl;
+        std::cerr << std::endl;
+        std::cerr << "----" << std::endl;
+        std::cerr << "**ERROR** in " << errorMsg.toLatin1().data() << std::endl;
+        std::cerr << "----" << std::endl;
         file.close();
         valid = false;
         return collection;
@@ -451,10 +450,10 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QS
             errorMsg += QString("  first   run (#%1) has %2 params.\n").arg(collection.GetRun(0).GetNumber()).arg(collection.GetRun(0).GetNoOfParam());
             errorMsg += QString("  current run (#%1) has %2 params.\n").arg(run.GetNumber()).arg(run.GetNoOfParam());
             errorMsg += QString("  Inspect your db-file!");
-            cerr << endl;
-            cerr << "----" << endl;
-            cerr << "**ERROR** in " << errorMsg.toLatin1().data() << endl;
-            cerr << "----" << endl;
+            std::cerr << std::endl;
+            std::cerr << "----" << std::endl;
+            std::cerr << "**ERROR** in " << errorMsg.toLatin1().data() << std::endl;
+            std::cerr << "----" << std::endl;
             file.close();
             valid = false;
             return collection;
@@ -464,20 +463,20 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QS
         run.Clear();
       } else { // parameter
         if (token.size() != 4) { // wrong number of parameter tokens
-          cerr << endl;
-          cerr << "----" << endl;
-          cerr << "**ERROR** in" << fln.toLatin1().data() <<". # parameter tokens != 4." << endl;
-          cerr << "----" << endl;
+          std::cerr << std::endl;
+          std::cerr << "----" << std::endl;
+          std::cerr << "**ERROR** in" << fln.toLatin1().data() <<". # parameter tokens != 4." << std::endl;
+          std::cerr << "----" << std::endl;
           file.close();
           valid = false;
           return collection;
         }
         subTok = token[0].split("=");
         if (subTok.size() != 2) {
-          cerr << endl;
-          cerr << "----" << endl;
-          cerr << "**ERROR** in" << fln.toLatin1().data() <<". parameter name=value token missing." << endl;
-          cerr << "----" << endl;
+          std::cerr << std::endl;
+          std::cerr << "----" << std::endl;
+          std::cerr << "**ERROR** in" << fln.toLatin1().data() <<". parameter name=value token missing." << std::endl;
+          std::cerr << "----" << std::endl;
           file.close();
           valid = false;
           return collection;
@@ -489,10 +488,10 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QS
         if (ok) {
           param.SetValue(dval);
         } else {
-          cerr << endl;
-          cerr << "----" << endl;
-          cerr << "**ERROR** in" << fln.toLatin1().data() <<". parameter name=value token missing or wrong?!" << endl;
-          cerr << "----" << endl;
+          std::cerr << std::endl;
+          std::cerr << "----" << std::endl;
+          std::cerr << "**ERROR** in" << fln.toLatin1().data() <<". parameter name=value token missing or wrong?!" << std::endl;
+          std::cerr << "----" << std::endl;
           file.close();
           valid = false;
           return collection;
@@ -502,10 +501,10 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QS
         if (ok) {
           param.SetPosErr(dval);
         } else {
-          cerr << endl;
-          cerr << "----" << endl;
-          cerr << "**ERROR** in" << fln.toLatin1().data() <<". parameter pos. error not a number?!" << endl;
-          cerr << "----" << endl;
+          std::cerr << std::endl;
+          std::cerr << "----" << std::endl;
+          std::cerr << "**ERROR** in" << fln.toLatin1().data() <<". parameter pos. error not a number?!" << std::endl;
+          std::cerr << "----" << std::endl;
           file.close();
           valid = false;
           return collection;
@@ -515,10 +514,10 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QS
         if (ok) {
           param.SetNegErr(dval);
         } else {
-          cerr << endl;
-          cerr << "----" << endl;
-          cerr << "**ERROR** in" << fln.toLatin1().data() <<". parameter neg. error not a number?!" << endl;
-          cerr << "----" << endl;
+          std::cerr << std::endl;
+          std::cerr << "----" << std::endl;
+          std::cerr << "**ERROR** in" << fln.toLatin1().data() <<". parameter neg. error not a number?!" << std::endl;
+          std::cerr << "----" << std::endl;
           file.close();
           valid = false;
           return collection;
@@ -528,10 +527,10 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QS
     }
   }
   if (!param_found) {
-    cerr << endl;
-    cerr << "----" << endl;
-    cerr << "**ERROR** in" << fln.toLatin1().data() <<". No parameter found." << endl;
-    cerr << "----" << endl;
+    std::cerr << std::endl;
+    std::cerr << "----" << std::endl;
+    std::cerr << "**ERROR** in" << fln.toLatin1().data() <<". No parameter found." << std::endl;
+    std::cerr << "----" << std::endl;
   }
   file.close();
 
@@ -557,10 +556,10 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
   QFile file(fln);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     errorMsg = QString("couldn't open ")+fln;
-    cerr << endl;
-    cerr << "----" << endl;
-    cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
-    cerr << "----" << endl;
+    std::cerr << std::endl;
+    std::cerr << "----" << std::endl;
+    std::cerr << "**ERROR** " << errorMsg.toLatin1().data() << std::endl;
+    std::cerr << "----" << std::endl;
     valid = false;
     return collection;
   }
@@ -608,10 +607,10 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
     // paranoia check
     if (token.size() != headerInfo.size()) {
       errorMsg = QString("size mismatch between header and parameter int line: %1 (header=%2 / param=%3)").arg(lineNo).arg(headerInfo.size()).arg(token.size());
-      cerr << endl;
-      cerr << "----" << endl;
-      cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
-      cerr << "----" << endl;
+      std::cerr << std::endl;
+      std::cerr << "----" << std::endl;
+      std::cerr << "**ERROR** " << errorMsg.toLatin1().data() << std::endl;
+      std::cerr << "----" << std::endl;
       valid = false;
       file.close();
       return collection;
@@ -623,10 +622,10 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
         dval = token[i].toDouble(&ok);
       if (!ok) {
         errorMsg = QString("unrecognized token ('%1') in line %2 (line number: %3)").arg(token[i].toLatin1().data()).arg(line.toLatin1().data()).arg(lineNo);
-        cerr << endl;
-        cerr << "----" << endl;
-        cerr << "**ERROR** " << errorMsg.toLatin1().data() << endl;
-        cerr << "----" << endl;
+        std::cerr << std::endl;
+        std::cerr << "----" << std::endl;
+        std::cerr << "**ERROR** " << errorMsg.toLatin1().data() << std::endl;
+        std::cerr << "----" << std::endl;
         valid = false;
         file.close();
         return collection;
@@ -966,18 +965,18 @@ void PParamDataHandler::Dump()
   PmuppParam param;
 
   for (int i=0; i<fCollection.size(); i++) {
-    cout << "debug> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-" << endl;
-    cout << "debug> collection name: " << fCollection[i].GetName().toLatin1().data() << endl;
-    cout << "debug> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-" << endl;
+    std::cout << "debug> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-" << std::endl;
+    std::cout << "debug> collection name: " << fCollection[i].GetName().toLatin1().data() << std::endl;
+    std::cout << "debug> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-" << std::endl;
     for (int j=0; j<fCollection[i].GetNoOfRuns(); j++) {
-      cout << "debug> ----------------------------------" << endl;
+      std::cout << "debug> ----------------------------------" << std::endl;
       run = fCollection[i].GetRun(j);
-      cout << "debug>> run number: " << run.GetNumber() << endl;
-      cout << "debug>> run name  : " << run.GetName().toLatin1().data() << endl;
-      cout << "debug>> ---------------------------------" << endl;
+      std::cout << "debug>> run number: " << run.GetNumber() << std::endl;
+      std::cout << "debug>> run name  : " << run.GetName().toLatin1().data() << std::endl;
+      std::cout << "debug>> ---------------------------------" << std::endl;
       for (int k=0; k<run.GetNoOfParam(); k++) {
         param = run.GetParam(k);
-        cout << "debug>>> " << param.GetName().toLatin1().data() << ": " << param.GetValue() << " -+ " << param.GetNegErr() << " / " << param.GetPosErr() << endl;
+        std::cout << "debug>>> " << param.GetName().toLatin1().data() << ": " << param.GetValue() << " -+ " << param.GetNegErr() << " / " << param.GetPosErr() << std::endl;
       }
     }
   }

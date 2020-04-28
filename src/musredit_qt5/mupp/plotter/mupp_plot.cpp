@@ -28,7 +28,6 @@
  ***************************************************************************/
 
 #include <iostream>
-using namespace std;
 
 #include <TApplication.h>
 #include <TSAXParser.h>
@@ -59,8 +58,8 @@ int main(int argc, char *argv[])
   TSAXParser *saxParser = new TSAXParser();
   PMuppStartupHandler *startupHandler = new PMuppStartupHandler();
   if (!startupHandler->StartupFileFound()) {
-    cerr << endl << ">> mupp_plot **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
-    cerr << endl;
+    std::cerr << std::endl << ">> mupp_plot **WARNING** couldn't find " << startupHandler->GetStartupFilePath().Data();
+    std::cerr << std::endl;
     // clean up
     if (saxParser) {
       delete saxParser;
@@ -78,9 +77,9 @@ int main(int argc, char *argv[])
     Int_t status = parseXmlFile(saxParser, startup_path_name);
     // check for parse errors
     if (status) { // error
-      cerr << endl << ">> mupp_plot **WARNING** Reading/parsing mupp_startup.xml failed.";
-      cerr << endl << ">>                       Graph will appear with random symbols and colors!";
-      cerr << endl;
+      std::cerr << std::endl << ">> mupp_plot **WARNING** Reading/parsing mupp_startup.xml failed.";
+      std::cerr << std::endl << ">>                       Graph will appear with random symbols and colors!";
+      std::cerr << std::endl;
       // clean up
       if (saxParser) {
         delete saxParser;
@@ -110,13 +109,13 @@ int main(int argc, char *argv[])
       TQObject::Connect("TCanvas", "Closed()", "PMuppCanvas", muppCanvas, "LastCanvasClosed()");
       muppCanvas->Connect("Done(Int_t)", "TApplication", &app, "Terminate(Int_t)");
     } else {
-      cerr << endl << ">> mupp_plot **SEVERE ERROR** invoke object is invalid, will quit.";
-      cerr << endl;
+      std::cerr << std::endl << ">> mupp_plot **SEVERE ERROR** invoke object is invalid, will quit.";
+      std::cerr << std::endl;
       ok = false;
     }
   } else {
-    cerr << endl << ">> mupp_plot **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
-    cerr << endl;
+    std::cerr << std::endl << ">> mupp_plot **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
+    std::cerr << std::endl;
     ok = false;
   }
 
