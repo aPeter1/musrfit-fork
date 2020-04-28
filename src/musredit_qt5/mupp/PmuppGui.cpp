@@ -747,6 +747,7 @@ void PmuppGui::helpCmds()
                            "<b>select &lt;nn&gt;:</b> select collection in GUI.<br>"\
                            "&nbsp;&nbsp;&nbsp;&nbsp;&lt;nn&gt; is either the collection name or the row number.<br>"\
                            "<b>x &lt;param_name&gt; / y &lt;param_name&gt;:</b> add the parameter to the select axis.<br>"\
+                           "<b>rmx &lt;param_name&gt; / rmy &lt;param_name&gt;:</b> remove the parameter of the select axis.<br>"\
                            "<b>flush:</b> flush the history buffer.");
 }
 
@@ -1036,7 +1037,7 @@ void PmuppGui::addX(QString param)
   QString paramName("");
   if (!param.isEmpty()) {
     // check that param exists
-    if (fParamList->findItems(param, Qt::MatchFixedString).empty()) {
+    if (fParamList->findItems(param, Qt::MatchCaseSensitive).empty()) {
       QMessageBox::critical(this, "**ERROR**", QString("Parameter X '%1' not found").arg(param));
       return;
     }
@@ -1078,7 +1079,7 @@ void PmuppGui::addY(QString param)
   QString paramName("");
   if (!param.isEmpty()) {
     // check that param exists
-    if (fParamList->findItems(param, Qt::MatchFixedString).empty()) {
+    if (fParamList->findItems(param, Qt::MatchCaseSensitive).empty()) {
       QMessageBox::critical(this, "**ERROR**", QString("Parameter Y '%1' not found").arg(param));
       return;
     }
@@ -1129,13 +1130,21 @@ void PmuppGui::addY(QString param)
 /**
  * @brief PmuppGui::removeX
  */
-void PmuppGui::removeX()
+void PmuppGui::removeX(QString param)
 {
   QListWidgetItem *item = fViewX->currentItem();
   if (item == 0)
     return;
 
-  int idx=getXlabelIndex(item->text());
+  int idx;
+  if (!param.isEmpty()) {
+    idx=fColList->currentRow();
+    param = QString("%1 (-%2-)").arg(param).arg(idx);
+    idx=getXlabelIndex(param);
+  } else {
+    idx=getXlabelIndex(item->text());
+  }
+
   if (idx == -1)
     return;
   fXY.remove(idx);
@@ -1148,7 +1157,7 @@ void PmuppGui::removeX()
 /**
  * @brief PmuppGui::removeY
  */
-void PmuppGui::removeY()
+void PmuppGui::removeY(QString param)
 {
   QListWidgetItem *item = fViewY->currentItem();
   if (item == 0)
@@ -1157,9 +1166,12 @@ void PmuppGui::removeY()
   // find y in XY and remove it
   QString xLabel = fViewX->currentItem()->text();
   QString yLabel = item->text();
+  if (!param.isEmpty()) {
+    yLabel = param;
+  }
   int idx = getXlabelIndex(xLabel);
   if (idx == -1)
-    return;
+    return;  
   fXY[idx].removeYlabel(yLabel);
 
   fViewY->removeItemWidget(item);
@@ -1672,7 +1684,7 @@ void PmuppGui::plot()
   }
 
   // write data file with path name: $HOME/.musrfit/mupp/_mupp_<startUpTime>.dat
-  // where <startUpTime is the time when mupp has been started.
+  // where <startUpTime> is the time when mupp has been started.
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
   QString pathName = QString("%1/.musrfit/mupp/_mupp_%2.dat").arg(env.value("HOME")).arg(fDatime);
 
@@ -1941,12 +1953,30 @@ void PmuppGui::handleCmds()
     selectCollection(cmd);
   } else if (cmd.startsWith("x")) {
     QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
-    addX(tok[1]);
+    if (tok.size() > 1)
+      addX(tok[1]);
+    else
+      QMessageBox::critical(0, "ERROR", QString("Found command 'x' without variable."));
   } else if (cmd.startsWith("y")) {
     QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
-    addY(tok[1]);
+    if (tok.size() > 1)
+      addY(tok[1]);
+    else
+      QMessageBox::critical(0, "ERROR", QString("Found command 'y' without variable."));
   } else if (cmd.startsWith("ditto")) {
     addDitto();
+  } else if (cmd.startsWith("rmx")) {
+    QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+    if (tok.size() > 1)
+      removeX(tok[1]);
+    else
+      QMessageBox::critical(0, "ERROR", QString("Found command 'rmx' without variable."));
+  } else if (cmd.startsWith("rmy")) {
+    QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+    if (tok.size() > 1)
+      removeY(tok[1]);
+    else
+      QMessageBox::critical(0, "ERROR", QString("Found command 'rmy' without variable."));
   } else if (cmd.startsWith("norm")) {
     QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
     if (tok.size() != 2) {

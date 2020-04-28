@@ -203,8 +203,8 @@ private slots:
   void remove();
   void addX(QString param="");
   void addY(QString param="");
-  void removeX();
-  void removeY();
+  void removeX(QString param="");
+  void removeY(QString param="");
   void addDitto();
   void createMacro();
   void plot();
