@@ -44,6 +44,46 @@
 
 //------------------------------------------------------------------------
 /**
+ * @brief mupp_script_syntax
+ */
+void mupp_script_syntax()
+{
+  std::cout << std::endl;
+  std::cout << "SCRIPT COMMANDS:" << std::endl;
+  std::cout << "   Lines starting with '#', '%', or '//' are comments and will be ignored." << std::endl;
+  std::cout << "   The same is true for empty lines. Comments are also allowed at the end" << std::endl;
+  std::cout << "   for a command, i.e. loadPath ./ # the best place ever." << std::endl;
+  std::cout << std::endl;
+  std::cout << "   load <coll>     : load a collection. <coll> is the filename of the" << std::endl;
+  std::cout << "                     collection (*.db, *.dat)" << std::endl;
+  std::cout << "   loadPath <path> : set the load path to <path>; accepting bash variables" << std::endl;
+  std::cout << "                     like $HOME, etc." << std::endl;
+  std::cout << "   x <var-name>    : set a x-axis variable. <var-name> is a data tag of" << std::endl;
+  std::cout << "                     the db/dat-file." << std::endl;
+  std::cout << "   y <var-name>    : set a y-axis variable. <var-name> is a data tag of" << std::endl;
+  std::cout << "                     the db/dat-file." << std::endl;
+  std::cout << "   select <nn>     : select collection <nn>, where <nn> is the row-number" << std::endl;
+  std::cout << "                     or the name of the collection to be selected." << std::endl;
+  std::cout << "   selectAll       : i.e. already set addX, addY will apply to ALL collections" << std::endl;
+  std::cout << "                     present." << std::endl;
+  std::cout << "   savePath <path> : sets the save path to <path>; accepting bash variables" << std::endl;
+  std::cout << "                     like $HOME, etc." << std::endl;
+  std::cout << "   plot <fln>      : where <fln> is the file name with extension under which" << std::endl;
+  std::cout << "                     the plot should be saved." << std::endl;
+  std::cout << "   macro <fln>     : where <fln> is the file name under which the root macro" << std::endl;
+  std::cout << "                     should be saved." << std::endl;
+  std::cout << "   var <var_name> = <expr> : defines a variable." << std::endl;
+  std::cout << "                             <expr> is a mathemathical expression where" << std::endl;
+  std::cout << "                             collection variables are addressed via the '$'," << std::endl;
+  std::cout << "                             e.g. dataT is addressed by $dataT, etc." << std::endl;
+  std::cout << "   col <nn> : <var_name>   : links <var_name> to the collection <nn>, where" << std::endl;
+  std::cout << "                             <nn> is the number of the collection as defined" << std::endl;
+  std::cout << "                             by the order of load, starting with 0." << std::endl;
+  std::cout << std::endl;
+}
+
+//------------------------------------------------------------------------
+/**
  * @brief mupp_syntax
  */
 void mupp_syntax()
@@ -58,30 +98,7 @@ void mupp_syntax()
   std::cout << "  --path <fit-param-path>: path where to look for the <fit-param-file-names>" << std::endl;
   std::cout << "  <fit-param-file-names>: list of file name(s) to be loaded." << std::endl;
   std::cout << "     allowed formats are: db, dat, msr" << std::endl << std::endl;
-  std::cout << "SCRIPT COMMANDS:" << std::endl;
-  std::cout << "  Lines starting with '#', '%', or '//' are comments and will be ignored." << std::endl;
-  std::cout << "  The same is true for empty lines. Comments are also allowed at the end" << std::endl;
-  std::cout << "  for a command, i.e. loadPath ./ # the best place ever." << std::endl;
-  std::cout << std::endl;
-  std::cout << "  loadPath <dir> : set the load path to <dir>. Bash variables like" << std::endl;
-  std::cout << "                   $HOME are accepted." << std::endl;
-  std::cout << "  load <coll>    : will load a collection <coll>. Currently *.db and *.dat" << std::endl;
-  std::cout << "                   are handled." << std::endl;
-  std::cout << "  selectAll      : will select all loaded collections. Thie means every plot" << std::endl;
-  std::cout << "                   of variable x/y will be carried out to ALL collections." << std::endl;
-  std::cout << "  select <nn>    : selects collection <nn>, where <nn> is either the number" << std::endl;
-  std::cout << "                   of the collections, or its name, e.g. " << std::endl;
-  std::cout << "                   select YBCO-40nm-T5K-FC150mT-Escan.db" << std::endl;
-  std::cout << "  x <label>      : add <label> as a x-variable. Only one is allowed." << std::endl;
-  std::cout << "  y <label(s)>   : add <label(s)> as y-variable. Multiple labls are possible." << std::endl;
-  std::cout << "  norm           : normalize data to maximum." << std::endl;
-  std::cout << "  savePath <dir> : set the save path to <dir>. The place where the macros," << std::endl;
-  std::cout << "                   and/or the plot output will be saved." << std::endl;
-  std::cout << "  plot <fln>     : where <fln> is the file name with extension under which" << std::endl;
-  std::cout << "                   the plot should be saved." << std::endl;
-  std::cout << "  macro <fln>    : where <fln> is the file name under which the root macro" << std::endl;
-  std::cout << "                   should be saved." << std::endl;
-  std::cout << std::endl;
+  mupp_script_syntax();
 }
 
 //------------------------------------------------------------------------
@@ -147,26 +164,6 @@ bool mupp_bash_variable_exists(const QString str)
     return true;
 
   return false;
-}
-
-//------------------------------------------------------------------------
-void mupp_script_syntax()
-{
-  std::cerr << std::endl;
-  std::cerr << " Currently supported script commands:" << std::endl;
-  std::cerr << "   load <coll(s)>  : where <coll(s)> is a file-name-list of collections (*.db, *.dat)" << std::endl;
-  std::cerr << "   loadPath <path> : where <path> is the load path accepting bash variables like $HOME, etc." << std::endl;
-  std::cerr << "   x <var-name>    : where <var-name> is a data tag of the db/dat-file." << std::endl;
-  std::cerr << "   y <var-name>    : where <var-name> is a data tag of the db/dat-file." << std::endl;
-  std::cerr << "   select <nn>     : where <nn> is the row-number or collection name of the collection to be selected." << std::endl;
-  std::cerr << "   selectAll       : i.e. already set addX, addY will apply to ALL collections present." << std::endl;
-  std::cerr << "   savePath <path> : where <path> is the save path accepting bash variables like $HOME, etc." << std::endl;
-  std::cerr << "   plot <fln>      : where <fln> is the file name with extension under which the plot should be saved." << std::endl;
-  std::cerr << "   macro <fln>     : where <fln> is the file name under which the root macro should be saved." << std::endl;
-  std::cerr << "   var <var_name> = <expr> : defines a variable." << std::endl;
-  std::cerr << "   col <nn> : <var_name>   : links <var_name> to the collection <nn>, where <nn> is the number of the" << std::endl;
-  std::cerr << "                             collection as defined by the order of load, starting with 0." << std::endl;
-  std::cerr << std::endl;
 }
 
 //------------------------------------------------------------------------
