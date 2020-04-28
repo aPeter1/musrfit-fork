@@ -28,7 +28,6 @@
  ***************************************************************************/
 
 #include <iostream>
-using namespace std;
 
 #include <QProcessEnvironment>
 #include <QString>
@@ -81,7 +80,7 @@ int PmuppScript::executeScript()
 {
   fParamDataHandler = new PParamDataHandler();
   if (fParamDataHandler == 0) {
-    cerr << endl << "**ERROR** couldn't invoke data handler ..." << endl << endl;
+    std::cerr << std::endl << "**ERROR** couldn't invoke data handler ..." << std::endl << std::endl;
     return -1;
   }
 
@@ -109,8 +108,12 @@ int PmuppScript::executeScript()
       status = plot(cmd);
     } else if (cmd.startsWith("macro")) {
       status = macro(cmd);
+    } else if (cmd.startsWith("var")) {
+      std::cout << "debug> will eventually handle variable definition here ..." << std::endl;
+    } else if (cmd.startsWith("col")) {
+      std::cout << "debug> will eventually handle linking of a variable to a collection ..." << std::endl;
     } else {
-      cerr << "**ERROR** found unkown script command '" << cmd.toLatin1().constData() << "'." << endl << endl;
+      std::cerr << "**ERROR** found unkown script command '" << cmd.toLatin1().constData() << "'." << std::endl << std::endl;
       status = -2;
     }
     // check for errors
@@ -224,7 +227,7 @@ int PmuppScript::select(const QString str)
   QString cmd = str;
   QStringList tok = cmd.split(' ', QString::SkipEmptyParts);
   if (tok.size() != 2) {
-    cerr << endl << "**ERROR** wrong 'select' command syntax." << endl << endl;
+    std::cerr << std::endl << "**ERROR** wrong 'select' command syntax." << std::endl << std::endl;
     return -1;
   }
 
@@ -232,18 +235,18 @@ int PmuppScript::select(const QString str)
   int ival = tok[1].toInt(&ok);
   if (ok) { // collection index given
     if (ival >= fParamDataHandler->GetNoOfCollections()) {
-      cerr << endl << "**ERROR** try to select a collection with index " << ival << ", which is >= # collections (" << fParamDataHandler->GetNoOfCollections() << ")." << endl << endl;
+      std::cerr << std::endl << "**ERROR** try to select a collection with index " << ival << ", which is >= # collections (" << fParamDataHandler->GetNoOfCollections() << ")." << std::endl << std::endl;
       return -2;
     }
     fSelected = ival;
   } else { // assume that a collection name is given
     ival = fParamDataHandler->GetCollectionIndex(tok[1]);
     if (ival == -1) {
-      cerr << endl << "**ERROR** couldn't find collection '" << tok[1].toLatin1().constData() << "'." << endl << endl;
+      std::cerr << std::endl << "**ERROR** couldn't find collection '" << tok[1].toLatin1().constData() << "'." << std::endl << std::endl;
       return -3;
     }
     if (ival >= fParamDataHandler->GetNoOfCollections()) {
-      cerr << endl << "**ERROR** try to select a collection with index " << ival << ", which is >= # collections (" << fParamDataHandler->GetNoOfCollections() << ")." << endl << endl;
+      std::cerr << std::endl << "**ERROR** try to select a collection with index " << ival << ", which is >= # collections (" << fParamDataHandler->GetNoOfCollections() << ")." << std::endl << std::endl;
       return -2;
     }
     fSelected = ival;
@@ -263,7 +266,7 @@ int PmuppScript::selectAll()
   if ( noColl > 0) {
     fSelected = -1; // all collections are selected
   } else {
-    cerr << endl << "**ERROR** no collections present, hence it is not possible to select them." << endl << endl;
+    std::cerr << std::endl << "**ERROR** no collections present, hence it is not possible to select them." << std::endl << std::endl;
     return -1;
   }
 
@@ -282,14 +285,14 @@ int PmuppScript::addX(const QString str)
   QStringList tok = cmd.split(' ', QString::SkipEmptyParts);
 
   if (tok.size() != 2) {
-    cerr << endl << "**ERROR** in addX: number of tokens missmatch." << endl << endl;
+    std::cerr << std::endl << "**ERROR** in addX: number of tokens missmatch." << std::endl << std::endl;
     return -1;
   }
   label = tok[1].trimmed();
 
   PmuppCollection *coll=0;
   if (fSelected == -2) { // no selection -> error
-    cerr << endl << "**ERROR** in addX. addX called without previous 'select' command." << endl << endl;
+    std::cerr << std::endl << "**ERROR** in addX. addX called without previous 'select' command." << std::endl << std::endl;
     return -2;
   } else if (fSelected == -1) { // i.e. select ALL
     // clean up plot info first
@@ -299,7 +302,7 @@ int PmuppScript::addX(const QString str)
     for (int i=0; i<fParamDataHandler->GetNoOfCollections(); i++) {
       coll = fParamDataHandler->GetCollection(i);
       if (!foundLabel(coll, label)) { // label not found
-        cerr << endl << "**ERROR** couldn't find '" << label.toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << endl << endl;
+        std::cerr << std::endl << "**ERROR** couldn't find '" << label.toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
         return -4;
       }
     }
@@ -316,11 +319,11 @@ int PmuppScript::addX(const QString str)
     // check that label is found in the selected collection
     coll = fParamDataHandler->GetCollection(fSelected);
     if (coll == 0) {
-      cerr << endl << "**ERROR** in addX: selected collection couldn't be found ..." << endl << endl;
+      std::cerr << std::endl << "**ERROR** in addX: selected collection couldn't be found ..." << std::endl << std::endl;
       return -3;
     }
     if (!foundLabel(coll, label)) { // label not found
-      cerr << endl << "**ERROR** couldn't find '" << label.toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << endl << endl;
+      std::cerr << std::endl << "**ERROR** couldn't find '" << label.toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
       return -4;
     }
 
@@ -345,7 +348,7 @@ int PmuppScript::addY(const QString str)
   QStringList tok = cmd.split(' ', QString::SkipEmptyParts);
 
   if (tok.size() < 2) {
-    cerr << endl << "**ERROR** in addY: number of tokens < 2." << endl << endl;
+    std::cerr << std::endl << "**ERROR** in addY: number of tokens < 2." << std::endl << std::endl;
     return -1;
   }
   // collect all potential labels
@@ -354,7 +357,7 @@ int PmuppScript::addY(const QString str)
 
   PmuppCollection *coll=0;
   if (fSelected == -2) { // no selection -> error
-    cerr << endl << "**ERROR** in addY. addY called without previous 'select' command." << endl << endl;
+    std::cerr << std::endl << "**ERROR** in addY. addY called without previous 'select' command." << std::endl << std::endl;
     return -2;
   } else if (fSelected == -1) { // i.e. select ALL
     // make sure that label(s) is/are found in ALL collections
@@ -362,7 +365,7 @@ int PmuppScript::addY(const QString str)
       coll = fParamDataHandler->GetCollection(i);
       for (int j=0; j<label.size(); j++) {
         if (!foundLabel(coll, label[j])) { // label not found
-          cerr << endl << "**ERROR** couldn't find '" << label[j].toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << endl << endl;
+          std::cerr << std::endl << "**ERROR** couldn't find '" << label[j].toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
           return -4;
         }
       }
@@ -379,13 +382,13 @@ int PmuppScript::addY(const QString str)
     // check that label is found in the selected collection
     coll = fParamDataHandler->GetCollection(fSelected);
     if (coll == 0) {
-      cerr << endl << "**ERROR** in addY: selected collection couldn't be found ..." << endl << endl;
+      std::cerr << std::endl << "**ERROR** in addY: selected collection couldn't be found ..." << std::endl << std::endl;
       return -3;
     }
 
     for (int i=0; i<label.size(); i++) {
       if (!foundLabel(coll, label[i])) { // label not found
-        cerr << endl << "**ERROR** couldn't find '" << label[i].toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << endl << endl;
+        std::cerr << std::endl << "**ERROR** couldn't find '" << label[i].toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
         return -4;
       }
     }
@@ -410,21 +413,21 @@ int PmuppScript::plot(const QString str)
   QString cmd = str;
   QStringList tok = cmd.split(' ', QString::SkipEmptyParts);
   if (tok.size() != 2) {
-    cerr << endl << "**ERROR** in plot: number of tokens != 2." << endl << endl;
+    std::cerr << std::endl << "**ERROR** in plot: number of tokens != 2." << std::endl << std::endl;
     return -1;
   }
   QString flnOut = fSavePath + tok[1];
   QString macroOut = fSavePath + "__out.C";
 
   if (macro(QString("macro " + macroOut), flnOut) != 0) {
-    cerr << endl << "**ERROR** temporary macro generation failed." << endl << endl;
+    std::cerr << std::endl << "**ERROR** temporary macro generation failed." << std::endl << std::endl;
     return -1;
   }
 
   // call root via batch
   QProcess *proc = new QProcess(this);
   if (proc == nullptr) {
-    cerr << endl << "**ERROR** couldn't invoke root.exe in batch mode." << endl << endl;
+    std::cerr << std::endl << "**ERROR** couldn't invoke root.exe in batch mode." << std::endl << std::endl;
     return -2;
   }
 
@@ -441,7 +444,7 @@ int PmuppScript::plot(const QString str)
   proc->setWorkingDirectory(fSavePath);
   proc->start(exec_cmd, arg);
   if (!proc->waitForStarted()) {
-    cerr << endl << "**ERROR** Could not execute the output command: " << exec_cmd.toLatin1().constData() << endl << endl;
+    std::cerr << std::endl << "**ERROR** Could not execute the output command: " << exec_cmd.toLatin1().constData() << std::endl << std::endl;
     QFile::remove(macroOut);
     return -3;
   }
@@ -467,7 +470,7 @@ int PmuppScript::macro(const QString str, const QString plotFln)
   QString cmd = str;
   QStringList tok = cmd.split(' ', QString::SkipEmptyParts);
   if (tok.size() != 2) {
-    cerr << endl << "**ERROR** macro command with wrong number of arguments (" << tok.size() << ")." << endl << endl;
+    std::cerr << std::endl << "**ERROR** macro command with wrong number of arguments (" << tok.size() << ")." << std::endl << std::endl;
     return -1;
   }
   QString macroName = tok[1].trimmed();
@@ -475,7 +478,7 @@ int PmuppScript::macro(const QString str, const QString plotFln)
   QString fln = fSavePath + macroName;
   QFile file(fln);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    cerr << endl << "**ERROR** Couldn't open macro file for writting." << endl << endl;
+    std::cerr << std::endl << "**ERROR** Couldn't open macro file for writting." << std::endl << std::endl;
     return -2;
   }
 
