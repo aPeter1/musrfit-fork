@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PmuppScript.h
+  PVarHandler.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -27,69 +27,29 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PMUPPSCRIPT_H_
-#define _PMUPPSCRIPT_H_
+#ifndef _PVARHANDLER_H_
+#define _PVARHANDLER_H_
+
+#include <string>
+#include <vector>
 
 #include <QString>
-#include <QStringList>
 
-#include "PmuppAdmin.h"
-#include "Pmupp.h"
-#include "PVarHandler.h"
+#include <PAst.hpp>
 
-typedef struct {
-  int collIdx;
-  QString xLabel;
-  QVector<QString> yLabel;
-} PmuppPlotEntry;
-
-class PmuppScript : public QObject
-{
-  Q_OBJECT
-
+class PVarHandler {
   public:
-    PmuppScript(QStringList script);
-    ~PmuppScript();
+    PVarHandler();
 
-    void setLoadPath(const QString cmd);
-    QString getLoadPath() { return fLoadPath; }
-
-    void setSavePath(const QString cmd);
-    QString getSavePath() { return fSavePath; }
-
-    int loadCollection(const QString str);
-    int select(const QString str);
-    int selectAll();
-    int addX(const QString str);
-    int addY(const QString str);
-    int plot(const QString str);
-    int macro(const QString str, const QString plotFln="");
-
-  public slots:
-    int executeScript();
-
-  signals:
-    void finished();
+    void setInput(QString &str) { fInput = str.toLatin1().data(); }
+    bool parse();
+    bool semcheck();
+    std::vector<double> getValues();
+    std::vector<double> getErrors();
 
   private:
-    PmuppAdmin *fAdmin;
-
-    QStringList fScript;
-    PParamDataHandler *fParamDataHandler;
-    int fSelected; ///< -2=nothing selected, -1=all selected, >=0 is the index if the selected collection
-
-    PmuppPlotEntry fPlotEntry;
-    QVector<PmuppPlotEntry> fPlotInfo;
-
-    bool fNorm;
-    QString fLoadPath;
-    QString fSavePath;
-
-    QVector<PVarHandler> fVarHandler;
-
-    bool foundLabel(PmuppCollection *coll, const QString label);
-    void minMax(QVector<double> dvec, double &min, double &max);
-    QString getNicerLabel(const QString label);
+    std::string fInput; ///< the variable input to be parsed
+    mupp::ast::statement_list fAst; ///< the AST
 };
 
-#endif // _PMUPPSCRIPT_H_
+#endif //_PVARHANDLER_H_

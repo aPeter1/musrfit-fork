@@ -42,7 +42,7 @@ set(GENERATED_HEADER_FILES
 )
 set_property(SOURCE mupp_version.h PROPERTY SKIP_AUTOMOC ON) # needed for cmake 3.x
 
-set(SOURCE_FILES
+set(MUPP_SOURCE_FILES
   mupp.cpp 
   PmuppAdmin.cpp 
   Pmupp.cpp
@@ -54,12 +54,23 @@ set(SOURCE_FILES
 if (APPLE)
   set(RESOURCE_FILES icons/mupp.icns)
   add_executable(mupp 
-     MACOSX_BUNDLE ${GENERATED_HEADER_FILES} ${SOURCE_FILES} 
+     MACOSX_BUNDLE ${GENERATED_HEADER_FILES} ${MUPP_SOURCE_FILES} 
      qrc_mupp.cpp ${RESOURCE_FILES}
   )
 else (APPLE)
-  add_executable(mupp ${GENERATED_HEADER_FILES} ${SOURCE_FILES} qrc_mupp.cpp)
+  add_executable(mupp ${GENERATED_HEADER_FILES} ${MUPP_SOURCE_FILES} qrc_mupp.cpp)
 endif (APPLE)
+
+#--- add the variable related sources -----------------------------------------
+add_subdirectory(var)
+
+#--- add the necessary header includes ----------------------------------------
+target_include_directories(mupp 
+  BEFORE PRIVATE
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/var/include>
+)
 
 #--- use the Widgets and XML modules from Qt5 ---------------------------------
 target_link_libraries(mupp Qt5::Widgets Qt5::Xml)
