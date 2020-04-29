@@ -35,21 +35,25 @@
 
 #include <QString>
 
+#include "Pmupp.h"
 #include <PAst.hpp>
 
 class PVarHandler {
   public:
-    PVarHandler();
+    PVarHandler(PmuppCollection *coll, std::string parse_str);
 
-    void setInput(QString &str) { fInput = str.toLatin1().data(); }
-    bool parse();
-    bool semcheck();
+    bool isValid() { return fIsValid; }
     std::vector<double> getValues();
     std::vector<double> getErrors();
 
   private:
-    std::string fInput; ///< the variable input to be parsed
+    PmuppCollection *fColl; ///< collection need for parsing and evaluation
+    std::string fParseStr; ///< the variable input to be parsed
+
+    bool fIsValid;
     mupp::ast::statement_list fAst; ///< the AST
+
+    void injectPredefVariables();
 };
 
 #endif //_PVARHANDLER_H_

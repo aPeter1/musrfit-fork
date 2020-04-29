@@ -27,35 +27,26 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <iostream>
+
 #include "PVarHandler.h"
+
+/*
+#include "PSkipper.hpp"
+#include "PErrorHandler.hpp"
+#include "PStatement.hpp"
+#include "PAstDump.hpp"
+#include "PProgram.hpp"
+*/
 
 //--------------------------------------------------------------------------
 /**
  * @brief PVarHandler::PVarHandler
  */
-PVarHandler::PVarHandler()
+PVarHandler::PVarHandler(PmuppCollection *coll, std::string parse_str) :
+  fColl(coll), fParseStr(parse_str), fIsValid(false)
 {
-  fInput = "";
-}
-
-//--------------------------------------------------------------------------
-/**
- * @brief PVarHandler::parse
- * @return
- */
-bool PVarHandler::parse()
-{
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * @brief PVarHandler::semcheck
- * @return
- */
-bool PVarHandler::semcheck()
-{
-  return true;
+  injectPredefVariables();
 }
 
 //--------------------------------------------------------------------------
@@ -80,4 +71,28 @@ std::vector<double> PVarHandler::getErrors()
   std::vector<double> result;
 
   return result;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief PVarHandler::injectPredefVariables
+ */
+void PVarHandler::injectPredefVariables()
+{
+  mupp::ast::statement var_stat;
+  mupp::ast::variable_declaration var;
+
+  std::string varName, errVarName;
+  for (int i=0; i<fColl->GetNoOfRuns(); i++) {
+    varName = fColl->GetRun(i).GetName().toLatin1().data();
+    errVarName = varName + "Err";
+    // inject err_name
+    var.lhs.name = errVarName;
+    var_stat = var;
+    fAst.push_front(var_stat);
+    // inject var_name
+    var.lhs.name = varName;
+    var_stat = var;
+    fAst.push_front(var_stat);
+  }
 }

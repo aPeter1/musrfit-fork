@@ -36,6 +36,8 @@
 #include <QDateTime>
 #include <QProcess>
 
+#include <QtGlobal> // Q_ASSERT
+
 #include "PmuppScript.h"
 
 //--------------------------------------------------------------------------
@@ -85,7 +87,7 @@ int PmuppScript::executeScript()
   }
 
   QString cmd;
-  int status=0;
+  int status;
   for (int i=0; i<fScript.size(); i++) {
     cmd = fScript.at(i);
     if (cmd.startsWith("loadPath")) {
@@ -109,7 +111,7 @@ int PmuppScript::executeScript()
     } else if (cmd.startsWith("macro")) {
       status = macro(cmd);
     } else if (cmd.startsWith("var")) {
-      std::cout << "debug> will eventually handle variable definition here ..." << std::endl;
+      status = var_cmd(cmd);
     } else if (cmd.startsWith("col")) {
       std::cout << "debug> will eventually handle linking of a variable to a collection ..." << std::endl;
     } else {
@@ -665,6 +667,47 @@ int PmuppScript::macro(const QString str, const QString plotFln)
 
 //--------------------------------------------------------------------------
 /**
+ * @brief PmuppScript::var_cmd
+ * @param str
+ * @return
+ */
+int PmuppScript::var_cmd(const QString str)
+{
+  QStringList tok;
+  int idx=0;
+
+  // get linked collection index for further use
+  tok = str.split(' ', QString::SkipEmptyParts);
+  if (tok[1].endsWith("Err")) // error variable no need to do something
+    return 0;
+  idx = getCollectionIndex(tok[1]);
+  if (idx == -1) // var not linked to collection, ignore it
+    return 0;
+
+  // check for the related error variable if present
+  QString varErr = QString("%1%2").arg(tok[1]).arg("Err");
+  QString varErrCmd("");
+  for (int i=0; i<fScript.size(); i++) {
+    if (fScript.at(i).contains(varErr, Qt::CaseSensitive)) {
+      varErrCmd = fScript.at(i);
+      break;
+    }
+  }
+
+  std::string parse_str = str.toLatin1().data();
+  if (!varErrCmd.isEmpty()) {
+    parse_str += "\n";
+    parse_str += varErrCmd.toLatin1().data();
+  }
+
+  PVarHandler varHandler(fParamDataHandler->GetCollection(idx), parse_str);
+  fVarHandler.push_back(varHandler);
+
+  return 0;
+}
+
+//--------------------------------------------------------------------------
+/**
  * @brief PmuppScript::foundLabel
  * @param coll
  * @return
@@ -748,4 +791,35 @@ QString PmuppScript::getNicerLabel(const QString label)
   }
 
   return nice;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief PmuppScript::getCollectionIndex
+ * @param var_name
+ * @return
+ */
+int PmuppScript::getCollectionIndex(const QString var_name)
+{
+  int idx = -1;
+  QString cmd;
+  QStringList tok;
+  bool ok;
+
+  for (int i=0; i<fScript.size(); i++) {
+    cmd = fScript.at(i);
+    if (cmd.startsWith("col")) {
+      tok.clear();
+      tok = cmd.split(' ', QString::SkipEmptyParts);
+      if (tok[3] == var_name) {
+        idx = tok[1].toInt(&ok);
+        if (!ok) {
+          Q_ASSERT(0);
+        }
+        break;
+      }
+    }
+  }
+
+  return idx;
 }

@@ -64,6 +64,7 @@ class PmuppScript : public QObject
     int addY(const QString str);
     int plot(const QString str);
     int macro(const QString str, const QString plotFln="");
+    int var_cmd(const QString str);
 
   public slots:
     int executeScript();
@@ -90,6 +91,8 @@ class PmuppScript : public QObject
     bool foundLabel(PmuppCollection *coll, const QString label);
     void minMax(QVector<double> dvec, double &min, double &max);
     QString getNicerLabel(const QString label);
+
+    int getCollectionIndex(const QString var_name);
 };
 
 #endif // _PMUPPSCRIPT_H_
