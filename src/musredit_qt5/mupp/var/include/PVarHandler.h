@@ -41,6 +41,7 @@
 
 class PVarHandler {
   public:
+    PVarHandler();
     PVarHandler(PmuppCollection *coll, std::string parse_str, std::string var_name);
 
     bool isValid() { return fIsValid; }

@@ -40,6 +40,16 @@
 /**
  * @brief PVarHandler::PVarHandler
  */
+PVarHandler::PVarHandler() :
+  fColl(nullptr), fParseStr(""), fVarName(""), fIsValid(false)
+{
+  // nothing to be done here
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief PVarHandler::PVarHandler
+ */
 PVarHandler::PVarHandler(PmuppCollection *coll, std::string parse_str, std::string var_name) :
   fColl(coll), fParseStr(parse_str), fVarName(var_name), fIsValid(false)
 {
