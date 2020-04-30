@@ -113,7 +113,7 @@ int PmuppScript::executeScript()
     } else if (cmd.startsWith("var")) {
       status = var_cmd(cmd);
     } else if (cmd.startsWith("col")) {
-      std::cout << "debug> will eventually handle linking of a variable to a collection ..." << std::endl;
+      // nothing to be done here, since var handles it internally
     } else {
       std::cerr << "**ERROR** found unkown script command '" << cmd.toLatin1().constData() << "'." << std::endl << std::endl;
       status = -2;
@@ -300,13 +300,31 @@ int PmuppScript::addX(const QString str)
     // clean up plot info first
     fPlotInfo.clear();
 
-    // make sure that label is found in ALL collections
+    // make sure that label is found in ALL collections, or in variables
+    // first check collections
+    bool foundInColl(true), foundInVar(true);
+    QString collName("");
     for (int i=0; i<fParamDataHandler->GetNoOfCollections(); i++) {
       coll = fParamDataHandler->GetCollection(i);
       if (!foundLabel(coll, label)) { // label not found
+        foundInColl = false;
+        collName = coll->GetName();
+        break;
+/* //as35
         std::cerr << std::endl << "**ERROR** couldn't find '" << label.toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
         return -4;
+*/ //as35
       }
+    }
+    // second check variables
+    if (!foundVariable(label)) { // label not found
+      foundInVar = false;
+    }
+    // make sure label(s) have been found
+    if (!foundInColl && !foundInVar) { // not all labels found, neither in collection nor variables.
+      std::cerr << std::endl << "**ERROR** couldn't find '" << label.toLatin1().constData() << "' in collection '" << collName.toLatin1().constData() << "'," << std::endl;
+      std::cerr << "          nor is it a defined variable" << std::endl << std::endl;
+      return -4;
     }
 
     // resize fPlotInfo to the number of selections
@@ -318,14 +336,31 @@ int PmuppScript::addX(const QString str)
       fPlotInfo[i].xLabel = label;
     }
   } else { // a specific selection
-    // check that label is found in the selected collection
+    // check that label is found in the selected collection, or in variables
     coll = fParamDataHandler->GetCollection(fSelected);
     if (coll == 0) {
       std::cerr << std::endl << "**ERROR** in addX: selected collection couldn't be found ..." << std::endl << std::endl;
       return -3;
     }
+    // first check collection
+    bool foundInColl(true), foundInVar(true);
+    QString collName("");
     if (!foundLabel(coll, label)) { // label not found
+      foundInColl = false;
+      collName = coll->GetName();
+/* //as35
       std::cerr << std::endl << "**ERROR** couldn't find '" << label.toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
+      return -4;
+*/ //as35
+    }
+    // second check variables
+    if (!foundVariable(label)) { // label not found
+      foundInVar = false;
+    }
+    // make sure label(s) have been found
+    if (!foundInColl && !foundInVar) { // not all labels found, neither in collection nor variables.
+      std::cerr << std::endl << "**ERROR** couldn't find '" << label.toLatin1().constData() << "' in collection '" << collName.toLatin1().constData() << "'," << std::endl;
+      std::cerr << "          nor is it a defined variable" << std::endl << std::endl;
       return -4;
     }
 
@@ -362,15 +397,39 @@ int PmuppScript::addY(const QString str)
     std::cerr << std::endl << "**ERROR** in addY. addY called without previous 'select' command." << std::endl << std::endl;
     return -2;
   } else if (fSelected == -1) { // i.e. select ALL
-    // make sure that label(s) is/are found in ALL collections
+    // make sure that label(s) is/are found in ALL collections, or in variables
+    // first check collections
+    bool foundInColl(true), foundInVar(true);
+    int idx = -1;
+    QString collName("");
     for (int i=0; i<fParamDataHandler->GetNoOfCollections(); i++) {
       coll = fParamDataHandler->GetCollection(i);
       for (int j=0; j<label.size(); j++) {
         if (!foundLabel(coll, label[j])) { // label not found
+          foundInColl = false;
+          collName = coll->GetName();
+          idx = j;
+          break;
+/* //as35
           std::cerr << std::endl << "**ERROR** couldn't find '" << label[j].toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
           return -4;
+*/ //as35
         }
       }
+    }
+    // second check variables
+    for (int i=0; i<label.size(); i++) {
+      if (!foundVariable(label[i])) { // label not found
+        foundInVar = false;
+        idx = i;
+        break;
+      }
+    }
+    // make sure label(s) have been found
+    if (!foundInColl && !foundInVar) { // not all labels found, neither in collection nor variables.
+      std::cerr << std::endl << "**ERROR** couldn't find '" << label[idx].toLatin1().constData() << "' in collection '" << collName.toLatin1().constData() << "'," << std::endl;
+      std::cerr << "          nor is it a defined variable" << std::endl << std::endl;
+      return -4;
     }
 
     // feed plot info with y-label(s)
@@ -381,19 +440,44 @@ int PmuppScript::addY(const QString str)
     // clear yLabel
     fPlotEntry.yLabel.clear();
 
-    // check that label is found in the selected collection
+    // check that label is found in the selected collection, or in the variables
     coll = fParamDataHandler->GetCollection(fSelected);
     if (coll == 0) {
       std::cerr << std::endl << "**ERROR** in addY: selected collection couldn't be found ..." << std::endl << std::endl;
       return -3;
     }
 
+    // first check specific collection
+    bool foundInColl(true), foundInVar(true);
+    int idx = -1;
+    QString collName("");
     for (int i=0; i<label.size(); i++) {
       if (!foundLabel(coll, label[i])) { // label not found
+        foundInColl = false;
+        collName = coll->GetName();
+        idx = i;
+        break;
+/* //as35
         std::cerr << std::endl << "**ERROR** couldn't find '" << label[i].toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
         return -4;
+*/ //as35
       }
     }
+    // second check variables
+    for (int i=0; i<label.size(); i++) {
+      if (!foundVariable(label[i])) { // label not found
+        foundInVar = false;
+        idx = i;
+        break;
+      }
+    }
+    // make sure label(s) have been found
+    if (!foundInColl && !foundInVar) { // not all labels found, neither in collection nor variables.
+      std::cerr << std::endl << "**ERROR** couldn't find '" << label[idx].toLatin1().constData() << "' in collection '" << collName.toLatin1().constData() << "'," << std::endl;
+      std::cerr << "          nor is it a defined variable" << std::endl << std::endl;
+      return -4;
+    }
+
     fPlotEntry.yLabel = label;
 
     // add plot entry
@@ -517,6 +601,16 @@ int PmuppScript::macro(const QString str, const QString plotFln)
     // get collection name
     collName = fParamDataHandler->GetCollectionName(i);
     xx = fParamDataHandler->GetValues(collName, fPlotInfo[i].xLabel);
+    if (xx.size() == 0) { // it is a variable
+      int idx = getVarIndex(fPlotInfo[i].xLabel);
+      if (idx == -1) {
+        std::cerr << std::endl;
+        std::cerr << "**ERROR** Couldn't get x-label '" << fPlotInfo[i].xLabel.toLatin1().data() << "'." << std::endl;
+        std::cerr << "          This should never happens." << std::endl;
+        return -3;
+      }
+      xx = QVector<double>::fromStdVector(fVarHandler[idx].getValues());
+    }
     // get x-axis min/max
     minMax(xx, x_min, x_max);
     if (count==0) {
@@ -533,6 +627,18 @@ int PmuppScript::macro(const QString str, const QString plotFln)
       yy = fParamDataHandler->GetValues(collName, fPlotInfo[i].yLabel[j]);
       yyPosErr = fParamDataHandler->GetPosErr(collName, fPlotInfo[i].yLabel[j]);
       yyNegErr = fParamDataHandler->GetNegErr(collName, fPlotInfo[i].yLabel[j]);
+      if (yy.size() == 0) { // it's a variable
+        int idx = getVarIndex(fPlotInfo[i].yLabel[j]);
+        if (idx == -1) {
+          std::cerr << std::endl;
+          std::cerr << "**ERROR** Couldn't get y-label '" << fPlotInfo[i].yLabel[j].toLatin1().data() << "'." << std::endl;
+          std::cerr << "          This should never happens." << std::endl;
+          return -3;
+        }
+        yy = QVector<double>::fromStdVector(fVarHandler[idx].getValues());
+        yyPosErr = QVector<double>::fromStdVector(fVarHandler[idx].getErrors());
+        yyNegErr = QVector<double>::fromStdVector(fVarHandler[idx].getErrors());
+      }
       // get y-axis min/max
       minMax(yy, y_min, y_max);
       if (count==0) {
@@ -684,7 +790,7 @@ int PmuppScript::var_cmd(const QString str)
   if (idx == -1) // var not linked to collection, ignore it
     return 0;
 
-  // check for the related error variable if present
+  // check if the related error variable is present
   QString varErr = QString("%1%2").arg(tok[1]).arg("Err");
   QString varErrCmd("");
   for (int i=0; i<fScript.size(); i++) {
@@ -700,7 +806,9 @@ int PmuppScript::var_cmd(const QString str)
     parse_str += varErrCmd.toLatin1().data();
   }
 
-  PVarHandler varHandler(fParamDataHandler->GetCollection(idx), parse_str);
+  PVarHandler varHandler(fParamDataHandler->GetCollection(idx), parse_str, tok[1].toLatin1().data());
+  if (!varHandler.isValid())
+    return 1;
   fVarHandler.push_back(varHandler);
 
   return 0;
@@ -723,6 +831,44 @@ bool PmuppScript::foundLabel(PmuppCollection *coll, const QString label)
   }
 
   return result;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief PmuppScript::foundVariable
+ * @param var
+ * @return
+ */
+bool PmuppScript::foundVariable(const QString var)
+{
+  bool result = false;
+  for (int i=0; i<fVarHandler.size(); i++) {
+    if (!fVarHandler[i].getVarName().compare(var)) {
+      result = true;
+      break;
+    }
+  }
+
+  return result;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief PmuppScript::getVarIndex
+ * @param var
+ * @return
+ */
+int PmuppScript::getVarIndex(const QString var)
+{
+  int idx = -1;
+  for (int i=0; i<fVarHandler.size(); i++) {
+    if (!fVarHandler[i].getVarName().compare(var)) {
+      idx = i;
+      break;
+    }
+  }
+
+  return idx;
 }
 
 //--------------------------------------------------------------------------

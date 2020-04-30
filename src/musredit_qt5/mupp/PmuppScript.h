@@ -89,6 +89,8 @@ class PmuppScript : public QObject
     QVector<PVarHandler> fVarHandler;
 
     bool foundLabel(PmuppCollection *coll, const QString label);
+    bool foundVariable(const QString var);
+    int  getVarIndex(const QString var);
     void minMax(QVector<double> dvec, double &min, double &max);
     QString getNicerLabel(const QString label);
 

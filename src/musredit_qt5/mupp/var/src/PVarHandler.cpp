@@ -31,22 +31,54 @@
 
 #include "PVarHandler.h"
 
-/*
 #include "PSkipper.hpp"
 #include "PErrorHandler.hpp"
 #include "PStatement.hpp"
-#include "PAstDump.hpp"
 #include "PProgram.hpp"
-*/
 
 //--------------------------------------------------------------------------
 /**
  * @brief PVarHandler::PVarHandler
  */
-PVarHandler::PVarHandler(PmuppCollection *coll, std::string parse_str) :
-  fColl(coll), fParseStr(parse_str), fIsValid(false)
+PVarHandler::PVarHandler(PmuppCollection *coll, std::string parse_str, std::string var_name) :
+  fColl(coll), fParseStr(parse_str), fVarName(var_name), fIsValid(false)
 {
   injectPredefVariables();
+
+  typedef std::string::const_iterator iterator_type;
+  iterator_type iter = fParseStr.begin();
+  iterator_type end = fParseStr.end();
+
+  mupp::PErrorHandler<iterator_type> error_handler(iter, end);   // the error handler
+  mupp::parser::PStatement<iterator_type> parser(error_handler); // the parser
+  mupp::prog::PProgram prog(error_handler); // our compiler, and exec
+  mupp::parser::PSkipper<iterator_type> skipper; // the skipper parser
+
+  // perform the parsing
+  bool success = phrase_parse(iter, end, parser, skipper, fAst);
+  if (success && iter == end) {
+    if (prog(fAst)) { // semantic analysis
+      std::vector<double> data, dataErr;
+      for (unsigned int i=0; i<fColl->GetRun(0).GetNoOfParam(); i++) {
+        data = getData(i);
+        dataErr = getDataErr(i);
+        prog.add_predef_var_values(getVarName(i), data, dataErr);
+      }
+      mupp::prog::PProgEval eval(prog.getVars()); // setup evaluation stage
+      eval(fAst); // evaluate stuff
+
+      // keep data
+      bool ok;
+      fVar = eval.getVar(fVarName, ok);
+      if (!ok) {
+        std::cerr << "**ERROR** evalution failed..." << std::endl;
+        fIsValid = false;
+      }
+    }
+    fIsValid = true;
+  } else {
+    std::cerr << "**ERROR** parsing failed..." << std::endl;
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -56,9 +88,11 @@ PVarHandler::PVarHandler(PmuppCollection *coll, std::string parse_str) :
  */
 std::vector<double> PVarHandler::getValues()
 {
-  std::vector<double> result;
+  std::vector<double> data;
+  if (fIsValid)
+    data = fVar.GetValue();
 
-  return result;
+  return data;
 }
 
 //--------------------------------------------------------------------------
@@ -68,9 +102,11 @@ std::vector<double> PVarHandler::getValues()
  */
 std::vector<double> PVarHandler::getErrors()
 {
-  std::vector<double> result;
+  std::vector<double> data;
+  if (fIsValid)
+    data = fVar.GetError();
 
-  return result;
+  return data;
 }
 
 //--------------------------------------------------------------------------
@@ -83,8 +119,9 @@ void PVarHandler::injectPredefVariables()
   mupp::ast::variable_declaration var;
 
   std::string varName, errVarName;
-  for (int i=0; i<fColl->GetNoOfRuns(); i++) {
-    varName = fColl->GetRun(i).GetName().toLatin1().data();
+  PmuppRun run = fColl->GetRun(0);
+  for (int i=0; i<run.GetNoOfParam(); i++) {
+    varName = run.GetParam(i).GetName().toLatin1().data();
     errVarName = varName + "Err";
     // inject err_name
     var.lhs.name = errVarName;
@@ -95,4 +132,69 @@ void PVarHandler::injectPredefVariables()
     var_stat = var;
     fAst.push_front(var_stat);
   }
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief PVarHandler::getVarName
+ * @param idx
+ * @return
+ */
+std::string PVarHandler::getVarName(int idx)
+{
+  std::string name("??");
+
+  // make sure idx is in range
+  if (idx >= fColl->GetRun(0).GetNoOfParam())
+    return name;
+
+  return fColl->GetRun(0).GetParam(idx).GetName().toLatin1().data();
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief PVarHandler::getData
+ * @param idx
+ * @return
+ */
+std::vector<double> PVarHandler::getData(int idx)
+{
+  std::vector<double> data;
+
+  // make sure idx is in range
+  if (idx >= fColl->GetRun(0).GetNoOfParam())
+    return data;
+
+  double dval;
+  for (int i=0; i<fColl->GetNoOfRuns(); i++) {
+    dval = fColl->GetRun(i).GetParam(idx).GetValue();
+    data.push_back(dval);
+  }
+
+  return data;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * @brief PVarHandler::getDataErr
+ * @param idx
+ * @return
+ */
+std::vector<double> PVarHandler::getDataErr(int idx)
+{
+  std::vector<double> err;
+
+  // make sure idx is in range
+  if (idx >= fColl->GetRun(0).GetNoOfParam())
+    return err;
+
+  double dvalPos, dvalNeg;
+  for (int i=0; i<fColl->GetNoOfRuns(); i++) {
+    dvalPos = fColl->GetRun(i).GetParam(idx).GetPosErr();
+    dvalNeg = fColl->GetRun(i).GetParam(idx).GetNegErr();
+    dvalPos = sqrt(fabs(dvalPos*dvalNeg)); // geometric mean of pos/neg error
+    err.push_back(dvalPos);
+  }
+
+  return err;
 }

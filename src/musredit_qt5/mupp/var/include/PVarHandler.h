@@ -36,24 +36,32 @@
 #include <QString>
 
 #include "Pmupp.h"
-#include <PAst.hpp>
+#include "PAst.hpp"
+#include "PProgram.hpp"
 
 class PVarHandler {
   public:
-    PVarHandler(PmuppCollection *coll, std::string parse_str);
+    PVarHandler(PmuppCollection *coll, std::string parse_str, std::string var_name);
 
     bool isValid() { return fIsValid; }
+    QString getVarName() { return QString(fVarName.c_str()); }
     std::vector<double> getValues();
     std::vector<double> getErrors();
 
   private:
     PmuppCollection *fColl; ///< collection need for parsing and evaluation
     std::string fParseStr; ///< the variable input to be parsed
+    std::string fVarName;  ///< variable name
+    mupp::prog::PVarHandler fVar; ///< values of the evaluation
 
     bool fIsValid;
     mupp::ast::statement_list fAst; ///< the AST
 
     void injectPredefVariables();
+
+    std::string getVarName(int idx);
+    std::vector<double> getData(int idx);
+    std::vector<double> getDataErr(int idx);
 };
 
 #endif //_PVARHANDLER_H_

@@ -5,22 +5,21 @@ loadPath ./
 load YBCO-40nm-FC-E3p8keV-B10mT-Tscan.db  # collection 0
 load YBCO-40nm-FC-E3p8keV-B150mT-Tscan.db # collection 1
 
-# define the variables (on this level the parsing will be done)
 # B=10mT
-var quatsch
 var SigmaSC_10 = pow(abs(pow($Sigma,2.0)-pow(0.11,2.0)), 0.5) # 0.11 (1/us) is the nuclear contribution (T>Tc)
 var SigmaSC_10Err = pow(pow($Sigma*$SigmaErr,2.0)+pow(0.11*0.0025,2.0), 0.5)/$SigmaSC_10
 # B=150mT
 var SigmaSC_150 = pow(abs(pow($Sigma,2.0)-pow(0.075,2.0)), 0.5) # 0.075 (1/us) is the nuclear contribution (T>Tc)
 var SigmaSC_150Err = pow(pow($Sigma*$SigmaErr,2.0)+pow(0.075*0.0025,2.0), 0.5)/$SigmaSC_150
 
-# link variables to collection (on this level the semantic checks will be done)
 col 0 : SigmaSC_10    # error variable SigmaSC_10Err doesn't need to be given, it is automatically linked to SigmaSC_10
 col 1 : SigmaSC_150
 
+norm
+
 select 0
 x dataT
-y SigmaSC_10  # (on this level the evaluation will be done)
+y SigmaSC_10
 
 select 1
 x dataT
