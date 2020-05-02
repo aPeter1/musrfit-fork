@@ -843,8 +843,6 @@ void PmuppGui::getTheme()
       fDarkToolBarIcon = true;
     }
   }
-
-  QMessageBox::information(0, "INFO", QString("str='%1', fDarkTheme=%2").arg(str).arg(fDarkTheme));
 }
 
 //----------------------------------------------------------------------------------------------------
