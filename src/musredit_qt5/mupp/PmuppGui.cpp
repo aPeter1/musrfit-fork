@@ -827,6 +827,14 @@ void PmuppGui::getTheme()
 
   QString str = QIcon::themeName();
 
+  if (str.isEmpty()) {
+    if (fAdmin->isDarkTheme()) {
+      fDarkTheme = true;
+      fDarkToolBarIcon = true;
+    }
+    return;
+  }
+
   if (str.contains("dark", Qt::CaseInsensitive)) {
     fDarkTheme = true;
     if (str.contains("ubuntu", Qt::CaseInsensitive)) {
@@ -835,6 +843,8 @@ void PmuppGui::getTheme()
       fDarkToolBarIcon = true;
     }
   }
+
+  QMessageBox::information(0, "INFO", QString("str='%1', fDarkTheme=%2").arg(str).arg(fDarkTheme));
 }
 
 //----------------------------------------------------------------------------------------------------

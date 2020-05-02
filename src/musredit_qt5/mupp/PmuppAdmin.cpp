@@ -109,6 +109,8 @@ bool PmuppAdminXMLParser::startElement( const QString&, const QString&,
 {
   if (qName == "path_file_name") {
     fKeyWord = eRecentFile;
+  } else if (qName == "dark_theme") {
+    fKeyWord = eDarkTheme;
   } else if (qName == "marker") {
     fKeyWord = eMarker;
   } else if (qName == "color") {
@@ -151,6 +153,12 @@ bool PmuppAdminXMLParser::characters(const QString& str)
   switch (fKeyWord) {
     case eRecentFile:
       fAdmin->addRecentFile(QString(str.toLatin1()).trimmed());
+      break;
+    case eDarkTheme:
+      if ((str == "yes") || (str == "1") || (str == "true"))
+        fAdmin->setTheme(true);
+      else
+        fAdmin->setTheme(false);
       break;
     case eMarker:
       tok = str.split(",", QString::SkipEmptyParts);
@@ -277,7 +285,7 @@ bool PmuppAdminXMLParser::fatalError( const QXmlParseException & exception )
  * <p>Initializes that PmuppAdmin object, and calls the XML parser which feeds
  * the object variables.
  */
-PmuppAdmin::PmuppAdmin() : QObject()
+PmuppAdmin::PmuppAdmin() : QObject(), fDarkTheme(false)
 {
   // XML Parser part
   // 1st: check local directory

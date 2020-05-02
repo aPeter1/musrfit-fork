@@ -98,7 +98,7 @@ class PmuppAdminXMLParser : public QXmlDefaultHandler
     virtual ~PmuppAdminXMLParser() {}
 
   private:
-    enum EAdminKeyWords {eEmpty, eRecentFile, eMarker, eColor};
+    enum EAdminKeyWords {eEmpty, eRecentFile, eDarkTheme, eMarker, eColor};
 
     bool startDocument();
     bool startElement( const QString&, const QString&, const QString& ,
@@ -133,6 +133,8 @@ class PmuppAdmin : public QObject
     int     getNumRecentFiles() { return fRecentFile.size(); }
     QString getRecentFile(int idx);
 
+
+
     int getNoOfMarkers() { return fMarker.size(); }
     QVector<PmuppMarker> getMarkers() { return fMarker; }
     PmuppMarker getMarker(int idx);
@@ -142,6 +144,9 @@ class PmuppAdmin : public QObject
     void getColor(QString name, int &r, int &g, int &b);
     void getColor(int idx, int &r, int &g, int &b);
 
+    bool isDarkTheme() { return fDarkTheme; }
+
+    void setTheme(bool theme) { fDarkTheme = theme; }
     void setMarker(int marker, double size);
     void setColor(int r, int g, int b, QString name="");
 
@@ -150,6 +155,7 @@ class PmuppAdmin : public QObject
 
     QVector<QString> fRecentFile; ///< keep vector of recent path-file names
 
+    bool fDarkTheme;
     QVector<PmuppMarker> fMarker;
     QVector<PmuppColor> fColor;
 
