@@ -6,7 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 #--- define mupp version ------------------------------------------------------
-set(mupp_VERSION 0.9.0)
+set(mupp_VERSION 1.0.0)
 
 #--- mupp_version.h generation - START ----------------------------------------
 configure_file(
