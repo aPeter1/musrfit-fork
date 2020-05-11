@@ -807,8 +807,23 @@ int PmuppScript::var_cmd(const QString str)
   }
 
   PVarHandler varHandler(fParamDataHandler->GetCollection(idx), parse_str, tok[1].toLatin1().data());
-  if (!varHandler.isValid())
+  if (!varHandler.isValid()) {
+    // deal with errors
+    QString mupp_err = QString("%1/.musrfit/mupp/mupp_err.log").arg(QString(qgetenv("HOME")));
+
+    // dump error messages if present
+    QFile fout(mupp_err);
+    if (fout.open(QIODevice::ReadOnly | QIODevice::Text)) {
+      QString msg;
+      while (!fout.atEnd()) {
+        msg = fout.readLine();
+        std::cerr << msg.toLatin1().data();
+      }
+      // delete potentially present mupp_err.log file
+      QFile::remove(mupp_err);
+    }
     return 1;
+  }
   fVarHandler.push_back(varHandler);
 
   return 0;

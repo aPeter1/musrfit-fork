@@ -34,6 +34,7 @@
 #define _PERROR_HANDLER_HPP_
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 
@@ -59,15 +60,19 @@ namespace mupp
      {
        int line;
        Iterator line_start = get_pos(err_pos, line);
+       const char *homeStr = getenv("HOME");
+       char fln[1024];
+       sprintf(fln, "%s/.musrfit/mupp/mupp_err.log", homeStr);
+       std::ofstream fout(fln, std::ofstream::app);
        if (err_pos != last) {
-         std::cout << message << what << ':' << std::endl;
-         std::cout << get_line(line_start) << std::endl;
+         fout << message << what << ':' << std::endl;
+         fout << get_line(line_start) << std::endl;
          for (; line_start != err_pos; ++line_start)
-           std::cout << ' ';
-         std::cout << "^~~" << std::endl;
+           fout << ' ';
+         fout << "^~~" << std::endl;
        } else {
-         std::cout << "**ERROR** Unexpected end of file. ";
-         std::cout << message << what << " line " << line << std::endl;
+         fout << "**ERROR** Unexpected end of file. ";
+         fout << message << what << " line " << line << std::endl;
        }
      }
 

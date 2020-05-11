@@ -42,15 +42,16 @@
 class PVarHandler {
   public:
     PVarHandler();
-    PVarHandler(PmuppCollection *coll, std::string parse_str, std::string var_name);
+    PVarHandler(PmuppCollection *coll, std::string parse_str, std::string var_name="");
 
     bool isValid() { return fIsValid; }
+    QString getCollName() { return fColl->GetName(); }
     QString getVarName() { return QString(fVarName.c_str()); }
     std::vector<double> getValues();
     std::vector<double> getErrors();
 
   private:
-    PmuppCollection *fColl; ///< collection need for parsing and evaluation
+    PmuppCollection *fColl; ///< collection needed for parsing and evaluation
     std::string fParseStr; ///< the variable input to be parsed
     std::string fVarName;  ///< variable name
     mupp::prog::PVarHandler fVar; ///< values of the evaluation

@@ -59,7 +59,6 @@
 
 #include "mupp_version.h"
 #include "PmuppGui.h"
-#include "PGetNormValDialog.h"
 
 //----------------------------------------------------------------------------------------------------
 /**
@@ -211,7 +210,8 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
   fNormalizeAction = nullptr;
 
   fNormalize = false;
-  fNormVal = 0.0;
+
+  fVarDlg = nullptr;
 
   fMacroPath = QString("./");
   fMacroName = QString("");
@@ -549,16 +549,25 @@ void PmuppGui::setupToolActions()
 
   menu->addSeparator();
 
+  a = new QAction(tr( "Add Variable" ), this );
+  a->setStatusTip( tr("Calls a dialog which allows to add variables which are expressions of db/dat vars.") );
+  connect( a, SIGNAL( triggered() ), this, SLOT( addVar() ));
+  menu->addAction(a);
+
+  menu->addSeparator();
+
   fNormalizeAction = new QAction(tr( "Normalize" ), this);
   fNormalizeAction->setStatusTip( tr("Plot Data Normalized (y-axis)") );
   fNormalizeAction->setCheckable(true);
   connect( fNormalizeAction, SIGNAL( changed() ), this, SLOT( normalize() ) );
   menu->addAction(fNormalizeAction);
 
+/* //as35 - eventually also remove PGetNormValDialog.* from the source
   a = new QAction(tr( "Normalize by Value" ), this);
   a->setStatusTip( tr("Normalize by Value") );
   connect( a, SIGNAL( triggered() ), this, SLOT( normVal() ) );
   menu->addAction(a);
+*/
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -706,33 +715,13 @@ void PmuppGui::normalize()
 }
 
 //----------------------------------------------------------------------------------------------------
-void PmuppGui::normVal()
-{
-  PGetNormValDialog *dlg = new PGetNormValDialog(fNormVal);
-  if (dlg == nullptr) {
-    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
-    return;
-  }
-
-  dlg->exec();
-
-  if (dlg->result() != QDialog::Accepted) {
-    delete dlg;
-    return;
-  }
-
-  fNormVal = dlg->getValue();
-
-  delete dlg;
-}
-
-//----------------------------------------------------------------------------------------------------
 /**
  * @brief PmuppGui::helpCmds
  */
 void PmuppGui::helpCmds()
 {
   QMessageBox::information(this, "cmd help", "<b>help:</b> this help.<br>"\
+                           "<b>add var</b>: allows to add a variable which is formula of collection vars.<br>"\
                            "<b>ditto</b>: addX/Y for the new selection as for the previous ones.<br>"\
                            "<b>dump collections:</b> dumps all currently loaded collections.<br>"\
                            "<b>dump XY:</b> dumps X/Y tree.<br>"\
@@ -1242,6 +1231,76 @@ void PmuppGui::addDitto()
 
   // un-select the collecion list
   fColList->clearSelection();
+}
+
+//----------------------------------------------------------------------------------------------------
+void PmuppGui::addVar()
+{
+  // create collection list
+  QVector<PCollInfo> collection_list;
+
+  // go through all available collections and obtain the needed information
+  PCollInfo collInfo;
+  for (int i=0; i<fParamDataHandler->GetNoOfCollections(); i++) {
+    // get collection name
+    collInfo.fCollName = fParamDataHandler->GetCollectionName(i);
+    // get variable names
+    for (int j=0; j<fParamDataHandler->GetCollection(i)->GetRun(0).GetNoOfParam(); j++) {
+      collInfo.fVarName << fParamDataHandler->GetCollection(i)->GetRun(0).GetParam(j).GetName();
+    }
+    collection_list.push_back(collInfo);
+  }
+
+  // call variable dialog
+  if (fVarDlg == nullptr) {
+    fVarDlg = new PVarDialog(collection_list, fDarkTheme);
+    connect(fVarDlg, SIGNAL(check_request(QString,QVector<int>)), this, SLOT(check(QString,QVector<int>)));
+    connect(fVarDlg, SIGNAL(add_request(QString,QVector<int>)), this, SLOT(add(QString,QVector<int>)));
+  }
+  fVarDlg->show();
+
+}
+
+//----------------------------------------------------------------------------------------------------
+void PmuppGui::check(QString varStr, QVector<int> idx)
+{
+  int count = 0;
+  for (int i=0; i<idx.size(); i++) {
+    PVarHandler var_check(fParamDataHandler->GetCollection(i), varStr.toLatin1().data());
+    if (var_check.isValid()) {
+      count++;
+    } else {
+      // get error messages
+      QString mupp_err = QString("%1/.musrfit/mupp/mupp_err.log").arg(QString(qgetenv("HOME")));
+      QFile fin(mupp_err);
+      QString errStr("");
+      if (fin.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream in(&fin);
+        while (!in.atEnd()) {
+          errStr += in.readLine();
+          errStr += "\n";
+        }
+      }
+      fin.close();
+      QFile::remove(mupp_err);
+
+      if (errStr.isEmpty())
+        errStr = "unknown error - should never happen.";
+      QString msg = QString("Parse error(s):\n");
+      msg += errStr;
+      QMessageBox::critical(this, "**ERROR**", msg);
+      return;
+    }
+  }
+  if (count == idx.size()) {
+    QMessageBox::information(this, "**INFO**", "Parsing successful.");
+  }
+}
+
+//----------------------------------------------------------------------------------------------------
+void PmuppGui::add(QString varStr, QVector<int> idx)
+{
+
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -1765,13 +1824,9 @@ void PmuppGui::plot()
       double max=0.0;
       for (int k=0; k<yyy.size(); k++) {
         max=0.0;
-        if (fNormVal == 0.0) {
-          for (int j=0; j<xx.size(); j++) {
-            if (yyy[k][j] > max)
-              max = yyy[k][j];
-          }
-        } else {
-          max = fNormVal;
+        for (int j=0; j<xx.size(); j++) {
+          if (yyy[k][j] > max)
+            max = yyy[k][j];
         }
         for (int j=0; j<xx.size(); j++) {
           yyy[k][j] /= max;
@@ -1998,6 +2053,8 @@ void PmuppGui::handleCmds()
       QMessageBox::critical(this, "**ERROR**", "found wrong norm cmd, will ignore it.");
       return;
     }
+  } else if (cmd.startsWith("add var")) {
+    addVar();
   } else if (cmd.startsWith("flush")) {
     fCmdHistory.clear();
     fCmdLine->setText("$ ");
@@ -2190,48 +2247,32 @@ QString PmuppGui::substituteDefaultLabels(QString label)
     result =QString("E (keV)");
   } else if (!label.compare("sigma", Qt::CaseInsensitive)) {
     if (fNormalize) {
-      if (fNormVal == 0.0)
-        result = QString("#sigma/max(#sigma)");
-      else
-        result = QString("#sigma/%1 (1/#mus)").arg(fNormVal);
+      result = QString("#sigma/max(#sigma)");
     } else {
       result = QString("#sigma (1/#mus)");
     }
   } else if (!label.compare("lambda", Qt::CaseInsensitive)) {
     if (fNormalize) {
-      if (fNormVal == 0.0)
-        result = QString("#lambda/max(#lambda)");
-      else
-        result = QString("#lambda/%1 (1/#mus)").arg(fNormVal);
+      result = QString("#lambda/max(#lambda)");
     } else {
       result = QString("#lambda (1/#mus)");
     }
   } else if (!label.compare("alpha_LR", Qt::CaseInsensitive)) {
     if (fNormalize) {
-      if (fNormVal == 0.0)
-        result = QString("#alpha_{LR}/max(#alpha_{LR})");
-      else
-        result = QString("#alpha_{LR}/%1").arg(fNormVal);
+      result = QString("#alpha_{LR}/max(#alpha_{LR})");
     } else {
       result = QString("#alpha_{LR}");
     }
   } else if (!label.compare("alpha_TB", Qt::CaseInsensitive)) {
     if (fNormalize) {
-      if (fNormVal == 0.0)
-        result = QString("#alpha_{TB}/max(#alpha_{TB})");
-      else
-        result = QString("#alpha_{TB}/%1").arg(fNormVal);
+      result = QString("#alpha_{TB}/max(#alpha_{TB})");
     } else {
       result = QString("#alpha_{TB}");
     }
   } else {
     if (fNormalize) {
-      if (fNormVal == 0.0) {
-        result = QString("Normalized ");
-        result += label;
-      } else {
-        result = QString("%1/%2").arg(label).arg(fNormVal);
-      }
+      result = QString("Normalized ");
+      result += label;
     }
   }
 

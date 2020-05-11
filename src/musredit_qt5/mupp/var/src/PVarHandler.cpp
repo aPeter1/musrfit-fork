@@ -74,15 +74,17 @@ PVarHandler::PVarHandler(PmuppCollection *coll, std::string parse_str, std::stri
         dataErr = getDataErr(i);
         prog.add_predef_var_values(getVarName(i), data, dataErr);
       }
-      mupp::prog::PProgEval eval(prog.getVars()); // setup evaluation stage
-      eval(fAst); // evaluate stuff
+      if (!fVarName.empty()) {
+        mupp::prog::PProgEval eval(prog.getVars()); // setup evaluation stage
+        eval(fAst); // evaluate stuff
 
-      // keep data
-      bool ok;
-      fVar = eval.getVar(fVarName, ok);
-      if (!ok) {
-        std::cerr << "**ERROR** evalution failed..." << std::endl;
-        fIsValid = false;
+        // keep data
+        bool ok;
+        fVar = eval.getVar(fVarName, ok);
+        if (!ok) {
+          std::cerr << "**ERROR** evalution failed..." << std::endl;
+          fIsValid = false;
+        }
       }
     }
     fIsValid = true;

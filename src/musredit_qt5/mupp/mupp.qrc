@@ -4,6 +4,8 @@
     <file>icons/mupp-dark.svg</file>
     <file>icons/document-open-plain.svg</file>
     <file>icons/document-open-dark.svg</file>
+    <file>icons/varEdit-plain.svg</file>
+    <file>icons/varEdit-dark.svg</file>
     <file>icons/mupp.icns</file>
     <file>mupp_startup.xml.in</file>
   </qresource>

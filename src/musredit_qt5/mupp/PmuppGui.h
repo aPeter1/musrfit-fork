@@ -45,11 +45,13 @@
 #include <QEvent>
 #include <QProcess>
 
+#include "PVarHandler.h"
+#include "PVarDialog.h"
 #include "PmuppAdmin.h"
 #include "Pmupp.h"
 #include "mupp.h"
 
-//----------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 class PmuppXY
 {
 public:
@@ -78,7 +80,7 @@ private:
   void init();
 };
 
-//----------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 // Layout Scheme of PmuppGui:
 // |--------------------------------------------------------------------|
 // | Main                                                               |
@@ -96,9 +98,11 @@ private:
 // | |----------------------------------------------------------------| |
 // ----------------------------------------------------------------------
 //
-// Grid Left  contains: fColLabel, fColParamSplitter, fRemoveCollection, fRefreshCollection
-// Grid Right contains: f(X,Y)axisLabel, fView(X,Y), fAdd(X,Y), fRemove(X,Y), fAddDitto, fPlot
-//----------------------------------------------------------------------------------------------
+// Grid Left  contains: fColLabel, fColParamSplitter,
+//                      fRemoveCollection, fRefreshCollection
+// Grid Right contains: f(X,Y)axisLabel, fView(X,Y), fAdd(X,Y), fRemove(X,Y),
+//                      fAddDitto, fPlot
+//-----------------------------------------------------------------------------
 class PmuppGui : public QMainWindow
 {
   Q_OBJECT
@@ -115,8 +119,8 @@ public slots:
 
   void toolDumpCollections();
   void toolDumpXY();
+  void addVar();
   void normalize();
-  void normVal();
 
   void helpCmds();
   void helpAbout();
@@ -132,13 +136,13 @@ private:
   bool fDarkTheme;
   bool fDarkToolBarIcon;
   bool fNormalize;
-  double fNormVal;
 
   uint fDatime;
   uint fMuppInstance;
 
   PParamDataHandler *fParamDataHandler;
   QVector<PmuppXY> fXY;
+  QVector<PVarHandler> fVarHandler;
 
   QString fMacroPath;
   QString fMacroName;
@@ -178,6 +182,8 @@ private:
 
   QVector<QString> fCmdHistory;
 
+  PVarDialog *fVarDlg;
+
   QProcess *fMuppPlot;
 
   void setupFileActions();
@@ -198,34 +204,37 @@ private:
   void selectCollection(QString cmd);
   uint getFirstAvailableMuppInstance();
 
-private slots:
-  void refresh();
-  void remove();
-  void addX(QString param="");
-  void addY(QString param="");
-  void removeX(QString param="");
-  void removeY(QString param="");
-  void addDitto();
-  void createMacro();
-  void plot();
-  void handleCmds();
-
-  void handleNewData();
   void updateCollectionList();
-  void updateParamList(int currentRow);
   void updateXYList(int idx);
   void updateXYListGui();
-  void editCollName(QListWidgetItem *item);
-  void dropOnViewX(QListWidgetItem *item);
-  void dropOnViewY(QListWidgetItem *item);
-  void refreshY();
-
   bool findValue(PmuppRun &run, EAxis tag);
   bool allXYEqual();
   bool indexAlreadyPresent(int idx);
   void replaceIndex(PmuppXY &data, const int idx);
 
   void startMuppPlot();
+
+private slots:
+  void addDitto();
+  void addX(QString param="");
+  void addY(QString param="");
+  void createMacro();
+  void handleCmds();
+  void plot();
+  void refresh();
+  void remove();
+  void removeX(QString param="");
+  void removeY(QString param="");
+
+  void handleNewData();
+  void updateParamList(int currentRow);
+  void editCollName(QListWidgetItem *item);
+  void dropOnViewX(QListWidgetItem *item);
+  void dropOnViewY(QListWidgetItem *item);
+  void refreshY();
+
+  void check(QString varStr, QVector<int> idx);
+  void add(QString varStr, QVector<int> idx);
 };
 
 #endif // _PMUPPGUI_H_

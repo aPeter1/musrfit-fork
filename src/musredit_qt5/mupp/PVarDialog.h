@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  PGetNormValDialog.h
+  PVarDialog.h
 
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
@@ -27,28 +27,66 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-#ifndef _PGETNORMVALDIALOG_H_
-#define _PGETNORMVALDIALOG_H_
+#ifndef _PVARDIALOG_H_
+#define _PVARDIALOG_H_
 
 #include <QDialog>
-#include <QLineEdit>
+#include <QPushButton>
+#include <QPlainTextEdit>
+#include <QListWidget>
+#include <QVector>
 
-class PGetNormValDialog : public QDialog
+//-----------------------------------------------------------------------------
+struct PCollInfo
+{
+  QString fCollName;
+  QStringList fVarName;
+};
+
+//-----------------------------------------------------------------------------
+class PShowVarNameDialog : public QDialog
 {
   Q_OBJECT
 
   public:
-    PGetNormValDialog(double dval, QWidget *parent = 0, Qt::WindowFlags f = 0);
-    virtual ~PGetNormValDialog() {}
-
-    virtual double getValue() { return fValue; }
-
-  private:
-    double fValue;
-    QLineEdit *fEdit;
-
-  private slots:
-    virtual void gotValue(const QString& str);
+    PShowVarNameDialog(PCollInfo &info);
 };
 
-#endif // _PGETNORMVALDIALOG_H_
+//-----------------------------------------------------------------------------
+class PVarDialog : public QDialog
+{
+  Q_OBJECT
+
+  public:
+    PVarDialog(QVector<PCollInfo> collection_list, bool darkTheme,
+               QWidget *parent = nullptr,
+               Qt::WindowFlags f = Qt::WindowFlags());
+
+  private:
+    QPlainTextEdit *fVarEdit;
+    QListWidget *fCollectionView;
+    QPushButton *fCancel;
+    QPushButton *fAdd;
+    QPushButton *fCheck;
+    QPushButton *fHelp;
+    QPushButton *fShowVarName;
+
+    QVector<PCollInfo> fCollList;
+
+    bool basic_check();
+    bool var_consistency_check();
+    QStringList collectVarNames(QStringList &list, bool& ok);
+    bool hasErrorDef(QStringList &varNames, QString& name);
+
+  private slots:
+    void check();
+    void add();
+    void help();
+    void showVarNames();
+
+  signals:
+    void check_request(QString varStr, QVector<int> idx);
+    void add_request(QString varStr, QVector<int> idx);
+};
+
+#endif // _PVARDIALOG_H_
