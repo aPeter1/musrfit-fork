@@ -44,7 +44,7 @@
 
 //------------------------------------------------------------------------
 /**
- * @brief mupp_script_syntax
+ * <p>mupp script help.
  */
 void mupp_script_syntax()
 {
@@ -84,7 +84,7 @@ void mupp_script_syntax()
 
 //------------------------------------------------------------------------
 /**
- * @brief mupp_syntax
+ * <p>mupp syntax help.
  */
 void mupp_syntax()
 {
@@ -103,10 +103,12 @@ void mupp_syntax()
 
 //------------------------------------------------------------------------
 /**
- * @brief mupp_scrript_read
- * @param fln
- * @param list
- * @return
+ * <p>Reads a mupp script and feeds its content to list.
+ *
+ * @param fln mupp script file name
+ * @param list content of the mupp script
+ *
+ * @return 0 if success, otherwise -1
  */
 int mupp_script_read(const char *fln, QStringList &list)
 {
@@ -149,9 +151,11 @@ int mupp_script_read(const char *fln, QStringList &list)
 
 //------------------------------------------------------------------------
 /**
- * @brief mupp_bash_variable_exists
- * @param str
- * @return
+ * <p>check if a bash environment variable exists.
+ *
+ * @param str name of bash variable to be checked.
+ *
+ * @return true if the bash variable exists, false otherwise.
  */
 bool mupp_bash_variable_exists(const QString str)
 {
@@ -168,9 +172,11 @@ bool mupp_bash_variable_exists(const QString str)
 
 //------------------------------------------------------------------------
 /**
- * @brief mupp_script_syntax_check
- * @param list
- * @return
+ * <p>checks the mupp script syntax.
+ *
+ * @param list mupp script content.
+ *
+ * @return 0 on success, negative numbers otherwise.
  */
 int mupp_script_syntax_check(QStringList &list)
 {
@@ -428,11 +434,14 @@ int mupp_script_syntax_check(QStringList &list)
 
 //------------------------------------------------------------------------
 /**
- * @brief createApplication
+ * <p>Depending on whether a script or gui application is wished, select
+ * the proper Qt application class.
+ *
  * @param argc
  * @param argv
- * @param gui
- * @return
+ * @param gui if true, the gui is wanted, otherwise the script is called.
+ *
+ * @return the request qt application
  */
 QCoreApplication* createApplication(int &argc, char *argv[], bool gui)
 {
@@ -444,10 +453,15 @@ QCoreApplication* createApplication(int &argc, char *argv[], bool gui)
 
 //------------------------------------------------------------------------
 /**
- * @brief main
+ * <p>Main mupp application. mupp stands for muon parameter plotter. It allows
+ * to plot the parameters of db- or dat-files. The typical use case is e.g.
+ * plotting parameters of muSR fits as function of temperature, pressure,
+ * energy, etc.
+ *
  * @param argc
  * @param argv
- * @return
+ *
+ * @return return value of the Qt application
  */
 int main(int argc, char *argv[])
 {

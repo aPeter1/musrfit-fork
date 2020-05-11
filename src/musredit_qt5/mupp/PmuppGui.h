@@ -52,6 +52,9 @@
 #include "mupp.h"
 
 //-----------------------------------------------------------------------------
+/**
+ * @brief The PmuppXY class.
+ */
 class PmuppXY
 {
 public:
@@ -93,6 +96,8 @@ private:
 // | | |----------------------------| |-----------------------------| | |
 // | |----------------------------------------------------------------| |
 // |                                                                    |
+// | |----------------------------------------------------------------| |
+// | | History                                                        | |
 // | |----------------------------------------------------------------| |
 // | | Cmd                                                            | |
 // | |----------------------------------------------------------------| |
@@ -180,11 +185,11 @@ private:
   QLineEdit   *fCmdLine;
   QPushButton *fExitButton;
 
-  QVector<QString> fCmdHistory;
+  QVector<QString> fCmdHistory; ///< command history buffer
 
-  PVarDialog *fVarDlg;
+  PVarDialog *fVarDlg; ///< variable dialog
 
-  QProcess *fMuppPlot;
+  QProcess *fMuppPlot; ///< mupp plotter
 
   void setupFileActions();
   void setupToolActions();

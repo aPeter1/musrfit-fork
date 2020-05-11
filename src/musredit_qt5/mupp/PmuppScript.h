@@ -37,12 +37,18 @@
 #include "Pmupp.h"
 #include "PVarHandler.h"
 
+//----------------------------------------------------------------------------
 typedef struct {
-  int collIdx;
-  QString xLabel;
-  QVector<QString> yLabel;
+  int collIdx; ///< collection index
+  QString xLabel; ///< x-axis label
+  QVector<QString> yLabel; ///< y-axis label(s)
 } PmuppPlotEntry;
 
+//----------------------------------------------------------------------------
+/**
+ * @brief The PmuppScript class. mupp script class which is used as a scripting
+ * interface for mupp.
+ */
 class PmuppScript : public QObject
 {
   Q_OBJECT
@@ -73,20 +79,20 @@ class PmuppScript : public QObject
     void finished();
 
   private:
-    PmuppAdmin *fAdmin;
+    PmuppAdmin *fAdmin; ///< admin object
 
-    QStringList fScript;
-    PParamDataHandler *fParamDataHandler;
+    QStringList fScript; ///< script source
+    PParamDataHandler *fParamDataHandler; ///< parameter data handler
     int fSelected; ///< -2=nothing selected, -1=all selected, >=0 is the index if the selected collection
 
-    PmuppPlotEntry fPlotEntry;
-    QVector<PmuppPlotEntry> fPlotInfo;
+    PmuppPlotEntry fPlotEntry; ///< plot entry object
+    QVector<PmuppPlotEntry> fPlotInfo; ///< vector of all plot entry objects
 
-    bool fNorm;
-    QString fLoadPath;
-    QString fSavePath;
+    bool fNorm; ///< normalization flag, true -> normalize y-data before plotting.
+    QString fLoadPath; ///< load path specifying where to look for data.
+    QString fSavePath; ///< save path specifying where to save data.
 
-    QVector<PVarHandler> fVarHandler;
+    QVector<PVarHandler> fVarHandler; ///< variable handler vector
 
     bool foundLabel(PmuppCollection *coll, const QString label);
     bool foundVariable(const QString var);

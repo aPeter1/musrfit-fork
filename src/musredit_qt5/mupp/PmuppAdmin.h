@@ -42,7 +42,8 @@ class PmuppAdmin;
 
 //---------------------------------------------------------------------------
 /**
- * @brief The PmuppColor class
+ * @brief The PmuppColor class. Contains to colors read from the xml-startup
+ * which are used for the plotted data.
  */
 class PmuppColor {
   public:
@@ -64,7 +65,8 @@ class PmuppColor {
 
 //---------------------------------------------------------------------------
 /**
- * @brief The PmuppMarker class
+ * @brief The PmuppMarker class. List of the markers used in the plotter. Read
+ * from the xml-startup.
  */
 class PmuppMarker {
   public:

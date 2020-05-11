@@ -54,7 +54,7 @@
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /**
- * @brief PmuppParam::PmuppParam
+ * @brief PmuppParam::PmuppParam. Ctor
  */
 PmuppParam::PmuppParam() {
   ResetParam();
@@ -62,10 +62,10 @@ PmuppParam::PmuppParam() {
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppParam::PmuppParam
- * @param name
- * @param param
- * @param posErr
+ * @brief PmuppParam::PmuppParam. Ctor
+ * @param name parameter name
+ * @param param parameter value
+ * @param posErr parameter error
  */
 PmuppParam::PmuppParam(QString name, double param, double posErr)
 {
@@ -74,11 +74,11 @@ PmuppParam::PmuppParam(QString name, double param, double posErr)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppParam::PmuppParam
- * @param name
- * @param param
- * @param posErr
- * @param negErr
+ * @brief PmuppParam::PmuppParam. Ctor
+ * @param name parameter name
+ * @param param parameter value
+ * @param posErr positive parameter error
+ * @param negErr negative parameter error
  */
 PmuppParam::PmuppParam(QString name, double param, double posErr, double negErr)
 {
@@ -87,7 +87,7 @@ PmuppParam::PmuppParam(QString name, double param, double posErr, double negErr)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppParam::ResetParam
+ * @brief PmuppParam::ResetParam. Reset the parameter values
  */
 void PmuppParam::ResetParam()
 {
@@ -99,10 +99,10 @@ void PmuppParam::ResetParam()
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppParam::SetParam
- * @param name
- * @param param
- * @param posErr
+ * @brief PmuppParam::SetParam. Set a parameter
+ * @param name parameter name
+ * @param param parameter value
+ * @param posErr parameter error
  */
 void PmuppParam::SetParam(QString name, double param, double posErr)
 {
@@ -113,11 +113,11 @@ void PmuppParam::SetParam(QString name, double param, double posErr)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppParam::SetParam
- * @param name
- * @param param
- * @param posErr
- * @param negErr
+ * @brief PmuppParam::SetParam. Set a parameter
+ * @param name parameter name
+ * @param param parameter value
+ * @param posErr positive parameter value
+ * @param negErr negative parameter value
  */
 void PmuppParam::SetParam(QString name, double param, double posErr, double negErr)
 {
@@ -129,9 +129,9 @@ void PmuppParam::SetParam(QString name, double param, double posErr, double negE
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /**
- * @brief PmuppRun::GetParam
- * @param idx
- * @return
+ * @brief PmuppRun::GetParam. Get a parameter from a run
+ * @param idx index of the parameter
+ * @return the parameter value
  */
 PmuppParam PmuppRun::GetParam(unsigned int idx)
 {
@@ -145,9 +145,9 @@ PmuppParam PmuppRun::GetParam(unsigned int idx)
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /**
- * @brief PmuppCollection::GetRun
- * @param idx
- * @return
+ * @brief PmuppCollection::GetRun. Returns a run from a collection.
+ * @param idx of the run in a collection
+ * @return a run from a collection
  */
 PmuppRun PmuppCollection::GetRun(unsigned int idx)
 {
@@ -161,8 +161,9 @@ PmuppRun PmuppCollection::GetRun(unsigned int idx)
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /**
- * @brief PParamDataHandler::NewCollection
- * @param name
+ * @brief PParamDataHandler::NewCollection. Adds an empty new collection with
+ * name 'name'.
+ * @param name of the new collection
  */
 void PParamDataHandler::NewCollection(const QString name)
 {
@@ -174,15 +175,20 @@ void PParamDataHandler::NewCollection(const QString name)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::analyzeFileList
- * @param fln
- * @param collectionName
- * @param arg
- * @param workDir
- * @param errorMsg
- * @return
+ * @brief PParamDataHandler::analyzeFileList. In case the input is given by
+ * msr-files, the structure of the file names needs to be analyzed that
+ * msr2data can be called.
+ *
+ * @param fln list of msr-files to be analyzed.
+ * @param collectionName output collection name (db-/dat-file).
+ * @param arg argument list which is needed to feed msr2data
+ * @param workDir working directory
+ * @param errorMsg error message in case something went wrong.
+ *
+ * @return true if successful, false otherwise
  */
-bool PParamDataHandler::analyzeFileList(const QStringList &fln, QString &collectionName, QStringList &arg, QString &workDir, QString &errorMsg)
+bool PParamDataHandler::analyzeFileList(const QStringList &fln, QString &collectionName,
+                                        QStringList &arg, QString &workDir, QString &errorMsg)
 {
   // 1) check all the msr-files have the same structure: <runNo><extension>.msr with <extension> the same
   //    for all msr-files present.
@@ -253,10 +259,11 @@ bool PParamDataHandler::analyzeFileList(const QStringList &fln, QString &collect
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::ReadParamFile
- * @param fln
- * @param errorMsg
- * @return
+ * @brief PParamDataHandler::ReadParamFile. Reads a msr-file.
+ * @param fln file name of the msr-file to be read
+ * @param errorMsg error message in case reading fails.
+ *
+ * @return true on success, otherwise false.
  */
 bool PParamDataHandler::ReadParamFile(const QStringList fln, QString &errorMsg)
 {
@@ -385,11 +392,12 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln, QString &errorMsg)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::ReadDbFile
- * @param fln
- * @param valid
- * @param errorMsg
- * @return
+ * @brief PParamDataHandler::ReadDbFile. Reads a db-file.
+ * @param fln file name of the db-file
+ * @param valid true on success, otherwise false
+ * @param errorMsg error messages in case read fails
+ *
+ * @return the collection object containing the db-file on success.
  */
 PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QString &errorMsg)
 {
@@ -541,11 +549,12 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QS
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::ReadColumnParamFile
- * @param fln
- * @param valid
- * @param errorMsg
- * @return
+ * @brief PParamDataHandler::ReadColumnParamFile. Reads a dat-file
+ * @param fln file name of the dat-file to be read
+ * @param valid true on success, false otherwise.
+ * @param errorMsg error message in case read fails.
+ *
+ * @return the collection object containing the dat-file on success.
  */
 PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &valid, QString &errorMsg)
 {
@@ -677,10 +686,12 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::GetCollection
- * @param idx
- * @param valid
- * @return
+ * @brief PParamDataHandler::GetCollection. Get a single collection from all
+ * the loaded collections
+ * @param idx of the collection
+ * @param valid true if collection is found
+ *
+ * @return requested collection on success.
  */
 PmuppCollection PParamDataHandler::GetCollection(const int idx, bool &valid)
 {
@@ -697,14 +708,16 @@ PmuppCollection PParamDataHandler::GetCollection(const int idx, bool &valid)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::GetCollection
- * @param idx
- * @return
+ * @brief PParamDataHandler::GetCollection. Get a pointer of the requested
+ * collection.
+ * @param idx of the collection
+ *
+ * @return requested pointer to the collection on success.
  */
 PmuppCollection *PParamDataHandler::GetCollection(const int idx)
 {
   if ((idx<0) || (idx>=fCollection.size())) {
-    return 0;
+    return nullptr;
   }
 
   return &fCollection[idx];
@@ -712,10 +725,11 @@ PmuppCollection *PParamDataHandler::GetCollection(const int idx)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::GetCollection
- * @param name
- * @param valid
- * @return
+ * @brief PParamDataHandler::GetCollection. Get collection by name.
+ * @param name of the requested collection
+ * @param valid true if found
+ *
+ * @return requested collection on success.
  */
 PmuppCollection PParamDataHandler::GetCollection(const QString name, bool &valid)
 {
@@ -740,9 +754,10 @@ PmuppCollection PParamDataHandler::GetCollection(const QString name, bool &valid
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::GetCollection
- * @param name
- * @return
+ * @brief PParamDataHandler::GetCollection. Get collection pointer by name.
+ * @param name of the requested collection
+ *
+ * @return pointer of the requested collection on success, nullptr otherwise
  */
 PmuppCollection *PParamDataHandler::GetCollection(const QString name)
 {
@@ -755,7 +770,7 @@ PmuppCollection *PParamDataHandler::GetCollection(const QString name)
   }
 
   if (idx==-1) { // not found
-    return 0;
+    return nullptr;
   }
 
   return &fCollection[idx];
@@ -763,9 +778,11 @@ PmuppCollection *PParamDataHandler::GetCollection(const QString name)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::GetCollectionIndex
- * @param name
- * @return
+ * @brief PParamDataHandler::GetCollectionIndex. Get the collection index of
+ * a given collection name.
+ * @param name of the requested collection
+ *
+ * @return index of the requested collection on success, otherwise -1.
  */
 int PParamDataHandler::GetCollectionIndex(const QString name)
 {
@@ -799,10 +816,13 @@ QString PParamDataHandler::GetCollectionName(const int idx)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::GetValues
- * @param collName
- * @param paramName
- * @return
+ * @brief PParamDataHandler::GetValues. Get the data values of a parameter of
+ * a requested collection.
+ * @param collName name of the collection
+ * @param paramName parameter name
+ *
+ * @return data values of the requested parameter name of the collection collName.
+ *         Empty data vector otherwise.
  */
 QVector<double> PParamDataHandler::GetValues(QString collName, QString paramName)
 {
@@ -842,10 +862,13 @@ QVector<double> PParamDataHandler::GetValues(QString collName, QString paramName
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::GetPosErr
- * @param collName
- * @param paramName
- * @return
+ * @brief PParamDataHandler::GetPosErr. Get the positive data error values of
+ * a parameter of a requested collection.
+ * @param collName name of the requested collection
+ * @param paramName parameter name
+ *
+ * @return positive error values of the requested parameter name of the
+ *         collection collName. Empty positive error vector otherwise.
  */
 QVector<double> PParamDataHandler::GetPosErr(QString collName, QString paramName)
 {
@@ -885,10 +908,13 @@ QVector<double> PParamDataHandler::GetPosErr(QString collName, QString paramName
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::GetNegErr
- * @param collName
- * @param paramName
- * @return
+ * @brief PParamDataHandler::GetNegErr. Get the negative data error values of
+ * a parameter of a requested collection.
+ * @param collName name of the requested collection
+ * @param paramName parameter name
+ *
+ * @return negative error values of the requested parameter name of the
+ *         collection collName. Empty negative error vector otherwise.
  */
 QVector<double> PParamDataHandler::GetNegErr(QString collName, QString paramName)
 {
@@ -928,8 +954,9 @@ QVector<double> PParamDataHandler::GetNegErr(QString collName, QString paramName
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::RemoveCollection
- * @param name
+ * @brief PParamDataHandler::RemoveCollection. Remove a collection from the
+ * data handler.
+ * @param name of the collection to be removed.
  */
 void PParamDataHandler::RemoveCollection(QString name)
 {
@@ -943,9 +970,10 @@ void PParamDataHandler::RemoveCollection(QString name)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::ReplaceCollection
- * @param coll
- * @param idx
+ * @brief PParamDataHandler::ReplaceCollection. Replaces a collection at index
+ * position idx.
+ * @param coll collection
+ * @param idx index of the collection to be replaced
  */
 void PParamDataHandler::ReplaceCollection(PmuppCollection coll, int idx)
 {
@@ -957,7 +985,7 @@ void PParamDataHandler::ReplaceCollection(PmuppCollection coll, int idx)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PParamDataHandler::Dump
+ * @brief PParamDataHandler::Dump. Dumps the collection onto stdout
  */
 void PParamDataHandler::Dump()
 {

@@ -38,6 +38,11 @@
 
 #define MUPP_UNDEF 1.0e99
 
+//----------------------------------------------------------------------------
+/**
+ * <p>The PmuppParam class. It handles a single parameter: name, value,
+ * positive- and negative error.
+ */
 class PmuppParam {
   public:
     PmuppParam();
@@ -58,12 +63,16 @@ class PmuppParam {
     double GetNegErr() { return fNegErr; }
 
   private:
-    QString fName;
-    double fValue;
-    double fPosErr;
-    double fNegErr;
+    QString fName; ///< parameter name
+    double fValue; ///< parameter value
+    double fPosErr; ///< positive error of the parameter
+    double fNegErr; ///< negative error of the parameter
 };
 
+//----------------------------------------------------------------------------
+/**
+ * <p>The PmuppRun class. Contains all the parameters of a single run.
+ */
 class PmuppRun {
   public:
     PmuppRun() { fNumber = -1; fName=""; fParam.clear(); }
@@ -81,10 +90,15 @@ class PmuppRun {
 
   private:
     int fNumber; ///< run number
-    QString fName;
-    QVector<PmuppParam> fParam;
+    QString fName; ///< name of the run
+    QVector<PmuppParam> fParam; ///< parameters of the run
 };
 
+//----------------------------------------------------------------------------
+/**
+ * <p>The PmuppCollection class. Is collecting a number of runs. Typically
+ * something like a full temperature scan, an energy scan, etc.
+ */
 class PmuppCollection {
   public:
     PmuppCollection() { fPathName=""; fName = ""; fRun.clear(); }
@@ -99,11 +113,16 @@ class PmuppCollection {
     PmuppRun GetRun(unsigned int idx);
 
   private:
-    QString fPathName;
-    QString fName;
-    QVector<PmuppRun> fRun;
+    QString fPathName; ///< path-name of the collection
+    QString fName; ///< name of the collection
+    QVector<PmuppRun> fRun; ///< all the runs in the collection
 };
 
+//----------------------------------------------------------------------------
+/**
+ * <p>The PParamDataHandler class. This class handles all the collections
+ * loaded.
+ */
 class PParamDataHandler : public QObject {
   Q_OBJECT
 
@@ -137,10 +156,11 @@ class PParamDataHandler : public QObject {
     void newData();
 
   private:
-    QProcess *fProc;
-    QVector<PmuppCollection> fCollection;
+    QProcess *fProc; ///< this will be needed if msr2data needs to be called
+    QVector<PmuppCollection> fCollection; ///< all the collections handeled
 
-    bool analyzeFileList(const QStringList &fln, QString &collectionName, QStringList &arg, QString &workDir, QString &errorMsg);
+    bool analyzeFileList(const QStringList &fln, QString &collectionName,
+                         QStringList &arg, QString &workDir, QString &errorMsg);
 
   private slots:
     void readFromStdOut();

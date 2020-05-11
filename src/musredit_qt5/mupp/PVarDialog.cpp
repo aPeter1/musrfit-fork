@@ -40,6 +40,10 @@
 #include "PVarDialog.h"
 
 //--------------------------------------------------------------------------
+/**
+ * @brief PShowVarNameDialog::PShowVarNameDialog. Ctor
+ * @param info containing the necessary information of the collection
+ */
 PShowVarNameDialog::PShowVarNameDialog(PCollInfo &info)
 {
   // if fCollName is a path name, extract the fln
@@ -80,6 +84,14 @@ PShowVarNameDialog::PShowVarNameDialog(PCollInfo &info)
 }
 
 //--------------------------------------------------------------------------
+/**
+ * @brief PVarDialog::PVarDialog. Variable GUI allowing the users to define
+ * variables.
+ * @param collection_list list of all the collections
+ * @param darkTheme plain/dark theme flag
+ * @param parent parent widget pointer
+ * @param f window flag
+ */
 PVarDialog::PVarDialog(QVector<PCollInfo> collection_list, bool darkTheme,
                        QWidget *parent, Qt::WindowFlags f) :
   QDialog(parent, f), fCollList(collection_list)
@@ -152,6 +164,9 @@ PVarDialog::PVarDialog(QVector<PCollInfo> collection_list, bool darkTheme,
 }
 
 //--------------------------------------------------------------------------
+/**
+ * @brief PVarDialog::check. Allows the user to check the variable string.
+ */
 void PVarDialog::check()
 {
   if (!basic_check())
@@ -170,6 +185,9 @@ void PVarDialog::check()
 }
 
 //--------------------------------------------------------------------------
+/**
+ * @brief PVarDialog::add. It is used to initiate the add variable to the mupp GUI.
+ */
 void PVarDialog::add()
 {
   if (fVarEdit->toPlainText().isEmpty()) {
@@ -198,12 +216,19 @@ void PVarDialog::add()
 }
 
 //--------------------------------------------------------------------------
+/**
+ * @brief PVarDialog::help
+ */
 void PVarDialog::help()
 {
   QMessageBox::information(this, "Var Help", "Syntax: var <var_name> = <expr>.\n<expr> can contain identifiers defined in the collections.\nExample:\nvar sigSC = pow(abs(pow($sigma,2.0)-pow(0.11,2.0)),0.5)");
 }
 
 //--------------------------------------------------------------------------
+/**
+ * @brief PVarDialog::showVarNames. Show a variable name dialog for a given
+ * selected collection.
+ */
 void PVarDialog::showVarNames()
 {
   // get the selected collection
@@ -229,6 +254,11 @@ void PVarDialog::showVarNames()
 }
 
 //--------------------------------------------------------------------------
+/**
+ * @brief PVarDialog::basic_check. Carry out basic checks before feeding it
+ * to the parser.
+ * @return true on success
+ */
 bool PVarDialog::basic_check()
 {
   QString varStr = fVarEdit->toPlainText();
@@ -275,6 +305,12 @@ bool PVarDialog::basic_check()
 }
 
 //--------------------------------------------------------------------------
+/**
+ * @brief PVarDialog::var_consistency_check. Variable consistency checks. For
+ * instance it is checked that for each variable there is also the corresponding
+ * error variable defined.
+ * @return true on success
+ */
 bool PVarDialog::var_consistency_check()
 {
   QString varStr = fVarEdit->toPlainText();
@@ -360,6 +396,12 @@ bool PVarDialog::var_consistency_check()
 }
 
 //--------------------------------------------------------------------------
+/**
+ * @brief PVarDialog::collectVarNames. Collect variable names from edit variable.
+ * @param list input list
+ * @param ok true if ok
+ * @return return variable list
+ */
 QStringList PVarDialog::collectVarNames(QStringList &list, bool &ok)
 {
   QStringList name;
@@ -380,6 +422,12 @@ QStringList PVarDialog::collectVarNames(QStringList &list, bool &ok)
 }
 
 //--------------------------------------------------------------------------
+/**
+ * @brief PVarDialog::hasErrorDef. Check for error definition
+ * @param varNames variable name list
+ * @param name failed variable name
+ * @return true on success
+ */
 bool PVarDialog::hasErrorDef(QStringList &varNames, QString &name)
 {
   QString errStr;

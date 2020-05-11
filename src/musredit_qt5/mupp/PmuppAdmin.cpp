@@ -47,7 +47,7 @@
 // implementation of PmuppColor class
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppColor::PmuppColor
+ * @brief PmuppColor::PmuppColor. Ctor
  */
 PmuppColor::PmuppColor()
 {
@@ -59,10 +59,10 @@ PmuppColor::PmuppColor()
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppColor::setRGB
- * @param r
- * @param g
- * @param b
+ * @brief PmuppColor::setRGB. set RGB value
+ * @param r red (0..255)
+ * @param g green (0..255)
+ * @param b blue (0..255)
  */
 void PmuppColor::setRGB(const int r, const int g, const int b)
 {
@@ -366,9 +366,12 @@ void PmuppAdmin::addRecentFile(const QString str)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppAdmin::getRecentFile
+ * @brief PmuppAdmin::getRecentFile. Get a file from the recent files with
+ * index idx.
  * @param idx
- * @return
+ *
+ * @return return the recent file with index idx if present, otherwise return
+ * an empty string.
  */
 QString PmuppAdmin::getRecentFile(int idx)
 {
@@ -382,9 +385,10 @@ QString PmuppAdmin::getRecentFile(int idx)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppAdmin::getMarker
- * @param idx
- * @return
+ * @brief PmuppAdmin::getMarker. Get the marker with index idx.
+ * @param idx marker index
+ *
+ * @return requested marker
  */
 PmuppMarker PmuppAdmin::getMarker(int idx) {
   PmuppMarker marker;
@@ -397,11 +401,11 @@ PmuppMarker PmuppAdmin::getMarker(int idx) {
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppAdmin::getColor
- * @param name
- * @param r
- * @param g
- * @param b
+ * @brief PmuppAdmin::getColor. Get rgb color codes of name
+ * @param name of the requeset color.
+ * @param r red value (0..255)
+ * @param g green value (0..255)
+ * @param b blue value (0..255
  */
 void PmuppAdmin::getColor(QString name, int &r, int &g, int &b)
 {
@@ -424,11 +428,11 @@ void PmuppAdmin::getColor(QString name, int &r, int &g, int &b)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppAdmin::getColor
- * @param idx
- * @param r
- * @param g
- * @param b
+ * @brief PmuppAdmin::getColor. Get color codes of color at index idx
+ * @param idx requested color index
+ * @param r red value (0..255)
+ * @param g green value (0..255)
+ * @param b blue value (0..255)
  */
 void PmuppAdmin::getColor(int idx, int &r, int &g, int &b)
 {
@@ -443,9 +447,9 @@ void PmuppAdmin::getColor(int idx, int &r, int &g, int &b)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppAdmin::setMaker
- * @param marker
- * @param size
+ * @brief PmuppAdmin::setMaker. Set a marker
+ * @param marker marker code
+ * @param size marker size
  */
 void PmuppAdmin::setMarker(int marker, double size)
 {
@@ -464,11 +468,11 @@ void PmuppAdmin::setMarker(int marker, double size)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppAdmin::setColor
- * @param r
- * @param g
- * @param b
- * @param name
+ * @brief PmuppAdmin::setColor. Set a color
+ * @param r red value (0..255)
+ * @param g green value (0..255)
+ * @param b blue value (0..255)
+ * @param name color name
  */
 void PmuppAdmin::setColor(int r, int g, int b, QString name)
 {
@@ -558,7 +562,8 @@ void PmuppAdmin::saveRecentFiles()
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppAdmin::createMuppStartupFile
+ * @brief PmuppAdmin::createMuppStartupFile. Create a default mupp_startup.xml
+ * file if not present.
  */
 void PmuppAdmin::createMuppStartupFile()
 {

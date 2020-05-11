@@ -37,13 +37,20 @@
 #include <QVector>
 
 //-----------------------------------------------------------------------------
+/**
+ * @brief The PCollInfo struct
+ */
 struct PCollInfo
 {
-  QString fCollName;
-  QStringList fVarName;
+  QString fCollName; ///< collection name
+  QStringList fVarName; ///< variable names of the given collection
 };
 
 //-----------------------------------------------------------------------------
+/**
+ * @brief The PShowVarNameDialog class. Class used to create a show variable
+ * name dialog.
+ */
 class PShowVarNameDialog : public QDialog
 {
   Q_OBJECT
@@ -53,6 +60,9 @@ class PShowVarNameDialog : public QDialog
 };
 
 //-----------------------------------------------------------------------------
+/**
+ * @brief The PVarDialog class
+ */
 class PVarDialog : public QDialog
 {
   Q_OBJECT

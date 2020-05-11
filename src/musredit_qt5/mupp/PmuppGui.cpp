@@ -62,7 +62,7 @@
 
 //----------------------------------------------------------------------------------------------------
 /**
- * @brief PmuppXY::init
+ * @brief PmuppXY::init the xy object
  */
 void PmuppXY::init()
 {
@@ -71,11 +71,11 @@ void PmuppXY::init()
   fYlabel.clear();
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppXY::setYlabel
- * @param idx
- * @param str
+ * @brief PmuppXY::setYlabel. Set the y-label
+ * @param idx index of the y-label
+ * @param str name of the y-label
  */
 void PmuppXY::setYlabel(int idx, QString str)
 {
@@ -85,10 +85,10 @@ void PmuppXY::setYlabel(int idx, QString str)
   fYlabel[idx] = str;
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppXY::removeYlabel
- * @param idx
+ * @brief PmuppXY::removeYlabel. Remove the y-label at position idx.
+ * @param idx index of the y-label to be removed.
  */
 void PmuppXY::removeYlabel(int idx)
 {
@@ -98,10 +98,10 @@ void PmuppXY::removeYlabel(int idx)
   fYlabel.remove(idx);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppXY::removeYlabel
- * @param str
+ * @brief PmuppXY::removeYlabel. Remove the y-label with name str.
+ * @param str name of the y-label to be removed.
  */
 void PmuppXY::removeYlabel(QString str)
 {
@@ -113,11 +113,12 @@ void PmuppXY::removeYlabel(QString str)
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppXY::getYlabel
- * @param idx
- * @return
+ * @brief PmuppXY::getYlabel. Get the y-label with index idx
+ * @param idx index of the requested y-label.
+ *
+ * @return requested y-label if found, empty string otherwise.
  */
 QString PmuppXY::getYlabel(int idx)
 {
@@ -127,10 +128,10 @@ QString PmuppXY::getYlabel(int idx)
   return fYlabel[idx];
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppXY::getXlabelIdx
- * @return
+ * @brief PmuppXY::getXlabelIdx. Get the x-label index.
+ * @return x-label index if found, otherwise -1.
  */
 int PmuppXY::getXlabelIdx()
 {
@@ -157,11 +158,11 @@ int PmuppXY::getXlabelIdx()
   return idx;
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppXY::getYlabelIdx
- * @param idx
- * @return
+ * @brief PmuppXY::getYlabelIdx. Get y-label index of index idx.
+ * @param idx index of the y-label.
+ * @return y-label index on success, -1 otherwise.
  */
 int PmuppXY::getYlabelIdx(int idx)
 {
@@ -191,7 +192,7 @@ int PmuppXY::getYlabelIdx(int idx)
   return iidx;
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
  * <p>Constructor
  *
@@ -399,18 +400,19 @@ PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::~PmuppGui
+ * @brief PmuppGui::~PmuppGui. Dtor
  */
 PmuppGui::~PmuppGui()
 {
   // all relevant clean up job are done in ::aboutToQuit()
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::aboutToQuit
+ * @brief PmuppGui::aboutToQuit. Called when the GUI is going to close. Cleans
+ * up everything.
  */
 void PmuppGui::aboutToQuit()
 {
@@ -466,9 +468,9 @@ void PmuppGui::aboutToQuit()
   exit(0);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::setupFileActions
+ * @brief PmuppGui::setupFileActions. Setup the file action menus.
  */
 void PmuppGui::setupFileActions()
 {
@@ -514,9 +516,9 @@ void PmuppGui::setupFileActions()
   menu->addAction(a);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::setupToolActions
+ * @brief PmuppGui::setupToolActions. Setup the tools action menu.
  */
 void PmuppGui::setupToolActions()
 {
@@ -570,9 +572,9 @@ void PmuppGui::setupToolActions()
 */
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::setupHelpActions
+ * @brief PmuppGui::setupHelpActions. Setup the help actions menu.
  */
 void PmuppGui::setupHelpActions()
 {
@@ -603,17 +605,17 @@ void PmuppGui::setupHelpActions()
   menu->addAction(a);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::fileOpen
+ * @brief PmuppGui::fileOpen. Open muSR parameter files.
  */
 void PmuppGui::fileOpen()
 {
   QStringList list = QFileDialog::getOpenFileNames(
-                                      this,
-                                      "muSR Parameter Files",
-                                      "./",
-                                      "db-files (*.db);; All Params (*.msr *.db *.dat);; Msr-Files (*.msr);; dat-Files (*.dat);; All (*)");
+         this,
+         "muSR Parameter Files",
+         "./",
+         "db-files (*.db);; All Params (*.msr *.db *.dat);; Msr-Files (*.msr);; dat-Files (*.dat);; All (*)");
 
   if (list.count() == 0)
     return;
@@ -651,9 +653,9 @@ void PmuppGui::fileOpen()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::fileOpenRecent
+ * @brief PmuppGui::fileOpenRecent. Opens a selected recent file.
  */
 void PmuppGui::fileOpenRecent()
 {
@@ -670,18 +672,18 @@ void PmuppGui::fileOpenRecent()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::fileExit
+ * @brief PmuppGui::fileExit. Exit mupp
  */
 void PmuppGui::fileExit()
 {
   aboutToQuit();
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::toolDump
+ * @brief PmuppGui::toolDump. Dumps collection for debug purposes.
  */
 void PmuppGui::toolDumpCollections()
 {
@@ -692,7 +694,10 @@ void PmuppGui::toolDumpCollections()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::toolDumpXY. Dump XY objects for debug purposes.
+ */
 void PmuppGui::toolDumpXY()
 {
   if (fXY.size() > 0) {
@@ -708,15 +713,19 @@ void PmuppGui::toolDumpXY()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::normalize. SLOT called when menu Tools/Normalize is selected.
+ * Keeps the normalizer flag
+ */
 void PmuppGui::normalize()
 {
   fNormalize = fNormalizeAction->isChecked();
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::helpCmds
+ * @brief PmuppGui::helpCmds. help command information popup.
  */
 void PmuppGui::helpCmds()
 {
@@ -739,29 +748,30 @@ void PmuppGui::helpCmds()
                            "<b>flush:</b> flush the history buffer.");
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::helpAbout
+ * @brief PmuppGui::helpAbout. Help about message box.
  */
 void PmuppGui::helpAbout()
 {
   QMessageBox::information(this, "about", QString("mupp: created by Andreas Suter.\nVersion: %1\nBranch: %2\nHash: %3").arg(MUPP_VERSION).arg(GIT_BRANCH).arg(GIT_COMMIT_HASH));
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::helpAboutQt
+ * @brief PmuppGui::helpAboutQt. Qt about message box.
  */
 void PmuppGui::helpAboutQt()
 {
   QMessageBox::aboutQt(this);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::eventFilter
- * @param o
- * @param e
+ * @brief PmuppGui::eventFilter. Event filter for the history buffer.
+ * @param o object pointer
+ * @param e event pointer
+ *
  * @return
  */
 bool PmuppGui::eventFilter(QObject *o, QEvent *e)
@@ -805,14 +815,15 @@ bool PmuppGui::eventFilter(QObject *o, QEvent *e)
   return QMainWindow::eventFilter(o, e);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::getTheme
+ * @brief PmuppGui::getTheme. Tries to get the theme of the system.
  */
 void PmuppGui::getTheme()
 {
   fDarkTheme = false; // true if theme is dark
-  fDarkToolBarIcon = false; // needed for ubuntu dark since there the menu icons are dark, however the toolbar icons are plain!
+  fDarkToolBarIcon = false; // needed for ubuntu dark since there the menu icons
+                            // are dark, however the toolbar icons are plain!
 
   QString str = QIcon::themeName();
 
@@ -834,7 +845,7 @@ void PmuppGui::getTheme()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
  * <p>fill the recent file list in the menu.
  */
@@ -846,9 +857,10 @@ void PmuppGui::fillRecentFiles()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::readCmdHistory
+ * @brief PmuppGui::readCmdHistory. Read the command history from file
+ * mupp_history.txt under $HOME/.musrfit/mupp
  */
 void PmuppGui::readCmdHistory()
 {
@@ -880,7 +892,10 @@ void PmuppGui::readCmdHistory()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::writeCmdHistory. Write the command history buffer to file.
+ */
 void PmuppGui::writeCmdHistory()
 {
   QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
@@ -916,9 +931,9 @@ void PmuppGui::writeCmdHistory()
   file.close();
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::refresh
+ * @brief PmuppGui::refresh. Refresh the collections, i.e. re-read it from file.
  */
 void PmuppGui::refresh()
 {
@@ -979,9 +994,9 @@ void PmuppGui::refresh()
   updateXYListGui();
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::remove
+ * @brief PmuppGui::remove. Remove collection from data handler and GUI.
  */
 void PmuppGui::remove()
 {
@@ -1024,9 +1039,10 @@ void PmuppGui::remove()
   updateXYListGui();
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::addX
+ * @brief PmuppGui::addX add param to x-axis
+ * @param param name of the parameter
  */
 void PmuppGui::addX(QString param)
 {
@@ -1066,9 +1082,10 @@ void PmuppGui::addX(QString param)
   fXY.push_back(xyItem);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::addY
+ * @brief PmuppGui::addY add param to y-labels
+ * @param param name of the parameter
  */
 void PmuppGui::addY(QString param)
 {  
@@ -1122,9 +1139,10 @@ void PmuppGui::addY(QString param)
   fXY[idx].addYlabel(yLabel);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::removeX
+ * @brief PmuppGui::removeX. remove from the x-axis
+ * @param param x-axis parameter name to be removed
  */
 void PmuppGui::removeX(QString param)
 {
@@ -1149,9 +1167,10 @@ void PmuppGui::removeX(QString param)
   delete item;
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::removeY
+ * @brief PmuppGui::removeY. remove from the y-axis
+ * @param param y-axis paramter name to be removed.
  */
 void PmuppGui::removeY(QString param)
 {
@@ -1175,9 +1194,10 @@ void PmuppGui::removeY(QString param)
 }
 
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::addDitto
+ * @brief PmuppGui::addDitto. Add x-/y-axis settings present for selected
+ * collection.
  */
 void PmuppGui::addDitto()
 {
@@ -1233,7 +1253,11 @@ void PmuppGui::addDitto()
   fColList->clearSelection();
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::addVar. Add a variable. A variable is an expression of
+ * variables present in the collection.
+ */
 void PmuppGui::addVar()
 {
   // create collection list
@@ -1258,10 +1282,15 @@ void PmuppGui::addVar()
     connect(fVarDlg, SIGNAL(add_request(QString,QVector<int>)), this, SLOT(add(QString,QVector<int>)));
   }
   fVarDlg->show();
-
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::check a variable string syntactically and sementically for
+ * validity.
+ * @param varStr var string to be parsed.
+ * @param idx vector of indices telling which collections have been selected.
+ */
 void PmuppGui::check(QString varStr, QVector<int> idx)
 {
   int count = 0;
@@ -1297,18 +1326,23 @@ void PmuppGui::check(QString varStr, QVector<int> idx)
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::add a variable to the GUI for given collections.
+ * @param varStr variable string to be parsed.
+ * @param idx vector of indices telling which collections have been selected.
+ */
 void PmuppGui::add(QString varStr, QVector<int> idx)
 {
-
+  // STILL TO BE IMPLEMENTED
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::findValue
- * @param run
- * @param tag
- * @return
+ * @brief PmuppGui::findValue check if run is found x-/y-axis
+ * @param run which is searched
+ * @param tag x-/y-axis selector
+ * @return true if found
  */
 bool PmuppGui::findValue(PmuppRun &run, EAxis tag)
 {
@@ -1339,10 +1373,10 @@ bool PmuppGui::findValue(PmuppRun &run, EAxis tag)
   return result;
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::allXYEqual
- * @return
+ * @brief PmuppGui::allXYEqual. Check that all x-/y-labels present are equal.
+ * @return true if this is the case.
  */
 bool PmuppGui::allXYEqual()
 {
@@ -1384,11 +1418,12 @@ bool PmuppGui::allXYEqual()
   return true;
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::indexAlreadyPresent
- * @param idx
- * @return
+ * @brief PmuppGui::indexAlreadyPresent. Check if x-label as given by idx is
+ * already present.
+ * @param idx which gets the x-label.
+ * @return true, if found.
  */
 bool PmuppGui::indexAlreadyPresent(const int idx)
 {
@@ -1402,11 +1437,11 @@ bool PmuppGui::indexAlreadyPresent(const int idx)
   return false;
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::replaceIndex
- * @param data
- * @param idx
+ * @brief PmuppGui::replaceIndex replace xy-object at position idx.
+ * @param data xy-object to be replaced
+ * @param idx index position where data needs to be replaced.
  */
 void PmuppGui::replaceIndex(PmuppXY &data, const int idx)
 {
@@ -1430,11 +1465,11 @@ void PmuppGui::replaceIndex(PmuppXY &data, const int idx)
   data.setCollectionTag(idx);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::getXlabelIndex
- * @param label
- * @return
+ * @brief PmuppGui::getXlabelIndex. Get x-label index for a given search label.
+ * @param label for which the index is searched for.
+ * @return idx of the searched label on success, -1 otherwise.
  */
 int PmuppGui::getXlabelIndex(QString label)
 {
@@ -1450,10 +1485,10 @@ int PmuppGui::getXlabelIndex(QString label)
   return idx;
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::dropOnViewX
- * @param item
+ * @brief PmuppGui::dropOnViewX. Drag and drop for x-axis.
+ * @param item to be dropped.
  */
 void PmuppGui::dropOnViewX(QListWidgetItem *item)
 {
@@ -1486,10 +1521,10 @@ void PmuppGui::dropOnViewX(QListWidgetItem *item)
   fXY.push_back(xyItem);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::dropOnViewY
- * @param item
+ * @brief PmuppGui::dropOnViewY. Drag and drop for y-axis.
+ * @param item to be dropped.
  */
 void PmuppGui::dropOnViewY(QListWidgetItem *item)
 {
@@ -1530,9 +1565,9 @@ void PmuppGui::dropOnViewY(QListWidgetItem *item)
   fXY[idx].addYlabel(yLabel);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::refreshY
+ * @brief PmuppGui::refreshY. Refresh the y-axis objects.
  */
 void PmuppGui::refreshY()
 {
@@ -1553,9 +1588,9 @@ void PmuppGui::refreshY()
     fViewY->addItem(fXY[idx].getYlabel(i));
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::createMacro
+ * @brief PmuppGui::createMacro. create a root macro based on the current settings.
  */
 void PmuppGui::createMacro()
 {
@@ -1737,9 +1772,10 @@ void PmuppGui::createMacro()
   fMacroName = QString("");
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::plot
+ * @brief PmuppGui::plot. plot all the requested x-/y-axis settings. It first
+ * prepares all necessary data sets, afterwards is calling mupp_plotter.
  */
 void PmuppGui::plot()
 {
@@ -1912,9 +1948,9 @@ void PmuppGui::plot()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::startMuppPlot
+ * @brief PmuppGui::startMuppPlot start the mupp_plotter
  */
 void PmuppGui::startMuppPlot()
 {
@@ -1951,9 +1987,9 @@ void PmuppGui::startMuppPlot()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::handleCmds
+ * @brief PmuppGui::handleCmds. Handles the commands form the command line.
  */
 void PmuppGui::handleCmds()
 {
@@ -2067,9 +2103,9 @@ void PmuppGui::handleCmds()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::handleNewData
+ * @brief PmuppGui::handleNewData. Handle new data from the fParamDataHandler.
  */
 void PmuppGui::handleNewData()
 {
@@ -2077,9 +2113,9 @@ void PmuppGui::handleNewData()
   updateCollectionList();
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::updateCollectionList
+ * @brief PmuppGui::updateCollectionList. update collection list.
  */
 void PmuppGui::updateCollectionList()
 {
@@ -2094,10 +2130,11 @@ void PmuppGui::updateCollectionList()
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::updateParamList
- * @param currentRow
+ * @brief PmuppGui::updateParamList. Update parameter list of the selected
+ * collection defined by currentRow.
+ * @param currentRow is the index of the selected collection.
  */
 void PmuppGui::updateParamList(int currentRow)
 {
@@ -2122,9 +2159,9 @@ void PmuppGui::updateParamList(int currentRow)
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::updateXYList
+ * @brief PmuppGui::updateXYList. Update xy-objects.
  * @param idx collection index which has been removed
  */
 void PmuppGui::updateXYList(int idx)
@@ -2165,9 +2202,10 @@ void PmuppGui::updateXYList(int idx)
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::updateXYListGui
+ * @brief PmuppGui::updateXYListGui. Update x-axis settings. This is needed
+ * after a remove or refresh.
  */
 void PmuppGui::updateXYListGui()
 {
@@ -2180,11 +2218,11 @@ void PmuppGui::updateXYListGui()
   fViewX->setCurrentRow(0);
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::isNewCollection
- * @param coll
- * @return
+ * @brief PmuppGui::isNewCollection. Check if coll is a new collection.
+ * @param coll collection which needs to be searched for.
+ * @return true if present, flase otherwise.
  */
 bool PmuppGui::isNewCollection(PmuppCollection &coll)
 {
@@ -2194,10 +2232,10 @@ bool PmuppGui::isNewCollection(PmuppCollection &coll)
   return true;
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::editCollName
- * @param item
+ * @brief PmuppGui::editCollName allow to edit the collection name.
+ * @param item from the listWidget.
  */
 void PmuppGui::editCollName(QListWidgetItem *item)
 {
@@ -2212,12 +2250,12 @@ void PmuppGui::editCollName(QListWidgetItem *item)
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::getMinMax
- * @param data
- * @param min
- * @param max
+ * @brief PmuppGui::getMinMax. Get minimum and maximum from data set.
+ * @param data data set
+ * @param min minimum of data
+ * @param max maximum of data
  */
 void PmuppGui::getMinMax(QVector<double> &data, double &min, double &max)
 {
@@ -2229,11 +2267,12 @@ void PmuppGui::getMinMax(QVector<double> &data, double &min, double &max)
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::substituteDefaultLabels
- * @param label
- * @return
+ * @brief PmuppGui::substituteDefaultLabels. Substitutes default labels, like
+ * sigma -> #sigma to make the plot nicer.
+ * @param label to be checked to prettify.
+ * @return prettified label string.
  */
 QString PmuppGui::substituteDefaultLabels(QString label)
 {
@@ -2279,10 +2318,11 @@ QString PmuppGui::substituteDefaultLabels(QString label)
   return result;
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::selectCollection
- * @param cmd
+ * @brief PmuppGui::selectCollection. Called from the command line. It allows to
+ * select a collection.
+ * @param cmd string to select a collection
  */
 void PmuppGui::selectCollection(QString cmd)
 {
@@ -2317,10 +2357,11 @@ void PmuppGui::selectCollection(QString cmd)
   }
 }
 
-//----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 /**
- * @brief PmuppGui::getFirstAvailableMuppInstance
- * @return
+ * @brief PmuppGui::getFirstAvailableMuppInstance. Get the first free mupp
+ * instance of the mupp <-> mupp_plotter ICP message queue
+ * @return the first free instance.
  */
 uint PmuppGui::getFirstAvailableMuppInstance()
 {

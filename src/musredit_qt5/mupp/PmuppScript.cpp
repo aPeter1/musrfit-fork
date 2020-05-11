@@ -42,8 +42,8 @@
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::PmuppScript
- * @param script
+ * @brief PmuppScript::PmuppScript. Ctor
+ * @param script source
  */
 PmuppScript::PmuppScript(QStringList script) :
   fScript(script)
@@ -59,7 +59,7 @@ PmuppScript::PmuppScript(QStringList script) :
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::~PmuppScript
+ * @brief PmuppScript::~PmuppScript. Dtor
  */
 PmuppScript::~PmuppScript()
 {
@@ -75,8 +75,8 @@ PmuppScript::~PmuppScript()
 }
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::executeScript
- * @return
+ * @brief PmuppScript::executeScript. Handles the script commands.
+ * @return 0 on success.
  */
 int PmuppScript::executeScript()
 {
@@ -132,8 +132,9 @@ int PmuppScript::executeScript()
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::setLoadPath
- * @param cmd
+ * @brief PmuppScript::setLoadPath. Sets the load path (where to look for input
+ * data.
+ * @param cmd set load path command string.
  */
 void PmuppScript::setLoadPath(const QString cmd)
 {
@@ -165,8 +166,9 @@ void PmuppScript::setLoadPath(const QString cmd)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::setSavePath
- * @param cmd
+ * @brief PmuppScript::setSavePath. Sets the save path (where to save the output
+ * files.
+ * @param cmd save path command string.
  */
 void PmuppScript::setSavePath(const QString cmd)
 {
@@ -198,9 +200,9 @@ void PmuppScript::setSavePath(const QString cmd)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::loadCollection
- * @param str
- * @return
+ * @brief PmuppScript::loadCollection. Load collection command
+ * @param str load collection command string
+ * @return 0 on success.
  */
 int PmuppScript::loadCollection(const QString str)
 {
@@ -220,9 +222,9 @@ int PmuppScript::loadCollection(const QString str)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::select
- * @param str
- * @return
+ * @brief PmuppScript::select. Select collection command.
+ * @param str selection command string
+ * @return 0 on success
  */
 int PmuppScript::select(const QString str)
 {
@@ -259,8 +261,8 @@ int PmuppScript::select(const QString str)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::selectAll
- * @return
+ * @brief PmuppScript::selectAll. Select all collections
+ * @return 0 on success
  */
 int PmuppScript::selectAll()
 {
@@ -277,9 +279,9 @@ int PmuppScript::selectAll()
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::addX
- * @param str
- * @return
+ * @brief PmuppScript::addX. Add label to x-axis
+ * @param str label string
+ * @return 0 on success
  */
 int PmuppScript::addX(const QString str)
 {
@@ -374,9 +376,9 @@ int PmuppScript::addX(const QString str)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::addY
- * @param str
- * @return
+ * @brief PmuppScript::addY. Add label to y-axis.
+ * @param str label string
+ * @return 0 on success
  */
 int PmuppScript::addY(const QString str)
 {
@@ -490,9 +492,9 @@ int PmuppScript::addY(const QString str)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::plot
- * @param str
- * @return
+ * @brief PmuppScript::plot. Create root macro and feed it to root in the bash mode.
+ * @param str plot script command string
+ * @return 0 on success
  */
 int PmuppScript::plot(const QString str)
 {
@@ -543,10 +545,11 @@ int PmuppScript::plot(const QString str)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::macro
- * @param str
- * @param plotFln
- * @return
+ * @brief PmuppScript::macro. Create a root macro
+ * @param str macro string command string
+ * @param plotFln plot file name. Depending on the extension (*.png, *.pdf, ...)
+ * the given a file will be created.
+ * @return 0 on success
  */
 int PmuppScript::macro(const QString str, const QString plotFln)
 {
@@ -773,9 +776,9 @@ int PmuppScript::macro(const QString str, const QString plotFln)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::var_cmd
- * @param str
- * @return
+ * @brief PmuppScript::var_cmd. Variable definition command
+ * @param str variable definition command string
+ * @return 0 on success
  */
 int PmuppScript::var_cmd(const QString str)
 {
@@ -831,9 +834,9 @@ int PmuppScript::var_cmd(const QString str)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::foundLabel
- * @param coll
- * @return
+ * @brief PmuppScript::foundLabel find label in collection coll.
+ * @param coll collection object
+ * @return true if found
  */
 bool PmuppScript::foundLabel(PmuppCollection *coll, const QString label)
 {
@@ -850,9 +853,10 @@ bool PmuppScript::foundLabel(PmuppCollection *coll, const QString label)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::foundVariable
- * @param var
- * @return
+ * @brief PmuppScript::foundVariable. Check if a variable is found in the
+ * variable handler.
+ * @param var variable name
+ * @return true if found
  */
 bool PmuppScript::foundVariable(const QString var)
 {
@@ -869,9 +873,10 @@ bool PmuppScript::foundVariable(const QString var)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::getVarIndex
- * @param var
- * @return
+ * @brief PmuppScript::getVarIndex. Get index of the variable object given by
+ * its name.
+ * @param var variable name searched for
+ * @return idx of found, -1 otherwise
  */
 int PmuppScript::getVarIndex(const QString var)
 {
@@ -888,9 +893,10 @@ int PmuppScript::getVarIndex(const QString var)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::minMax
- * @param min
- * @param max
+ * @brief PmuppScript::minMax get minimum and maximum of the data set.
+ * @param dvec data set vector
+ * @param min resulting minimum
+ * @param max resulting maximum
  */
 void PmuppScript::minMax(QVector<double> dvec, double &min, double &max)
 {
@@ -906,9 +912,9 @@ void PmuppScript::minMax(QVector<double> dvec, double &min, double &max)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::getNicerLabel
- * @param label
- * @return
+ * @brief PmuppScript::getNicerLabel. Prettify the labels.
+ * @param label to be prettified
+ * @return prettified label
  */
 QString PmuppScript::getNicerLabel(const QString label)
 {
@@ -956,9 +962,9 @@ QString PmuppScript::getNicerLabel(const QString label)
 
 //--------------------------------------------------------------------------
 /**
- * @brief PmuppScript::getCollectionIndex
- * @param var_name
- * @return
+ * @brief PmuppScript::getCollectionIndex. Get the index of a collection.
+ * @param var_name name of the collection
+ * @return idx on success, -1 otherwise
  */
 int PmuppScript::getCollectionIndex(const QString var_name)
 {
