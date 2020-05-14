@@ -110,6 +110,7 @@ PVarDialog::PVarDialog(QVector<PCollInfo> collection_list, bool darkTheme,
     newItem->setText(fCollList[i].fCollName);
     fCollectionView->addItem(newItem);
   }
+  fCollectionView->setCurrentRow(0, QItemSelectionModel::Select);
   fCollectionView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
   QHBoxLayout *hLayout0 = new QHBoxLayout;
@@ -212,7 +213,7 @@ void PVarDialog::add()
     idx.push_back(fCollectionView->row(selected[i]));
   }
 
-  emit check_request(fVarEdit->toPlainText(), idx);
+  emit add_request(fVarEdit->toPlainText(), idx);
 }
 
 //--------------------------------------------------------------------------
@@ -221,7 +222,13 @@ void PVarDialog::add()
  */
 void PVarDialog::help()
 {
-  QMessageBox::information(this, "Var Help", "Syntax: var <var_name> = <expr>.\n<expr> can contain identifiers defined in the collections.\nExample:\nvar sigSC = pow(abs(pow($sigma,2.0)-pow(0.11,2.0)),0.5)");
+  QMessageBox::information(this, "Var Help",
+       "Syntax: var <var_name> = <expr>.\n"\
+       "<expr> can contain identifiers defined in the collections.\n"\
+       "An identifier is an addressed variable which is defined\n"\
+       "by a preceeding '$' before the variable name.\n"\
+       "Example: variable sigma -> identifier $sigma.\n"\
+       "Example:\nvar sigSC = pow(abs(pow($sigma,2.0)-pow(0.11,2.0)),0.5)");
 }
 
 //--------------------------------------------------------------------------
