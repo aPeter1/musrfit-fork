@@ -596,13 +596,6 @@ void PmuppGui::setupToolActions()
   fNormalizeAction->setCheckable(true);
   connect( fNormalizeAction, SIGNAL( changed() ), this, SLOT( normalize() ) );
   menu->addAction(fNormalizeAction);
-
-/* //as35 - eventually also remove PGetNormValDialog.* from the source
-  a = new QAction(tr( "Normalize by Value" ), this);
-  a->setStatusTip( tr("Normalize by Value") );
-  connect( a, SIGNAL( triggered() ), this, SLOT( normVal() ) );
-  menu->addAction(a);
-*/
 }
 
 //-----------------------------------------------------------------------------
@@ -1858,7 +1851,6 @@ void PmuppGui::createMacro()
       QMessageBox::critical(this, "**ERROR**", msg);
       return;
     }
-//as35    xx = fParamDataHandler->GetValues(collName, xLabel);
     getMinMax(xx, xMin, xMax);
     // a couple of x-vector specifics
     if ((xLabel == "dataT") || (xLabel == "dataE"))
@@ -1876,21 +1868,18 @@ void PmuppGui::createMacro()
         QMessageBox::critical(this, "**ERROR**", msg);
         return;
       }
-//as35      yy = fParamDataHandler->GetValues(collName, yLabel);
       yyPosErr = getPosErr(collName, yLabel, ok);
       if (!ok) {
         QString msg = QString("Couldn't get y-axis pos. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
         QMessageBox::critical(this, "**ERROR**", msg);
         return;
       }
-//as35      yyPosErr = fParamDataHandler->GetPosErr(collName, yLabel);
       yyNegErr = getNegErr(collName, yLabel, ok);
       if (!ok) {
         QString msg = QString("Couldn't get y-axis neg. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
         QMessageBox::critical(this, "**ERROR**", msg);
         return;
       }
-//as35      yyNegErr = fParamDataHandler->GetNegErr(collName, yLabel);
       yLabel = substituteDefaultLabels(yLabel);
       getMinMax(yy, yMin, yMax);
       // create TGraph objects
@@ -2051,7 +2040,6 @@ void PmuppGui::plot()
       QMessageBox::critical(this, "**ERROR**", msg);
       return;
     }
-//as35    xx = fParamDataHandler->GetValues(collName, xLabel);
 
     xLabel = substituteDefaultLabels(xLabel);
     fout << "xLabel: " << xLabel << ", ";
@@ -2067,7 +2055,6 @@ void PmuppGui::plot()
         QMessageBox::critical(this, "**ERROR**", msg);
         return;
       }
-//as35      yy = fParamDataHandler->GetValues(collName, yLabel);
       yyy.push_back(yy);
       yyPosErr = getPosErr(collName, yLabel, ok);
       if (!ok) {
@@ -2075,7 +2062,6 @@ void PmuppGui::plot()
         QMessageBox::critical(this, "**ERROR**", msg);
         return;
       }
-//as35      yyPosErr = fParamDataHandler->GetPosErr(collName, yLabel);
       yyyPosErr.push_back(yyPosErr);
       yyNegErr = getNegErr(collName, yLabel, ok);
       if (!ok) {
@@ -2083,7 +2069,6 @@ void PmuppGui::plot()
         QMessageBox::critical(this, "**ERROR**", msg);
         return;
       }
-//as35      yyNegErr = fParamDataHandler->GetNegErr(collName, yLabel);
       yyyNegErr.push_back(yyNegErr);
       yLabel = substituteDefaultLabels(yLabel);
       fout << "yLabel: " << yLabel << ", ";
@@ -2100,7 +2085,6 @@ void PmuppGui::plot()
       QMessageBox::critical(this, "**ERROR**", msg);
       return;
     }
-//as35    yy = fParamDataHandler->GetValues(collName, yLabel);
     yyy.push_back(yy);
     yyPosErr = getPosErr(collName, yLabel, ok);
     if (!ok) {
@@ -2108,7 +2092,6 @@ void PmuppGui::plot()
       QMessageBox::critical(this, "**ERROR**", msg);
       return;
     }
-//as35    yyPosErr = fParamDataHandler->GetPosErr(collName, yLabel);
     yyyPosErr.push_back(yyPosErr);
     yyNegErr = getNegErr(collName, yLabel, ok);
     if (!ok) {
@@ -2116,7 +2099,6 @@ void PmuppGui::plot()
       QMessageBox::critical(this, "**ERROR**", msg);
       return;
     }
-//as35    yyNegErr = fParamDataHandler->GetNegErr(collName, yLabel);
     yyyNegErr.push_back(yyNegErr);
 
     yLabel = substituteDefaultLabels(yLabel);

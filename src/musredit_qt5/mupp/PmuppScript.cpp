@@ -312,10 +312,6 @@ int PmuppScript::addX(const QString str)
         foundInColl = false;
         collName = coll->GetName();
         break;
-/* //as35
-        std::cerr << std::endl << "**ERROR** couldn't find '" << label.toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
-        return -4;
-*/ //as35
       }
     }
     // second check variables
@@ -350,10 +346,6 @@ int PmuppScript::addX(const QString str)
     if (!foundLabel(coll, label)) { // label not found
       foundInColl = false;
       collName = coll->GetName();
-/* //as35
-      std::cerr << std::endl << "**ERROR** couldn't find '" << label.toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
-      return -4;
-*/ //as35
     }
     // second check variables
     if (!foundVariable(label)) { // label not found
@@ -412,10 +404,6 @@ int PmuppScript::addY(const QString str)
           collName = coll->GetName();
           idx = j;
           break;
-/* //as35
-          std::cerr << std::endl << "**ERROR** couldn't find '" << label[j].toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
-          return -4;
-*/ //as35
         }
       }
     }
@@ -459,10 +447,6 @@ int PmuppScript::addY(const QString str)
         collName = coll->GetName();
         idx = i;
         break;
-/* //as35
-        std::cerr << std::endl << "**ERROR** couldn't find '" << label[i].toLatin1().constData() << "' in collection '" << coll->GetName().toLatin1().constData() << "'" << std::endl << std::endl;
-        return -4;
-*/ //as35
       }
     }
     // second check variables
