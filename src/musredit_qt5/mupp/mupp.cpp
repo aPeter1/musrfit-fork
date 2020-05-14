@@ -73,7 +73,7 @@ void mupp_script_syntax()
   std::cout << "   macro <fln>     : where <fln> is the file name under which the root macro" << std::endl;
   std::cout << "                     should be saved." << std::endl;
   std::cout << "   var <var_name> = <expr> : defines a variable." << std::endl;
-  std::cout << "                             <expr> is a mathemathical expression where" << std::endl;
+  std::cout << "                             <expr> is a mathematical expression where" << std::endl;
   std::cout << "                             collection variables are addressed via the '$'," << std::endl;
   std::cout << "                             e.g. dataT is addressed by $dataT, etc." << std::endl;
   std::cout << "   col <nn> : <var_name>   : links <var_name> to the collection <nn>, where" << std::endl;
