@@ -33,6 +33,7 @@
 #include <QMainWindow>
 #include <QVector>
 #include <QString>
+#include <QStringList>
 #include <QWidget>
 #include <QBoxLayout>
 #include <QGridLayout>
@@ -44,6 +45,7 @@
 #include <QPlainTextEdit>
 #include <QEvent>
 #include <QProcess>
+#include <QDialog>
 
 #include "PVarHandler.h"
 #include "PVarDialog.h"
@@ -81,6 +83,23 @@ private:
   QVector<QString> fYlabel;
 
   void init();
+};
+
+//-----------------------------------------------------------------------------
+/**
+ * @brief The PVarErrorDialog class. It is used to display error messages from
+ * the variable parsing.
+ */
+class PVarErrorDialog : public QDialog
+{
+  Q_OBJECT
+
+  public:
+    PVarErrorDialog(QString errMsg);
+
+  private:
+    QPlainTextEdit *fErrMsg;
+    QPushButton *fOK;
 };
 
 //-----------------------------------------------------------------------------
@@ -218,6 +237,12 @@ private:
   void replaceIndex(PmuppXY &data, const int idx);
 
   void startMuppPlot();
+
+  void parseErrMsgDlg();
+  QStringList getVarNames(QString parseStr);
+  QVector<double> getValues(QString collName, QString paramName, bool &ok);
+  QVector<double> getPosErr(QString collName, QString paramName, bool &ok);
+  QVector<double> getNegErr(QString collName, QString paramName, bool &ok);
 
 private slots:
   void addDitto();

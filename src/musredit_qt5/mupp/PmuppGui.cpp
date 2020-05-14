@@ -194,6 +194,39 @@ int PmuppXY::getYlabelIdx(int idx)
 
 //-----------------------------------------------------------------------------
 /**
+ * @brief PVarErrorDialog::PVarErrorDialog. Ctor
+ * @param errMsg error message(s) to be displayed
+ */
+PVarErrorDialog::PVarErrorDialog(QString errMsg)
+{
+  int length = errMsg.length();
+
+  fErrMsg = new QPlainTextEdit(errMsg);
+  fOK = new QPushButton("Done", this);
+
+  fErrMsg->setReadOnly(true);
+
+  QVBoxLayout *layout = new QVBoxLayout;
+  layout->addWidget(fErrMsg);
+  layout->addWidget(fOK);
+
+  connect( fOK, SIGNAL( clicked() ), this, SLOT( accept() ));
+
+  if (length > 0) {
+    int noBreaks = errMsg.count('\n');
+    int width = 20*length / noBreaks;
+    if (width < 300)
+      width = 300;
+    if (width > 900)
+      width = 900;
+    setMinimumWidth(width);
+  }
+  setLayout(layout);
+  show();
+}
+
+//-----------------------------------------------------------------------------
+/**
  * <p>Constructor
  *
  * \param fln file names to be loaded
@@ -1276,11 +1309,13 @@ void PmuppGui::addVar()
   }
 
   // call variable dialog
-  if (fVarDlg == nullptr) {
-    fVarDlg = new PVarDialog(collection_list, fDarkTheme);
-    connect(fVarDlg, SIGNAL(check_request(QString,QVector<int>)), this, SLOT(check(QString,QVector<int>)));
-    connect(fVarDlg, SIGNAL(add_request(QString,QVector<int>)), this, SLOT(add(QString,QVector<int>)));
+  if (fVarDlg != nullptr) {
+    delete fVarDlg;
+    fVarDlg == nullptr;
   }
+  fVarDlg = new PVarDialog(collection_list, fDarkTheme);
+  connect(fVarDlg, SIGNAL(check_request(QString,QVector<int>)), this, SLOT(check(QString,QVector<int>)));
+  connect(fVarDlg, SIGNAL(add_request(QString,QVector<int>)), this, SLOT(add(QString,QVector<int>)));
   fVarDlg->show();
 }
 
@@ -1299,31 +1334,15 @@ void PmuppGui::check(QString varStr, QVector<int> idx)
     if (var_check.isValid()) {
       count++;
     } else {
-      // get error messages
-      QString mupp_err = QString("%1/.musrfit/mupp/mupp_err.log").arg(QString(qgetenv("HOME")));
-      QFile fin(mupp_err);
-      QString errStr("");
-      if (fin.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream in(&fin);
-        while (!in.atEnd()) {
-          errStr += in.readLine();
-          errStr += "\n";
-        }
-      }
-      fin.close();
-      QFile::remove(mupp_err);
-
-      if (errStr.isEmpty())
-        errStr = "unknown error - should never happen.";
-      QString msg = QString("Parse error(s):\n");
-      msg += errStr;
-      QMessageBox::critical(this, "**ERROR**", msg);
+      parseErrMsgDlg();
       return;
     }
   }
   if (count == idx.size()) {
     QMessageBox::information(this, "**INFO**", "Parsing successful.");
   }
+  fVarDlg->raise();
+  fVarDlg->setFocus();
 }
 
 //-----------------------------------------------------------------------------
@@ -1334,7 +1353,187 @@ void PmuppGui::check(QString varStr, QVector<int> idx)
  */
 void PmuppGui::add(QString varStr, QVector<int> idx)
 {
-  // STILL TO BE IMPLEMENTED
+  // analyze varStr to see how many variables are present
+  // the PVarHandler class handles only ONE variable of ONE collection.
+  QStringList varNames = getVarNames(varStr);
+
+  // go through all collections
+  for (int i=0; i<idx.size(); i++) {
+    // go through all the defined variables
+    for (int j=0; j<varNames.count(); j++) {
+      PVarHandler var(fParamDataHandler->GetCollection(idx[i]),
+                      varStr.toLatin1().data(),
+                      varNames[j].toLatin1().data());
+      if (!var.isValid()) {
+        parseErrMsgDlg();
+        return;
+      }
+      fVarHandler.push_back(var); // collect all valid variables
+    }
+  }
+
+  // add the new variable to the paramter list (fParamList)
+  // update the parameter list (GUI)
+  updateParamList(fColList->currentRow());
+  // update XY list (GUI)
+  updateXYListGui();
+
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::parseErrMsgDlg reads the parse error message log and creates
+ * a dialog for the user.
+ */
+void PmuppGui::parseErrMsgDlg()
+{
+  // get error messages
+  QString mupp_err = QString("%1/.musrfit/mupp/mupp_err.log").arg(QString(qgetenv("HOME")));
+  QFile fin(mupp_err);
+  QString errStr("");
+  if (fin.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    QTextStream in(&fin);
+    while (!in.atEnd()) {
+      errStr += in.readLine();
+      errStr += "\n";
+    }
+  }
+  fin.close();
+  QFile::remove(mupp_err);
+
+  if (errStr.isEmpty())
+    errStr = "unknown error - should never happen.";
+  QString msg = QString("Parse error(s):\n");
+  msg += errStr;
+  PVarErrorDialog *errDlg = new PVarErrorDialog(msg);
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::getVarNames collects from the parse string the variable
+ * names.
+ * @param parseStr
+ * @return
+ */
+QStringList PmuppGui::getVarNames(QString parseStr)
+{
+  QStringList varNames;
+  QString str;
+  int idxS=0, idxE=0;
+
+  while (idxS != -1) {
+    idxS = parseStr.indexOf("var", idxS);
+    if (idxS != -1) {
+      idxE = parseStr.indexOf("=", idxS);
+      str = parseStr.mid(idxS+4, idxE-idxS-4).trimmed();
+      if (!str.endsWith("Err"))
+        varNames << str;
+      idxS = idxE;
+    }
+  }
+
+  return varNames;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::getValues get parameter values from a collection or a variable.
+ * @param collName name of the collection
+ * @param paramName parameter name
+ * @param ok true if any data are found, false otherwise
+ *
+ * @return requested values if found, otherwise and empty vector and ok set to false.
+ */
+QVector<double> PmuppGui::getValues(QString collName, QString paramName, bool &ok)
+{
+  ok = false;
+  QVector<double> values;
+
+  // 1st check if paramName is found in collection
+  values = fParamDataHandler->GetValues(collName, paramName);
+
+  // 2nd check if paramName is found in variable handler
+  if (values.size() == 0) {
+    for (int i=0; i<fVarHandler.size(); i++) {
+      if ((fVarHandler[i].getCollName() == collName) &&
+          (fVarHandler[i].getVarName() == paramName)) {
+        values = QVector<double>::fromStdVector(fVarHandler[i].getValues());
+      }
+    }
+  }
+
+  if (values.size() > 0)
+    ok = true;
+
+  return values;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::getPosErr get the positve error estimates of parameter from
+ * a collection or a variable.
+ * @param collName name of the collection
+ * @param paramName parameter name
+ * @param ok true if positive errors are found, false otherwise
+ *
+ * @return requested positive errors if found, otherwise and empty vector and ok set to false.
+ */
+QVector<double> PmuppGui::getPosErr(QString collName, QString paramName, bool &ok)
+{
+  ok = false;
+  QVector<double> values;
+
+  // 1st check if paramName is found in collection
+  values = fParamDataHandler->GetPosErr(collName, paramName);
+
+  // 2nd check if paramName is found in variable handler
+  if (values.size() == 0) {
+    for (int i=0; i<fVarHandler.size(); i++) {
+      if ((fVarHandler[i].getCollName() == collName) &&
+          (fVarHandler[i].getVarName() == paramName)) {
+        values = QVector<double>::fromStdVector(fVarHandler[i].getErrors());
+      }
+    }
+  }
+
+  if (values.size() > 0)
+    ok = true;
+
+  return values;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * @brief PmuppGui::getNegErr get the negative error estimates of parameter from
+ * a collection or a variable.
+ * @param collName name of the collection
+ * @param paramName parameter name
+ * @param ok true if negative errors are found, false otherwise
+ *
+ * @return requested negative errors if found, otherwise and empty vector and ok set to false.
+ */
+QVector<double> PmuppGui::getNegErr(QString collName, QString paramName, bool &ok)
+{
+  ok = false;
+  QVector<double> values;
+
+  // 1st check if paramName is found in collection
+  values = fParamDataHandler->GetNegErr(collName, paramName);
+
+  // 2nd check if paramName is found in variable handler
+  if (values.size() == 0) {
+    for (int i=0; i<fVarHandler.size(); i++) {
+      if ((fVarHandler[i].getCollName() == collName) &&
+          (fVarHandler[i].getVarName() == paramName)) {
+        values = QVector<double>::fromStdVector(fVarHandler[i].getErrors());
+      }
+    }
+  }
+
+  if (values.size() > 0)
+    ok = true;
+
+  return values;
 }
 
 //-----------------------------------------------------------------------------
@@ -1644,6 +1843,7 @@ void PmuppGui::createMacro()
   char gLabel[128];
   QVector<double> xx, yy, yyPosErr, yyNegErr;
   double xMin=1.0e10, xMax=-1.0e10, yMin=1.0e10, yMax=-1.0e10;
+  bool ok;
   for (int i=0; i<fXY.size(); i++) {
     collTag = fXY[i].getCollectionTag();
     collName = fColList->item(collTag)->text();
@@ -1652,7 +1852,13 @@ void PmuppGui::createMacro()
     pos = xLabel.indexOf(" (-");
     xLabel.remove(pos, xLabel.length()-pos);
     // get x-vector
-    xx = fParamDataHandler->GetValues(collName, xLabel);
+    xx = getValues(collName, xLabel, ok);
+    if (!ok) {
+      QString msg = QString("Couldn't get x-axis data from '%1', coll: '%2'").arg(xLabel).arg(collName);
+      QMessageBox::critical(this, "**ERROR**", msg);
+      return;
+    }
+//as35    xx = fParamDataHandler->GetValues(collName, xLabel);
     getMinMax(xx, xMin, xMax);
     // a couple of x-vector specifics
     if ((xLabel == "dataT") || (xLabel == "dataE"))
@@ -1664,9 +1870,27 @@ void PmuppGui::createMacro()
       pos = yLabel.indexOf(" (-");
       yLabel.remove(pos, yLabel.length()-pos);
       // get y-vector
-      yy = fParamDataHandler->GetValues(collName, yLabel);
-      yyPosErr = fParamDataHandler->GetPosErr(collName, yLabel);
-      yyNegErr = fParamDataHandler->GetNegErr(collName, yLabel);
+      yy = getValues(collName, yLabel, ok);
+      if (!ok) {
+        QString msg = QString("Couldn't get y-axis data from '%1', coll: '%2'").arg(yLabel).arg(collName);
+        QMessageBox::critical(this, "**ERROR**", msg);
+        return;
+      }
+//as35      yy = fParamDataHandler->GetValues(collName, yLabel);
+      yyPosErr = getPosErr(collName, yLabel, ok);
+      if (!ok) {
+        QString msg = QString("Couldn't get y-axis pos. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
+        QMessageBox::critical(this, "**ERROR**", msg);
+        return;
+      }
+//as35      yyPosErr = fParamDataHandler->GetPosErr(collName, yLabel);
+      yyNegErr = getNegErr(collName, yLabel, ok);
+      if (!ok) {
+        QString msg = QString("Couldn't get y-axis neg. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
+        QMessageBox::critical(this, "**ERROR**", msg);
+        return;
+      }
+//as35      yyNegErr = fParamDataHandler->GetNegErr(collName, yLabel);
       yLabel = substituteDefaultLabels(yLabel);
       getMinMax(yy, yMin, yMax);
       // create TGraph objects
@@ -1795,6 +2019,7 @@ void PmuppGui::plot()
   QString xLabel(""), yLabel("");
   QVector<double> xx, yy, yyPosErr, yyNegErr;
   QVector< QVector<double> > yyy, yyyPosErr, yyyNegErr;
+  bool ok;
 
   QFile file(pathName);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
@@ -1820,7 +2045,13 @@ void PmuppGui::plot()
     pos = xLabel.indexOf(" (-");
     xLabel.remove(pos, xLabel.length()-pos);
     // get x-vector
-    xx = fParamDataHandler->GetValues(collName, xLabel);
+    xx = getValues(collName, xLabel, ok);
+    if (!ok) {
+      QString msg = QString("Couldn't get x-axis data from '%1', coll: '%2'").arg(xLabel).arg(collName);
+      QMessageBox::critical(this, "**ERROR**", msg);
+      return;
+    }
+//as35    xx = fParamDataHandler->GetValues(collName, xLabel);
 
     xLabel = substituteDefaultLabels(xLabel);
     fout << "xLabel: " << xLabel << ", ";
@@ -1830,11 +2061,29 @@ void PmuppGui::plot()
       pos = yLabel.indexOf(" (-");
       yLabel.remove(pos, yLabel.length()-pos);
       // get y-vector and errors
-      yy = fParamDataHandler->GetValues(collName, yLabel);
+      yy = getValues(collName, yLabel, ok);
+      if (!ok) {
+        QString msg = QString("Couldn't get y-axis data from '%1', coll: '%2'").arg(yLabel).arg(collName);
+        QMessageBox::critical(this, "**ERROR**", msg);
+        return;
+      }
+//as35      yy = fParamDataHandler->GetValues(collName, yLabel);
       yyy.push_back(yy);
-      yyPosErr = fParamDataHandler->GetPosErr(collName, yLabel);
+      yyPosErr = getPosErr(collName, yLabel, ok);
+      if (!ok) {
+        QString msg = QString("Couldn't get y-axis pos. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
+        QMessageBox::critical(this, "**ERROR**", msg);
+        return;
+      }
+//as35      yyPosErr = fParamDataHandler->GetPosErr(collName, yLabel);
       yyyPosErr.push_back(yyPosErr);
-      yyNegErr = fParamDataHandler->GetNegErr(collName, yLabel);
+      yyNegErr = getNegErr(collName, yLabel, ok);
+      if (!ok) {
+        QString msg = QString("Couldn't get y-axis neg. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
+        QMessageBox::critical(this, "**ERROR**", msg);
+        return;
+      }
+//as35      yyNegErr = fParamDataHandler->GetNegErr(collName, yLabel);
       yyyNegErr.push_back(yyNegErr);
       yLabel = substituteDefaultLabels(yLabel);
       fout << "yLabel: " << yLabel << ", ";
@@ -1845,11 +2094,29 @@ void PmuppGui::plot()
     pos = yLabel.indexOf(" (-");
     yLabel.remove(pos, yLabel.length()-pos);
     // get y-vector and errors
-    yy = fParamDataHandler->GetValues(collName, yLabel);
+    yy = getValues(collName, yLabel, ok);
+    if (!ok) {
+      QString msg = QString("Couldn't get y-axis data from '%1', coll: '%2'").arg(yLabel).arg(collName);
+      QMessageBox::critical(this, "**ERROR**", msg);
+      return;
+    }
+//as35    yy = fParamDataHandler->GetValues(collName, yLabel);
     yyy.push_back(yy);
-    yyPosErr = fParamDataHandler->GetPosErr(collName, yLabel);
+    yyPosErr = getPosErr(collName, yLabel, ok);
+    if (!ok) {
+      QString msg = QString("Couldn't get y-axis pos. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
+      QMessageBox::critical(this, "**ERROR**", msg);
+      return;
+    }
+//as35    yyPosErr = fParamDataHandler->GetPosErr(collName, yLabel);
     yyyPosErr.push_back(yyPosErr);
-    yyNegErr = fParamDataHandler->GetNegErr(collName, yLabel);
+    yyNegErr = getNegErr(collName, yLabel, ok);
+    if (!ok) {
+      QString msg = QString("Couldn't get y-axis neg. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
+      QMessageBox::critical(this, "**ERROR**", msg);
+      return;
+    }
+//as35    yyNegErr = fParamDataHandler->GetNegErr(collName, yLabel);
     yyyNegErr.push_back(yyNegErr);
 
     yLabel = substituteDefaultLabels(yLabel);
@@ -2133,7 +2400,7 @@ void PmuppGui::updateCollectionList()
 //-----------------------------------------------------------------------------
 /**
  * @brief PmuppGui::updateParamList. Update parameter list of the selected
- * collection defined by currentRow.
+ * collection defined by currentRow. Check also for variables.
  * @param currentRow is the index of the selected collection.
  */
 void PmuppGui::updateParamList(int currentRow)
@@ -2156,6 +2423,13 @@ void PmuppGui::updateParamList(int currentRow)
   fParamList->clear();
   for (int i=0; i<run.GetNoOfParam(); i++) {
     fParamList->insertItem(i, run.GetParam(i).GetName());
+  }
+
+  // check if this collection has defined variables, and if yes add them as well
+  for (int i=0; i<fVarHandler.size(); i++) {
+    if (fVarHandler[i].getCollName() == item->text()) {
+      fParamList->addItem(fVarHandler[i].getVarName());
+    }
   }
 }
 
