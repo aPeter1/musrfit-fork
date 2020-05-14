@@ -1,4 +1,5 @@
 # This is a comment
+# Script: sigmaSC-vs-temp.txt
 
 loadPath ./
 
@@ -12,6 +13,7 @@ var SigmaSC_10Err = pow(pow($Sigma*$SigmaErr,2.0)+pow(0.11*0.0025,2.0), 0.5)/$Si
 var SigmaSC_150 = pow(abs(pow($Sigma,2.0)-pow(0.075,2.0)), 0.5) # 0.075 (1/us) is the nuclear contribution (T>Tc)
 var SigmaSC_150Err = pow(pow($Sigma*$SigmaErr,2.0)+pow(0.075*0.0025,2.0), 0.5)/$SigmaSC_150
 
+# link variables to collections
 col 0 : SigmaSC_10    # error variable SigmaSC_10Err doesn't need to be given, it is automatically linked to SigmaSC_10
 col 1 : SigmaSC_150
 
