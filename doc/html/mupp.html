@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>mupp - μSR Parameter Plotter &#8212; musrfit 1.5.2 documentation</title>
+    <title>mupp - μSR Parameter Plotter &#8212; musrfit 1.6.0 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,7 +30,7 @@
         <li class="right" >
           <a href="musredit.html" title="musredit: the GUI Based Interface to musrfit"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.5.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.0 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -47,6 +47,10 @@ Also a collection of <code class="docutils literal notranslate"><span class="pre
 <a class="reference external" href="http://musr.org/muview/">here</a>).</p>
 <p><code class="docutils literal notranslate"><span class="pre">mupp</span></code> can be operated from within as graphical user interface or via a command line scripting interface.
 The <code class="docutils literal notranslate"><span class="pre">mupp</span></code> GUI can be invoked either directly from the command line or from within <a class="reference internal" href="musredit.html#musredit-sec"><span class="std std-ref">musredit</span></a>.</p>
+<p>Each collection bundles a number of runs, where a run is a single μSR measurement.
+A run is analyzed by a number of parameters (defined in the msr-files), and complemented by
+additional physical parameters as the temperature, magnetic field, implantation energy, etc.
+Hence parameters can be seen as vectors and can be plot against each other.</p>
 <div class="section" id="the-graphical-user-interface">
 <span id="index-1"></span><h2>The Graphical User Interface<a class="headerlink" href="#the-graphical-user-interface" title="Permalink to this headline">¶</a></h2>
 <p>A typical setting could look like this</p>
@@ -79,17 +83,34 @@ present the data, as shown here</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">Remove</span> <span class="pre">Collection</span></code>: will remove the selected collection</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">Refresh</span> <span class="pre">Collection</span></code>: will reload the collection (<code class="docutils literal notranslate"><span class="pre">db</span></code>- or <code class="docutils literal notranslate"><span class="pre">dat</span></code>-file). This is often useful
 during beamtime where the collection is growing run-by-run.</p></li>
+<li><p>Command history window.</p></li>
 <li><p>This is the script command line. Currently it allows to perform the tasks without mouse gambling.
 In the future much more commands are planed. See the <code class="docutils literal notranslate"><span class="pre">Help</span> <span class="pre">/</span> <span class="pre">Cmd's</span></code> for the currently available
 commands.</p></li>
 </ol>
+<div class="section" id="define-variable-dialog">
+<h3>Define Variable Dialog<a class="headerlink" href="#define-variable-dialog" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/mupp-add-var.svg" src="_images/mupp-add-var.svg" /><ol class="arabic simple">
+<li><p>Variable text edit window.</p></li>
+<li><p>Collection link window.</p></li>
+<li><p>Shows the parameters of the selected collection.</p></li>
+<li><p>Check if the variable/error variable from the edit window is valid.</p></li>
+<li><p>Add the variable to the selected collection(s) if the parsing is successful.</p></li>
+</ol>
+<p>A variable defined here is a mathematical expression defined by parameters of loaded collections.
+Since a parameter also has an associated error, also newly defined variables <strong>always</strong> need
+to be defined together with a corresponding error variable. If the name of a variable is defined
+as <code class="docutils literal notranslate"><span class="pre">SigmaSC_10</span></code> (see the above snapshot), the error variable need to be named as <code class="docutils literal notranslate"><span class="pre">SigmaSC_10Err</span></code>.</p>
+<p>Currently the following mathematical functions are defined: <code class="docutils literal notranslate"><span class="pre">max</span></code>, <code class="docutils literal notranslate"><span class="pre">min</span></code>, <code class="docutils literal notranslate"><span class="pre">abs</span></code>, <code class="docutils literal notranslate"><span class="pre">sin</span></code>, <code class="docutils literal notranslate"><span class="pre">cos</span></code>,
+<code class="docutils literal notranslate"><span class="pre">tan</span></code>, <code class="docutils literal notranslate"><span class="pre">exp</span></code>, <code class="docutils literal notranslate"><span class="pre">log</span></code>, <code class="docutils literal notranslate"><span class="pre">ln</span></code>, <code class="docutils literal notranslate"><span class="pre">pow</span></code>.</p>
+</div>
 </div>
 <div class="section" id="the-scripting-interface">
 <span id="index-2"></span><h2>The Scripting Interface<a class="headerlink" href="#the-scripting-interface" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">mupp</span></code> can also be operated in a scripting like manner. The use cases are plot updates during run time,
 or web-based interaction which requests figures. A script is invoked by the command line option <code class="docutils literal notranslate"><span class="pre">-s</span></code> (see
 <a class="reference internal" href="#mupp-usage"><span class="std std-ref">mupp command line summary</span></a>. Currently the following scripting commands are available:</p>
-<dl class="simple">
+<dl>
 <dt><strong>loadPath &lt;dir&gt;</strong></dt><dd><p>set the load path to <code class="docutils literal notranslate"><span class="pre">&lt;dir&gt;</span></code>. Bash variables like $HOME are accepted. This is the path where to look for collection files (<code class="docutils literal notranslate"><span class="pre">db</span></code>- and <code class="docutils literal notranslate"><span class="pre">dat</span></code>-files).</p>
 </dd>
 <dt><strong>load &lt;coll&gt;</strong></dt><dd><p>will load the collection <code class="docutils literal notranslate"><span class="pre">&lt;coll&gt;</span></code>.</p>
@@ -99,9 +120,11 @@ or web-based interaction which requests figures. A script is invoked by the comm
 <dt><strong>select &lt;nn&gt;</strong></dt><dd><p>selects collection <code class="docutils literal notranslate"><span class="pre">&lt;nn&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;nn&gt;</span></code> is either the <em>number</em> of the collections, or its <em>name</em>, <em>e.g.</em>
 select YBCO-40nm-T5K-FC150mT-Escan.db.</p>
 </dd>
-<dt><strong>addX &lt;label&gt;</strong></dt><dd><p>add <code class="docutils literal notranslate"><span class="pre">&lt;label&gt;</span></code> as a <em>x</em>-variable. Only <em>one</em> is allowed.</p>
+<dt><strong>x &lt;label&gt;</strong></dt><dd><p>add <code class="docutils literal notranslate"><span class="pre">&lt;label&gt;</span></code> as a <em>x</em>-variable. Only <em>one</em> is allowed.</p>
 </dd>
-<dt><strong>addY &lt;label(s)&gt;</strong></dt><dd><p>add <code class="docutils literal notranslate"><span class="pre">&lt;label(s)&gt;</span></code> as <em>y</em>-variable. <em>Multiple</em> labels are possible.</p>
+<dt><strong>y &lt;label(s)&gt;</strong></dt><dd><p>add <code class="docutils literal notranslate"><span class="pre">&lt;label(s)&gt;</span></code> as <em>y</em>-variable. <em>Multiple</em> labels are possible.</p>
+</dd>
+<dt><strong>norm</strong></dt><dd><p>this will normalize all the <em>y</em>-variables by their maximum.</p>
 </dd>
 <dt><strong>savePath &lt;dir&gt;</strong></dt><dd><p>set the save path to <code class="docutils literal notranslate"><span class="pre">&lt;dir&gt;</span></code>. The place where the macros, and/or the plot output will be saved.</p>
 </dd>
@@ -109,28 +132,63 @@ select YBCO-40nm-T5K-FC150mT-Escan.db.</p>
 </dd>
 <dt><strong>macro &lt;fln&gt;</strong></dt><dd><p>where <code class="docutils literal notranslate"><span class="pre">&lt;fln&gt;</span></code> is the file name under which the root macro should be saved.</p>
 </dd>
+<dt><strong>var &lt;var_name&gt; = &lt;expr&gt;</strong></dt><dd><p>defines a variable.
+&lt;expr&gt; is a mathematical expression where collection variables are addressed
+via the ‘$’, e.g. <code class="docutils literal notranslate"><span class="pre">dataT</span></code> is addressed by <code class="docutils literal notranslate"><span class="pre">$dataT</span></code>, etc. An example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">var</span> <span class="pre">invT</span> <span class="pre">=</span> <span class="pre">1000.0</span> <span class="pre">/</span> <span class="pre">$dataT</span></code></p>
+<p>Each variable has to be accompanied by its error variable. An error variable
+is defined by the <code class="docutils literal notranslate"><span class="pre">&lt;var_name&gt;</span></code> followed by <code class="docutils literal notranslate"><span class="pre">Err</span></code>
+For the above example the error variable is</p>
+<p><code class="docutils literal notranslate"><span class="pre">var</span> <span class="pre">invTErr</span> <span class="pre">=</span> <span class="pre">$invT</span> <span class="pre">*</span> <span class="pre">$dataTErr</span> <span class="pre">/</span> <span class="pre">$dataT</span></code></p>
+</dd>
+<dt><strong>col &lt;nn&gt; : &lt;var_name&gt;</strong></dt><dd><p>links &lt;var_name&gt; to the collection &lt;nn&gt;, where &lt;nn&gt; is the number of the
+collection as defined by the order of load, starting with 0.</p>
+</dd>
 </dl>
-<p>An example script file <code class="docutils literal notranslate"><span class="pre">field-vs-energy.txt</span></code> might look like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is a comment</span>
+<p>An example script file <code class="docutils literal notranslate"><span class="pre">sigmaSC-vs-temp.txt</span></code> might look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># This is a comment
+# Script: sigmaSC-vs-temp.txt
 
-<span class="n">loadPath</span> <span class="o">./</span>
+loadPath ./
 
-<span class="n">load</span> <span class="n">YBCO</span><span class="o">-</span><span class="mi">40</span><span class="n">nm</span><span class="o">-</span><span class="n">T5K</span><span class="o">-</span><span class="n">FC150mT</span><span class="o">-</span><span class="n">Escan</span><span class="o">.</span><span class="n">db</span>
-<span class="n">load</span> <span class="n">YBCO</span><span class="o">-</span><span class="mi">40</span><span class="n">nm</span><span class="o">-</span><span class="n">T30K</span><span class="o">-</span><span class="n">FC150mT</span><span class="o">-</span><span class="n">Escan</span><span class="o">.</span><span class="n">db</span>
-<span class="n">load</span> <span class="n">YBCO</span><span class="o">-</span><span class="mi">40</span><span class="n">nm</span><span class="o">-</span><span class="n">T60K</span><span class="o">-</span><span class="n">FC150mT</span><span class="o">-</span><span class="n">Escan</span><span class="o">.</span><span class="n">db</span>
-<span class="n">load</span> <span class="n">YBCO</span><span class="o">-</span><span class="mi">40</span><span class="n">nm</span><span class="o">-</span><span class="n">T120K</span><span class="o">-</span><span class="n">FC150mT</span><span class="o">-</span><span class="n">Escan</span><span class="o">.</span><span class="n">db</span>
+load YBCO-40nm-FC-E3p8keV-B10mT-Tscan.db  # collection 0
+load YBCO-40nm-FC-E3p8keV-B150mT-Tscan.db # collection 1
 
-<span class="n">selectAll</span>
+# define variables: for each variable an associated error variable is needed.
+# B=10mT
+var SigmaSC_10 = pow(abs(pow($Sigma,2.0)-pow(0.11,2.0)), 0.5) # 0.11 (1/us) is the nuclear contribution (T&gt;Tc)
+var SigmaSC_10Err = pow(pow($Sigma*$SigmaErr,2.0)+pow(0.11*0.0025,2.0), 0.5)/$SigmaSC_10
+# B=150mT
+var SigmaSC_150 = pow(abs(pow($Sigma,2.0)-pow(0.075,2.0)), 0.5) # 0.075 (1/us) is the nuclear contribution (T&gt;Tc)
+var SigmaSC_150Err = pow(pow($Sigma*$SigmaErr,2.0)+pow(0.075*0.0025,2.0), 0.5)/$SigmaSC_150
 
-<span class="n">addX</span> <span class="n">dataE</span>
-<span class="n">addY</span> <span class="n">Field</span>
+# link variables to collections
+col 0 : SigmaSC_10    # error variable SigmaSC_10Err doesn&#39;t need to be given, it is automatically linked to SigmaSC_10
+col 1 : SigmaSC_150
 
-<span class="n">savePath</span> <span class="o">./</span>
-<span class="n">plot</span> <span class="n">FieldVsEnergy</span><span class="o">.</span><span class="n">pdf</span>
+norm # normalize the plot to the maximum of each y-data-set
 
-<span class="n">macro</span> <span class="n">FieldVsEnergy</span><span class="o">.</span><span class="n">C</span>
+# the next 3 cmds means the following: use collection 0, add dataT to the x-axis,
+# and SigmaSC_10 to the y-axis
+select 0
+x dataT
+y SigmaSC_10
 
-<span class="c1"># end</span>
+select 1
+x dataT
+y SigmaSC_150
+
+# where to save the output
+savePath ./
+
+# create a pdf output file of the above defined xy-data sets. Currently also
+# other file formats are supported, like png, jpg, etc.
+plot SigmaSCVsTemp.pdf
+
+# creates a ROOT macro which can be used for further refinement
+macro SigmaSCVsTemp.C
+
+# end
 </pre></div>
 </div>
 </div>
@@ -146,28 +204,37 @@ OPTIONS:
   &lt;fit-param-file-names&gt;: list of file name(s) to be loaded.
      allowed formats are: db, dat, msr
 
-SCRIPT COMMANDS:
-  Lines starting with &#39;#&#39;, &#39;%&#39;, or &#39;//&#39; are comments and will be ignored.
-  The same is true for empty lines. Comments are also allowed at the end
-  for a command, i.e. loadPath ./ # the best place ever.
 
-  loadPath &lt;dir&gt; : set the load path to &lt;dir&gt;. Bash variables like
-                   $HOME are accepted.
-  load &lt;coll&gt;    : will load a collection &lt;coll&gt;. Currently *.db and *.dat
-                   are handled.
-  selectAll      : will select all loaded collections. Thie means every plot
-                   of variable x/y will be carried out to ALL collections.
-  select &lt;nn&gt;    : selects collection &lt;nn&gt;, where &lt;nn&gt; is either the number
-                   of the collections, or its name, e.g.
-                   select YBCO-40nm-T5K-FC150mT-Escan.db
-  addX &lt;label&gt;   : add &lt;label&gt; as a x-variable. Only one is allowed.
-  addY &lt;label(s)&gt;: add &lt;label(s)&gt; as y-variable. Multiple labls are possible.
-  savePath &lt;dir&gt; : set the save path to &lt;dir&gt;. The place where the macros,
-                   and/or the plot output will be saved.
-  plot &lt;fln&gt;     : where &lt;fln&gt; is the file name with extension under which
-                   the plot should be saved.
-  macro &lt;fln&gt;    : where &lt;fln&gt; is the file name under which the root macro
-                   should be saved.
+SCRIPT COMMANDS:
+   Lines starting with &#39;#&#39;, &#39;%&#39;, or &#39;//&#39; are comments and will be ignored.
+   The same is true for empty lines. Comments are also allowed at the end
+   for a command, i.e. loadPath ./ # the best place ever.
+
+   load &lt;coll&gt;     : load a collection. &lt;coll&gt; is the filename of the
+                     collection (*.db, *.dat)
+   loadPath &lt;path&gt; : set the load path to &lt;path&gt;; accepting bash variables
+                     like $HOME, etc.
+   x &lt;var-name&gt;    : set a x-axis variable. &lt;var-name&gt; is a data tag of
+                     the db/dat-file.
+   y &lt;var-name&gt;    : set a y-axis variable. &lt;var-name&gt; is a data tag of
+                     the db/dat-file.
+   select &lt;nn&gt;     : select collection &lt;nn&gt;, where &lt;nn&gt; is the row-number
+                     or the name of the collection to be selected.
+   selectAll       : i.e. already set &#39;x&#39;, &#39;y&#39; will apply to ALL collections
+                     present.
+   savePath &lt;path&gt; : sets the save path to &lt;path&gt;; accepting bash variables
+                     like $HOME, etc.
+   plot &lt;fln&gt;      : where &lt;fln&gt; is the file name with extension under which
+                     the plot should be saved.
+   macro &lt;fln&gt;     : where &lt;fln&gt; is the file name under which the root macro
+                     should be saved.
+   var &lt;var_name&gt; = &lt;expr&gt; : defines a variable.
+                             &lt;expr&gt; is a mathematical expression where
+                             collection variables are addressed via the &#39;$&#39;,
+                             e.g. dataT is addressed by $dataT, etc.
+   col &lt;nn&gt; : &lt;var_name&gt;   : links &lt;var_name&gt; to the collection &lt;nn&gt;, where
+                             &lt;nn&gt; is the number of the collection as defined
+                             by the order of load, starting with 0.
 </pre></div>
 </div>
 </div>
@@ -182,7 +249,10 @@ SCRIPT COMMANDS:
   <h3><a href="index.html">Table of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">mupp - μSR Parameter Plotter</a><ul>
-<li><a class="reference internal" href="#the-graphical-user-interface">The Graphical User Interface</a></li>
+<li><a class="reference internal" href="#the-graphical-user-interface">The Graphical User Interface</a><ul>
+<li><a class="reference internal" href="#define-variable-dialog">Define Variable Dialog</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#the-scripting-interface">The Scripting Interface</a></li>
 <li><a class="reference internal" href="#the-usage-summary">The Usage Summary</a></li>
 </ul>
@@ -228,13 +298,13 @@ SCRIPT COMMANDS:
         <li class="right" >
           <a href="musredit.html" title="musredit: the GUI Based Interface to musrfit"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.5.2 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.0 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Andreas Suter.
-      Last updated on Feb 04, 2020.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.1.2.
+      Last updated on May 15, 2020.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
     </div>
   </body>
 </html>
