@@ -12,6 +12,13 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.6.0, 2020/05/16
+=============================
+
+Allow to transform parameter vectors of run collections for mupp. 
+This allows for instance to calculate the superfluid density directly from the
+depolarization rate and plot it.
+
 Release of V1.5.2, 2020/02/03
 =============================
 
