@@ -1361,7 +1361,18 @@ void PmuppGui::add(QString varStr, QVector<int> idx)
         parseErrMsgDlg();
         return;
       }
-      fVarHandler.push_back(var); // collect all valid variables
+      // check if variable name for the given collection already exists
+      int var_idx=-1;
+      for (int k=0; k<fVarHandler.size(); k++) {
+        if ((fVarHandler[k].getVarName() == var.getVarName()) &&
+            (fVarHandler[k].getCollName()) == var.getCollName()) {
+          var_idx = k;
+        }
+      }
+      if (var_idx == -1) // a new variable
+        fVarHandler.push_back(var); // collect all valid variables
+      else // replace an already existing variable
+        fVarHandler[var_idx] = var;
     }
   }
 
