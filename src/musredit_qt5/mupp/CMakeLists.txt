@@ -61,6 +61,13 @@ else (APPLE)
   add_executable(mupp ${GENERATED_HEADER_FILES} ${MUPP_SOURCE_FILES} qrc_mupp.cpp)
 endif (APPLE)
 
+#--- compiler option to workaround a little cast problem for some 
+#--- boost/compiler combinations ----------------------------------------------
+target_compile_options(mupp
+  PRIVATE
+    "-fpermissive"  
+)
+
 #--- add the variable related sources -----------------------------------------
 add_subdirectory(var)
 
