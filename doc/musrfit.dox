@@ -49,10 +49,12 @@ under Linux, Mac OS X, and (with some more work) under Windows. The musrfit fram
 - **msr2msr**: old WKM like msr-files can be transformed into musrfit style msr-files with this little program.
 - musrgui (obsolete): an editor to handle msr-files, calling musrfit, etc. from within the editor, based on Qt3.x. 
      Only bug fixing will be done on this version, and if you have >= Qt4.6 available you should use musredit instead.
-- **musredit**: an editor to handle msr-files, calling musrfit, etc. from within a simple text editor, based on >= Qt4.6. 
+- **musredit**: an editor to handle msr-files, calling musrfit, etc. from within a simple text editor, based on >= Qt4.6. A technical documentation of musredit can be found 
+\htmlonly <a href="../musredit/html/index.html">here.</a>\endhtmlonly
 - **musrWiz** (beta): allows to create an initial msr-file by a step-by-step instruction wizard.
 - **musrStep**: allows to efficiently deal with initial step values of msr-files. Especially useful for msr-files dealing with many runs/detectors.
-- **mupp**: is the muSR parameter plotter. It allows to plot values in db- or dat-files (collections).
+- **mupp**: is the muSR parameter plotter. It allows to plot values in db- or dat-files (collections). A technical documentation of mupp can be found 
+\htmlonly <a href="../mupp/html/index.html">here.</a>\endhtmlonly
 - **MuSRFit**: a graphical user interface based on PerlQt (written by Z. Salman) for an easy to use interface to the musrfit framework. 
      Compared to the more general approach of writing msr-files, it has some limitations, though it might be easier for a first user of the musrfit framework.
 - **any2many**: should be a "universal" muSR data-file-format converter.
