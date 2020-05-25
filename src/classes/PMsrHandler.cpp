@@ -819,15 +819,24 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
         } else if (sstr.BeginsWith("alpha ")) {
           fout.width(16);
           fout << std::left << "alpha";
-          fout << fRuns[runNo].GetAlphaParamNo() << std::endl;
+          // check of alpha is given as a function
+          if (fRuns[runNo].GetAlphaParamNo() >= MSR_PARAM_FUN_OFFSET)
+            fout << "fun" << fRuns[runNo].GetAlphaParamNo()-MSR_PARAM_FUN_OFFSET;
+          else
+            fout << fRuns[runNo].GetAlphaParamNo() << std::endl;
+          fout << std::endl;
         } else if (sstr.BeginsWith("beta ")) {
           fout.width(16);
           fout << std::left << "beta";
-          fout << fRuns[runNo].GetBetaParamNo()  << std::endl;
+          if (fRuns[runNo].GetBetaParamNo() >= MSR_PARAM_FUN_OFFSET)
+            fout << "fun" << fRuns[runNo].GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+          else
+            fout << fRuns[runNo].GetBetaParamNo()  << std::endl;
+          fout << std::endl;
         } else if (sstr.BeginsWith("norm")) {
           fout.width(16);
           fout << std::left << "norm";
-          // check if norm is give as a function
+          // check if norm is given as a function
           if (fRuns[runNo].GetNormParamNo() >= MSR_PARAM_FUN_OFFSET)
             fout << "fun" << fRuns[runNo].GetNormParamNo()-MSR_PARAM_FUN_OFFSET;
           else
@@ -1939,14 +1948,24 @@ Int_t PMsrHandler::WriteMsrFile(const Char_t *filename, std::map<UInt_t, TString
     if (fRuns[i].GetAlphaParamNo() != -1) {
       fout.width(16);
       fout << std::left << "alpha";
-      fout << fRuns[i].GetAlphaParamNo() << std::endl;
+      // check if alpha is give as a function
+      if (fRuns[i].GetAlphaParamNo() >= MSR_PARAM_FUN_OFFSET)
+        fout << "fun" << fRuns[i].GetAlphaParamNo()-MSR_PARAM_FUN_OFFSET;
+      else
+        fout << fRuns[i].GetAlphaParamNo();
+      fout << std::endl;
     }
 
     // beta
     if (fRuns[i].GetBetaParamNo() != -1) {
       fout.width(16);
       fout << std::left << "beta";
-      fout << fRuns[i].GetBetaParamNo()  << std::endl;
+      // check if beta is give as a function
+      if (fRuns[i].GetBetaParamNo() >= MSR_PARAM_FUN_OFFSET)
+        fout << "fun" << fRuns[i].GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+      else
+        fout << fRuns[i].GetBetaParamNo();
+      fout << std::endl;
     }
 
     // norm
@@ -3379,6 +3398,12 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
             param.SetAlphaParamNo(ival);
           else
             error = true;
+        } else if (str.Contains("fun")) {
+          Int_t no;
+          if (FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, no))
+            param.SetAlphaParamNo(no);
+          else
+            error = true;
         } else {
           error = true;
         }
@@ -3399,6 +3424,12 @@ Bool_t PMsrHandler::HandleRunEntry(PMsrLines &lines)
           ival = str.Atoi();
           if (ival > 0)
             param.SetBetaParamNo(ival);
+          else
+            error = true;          
+        } else if (str.Contains("fun")) {
+          Int_t no;
+          if (FilterNumber(str, "fun", MSR_PARAM_FUN_OFFSET, no))
+            param.SetBetaParamNo(no);
           else
             error = true;
         } else {
@@ -4582,9 +4613,12 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
 
     // handle a single PLOT block
     while ((iter1 != iter2) && !error) {
+      TString line = iter1->fLine;
+      if (line.First('#') != -1) // remove trailing comment before proceed
+        line.Resize(line.First('#'));
 
-      if (iter1->fLine.Contains("PLOT")) { // handle plot header
-        tokens = iter1->fLine.Tokenize(" \t");
+      if (line.Contains("PLOT")) { // handle plot header
+        tokens = line.Tokenize(" \t");
         if (!tokens) {
           std::cerr << std::endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
           std::cerr << std::endl << std::endl;
@@ -4605,9 +4639,9 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           delete tokens;
           tokens = nullptr;
         }
-      } else if (iter1->fLine.Contains("lifetimecorrection", TString::kIgnoreCase)) {
+      } else if (line.Contains("lifetimecorrection", TString::kIgnoreCase)) {
         param.fLifeTimeCorrection = true;
-      } else if (iter1->fLine.Contains("runs", TString::kIgnoreCase)) { // handle plot runs
+      } else if (line.Contains("runs", TString::kIgnoreCase)) { // handle plot runs
         TComplex run;
         PStringNumberList *rl;
         std::string errorMsg;
@@ -4623,7 +4657,7 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           case MSR_PLOT_ASYM_RRF:
           case MSR_PLOT_NON_MUSR:
           case MSR_PLOT_MU_MINUS:
-            rl = new PStringNumberList(iter1->fLine.Data());
+            rl = new PStringNumberList(line.Data());
             if (!rl->Parse(errorMsg, true)) {
               std::cerr << std::endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
               std::cerr << std::endl << ">>   Error Message: " << errorMsg;
@@ -4643,14 +4677,14 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
             error = true;
             break;
         }
-      } else if (iter1->fLine.Contains("range ", TString::kIgnoreCase)) { // handle plot range
+      } else if (line.Contains("range ", TString::kIgnoreCase)) { // handle plot range
         // remove previous entries
         param.fTmin.clear();
         param.fTmax.clear();
         param.fYmin.clear();
         param.fYmax.clear();
 
-        tokens = iter1->fLine.Tokenize(" \t");
+        tokens = line.Tokenize(" \t");
         if (!tokens) {
           std::cerr << std::endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
           std::cerr << std::endl << std::endl;
@@ -4700,14 +4734,14 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           delete tokens;
           tokens = nullptr;
         }
-      } else if (iter1->fLine.Contains("sub_ranges", TString::kIgnoreCase)) {
+      } else if (line.Contains("sub_ranges", TString::kIgnoreCase)) {
         // remove previous entries
         param.fTmin.clear();
         param.fTmax.clear();
         param.fYmin.clear();
         param.fYmax.clear();
 
-        tokens = iter1->fLine.Tokenize(" \t");
+        tokens = line.Tokenize(" \t");
         if (!tokens) {
           std::cerr << std::endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
           std::cerr << std::endl << std::endl;
@@ -4762,11 +4796,11 @@ Bool_t PMsrHandler::HandlePlotEntry(PMsrLines &lines)
           delete tokens;
           tokens = nullptr;
         }
-      } else if (iter1->fLine.Contains("use_fit_ranges", TString::kIgnoreCase)) {
+      } else if (line.Contains("use_fit_ranges", TString::kIgnoreCase)) {
         param.fUseFitRanges = true;
         // check if y-ranges are given
 
-        tokens = iter1->fLine.Tokenize(" \t");
+        tokens = line.Tokenize(" \t");
         if (!tokens) {
           std::cerr << std::endl << ">> PMsrHandler::HandlePlotEntry: **SEVERE ERROR** Couldn't tokenize PLOT in line " << iter1->fLineNo;
           std::cerr << std::endl << std::endl;
@@ -5207,12 +5241,20 @@ UInt_t PMsrHandler::GetNoOfFitParameters(UInt_t idx)
     paramVector.push_back(fRuns[idx].GetBkgFitParamNo());
 
   // get alpha parameter if present (asymmetry fit)
-  if (fRuns[idx].GetAlphaParamNo() != -1)
-    paramVector.push_back(fRuns[idx].GetAlphaParamNo());
+  if (fRuns[idx].GetAlphaParamNo() != -1) {
+    if (fRuns[idx].GetAlphaParamNo() < MSR_PARAM_FUN_OFFSET) // parameter
+      paramVector.push_back(fRuns[idx].GetAlphaParamNo());
+    else // function
+      funVector.push_back(fRuns[idx].GetAlphaParamNo() - MSR_PARAM_FUN_OFFSET);
+  }
 
   // get beta parameter if present (asymmetry fit)
-  if (fRuns[idx].GetBetaParamNo() != -1)
-    paramVector.push_back(fRuns[idx].GetBetaParamNo());
+  if (fRuns[idx].GetBetaParamNo() != -1) {
+    if (fRuns[idx].GetBetaParamNo() < MSR_PARAM_FUN_OFFSET) // parameter
+      paramVector.push_back(fRuns[idx].GetBetaParamNo());
+    else // function
+      funVector.push_back(fRuns[idx].GetBetaParamNo() - MSR_PARAM_FUN_OFFSET);
+  }
 
   // go through the theory block and collect parameters
   // possible entries: number -> parameter, fun<number> -> function, map<number> -> maps

@@ -206,56 +206,90 @@ Double_t PRunAsymmetryBNMR::CalcChiSquare(const std::vector<Double_t>& par)
   Double_t time(1.0),alphaest;
   Int_t i;
 
+  // determine alpha/beta
+  alphaest = fRunInfo->GetEstimatedAlpha();
+  switch (fAlphaBetaTag) {
+    case 1: // alpha == 1, beta == 1
+      a = 1.0;
+      b = 1.0;
+      break;
+    case 2: // alpha != 1, beta == 1
+      if (fRunInfo->GetAlphaParamNo() < MSR_PARAM_FUN_OFFSET) { // alpha is a parameter
+        a = par[fRunInfo->GetAlphaParamNo()-1];
+      } else { // alpha is function
+        // get function number
+        UInt_t funNo = fRunInfo->GetAlphaParamNo()-MSR_PARAM_FUN_OFFSET;
+        // evaluate function
+        a = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+      }
+      b = 1.0;
+      break;
+    case 3: // alpha == 1, beta != 1
+      a = 1.0;
+      if (fRunInfo->GetBetaParamNo() < MSR_PARAM_FUN_OFFSET) { // beta is a parameter
+        b = par[fRunInfo->GetBetaParamNo()-1];
+      } else { // beta is a function
+        // get function number
+        UInt_t funNo = fRunInfo->GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+        // evaluate function
+        b = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+      }
+      break;
+    case 4: // alpha != 1, beta != 1
+      if (fRunInfo->GetAlphaParamNo() < MSR_PARAM_FUN_OFFSET) { // alpha is a parameter
+        a = par[fRunInfo->GetAlphaParamNo()-1];
+      } else { // alpha is function
+        // get function number
+        UInt_t funNo = fRunInfo->GetAlphaParamNo()-MSR_PARAM_FUN_OFFSET;
+        // evaluate function
+        a = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+      }
+      if (fRunInfo->GetBetaParamNo() < MSR_PARAM_FUN_OFFSET) { // beta is a parameter
+        b = par[fRunInfo->GetBetaParamNo()-1];
+      } else { // beta is a function
+        // get function number
+        UInt_t funNo = fRunInfo->GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+        // evaluate function
+        b = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+      }
+      break;
+    case 5: // alpha ?? , beta == 1
+      a = alphaest;
+      b = 1.0;
+      break;
+    case 6: // alpha ??, beta != 1
+      a = alphaest;
+      if (fRunInfo->GetBetaParamNo() < MSR_PARAM_FUN_OFFSET) { // beta is a parameter
+        b = par[fRunInfo->GetBetaParamNo()-1];
+      } else { // beta is a function
+        // get function number
+        UInt_t funNo = fRunInfo->GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+        // evaluate function
+        b = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+      }
+      break;
+    default:
+      a = 1.0;
+      b = 1.0;
+      break;
+  }
+
   // Calculate the theory function once to ensure one function evaluation for the current set of parameters.
   // This is needed for the LF and user functions where some non-thread-save calculations only need to be calculated once
   // for a given set of parameters---which should be done outside of the parallelized loop.
   // For all other functions it means a tiny and acceptable overhead.
   asymFcnValue = fTheory->Func(time, par, fFuncValues);
-  alphaest = fRunInfo->GetEstimatedAlpha();
 
   #ifdef HAVE_GOMP
   Int_t chunk = (fEndTimeBin - fStartTimeBin)/omp_get_num_procs();
   if (chunk < 10)
     chunk = 10;
-  #pragma omp parallel for default(shared) private(i,time,diff,asymFcnValue,a,b,f) schedule(dynamic,chunk) reduction(+:chisq)
+  #pragma omp parallel for default(shared) private(i,time,diff,asymFcnValue,f) schedule(dynamic,chunk) reduction(+:chisq)
   #endif
   for (i=fStartTimeBin; i<fEndTimeBin; ++i) {
     time = fData.GetDataTimeStart() + static_cast<Double_t>(i)*fData.GetDataTimeStep();
-    switch (fAlphaBetaTag) {
-      case 1: // alpha == 1, beta == 1
-        asymFcnValue = fTheory->Func(time, par, fFuncValues);
-        break;
-      case 2: // alpha != 1, beta == 1
-        a = par[fRunInfo->GetAlphaParamNo()-1];
-        f = fTheory->Func(time, par, fFuncValues)/2.0;
-        asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0)) - (-f*(a+1.0)-(a-1.0))/((a+1.0)+f*(a-1.0));
-        break;
-      case 3: // alpha == 1, beta != 1
-        b = par[fRunInfo->GetBetaParamNo()-1];
-        f = fTheory->Func(time, par, fFuncValues)/2.0;
-        asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0))-f*(b+1.0)/(2.0+f*(b-1.0));
-        break;
-      case 4: // alpha != 1, beta != 1
-        a = par[fRunInfo->GetAlphaParamNo()-1];
-        b = par[fRunInfo->GetBetaParamNo()-1];
-        f = fTheory->Func(time, par, fFuncValues)/2.0;
-        asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
-        break;
-      case 5: // alpha ?? , beta == 1
-        a = alphaest;
-        f = fTheory->Func(time, par, fFuncValues)/2.0;
-        asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0)) - (-f*(a+1.0)-(a-1.0))/((a+1.0)+f*(a-1.0));
-        break;
-      case 6: // alpha ??, beta != 1
-        a = alphaest;
-        b = par[fRunInfo->GetBetaParamNo()-1];
-        f = fTheory->Func(time, par, fFuncValues)/2.0;
-        asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
-        break;
-      default:
-        asymFcnValue = 0.0;
-        break;
-    }
+    f = fTheory->Func(time, par, fFuncValues)/2.0;
+    asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
     diff = fData.GetValue()->at(i) - asymFcnValue;
     chisq += diff*diff / (fData.GetError()->at(i)*fData.GetError()->at(i));
   }
@@ -455,18 +489,46 @@ void PRunAsymmetryBNMR::CalcTheory()
         asymFcnValue = fTheory->Func(time, par, fFuncValues);
         break;
       case 2: // alpha != 1, beta == 1
-        a = par[fRunInfo->GetAlphaParamNo()-1];
+        if (fRunInfo->GetAlphaParamNo() < MSR_PARAM_FUN_OFFSET) { // alpha is a parameter
+          a = par[fRunInfo->GetAlphaParamNo()-1];
+        } else { // alpha is function
+          // get function number
+          UInt_t funNo = fRunInfo->GetAlphaParamNo()-MSR_PARAM_FUN_OFFSET;
+          // evaluate function
+          a = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+        }
         f = fTheory->Func(time, par, fFuncValues);
         asymFcnValue = (f*(a+1.0)-(a-1.0))/((a+1.0)-f*(a-1.0)) - (-f*(a+1.0)-(a-1.0))/((a+1.0)+f*(a-1.0));
         break;
       case 3: // alpha == 1, beta != 1
-        b = par[fRunInfo->GetBetaParamNo()-1];
+        if (fRunInfo->GetBetaParamNo() < MSR_PARAM_FUN_OFFSET) { // beta is a parameter
+          b = par[fRunInfo->GetBetaParamNo()-1];
+        } else { // beta is a function
+          // get function number
+          UInt_t funNo = fRunInfo->GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+          // evaluate function
+          b = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+        }
         f = fTheory->Func(time, par, fFuncValues);
         asymFcnValue = f*(b+1.0)/(2.0-f*(b-1.0))-f*(b+1.0)/(2.0+f*(b-1.0));
         break;
       case 4: // alpha != 1, beta != 1
-        a = par[fRunInfo->GetAlphaParamNo()-1];
-        b = par[fRunInfo->GetBetaParamNo()-1];
+        if (fRunInfo->GetAlphaParamNo() < MSR_PARAM_FUN_OFFSET) { // alpha is a parameter
+          a = par[fRunInfo->GetAlphaParamNo()-1];
+        } else { // alpha is function
+          // get function number
+          UInt_t funNo = fRunInfo->GetAlphaParamNo()-MSR_PARAM_FUN_OFFSET;
+          // evaluate function
+          a = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+        }
+        if (fRunInfo->GetBetaParamNo() < MSR_PARAM_FUN_OFFSET) { // beta is a parameter
+          b = par[fRunInfo->GetBetaParamNo()-1];
+        } else { // beta is a function
+          // get function number
+          UInt_t funNo = fRunInfo->GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+          // evaluate function
+          b = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+        }
         f = fTheory->Func(time, par, fFuncValues);
         asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
         break;
@@ -477,7 +539,14 @@ void PRunAsymmetryBNMR::CalcTheory()
         break;
       case 6: // alpha ??, beta != 1
         a = alphaest;
-        b = par[fRunInfo->GetBetaParamNo()-1];
+        if (fRunInfo->GetBetaParamNo() < MSR_PARAM_FUN_OFFSET) { // beta is a parameter
+          b = par[fRunInfo->GetBetaParamNo()-1];
+        } else { // beta is a function
+          // get function number
+          UInt_t funNo = fRunInfo->GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+          // evaluate function
+          b = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+        }
         f = fTheory->Func(time, par, fFuncValues);
         asymFcnValue = (f*(a*b+1.0)-(a-1.0))/((a+1.0)-f*(a*b-1.0))-(-f*(a*b+1.0)-(a-1.0))/((a+1.0)+f*(a*b-1.0));
         break;
@@ -1287,16 +1356,44 @@ Bool_t PRunAsymmetryBNMR::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2
       beta  = 1.0;
       break;
     case 2: // alpha != 1, beta == 1
-      alpha = par[fRunInfo->GetAlphaParamNo()-1];
+      if (fRunInfo->GetAlphaParamNo() < MSR_PARAM_FUN_OFFSET) { // alpha is a parameter
+        alpha = par[fRunInfo->GetAlphaParamNo()-1];
+      } else { // alpha is function
+        // get function number
+        UInt_t funNo = fRunInfo->GetAlphaParamNo()-MSR_PARAM_FUN_OFFSET;
+        // evaluate function
+        alpha = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+      }
       beta  = 1.0;
       break;
     case 3: // alpha == 1, beta != 1
       alpha = 1.0;
-      beta  = par[fRunInfo->GetBetaParamNo()-1];
+      if (fRunInfo->GetBetaParamNo() < MSR_PARAM_FUN_OFFSET) { // beta is a parameter
+        beta = par[fRunInfo->GetBetaParamNo()-1];
+      } else { // beta is a function
+        // get function number
+        UInt_t funNo = fRunInfo->GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+        // evaluate function
+        beta = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+      }
       break;
     case 4: // alpha != 1, beta != 1
-      alpha = par[fRunInfo->GetAlphaParamNo()-1];
-      beta  = par[fRunInfo->GetBetaParamNo()-1];
+      if (fRunInfo->GetAlphaParamNo() < MSR_PARAM_FUN_OFFSET) { // alpha is a parameter
+        alpha = par[fRunInfo->GetAlphaParamNo()-1];
+      } else { // alpha is function
+        // get function number
+        UInt_t funNo = fRunInfo->GetAlphaParamNo()-MSR_PARAM_FUN_OFFSET;
+        // evaluate function
+        alpha = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+      }
+      if (fRunInfo->GetBetaParamNo() < MSR_PARAM_FUN_OFFSET) { // beta is a parameter
+        beta = par[fRunInfo->GetBetaParamNo()-1];
+      } else { // beta is a function
+        // get function number
+        UInt_t funNo = fRunInfo->GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+        // evaluate function
+        beta = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+      }
       break;
     case 5: // alpha ?? , beta == 1
       // use estimated value
@@ -1304,7 +1401,14 @@ Bool_t PRunAsymmetryBNMR::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2
       break;
     case 6: // alpha ??, beta != 1
       // use estimated value
-      beta  = par[fRunInfo->GetBetaParamNo()-1];
+      if (fRunInfo->GetBetaParamNo() < MSR_PARAM_FUN_OFFSET) { // beta is a parameter
+        beta = par[fRunInfo->GetBetaParamNo()-1];
+      } else { // beta is a function
+        // get function number
+        UInt_t funNo = fRunInfo->GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
+        // evaluate function
+        beta = fMsrInfo->EvalFunc(funNo, *fRunInfo->GetMap(), par);
+      }
       break;
     default:
       break;
