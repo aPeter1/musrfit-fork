@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>User manual &#8212; musrfit 1.6.0 documentation</title>
+    <title>User manual &#8212; musrfit 1.6.1 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,7 +30,7 @@
         <li class="right" >
           <a href="tutorial.html" title="Tutorial for musrfit"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.1 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -897,7 +897,7 @@ instead of specifying the parameters directly.</p>
 <div class="section" id="the-functions-block">
 <span id="msr-functions-block"></span><span id="index-15"></span><h3>The FUNCTIONS Block<a class="headerlink" href="#the-functions-block" title="Permalink to this headline">¶</a></h3>
 <p>Here some auxiliary functions can be defined. These functions can currently <em>only</em> operate on the defined parameters. They can be used in the
-<a class="reference internal" href="#msr-theory-block"><span class="std std-ref">THEORY block</span></a> and for one specific case in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a>. Supported is the use of basic arithmetic:</p>
+<a class="reference internal" href="#msr-theory-block"><span class="std std-ref">THEORY block</span></a> and for three specific cases in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a> (<cite>norm</cite>, <cite>alpha</cite>, and <cite>beta</cite>). Supported is the use of basic arithmetic:</p>
 <dl class="simple">
 <dt><span class="math notranslate nohighlight">\(+\)</span></dt><dd><p>Addition</p>
 </dd>
@@ -1169,15 +1169,19 @@ a short digression is needed.</p>
 </dd>
 </dl>
 <span id="index-20"></span><dl id="msr-alpha-beta">
-<dt><strong>alpha, beta</strong> (fit type 2, 3, 5)</dt><dd><p>These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as <span class="math notranslate nohighlight">\(\alpha = N_{0,b}/N_{0,f}\)</span> and <span class="math notranslate nohighlight">\(\beta = A_{0,b}/A_{0,f}\)</span>. If the parameters are not specified in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a>, for each one the value of 1 is assumed (for fittype 5, alpha is estimated from the ratio of <span class="math notranslate nohighlight">\(\sum_i \left( N_{\mathrm{bp}}(i)+N_{\mathrm{bm}}(i) \right)\)</span> and <span class="math notranslate nohighlight">\(\sum_i \left( N_{\mathrm{fp}}(i)+N_{\mathrm{fm}}(i) \right)\)</span>). Example for alpha with fit parameter number 1:</p>
+<dt><strong>alpha, beta</strong> (fit type 2, 3, 5)</dt><dd><p>These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as <span class="math notranslate nohighlight">\(\alpha = N_{0,b}/N_{0,f}\)</span> and <span class="math notranslate nohighlight">\(\beta = A_{0,b}/A_{0,f}\)</span>. If the parameters are not specified in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a>, for each one the value of 1 is assumed (for fittype 5, alpha is estimated from the ratio of <span class="math notranslate nohighlight">\(\sum_i \left( N_{\mathrm{bp}}(i)+N_{\mathrm{bm}}(i) \right)\)</span> and <span class="math notranslate nohighlight">\(\sum_i \left( N_{\mathrm{fp}}(i)+N_{\mathrm{fm}}(i) \right)\)</span>). Both, <cite>alpha</cite> as well as <cite>beta</cite> can be expressed through a function. Example for alpha with fit parameter number 1:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Example for an <code class="docutils literal notranslate"><span class="pre">alpha</span></code> defined via function number 1:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="n">fun1</span>
 </pre></div>
 </div>
 </dd>
 </dl>
 <span id="index-21"></span><dl id="msr-norm">
 <dt><strong>norm</strong> (fit type 0)</dt><dd><p>Number of the fit parameter that represents the normalization constant <span class="math notranslate nohighlight">\(N_0\)</span> of the histogram; the value of this parameter is given either per nanosecond or per bin (see <a class="reference internal" href="#msr-commands-block"><span class="std std-ref">below</span></a>).
-It is possible to substitute the parameter number by a function here (and only here in a RUN block), for instance to relate <span class="math notranslate nohighlight">\(N_0\)</span>’s of different histograms through an <span class="math notranslate nohighlight">\(\alpha\)</span>
+It is possible to substitute the parameter number by a function, for instance to relate <span class="math notranslate nohighlight">\(N_0\)</span>’s of different histograms through an <span class="math notranslate nohighlight">\(\alpha\)</span>
 parameter. Example for a <code class="docutils literal notranslate"><span class="pre">norm</span></code> defined by fit parameter number 12:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">norm</span> <span class="mi">12</span>
 </pre></div>
@@ -2429,12 +2433,12 @@ In case this cannot be ensured, the parallelization can be disabled by <em>–di
         <li class="right" >
           <a href="tutorial.html" title="Tutorial for musrfit"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.0 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.1 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Andreas Suter.
-      Last updated on May 14, 2020.
+      Last updated on May 25, 2020.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
     </div>
   </body>

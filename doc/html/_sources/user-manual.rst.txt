@@ -775,7 +775,7 @@ The FUNCTIONS Block
 +++++++++++++++++++
 
 Here some auxiliary functions can be defined. These functions can currently *only* operate on the defined parameters. They can be used in the 
-:ref:`THEORY block <msr-theory-block>` and for one specific case in the :ref:`RUN block <msr-run-block>`. Supported is the use of basic arithmetic:
+:ref:`THEORY block <msr-theory-block>` and for three specific cases in the :ref:`RUN block <msr-run-block>` (`norm`, `alpha`, and `beta`). Supported is the use of basic arithmetic:
 
 :math:`+`
   Addition
@@ -1064,18 +1064,24 @@ In order to describe the operations needed for fitting and plotting, quite some 
 .. _msr-alpha-beta:
 
 **alpha, beta** (fit type 2, 3, 5)
-  These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as :math:`\alpha = N_{0,b}/N_{0,f}` and :math:`\beta = A_{0,b}/A_{0,f}`. If the parameters are not specified in the :ref:`RUN block <msr-run-block>`, for each one the value of 1 is assumed (for fittype 5, alpha is estimated from the ratio of :math:`\sum_i \left( N_{\mathrm{bp}}(i)+N_{\mathrm{bm}}(i) \right)` and :math:`\sum_i \left( N_{\mathrm{fp}}(i)+N_{\mathrm{fm}}(i) \right)`). Example for alpha with fit parameter number 1:
+  These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as :math:`\alpha = N_{0,b}/N_{0,f}` and :math:`\beta = A_{0,b}/A_{0,f}`. If the parameters are not specified in the :ref:`RUN block <msr-run-block>`, for each one the value of 1 is assumed (for fittype 5, alpha is estimated from the ratio of :math:`\sum_i \left( N_{\mathrm{bp}}(i)+N_{\mathrm{bm}}(i) \right)` and :math:`\sum_i \left( N_{\mathrm{fp}}(i)+N_{\mathrm{fm}}(i) \right)`). Both, `alpha` as well as `beta` can be expressed through a function. Example for alpha with fit parameter number 1:
 
   ::
 
     alpha 1
+
+  Example for an ``alpha`` defined via function number 1:
+  
+  ::
+  
+    alpha fun1 
 
 .. index:: norm
 .. _msr-norm:
 
 **norm** (fit type 0)
   Number of the fit parameter that represents the normalization constant :math:`N_0` of the histogram; the value of this parameter is given either per nanosecond or per bin (see :ref:`below <msr-commands-block>`). 
-  It is possible to substitute the parameter number by a function here (and only here in a RUN block), for instance to relate :math:`N_0`\'s of different histograms through an :math:`\alpha` 
+  It is possible to substitute the parameter number by a function, for instance to relate :math:`N_0`\'s of different histograms through an :math:`\alpha` 
   parameter. Example for a ``norm`` defined by fit parameter number 12:
   
   ::

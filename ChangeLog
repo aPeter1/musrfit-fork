@@ -12,6 +12,11 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.6.1, 2020/05/25
+=============================
+
+For asymmetry fits: allow alpha, beta in the RUN block to be functions.
+
 Release of V1.6.0, 2020/05/16
 =============================
 
