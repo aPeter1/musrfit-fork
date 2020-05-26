@@ -823,7 +823,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           if (fRuns[runNo].GetAlphaParamNo() >= MSR_PARAM_FUN_OFFSET)
             fout << "fun" << fRuns[runNo].GetAlphaParamNo()-MSR_PARAM_FUN_OFFSET;
           else
-            fout << fRuns[runNo].GetAlphaParamNo() << std::endl;
+            fout << fRuns[runNo].GetAlphaParamNo();
           fout << std::endl;
         } else if (sstr.BeginsWith("beta ")) {
           fout.width(16);
@@ -831,7 +831,7 @@ Int_t PMsrHandler::WriteMsrLogFile(const Bool_t messages)
           if (fRuns[runNo].GetBetaParamNo() >= MSR_PARAM_FUN_OFFSET)
             fout << "fun" << fRuns[runNo].GetBetaParamNo()-MSR_PARAM_FUN_OFFSET;
           else
-            fout << fRuns[runNo].GetBetaParamNo()  << std::endl;
+            fout << fRuns[runNo].GetBetaParamNo();
           fout << std::endl;
         } else if (sstr.BeginsWith("norm")) {
           fout.width(16);
