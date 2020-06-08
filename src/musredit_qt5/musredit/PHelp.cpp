@@ -108,6 +108,7 @@ PHelp::PHelp(const QString &url, const bool isDarkTheme) :
 
   setCentralWidget(fView);
   setUnifiedTitleAndToolBarOnMac(true);
+  setMinimumSize(800, 700);
 }
 
 //---------------------------------------------------------------------------
