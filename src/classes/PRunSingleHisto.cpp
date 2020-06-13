@@ -709,6 +709,13 @@ Bool_t PRunSingleHisto::PrepareData()
     return false;
   }
 
+  // keep the field from the meta-data from the data-file
+  fField = runData->GetField();
+
+  // keep the temperature(s) from the meta-data from the data-file
+  for (unsigned int i=0; i<runData->GetNoOfTemperatures(); i++)
+    fTemp.push_back(runData->GetTemperature(i));
+
   // collect histogram numbers
   PUIntVector histoNo; // histoNo = msr-file forward + redGreen_offset - 1
   for (UInt_t i=0; i<fRunInfo->GetForwardHistoNoSize(); i++) {

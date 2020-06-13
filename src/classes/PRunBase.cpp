@@ -49,6 +49,7 @@ PRunBase::PRunBase()
   fRunNo = -1;
   fRunInfo = nullptr;
   fRawData = nullptr;
+  fField = -1.0;
   fTimeResolution = -1.0;
 
   fFitStartTime = PMUSR_UNDEFINED;
@@ -90,6 +91,7 @@ PRunBase::PRunBase(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo,
   }
 
   // init private variables
+  fField = -1.0;
   fTimeResolution = -1.0;
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++)
     fFuncValues.push_back(0.0);
