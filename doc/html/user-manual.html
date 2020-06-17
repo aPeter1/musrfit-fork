@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta charset="utf-8" />
-    <title>User manual &#8212; musrfit 1.6.1 documentation</title>
+    <title>User manual &#8212; musrfit 1.6.2 documentation</title>
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -30,7 +30,7 @@
         <li class="right" >
           <a href="tutorial.html" title="Tutorial for musrfit"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.2 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -896,8 +896,9 @@ instead of specifying the parameters directly.</p>
 </div>
 <div class="section" id="the-functions-block">
 <span id="msr-functions-block"></span><span id="index-15"></span><h3>The FUNCTIONS Block<a class="headerlink" href="#the-functions-block" title="Permalink to this headline">¶</a></h3>
-<p>Here some auxiliary functions can be defined. These functions can currently <em>only</em> operate on the defined parameters. They can be used in the
-<a class="reference internal" href="#msr-theory-block"><span class="std std-ref">THEORY block</span></a> and for three specific cases in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a> (<cite>norm</cite>, <cite>alpha</cite>, and <cite>beta</cite>). Supported is the use of basic arithmetic:</p>
+<p>Here some auxiliary functions can be defined. These functions can currently <em>only</em> operate on the defined parameters, and some meta information from the data files.
+They can be used in the <a class="reference internal" href="#msr-theory-block"><span class="std std-ref">THEORY block</span></a> and for three specific cases in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a> (<cite>norm</cite>, <cite>alpha</cite>, and <cite>beta</cite>).
+Supported is the use of basic arithmetic:</p>
 <dl class="simple">
 <dt><span class="math notranslate nohighlight">\(+\)</span></dt><dd><p>Addition</p>
 </dd>
@@ -919,6 +920,37 @@ acosh(), asinh(), atanh(), exp(), log(), ln(), sqrt(), pow(base, exponent)</stro
 </ul>
 <p>The fit parameters are accessed either directly through parX, where ‘X’ is the number of the parameter in the <a class="reference internal" href="#msr-fitparameter-block"><span class="std std-ref">FITPARAMETER block</span></a>,
 <em>e.g.</em> <em>par5</em> or through a mapping with mapY, where ‘Y’ specifies the mapping number in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a> as explained below.</p>
+<p id="index-16">The available meta information form the data files are:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 23%" />
+<col style="width: 15%" />
+<col style="width: 34%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p>Meta Information</p></td>
+<td><p>Symbol</p></td>
+<td><p>Units</p></td>
+<td><p>Comments</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Field</strong></p></td>
+<td><p><em>B</em> or <em>b</em></p></td>
+<td><p><cite>(G)</cite></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Energy</strong></p></td>
+<td><p><em>En</em> or <em>en</em></p></td>
+<td><p><cite>(keV)</cite></p></td>
+<td><p>mainly LEM</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Temperature</strong></p></td>
+<td><p><em>Tx</em></p></td>
+<td><p><cite>(K)</cite></p></td>
+<td><p>x=0,1,.. e.g. <em>t0</em></p></td>
+</tr>
+</tbody>
+</table>
 <p>The defined functions are denoted as funX, where ‘X’ is the function number, <em>i.e.</em> fun1, fun2, etc. and have to be placed separately on one
 line each. Afterwards they can be used in the <a class="reference internal" href="#msr-theory-block"><span class="std std-ref">THEORY block</span></a>.</p>
 <p>It follows an example to illustrate the usage of functions in the <a class="reference internal" href="#msr-theory-block"><span class="std std-ref">THEORY block</span></a>. The total asymmetry of a signal
@@ -948,7 +980,7 @@ consisting of two parts should be a fit parameter. The fraction of each of the p
 </div>
 </div>
 <div class="section" id="the-global-block">
-<span id="msr-global-block"></span><span id="index-16"></span><h3>The GLOBAL Block<a class="headerlink" href="#the-global-block" title="Permalink to this headline">¶</a></h3>
+<span id="msr-global-block"></span><span id="index-17"></span><h3>The GLOBAL Block<a class="headerlink" href="#the-global-block" title="Permalink to this headline">¶</a></h3>
 <p>The GLOBAL block is used to collect data which otherwise need to be specified in every single run entry of the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a>.
 Therefore, this block is only present to potentially shorten the msr file and to ease the handling for the user. The logic will by like that:</p>
 <ol class="arabic simple">
@@ -1052,7 +1084,7 @@ Syntax: rrf_phase &lt;phase&gt;, where the value &lt;phase&gt; is given in degre
 </div>
 </div>
 <div class="section" id="the-run-block">
-<span id="msr-run-block"></span><span id="index-17"></span><h3>The RUN Block<a class="headerlink" href="#the-run-block" title="Permalink to this headline">¶</a></h3>
+<span id="msr-run-block"></span><span id="index-18"></span><h3>The RUN Block<a class="headerlink" href="#the-run-block" title="Permalink to this headline">¶</a></h3>
 <p>The RUN block is used to collect the data needed for a particular run to be fitted. This includes the run name, fit type, data format, etc.
 The RUN block is slightly differently organized than the other blocks. The information is collected via labels followed by the information.
 Each run to be fitted has its <em>own</em> RUN block. A RUN block starts with a run-file line which has the structure</p>
@@ -1126,7 +1158,7 @@ a short digression is needed.</p>
 </div>
 <p>After this short digression back to the RUN-block description.</p>
 <p>In order to describe the operations needed for fitting and plotting, quite some information are needed. These information are following the RUN statement and are listed below. Depending on the fit type these information vary and hence it is indicated for which fit/plot type the information is applicable</p>
-<span id="index-18"></span><dl id="msr-addrun">
+<span id="index-19"></span><dl id="msr-addrun">
 <dt><strong>ADDRUN &lt;run_file_name&gt; &lt;beamline&gt; &lt;facility&gt; &lt;file_format&gt;</strong> (optional)</dt><dd><p>If an ADDRUN is just following after a RUN statement, these runs will be added. More than one ADDRUN statements are possible, <em>i.e.</em> adding up as many runs as wished. It is also possible to add runs with different file formats. If the t0’s are given in the data files, the ADDRUN statement is all what is needed, otherwise just add the t0’s with the addt0 statement.</p>
 <p>For a <a class="reference internal" href="#single-histogram-fit"><span class="std std-ref">Single Histogram Fit</span></a> or a <a class="reference internal" href="#negative-muon-musr-fit"><span class="std std-ref">MuMinus Fit</span></a> it will be</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">addt0</span> <span class="n">t0AddRun1</span>
@@ -1144,7 +1176,7 @@ a short digression is needed.</p>
 <p>ADDRUN is <em>not</em> available for the fit type <a class="reference internal" href="#non-musr-fit"><span class="std std-ref">Non-muSR Fit</span></a>.</p>
 </dd>
 </dl>
-<span id="index-19"></span><dl id="msr-fittype">
+<span id="index-20"></span><dl id="msr-fittype">
 <dt><strong>fittype</strong> (required if not already defined in the GLOBAL block)</dt><dd><p>This tag is used to indicate which type of fit is wished. The supported fit types are:</p>
 <dl class="simple">
 <dt><strong>0</strong></dt><dd><p>Single Histogram Fit</p>
@@ -1168,7 +1200,7 @@ a short digression is needed.</p>
 </div>
 </dd>
 </dl>
-<span id="index-20"></span><dl id="msr-alpha-beta">
+<span id="index-21"></span><dl id="msr-alpha-beta">
 <dt><strong>alpha, beta</strong> (fit type 2, 3, 5)</dt><dd><p>These parameters are used to correct the asymmetry for different detector efficiencies, solid angles and initial asymmetries. They are defined as <span class="math notranslate nohighlight">\(\alpha = N_{0,b}/N_{0,f}\)</span> and <span class="math notranslate nohighlight">\(\beta = A_{0,b}/A_{0,f}\)</span>. If the parameters are not specified in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a>, for each one the value of 1 is assumed (for fittype 5, alpha is estimated from the ratio of <span class="math notranslate nohighlight">\(\sum_i \left( N_{\mathrm{bp}}(i)+N_{\mathrm{bm}}(i) \right)\)</span> and <span class="math notranslate nohighlight">\(\sum_i \left( N_{\mathrm{fp}}(i)+N_{\mathrm{fm}}(i) \right)\)</span>). Both, <cite>alpha</cite> as well as <cite>beta</cite> can be expressed through a function. Example for alpha with fit parameter number 1:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">alpha</span> <span class="mi">1</span>
 </pre></div>
@@ -1179,7 +1211,7 @@ a short digression is needed.</p>
 </div>
 </dd>
 </dl>
-<span id="index-21"></span><dl id="msr-norm">
+<span id="index-22"></span><dl id="msr-norm">
 <dt><strong>norm</strong> (fit type 0)</dt><dd><p>Number of the fit parameter that represents the normalization constant <span class="math notranslate nohighlight">\(N_0\)</span> of the histogram; the value of this parameter is given either per nanosecond or per bin (see <a class="reference internal" href="#msr-commands-block"><span class="std std-ref">below</span></a>).
 It is possible to substitute the parameter number by a function, for instance to relate <span class="math notranslate nohighlight">\(N_0\)</span>’s of different histograms through an <span class="math notranslate nohighlight">\(\alpha\)</span>
 parameter. Example for a <code class="docutils literal notranslate"><span class="pre">norm</span></code> defined by fit parameter number 12:</p>
@@ -1192,25 +1224,25 @@ parameter. Example for a <code class="docutils literal notranslate"><span class=
 </div>
 </dd>
 </dl>
-<span id="index-22"></span><dl class="simple" id="msr-backgr-fit">
+<span id="index-23"></span><dl class="simple" id="msr-backgr-fit">
 <dt><strong>backgr.fit</strong> (fit type 0)</dt><dd><p>Parameter number specifying the constant background in a histogram. Its value is given either per nanosecond or per bin (see <a class="reference internal" href="#msr-commands-block"><span class="std std-ref">below</span></a>). If this keyword is present,
 any information on a background line are ignored.</p>
 </dd>
 </dl>
-<span id="index-23"></span><dl class="simple" id="msr-lifetime">
+<span id="index-24"></span><dl class="simple" id="msr-lifetime">
 <dt><strong>lifetime</strong> (fit type 0)</dt><dd><p>Fit parameter representing the lifetime of the muon. If it is not specified the value <span class="math notranslate nohighlight">\(\tau_\mu=2.197019~ \mu\mathrm{s}\)</span> is used in the calculations.</p>
 </dd>
 <dt><strong>lifetimecorrection</strong> (fit type 0) <em>obsolete</em></dt><dd><p>Does not accept any arguments. If present, the output in <code class="docutils literal notranslate"><span class="pre">musrview</span></code> is corrected for the exponential decay of the muon. This item is <em>obsolete</em> in the RUN block
 and will be transferred to the <a class="reference internal" href="#msr-plot-block"><span class="std std-ref">PLOT block</span></a>, which allows switching between histogram view and asymmetry view much quicker.</p>
 </dd>
 </dl>
-<span id="index-24"></span><dl class="simple" id="msr-map">
+<span id="index-25"></span><dl class="simple" id="msr-map">
 <dt><strong>map</strong></dt><dd><p>On this line the mapping of run-dependent parameters is done. Parameter numbers given here may be accessed through map1, map2, etc. in the
 <a class="reference internal" href="#msr-theory-block"><span class="std std-ref">THEORY</span></a> and <a class="reference internal" href="#msr-functions-block"><span class="std std-ref">FUNCTIONS</span></a> blocks (see also <a class="reference internal" href="#msr-map-intro"><span class="std std-ref">maps</span></a>). The first ten maps
 are always present and have the value 0 if not used; however, the total number of maps is not restricted!</p>
 </dd>
 </dl>
-<span id="index-25"></span><dl id="msr-forward">
+<span id="index-26"></span><dl id="msr-forward">
 <dt><strong>forward</strong> (fit type 0, 1, 4)</dt><dd><p>Number of the histogram in the data file to be processed. If histograms shall be grouped, all the numbers which shall be grouped. Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">forward</span> <span class="mi">3</span>       <span class="c1"># no grouping, take histogram number 3</span>
 <span class="n">forward</span> <span class="mi">1</span> <span class="mi">2</span>     <span class="c1"># group histogram number 1 and 2</span>
@@ -1219,7 +1251,7 @@ are always present and have the value 0 if not used; however, the total number o
 </div>
 </dd>
 </dl>
-<span id="index-26"></span><dl id="msr-forward-backward">
+<span id="index-27"></span><dl id="msr-forward-backward">
 <dt><strong>forward, backward</strong> (fit types 2, 3)</dt><dd><p>Numbers of the histograms in the data file that should be taken to calculate the asymmetry. If histograms shall be grouped, all the numbers which shall be grouped. Examples:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># build forward/backward asymmetry with histogram 1 and 3</span>
 <span class="n">forward</span>  <span class="mi">1</span>
@@ -1241,12 +1273,12 @@ are always present and have the value 0 if not used; however, the total number o
 </div>
 </dd>
 </dl>
-<span id="index-27"></span><dl class="simple" id="msr-backgr-fix">
+<span id="index-28"></span><dl class="simple" id="msr-backgr-fix">
 <dt><strong>backgr.fix</strong> (fit types 0, 1, 2, 3, 5)</dt><dd><p>A fixed constant background in counts per nanosecond or per bin (see <a class="reference internal" href="#msr-commands-block"><span class="std std-ref">below</span></a>) may be given at this point.
 The background is specified for all histograms in the order <span class="math notranslate nohighlight">\(B_f B_b [B_r B_l]\)</span>. If this keyword is present, <em>any</em> information on a <code class="docutils literal notranslate"><span class="pre">background</span></code> line is ignored.</p>
 </dd>
 </dl>
-<span id="index-28"></span><dl id="msr-background-single-histo">
+<span id="index-29"></span><dl id="msr-background-single-histo">
 <dt><strong>background</strong> (fit type 0, 1)</dt><dd><p>The numbers of the first and the last channel of an interval from which the constant background should be calculated are specified here.
 In case histograms are being grouped, the specified channels are interpreted with respect to the first histogram. Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">background</span>  <span class="mi">100</span>  <span class="mi">18000</span>
@@ -1254,7 +1286,7 @@ In case histograms are being grouped, the specified channels are interpreted wit
 </div>
 </dd>
 </dl>
-<span id="index-29"></span><dl id="msr-background-asymmetry">
+<span id="index-30"></span><dl id="msr-background-asymmetry">
 <dt><strong>background</strong> (fit types 2, 3, 5)</dt><dd><p>The numbers of the first and the last channel of an interval from which the constant background should be calculated are specified here.
 For all the histograms this is done together in the following order: <span class="math notranslate nohighlight">\(k_{f,\rm first} k_{f,\rm last} k_{b,\rm first} k_{b, \rm last} [k_{r,\rm first} k_{r,\rm last} k_{l,\rm first} k_{l,\rm last}]\)</span>.
 In case histograms are being grouped, the specified channels are interpreted with respect to the first histograms. Example:</p>
@@ -1263,7 +1295,7 @@ In case histograms are being grouped, the specified channels are interpreted wit
 </div>
 </dd>
 </dl>
-<span id="index-30"></span><dl id="msr-data-single-histo">
+<span id="index-31"></span><dl id="msr-data-single-histo">
 <dt><strong>data</strong> (fit type 0, 1, 4)</dt><dd><p>The numbers of the first and the last channel of an interval from which the data is taken are specified here.
 In case histograms are being grouped, the specified channels are interpreted with respect to the first histogram.
 Typically these channels are referred to as <code class="docutils literal notranslate"><span class="pre">first</span> <span class="pre">good</span> <span class="pre">bin</span></code> / <code class="docutils literal notranslate"><span class="pre">last</span> <span class="pre">good</span> <span class="pre">bin</span></code> (fgb/lgb). Example:</p>
@@ -1272,7 +1304,7 @@ Typically these channels are referred to as <code class="docutils literal notran
 </div>
 </dd>
 </dl>
-<span id="index-31"></span><dl id="msr-data-asymmetry">
+<span id="index-32"></span><dl id="msr-data-asymmetry">
 <dt><strong>data</strong> (fit type 2, 3, 5)</dt><dd><p>The numbers of the first and the last channel of an interval from which the data is taken are specified here.
 Typically these channels are referred to as first good bin / last good bin (fgb/lgb). For all the histograms this is
 done together in the following order: <span class="math notranslate nohighlight">\(k_{f,\rm first} k_{f,\rm last} k_{b,\rm first} k_{b, \rm last} [k_{r,\rm first} k_{r,\rm last} k_{l,\rm first} k_{l,\rm last}]\)</span>.
@@ -1282,7 +1314,7 @@ In case histograms are being grouped, the specified channels are interpreted wit
 </div>
 </dd>
 </dl>
-<span id="index-32"></span><dl id="msr-t0-single-histo">
+<span id="index-33"></span><dl id="msr-t0-single-histo">
 <dt><strong>t0</strong> (fit type 0, 1, 4)</dt><dd><p>The number of the time-zero channel of the histogram. Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t0</span> <span class="mi">3419</span>        <span class="c1"># t0 channel = 3419</span>
 <span class="n">t0</span> <span class="mi">3419</span> <span class="mi">3434</span>   <span class="c1"># t0 channels for groupings: forward f1 f2. 3419 t0 for f1, 3434 t0 for f2.</span>
@@ -1290,7 +1322,7 @@ In case histograms are being grouped, the specified channels are interpreted wit
 </div>
 </dd>
 </dl>
-<span id="index-33"></span><dl id="msr-t0-asymmetry">
+<span id="index-34"></span><dl id="msr-t0-asymmetry">
 <dt><strong>t0</strong> (fit type 2, 3, 5)</dt><dd><p>The numbers of time-zero channels of the histograms in the order <span class="math notranslate nohighlight">\(t_{0,f} t_{0,b}\)</span>. For fit type 5, the time-zero is the channel of the start of beam pulse. Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t0</span> <span class="mi">3419</span> <span class="mi">3418</span>           <span class="c1"># t0 channels: forward (3419), backward (3418)</span>
 <span class="n">t0</span> <span class="mi">3419</span> <span class="mi">3418</span> <span class="mi">3417</span> <span class="mi">3416</span> <span class="c1"># t0 channels (assuming forward f1 f2, backward b1 b2): forward (3419, f1), backward (3418, b1); forward (3417, f2), backward (3416, b2)</span>
@@ -1298,25 +1330,25 @@ In case histograms are being grouped, the specified channels are interpreted wit
 </div>
 </dd>
 </dl>
-<span id="index-34"></span><dl class="simple" id="msr-addt0-single-histo">
+<span id="index-35"></span><dl class="simple" id="msr-addt0-single-histo">
 <dt><strong>addt0</strong> (fit type 0, 1, 4)</dt><dd><p>The number of the time-zero channel of the histogram. If grouping of histograms is present (see <a class="reference internal" href="#msr-forward"><span class="std std-ref">forward</span></a>) the
 same syntax as for <a class="reference internal" href="#msr-t0-single-histo"><span class="std std-ref">t0</span></a> applies. If one addt0 is given, the total number of addt0’s needs to be equal to
 the total number of <a class="reference internal" href="#msr-addrun"><span class="std std-ref">ADDRUN</span></a>’s!</p>
 </dd>
 </dl>
-<span id="index-35"></span><dl class="simple" id="msr-addt0-asymmetry">
+<span id="index-36"></span><dl class="simple" id="msr-addt0-asymmetry">
 <dt><strong>addt0</strong> (fit type 2, 3, 5)</dt><dd><p>The numbers of time-zero channels of the histograms in the order <span class="math notranslate nohighlight">\(t_{0,f} t_{0,b} [t_{0,r} t_{0,l}]\)</span>.
 If grouping of histograms is present (see <a class="reference internal" href="#msr-forward-backward"><span class="std std-ref">forward</span></a>) the same syntax as for <a class="reference internal" href="#msr-t0-asymmetry"><span class="std std-ref">t0</span></a> applies.
 If one addt0 is given, the total number of addt0’s needs to be equal to the total number of <a class="reference internal" href="#msr-addrun"><span class="std std-ref">ADDRUN</span></a>’s!</p>
 </dd>
 </dl>
-<span id="index-36"></span><dl class="simple" id="msr-xy-data">
+<span id="index-37"></span><dl class="simple" id="msr-xy-data">
 <dt><strong>xy-data</strong> (fit type 8)</dt><dd><p>Specification of the data from an ASCII or DB file which should be used as <em>x</em> and <em>y</em> data (in this order).
 For a simple ASCII file the column numbers are used, in the case of a DB file one can either specify the variable
 numbers or the name of the variables as given in the DB header.</p>
 </dd>
 </dl>
-<span id="index-37"></span><dl id="msr-fit">
+<span id="index-38"></span><dl id="msr-fit">
 <dt><strong>fit</strong></dt><dd><p>The range of data that should be considered when the fitting is done. For the μSR fit types 0, 1, 2, 3, and 4 the
 starting and end times are given in micro-seconds. For the non-μSR fit type 8 the starting and end points of the
 fitting range are given in the units of the <em>x</em> data.</p>
@@ -1339,19 +1371,19 @@ An example:</p>
 </div>
 </dd>
 </dl>
-<span id="index-38"></span><dl class="simple" id="msr-packing">
+<span id="index-39"></span><dl class="simple" id="msr-packing">
 <dt><strong>packing</strong></dt><dd><p>Number of data channels to be binned together. For the non-μSR fit type 8 the binning is supposed to be 1.
 For the single histogram RRF fit (fittype 1) and asymmetry RRF fit (fittype 3) this parameter is meaningless.</p>
 </dd>
 </dl>
 </div>
 <div class="section" id="the-commands-block">
-<span id="msr-commands-block"></span><span id="index-39"></span><h3>The COMMANDS Block<a class="headerlink" href="#the-commands-block" title="Permalink to this headline">¶</a></h3>
+<span id="msr-commands-block"></span><span id="index-40"></span><h3>The COMMANDS Block<a class="headerlink" href="#the-commands-block" title="Permalink to this headline">¶</a></h3>
 <p>The COMMANDS block is used to specify the commands which are passed from <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> to <code class="docutils literal notranslate"><span class="pre">MINUIT2</span></code>. The supported commands
 after the <code class="docutils literal notranslate"><span class="pre">COMMANDS</span></code> keyword are listed in the two tables below (<a class="reference internal" href="#minuit2-command-overview"><span class="std std-ref">Minuit2 Command Overview</span></a> and <a class="reference internal" href="#dks-command-overview"><span class="std std-ref">DKS Command Overview</span></a>)
 and further described in <a class="reference internal" href="#musrfit-command-block-details"><span class="std std-ref">musrfit Command Block Details</span></a>.</p>
 <div class="section" id="minuit2-command-overview">
-<span id="index-40"></span><span id="id21"></span><h4>Minuit2 Command Overview<a class="headerlink" href="#minuit2-command-overview" title="Permalink to this headline">¶</a></h4>
+<span id="index-41"></span><span id="id21"></span><h4>Minuit2 Command Overview<a class="headerlink" href="#minuit2-command-overview" title="Permalink to this headline">¶</a></h4>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 20%" />
@@ -1499,7 +1531,7 @@ Used for statistical analysis only.</p></td>
 </dl>
 </div>
 <div class="section" id="dks-command-overview">
-<span id="index-41"></span><span id="id31"></span><h4>DKS Command Overview<a class="headerlink" href="#dks-command-overview" title="Permalink to this headline">¶</a></h4>
+<span id="index-42"></span><span id="id31"></span><h4>DKS Command Overview<a class="headerlink" href="#dks-command-overview" title="Permalink to this headline">¶</a></h4>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 28%" />
@@ -1560,7 +1592,7 @@ It allows to use all your threads of your CPU(s) during the minimization.</p>
 </dl>
 </div>
 <div class="section" id="musrfit-command-block-details">
-<span id="index-42"></span><span id="id36"></span><h4><code class="docutils literal notranslate"><span class="pre">musrfit</span></code> Command Block Details<a class="headerlink" href="#musrfit-command-block-details" title="Permalink to this headline">¶</a></h4>
+<span id="index-43"></span><span id="id36"></span><h4><code class="docutils literal notranslate"><span class="pre">musrfit</span></code> Command Block Details<a class="headerlink" href="#musrfit-command-block-details" title="Permalink to this headline">¶</a></h4>
 <p>A standard COMMANDS block then looks like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMMANDS</span>
 <span class="n">MINIMIZE</span>
@@ -1657,7 +1689,7 @@ MIGRAD to the MINUIT2.OUTPUT file and at the end append the MINOS results to thi
 <p><em>Note:</em> If a fit is invoked, the sector command results will only be written to file, if the fit <em>has converged</em>!</p>
 </div>
 <div class="section" id="dks-extensions-of-the-commands-block-enabling-gpu-and-general-opencl-support">
-<span id="msr-commands-block-dks"></span><span id="index-43"></span><h4>DKS extensions of the COMMANDS block enabling GPU and general OpenCL support<a class="headerlink" href="#dks-extensions-of-the-commands-block-enabling-gpu-and-general-opencl-support" title="Permalink to this headline">¶</a></h4>
+<span id="msr-commands-block-dks"></span><span id="index-44"></span><h4>DKS extensions of the COMMANDS block enabling GPU and general OpenCL support<a class="headerlink" href="#dks-extensions-of-the-commands-block-enabling-gpu-and-general-opencl-support" title="Permalink to this headline">¶</a></h4>
 <p>In case you are running the musrfit / DKS version, there are a couple commands which allow you to control the way how the fit shall be performed. These commands are:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -1690,27 +1722,27 @@ In the <a class="reference internal" href="#msr-theory-block"><span class="std s
 </div>
 </div>
 <div class="section" id="the-fourier-block">
-<span id="msr-fourier-block"></span><span id="index-44"></span><h3>The FOURIER Block<a class="headerlink" href="#the-fourier-block" title="Permalink to this headline">¶</a></h3>
+<span id="msr-fourier-block"></span><span id="index-45"></span><h3>The FOURIER Block<a class="headerlink" href="#the-fourier-block" title="Permalink to this headline">¶</a></h3>
 <p>If a Fourier transform is carried out the results are plotted within <code class="docutils literal notranslate"><span class="pre">musrview</span></code>. As input data the actual data <em>shown</em> in <code class="docutils literal notranslate"><span class="pre">musrview</span></code> is used,
 <em>i.e.</em> the currently time range shown in <code class="docutils literal notranslate"><span class="pre">musrview</span></code>! In the FOURIER block of the msr file all necessary parameters for calculating and presenting
 the Fourier transform of the data specified in the <a class="reference internal" href="#msr-plot-block"><span class="std std-ref">PLOT block</span></a> is given. If the FOURIER block is not present in the msr file,
 either the parameters set in the <a class="reference internal" href="#musrfit-startup"><span class="std std-ref">XML startup</span></a> file or the system defaults are taken when the Fourier transform is performed.
 The block starts with the <em>FOURIER</em> keyword and may contain the following entries on the successive lines:</p>
-<span id="index-45"></span><dl class="simple" id="msr-fourier-block-units">
+<span id="index-46"></span><dl class="simple" id="msr-fourier-block-units">
 <dt><strong>units</strong></dt><dd><p>Here is specified in which domain the Fourier-transformed data is presented. One may choose between the fields (<em>Gauss</em>) or (<em>Tesla</em>), the frequency (<em>MHz</em>), and the angular-frequency domain (<em>Mc/s</em>).</p>
 </dd>
 </dl>
-<span id="index-46"></span><dl class="simple" id="msr-fourier-block-fourier-power">
+<span id="index-47"></span><dl class="simple" id="msr-fourier-block-fourier-power">
 <dt><strong>fourier_power</strong></dt><dd><p>It is possible (but not necessary) to set the number of data points used for the Fourier transform here. As argument the exponent <em>n&lt;21</em> of a power of 2 is accepted.
 The number of data points is then 2<sup>n</sup>. <strong>Attention:</strong> If the number of points given here is bigger than the actual number of available data points,
 the input data vector is filled with zeros until the number of requested points is reached (<em>zero padding</em>)!</p>
 </dd>
 </dl>
-<span id="index-47"></span><dl class="simple" id="msr-fourier-block-dc-corrected">
+<span id="index-48"></span><dl class="simple" id="msr-fourier-block-dc-corrected">
 <dt><strong>dc-corrected</strong></dt><dd><p>a flag to remove a potential DC-offset of the signal. Allowed entries are <code class="docutils literal notranslate"><span class="pre">dc-corrected</span> <span class="pre">true</span> <span class="pre">|</span> <span class="pre">1</span> <span class="pre">|</span> <span class="pre">false</span> <span class="pre">|</span> <span class="pre">0</span></code>.</p>
 </dd>
 </dl>
-<span id="index-48"></span><dl id="msr-fourier-block-apodization">
+<span id="index-49"></span><dl id="msr-fourier-block-apodization">
 <dt><strong>apodization</strong></dt><dd><p>Here is decided if the data should be apodized before the Fourier transform is performed and if yes, which apodization should be used (for further details about apodization of
 μSR data refer to the <a class="reference external" href="https://open.library.ubc.ca/cIRcle/collections/ubctheses/831/items/1.0085550">PhD thesis of T.M. Riseman (UBC)</a>). The argument to be put after the
 keyword is therefore one of the following: <strong>NONE, WEAK, MEDIUM</strong> or <strong>STRONG</strong>. If the data should be apodized, they are manipulated as follows: each data value is multiplied by the function</p>
@@ -1727,7 +1759,7 @@ keyword is therefore one of the following: <strong>NONE, WEAK, MEDIUM</strong> o
 </dl>
 </dd>
 </dl>
-<span id="index-49"></span><dl id="msr-fourier-block-plot">
+<span id="index-50"></span><dl id="msr-fourier-block-plot">
 <dt><strong>plot</strong></dt><dd><p>At this point it is possible to set the part of the Fourier-transformed data which should be plotted by default if the Fourier transform is done by pressing the <em>f</em>-key in <code class="docutils literal notranslate"><span class="pre">musrview</span></code>.
 The argument may be one of the following:</p>
 <dl class="simple">
@@ -1744,7 +1776,7 @@ The argument may be one of the following:</p>
 </dl>
 </dd>
 </dl>
-<span id="index-50"></span><dl id="msr-fourier-block-phase">
+<span id="index-51"></span><dl id="msr-fourier-block-phase">
 <dt><strong>phase</strong></dt><dd><p>If a real Fourier shall be plotted, it is necessary to adopt the phases of the different detectors. The number of potentially provided phases can be either <strong>one</strong>, which means that this phase will be applied to <em>all</em> Fourier spectra,
 or the number of phases have to correspond to the number of runs in the plot block.</p>
 <p>Currently there are three options:</p>
@@ -1796,12 +1828,12 @@ list example, the first parameter number will be the reference phase. The compac
 </ol>
 </dd>
 </dl>
-<span id="index-51"></span><dl class="simple" id="msr-fourier-block-range-for-phase-correction">
+<span id="index-52"></span><dl class="simple" id="msr-fourier-block-range-for-phase-correction">
 <dt><strong>range_for_phase_correction</strong></dt><dd><p>An interval in Fourier space given in units as define with the ‘units’ tag, or the tag ‘all’ in which case the range given under ‘range’ will be used.
 The given interval will be used for an automatic phasing of the real Fourier transform. This will allow to add real Fourier spectra coherently.</p>
 </dd>
 </dl>
-<span id="index-52"></span><dl class="simple" id="msr-fourier-block-range">
+<span id="index-53"></span><dl class="simple" id="msr-fourier-block-range">
 <dt><strong>range</strong></dt><dd><p>The plotting range is set here. The interval is specified through its start and end points given in the <em>units</em> set after the <strong>units</strong> tag.</p>
 </dd>
 </dl>
@@ -1817,20 +1849,20 @@ The given interval will be used for an automatic phasing of the real Fourier tra
 </div>
 </div>
 <div class="section" id="the-plot-block">
-<span id="msr-plot-block"></span><span id="index-53"></span><h3>The PLOT Block<a class="headerlink" href="#the-plot-block" title="Permalink to this headline">¶</a></h3>
+<span id="msr-plot-block"></span><span id="index-54"></span><h3>The PLOT Block<a class="headerlink" href="#the-plot-block" title="Permalink to this headline">¶</a></h3>
 <p>The PLOT block is intended to collect all the information needed for the graphical presentation of the data and fits using <code class="docutils literal notranslate"><span class="pre">musrview</span></code>.
 The PLOT keyword at the beginning of the block is followed by a number which indicates the plot type. The plot types have to match the <a class="reference internal" href="#fit-types"><span class="std std-ref">fit types</span></a>.
 Additionally, it is possible to provide information using the following keywords:</p>
-<span id="index-54"></span><dl class="simple" id="msr-plot-block-lifetimecorrection">
+<span id="index-55"></span><dl class="simple" id="msr-plot-block-lifetimecorrection">
 <dt><strong>lifetimecorrection</strong></dt><dd><p>Does not accept any arguments. If present, the output in <code class="docutils literal notranslate"><span class="pre">musrview</span></code> is corrected for the exponential decay of the muon. Only relevant for (type 0).</p>
 </dd>
 </dl>
-<span id="index-55"></span><dl class="simple" id="msr-plot-block-runs">
+<span id="index-56"></span><dl class="simple" id="msr-plot-block-runs">
 <dt><strong>runs</strong></dt><dd><p>The numbers of the runs to be plotted have to be put here. The runs are numbered according to their appearance in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a>.
 The numbers is either a space separated list of numbers, an interval <em>e.g.</em> 1-16, or a combination of both.</p>
 </dd>
 </dl>
-<span id="index-56"></span><dl id="msr-plot-block-range">
+<span id="index-57"></span><dl id="msr-plot-block-range">
 <dt><strong>range</strong></dt><dd><p>Here it is possible to define the plotting range explicitly. Depending on the plot type the following settings are allowed where the times are given in
 micro-seconds and the <em>N</em> in counts (types 0-4) or in counts/nsec (type 0, 1):</p>
 <dl class="simple">
@@ -1843,7 +1875,7 @@ micro-seconds and the <em>N</em> in counts (types 0-4) or in counts/nsec (type 0
 </dl>
 </dd>
 </dl>
-<span id="index-57"></span><dl id="msr-plot-block-sub-ranges">
+<span id="index-58"></span><dl id="msr-plot-block-sub-ranges">
 <dt><strong>sub_ranges</strong></dt><dd><p>Here it is possible to define the plotting range for each run individually. For the different plot types the command has the structure:</p>
 <dl class="simple">
 <dt>fit type 0-4 <em>without</em> lifetimecorrection:</dt><dd><p><em>t</em><sup>1</sup><sub>min</sub>  <em>t</em><sup>1</sup><sub>max</sub> <em>t</em><sup>2</sup><sub>min</sub> <em>t</em><sup>2</sup><sub>max</sub> … <em>t</em><sup>n</sup><sub>min</sub> <em>t</em><sup>n</sup><sub>max</sub> [ <em>N</em><sub>min</sub> <em>N</em> <sub>max</sub> ] (n = the number of runs to be plotted)</p>
@@ -1855,31 +1887,31 @@ micro-seconds and the <em>N</em> in counts (types 0-4) or in counts/nsec (type 0
 </dl>
 </dd>
 </dl>
-<span id="index-58"></span><dl class="simple" id="msr-plot-block-use-fit-ranges">
+<span id="index-59"></span><dl class="simple" id="msr-plot-block-use-fit-ranges">
 <dt><strong>use_fit_ranges</strong> [ <em>y</em><sub>min</sub> <em>y</em><sub>max</sub> ]</dt><dd><p>The fit ranges of the individual runs are used to present the data. Optionally, an ordinate range can be provided.</p>
 </dd>
 </dl>
-<span id="index-59"></span><dl class="simple" id="msr-plot-block-view-packing">
+<span id="index-60"></span><dl class="simple" id="msr-plot-block-view-packing">
 <dt><strong>view_packing</strong></dt><dd><p>The data are presented in the packing given here rather than the binning used for the fit. <strong>WARNING:</strong> This is a global option and applies to all PLOT-blocks.</p>
 </dd>
 </dl>
-<span id="index-60"></span><dl class="simple" id="msr-plot-block-logx">
+<span id="index-61"></span><dl class="simple" id="msr-plot-block-logx">
 <dt><strong>logx</strong></dt><dd><p>Will present the time axis in a logarithmic scale. <em>So far no checking of negative and zero-valued data is performed, hence expect interesting output!</em></p>
 </dd>
 </dl>
-<span id="index-61"></span><dl class="simple" id="msr-plot-block-logy">
+<span id="index-62"></span><dl class="simple" id="msr-plot-block-logy">
 <dt><strong>logy</strong></dt><dd><p>Will present the axis of ordinates in a logarithmic scale. <em>So far no checking of negative and zero-valued data is performed, hence expect interesting output!</em></p>
 </dd>
 </dl>
-<span id="index-62"></span><dl class="simple" id="msr-plot-block-rrf-packing">
+<span id="index-63"></span><dl class="simple" id="msr-plot-block-rrf-packing">
 <dt><strong>rrf_packing</strong> value</dt><dd><p>In the rotating-reference-frame (RRF) representation, this will be the value for the packing. <strong>WARNING:</strong> For the time being, this is a global option and applies to all PLOT blocks.</p>
 </dd>
 </dl>
-<span id="index-63"></span><dl class="simple" id="msr-plot-block-rrf-freq">
+<span id="index-64"></span><dl class="simple" id="msr-plot-block-rrf-freq">
 <dt><strong>rrf_freq</strong> value unit</dt><dd><p>This entry provides the RRF “frequency” given by the value and the unit which can be: <em>kHz</em>, <em>MHz</em>, <em>Mc/s</em>, <em>G</em>, or <em>T</em>.</p>
 </dd>
 </dl>
-<span id="index-64"></span><dl class="simple" id="msr-plot-block-rrf-phase">
+<span id="index-65"></span><dl class="simple" id="msr-plot-block-rrf-phase">
 <dt><strong>rrf_phase</strong> value</dt><dd><p>A phase of the RRF can be provided, either as a value in degrees, or as a parX, <em>e.g.</em> par4, where ‘X’ is supposed to be the phase parameter number in the <a class="reference internal" href="#msr-fitparameter-block"><span class="std std-ref">FITPARAMETER block</span></a>.</p>
 </dd>
 <dt><strong>Notes:</strong></dt><dd><ul class="simple">
@@ -1913,7 +1945,7 @@ The theory, however, is filtered via <a class="reference external" href="https:/
 </div>
 </div>
 <div class="section" id="the-statistic-block">
-<span id="msr-statistic-block"></span><span id="index-65"></span><h3>The STATISTIC Block<a class="headerlink" href="#the-statistic-block" title="Permalink to this headline">¶</a></h3>
+<span id="msr-statistic-block"></span><span id="index-66"></span><h3>The STATISTIC Block<a class="headerlink" href="#the-statistic-block" title="Permalink to this headline">¶</a></h3>
 <p>The STATISTIC block is the last block of a msr file. It contains some information on the fit: the date and time as well as
 the absolute and normalized values of <span class="math notranslate nohighlight">\(\chi^2\)</span> and the number of degrees of freedom in the fit.
 If enabled in the <a class="reference internal" href="#musrfit-startup"><span class="std std-ref">XML file</span></a> for <span class="math notranslate nohighlight">\(\chi^2\)</span>-single-histogram fits also <a class="reference external" href="http://en.wikipedia.org/wiki/Pearson's_chi-square_test">Pearson’s</a>
@@ -1922,9 +1954,9 @@ If enabled in the <a class="reference internal" href="#musrfit-startup"><span cl
 </div>
 </div>
 <div class="section" id="fit-types">
-<span id="index-66"></span><span id="id37"></span><h2>Fit Types<a class="headerlink" href="#fit-types" title="Permalink to this headline">¶</a></h2>
+<span id="index-67"></span><span id="id37"></span><h2>Fit Types<a class="headerlink" href="#fit-types" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="single-histogram-fit-fit-type-0">
-<span id="single-histogram-fit"></span><span id="index-67"></span><h3>Single Histogram Fit (fit type 0)<a class="headerlink" href="#single-histogram-fit-fit-type-0" title="Permalink to this headline">¶</a></h3>
+<span id="single-histogram-fit"></span><span id="index-68"></span><h3>Single Histogram Fit (fit type 0)<a class="headerlink" href="#single-histogram-fit-fit-type-0" title="Permalink to this headline">¶</a></h3>
 <p>The single-histogram fit (fit type 0) is used to fit a function directly to the raw data using</p>
 <div class="math notranslate nohighlight">
 \[N(t) = N_0 e^{-t/\tau_\mu} [ 1 + A(t) ] + N_{\rm bkg}\]</div>
@@ -1944,7 +1976,7 @@ If the option lifetimecorrection is <em>set</em> in the PLOT block the asymmetry
 \[A(t) = \frac{N(t) - N_{\rm bkg}}{N_0} e^{+t/\tau_\mu} - 1\]</div>
 </div>
 <div class="section" id="single-histogram-rrf-fit-fit-type-1">
-<span id="single-histogram-rrf-fit"></span><span id="index-68"></span><h3>Single Histogram RRF Fit (fit type 1)<a class="headerlink" href="#single-histogram-rrf-fit-fit-type-1" title="Permalink to this headline">¶</a></h3>
+<span id="single-histogram-rrf-fit"></span><span id="index-69"></span><h3>Single Histogram RRF Fit (fit type 1)<a class="headerlink" href="#single-histogram-rrf-fit-fit-type-1" title="Permalink to this headline">¶</a></h3>
 <p>The single-histogram RRF fit (fit type 1) is used to fit the rotating reference frame asymmetry <span class="math notranslate nohighlight">\(A_{\rm rrf}(t)\)</span> extracted from the raw data.
 The currently implemented version will fail at low fields/frequencies (for about &lt; 1 Tesla). The same is true, if multiple frequencies with large
 enough separation are present, <em>e.g.</em> when dealing with muonium. <span class="math notranslate nohighlight">\(A_{\rm rrf}(t)\)</span> is estimated the following way (for more details see the
@@ -1968,7 +2000,7 @@ of the <span class="math notranslate nohighlight">\(N_0\)</span> estimate, line 
 For more details see the rrf-memo found in the source code under &lt;musrfit&gt;/doc/memo/rrf/rrf-notes.pdf or <a class="reference external" href="http://dx.doi.org/10.7566/JPSCP.21.011051">Musrfit–Real Time Parameter Fitting Using GPUs</a></p>
 </div>
 <div class="section" id="asymmetry-fit-fit-type-2">
-<span id="asymmetry-fit"></span><span id="index-69"></span><h3>Asymmetry Fit (fit type 2)<a class="headerlink" href="#asymmetry-fit-fit-type-2" title="Permalink to this headline">¶</a></h3>
+<span id="asymmetry-fit"></span><span id="index-70"></span><h3>Asymmetry Fit (fit type 2)<a class="headerlink" href="#asymmetry-fit-fit-type-2" title="Permalink to this headline">¶</a></h3>
 <p>For an asymmetry fit (fit type 2) two histograms are needed. These are given by the <a class="reference internal" href="#msr-forward-backward"><span class="std std-ref">forward</span></a> and <a class="reference internal" href="#msr-forward-backward"><span class="std std-ref">backward</span></a> keywords
 in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a>. Additionally, the parameters <a class="reference internal" href="#msr-alpha-beta"><span class="std std-ref">alpha</span></a> and <a class="reference internal" href="#msr-alpha-beta"><span class="std std-ref">beta</span></a> which relate the detector
 efficiencies, solid angles and initial asymmetries of the two detectors can be supplied. The constant background for the two histograms is either given by
@@ -2002,13 +2034,13 @@ efficiencies, solid angles and initial asymmetries of the two detectors can be s
 <p>and plotted together with the function given in the THEORY block.</p>
 </div>
 <div class="section" id="asymmetry-rrf-fit-fit-type-3">
-<span id="asymmetry-rrf-fit"></span><span id="index-70"></span><h3>Asymmetry RRF Fit (fit type 3)<a class="headerlink" href="#asymmetry-rrf-fit-fit-type-3" title="Permalink to this headline">¶</a></h3>
+<span id="asymmetry-rrf-fit"></span><span id="index-71"></span><h3>Asymmetry RRF Fit (fit type 3)<a class="headerlink" href="#asymmetry-rrf-fit-fit-type-3" title="Permalink to this headline">¶</a></h3>
 <p>For asymmetry RRF Fit (fit type 3) two histograms are needed. In a first step, the unbinned asymmetry is formed as described for the asymmetry fit.
 Afterwards the RRF transformation is carried out, <em>i.e.</em> point 4. and 5. as sketched in the single histogramm RRF fit. The same reservations as for
 the single histogram RRF fit apply: <strong>if you not urgently need it: do not use it! There are better ways to deal with the analysis of high frequency data!</strong></p>
 </div>
 <div class="section" id="negative-muon-mgrsr-fit-fit-type-4">
-<span id="negative-muon-musr-fit"></span><span id="index-71"></span><h3>Negative Muon μSR Fit (fit type 4)<a class="headerlink" href="#negative-muon-mgrsr-fit-fit-type-4" title="Permalink to this headline">¶</a></h3>
+<span id="negative-muon-musr-fit"></span><span id="index-72"></span><h3>Negative Muon μSR Fit (fit type 4)<a class="headerlink" href="#negative-muon-mgrsr-fit-fit-type-4" title="Permalink to this headline">¶</a></h3>
 <p>The negative muon μSR fit (fit type 4) is used for single histogram fits of MuMinus, <em>i.e.</em></p>
 <div class="math notranslate nohighlight">
 \[N(t) = \sum_i N_i\,\mathrm{e}^{-t/\tau_i} \left[ 1 + A_i(t)\right] + N_{\rm bkg}(t)\]</div>
@@ -2024,7 +2056,7 @@ the single histogram RRF fit apply: <strong>if you not urgently need it: do not 
 <p>Since MuMinus is quite generic, the full functional depends has to be written in the <a class="reference internal" href="#msr-theory-block"><span class="std std-ref">THEORY Block</span></a>.</p>
 </div>
 <div class="section" id="beta-nmr-asymmetry-fit-fit-type-5">
-<span id="bnmr-asymmetry-fit"></span><span id="index-72"></span><h3>beta-NMR Asymmetry Fit (fit type 5)<a class="headerlink" href="#beta-nmr-asymmetry-fit-fit-type-5" title="Permalink to this headline">¶</a></h3>
+<span id="bnmr-asymmetry-fit"></span><span id="index-73"></span><h3>beta-NMR Asymmetry Fit (fit type 5)<a class="headerlink" href="#beta-nmr-asymmetry-fit-fit-type-5" title="Permalink to this headline">¶</a></h3>
 <p>Four histograms are needed for a beta-NMR asymmetry fit (fit type 5), two for positive helecity and two for negative. These are given by the <a class="reference internal" href="#msr-forward-backward"><span class="std std-ref">forward</span></a> and <a class="reference internal" href="#msr-forward-backward"><span class="std std-ref">backward</span></a> keywords
 in the <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a>. Additionally, the parameters <a class="reference internal" href="#msr-alpha-beta"><span class="std std-ref">alpha</span></a> and <a class="reference internal" href="#msr-alpha-beta"><span class="std std-ref">beta</span></a> which relate the detector
 efficiencies, solid angles and initial asymmetries of the two detectors can be supplied. The constant background for the two histograms is either given by
@@ -2064,7 +2096,7 @@ efficiencies, solid angles and initial asymmetries of the two detectors can be s
 <p>and plotted together with the function given in the THEORY block.</p>
 </div>
 <div class="section" id="non-mgrsr-fit-fit-type-8">
-<span id="non-musr-fit"></span><span id="index-73"></span><h3>Non-μSR Fit (fit type 8)<a class="headerlink" href="#non-mgrsr-fit-fit-type-8" title="Permalink to this headline">¶</a></h3>
+<span id="non-musr-fit"></span><span id="index-74"></span><h3>Non-μSR Fit (fit type 8)<a class="headerlink" href="#non-mgrsr-fit-fit-type-8" title="Permalink to this headline">¶</a></h3>
 <p>In the case of a non-μSR fit (fit type 8) the fitting function is</p>
 <div class="math notranslate nohighlight">
 \[y = f(x),\]</div>
@@ -2073,7 +2105,7 @@ efficiencies, solid angles and initial asymmetries of the two detectors can be s
 </div>
 </div>
 <div class="section" id="id38">
-<span id="index-74"></span><span id="id39"></span><h2>User Functions<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h2>
+<span id="index-75"></span><span id="id39"></span><h2>User Functions<a class="headerlink" href="#id38" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">musrfit</span></code> offers the possibility to plug-in user-defined functions implemented in <code class="docutils literal notranslate"><span class="pre">C++</span></code> classes to the fitting and plotting routines.
 In order to do so, basically two things are needed:</p>
 <blockquote>
@@ -2091,7 +2123,7 @@ In order to do so, basically two things are needed:</p>
 </div></blockquote>
 <p>Since the first is simpler this will be explained using an explicit example, before it is discussed why the second option is needed and how it can be used.</p>
 <div class="section" id="user-function-without-global-user-function-object-access">
-<span id="user-functions-without-global-part"></span><span id="index-75"></span><h3>User Function without global user-function-object access<a class="headerlink" href="#user-function-without-global-user-function-object-access" title="Permalink to this headline">¶</a></h3>
+<span id="user-functions-without-global-part"></span><span id="index-76"></span><h3>User Function without global user-function-object access<a class="headerlink" href="#user-function-without-global-user-function-object-access" title="Permalink to this headline">¶</a></h3>
 <p>In the following it is explained in detail how the implementation of a user function is done using the simple example of <span class="math notranslate nohighlight">\(f_a(x) = \sin(a x)/(a x)\)</span>,
 where the parameter <span class="math notranslate nohighlight">\(a\)</span> should be determined by the fit. Although not necessary for this simple example, the source code is split into two parts,
 namely a header file <code class="docutils literal notranslate"><span class="pre">TMyFunction.h</span></code> containing the class declaration and a second file <code class="docutils literal notranslate"><span class="pre">TMyFunction.cpp</span></code> including the function implementation
@@ -2194,7 +2226,7 @@ refer to the <a class="reference external" href="https://root.cern.ch/interactin
 <p>Finally, please be aware of the <a class="reference internal" href="#user-function-important"><span class="std std-ref">remark</span></a> at the end of this section.</p>
 </div>
 <div class="section" id="user-function-with-global-user-function-object-access">
-<span id="user-functions-with-global-part"></span><span id="index-76"></span><h3>User Function with global user-function-object access<a class="headerlink" href="#user-function-with-global-user-function-object-access" title="Permalink to this headline">¶</a></h3>
+<span id="user-functions-with-global-part"></span><span id="index-77"></span><h3>User Function with global user-function-object access<a class="headerlink" href="#user-function-with-global-user-function-object-access" title="Permalink to this headline">¶</a></h3>
 <p>Before explaining how to use global objects within user functions, it will be shortly explained where is the problem and why this might be a sensible approach.
 In <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> each <a class="reference internal" href="#msr-run-block"><span class="std std-ref">RUN block</span></a> (histogram, asymmetry, …) is owning its own theory-function tree. An example is shown in the figure below.
 The bluish nodes are default musrfit functions, whereas the red nodes represent user functions (here labeled by <code class="docutils literal notranslate"><span class="pre">uF1</span></code> and <code class="docutils literal notranslate"><span class="pre">uF2</span></code>). Without global user-function
@@ -2334,7 +2366,7 @@ In case this cannot be ensured, the parallelization can be disabled by <em>–di
 </div>
 </div>
 <div class="section" id="technical-description-of-the-musrfit-framework">
-<span id="technical-musrfit"></span><span id="index-77"></span><h2>Technical Description of the musrfit framework<a class="headerlink" href="#technical-description-of-the-musrfit-framework" title="Permalink to this headline">¶</a></h2>
+<span id="technical-musrfit"></span><span id="index-78"></span><h2>Technical Description of the musrfit framework<a class="headerlink" href="#technical-description-of-the-musrfit-framework" title="Permalink to this headline">¶</a></h2>
 <p>A technical description of the musrfit framework can be found on its own <a class="reference external" href="http://lmu.web.psi.ch/musrfit/technical/index.html">docu</a>.</p>
 </div>
 </div>
@@ -2433,12 +2465,12 @@ In case this cannot be ensured, the parallelization can be disabled by <em>–di
         <li class="right" >
           <a href="tutorial.html" title="Tutorial for musrfit"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.1 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.2 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
         &#169; Copyright 2020, Andreas Suter.
-      Last updated on May 25, 2020.
+      Last updated on Jun 17, 2020.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
     </div>
   </body>

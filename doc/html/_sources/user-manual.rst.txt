@@ -774,8 +774,9 @@ A THEORY block including a user function may then look like ::
 The FUNCTIONS Block
 +++++++++++++++++++
 
-Here some auxiliary functions can be defined. These functions can currently *only* operate on the defined parameters. They can be used in the 
-:ref:`THEORY block <msr-theory-block>` and for three specific cases in the :ref:`RUN block <msr-run-block>` (`norm`, `alpha`, and `beta`). Supported is the use of basic arithmetic:
+Here some auxiliary functions can be defined. These functions can currently *only* operate on the defined parameters, and some meta information from the data files. 
+They can be used in the :ref:`THEORY block <msr-theory-block>` and for three specific cases in the :ref:`RUN block <msr-run-block>` (`norm`, `alpha`, and `beta`). 
+Supported is the use of basic arithmetic:
 
 :math:`+`
   Addition
@@ -798,6 +799,21 @@ Furthermore, some constants are predefined and might also be used:
 
 The fit parameters are accessed either directly through parX, where 'X' is the number of the parameter in the :ref:`FITPARAMETER block <msr-fitparameter-block>`, 
 *e.g.* *par5* or through a mapping with mapY, where 'Y' specifies the mapping number in the :ref:`RUN block <msr-run-block>` as explained below. 
+
+
+.. index:: meta-information
+
+The available meta information form the data files are:
+
++------------------+--------------+---------+---------------------+
+| Meta Information | Symbol       | Units   | Comments            |
++------------------+--------------+---------+---------------------+
+| **Field**        | *B* or *b*   | `(G)`   |                     |
++------------------+--------------+---------+---------------------+
+| **Energy**       | *En* or *en* | `(keV)` | mainly LEM          |
++------------------+--------------+---------+---------------------+
+| **Temperature**  | *Tx*         | `(K)`   | x=0,1,.. e.g. *t0*  |
++------------------+--------------+---------+---------------------+
 
 The defined functions are denoted as funX, where 'X' is the function number, *i.e.* fun1, fun2, etc. and have to be placed separately on one 
 line each. Afterwards they can be used in the :ref:`THEORY block <msr-theory-block>`.
