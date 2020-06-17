@@ -154,7 +154,7 @@ Double_t PRunSingleHistoRRF::CalcChiSquare(const std::vector<Double_t>& par)
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
     UInt_t funcNo = fMsrInfo->GetFuncNo(i);
-    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par, fMetaData);
   }
 
   // calculate chi square
@@ -202,7 +202,7 @@ Double_t PRunSingleHistoRRF::CalcChiSquareExpected(const std::vector<Double_t>& 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
     UInt_t funcNo = fMsrInfo->GetFuncNo(i);
-    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(funcNo, *fRunInfo->GetMap(), par, fMetaData);
   }
 
   // calculate chi square
@@ -265,7 +265,7 @@ void PRunSingleHistoRRF::CalcTheory()
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par, fMetaData);
   }
 
   // calculate theory
@@ -441,11 +441,14 @@ Bool_t PRunSingleHistoRRF::PrepareData()
   }
 
   // keep the field from the meta-data from the data-file
-  fField = runData->GetField();
+  fMetaData.fField = runData->GetField();
+
+  // keep the energy from the meta-data from the data-file
+  fMetaData.fEnergy = runData->GetEnergy();
 
   // keep the temperature(s) from the meta-data from the data-file
   for (unsigned int i=0; i<runData->GetNoOfTemperatures(); i++)
-    fTemp.push_back(runData->GetTemperature(i));
+    fMetaData.fTemp.push_back(runData->GetTemperature(i));
 
   // collect histogram numbers
   PUIntVector histoNo; // histoNo = msr-file forward + redGreen_offset - 1
@@ -750,7 +753,7 @@ Bool_t PRunSingleHistoRRF::PrepareViewData(PRawRunData* runData, const UInt_t hi
 
   // calculate functions
   for (Int_t i=0; i<fMsrInfo->GetNoOfFuncs(); i++) {
-    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par);
+    fFuncValues[i] = fMsrInfo->EvalFunc(fMsrInfo->GetFuncNo(i), *fRunInfo->GetMap(), par, fMetaData);
   }
 
   // check if a finer binning for the theory is needed

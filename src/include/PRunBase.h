@@ -73,8 +73,7 @@ class PRunBase
 
     PRunData fData;             ///< data to be fitted, viewed, i.e. binned data
     Double_t fTimeResolution;   ///< time resolution in (us)
-    Double_t fField;            ///< field from the meta-data of the data file
-    PDoubleVector fTemp;        ///< temperature(s) from the meta-data of the data file : first = temp, second = std. dev. of the temperature
+    PMetaData fMetaData;        ///< keeps the meta data from the data file like field, temperature, energy, ...
     PDoubleVector fT0s;         ///< all t0 bins of a run! The derived classes will handle it.
     std::vector<PDoubleVector> fAddT0s; ///< all t0 bins of all addrun's of a run! The derived classes will handle it.
 

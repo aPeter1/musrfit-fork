@@ -57,15 +57,18 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
     static const int realID         = 1;
     static const int constPiID      = 2;
     static const int constGammaMuID = 3;
-    static const int funLabelID     = 4;
-    static const int parameterID    = 5;
-    static const int mapID          = 6;
-    static const int functionID     = 7;
-    static const int powerID        = 8;
-    static const int factorID       = 9;
-    static const int termID         = 10;
-    static const int expressionID   = 11;
-    static const int assignmentID   = 12;
+    static const int constFieldID   = 4;
+    static const int constEnergyID  = 5;
+    static const int constTempID    = 6;
+    static const int funLabelID     = 7;
+    static const int parameterID    = 8;
+    static const int mapID          = 9;
+    static const int functionID     = 10;
+    static const int powerID        = 11;
+    static const int factorID       = 12;
+    static const int termID         = 13;
+    static const int expressionID   = 14;
+    static const int assignmentID   = 15;
 
     template <typename ScannerT>
     struct definition
@@ -78,6 +81,12 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
             const_pi       =   leaf_node_d[ str_p("PI") ];
 
             const_gamma_mu =   leaf_node_d[ str_p("GAMMA_MU") ];
+
+            const_field    =   leaf_node_d[ str_p("B") ];
+
+            const_energy   =   leaf_node_d[ str_p("EN") ];
+
+            const_temp    =    leaf_node_d[ ( lexeme_d[ "T" >> +digit_p ] ) ];
 
             fun_label      =   leaf_node_d[ ( lexeme_d[ "FUN" >> +digit_p ] ) ];
 
@@ -110,6 +119,9 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
             factor         =   real
                            |   const_pi
                            |   const_gamma_mu
+                           |   const_field
+                           |   const_energy
+                           |   const_temp
                            |   parameter
                            |   map
                            |   function
@@ -134,6 +146,9 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
             BOOST_SPIRIT_DEBUG_RULE(real);
             BOOST_SPIRIT_DEBUG_RULE(const_pi);
             BOOST_SPIRIT_DEBUG_RULE(const_gamma_mu);
+            BOOST_SPIRIT_DEBUG_RULE(const_field);
+            BOOST_SPIRIT_DEBUG_RULE(const_energy);
+            BOOST_SPIRIT_DEBUG_RULE(const_temp);
             BOOST_SPIRIT_DEBUG_RULE(fun_label);
             BOOST_SPIRIT_DEBUG_RULE(parameter);
             BOOST_SPIRIT_DEBUG_RULE(map);
@@ -154,6 +169,9 @@ struct PFunctionGrammar : public grammar<PFunctionGrammar>
         rule<ScannerT, parser_context<>, parser_tag<mapID> >          map;
         rule<ScannerT, parser_context<>, parser_tag<parameterID> >    parameter;
         rule<ScannerT, parser_context<>, parser_tag<funLabelID> >     fun_label;
+        rule<ScannerT, parser_context<>, parser_tag<constTempID> >    const_temp;
+        rule<ScannerT, parser_context<>, parser_tag<constEnergyID> >  const_energy;
+        rule<ScannerT, parser_context<>, parser_tag<constFieldID> >   const_field;
         rule<ScannerT, parser_context<>, parser_tag<constGammaMuID> > const_gamma_mu;
         rule<ScannerT, parser_context<>, parser_tag<constPiID> >      const_pi;
         rule<ScannerT, parser_context<>, parser_tag<realID> >         real;

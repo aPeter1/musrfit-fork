@@ -187,6 +187,16 @@ void PFunction::FillFuncEvalTree(iter_t const& i, PFuncTreeNode &node)
   } else if (i->value.id() == PFunctionGrammar::constGammaMuID) { // handle constant gamma_mu
     node.fID = PFunctionGrammar::constGammaMuID; // keep the ID
     node.fDvalue = GAMMA_BAR_MUON; // keep the value
+  } else if (i->value.id() == PFunctionGrammar::constFieldID) { // handle constant field from meta data
+    node.fID = PFunctionGrammar::constFieldID; // keep the ID
+  } else if (i->value.id() == PFunctionGrammar::constEnergyID) { // handle constant energy from meta data
+    node.fID = PFunctionGrammar::constEnergyID; // keep the ID
+  } else if (i->value.id() == PFunctionGrammar::constTempID) { // handle constant temperature from meta data
+    str = std::string(i->value.begin(), i->value.end()); // get string
+    boost::algorithm::trim(str);
+    status = sscanf(str.c_str(), "T%d", &ivalue); // convert string to temperature index
+    node.fID = PFunctionGrammar::constTempID; // keep the ID
+    node.fIvalue = ivalue; // Temp idx
   } else if (i->value.id() == PFunctionGrammar::parameterID) { // handle parameter number
     str = std::string(i->value.begin(), i->value.end()); // get string
     boost::algorithm::trim(str);
@@ -343,6 +353,12 @@ Bool_t PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSi
     return true;
   } else if (node.fID == PFunctionGrammar::constGammaMuID) {
     return true;
+  } else if (node.fID == PFunctionGrammar::constFieldID) {
+    return true;
+  } else if (node.fID == PFunctionGrammar::constEnergyID) {
+    return true;
+  } else if (node.fID == PFunctionGrammar::constTempID) {
+    return true;
   } else if (node.fID == PFunctionGrammar::parameterID) {
     if (node.fIvalue <= static_cast<Int_t>(paramSize))
       return true;
@@ -391,9 +407,10 @@ Bool_t PFunction::FindAndCheckMapAndParamRange(PFuncTreeNode &node, UInt_t mapSi
  *
  * \param param fit parameter vector
  */
-Double_t PFunction::Eval(std::vector<Double_t> param)
+Double_t PFunction::Eval(std::vector<Double_t> param, PMetaData metaData)
 {
   fParam = param;
+  fMetaData = metaData;
 
   return EvalNode(fFunc);
 }
@@ -414,6 +431,22 @@ Double_t PFunction::EvalNode(PFuncTreeNode &node)
     return node.fDvalue;
   } else if (node.fID == PFunctionGrammar::constGammaMuID) {
     return node.fDvalue;
+  } else if (node.fID == PFunctionGrammar::constFieldID) {
+    return fMetaData.fField;
+  } else if (node.fID == PFunctionGrammar::constEnergyID) {
+    if (fMetaData.fEnergy == PMUSR_UNDEFINED) {
+      std::cerr << std::endl << "**PANIC ERROR**: PFunction::EvalNode: energy meta data not available." << std::endl;
+      std::cerr << std::endl;
+      exit(0);
+    }
+    return fMetaData.fEnergy;
+  } else if (node.fID == PFunctionGrammar::constTempID) {
+    if (node.fIvalue >= fMetaData.fTemp.size()) {
+      std::cerr << std::endl << "**PANIC ERROR**: PFunction::EvalNode: Temp idx=" << node.fIvalue << " requested which is >= #Temp(s)=" << fMetaData.fTemp.size() << " available." << std::endl;
+      std::cerr << std::endl;
+      exit(0);
+    }
+    return fMetaData.fTemp[node.fIvalue];
   } else if (node.fID == PFunctionGrammar::parameterID) {
     Double_t dval;
     if (node.fSign)
@@ -576,6 +609,13 @@ void PFunction::EvalTreeForStringExpression(iter_t const& i)
     fFuncString += "Pi";
   } else if (i->value.id() == PFunctionGrammar::constGammaMuID) {
     fFuncString += "gamma_mu";
+  } else if (i->value.id() == PFunctionGrammar::constFieldID) {
+    fFuncString += "B";
+  } else if (i->value.id() == PFunctionGrammar::constEnergyID) {
+    fFuncString += "EN";
+  } else if (i->value.id() == PFunctionGrammar::constTempID) {
+    assert(i->children.size() == 0);
+    fFuncString += boost::algorithm::trim_copy(std::string(i->value.begin(), i->value.end())).c_str();
   } else if (i->value.id() == PFunctionGrammar::funLabelID) {
     assert(i->children.size() == 0);
     //SetFuncNo(i);

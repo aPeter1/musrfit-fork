@@ -44,6 +44,7 @@
 
 #include <TString.h>
 
+#include "PMusr.h"
 #include "PFunctionGrammar.h"
 
 //----------------------------------------------------------------------------
@@ -79,7 +80,7 @@ typedef struct func_tree_node {
   Int_t    fOperatorTag; ///< tag for '+', '-', '*', '/'
   Int_t    fFunctionTag; ///< tag got "cos", "sin", ...
   Int_t    fIvalue; ///< for parameter numbers and maps
-  Bool_t fSign; ///< for sign, true means '-', false '+'
+  Bool_t   fSign; ///< for sign, true means '-', false '+'
   Double_t fDvalue; ///< for numbers
   std::vector<func_tree_node> children; ///< holding sub-tree
 } PFuncTreeNode;
@@ -96,7 +97,7 @@ class PFunction {
     virtual Bool_t IsValid() { return fValid; }
     virtual Int_t GetFuncNo() { return fFuncNo; }
     virtual Bool_t CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize);
-    virtual Double_t Eval(std::vector<Double_t> param);
+    virtual Double_t Eval(std::vector<Double_t> param, PMetaData metaData);
     virtual void SetMap(std::vector<Int_t> map) { fMap = map; }
 
     virtual TString* GetFuncString() { return &fFuncString; }
@@ -124,6 +125,8 @@ class PFunction {
     virtual void EvalTreeForString(tree_parse_info<> info);
     virtual void EvalTreeForStringExpression(iter_t const& i);
     TString fFuncString; ///< clear text representation of the function
+
+    PMetaData fMetaData; ///< keeps meta data from data files (field, energy, temperature, ...)
 };
 
 #endif // _PFUNCTION_H_

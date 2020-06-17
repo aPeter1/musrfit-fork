@@ -93,9 +93,8 @@ class PMsrHandler
     virtual UInt_t GetFuncIndex(Int_t funNo) { return fFuncHandler->GetFuncIndex(funNo); }
     virtual Bool_t CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
                        { return fFuncHandler->CheckMapAndParamRange(mapSize, paramSize); }
-    virtual Double_t EvalFunc(UInt_t i, std::vector<Int_t> map, std::vector<Double_t> param)
-                       { return fFuncHandler->Eval(i,map,param); }
-
+    virtual Double_t EvalFunc(UInt_t i, std::vector<Int_t> map, std::vector<Double_t> param, PMetaData metaData)
+                       { return fFuncHandler->Eval(i, map, param, metaData); }
     virtual UInt_t GetNoOfFitParameters(UInt_t idx);
     virtual Int_t ParameterInUse(UInt_t paramNo);
     virtual Bool_t CheckRunBlockIntegrity();

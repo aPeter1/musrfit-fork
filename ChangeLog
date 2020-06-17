@@ -12,6 +12,13 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.6.2, 2020/06/17
+=============================
+
+Functions not only can use parameters and maps but now also meta data from the 
+data files like, field (B or b), energy (En or en), or temperature (T<x> pr t<x>
+where <x> is a number starting from 0, e.g. t0).
+
 Release of V1.6.1, 2020/05/25
 =============================
 

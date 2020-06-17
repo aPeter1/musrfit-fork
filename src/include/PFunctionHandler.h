@@ -51,7 +51,7 @@ class PFunctionHandler
     virtual Bool_t IsValid() { return fValid; }
     virtual Bool_t DoParse();
     virtual Bool_t CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize);
-    virtual double Eval(Int_t funNo, std::vector<Int_t> map, std::vector<double> param);
+    virtual double Eval(Int_t funNo, std::vector<Int_t> map, std::vector<double> param, PMetaData metaData);
     virtual Int_t GetFuncNo(UInt_t idx);
     virtual Int_t GetFuncIndex(Int_t funcNo);
     virtual UInt_t GetNoOfFuncs() { return fFuncs.size(); }

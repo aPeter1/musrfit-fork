@@ -214,6 +214,16 @@ enum EPMusrHandleTag { kEmpty, kFit, kView };
 
 //-------------------------------------------------------------
 /**
+ * <p>keep a couple of meta data for the FUNCTIONS.
+ */
+struct PMetaData {
+  Double_t fField;  ///< field in (G)
+  Double_t fEnergy; ///< energy in (keV)
+  PDoubleVector fTemp; ///< temperature(s) in (K)
+};
+
+//-------------------------------------------------------------
+/**
  * <p>Handles the data which will be fitted, i.e. packed, background corrected, ...
  * This are <b>not</b> the raw histogram data of a run. This are the pre-processed data.
  */

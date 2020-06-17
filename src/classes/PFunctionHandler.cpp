@@ -155,7 +155,7 @@ Bool_t PFunctionHandler::CheckMapAndParamRange(UInt_t mapSize, UInt_t paramSize)
  * \param map map vector
  * \param param fit parameter vector
  */
-Double_t PFunctionHandler::Eval(Int_t funNo, std::vector<Int_t> map, std::vector<double> param)
+Double_t PFunctionHandler::Eval(Int_t funNo, std::vector<Int_t> map, std::vector<double> param, PMetaData metaData)
 {
   if (GetFuncIndex(funNo) == -1) {
     std::cerr << std::endl << "**ERROR**: Couldn't find FUN" << funNo << " for evaluation";
@@ -167,7 +167,7 @@ Double_t PFunctionHandler::Eval(Int_t funNo, std::vector<Int_t> map, std::vector
   fFuncs[GetFuncIndex(funNo)].SetMap(map);
 
   // return evaluated function
-  return fFuncs[GetFuncIndex(funNo)].Eval(param);
+  return fFuncs[GetFuncIndex(funNo)].Eval(param, metaData);
 }
 
 //-------------------------------------------------------------
