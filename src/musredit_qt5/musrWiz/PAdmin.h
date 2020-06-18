@@ -32,7 +32,10 @@
 
 #include <QObject>
 #include <QVector>
-#include <QtXml>
+#include <QXmlStreamReader>
+#include <QIODevice>
+#include <QProcessEnvironment>
+#include <QDir>
 
 #include "PTheoTemplate.h"
 #include "PMusrfitFunc.h"
@@ -41,11 +44,13 @@
 class PAdmin;
 
 //---------------------------------------------------------------------------
-class PFuncXMLParser : public QXmlDefaultHandler
+class PFuncXMLParser
 {
   public:
-    PFuncXMLParser(PAdmin*);
+    PFuncXMLParser(const QString &fln, PAdmin*);
     virtual ~PFuncXMLParser() {}
+
+    virtual bool isValid() { return fValid; }
 
   private:
     enum EFuncKeyWords {eEmpty,
@@ -53,20 +58,18 @@ class PFuncXMLParser : public QXmlDefaultHandler
                         eName, eAbbrv, eNoOfParam, eParam,
                         eParamName, eParamValue, eParamMap};
 
+    bool parse(QIODevice *device);
     bool startDocument();
-    bool startElement(const QString&, const QString&, const QString& ,
-                      const QXmlAttributes& qAttr);
-    bool endElement( const QString&, const QString&, const QString& );
-
-    bool characters(const QString&);
+    bool startElement();
+    bool endElement();
+    bool characters();
     bool endDocument();
 
-    bool warning( const QXmlParseException & exception );
-    bool error( const QXmlParseException & exception );
-    bool fatalError( const QXmlParseException & exception );
 
-    EFuncKeyWords fKeyWord;    ///< key word tag to know how to handle the content
-    PAdmin        *fAdmin;     ///< a pointer to the main administration class object
+    QXmlStreamReader fXml;     ///< xml stream reader object
+    bool             fValid;   ///< flag showing if XML read has been successful
+    EFuncKeyWords    fKeyWord; ///< key word tag to know how to handle the content
+    PAdmin           *fAdmin;  ///< a pointer to the main administration class object
 
     PTheoTemplate fTheoTemplate;
     PMusrfitFunc fFunc;
@@ -74,11 +77,13 @@ class PFuncXMLParser : public QXmlDefaultHandler
 };
 
 //---------------------------------------------------------------------------
-class PInstrumentDefXMLParser : public QXmlDefaultHandler
+class PInstrumentDefXMLParser
 {
   public:
-    PInstrumentDefXMLParser(PAdmin*);
+    PInstrumentDefXMLParser(const QString &fln, PAdmin*);
     virtual ~PInstrumentDefXMLParser() {}
+
+    virtual bool isValid() { return fValid; }
 
   private:
     enum EKeyWords {eEmpty, eInstitute, eInstrument, eRunNameTemplate,
@@ -86,20 +91,17 @@ class PInstrumentDefXMLParser : public QXmlDefaultHandler
                     eNoOfDetectors, eFgbOffset, eLgb, eBkgRange,
                     eLogicDetector};
 
+    bool parse(QIODevice *device);
     bool startDocument();
-    bool startElement(const QString&, const QString&, const QString& ,
-                      const QXmlAttributes& qAttr);
-    bool endElement( const QString&, const QString&, const QString& );
-
-    bool characters(const QString&);
+    bool startElement();
+    bool endElement();
+    bool characters();
     bool endDocument();
 
-    bool warning( const QXmlParseException & exception );
-    bool error( const QXmlParseException & exception );
-    bool fatalError( const QXmlParseException & exception );
-
-    EKeyWords fKeyWord;    ///< key word tag to know how to handle the content
-    PAdmin    *fAdmin;     ///< a pointer to the main administration class object
+    QXmlStreamReader fXml;   ///< xml stream reader object
+    bool             fValid; ///< flag showing if XML read has been successful
+    EKeyWords fKeyWord; ///< key word tag to know how to handle the content
+    PAdmin    *fAdmin;  ///< a pointer to the main administration class object
 
     QString fInstituteName;
     PInstrument *fInstrument;
@@ -128,27 +130,26 @@ class PMusrWizDefault
 };
 
 //---------------------------------------------------------------------------
-class PMusrWizDefaultXMLParser : public QXmlDefaultHandler
+class PMusrWizDefaultXMLParser
 {
   public:
-    PMusrWizDefaultXMLParser(PAdmin*);
+    PMusrWizDefaultXMLParser(const QString &fln, PAdmin*);
     virtual ~PMusrWizDefaultXMLParser() {}
+
+    virtual bool isValid() { return fValid; }
 
   private:
     enum EKeyWords {eEmpty, eInstitute, eInstrument, eFitType};
 
+    bool parse(QIODevice *device);
     bool startDocument();
-    bool startElement(const QString&, const QString&, const QString& ,
-                      const QXmlAttributes& );
-    bool endElement( const QString&, const QString&, const QString& );
-
-    bool characters(const QString&);
+    bool startElement();
+    bool endElement();
+    bool characters();
     bool endDocument();
 
-    bool warning( const QXmlParseException & exception );
-    bool error( const QXmlParseException & exception );
-    bool fatalError( const QXmlParseException & exception );
-
+    QXmlStreamReader fXml;   ///< xml stream reader object
+    bool             fValid; ///< flag showing if XML read has been successful
     EKeyWords fKeyWord;    ///< key word tag to know how to handle the content
     PAdmin    *fAdmin;     ///< a pointer to the main administration class object
 

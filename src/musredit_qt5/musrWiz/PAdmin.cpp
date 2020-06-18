@@ -36,6 +36,9 @@ using namespace std;
 #include <QFile>
 #include <QTextStream>
 #include <QVector>
+#include <QXmlStreamAttributes>
+
+#include <QtDebug>
 
 #include "PAdmin.h"
 
@@ -47,28 +50,78 @@ using namespace std;
  *
  * \param admin pointer to an admin class instance.
  */
-PFuncXMLParser::PFuncXMLParser(PAdmin *admin) : fAdmin(admin)
+PFuncXMLParser::PFuncXMLParser(const QString& fln, PAdmin *admin) : fAdmin(admin)
 {
+  fValid = false;
   fKeyWord = eEmpty;
+
+  QFile file(fln);
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    // warning and create default - STILL MISSING
+  }
+
+  fValid = parse(&file);
 }
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>parse musrfit_funcs.xml
+ *
+ * \param device QFile object of musrfit_funcs.xml
+ *
+ * @return true on success, false otherwise
  */
-bool PFuncXMLParser::startDocument()
+bool PFuncXMLParser::parse(QIODevice *device)
 {
+  fXml.setDevice(device);
+
+  bool expectChars = false;
+  while (!fXml.atEnd()) {
+    fXml.readNext();
+    if (fXml.isStartDocument()) {
+      startDocument();
+    } else if (fXml.isStartElement()) {
+      startElement();
+      expectChars = true;
+    } else if (fXml.isCharacters() && expectChars) {
+      characters();
+    } else if (fXml.isEndElement()) {
+      endElement();
+      expectChars = false;
+    } else if (fXml.isEndDocument()) {
+      endDocument();
+    }
+  }
+  if (fXml.hasError()) {
+    QString msg;
+    msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
+    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    return false;
+  }
+
   return true;
 }
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Routine called at the beginning of the XML parsing process.
  */
-bool PFuncXMLParser::startElement(const QString&, const QString&,
-                                  const QString& qName,
-                                  const QXmlAttributes& qAttr)
+bool PFuncXMLParser::startDocument()
 {
+  // nothing to be done here for now
+  return true;
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>Routine called when a new XML tag is found. Here it is used
+ * to set a tag for filtering afterwards the content.
+ */
+bool PFuncXMLParser::startElement()
+{
+  QStringRef qName = fXml.name();
+  QString str;
+
   QString errMsg("");
   int ival;
   double dval;
@@ -83,29 +136,26 @@ bool PFuncXMLParser::startElement(const QString&, const QString&,
   } else if (qName == "theo_fun") {
     fKeyWord = eTemplateFunc;
   } else if (qName == "theo_map") {
+    QXmlStreamAttributes qAttr = fXml.attributes();
     if (qAttr.count() != 2) {
       errMsg = QString("theo_map should have 2 attributes, called 'no', and 'name', found %1").arg(qAttr.count());
       QMessageBox::critical(0, "ERROR", errMsg);
       return false;
     }
     PParam map;
-    for (int i=0; i<qAttr.count(); i++) {
-      if (qAttr.qName(i) == "no") {
-        ival = qAttr.value(i).toInt(&ok);
-        if (!ok) {
-          errMsg = QString("theo_map attribute 'no' is not a number (%1)").arg(qAttr.value(i));
-          QMessageBox::critical(0, "ERROR", errMsg);
-          return false;
-        }
-        map.setNumber(ival);
-      } else if (qAttr.qName(i) == "name") {
-        map.setName(qAttr.value(i));
-      } else {
-        errMsg = QString("found unkown theo_map attribute (%1)").arg(qAttr.qName(i));
-        QMessageBox::critical(0, "ERROR", errMsg);
-        return false;
-      }
+    // get map number
+    str = qAttr.value("no").toString();
+    ival = str.toInt(&ok);
+    if (!ok) {
+      errMsg = QString("theo_map attribute 'no' is not a number (%1)").arg(str);
+      QMessageBox::critical(0, "ERROR", errMsg);
+      return false;
     }
+    map.setNumber(ival);
+    // get map name
+    str = qAttr.value("name").toString();
+    map.setName(str);
+
     // check that all necessary attributes where found
     if ((map.getName() == "UnDef") || (map.getNumber() == -1)) {
       errMsg = QString("found theo_map with missing attribute(s)");
@@ -114,45 +164,51 @@ bool PFuncXMLParser::startElement(const QString&, const QString&,
     }
     fTheoTemplate.appendMap(map);
   } else if (qName == "template_param") {
+    QXmlStreamAttributes qAttr = fXml.attributes();
     if ((qAttr.count() != 4) && (qAttr.count() != 6)) {
       errMsg = QString("template_param should have 4 or 6 attributes, called\n'no', 'name', 'value', 'step', ['boundLow', 'boundHigh'] found %1").arg(qAttr.count());
       QMessageBox::critical(0, "ERROR", errMsg);
       return false;
     }
     PParam param;
-    for (int i=0; i<qAttr.count(); i++) {
-      if (qAttr.qName(i) == "no") {
-        ival = qAttr.value(i).toInt(&ok);
-        if (!ok) {
-          errMsg = QString("template_param attribute 'no' is not a number (%1)").arg(qAttr.value(i));
-          QMessageBox::critical(0, "ERROR", errMsg);
-          return false;
-        }
-        param.setNumber(ival);
-      } else if (qAttr.qName(i) == "name") {
-        param.setName(qAttr.value(i));
-      } else if (qAttr.qName(i) == "value") {
-        dval = qAttr.value(i).toDouble(&ok);
-        if (!ok) {
-          errMsg = QString("template_param attribute 'value' is not a number (%1)").arg(qAttr.value(i));
-          QMessageBox::critical(0, "ERROR", errMsg);
-          return false;
-        }
-        param.setValue(dval);
-      } else if (qAttr.qName(i) == "step") {
-        dval = qAttr.value(i).toDouble(&ok);
-        if (!ok) {
-          errMsg = QString("template_param attribute 'step' is not a number (%1)").arg(qAttr.value(i));
-          QMessageBox::critical(0, "ERROR", errMsg);
-          return false;
-        }
-        param.setStep(dval);
-      } else if (qAttr.qName(i) == "boundLow") {
-        param.setBoundLow(qAttr.qName(i));
-      } else if (qAttr.qName(i) == "boundHigh") {
-        param.setBoundHigh(qAttr.qName(i));
-      }
+    // parameter number
+    str = qAttr.value("no").toString();
+    ival = str.toInt(&ok);
+    if (!ok) {
+      errMsg = QString("template_param attribute 'no' is not a number (%1)").arg(str);
+      QMessageBox::critical(0, "ERROR", errMsg);
+      return false;
     }
+    param.setNumber(ival);
+    // parameter name
+    str = qAttr.value("name").toString();
+    param.setName(str);
+    // parameter value
+    str = qAttr.value("value").toString();
+    dval = str.toDouble(&ok);
+    if (!ok) {
+      errMsg = QString("template_param attribute 'value' is not a number (%1)").arg(str);
+      QMessageBox::critical(0, "ERROR", errMsg);
+      return false;
+    }
+    param.setValue(dval);
+    // parameter step
+    str = qAttr.value("step").toString();
+    dval = str.toDouble(&ok);
+    if (!ok) {
+      errMsg = QString("template_param attribute 'step' is not a number (%1)").arg(str);
+      QMessageBox::critical(0, "ERROR", errMsg);
+      return false;
+    }
+    param.setStep(dval);
+    // parameter lower bound
+    str = qAttr.value("boundLow").toString();
+    if (!str.isEmpty())
+      param.setBoundLow(str);
+    // parameter upper bound
+    str = qAttr.value("boundHigh").toString();
+    if (!str.isEmpty())
+      param.setBoundHigh(str);
     fTheoTemplate.appendParam(param);
   } else if (qName == "func") {
     fFunc.initFunc();
@@ -177,11 +233,15 @@ bool PFuncXMLParser::startElement(const QString&, const QString&,
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Routine called when the end XML tag is found. It is used to
+ * put the filtering tag to 'empty'. It also resets the fFunc flag in case
+ * the entry was a theory function.
  */
-bool PFuncXMLParser::endElement( const QString&, const QString&, const QString &qName )
+bool PFuncXMLParser::endElement()
 {
   fKeyWord = eEmpty;
+
+  QStringRef qName = fXml.name();
 
   if (qName == "theo_template") {
     fAdmin->fTheoTemplate.push_back(fTheoTemplate);
@@ -196,10 +256,15 @@ bool PFuncXMLParser::endElement( const QString&, const QString&, const QString &
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>This routine delivers the content of an XML tag. It fills the
+ * content into the load data structure.
  */
-bool PFuncXMLParser::characters(const QString &str)
+bool PFuncXMLParser::characters()
 {
+  QString str = *fXml.text().string();
+  if (str.isEmpty())
+    return true;
+
   bool ok;
   int ival;
   double dval;
@@ -246,64 +311,11 @@ bool PFuncXMLParser::characters(const QString &str)
 
 //--------------------------------------------------------------------------
 /**
- * <p>
+ * <p>Called at the end of the XML parse process. It checks if default paths
+ * contain system variables, and if so expand them for the further use.
  */
 bool PFuncXMLParser::endDocument()
 {
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>
- */
-bool PFuncXMLParser::warning( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**WARNING** while parsing musrfit_funcs.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**WARNING MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>
- */
-bool PFuncXMLParser::error( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**ERROR** while parsing musrfit_funcs.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::warning(0, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>
- */
-bool PFuncXMLParser::fatalError( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**FATAL ERROR** while parsing musrfit_funcs.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**FATAL ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::warning(0, "FATAL ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
   return true;
 }
 
@@ -313,15 +325,63 @@ bool PFuncXMLParser::fatalError( const QXmlParseException & exception )
 /**
  * <p>XML Parser class for the instrument definition file(s).
  *
+ * \param file name of the instrument definition file(s).
  * \param admin pointer to an admin class instance.
  */
-PInstrumentDefXMLParser::PInstrumentDefXMLParser(PAdmin *admin) : fAdmin(admin)
+PInstrumentDefXMLParser::PInstrumentDefXMLParser(const QString& fln, PAdmin *admin) : fAdmin(admin)
 {
+  fValid = false;
   fKeyWord = eEmpty;
 
   fInstituteName = "";
   fInstrument = 0;
   fSetup = 0;
+
+  QFile file(fln);
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    // warning and create default - STILL MISSING
+  }
+
+  fValid = parse(&file);
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>parse the instrument definition xml-file(s).
+ *
+ * \param device QFile object of the instrument definition xml-file(s).
+ *
+ * @return true on success, false otherwise
+ */
+bool PInstrumentDefXMLParser::parse(QIODevice *device)
+{
+  fXml.setDevice(device);
+
+  bool expectChars = false;
+  while (!fXml.atEnd()) {
+    fXml.readNext();
+    if (fXml.isStartDocument()) {
+      startDocument();
+    } else if (fXml.isStartElement()) {
+      startElement();
+      expectChars = true;
+    } else if (fXml.isCharacters() && expectChars) {
+      characters();
+    } else if (fXml.isEndElement()) {
+      endElement();
+      expectChars = false;
+    } else if (fXml.isEndDocument()) {
+      endDocument();
+    }
+  }
+  if (fXml.hasError()) {
+    QString msg;
+    msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
+    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    return false;
+  }
+
+  return true;
 }
 
 //--------------------------------------------------------------------------
@@ -330,6 +390,7 @@ PInstrumentDefXMLParser::PInstrumentDefXMLParser(PAdmin *admin) : fAdmin(admin)
  */
 bool PInstrumentDefXMLParser::startDocument()
 {
+  // nothing to be done here for now
   return true;
 }
 
@@ -337,13 +398,11 @@ bool PInstrumentDefXMLParser::startDocument()
 /**
  * <p>Routine called when a new XML tag is found. Here it is used
  * to set a tag for filtering afterwards the content.
- *
- * \param qName name of the XML tag.
  */
-bool PInstrumentDefXMLParser::startElement( const QString&, const QString&,
-                                    const QString& qName,
-                                    const QXmlAttributes& qAttr)
+bool PInstrumentDefXMLParser::startElement()
 {
+  QStringRef qName = fXml.name();
+
   bool ok;
   double dval;
   double ival;
@@ -356,6 +415,7 @@ bool PInstrumentDefXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eInstitute;
   } else if (qName == "instrument") {
     fKeyWord = eInstrument;
+    QXmlStreamAttributes qAttr = fXml.attributes();
     if (qAttr.count() != 1) {
       errMsg = QString("instrument should have 1 attribute, called 'name', found %1").arg(qAttr.count());
       QMessageBox::critical(0, "ERROR", errMsg);
@@ -369,7 +429,7 @@ bool PInstrumentDefXMLParser::startElement( const QString&, const QString&,
     // create an instrument object
     fInstrument = new PInstrument();
     fInstrument->setInstitue(fInstituteName);
-    fInstrument->setName(qAttr.value(0));
+    fInstrument->setName(qAttr.value("name").toString());
   } else if (qName == "run_name_template") {
     fKeyWord = eRunNameTemplate;
   } else if (qName == "beamline") {
@@ -378,23 +438,26 @@ bool PInstrumentDefXMLParser::startElement( const QString&, const QString&,
     fKeyWord = eDataFileFormat;
   } else if (qName == "tf") {
     fKeyWord = eTf;
+    QXmlStreamAttributes qAttr = fXml.attributes();
     fSetup = new PSetup();
     if (qAttr.count() == 1)
-      fSetup->setName(qAttr.value(0));
+      fSetup->setName(qAttr.value("name").toString());
     else
       fSetup->setName("Default");
   } else if (qName == "zf") {
     fKeyWord = eZf;
+    QXmlStreamAttributes qAttr = fXml.attributes();
     fSetup = new PSetup();
     if (qAttr.count() == 1)
-      fSetup->setName(qAttr.value(0));
+      fSetup->setName(qAttr.value("name").toString());
     else
       fSetup->setName("Default");
   } else if (qName == "lf") {
     fKeyWord = eLf;
+    QXmlStreamAttributes qAttr = fXml.attributes();
     fSetup = new PSetup();
     if (qAttr.count() == 1)
-      fSetup->setName(qAttr.value(0));
+      fSetup->setName(qAttr.value("name").toString());
     else
       fSetup->setName("Default");
   } else if (qName == "no_of_detectors") {
@@ -406,94 +469,78 @@ bool PInstrumentDefXMLParser::startElement( const QString&, const QString&,
   } else if (qName == "asym_bkg_range") {
     fKeyWord = eBkgRange;
   } else if (qName == "logic_detector") {
+    QXmlStreamAttributes qAttr = fXml.attributes();
     if (qAttr.count() < 3)
       return false;
     PDetector detect;
-    int count=0;
-    for (int i=0; i<qAttr.count(); i++) {
-      if (qAttr.localName(i) == "name") {
-        detect.setName(qAttr.value(i)); // detector name
-        count++;
-      } else if (qAttr.localName(i) == "rel_phase") {
-        str = qAttr.value(i);
-        dval = str.toDouble(&ok);
-        if (ok) {
-          detect.setRelGeomPhase(dval);
-          count++;
-        }
-      } else if (qAttr.localName(i) == "forward") {
-        str = qAttr.value(i);
-        strL.clear();
-        strL = str.split(' ');
-        forward.clear();
-        for (int j=0; j<strL.size(); j++) {
-          ival = strL[j].toInt(&ok);
-          if (!ok)
-            return false;
-          forward.push_back(ival);
-        }
-        detect.setForwards(forward);
-        count++;
-      }
-    }
-
-    if (count != 3) // i.e. didn't find all needed attributes
+    // detector name
+    str = qAttr.value("name").toString();
+    detect.setName(str);
+    // detector relative phase
+    str = qAttr.value("rel_phase").toString();
+    dval = str.toDouble(&ok);
+    if (!ok) {
       return false;
+    }
+    detect.setRelGeomPhase(dval);
+    // detector number(s)
+    str = qAttr.value("forward").toString();
+    strL.clear();
+    strL = str.split(' ');
+    forward.clear();
+    for (int j=0; j<strL.size(); j++) {
+      ival = strL[j].toInt(&ok);
+      if (!ok)
+        return false;
+      forward.push_back(ival);
+    }
+    detect.setForwards(forward);
     fSetup->addDetector(detect);
   } else if (qName == "logic_asym_detector") {
+    QXmlStreamAttributes qAttr = fXml.attributes();
     if (qAttr.count() != 5)
       return false;
     PDetector detect;
-    int count=0;
-    for (int i=0; i<5; i++) {
-      if (qAttr.localName(i) == "name") {
-        detect.setName(qAttr.value(i)); // detector name
-        count++;
-      } else if (qAttr.localName(i) == "rel_phase") {
-        str = qAttr.value(i);
-        dval = str.toDouble(&ok);
-        if (ok) {
-          detect.setRelGeomPhase(dval);
-          count++;
-        }
-      } else if (qAttr.localName(i) == "forward") {
-        str = qAttr.value(i);
-        strL.clear();
-        strL = str.split(' ');
-        forward.clear();
-        for (int j=0; j<strL.size(); j++) {
-          ival = strL[j].toInt(&ok);
-          if (!ok)
-            return false;
-          forward.push_back(ival);
-        }
-        detect.setForwards(forward);
-        count++;
-      } else if (qAttr.localName(i) == "backward") {
-        str = qAttr.value(i);
-        strL.clear();
-        strL = str.split(' ');
-        backward.clear();
-        for (int j=0; j<strL.size(); j++) {
-          ival = strL[j].toInt(&ok);
-          if (!ok)
-            return false;
-          backward.push_back(ival);
-        }
-        detect.setBackwards(backward);
-        count++;
-      } else if (qAttr.localName(i) == "alpha") {
-        str = qAttr.value(i);
-        dval = str.toDouble(&ok);
-        if (!ok)
-          return false;
-        detect.setAlpha(dval);
-        count++;
-      }
-    }
-
-    if (count != 5) // i.e. didn't find all needed attributes
+    // detector name
+    str = qAttr.value("name").toString();
+    detect.setName(str);
+    // detector relative phase
+    str = qAttr.value("rel_phase").toString();
+    dval = str.toDouble(&ok);
+    if (!ok) {
       return false;
+    }
+    detect.setRelGeomPhase(dval);
+    // detector forward
+    str = qAttr.value("forward").toString();
+    strL.clear();
+    strL = str.split(' ');
+    forward.clear();
+    for (int j=0; j<strL.size(); j++) {
+      ival = strL[j].toInt(&ok);
+      if (!ok)
+        return false;
+      forward.push_back(ival);
+    }
+    detect.setForwards(forward);
+    // detector backward
+    str = qAttr.value("backward").toString();
+    strL.clear();
+    strL = str.split(' ');
+    backward.clear();
+    for (int j=0; j<strL.size(); j++) {
+      ival = strL[j].toInt(&ok);
+      if (!ok)
+        return false;
+      backward.push_back(ival);
+    }
+    detect.setForwards(backward);
+    // detector alpha
+    str = qAttr.value("alpha").toString();
+    dval = str.toDouble(&ok);
+    if (!ok)
+      return false;
+    detect.setAlpha(dval);
     fSetup->addAsymDetector(detect);
   }
 
@@ -505,12 +552,12 @@ bool PInstrumentDefXMLParser::startElement( const QString&, const QString&,
  * <p>Routine called when the end XML tag is found. It is used to
  * put the filtering tag to 'empty'. It also resets the fFunc flag in case
  * the entry was a theory function.
- *
- * \param qName name of the element.
  */
-bool PInstrumentDefXMLParser::endElement( const QString&, const QString&, const QString &qName )
+bool PInstrumentDefXMLParser::endElement()
 {
   fKeyWord = eEmpty;
+
+  QStringRef qName = fXml.name();
 
   if (qName == "instrument") {
     // store instrument
@@ -557,11 +604,13 @@ bool PInstrumentDefXMLParser::endElement( const QString&, const QString&, const 
 /**
  * <p>This routine delivers the content of an XML tag. It fills the
  * content into the load data structure.
- *
- * \param str keeps the content of the XML tag.
  */
-bool PInstrumentDefXMLParser::characters(const QString& str)
+bool PInstrumentDefXMLParser::characters()
 {
+  QString str = *fXml.text().string();
+  if (str.isEmpty())
+    return true;
+
   bool ok;
   int ival, start, end;
   QString errMsg;
@@ -650,66 +699,6 @@ bool PInstrumentDefXMLParser::endDocument()
 }
 
 //--------------------------------------------------------------------------
-/**
- * <p>Report XML warnings.
- *
- * \param exception holds the information of the XML warning
- */
-bool PInstrumentDefXMLParser::warning( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**WARNING** while parsing instrument_def_XXX.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**WARNING MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report recoverable XML errors.
- *
- * \param exception holds the information of the XML recoverable errors.
- */
-bool PInstrumentDefXMLParser::error( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**ERROR** while parsing instrument_def_XXX.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::critical(0, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report fatal XML errors.
- *
- * \param exception holds the information of the XML fatal errors.
- */
-bool PInstrumentDefXMLParser::fatalError( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**FATAL ERROR** while parsing parsing instrument_def_XXX.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**FATAL ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::critical(0, "FATAL ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
 // implementation of PMusrWizDefault class
 //--------------------------------------------------------------------------
 /**
@@ -730,9 +719,56 @@ PMusrWizDefault::PMusrWizDefault()
  *
  * \param admin pointer to an admin class instance.
  */
-PMusrWizDefaultXMLParser::PMusrWizDefaultXMLParser(PAdmin *admin) : fAdmin(admin)
+PMusrWizDefaultXMLParser::PMusrWizDefaultXMLParser(const QString& fln, PAdmin *admin) : fAdmin(admin)
 {
+  fValid = false;
   fKeyWord = eEmpty;
+
+  QFile file(fln);
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    // warning and create default - STILL MISSING
+  }
+
+  fValid = parse(&file);
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>parse the musrWiz startup xml-file.
+ *
+ * \param device QFile object of the musrWiz startup xml-file
+ *
+ * @return true on success, false otherwise
+ */
+bool PMusrWizDefaultXMLParser::parse(QIODevice *device)
+{
+  fXml.setDevice(device);
+
+  bool expectChars = false;
+  while (!fXml.atEnd()) {
+    fXml.readNext();
+    if (fXml.isStartDocument()) {
+      startDocument();
+    } else if (fXml.isStartElement()) {
+      startElement();
+      expectChars = true;
+    } else if (fXml.isCharacters() && expectChars) {
+      characters();
+    } else if (fXml.isEndElement()) {
+      endElement();
+      expectChars = false;
+    } else if (fXml.isEndDocument()) {
+      endDocument();
+    }
+  }
+  if (fXml.hasError()) {
+    QString msg;
+    msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
+    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    return false;
+  }
+
+  return true;
 }
 
 //--------------------------------------------------------------------------
@@ -741,6 +777,7 @@ PMusrWizDefaultXMLParser::PMusrWizDefaultXMLParser(PAdmin *admin) : fAdmin(admin
  */
 bool PMusrWizDefaultXMLParser::startDocument()
 {
+  // nothing to be done here for now
   return true;
 }
 
@@ -748,13 +785,11 @@ bool PMusrWizDefaultXMLParser::startDocument()
 /**
  * <p>Routine called when a new XML tag is found. Here it is used
  * to set a tag for filtering afterwards the content.
- *
- * \param qName name of the XML tag.
  */
-bool PMusrWizDefaultXMLParser::startElement( const QString&, const QString&,
-                                             const QString& qName,
-                                             const QXmlAttributes& )
+bool PMusrWizDefaultXMLParser::startElement()
 {
+  QStringRef qName = fXml.name();
+
   if (qName == "institute") {
     fKeyWord = eInstitute;
   } else if (qName == "instrument") {
@@ -771,10 +806,8 @@ bool PMusrWizDefaultXMLParser::startElement( const QString&, const QString&,
  * <p>Routine called when the end XML tag is found. It is used to
  * put the filtering tag to 'empty'. It also resets the fFunc flag in case
  * the entry was a theory function.
- *
- * \param qName name of the element.
  */
-bool PMusrWizDefaultXMLParser::endElement( const QString&, const QString&, const QString& )
+bool PMusrWizDefaultXMLParser::endElement()
 {
   fKeyWord = eEmpty;
 
@@ -785,11 +818,13 @@ bool PMusrWizDefaultXMLParser::endElement( const QString&, const QString&, const
 /**
  * <p>This routine delivers the content of an XML tag. It fills the
  * content into the load data structure.
- *
- * \param str keeps the content of the XML tag.
  */
-bool PMusrWizDefaultXMLParser::characters(const QString& str)
+bool PMusrWizDefaultXMLParser::characters()
 {
+  QString str = *fXml.text().string();
+  if (str.isEmpty())
+    return true;
+
   switch (fKeyWord) {
   case eInstitute:
     fDefault.setInstitute(str);
@@ -814,66 +849,6 @@ bool PMusrWizDefaultXMLParser::characters(const QString& str)
 bool PMusrWizDefaultXMLParser::endDocument()
 {
   fAdmin->fDefault = fDefault;
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report XML warnings.
- *
- * \param exception holds the information of the XML warning
- */
-bool PMusrWizDefaultXMLParser::warning( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**WARNING** while parsing musrWiz.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**WARNING MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report recoverable XML errors.
- *
- * \param exception holds the information of the XML recoverable errors.
- */
-bool PMusrWizDefaultXMLParser::error( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**ERROR** while parsing musrWiz.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::critical(0, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report fatal XML errors.
- *
- * \param exception holds the information of the XML fatal errors.
- */
-bool PMusrWizDefaultXMLParser::fatalError( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**FATAL ERROR** while parsing parsing musrWiz.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**FATAL ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::critical(0, "FATAL ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
 
   return true;
 }
@@ -1245,12 +1220,8 @@ int PAdmin::loadMusrWizDefault(QString fln)
     }
   }
 
-  PMusrWizDefaultXMLParser handler(this);
-  QFile xmlFile(fln);
-  QXmlInputSource source( &xmlFile );
-  QXmlSimpleReader reader;
-  reader.setContentHandler( &handler );
-  if (!reader.parse(source)) {
+  PMusrWizDefaultXMLParser handler(fln, this);
+  if (!handler.isValid()) {
     QString errMsg = QString("Error parsing %1 file.").arg(fln);
     QMessageBox::critical(0, "ERROR", errMsg);
     return 1;
@@ -1282,12 +1253,8 @@ int PAdmin::loadMusrfitFunc(QString fln)
     }
   }
 
-  PFuncXMLParser handler(this);
-  QFile xmlFile(fln);
-  QXmlInputSource source( &xmlFile );
-  QXmlSimpleReader reader;
-  reader.setContentHandler( &handler );
-  if (!reader.parse(source)) {
+  PFuncXMLParser handler(fln, this);
+  if (!handler.isValid()) {
     QString errMsg = QString("Error parsing %1 musrfit func file.").arg(fln);
     QMessageBox::critical(0, "ERROR", errMsg);
     return 1;
@@ -1326,12 +1293,8 @@ int PAdmin::loadInstrumentDef(QString path, QString fln)
     }
   }
 
-  PInstrumentDefXMLParser handler(this);
-  QFile xmlFile(pathFln);
-  QXmlInputSource source( &xmlFile );
-  QXmlSimpleReader reader;
-  reader.setContentHandler( &handler );
-  if (!reader.parse(source)) {
+  PInstrumentDefXMLParser handler(pathFln, this);
+  if (!handler.isValid()) {
     QString errMsg = QString("Error parsing %1 instrument def file.").arg(pathFln);
     QMessageBox::critical(0, "ERROR", errMsg);
     return 1;
