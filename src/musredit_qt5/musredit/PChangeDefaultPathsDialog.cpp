@@ -27,21 +27,76 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include <QString>
+#include <QStringRef>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QListWidgetItem>
+#include <QIODevice>
+#include <QFile>
+#include <QProcessEnvironment>
+#include <QTextStream>
 
 #include "PChangeDefaultPathsDialog.h"
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /**
- * @brief PDefaultPathsXMLParser::PDefaultPathsXMLParser
+ * <p>XML Parser class for the musrfit administration file.
+ *
+ * \param fln file name of the musredit startup xml-file
  * @param defaultPaths
  */
-PDefaultPathsXMLParser::PDefaultPathsXMLParser(PDefaultPaths *defaultPaths) :
+PDefaultPathsXMLParser::PDefaultPathsXMLParser(const QString& fln, PDefaultPaths *defaultPaths) :
   fDefaultPaths(defaultPaths)
 {
+  fValid = false;
   fKeyWord = eEmpty;
+
+  QFile file(fln);
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    // warning and create default - STILL MISSING
+  }
+
+  fValid = parse(&file);
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>parse the musrfit startup xml-file.
+ *
+ * \param device QFile object of the musrfit startup xml-file
+ *
+ * @return true on success, false otherwise
+ */
+bool PDefaultPathsXMLParser::parse(QIODevice *device)
+{
+  fXml.setDevice(device);
+
+  bool expectChars = false;
+  while (!fXml.atEnd()) {
+    fXml.readNext();
+    if (fXml.isStartDocument()) {
+      startDocument();
+    } else if (fXml.isStartElement()) {
+      startElement();
+      expectChars = true;
+    } else if (fXml.isCharacters() && expectChars) {
+      characters();
+    } else if (fXml.isEndElement()) {
+      endElement();
+      expectChars = false;
+    } else if (fXml.isEndDocument()) {
+      endDocument();
+    }
+  }
+  if (fXml.hasError()) {
+    QString msg;
+    msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
+    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    return false;
+  }
+
+  return true;
 }
 
 //--------------------------------------------------------------------------
@@ -50,6 +105,7 @@ PDefaultPathsXMLParser::PDefaultPathsXMLParser(PDefaultPaths *defaultPaths) :
  */
 bool PDefaultPathsXMLParser::startDocument()
 {
+  // nothing to be done here for now
   return true;
 }
 
@@ -57,13 +113,11 @@ bool PDefaultPathsXMLParser::startDocument()
 /**
  * <p>Routine called when a new XML tag is found. Here it is used
  * to set a tag for filtering afterwards the content.
- *
- * \param qName name of the XML tag.
  */
-bool PDefaultPathsXMLParser::startElement( const QString&, const QString&,
-                                           const QString& qName,
-                                           const QXmlAttributes& )
+bool PDefaultPathsXMLParser::startElement()
 {
+  QStringRef qName = fXml.name();
+
   if (qName == "data_path") {
     fKeyWord = eDataPath;
   }
@@ -75,10 +129,8 @@ bool PDefaultPathsXMLParser::startElement( const QString&, const QString&,
 /**
  * <p>Routine called when the end XML tag is found. It is used to
  * put the filtering tag to 'empty'.
- *
- * \param qName name of the element.
  */
-bool PDefaultPathsXMLParser::endElement( const QString&, const QString&, const QString & )
+bool PDefaultPathsXMLParser::endElement()
 {
   fKeyWord = eEmpty;
 
@@ -89,11 +141,13 @@ bool PDefaultPathsXMLParser::endElement( const QString&, const QString&, const Q
 /**
  * <p>This routine delivers the content of an XML tag. It fills the
  * content into the load data structure.
- *
- * \param str keeps the content of the XML tag.
  */
-bool PDefaultPathsXMLParser::characters(const QString& str)
+bool PDefaultPathsXMLParser::characters()
 {
+  QString str = *fXml.text().string();
+  if (str.isEmpty())
+    return true;
+
   switch (fKeyWord) {
     case eDataPath:
       fDefaultPaths->appendDefaultPath(str);
@@ -115,67 +169,10 @@ bool PDefaultPathsXMLParser::endDocument()
   return true;
 }
 
-//--------------------------------------------------------------------------
-/**
- * <p>Report XML warnings.
- *
- * \param exception holds the information of the XML warning
- */
-bool PDefaultPathsXMLParser::warning( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**WARNING** while parsing musrfit_startup.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**WARNING MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report recoverable XML errors.
- *
- * \param exception holds the information of the XML recoverable errors.
- */
-bool PDefaultPathsXMLParser::error( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**ERROR** while parsing musrfit_startup.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::critical(0, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report fatal XML errors.
- *
- * \param exception holds the information of the XML fatal errors.
- */
-bool PDefaultPathsXMLParser::fatalError( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**FATAL ERROR** while parsing musrfit_startup.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**FATAL ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::critical(0, "FATAL ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+/**
+ * @brief PDefaultPaths::PDefaultPaths
+ */
 PDefaultPaths::PDefaultPaths() : QObject()
 {
   fValid = true;
@@ -204,13 +201,8 @@ PDefaultPaths::PDefaultPaths() : QObject()
   fPrefPathName = pathFln;
 
   // read musrfit_startup.xml and extract default data file search paths
-  PDefaultPathsXMLParser handler(this);
-  QFile xmlFile(fPrefPathName);
-  QXmlInputSource source( &xmlFile );
-  QXmlSimpleReader reader;
-  reader.setContentHandler( &handler );
-  reader.setErrorHandler( &handler );
-  if (!reader.parse( source )) {
+  PDefaultPathsXMLParser handler(fPrefPathName, this);
+  if (!handler.isValid()) {
     fValid = false;
     QMessageBox::critical(0, "ERROR",
                           "Error parsing musrfit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
