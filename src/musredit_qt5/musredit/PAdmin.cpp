@@ -38,6 +38,7 @@
 #include <QDir>
 #include <QProcessEnvironment>
 #include <QSysInfo>
+#include <QIODevice>
 
 #include "musrfit-info.h"
 #include "PAdmin.h"
@@ -48,12 +49,60 @@
 /**
  * <p>XML Parser class for the musredit administration file.
  *
+ * \param fln file name of the musredit startup xml-file
  * \param admin pointer to an admin class instance.
  */
-PAdminXMLParser::PAdminXMLParser(PAdmin *admin) : fAdmin(admin)
+PAdminXMLParser::PAdminXMLParser(const QString& fln, PAdmin *admin) : fAdmin(admin)
 {
+  fValid = false;
   fKeyWord = eEmpty;
   fFunc = false;
+
+  QFile file(fln);
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    // warning and create default - STILL MISSING
+  }
+
+  fValid = parse(&file);
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>parse the musredit startup xml-file.
+ *
+ * \param device QFile object of the musredit startup xml-file
+ *
+ * @return true on success, false otherwise
+ */
+bool PAdminXMLParser::parse(QIODevice *device)
+{
+  fXml.setDevice(device);
+
+  bool expectChars = false;
+  while (!fXml.atEnd()) {
+    fXml.readNext();
+    if (fXml.isStartDocument()) {
+      startDocument();
+    } else if (fXml.isStartElement()) {
+      startElement();
+      expectChars = true;
+    } else if (fXml.isCharacters() && expectChars) {
+      characters();
+    } else if (fXml.isEndElement()) {
+      endElement();
+      expectChars = false;
+    } else if (fXml.isEndDocument()) {
+      endDocument();
+    }
+  }
+  if (fXml.hasError()) {
+    QString msg;
+    msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
+    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    return false;
+  }
+
+  return true;
 }
 
 //--------------------------------------------------------------------------
@@ -62,6 +111,7 @@ PAdminXMLParser::PAdminXMLParser(PAdmin *admin) : fAdmin(admin)
  */
 bool PAdminXMLParser::startDocument()
 {
+  // nothing to be done here for now
   return true;
 }
 
@@ -69,13 +119,11 @@ bool PAdminXMLParser::startDocument()
 /**
  * <p>Routine called when a new XML tag is found. Here it is used
  * to set a tag for filtering afterwards the content.
- *
- * \param qName name of the XML tag.
  */
-bool PAdminXMLParser::startElement( const QString&, const QString&,
-                                       const QString& qName,
-                                       const QXmlAttributes& )
+bool PAdminXMLParser::startElement()
 {
+  QStringRef qName = fXml.name();
+
   if (qName == "timeout") {
     fKeyWord = eTimeout;
   } else if (qName == "font_name") {
@@ -196,12 +244,12 @@ bool PAdminXMLParser::startElement( const QString&, const QString&,
  * <p>Routine called when the end XML tag is found. It is used to
  * put the filtering tag to 'empty'. It also resets the fFunc flag in case
  * the entry was a theory function.
- *
- * \param qName name of the element.
  */
-bool PAdminXMLParser::endElement( const QString&, const QString&, const QString &qName )
+bool PAdminXMLParser::endElement()
 {
   fKeyWord = eEmpty;
+
+  QStringRef qName = fXml.name();
 
   if (qName == "func") {
     fFunc = false;
@@ -215,11 +263,13 @@ bool PAdminXMLParser::endElement( const QString&, const QString&, const QString 
 /**
  * <p>This routine delivers the content of an XML tag. It fills the
  * content into the load data structure.
- *
- * \param str keeps the content of the XML tag.
  */
-bool PAdminXMLParser::characters(const QString& str)
+bool PAdminXMLParser::characters()
 {
+  QString str = *fXml.text().string();
+  if (str.isEmpty())
+    return true;
+
   QString help;
   bool flag, ok;
   int  ival;
@@ -512,67 +562,90 @@ bool PAdminXMLParser::endDocument()
       fAdmin->setTheoFuncPixmapPath(str);
   }
 
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report XML warnings.
- *
- * \param exception holds the information of the XML warning
- */
-bool PAdminXMLParser::warning( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**WARNING** while parsing musredit_startup.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**WARNING MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
+  //as35 dump admin - only for debugging
+  //as35 dump();
 
   return true;
 }
 
 //--------------------------------------------------------------------------
 /**
- * <p>Report recoverable XML errors.
- *
- * \param exception holds the information of the XML recoverable errors.
+ * <p>Dumps the content of the admin class. For debugging purposes only.
  */
-bool PAdminXMLParser::error( const QXmlParseException & exception )
+void PAdminXMLParser::dump()
 {
-  QString msg;
-
-  msg  = QString("**ERROR** while parsing musredit_startup.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::critical(0, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report fatal XML errors.
- *
- * \param exception holds the information of the XML fatal errors.
- */
-bool PAdminXMLParser::fatalError( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**FATAL ERROR** while parsing musredit_startup.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**FATAL ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::critical(0, "FATAL ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
+  std::cout << "debug> +++++++++++++++++++++++" << std::endl;
+  std::cout << "debug> general:" << std::endl;
+  std::cout << "debug> exec_path : " << fAdmin->getExecPath().toLatin1().data() << std::endl;
+  std::cout << "debug> default_save_path : " << fAdmin->getDefaultSavePath().toLatin1().data() << std::endl;
+  std::cout << "debug> timeout : " << fAdmin->getTimeout() << std::endl;
+  std::cout << "debug> keep_minuit2_output : " << fAdmin->getKeepMinuit2OutputFlag() << std::endl;
+  std::cout << "debug> dump_ascii : " << fAdmin->getDumpAsciiFlag() << std::endl;
+  std::cout << "debug> dump_root : " << fAdmin->getDumpRootFlag() << std::endl;
+  std::cout << "debug> title_from_data_file : " << fAdmin->getTitleFromDataFileFlag() << std::endl;
+  std::cout << "debug> chisq_per_run_block : " << fAdmin->getChisqPerRunBlockFlag() << std::endl;
+  std::cout << "debug> estimate_n0 : " << fAdmin->getEstimateN0Flag() << std::endl;
+  std::cout << "debug> musrview_show_fourier : " << fAdmin->getMusrviewShowFourierFlag() << std::endl;
+  std::cout << "debug> musrview_show_avg : " << fAdmin->getMusrviewShowAvgFlag() << std::endl;
+  std::cout << "debug> enable_musrt0 : " << fAdmin->getEnableMusrT0Flag() << std::endl;
+  std::cout << "debug> dark_theme_icons_menu : " << fAdmin->getDarkThemeIconsMenuFlag() << std::endl;
+  std::cout << "debug> dark_theme_icons_toolbar : " << fAdmin->getDarkThemeIconsToolbarFlag() << std::endl;
+  std::cout << "debug> +++++++++++++++++++++++" << std::endl;
+  std::cout << "debug> recent_files:" << std::endl;
+  for (int i=0; i<fAdmin->getNumRecentFiles(); i++) {
+    std::cout << "debug> recent_file " << i << ":" << fAdmin->getRecentFile(i).toLatin1().data() << std::endl;
+  }
+  std::cout << "debug> +++++++++++++++++++++++" << std::endl;
+  std::cout << "debug> help_section:" << std::endl;
+  std::cout << "debug> musr_web_main : " << fAdmin->getHelpUrl("main").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_title : " << fAdmin->getHelpUrl("title").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_parameters : " << fAdmin->getHelpUrl("parameters").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_theory : " << fAdmin->getHelpUrl("theory").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_functions : " << fAdmin->getHelpUrl("functions").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_run : " << fAdmin->getHelpUrl("run").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_command : " << fAdmin->getHelpUrl("command").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_fourier : " << fAdmin->getHelpUrl("fourier").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_plot : " << fAdmin->getHelpUrl("plot").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_statistic : " << fAdmin->getHelpUrl("statistic").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_msr2data : " << fAdmin->getHelpUrl("msr2data").toLatin1().data() << std::endl;
+  std::cout << "debug> musr_web_musrFT : " << fAdmin->getHelpUrl("musrFT").toLatin1().data() << std::endl;
+  std::cout << "debug> +++++++++++++++++++++++" << std::endl;
+  std::cout << "debug> font_section:" << std::endl;
+  std::cout << "debug> font_name : " << fAdmin->getFontName().toLatin1().data() << std::endl;
+  std::cout << "debug> font_size : " << fAdmin->getFontSize() << std::endl;
+  std::cout << "debug> +++++++++++++++++++++++" << std::endl;
+  std::cout << "debug> msr_file_defaults:" << std::endl;
+  std::cout << "debug> beamline : " << fAdmin->getBeamline().toLatin1().data() << std::endl;
+  std::cout << "debug> institute : " << fAdmin->getInstitute().toLatin1().data() << std::endl;
+  std::cout << "debug> file_format : " << fAdmin->getFileFormat().toLatin1().data() << std::endl;
+  std::cout << "debug> lifetime_correction : " << fAdmin->getLifetimeCorrectionFlag() << std::endl;
+  std::cout << "debug> +++++++++++++++++++++++" << std::endl;
+  std::cout << "debug> msr2data_defaults:" << std::endl;
+  std::cout << "debug> chain_fit : " << fAdmin->getMsr2DataParam().chainFit << std::endl;
+  std::cout << "debug> write_data_header : " << fAdmin->getMsr2DataParam().writeDbHeader << std::endl;
+  std::cout << "debug> ignore_data_header_info : " << fAdmin->getMsr2DataParam().ignoreDataHeaderInfo << std::endl;
+  std::cout << "debug> keep_minuit2_output : " << fAdmin->getMsr2DataParam().keepMinuit2Output << std::endl;
+  std::cout << "debug> write_column_data : " << fAdmin->getMsr2DataParam().writeColumnData << std::endl;
+  std::cout << "debug> recreate_data_file : " << fAdmin->getMsr2DataParam().recreateDbFile << std::endl;
+  std::cout << "debug> open_file_after_fitting : " << fAdmin->getMsr2DataParam().openFilesAfterFitting << std::endl;
+  std::cout << "debug> create_msr_file_only : " << fAdmin->getMsr2DataParam().createMsrFileOnly << std::endl;
+  std::cout << "debug> fit_only : " << fAdmin->getMsr2DataParam().fitOnly << std::endl;
+  std::cout << "debug> global : " << fAdmin->getMsr2DataParam().global << std::endl;
+  std::cout << "debug> global_plus : " << fAdmin->getMsr2DataParam().globalPlus << std::endl;
+  std::cout << "debug> +++++++++++++++++++++++" << std::endl;
+  std::cout << "debug> theory_functions:" << std::endl;
+  std::cout << "debug> func_pixmap_path : " << fAdmin->getTheoFuncPixmapPath().toLatin1().data() << std::endl;
+  std::cout << "debug> #theory : " << fAdmin->getTheoryCounts() << std::endl;
+  PTheory *theo;
+  for (unsigned int i=0; i<fAdmin->getTheoryCounts(); i++) {
+    theo = fAdmin->getTheoryItem(i);
+    std::cout << "debug> -------" << std::endl;
+    std::cout << "debug> name : " << theo->name.toLatin1().data() << std::endl;
+    std::cout << "debug> comment : " << theo->comment.toLatin1().data() << std::endl;
+    std::cout << "debug> label : " << theo->label.toLatin1().data() << std::endl;
+    std::cout << "debug> pixmapName : " << theo->pixmapName.toLatin1().data() << std::endl;
+    std::cout << "debug> params : " << theo->params << std::endl;
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -776,20 +849,15 @@ void PAdmin::setHelpUrl(const QString tag, const QString url)
 int PAdmin::loadPrefs(QString fln)
 {
   if (QFile::exists(fln)) { // administration file present
-    PAdminXMLParser handler(this);
-    QFile xmlFile(fln);
-    QXmlInputSource source( &xmlFile );
-    QXmlSimpleReader reader;
-    reader.setContentHandler( &handler );
-    reader.setErrorHandler( &handler );
-    if (!reader.parse( source )) {
-      QMessageBox::critical(0, "ERROR",
+    PAdminXMLParser handler(fln, this);
+    if (!handler.isValid()) {
+      QMessageBox::critical(0, "**ERROR**",
                             "Error parsing musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
                             QMessageBox::Ok, QMessageBox::NoButton);
       return 0;
     }
   } else {
-    QMessageBox::critical(0, "ERROR",
+    QMessageBox::critical(0, "**ERROR**",
                           "Couldn't find the musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
                           QMessageBox::Ok, QMessageBox::NoButton);
     return 0;

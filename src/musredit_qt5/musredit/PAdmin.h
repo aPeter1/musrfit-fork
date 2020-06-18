@@ -34,7 +34,7 @@
 #include <QVector>
 #include <QMap>
 #include <QPixmap>
-#include <QtXml>
+#include <QXmlStreamReader>
 
 #include <musredit.h>
 
@@ -61,11 +61,13 @@ typedef struct {
  * necessary informations about executable pathes, online help informations,
  * default font sizes, etc.
  */
-class PAdminXMLParser : public QXmlDefaultHandler
+class PAdminXMLParser
 {
   public:
-    PAdminXMLParser(PAdmin*);
+    PAdminXMLParser(const QString &fln, PAdmin*);
     virtual ~PAdminXMLParser() {}
+
+    virtual bool isValid() { return fValid; }
 
   private:
     enum EAdminKeyWords {eEmpty, eTimeout, eKeepMinuit2Output, eDumpAscii, eDumpRoot,
@@ -80,24 +82,23 @@ class PAdminXMLParser : public QXmlDefaultHandler
                          eChainFit, eWriteDataHeader, eIgnoreDataHeaderInfo, eWriteColumnData,
                          eRecreateDataFile, eOpenFileAfterFitting, eCreateMsrFileOnly, eFitOnly, eGlobal, eGlobalPlus};
 
+    bool parse(QIODevice *device);
     bool startDocument();
-    bool startElement( const QString&, const QString&, const QString& ,
-                       const QXmlAttributes& );
-    bool endElement( const QString&, const QString&, const QString& );
-
-    bool characters(const QString&);
+    bool startElement();
+    bool endElement();
+    bool characters();
     bool endDocument();
 
-    bool warning( const QXmlParseException & exception );
-    bool error( const QXmlParseException & exception );
-    bool fatalError( const QXmlParseException & exception );
+    void dump();
 
     QString expandPath(const QString&);
 
-    EAdminKeyWords fKeyWord;    ///< key word tag to know how to handle the content
-    bool           fFunc;       ///< flag needed to indicate that a new theory function is found
-    PTheory        fTheoryItem; ///< holding the informations necessary for a theory item
-    PAdmin         *fAdmin;     ///< a pointer to the main administration class object
+    QXmlStreamReader fXml;        ///< xml stream reader object
+    bool             fValid;      ///< flag showing if XML read has been successful
+    EAdminKeyWords   fKeyWord;    ///< key word tag to know how to handle the content
+    bool             fFunc;       ///< flag needed to indicate that a new theory function is found
+    PTheory          fTheoryItem; ///< holding the informations necessary for a theory item
+    PAdmin           *fAdmin;     ///< a pointer to the main administration class object
 };
 
 //---------------------------------------------------------------------------
