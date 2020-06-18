@@ -32,6 +32,7 @@
 
 #include <QMessageBox>
 #include <QString>
+#include <QStringRef>
 #include <QFile>
 #include <QTextStream>
 #include <QVector>
@@ -82,9 +83,56 @@ void PmuppColor::setRGB(const int r, const int g, const int b)
  *
  * \param admin pointer to an admin class instance.
  */
-PmuppAdminXMLParser::PmuppAdminXMLParser(PmuppAdmin *admin) : fAdmin(admin)
+PmuppAdminXMLParser::PmuppAdminXMLParser(const QString& fln, PmuppAdmin *admin) : fAdmin(admin)
 {
+  fValid = false;
   fKeyWord = eEmpty;
+
+  QFile file(fln);
+  if (!file.open(QFile::ReadOnly | QFile::Text)) {
+    // warning and create default - STILL MISSING
+  }
+
+  fValid = parse(&file);
+}
+
+//--------------------------------------------------------------------------
+/**
+ * <p>parse the mupp startup xml-file.
+ *
+ * \param device QFile object of the mupp startup xml-file
+ *
+ * @return true on success, false otherwise
+ */
+bool PmuppAdminXMLParser::parse(QIODevice *device)
+{
+  fXml.setDevice(device);
+
+  bool expectChars = false;
+  while (!fXml.atEnd()) {
+    fXml.readNext();
+    if (fXml.isStartDocument()) {
+      startDocument();
+    } else if (fXml.isStartElement()) {
+      startElement();
+      expectChars = true;
+    } else if (fXml.isCharacters() && expectChars) {
+      characters();
+    } else if (fXml.isEndElement()) {
+      endElement();
+      expectChars = false;
+    } else if (fXml.isEndDocument()) {
+      endDocument();
+    }
+  }
+  if (fXml.hasError()) {
+    QString msg;
+    msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
+    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    return false;
+  }
+
+  return true;
 }
 
 //--------------------------------------------------------------------------
@@ -93,6 +141,7 @@ PmuppAdminXMLParser::PmuppAdminXMLParser(PmuppAdmin *admin) : fAdmin(admin)
  */
 bool PmuppAdminXMLParser::startDocument()
 {
+  // nothing to be done here for now
   return true;
 }
 
@@ -100,13 +149,11 @@ bool PmuppAdminXMLParser::startDocument()
 /**
  * <p>Routine called when a new XML tag is found. Here it is used
  * to set a tag for filtering afterwards the content.
- *
- * \param qName name of the XML tag.
  */
-bool PmuppAdminXMLParser::startElement( const QString&, const QString&,
-                                        const QString& qName,
-                                        const QXmlAttributes& )
+bool PmuppAdminXMLParser::startElement()
 {
+  QStringRef qName = fXml.name();
+
   if (qName == "path_file_name") {
     fKeyWord = eRecentFile;
   } else if (qName == "dark_theme") {
@@ -125,10 +172,8 @@ bool PmuppAdminXMLParser::startElement( const QString&, const QString&,
  * <p>Routine called when the end XML tag is found. It is used to
  * put the filtering tag to 'empty'. It also resets the fFunc flag in case
  * the entry was a theory function.
- *
- * \param qName name of the element.
  */
-bool PmuppAdminXMLParser::endElement( const QString&, const QString&, const QString& )
+bool PmuppAdminXMLParser::endElement()
 {
   fKeyWord = eEmpty;
 
@@ -139,11 +184,13 @@ bool PmuppAdminXMLParser::endElement( const QString&, const QString&, const QStr
 /**
  * <p>This routine delivers the content of an XML tag. It fills the
  * content into the load data structure.
- *
- * \param str keeps the content of the XML tag.
  */
-bool PmuppAdminXMLParser::characters(const QString& str)
+bool PmuppAdminXMLParser::characters()
 {
+  QString str = *fXml.text().string();
+  if (str.isEmpty())
+    return true;
+
   bool ok;
   int  ival, r, g, b;
   double dval;
@@ -219,66 +266,6 @@ bool PmuppAdminXMLParser::endDocument()
 }
 
 //--------------------------------------------------------------------------
-/**
- * <p>Report XML warnings.
- *
- * \param exception holds the information of the XML warning
- */
-bool PmuppAdminXMLParser::warning( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**WARNING** while parsing mupp_startup.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**WARNING MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report recoverable XML errors.
- *
- * \param exception holds the information of the XML recoverable errors.
- */
-bool PmuppAdminXMLParser::error( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**ERROR** while parsing mupp_startup.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::critical(0, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
-/**
- * <p>Report fatal XML errors.
- *
- * \param exception holds the information of the XML fatal errors.
- */
-bool PmuppAdminXMLParser::fatalError( const QXmlParseException & exception )
-{
-  QString msg;
-
-  msg  = QString("**FATAL ERROR** while parsing mupp_startup.xml in line no %1\n").arg(exception.lineNumber());
-  msg += QString("**FATAL ERROR MESSAGE** ") + exception.message();
-
-  qWarning() << endl << msg << endl;
-
-  QMessageBox::critical(0, "FATAL ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
-
-  return true;
-}
-
-//--------------------------------------------------------------------------
 // implementation of PmuppAdmin class
 //--------------------------------------------------------------------------
 /**
@@ -315,21 +302,16 @@ PmuppAdmin::PmuppAdmin() : QObject(), fDarkTheme(false)
     }
   }
 
-  if (QFile::exists(pathFln)) { // administration file present
-    PmuppAdminXMLParser handler(this);
-    QFile xmlFile(pathFln);
-    QXmlInputSource source( &xmlFile );
-    QXmlSimpleReader reader;
-    reader.setContentHandler( &handler );
-    reader.setErrorHandler( &handler );
-    if (!reader.parse( source )) {
-      QMessageBox::critical(0, "ERROR",
+  if (QFile::exists(pathFln)) { // administration file present    
+    PmuppAdminXMLParser handler(pathFln, this);
+    if (!handler.isValid()) {
+      QMessageBox::critical(0, "**ERROR**",
                             "Error parsing mupp_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
                             QMessageBox::Ok, QMessageBox::NoButton);
       return;
     }
   } else {
-    QMessageBox::critical(0, "ERROR",
+    QMessageBox::critical(0, "**ERROR**",
                           "Couldn't find the mupp_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
                           QMessageBox::Ok, QMessageBox::NoButton);
     return;

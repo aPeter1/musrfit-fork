@@ -34,7 +34,7 @@
 #include <QVector>
 #include <QMap>
 #include <QPixmap>
-#include <QtXml>
+#include <QXmlStreamReader>
 
 #include "mupp.h"
 
@@ -93,29 +93,28 @@ class PmuppMarker {
  * necessary informations about executable pathes, online help informations,
  * default font sizes, etc.
  */
-class PmuppAdminXMLParser : public QXmlDefaultHandler
+class PmuppAdminXMLParser
 {
   public:
-    PmuppAdminXMLParser(PmuppAdmin*);
+    PmuppAdminXMLParser(const QString &fln, PmuppAdmin*);
     virtual ~PmuppAdminXMLParser() {}
+
+    virtual bool isValid() { return fValid; }
 
   private:
     enum EAdminKeyWords {eEmpty, eRecentFile, eDarkTheme, eMarker, eColor};
 
+    bool parse(QIODevice *device);
     bool startDocument();
-    bool startElement( const QString&, const QString&, const QString& ,
-                       const QXmlAttributes& );
-    bool endElement( const QString&, const QString&, const QString& );
-
-    bool characters(const QString&);
+    bool startElement();
+    bool endElement();
+    bool characters();
     bool endDocument();
 
-    bool warning( const QXmlParseException & exception );
-    bool error( const QXmlParseException & exception );
-    bool fatalError( const QXmlParseException & exception );
-
-    EAdminKeyWords  fKeyWord;   ///< key word tag to know how to handle the content
-    PmuppAdmin     *fAdmin;     ///< a pointer to the main administration class object
+    QXmlStreamReader fXml;     ///< xml stream reader object
+    bool             fValid;   ///< flag showing if XML read has been successful
+    EAdminKeyWords   fKeyWord; ///< key word tag to know how to handle the content
+    PmuppAdmin       *fAdmin;  ///< a pointer to the main administration class object
 };
 
 //---------------------------------------------------------------------------

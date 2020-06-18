@@ -37,6 +37,8 @@
 #include <QString>
 #include <QStringList>
 #include <QVector>
+#include <QTextStream>
+#include <QTimer>
 
 #include "mupp_version.h"
 #include "PmuppScript.h"
