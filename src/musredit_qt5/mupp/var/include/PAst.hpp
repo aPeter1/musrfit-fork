@@ -70,9 +70,16 @@ namespace mupp { namespace ast
       fun_sin,
       fun_cos,
       fun_tan,
+      fun_sinh,
+      fun_cosh,
+      fun_tanh,
+      fun_asin,
+      fun_acos,
+      fun_atan,
       fun_exp,
       fun_log,
-      fun_ln
+      fun_ln,
+      fun_sqrt
     };
 
     struct nil {};

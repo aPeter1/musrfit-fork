@@ -102,9 +102,16 @@ namespace mupp { namespace prog {
         case ast::fun_sin:
         case ast::fun_cos:
         case ast::fun_tan:
+        case ast::fun_sinh:
+        case ast::fun_cosh:
+        case ast::fun_tanh:
+        case ast::fun_asin:
+        case ast::fun_acos:
+        case ast::fun_atan:
         case ast::fun_exp:
         case ast::fun_log:
         case ast::fun_ln:
+        case ast::fun_sqrt:
           break;
         default:
           BOOST_ASSERT(0);
@@ -412,6 +419,30 @@ namespace mupp { namespace prog {
           for (unsigned int i=0; i<vec.size(); i++)
             vec[i] = tan(vec[i]);
           break;
+        case ast::fun_sinh:
+          for (unsigned int i=0; i<vec.size(); i++)
+            vec[i] = sinh(vec[i]);
+          break;
+        case ast::fun_cosh:
+          for (unsigned int i=0; i<vec.size(); i++)
+            vec[i] = cosh(vec[i]);
+          break;
+        case ast::fun_tanh:
+          for (unsigned int i=0; i<vec.size(); i++)
+            vec[i] = tanh(vec[i]);
+          break;
+        case ast::fun_asin:
+          for (unsigned int i=0; i<vec.size(); i++)
+            vec[i] = asin(vec[i]);
+          break;
+        case ast::fun_acos:
+          for (unsigned int i=0; i<vec.size(); i++)
+            vec[i] = acos(vec[i]);
+          break;
+        case ast::fun_atan:
+          for (unsigned int i=0; i<vec.size(); i++)
+            vec[i] = atan(vec[i]);
+          break;
         case ast::fun_exp:
           for (unsigned int i=0; i<vec.size(); i++)
             vec[i] = exp(vec[i]);
@@ -433,6 +464,16 @@ namespace mupp { namespace prog {
               break;
             } else {
               vec[i] = log(vec[i]);
+            }
+          }
+          break;
+        case ast::fun_sqrt:
+          for (unsigned int i=0; i<vec.size(); i++) {
+            if (vec[i] <= 0.0) {
+              BOOST_ASSERT(0);
+              break;
+            } else {
+              vec[i] = sqrt(vec[i]);
             }
           }
           break;

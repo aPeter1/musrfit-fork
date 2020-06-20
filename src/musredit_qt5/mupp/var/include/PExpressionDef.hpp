@@ -86,9 +86,16 @@ namespace mupp { namespace parser
         ("sin", ast::fun_sin)
         ("cos", ast::fun_cos)
         ("tan", ast::fun_tan)
+        ("sinh", ast::fun_sinh)
+        ("cosh", ast::fun_cosh)
+        ("tanh", ast::fun_tanh)
+        ("asin", ast::fun_asin)
+        ("acos", ast::fun_acos)
+        ("atan", ast::fun_atan)
         ("exp", ast::fun_exp)
         ("log", ast::fun_log)
         ("ln",  ast::fun_ln)
+        ("sqrt", ast::fun_sqrt)
         ;
 
     ///////////////////////////////////////////////////////////////////////
