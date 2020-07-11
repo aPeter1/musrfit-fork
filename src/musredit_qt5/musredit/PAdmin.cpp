@@ -773,6 +773,16 @@ PAdmin::PAdmin() : QObject()
   fPrefPathName = pathFln;
 
   loadPrefs(fPrefPathName);
+
+  // make sure that musrfit, musrview, etc are found under the fExecPath provided
+  QString str = fExecPath + "/musrfit";
+  QFileInfo info(str);
+  if (info.exists()) {
+    if (!info.isExecutable())
+      QMessageBox::critical(0, "ERROR", "musrfit found but not recognized as executable.\nPlease check!");
+  } else {
+    QMessageBox::critical(0, "ERROR", "musrfit not found.\nHave you set the necessary system variables properly?\nPlease check the manual.\nBefore you can use musrfit, this needs to be fixed.");
+  }
 }
 
 //--------------------------------------------------------------------------
