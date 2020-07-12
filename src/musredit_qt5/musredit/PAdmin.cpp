@@ -783,6 +783,24 @@ PAdmin::PAdmin() : QObject()
   } else {
     QMessageBox::critical(0, "ERROR", "musrfit not found.\nHave you set the necessary system variables properly?\nPlease check the manual.\nBefore you can use musrfit, this needs to be fixed.");
   }
+
+  // check if system variables are set properly
+  bool sysVarMissing = false;
+  QString msg("Missing System Variables:\n");
+  path = procEnv.value("ROOTSYS", "");
+  if (path.isEmpty()) {
+    msg += "> ROOTSYS\n";
+    sysVarMissing = true;
+  }
+  path = procEnv.value("MUSRFITPATH", "");
+  if (path.isEmpty()) {
+    msg += "> MUSRFITPATH\n";
+    sysVarMissing = true;
+  }
+  if (sysVarMissing) {
+    msg += "Please set this/these system variables.";
+    QMessageBox::warning(0, "WARNING", msg);
+  }
 }
 
 //--------------------------------------------------------------------------
