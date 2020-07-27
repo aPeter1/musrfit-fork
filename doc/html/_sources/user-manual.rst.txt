@@ -141,6 +141,9 @@ Additionally, some functions can be accessed using *key-shortcuts*:
   reset the plotting range to the area given in the msr file ("un-zoom").
 **c**  
   toggles between normal and cross-hair cursor.
+**t**
+  a plot of a **single** data set allows to toggle the color of the theory function line.
+    
   
 .. index:: musrFT
 .. _musrFT:

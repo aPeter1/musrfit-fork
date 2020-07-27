@@ -125,6 +125,7 @@ PMusrCanvas::PMusrCanvas()
   fValid = false;
   fAveragedView     = false;
   fDifferenceView   = false;
+  fToggleColor      = false;
   fCurrentPlotView  = PV_DATA;
   fPreviousPlotView = PV_DATA;
   fPlotType = -1;
@@ -1182,6 +1183,19 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
       fDataTheoryPad->SetCrosshair(0);
     }
     fMainCanvas->Update();
+  } else if (x == 't') { // toggle theory color
+    if (fData.size() == 1) { // only do something if there is a single data set
+      if (fToggleColor) {
+        fData[0].theory->SetLineColor(kRed);
+        fData[0].theory->SetLineWidth(2);
+      } else {
+        fData[0].theory->SetLineColor(fColorList[0]);
+        fData[0].theory->SetLineWidth(1);
+      }
+      fToggleColor = !fToggleColor;
+      fDataTheoryPad->Modified();
+      fMainCanvas->Update();
+    }
   } else {
     fMainCanvas->Update();
   }
@@ -2384,6 +2398,7 @@ void PMusrCanvas::InitMusrCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, 
   fValid = false;
   fAveragedView     = false;
   fDifferenceView   = false;
+  fToggleColor      = false;
   fCurrentPlotView  = PV_DATA;
   fPreviousPlotView = PV_DATA;
   fPlotType = -1;
