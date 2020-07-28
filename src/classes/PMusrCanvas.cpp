@@ -1185,6 +1185,7 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     fMainCanvas->Update();
   } else if (x == 't') { // toggle theory color
     if (fData.size() == 1) { // only do something if there is a single data set
+      fToggleColor = !fToggleColor;
       if (fToggleColor) {
         fData[0].theory->SetLineColor(kRed);
         fData[0].theory->SetLineWidth(2);
@@ -1192,7 +1193,6 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
         fData[0].theory->SetLineColor(fColorList[0]);
         fData[0].theory->SetLineWidth(1);
       }
-      fToggleColor = !fToggleColor;
       fDataTheoryPad->Modified();
       fMainCanvas->Update();
     }
