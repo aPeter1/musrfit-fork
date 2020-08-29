@@ -60,6 +60,7 @@ PRunSingleHistoRRF::PRunSingleHistoRRF() : PRunBase()
   fBackground = 0.0;
   fBkgErr = 1.0;
   fRRFPacking = -1;
+  fTheoAsData = false;
 
   // the 2 following variables are need in case fit range is given in bins, and since
   // the fit range can be changed in the command block, these variables need to be accessible
@@ -80,7 +81,8 @@ PRunSingleHistoRRF::PRunSingleHistoRRF() : PRunBase()
  * \param runNo number of the run within the msr-file
  * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
-PRunSingleHistoRRF::PRunSingleHistoRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
+PRunSingleHistoRRF::PRunSingleHistoRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag, Bool_t theoAsData) :
+  PRunBase(msrInfo, rawData, runNo, tag), fTheoAsData(theoAsData)
 {
   fNoOfFitBins  = 0;
 
@@ -758,18 +760,19 @@ Bool_t PRunSingleHistoRRF::PrepareViewData(PRawRunData* runData, const UInt_t hi
 
   // check if a finer binning for the theory is needed
   UInt_t size = fForward.size();
-  Double_t factor = 1.0;
-  Double_t time = 0.0;
-  Double_t theoryValue = 0.0;
-
-  if (fData.GetValue()->size() * 10 > fForward.size()) {
-    size = fData.GetValue()->size() * 10;
-    factor = static_cast<Double_t>(fForward.size()) / static_cast<Double_t>(size);
-  }
+  Int_t factor = 8; // 8 times more points for the theory (if fTheoAsData == false)
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
-  fData.SetTheoryTimeStep(fTimeResolution*factor);
+  if (fTheoAsData) { // cacluate theory only at the data points
+    fData.SetTheoryTimeStep(fData.GetDataTimeStep());
+  } else {
+    // finer binning for the theory (8 times as many points = factor)
+    size *= factor;
+    fData.SetTheoryTimeStep(fData.GetDataTimeStep()/(Double_t)factor);
+  }
 
   // calculate theory
+  Double_t time = 0.0;
+  Double_t theoryValue = 0.0;
   for (UInt_t i=0; i<size; i++) {
     time = fData.GetTheoryTimeStart() + static_cast<Double_t>(i)*fData.GetTheoryTimeStep();
     theoryValue = fTheory->Func(time, par, fFuncValues);

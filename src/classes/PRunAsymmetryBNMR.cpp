@@ -57,6 +57,7 @@ PRunAsymmetryBNMR::PRunAsymmetryBNMR() : PRunBase()
 {
   fNoOfFitBins  = 0;
   fPacking = -1;
+  fTheoAsData = false;
 
   // the 2 following variables are need in case fit range is given in bins, and since
   // the fit range can be changed in the command block, these variables need to be accessible
@@ -78,7 +79,8 @@ PRunAsymmetryBNMR::PRunAsymmetryBNMR() : PRunBase()
  * \param runNo number of the run within the msr-file
  * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
-PRunAsymmetryBNMR::PRunAsymmetryBNMR(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
+PRunAsymmetryBNMR::PRunAsymmetryBNMR(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag, Bool_t theoAsData) :
+  PRunBase(msrInfo, rawData, runNo, tag), fTheoAsData(theoAsData)
 {
   // the 2 following variables are need in case fit range is given in bins, and since
   // the fit range can be changed in the command block, these variables need to be accessible
@@ -1472,17 +1474,21 @@ Bool_t PRunAsymmetryBNMR::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2
   }
 
   // calculate theory
-  Double_t time;
   UInt_t size = runData->GetDataBin(histoNo[0])->size();
-  Double_t factor = 1.0;
-  if (fData.GetValue()->size() * 10 > runData->GetDataBin(histoNo[0])->size()) {
-    size = fData.GetValue()->size() * 10;
-    factor = static_cast<Double_t>(runData->GetDataBin(histoNo[0])->size()) / static_cast<Double_t>(size);
-  }
+
+  Int_t factor = 8; // 8 times more points for the theory (if fTheoAsData == false)
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
-  fData.SetTheoryTimeStep(fTimeResolution*factor);
+  if (fTheoAsData) { // cacluate theory only at the data points
+    fData.SetTheoryTimeStep(fData.GetDataTimeStep());
+  } else {
+    // finer binning for the theory (8 times as many points = factor)
+    size *= factor;
+    fData.SetTheoryTimeStep(fData.GetDataTimeStep()/(Double_t)factor);
+  }
+
+  Double_t time;
   for (UInt_t i=0; i<size; i++) {
-    time = fData.GetTheoryTimeStart() + static_cast<Double_t>(i)*fTimeResolution*factor;
+    time = fData.GetTheoryTimeStart() + static_cast<Double_t>(i)*fData.GetTheoryTimeStep();
     value = fTheory->Func(time, par, fFuncValues);
     if (fabs(value) > 10.0) {  // dirty hack needs to be fixed!!
       value = 0.0;

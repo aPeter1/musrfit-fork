@@ -1,24 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
-    <title>msr2data - A Program for Automatically Processing Multiple musrfit msr Files &#8212; musrfit 1.6.3 documentation</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>msr2data - A Program for Automatically Processing Multiple musrfit msr Files &mdash; musrfit 1.6.4 documentation</title>
+    
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.6.4',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/language_data.js"></script>
-    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="musrfit 1.6.4 documentation" href="index.html" />
     <link rel="next" title="any2many - a Universal μSR-file-format converter" href="any2many.html" />
     <link rel="prev" title="mupp - μSR Parameter Plotter" href="mupp.html" /> 
-  </head><body>
-    <div class="related" role="navigation" aria-label="related navigation">
+  </head>
+  <body>
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -30,80 +41,82 @@
         <li class="right" >
           <a href="mupp.html" title="mupp - μSR Parameter Plotter"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.3 documentation</a> &#187;</li> 
+        <li><a href="index.html">musrfit 1.6.4 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          <div class="body" role="main">
+          <div class="body">
             
   <div class="section" id="msr2data-a-program-for-automatically-processing-multiple-musrfit-msr-files">
-<span id="msr2data"></span><span id="index-0"></span><h1>msr2data - A Program for Automatically Processing Multiple <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> msr Files<a class="headerlink" href="#msr2data-a-program-for-automatically-processing-multiple-musrfit-msr-files" title="Permalink to this headline">¶</a></h1>
-<p><code class="docutils literal notranslate"><span class="pre">msr2data</span></code> (originally written by B. M. Wojek) is a program implemented in <code class="docutils literal notranslate"><span class="pre">C++</span></code>. Its purpose is
-to process multiple msr files (input files for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>) with the same parameters and summarize the fitting
-results either in a <em>TRIUMF DB</em> <a class="footnote-reference brackets" href="#f1" id="id1">1</a> or a <em>column ASCII</em> file. This allows essentially to</p>
+<span id="msr2data"></span><span id="index-0"></span><h1>msr2data - A Program for Automatically Processing Multiple <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr Files<a class="headerlink" href="#msr2data-a-program-for-automatically-processing-multiple-musrfit-msr-files" title="Permalink to this headline">¶</a></h1>
+<p><tt class="docutils literal"><span class="pre">msr2data</span></tt> (originally written by B. M. Wojek) is a program implemented in <tt class="docutils literal"><span class="pre">C++</span></tt>. Its purpose is
+to process multiple msr files (input files for <tt class="docutils literal"><span class="pre">musrfit</span></tt>) with the same parameters and summarize the fitting
+results either in a <em>TRIUMF DB</em> <a class="footnote-reference" href="#f1" id="id1">[1]</a> or a <em>column ASCII</em> file. This allows essentially to</p>
 <ol class="arabic simple">
-<li><p>Collect the fit parameters.</p></li>
-<li><p>Generate <em>new</em> input msr files based on old ones.</p></li>
+<li>Collect the fit parameters.</li>
+<li>Generate <em>new</em> input msr files based on old ones.</li>
 </ol>
-<dl class="footnote brackets">
-<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
-<dd><p>For an abridged description of this format see <a class="reference external" href="http://musr.org/xyfit/dbformat.html">here</a>. The DB files
-produced by <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> can be viewed for instance with <a class="reference internal" href="mupp.html#mupp"><span class="std std-ref">mupp</span></a> or μView <a class="reference external" href="http://musr.org/muview/">see here</a>, however,
-they are not completely backward-compatible to the original <code class="docutils literal notranslate"><span class="pre">db</span> <span class="pre">language</span></code> since the parameter names can be longer than five or
+<table class="docutils footnote" frame="void" id="f1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>For an abridged description of this format see <a class="reference external" href="http://musr.org/xyfit/dbformat.html">here</a>. The DB files
+produced by <tt class="docutils literal"><span class="pre">msr2data</span></tt> can be viewed for instance with <a class="reference internal" href="mupp.html#mupp"><em>mupp</em></a> or μView <a class="reference external" href="http://musr.org/muview/">see here</a>, however,
+they are not completely backward-compatible to the original <tt class="docutils literal"><span class="pre">db</span> <span class="pre">language</span></tt> since the parameter names can be longer than five or
 six characters! In order to establish this backward compatibility (if needed) the user has to ensure the correct length of the
-parameter names in the msr files!</p>
-</dd>
-</dl>
+parameter names in the msr files!</td></tr>
+</tbody>
+</table>
 <div class="section" id="basic-types-of-usage">
 <span id="msr2data-basic-usage"></span><h2>Basic Types of Usage<a class="headerlink" href="#basic-types-of-usage" title="Permalink to this headline">¶</a></h2>
-<p>Apart from numerous <a class="reference internal" href="#msr2data-opt-param"><span class="std std-ref">optional parameters</span></a> that might be set, in principle there are four different ways of calling <code class="docutils literal notranslate"><span class="pre">msr2data</span></code>.
+<p>Apart from numerous <a class="reference internal" href="#msr2data-opt-param"><em>optional parameters</em></a> that might be set, in principle there are four different ways of calling <tt class="docutils literal"><span class="pre">msr2data</span></tt>.
 These differ in how the list of runs which should be processed is supplied:</p>
-<dl class="simple">
-<dt><strong>msr2data &lt;run&gt; &lt;extension&gt; [optional parameters]</strong></dt><dd><p>A single run number.</p>
-</dd>
-<dt><strong>msr2data &lt;firstRunNo&gt; &lt;lastRunNo&gt; &lt;extension&gt; [optional parameters]</strong></dt><dd><p>An interval of run numbers is specified through the first and the last run number. The condition <code class="docutils literal notranslate"><span class="pre">&lt;firstRunNo&gt;</span></code> &lt; <code class="docutils literal notranslate"><span class="pre">&lt;lastRunNo&gt;</span></code> is not necessary.</p>
-</dd>
-<dt><strong>msr2data [ &lt;runList&gt; ] &lt;extension&gt; [optional parameters]</strong></dt><dd><p>Where <code class="docutils literal notranslate"><span class="pre">&lt;runList&gt;</span></code> is one or a combination of the following:</p>
-<ol class="arabic simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&lt;run0&gt;,</span> <span class="pre">&lt;run1&gt;,</span> <span class="pre">&lt;run2&gt;,</span> <span class="pre">...</span> <span class="pre">&lt;runN&gt;</span></code> : run numbers, <em>e.g.</em> 123 124,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&lt;run0&gt;-&lt;runN&gt;</span></code> : a range, <em>e.g.</em> 123-125 -&gt; 123 124 125,</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&lt;run0&gt;:&lt;runN&gt;:&lt;step&gt;</span></code> : a sequence, <em>e.g.</em> 123:127:2 -&gt; 123 125 127. <code class="docutils literal notranslate"><span class="pre">&lt;step&gt;</span></code> has to be a positive integer.</p></li>
-<li><p>A <code class="docutils literal notranslate"><span class="pre">&lt;runList&gt;</span></code> can also combine (1)-(3), <em>e.g.</em> 123 128-130 133, etc.</p></li>
+<dl class="docutils">
+<dt><strong>msr2data &lt;run&gt; &lt;extension&gt; [optional parameters]</strong></dt>
+<dd>A single run number.</dd>
+<dt><strong>msr2data &lt;firstRunNo&gt; &lt;lastRunNo&gt; &lt;extension&gt; [optional parameters]</strong></dt>
+<dd>An interval of run numbers is specified through the first and the last run number. The condition <tt class="docutils literal"><span class="pre">&lt;firstRunNo&gt;</span></tt> &lt; <tt class="docutils literal"><span class="pre">&lt;lastRunNo&gt;</span></tt> is not necessary.</dd>
+<dt><strong>msr2data [ &lt;runList&gt; ] &lt;extension&gt; [optional parameters]</strong></dt>
+<dd><p class="first">Where <tt class="docutils literal"><span class="pre">&lt;runList&gt;</span></tt> is one or a combination of the following:</p>
+<ol class="last arabic simple">
+<li><tt class="docutils literal"><span class="pre">&lt;run0&gt;,</span> <span class="pre">&lt;run1&gt;,</span> <span class="pre">&lt;run2&gt;,</span> <span class="pre">...</span> <span class="pre">&lt;runN&gt;</span></tt> : run numbers, <em>e.g.</em> 123 124,</li>
+<li><tt class="docutils literal"><span class="pre">&lt;run0&gt;-&lt;runN&gt;</span></tt> : a range, <em>e.g.</em> 123-125 -&gt; 123 124 125,</li>
+<li><tt class="docutils literal"><span class="pre">&lt;run0&gt;:&lt;runN&gt;:&lt;step&gt;</span></tt> : a sequence, <em>e.g.</em> 123:127:2 -&gt; 123 125 127. <tt class="docutils literal"><span class="pre">&lt;step&gt;</span></tt> has to be a positive integer.</li>
+<li>A <tt class="docutils literal"><span class="pre">&lt;runList&gt;</span></tt> can also combine (1)-(3), <em>e.g.</em> 123 128-130 133, etc.</li>
 </ol>
 </dd>
-<dt><strong>msr2data &lt;runListFileName&gt; &lt;extension&gt; [optional parameters]</strong></dt><dd><p>An ASCII file containing a list of run numbers and optional external parameters is passed to <code class="docutils literal notranslate"><span class="pre">msr2data</span></code>. For the structure of the ASCII file
-see <a class="reference internal" href="#run-list-file-structure"><span class="std std-ref">below</span></a>.</p>
-</dd>
+<dt><strong>msr2data &lt;runListFileName&gt; &lt;extension&gt; [optional parameters]</strong></dt>
+<dd>An ASCII file containing a list of run numbers and optional external parameters is passed to <tt class="docutils literal"><span class="pre">msr2data</span></tt>. For the structure of the ASCII file
+see <a class="reference internal" href="#run-list-file-structure"><em>below</em></a>.</dd>
 </dl>
-<p>All four basic types of calling <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> contain the <em>mandatory</em> file-name <code class="docutils literal notranslate"><span class="pre">&lt;extension&gt;</span></code> passed right after the list of runs. The meaning of
-this <code class="docutils literal notranslate"><span class="pre">&lt;extension&gt;</span></code> should become clear after giving examples for all four cases:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8472</span> _tf_h13
+<p>All four basic types of calling <tt class="docutils literal"><span class="pre">msr2data</span></tt> contain the <em>mandatory</em> file-name <tt class="docutils literal"><span class="pre">&lt;extension&gt;</span></tt> passed right after the list of runs. The meaning of
+this <tt class="docutils literal"><span class="pre">&lt;extension&gt;</span></tt> should become clear after giving examples for all four cases:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8472</span> _tf_h13
 </pre></div>
 </div>
-<p>generates the DB file <code class="docutils literal notranslate"><span class="pre">out.db</span></code> (can be changed by using the -o option) from <code class="docutils literal notranslate"><span class="pre">8472_tf_h13.msr</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8472</span> <span class="m">8474</span> _tf_h13
+<p>generates the DB file <tt class="docutils literal"><span class="pre">out.db</span></tt> (can be changed by using the -o option) from <tt class="docutils literal"><span class="pre">8472_tf_h13.msr</span></tt>.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8472</span> <span class="m">8474</span> _tf_h13
 </pre></div>
 </div>
-<p>generates the DB file <code class="docutils literal notranslate"><span class="pre">out.db</span></code> (can be changed by using the -o option) from <code class="docutils literal notranslate"><span class="pre">8472_tf_h13.msr</span></code>, <code class="docutils literal notranslate"><span class="pre">8473_tf_h13.msr</span></code>, and <code class="docutils literal notranslate"><span class="pre">8474_tf_h13.msr</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="o">[</span><span class="m">8472</span> <span class="m">8470</span><span class="o">]</span> _tf_h13
+<p>generates the DB file <tt class="docutils literal"><span class="pre">out.db</span></tt> (can be changed by using the -o option) from <tt class="docutils literal"><span class="pre">8472_tf_h13.msr</span></tt>, <tt class="docutils literal"><span class="pre">8473_tf_h13.msr</span></tt>, and <tt class="docutils literal"><span class="pre">8474_tf_h13.msr</span></tt>.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="o">[</span><span class="m">8472</span> <span class="m">8470</span><span class="o">]</span> _tf_h13
 </pre></div>
 </div>
-<p>generates the DB file <code class="docutils literal notranslate"><span class="pre">out.db</span></code> (can be changed by using the -o option) from <code class="docutils literal notranslate"><span class="pre">8472_tf_h13.msr</span></code> and <code class="docutils literal notranslate"><span class="pre">8470_tf_h13.msr</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="o">[</span><span class="m">8470</span>:8474:2<span class="o">]</span> _tf_h13
+<p>generates the DB file <tt class="docutils literal"><span class="pre">out.db</span></tt> (can be changed by using the -o option) from <tt class="docutils literal"><span class="pre">8472_tf_h13.msr</span></tt> and <tt class="docutils literal"><span class="pre">8470_tf_h13.msr</span></tt>.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="o">[</span><span class="m">8470</span>:8474:2<span class="o">]</span> _tf_h13
 </pre></div>
 </div>
-<p>generates the DB file <code class="docutils literal notranslate"><span class="pre">out.db</span></code> (can be changed by using the -o option) from <code class="docutils literal notranslate"><span class="pre">8470_tf_h13.msr</span></code>, <code class="docutils literal notranslate"><span class="pre">8472_tf_h13.msr</span></code>, and <code class="docutils literal notranslate"><span class="pre">8474_tf_h13.msr</span></code>.</p>
+<p>generates the DB file <tt class="docutils literal"><span class="pre">out.db</span></tt> (can be changed by using the -o option) from <tt class="docutils literal"><span class="pre">8470_tf_h13.msr</span></tt>, <tt class="docutils literal"><span class="pre">8472_tf_h13.msr</span></tt>, and <tt class="docutils literal"><span class="pre">8474_tf_h13.msr</span></tt>.</p>
 <div class="section" id="run-list-file-structure">
 <span id="id2"></span><h3>Run List File Structure<a class="headerlink" href="#run-list-file-structure" title="Permalink to this headline">¶</a></h3>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data run.list _tf_h13
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data run.list _tf_h13
 </pre></div>
 </div>
-<p>generates the DB file <code class="docutils literal notranslate"><span class="pre">out.db</span></code> (can be changed by using the -o option) from all runs listed in the ASCII file <code class="docutils literal notranslate"><span class="pre">run.list</span></code> in the working directory.
-In this file it is also possible to include <em>external</em> parameters which should be put in the resulting DB file. The structure of the <code class="docutils literal notranslate"><span class="pre">run.list</span></code> is the following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>RUN VAR1 VAR2 VAR3 ...
+<p>generates the DB file <tt class="docutils literal"><span class="pre">out.db</span></tt> (can be changed by using the -o option) from all runs listed in the ASCII file <tt class="docutils literal"><span class="pre">run.list</span></tt> in the working directory.
+In this file it is also possible to include <em>external</em> parameters which should be put in the resulting DB file. The structure of the <tt class="docutils literal"><span class="pre">run.list</span></tt> is the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>RUN VAR1 VAR2 VAR3 ...
 8460 200 27.1 46.2 ...
 8472 205 27.1 46.3 ...
 8453 210 27.2 45.9 ...
@@ -113,16 +126,18 @@ In this file it is also possible to include <em>external</em> parameters which s
 </pre></div>
 </div>
 <p><em>The first not commented and not empty line determines the parameter names and labels and has to be present!</em></p>
-<p>It is allowed to add comments (with a preceding ‘#’) or empty lines to the run-list file.</p>
+<p>It is allowed to add comments (with a preceding &#8216;#&#8217;) or empty lines to the run-list file.</p>
 <p>The following should be mentioned together with the above examples:</p>
 <ul>
-<li><p>The output files in the examples above are only newly created if they did <em>not</em> exist before invoking <code class="docutils literal notranslate"><span class="pre">msr2data</span></code>.
-If the files were already present the msr file data would be appended!</p></li>
-<li><p>If the files have been newly created, also the DB file header is written. If the files were present before, only
-the data blocks are appended. The output of the header can either be forced or completely suppressed with the <code class="docutils literal notranslate"><span class="pre">header</span></code>
-and <code class="docutils literal notranslate"><span class="pre">noheader</span></code> options as shall be seen later.</p></li>
-<li><p>If the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> output files do not have an <code class="docutils literal notranslate"><span class="pre">&lt;extension&gt;</span></code> as specified above like <code class="docutils literal notranslate"><span class="pre">8472.msr</span></code> one has to call <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> like in the following example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8472</span> <span class="m">8460</span> <span class="s2">&quot;&quot;</span>
+<li><p class="first">The output files in the examples above are only newly created if they did <em>not</em> exist before invoking <tt class="docutils literal"><span class="pre">msr2data</span></tt>.
+If the files were already present the msr file data would be appended!</p>
+</li>
+<li><p class="first">If the files have been newly created, also the DB file header is written. If the files were present before, only
+the data blocks are appended. The output of the header can either be forced or completely suppressed with the <tt class="docutils literal"><span class="pre">header</span></tt>
+and <tt class="docutils literal"><span class="pre">noheader</span></tt> options as shall be seen later.</p>
+</li>
+<li><p class="first">If the <tt class="docutils literal"><span class="pre">musrfit</span></tt> output files do not have an <tt class="docutils literal"><span class="pre">&lt;extension&gt;</span></tt> as specified above like <tt class="docutils literal"><span class="pre">8472.msr</span></tt> one has to call <tt class="docutils literal"><span class="pre">msr2data</span></tt> like in the following example:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8472</span> <span class="m">8460</span> <span class="s2">&quot;&quot;</span>
 </pre></div>
 </div>
 </li>
@@ -131,138 +146,138 @@ and <code class="docutils literal notranslate"><span class="pre">noheader</span>
 </div>
 <div class="section" id="optional-parameters">
 <span id="msr2data-opt-param"></span><h2>Optional Parameters<a class="headerlink" href="#optional-parameters" title="Permalink to this headline">¶</a></h2>
-<p>As mentioned already above there are some optional parameters which change the behavior of <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> and can be passed in any order. Here is a complete list:</p>
-<dl class="simple">
-<dt><strong>data</strong></dt><dd><p>The output file format is changed to a simple column ASCII file (default output file name: out.dat).</p>
-</dd>
-<dt><strong>new</strong></dt><dd><p>An existing output file is deleted before new information is written to it.</p>
-</dd>
-<dt><strong>header</strong></dt><dd><p>Force the output of the file header even if the output file was present before.</p>
-</dd>
-<dt><strong>noheader</strong></dt><dd><p>The output of the file header is suppressed—also if the output file is newly created.
-If either both or none of the header options are given, <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> writes the file header only to new files
-and it solely appends the data blocks to an existing output file assuming that the header is present already.</p>
-</dd>
-<dt><strong>nosummary</strong></dt><dd><p>There will be no attempt to read additional information like the temperature or the applied magnetic field from
-the data files even if these information were present there.</p>
-</dd>
-<dt><strong>paramList &lt;param&gt;</strong></dt><dd><p>option used to select the parameters which shall be exported. <code class="docutils literal notranslate"><span class="pre">&lt;param&gt;</span></code> is a list of parameter numbers to be exported.
-Allowed lists are: <code class="docutils literal notranslate"><span class="pre">&lt;startNo&gt;-&lt;endNo&gt;</span></code>, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">1-16</span></code> will export parameters 1 to 16. Space separated numbers, <em>e.g.:</em> <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">3</span> <span class="pre">5</span></code>.
-A combination of both is possible, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">1-16</span> <span class="pre">19</span> <span class="pre">31</span> <span class="pre">62</span></code>, and so on.</p>
-</dd>
-<dt><strong>-o&lt;outputFileName&gt;, -o &lt;outputFileName&gt;</strong></dt><dd><p>The processed data will be written to the file <code class="docutils literal notranslate"><span class="pre">&lt;outputFileName&gt;</span></code> instead of the default <code class="docutils literal notranslate"><span class="pre">out.db</span></code> or <code class="docutils literal notranslate"><span class="pre">out.dat</span></code>.
-If <code class="docutils literal notranslate"><span class="pre">&lt;outputFileName&gt;</span></code> is equal to none (case-insensitive) the parameter data are not appended to any output file.</p>
-</dd>
-<dt><strong>fit</strong></dt><dd><p>Additionally to the final data collection <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> will invoke <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> to fit the specified runs.
-All msr files are assumed to be present, none is newly generated!</p>
-</dd>
-<dt><strong>fit-&lt;template&gt;[!]</strong></dt><dd><p>Additionally to the final data collection <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> will generate msr files for the runs specified in the list
-of runs and invoke <a class="reference internal" href="user-manual.html#musrfit"><span class="std std-ref">musrfit</span></a> for performing fits of the data. As template for the first run the file
-<code class="docutils literal notranslate"><span class="pre">&lt;template&gt;&lt;extension&gt;.msr</span></code> (or if not available: <code class="docutils literal notranslate"><span class="pre">&lt;template&gt;&lt;extension&gt;.mlog</span></code>) is used; the subsequent input
-files will be created using the msr output of the last processed runs (“chain fit”). However, if for all runs only
-the given template should be used one has to append an exclamation mark (<strong>!</strong>) to the <code class="docutils literal notranslate"><span class="pre">&lt;template&gt;</span></code>.</p>
-</dd>
-<dt><strong>msr-&lt;template&gt;</strong></dt><dd><p>The same as <code class="docutils literal notranslate"><span class="pre">fit-&lt;template&gt;[!]</span></code>, <em>without</em> calling <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> and the final data collection, <em>i.e.</em> only the msr files for the given runs are generated.</p>
-</dd>
-<dt><strong>-k</strong></dt><dd><p>If specified together with the <code class="docutils literal notranslate"><span class="pre">fit-&lt;template&gt;</span></code> option, the <a class="reference internal" href="user-manual.html#musrfit"><span class="std std-ref">- -keep-mn2-output</span></a> option is passed to <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>.
-In the case no fits should be done, this option is ignored.</p>
-</dd>
-<dt><strong>-t</strong></dt><dd><p>In case this option is given additionally to the <code class="docutils literal notranslate"><span class="pre">fit-&lt;template&gt;</span> <span class="pre">option</span></code>, <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> is called with
-the <a class="reference internal" href="user-manual.html#musrfit"><span class="std std-ref">- -title-from-data-file</span></a> option. If no fitting is done, this option is ignored.</p>
-</dd>
+<p>As mentioned already above there are some optional parameters which change the behavior of <tt class="docutils literal"><span class="pre">msr2data</span></tt> and can be passed in any order. Here is a complete list:</p>
+<dl class="docutils">
+<dt><strong>data</strong></dt>
+<dd>The output file format is changed to a simple column ASCII file (default output file name: out.dat).</dd>
+<dt><strong>new</strong></dt>
+<dd>An existing output file is deleted before new information is written to it.</dd>
+<dt><strong>header</strong></dt>
+<dd>Force the output of the file header even if the output file was present before.</dd>
+<dt><strong>noheader</strong></dt>
+<dd>The output of the file header is suppressed—also if the output file is newly created.
+If either both or none of the header options are given, <tt class="docutils literal"><span class="pre">msr2data</span></tt> writes the file header only to new files
+and it solely appends the data blocks to an existing output file assuming that the header is present already.</dd>
+<dt><strong>nosummary</strong></dt>
+<dd>There will be no attempt to read additional information like the temperature or the applied magnetic field from
+the data files even if these information were present there.</dd>
+<dt><strong>paramList &lt;param&gt;</strong></dt>
+<dd>option used to select the parameters which shall be exported. <tt class="docutils literal"><span class="pre">&lt;param&gt;</span></tt> is a list of parameter numbers to be exported.
+Allowed lists are: <tt class="docutils literal"><span class="pre">&lt;startNo&gt;-&lt;endNo&gt;</span></tt>, <em>e.g.</em> <tt class="docutils literal"><span class="pre">1-16</span></tt> will export parameters 1 to 16. Space separated numbers, <em>e.g.:</em> <tt class="docutils literal"><span class="pre">1</span> <span class="pre">3</span> <span class="pre">5</span></tt>.
+A combination of both is possible, <em>e.g.</em> <tt class="docutils literal"><span class="pre">1-16</span> <span class="pre">19</span> <span class="pre">31</span> <span class="pre">62</span></tt>, and so on.</dd>
+<dt><strong>-o&lt;outputFileName&gt;, -o &lt;outputFileName&gt;</strong></dt>
+<dd>The processed data will be written to the file <tt class="docutils literal"><span class="pre">&lt;outputFileName&gt;</span></tt> instead of the default <tt class="docutils literal"><span class="pre">out.db</span></tt> or <tt class="docutils literal"><span class="pre">out.dat</span></tt>.
+If <tt class="docutils literal"><span class="pre">&lt;outputFileName&gt;</span></tt> is equal to none (case-insensitive) the parameter data are not appended to any output file.</dd>
+<dt><strong>fit</strong></dt>
+<dd>Additionally to the final data collection <tt class="docutils literal"><span class="pre">msr2data</span></tt> will invoke <tt class="docutils literal"><span class="pre">musrfit</span></tt> to fit the specified runs.
+All msr files are assumed to be present, none is newly generated!</dd>
+<dt><strong>fit-&lt;template&gt;[!]</strong></dt>
+<dd>Additionally to the final data collection <tt class="docutils literal"><span class="pre">msr2data</span></tt> will generate msr files for the runs specified in the list
+of runs and invoke <a class="reference internal" href="user-manual.html#musrfit"><em>musrfit</em></a> for performing fits of the data. As template for the first run the file
+<tt class="docutils literal"><span class="pre">&lt;template&gt;&lt;extension&gt;.msr</span></tt> (or if not available: <tt class="docutils literal"><span class="pre">&lt;template&gt;&lt;extension&gt;.mlog</span></tt>) is used; the subsequent input
+files will be created using the msr output of the last processed runs (&#8220;chain fit&#8221;). However, if for all runs only
+the given template should be used one has to append an exclamation mark (<strong>!</strong>) to the <tt class="docutils literal"><span class="pre">&lt;template&gt;</span></tt>.</dd>
+<dt><strong>msr-&lt;template&gt;</strong></dt>
+<dd>The same as <tt class="docutils literal"><span class="pre">fit-&lt;template&gt;[!]</span></tt>, <em>without</em> calling <tt class="docutils literal"><span class="pre">musrfit</span></tt> and the final data collection, <em>i.e.</em> only the msr files for the given runs are generated.</dd>
+<dt><strong>-k</strong></dt>
+<dd>If specified together with the <tt class="docutils literal"><span class="pre">fit-&lt;template&gt;</span></tt> option, the <a class="reference internal" href="user-manual.html#musrfit"><em>- -keep-mn2-output</em></a> option is passed to <tt class="docutils literal"><span class="pre">musrfit</span></tt>.
+In the case no fits should be done, this option is ignored.</dd>
+<dt><strong>-t</strong></dt>
+<dd>In case this option is given additionally to the <tt class="docutils literal"><span class="pre">fit-&lt;template&gt;</span> <span class="pre">option</span></tt>, <tt class="docutils literal"><span class="pre">musrfit</span></tt> is called with
+the <a class="reference internal" href="user-manual.html#musrfit"><em>- -title-from-data-file</em></a> option. If no fitting is done, this option is ignored.</dd>
 </dl>
 <p><strong>Examples:</strong></p>
 <p>In order to illustrate the usage of these parameters a few examples with explanations are given below:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8400</span> <span class="m">8460</span> _tf_h13 -oABC.db fit-8472
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8400</span> <span class="m">8460</span> _tf_h13 -oABC.db fit-8472
 </pre></div>
 </div>
-<p>Using <code class="docutils literal notranslate"><span class="pre">8472_tf_h13.msr</span></code> as first template, <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> generates subsequent msr input files <code class="docutils literal notranslate"><span class="pre">8400_tf_h13.msr</span></code> through <code class="docutils literal notranslate"><span class="pre">8460_tf_h13.msr</span></code>,
-calls <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> to perform a fit of these files and collects the results of the fits together with the DB header in the new file <code class="docutils literal notranslate"><span class="pre">ABC.db</span></code>.
-Additionally, some information about external parameters like the temperature will be passed to <code class="docutils literal notranslate"><span class="pre">ABC.db</span></code> if it is present in the data files.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="o">[</span><span class="m">8500</span> <span class="m">8502</span>-8504 <span class="m">8507</span><span class="o">]</span> _zf fit-8472 noheader nosummary -o DEF.db
+<p>Using <tt class="docutils literal"><span class="pre">8472_tf_h13.msr</span></tt> as first template, <tt class="docutils literal"><span class="pre">msr2data</span></tt> generates subsequent msr input files <tt class="docutils literal"><span class="pre">8400_tf_h13.msr</span></tt> through <tt class="docutils literal"><span class="pre">8460_tf_h13.msr</span></tt>,
+calls <tt class="docutils literal"><span class="pre">musrfit</span></tt> to perform a fit of these files and collects the results of the fits together with the DB header in the new file <tt class="docutils literal"><span class="pre">ABC.db</span></tt>.
+Additionally, some information about external parameters like the temperature will be passed to <tt class="docutils literal"><span class="pre">ABC.db</span></tt> if it is present in the data files.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="o">[</span><span class="m">8500</span> <span class="m">8502</span>-8504 <span class="m">8507</span><span class="o">]</span> _zf fit-8472 noheader nosummary -o DEF.db
 </pre></div>
 </div>
-<p>Using <code class="docutils literal notranslate"><span class="pre">8472_zf.msr</span></code> as first template, <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> generates subsequent msr input files <code class="docutils literal notranslate"><span class="pre">8500_zf.msr</span></code>, <code class="docutils literal notranslate"><span class="pre">8502_zf.msr</span></code>, <code class="docutils literal notranslate"><span class="pre">8503_zf.msr</span></code>,
-<code class="docutils literal notranslate"><span class="pre">8504_zf.msr</span></code>, and <code class="docutils literal notranslate"><span class="pre">8507_zf.msr</span></code>, calls <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> to perform a fit of these files and collects the results of the fits in the file <code class="docutils literal notranslate"><span class="pre">DEF.db</span></code>
+<p>Using <tt class="docutils literal"><span class="pre">8472_zf.msr</span></tt> as first template, <tt class="docutils literal"><span class="pre">msr2data</span></tt> generates subsequent msr input files <tt class="docutils literal"><span class="pre">8500_zf.msr</span></tt>, <tt class="docutils literal"><span class="pre">8502_zf.msr</span></tt>, <tt class="docutils literal"><span class="pre">8503_zf.msr</span></tt>,
+<tt class="docutils literal"><span class="pre">8504_zf.msr</span></tt>, and <tt class="docutils literal"><span class="pre">8507_zf.msr</span></tt>, calls <tt class="docutils literal"><span class="pre">musrfit</span></tt> to perform a fit of these files and collects the results of the fits in the file <tt class="docutils literal"><span class="pre">DEF.db</span></tt>
 <em>without</em> writing the DB file header or attempting to read additional information from the data files.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8595</span> <span class="m">8585</span> <span class="s2">&quot;&quot;</span> noheader fit-8472! -oGHI.dat data nosummary -k
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8595</span> <span class="m">8585</span> <span class="s2">&quot;&quot;</span> noheader fit-8472! -oGHI.dat data nosummary -k
 </pre></div>
 </div>
-<p>Using <code class="docutils literal notranslate"><span class="pre">8472.msr</span></code> as template for all runs, <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> generates the msr input files <code class="docutils literal notranslate"><span class="pre">8595.msr</span></code> through <code class="docutils literal notranslate"><span class="pre">8585.msr</span></code>, calls <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> with
-the option <code class="docutils literal notranslate"><span class="pre">--keep-mn2-ouput</span></code> to perform a fit of these files and collects the results of the fits in the column-structured ASCII file <code class="docutils literal notranslate"><span class="pre">GHI.dat</span></code>
+<p>Using <tt class="docutils literal"><span class="pre">8472.msr</span></tt> as template for all runs, <tt class="docutils literal"><span class="pre">msr2data</span></tt> generates the msr input files <tt class="docutils literal"><span class="pre">8595.msr</span></tt> through <tt class="docutils literal"><span class="pre">8585.msr</span></tt>, calls <tt class="docutils literal"><span class="pre">musrfit</span></tt> with
+the option <tt class="docutils literal"><span class="pre">--keep-mn2-ouput</span></tt> to perform a fit of these files and collects the results of the fits in the column-structured ASCII file <tt class="docutils literal"><span class="pre">GHI.dat</span></tt>
 <em>without</em> writing any file header or attempting to read additional information from the data files.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8472</span> <span class="m">8475</span> <span class="s2">&quot;&quot;</span> fit -o none
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8472</span> <span class="m">8475</span> <span class="s2">&quot;&quot;</span> fit -o none
 </pre></div>
 </div>
-<p>Take the <em>given</em> msr files <code class="docutils literal notranslate"><span class="pre">8472.msr</span></code> through <code class="docutils literal notranslate"><span class="pre">8475.msr</span></code> and call <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> <em>without</em> finally summarizing the results.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8472</span> <span class="m">8475</span> _tf_h13 msr-8471!
+<p>Take the <em>given</em> msr files <tt class="docutils literal"><span class="pre">8472.msr</span></tt> through <tt class="docutils literal"><span class="pre">8475.msr</span></tt> and call <tt class="docutils literal"><span class="pre">musrfit</span></tt> <em>without</em> finally summarizing the results.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8472</span> <span class="m">8475</span> _tf_h13 msr-8471!
 </pre></div>
 </div>
-<p>Using <code class="docutils literal notranslate"><span class="pre">8471_tf_h13.msr</span></code> as template for all runs, <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> generates the msr input files <code class="docutils literal notranslate"><span class="pre">8472_tf_h13.msr</span></code> through <code class="docutils literal notranslate"><span class="pre">8475_tf_h13.msr</span></code>.
+<p>Using <tt class="docutils literal"><span class="pre">8471_tf_h13.msr</span></tt> as template for all runs, <tt class="docutils literal"><span class="pre">msr2data</span></tt> generates the msr input files <tt class="docutils literal"><span class="pre">8472_tf_h13.msr</span></tt> through <tt class="docutils literal"><span class="pre">8475_tf_h13.msr</span></tt>.
 <em>No fitting will be performed and no DB or ASCII output will be generated!</em></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="o">[</span><span class="m">8472</span> <span class="m">8475</span>-8479<span class="o">]</span> _tf_h13 paramList <span class="m">1</span>-16 data -o bestData.dat
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="o">[</span><span class="m">8472</span> <span class="m">8475</span>-8479<span class="o">]</span> _tf_h13 paramList <span class="m">1</span>-16 data -o bestData.dat
 </pre></div>
 </div>
-<p>Will collect the parameters 1 to 16 from the msr-files <code class="docutils literal notranslate"><span class="pre">8472_tf_h13.msr</span></code>, <code class="docutils literal notranslate"><span class="pre">8475_tf_h13.msr</span></code>, <code class="docutils literal notranslate"><span class="pre">8476_tf_h13.msr</span></code>, <code class="docutils literal notranslate"><span class="pre">8477_tf_h13.msr</span></code>, <code class="docutils literal notranslate"><span class="pre">8478_tf_h13.msr</span></code>,
-and <code class="docutils literal notranslate"><span class="pre">8479_tf_h13.msr</span></code> and write these parameters into a column like output file <code class="docutils literal notranslate"><span class="pre">bestData.dat</span></code>.</p>
+<p>Will collect the parameters 1 to 16 from the msr-files <tt class="docutils literal"><span class="pre">8472_tf_h13.msr</span></tt>, <tt class="docutils literal"><span class="pre">8475_tf_h13.msr</span></tt>, <tt class="docutils literal"><span class="pre">8476_tf_h13.msr</span></tt>, <tt class="docutils literal"><span class="pre">8477_tf_h13.msr</span></tt>, <tt class="docutils literal"><span class="pre">8478_tf_h13.msr</span></tt>,
+and <tt class="docutils literal"><span class="pre">8479_tf_h13.msr</span></tt> and write these parameters into a column like output file <tt class="docutils literal"><span class="pre">bestData.dat</span></tt>.</p>
 </div>
 <div class="section" id="the-global-mode">
 <span id="index-1"></span><h2>The Global Mode<a class="headerlink" href="#the-global-mode" title="Permalink to this headline">¶</a></h2>
-<p>Apart from all the options described <a class="reference internal" href="#msr2data-opt-param"><span class="std std-ref">above</span></a> there is another program option: <strong>global</strong>.
-This option changes the general behavior of <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> in that way that instead of processing one msr file for each
+<p>Apart from all the options described <a class="reference internal" href="#msr2data-opt-param"><em>above</em></a> there is another program option: <strong>global</strong>.
+This option changes the general behavior of <tt class="docutils literal"><span class="pre">msr2data</span></tt> in that way that instead of processing one msr file for each
 run it combines all specified runs in <em>one single msr file</em> with the possibility to define common parameters for all
 runs as well as run-specific parameters. When writing the obtained parameters to a DB file or a column-structured
 ASCII file that single msr file is read and the parameters valid for each run are extracted. The global option can be
-used in conjunction with any of the described invocations of <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> and together with all options stated <a class="reference internal" href="#msr2data-opt-param"><span class="std std-ref">above</span></a>.</p>
+used in conjunction with any of the described invocations of <tt class="docutils literal"><span class="pre">msr2data</span></tt> and together with all options stated <a class="reference internal" href="#msr2data-opt-param"><em>above</em></a>.</p>
 <div class="section" id="file-generation">
 <h3>File Generation<a class="headerlink" href="#file-generation" title="Permalink to this headline">¶</a></h3>
 <p>The general idea of this mode is to generate a global msr file on the basis of a working single-run msr file. For this
 purpose a single-run template containing information about common and run-specific parameters should be created. These
 parameters are identified through their parameter names:</p>
-<dl class="simple">
-<dt><strong>run-specific parameters</strong></dt><dd><p>these parameters are tagged with the current run number in the format <code class="docutils literal notranslate"><span class="pre">%0Xu</span></code>, <em>i.e.</em> <code class="docutils literal notranslate"><span class="pre">X</span></code> digits with leading zeros,
-at the end of the parameter name, <em>e.g.</em> for a 4-digit-formatted run number <code class="docutils literal notranslate"><span class="pre">alpha0123</span></code> if the run number was 123 or
-for a 8-digit-formatted run number <code class="docutils literal notranslate"><span class="pre">alpha00123456</span></code> if the run number was 123456. <code class="docutils literal notranslate"><span class="pre">X</span></code> has to be at least 4.</p>
-</dd>
-<dt><strong>common parameters</strong></dt><dd><p>all parameters that are not run specific</p>
-</dd>
+<dl class="docutils">
+<dt><strong>run-specific parameters</strong></dt>
+<dd>these parameters are tagged with the current run number in the format <tt class="docutils literal"><span class="pre">%0Xu</span></tt>, <em>i.e.</em> <tt class="docutils literal"><span class="pre">X</span></tt> digits with leading zeros,
+at the end of the parameter name, <em>e.g.</em> for a 4-digit-formatted run number <tt class="docutils literal"><span class="pre">alpha0123</span></tt> if the run number was 123 or
+for a 8-digit-formatted run number <tt class="docutils literal"><span class="pre">alpha00123456</span></tt> if the run number was 123456. <tt class="docutils literal"><span class="pre">X</span></tt> has to be at least 4.</dd>
+<dt><strong>common parameters</strong></dt>
+<dd>all parameters that are not run specific</dd>
 </dl>
-<p>The <a class="reference internal" href="user-manual.html#msr-fitparameter-block"><span class="std std-ref">FITPARAMETER block</span></a> of an exemplary template file <code class="docutils literal notranslate"><span class="pre">8472_example.msr</span></code> could therefore look like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FITPARAMETER</span>
-<span class="c1">#       No   Name      Value     Step        Pos_Error    Boundaries</span>
-        <span class="mi">1</span>    <span class="n">Phase</span>     <span class="mf">35.8359</span>   <span class="o">-</span><span class="mf">3.94496</span>    <span class="mf">3.93749</span>
-        <span class="mi">2</span>    <span class="n">Asy8472</span>   <span class="mf">0.04501</span>   <span class="o">-</span><span class="mf">0.00208</span>    <span class="mf">0.00211</span>      <span class="mi">0</span>       <span class="mf">0.33</span>
-        <span class="mi">3</span>    <span class="n">Field</span>     <span class="mf">143.212</span>   <span class="o">-</span><span class="mf">0.27960</span>    <span class="mf">0.27885</span>      <span class="mi">100</span>     <span class="mi">200</span>
-        <span class="mi">4</span>    <span class="n">Rate8472</span>  <span class="mf">0.14245</span>   <span class="o">-</span><span class="mf">0.02501</span>    <span class="mf">0.02279</span>      <span class="mi">0</span>       <span class="mi">1</span>
+<p>The <a class="reference internal" href="user-manual.html#msr-fitparameter-block"><em>FITPARAMETER block</em></a> of an exemplary template file <tt class="docutils literal"><span class="pre">8472_example.msr</span></tt> could therefore look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>FITPARAMETER
+#       No   Name      Value     Step        Pos_Error    Boundaries
+        1    Phase     35.8359   -3.94496    3.93749
+        2    Asy8472   0.04501   -0.00208    0.00211      0       0.33
+        3    Field     143.212   -0.27960    0.27885      100     200
+        4    Rate8472  0.14245   -0.02501    0.02279      0       1
 </pre></div>
 </div>
 <p>Here the parameters <strong>2</strong> and <strong>4</strong> would be treated as <em>run-specific</em> whereas the parameters <strong>1</strong> and <strong>3</strong> would be <em>common</em> to the original and all newly added runs.</p>
-<p>Normally, within the template file there should <em>not</em> appear explicitly any run-specific parameters in the <a class="reference internal" href="user-manual.html#msr-theory-block"><span class="std std-ref">THEORY</span></a> and
-<a class="reference internal" href="user-manual.html#msr-functions-block"><span class="std std-ref">FUNCTIONS</span></a> blocks. If however, those parameters are met, <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> will try to substitute them by mapped parameters
-and add them accordingly to the map contained in each <a class="reference internal" href="user-manual.html#msr-run-block"><span class="std std-ref">RUN block</span></a>.</p>
-<p>When <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> is called to generate a global msr file, <em>e.g.</em></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8471</span> <span class="m">8470</span> _example msr-8472 global
+<p>Normally, within the template file there should <em>not</em> appear explicitly any run-specific parameters in the <a class="reference internal" href="user-manual.html#msr-theory-block"><em>THEORY</em></a> and
+<a class="reference internal" href="user-manual.html#msr-functions-block"><em>FUNCTIONS</em></a> blocks. If however, those parameters are met, <tt class="docutils literal"><span class="pre">msr2data</span></tt> will try to substitute them by mapped parameters
+and add them accordingly to the map contained in each <a class="reference internal" href="user-manual.html#msr-run-block"><em>RUN block</em></a>.</p>
+<p>When <tt class="docutils literal"><span class="pre">msr2data</span></tt> is called to generate a global msr file, <em>e.g.</em></p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8471</span> <span class="m">8470</span> _example msr-8472 global
 </pre></div>
 </div>
-<p>a new msr file <code class="docutils literal notranslate"><span class="pre">8471+global_example.msr</span></code> is created. As can be seen in the example, the name of the global msr file always starts with the
-first specified run number followed by the <code class="docutils literal notranslate"><span class="pre">+global</span></code> identifier and the template <code class="docutils literal notranslate"><span class="pre">&lt;extension&gt;</span></code>. The example’s global FITPARAMETER block would be:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FITPARAMETER</span>
-<span class="c1">#       No   Name      Value     Step        Pos_Error    Boundaries</span>
+<p>a new msr file <tt class="docutils literal"><span class="pre">8471+global_example.msr</span></tt> is created. As can be seen in the example, the name of the global msr file always starts with the
+first specified run number followed by the <tt class="docutils literal"><span class="pre">+global</span></tt> identifier and the template <tt class="docutils literal"><span class="pre">&lt;extension&gt;</span></tt>. The example&#8217;s global FITPARAMETER block would be:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>FITPARAMETER
+#       No   Name      Value     Step        Pos_Error    Boundaries
 
-<span class="c1"># Common parameters for all runs</span>
+# Common parameters for all runs
 
-        <span class="mi">1</span>    <span class="n">Phase</span>     <span class="mf">35.8359</span>   <span class="o">-</span><span class="mf">3.94496</span>    <span class="mf">3.93749</span>
-        <span class="mi">2</span>    <span class="n">Field</span>     <span class="mf">143.212</span>   <span class="o">-</span><span class="mf">0.27960</span>    <span class="mf">0.27885</span>      <span class="mi">100</span>     <span class="mi">200</span>
+        1    Phase     35.8359   -3.94496    3.93749
+        2    Field     143.212   -0.27960    0.27885      100     200
 
-<span class="c1"># Specific parameters for run 8471</span>
+# Specific parameters for run 8471
 
-        <span class="mi">3</span>    <span class="n">Asy8471</span>   <span class="mf">0.04501</span>   <span class="o">-</span><span class="mf">0.00208</span>    <span class="mf">0.00211</span>      <span class="mi">0</span>       <span class="mf">0.33</span>
-        <span class="mi">4</span>    <span class="n">Rate8471</span>  <span class="mf">0.14245</span>   <span class="o">-</span><span class="mf">0.02501</span>    <span class="mf">0.02279</span>      <span class="mi">0</span>       <span class="mi">1</span>
+        3    Asy8471   0.04501   -0.00208    0.00211      0       0.33
+        4    Rate8471  0.14245   -0.02501    0.02279      0       1
 
-<span class="c1"># Specific parameters for run 8470</span>
+# Specific parameters for run 8470
 
-        <span class="mi">5</span>    <span class="n">Asy8470</span>   <span class="mf">0.04501</span>   <span class="o">-</span><span class="mf">0.00208</span>    <span class="mf">0.00211</span>      <span class="mi">0</span>       <span class="mf">0.33</span>
-        <span class="mi">6</span>    <span class="n">Rate8470</span>  <span class="mf">0.14245</span>   <span class="o">-</span><span class="mf">0.02501</span>    <span class="mf">0.02279</span>      <span class="mi">0</span>       <span class="mi">1</span>
+        5    Asy8470   0.04501   -0.00208    0.00211      0       0.33
+        6    Rate8470  0.14245   -0.02501    0.02279      0       1
 </pre></div>
 </div>
 <p>This shows that the fit parameters are reorganized in a way that the common parameters appear at the beginning of the parameter list and they are
@@ -270,50 +285,50 @@ followed by copies of the parameters specific to each run (in the specified orde
 created — for each run as many as found for the template run.</p>
 <p>During this reorganization all the affected parameter occurrences are changed accordingly!</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Please be aware of the fact that comments in the template msr file are <em>not</em> propagated to the newly generated global msr file!</p>
+<p class="first admonition-title">Note</p>
+<p class="last">Please be aware of the fact that comments in the template msr file are <em>not</em> propagated to the newly generated global msr file!</p>
 </div>
 </div>
 <div class="section" id="parameter-extraction">
 <span id="index-2"></span><h3>Parameter Extraction<a class="headerlink" href="#parameter-extraction" title="Permalink to this headline">¶</a></h3>
 <p>After fitting some model to the specified data the fit parameters can be extracted from the global msr file to a DB or column-structured ASCII file;
-as usual this includes also parameters stored in the run data files or externally specified parameters given in a <a class="reference internal" href="#run-list-file-structure"><span class="std std-ref">run-list file</span></a>.
+as usual this includes also parameters stored in the run data files or externally specified parameters given in a <a class="reference internal" href="#run-list-file-structure"><em>run-list file</em></a>.
 In order to reach this goal the global msr file has to obey certain rules:</p>
 <ul class="simple">
-<li><p>The order of the parameters has to match the one described above, meaning the common parameters are listed first followed by
+<li>The order of the parameters has to match the one described above, meaning the common parameters are listed first followed by
 the same number of parameters specific to each run tagged by the according run numbers at the end of the parameter names and
-having the same order as the specified list of runs.</p></li>
-<li><p>The RUN blocks have to be ordered according to the list of runs to be processed.</p></li>
+having the same order as the specified list of runs.</li>
+<li>The RUN blocks have to be ordered according to the list of runs to be processed.</li>
 </ul>
-<p>Following these rules – which is achieved most easily by generating the global msr file using <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> as shown above – the parameters can be extracted <em>e.g.</em> like</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8471</span> <span class="m">8470</span> _example global data -o globalFit.dat
+<p>Following these rules &#8211; which is achieved most easily by generating the global msr file using <tt class="docutils literal"><span class="pre">msr2data</span></tt> as shown above &#8211; the parameters can be extracted <em>e.g.</em> like</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8471</span> <span class="m">8470</span> _example global data -o globalFit.dat
 </pre></div>
 </div>
-<p>This will read in the file <code class="docutils literal notranslate"><span class="pre">8471+global_example.msr</span></code>, extract for each run all relevant parameters from the msr file as well as
-from the according data files (if available) and append all of them in columns to the ASCII file <code class="docutils literal notranslate"><span class="pre">globalFit.dat</span></code>.</p>
+<p>This will read in the file <tt class="docutils literal"><span class="pre">8471+global_example.msr</span></tt>, extract for each run all relevant parameters from the msr file as well as
+from the according data files (if available) and append all of them in columns to the ASCII file <tt class="docutils literal"><span class="pre">globalFit.dat</span></tt>.</p>
 </div>
 <div class="section" id="the-extended-global-mode">
 <span id="index-3"></span><h3>The Extended Global Mode<a class="headerlink" href="#the-extended-global-mode" title="Permalink to this headline">¶</a></h3>
 <p>If a new global input file is generated, it is also possible to do an automatic pre-analysis for each single run using the specified template first;
 afterwards the run-specific parameters of these single-run msr files are collected into the global msr file. In special cases this might be useful
-to obtain a better set of starting values for the parameters, however, in most cases it will not replace the “manual review” of the generated global
+to obtain a better set of starting values for the parameters, however, in most cases it will not replace the &#8220;manual review&#8221; of the generated global
 input file. The option is activated by choosing the keyword <strong>global+</strong>. For example</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8471</span> <span class="m">8470</span> _example global+ msr-8472
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8471</span> <span class="m">8470</span> _example global+ msr-8472
 </pre></div>
 </div>
-<p>Here, <code class="docutils literal notranslate"><span class="pre">8472_example.msr</span></code> is first used as template to generate the file <code class="docutils literal notranslate"><span class="pre">8471-OneRunFit_example.msr</span></code>, then <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> is called for it, the result
-is used to generate <code class="docutils literal notranslate"><span class="pre">8470-OneRunFit_example.msr</span></code> and <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> is called for that file. Finally, the global fit file <code class="docutils literal notranslate"><span class="pre">8471+global_example.msr</span></code> is
-produced — including the fit results of the <code class="docutils literal notranslate"><span class="pre">OneRunFit</span></code> files for the run-specific parameters.</p>
+<p>Here, <tt class="docutils literal"><span class="pre">8472_example.msr</span></tt> is first used as template to generate the file <tt class="docutils literal"><span class="pre">8471-OneRunFit_example.msr</span></tt>, then <tt class="docutils literal"><span class="pre">musrfit</span></tt> is called for it, the result
+is used to generate <tt class="docutils literal"><span class="pre">8470-OneRunFit_example.msr</span></tt> and <tt class="docutils literal"><span class="pre">musrfit</span></tt> is called for that file. Finally, the global fit file <tt class="docutils literal"><span class="pre">8471+global_example.msr</span></tt> is
+produced — including the fit results of the <tt class="docutils literal"><span class="pre">OneRunFit</span></tt> files for the run-specific parameters.</p>
 <p>By appending an exclamation mark <strong>!</strong> to the <strong>global+</strong> option, the given template will be used for every new file generation (similar to the fit option
 explained before). The <strong>+[!]</strong> extension will be ignored, if no new global input file is generated.
 The single run msr files are <em>not</em> deleted at the moment. The information contained in them might be useful for some people. Of course the data can also
-be collected by <code class="docutils literal notranslate"><span class="pre">msr2data</span></code>. <em>E.g.</em> in order to produce a DB file <code class="docutils literal notranslate"><span class="pre">OneRunFits.db</span></code> one could call</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8471</span> <span class="m">8470</span> -OneRunFit_example -o OneRunFits.db
+be collected by <tt class="docutils literal"><span class="pre">msr2data</span></tt>. <em>E.g.</em> in order to produce a DB file <tt class="docutils literal"><span class="pre">OneRunFits.db</span></tt> one could call</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">8471</span> <span class="m">8470</span> -OneRunFit_example -o OneRunFits.db
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Please be aware that the program in this mode <em>always</em> generates new single-run msr files and <em>always</em> calls <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> for them. In case there are
+<p class="first admonition-title">Note</p>
+<p class="last">Please be aware that the program in this mode <em>always</em> generates new single-run msr files and <em>always</em> calls <tt class="docutils literal"><span class="pre">musrfit</span></tt> for them. In case there are
 already single-run fits present, these cannot be used in conjunction with this option. The program on purpose behaves in this way in order to ensure
 the file integrity and correct parameter order within these files.</p>
 </div>
@@ -322,34 +337,34 @@ the file integrity and correct parameter order within these files.</p>
 <div class="section" id="known-limitations">
 <h2>Known Limitations<a class="headerlink" href="#known-limitations" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>The indexing run number of the msr file has to be at the begin of every filename.</p></li>
-<li><p>Within the data file name the <code class="docutils literal notranslate"><span class="pre">RUN#</span></code> has the format <code class="docutils literal notranslate"><span class="pre">%0Xu</span></code>, <em>i.e.</em> <code class="docutils literal notranslate"><span class="pre">X</span></code> digits with leading zeros, and has to be the rightmost number given in this
-format in the file name. <code class="docutils literal notranslate"><span class="pre">X</span></code> has to be at least 4. The highest treatable run number is <span class="math notranslate nohighlight">\(2^{32}-1 = 4294967295\)</span>.</p></li>
-<li><p>In order to keep <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> working properly the msr files should only contain <em>one</em> STATISTIC block at the end of the file and <em>one</em> FITPARAMETER block
-right after the TITLE — <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> itself allows to have more creative msr files…</p></li>
-<li><p>The msr-file generation from a template takes only care of runs given on the <em>first</em> line of a <code class="docutils literal notranslate"><span class="pre">RUN</span> <span class="pre">block</span></code>. <a class="reference internal" href="user-manual.html#msr-addrun"><span class="std std-ref">ADDRUN</span></a> statements are simply
-copied! Since this is most probably <em>not</em> what one likes to do, it is suggested <em>not</em> to use the <code class="docutils literal notranslate"><span class="pre">fit-&lt;template&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">msr-&lt;template&gt;</span></code> options if
-ADDRUN statements were present in the template file.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">msr2data</span></code> will write only up to two successive empty lines in newly generated msr files. In case more subsequent empty lines are encountered in a template file,
-these are not copied! Actually, this measure is not a limitation but has been introduced to keep the msr files in a reasonable shape.</p></li>
+<li>The indexing run number of the msr file has to be at the begin of every filename.</li>
+<li>Within the data file name the <tt class="docutils literal"><span class="pre">RUN#</span></tt> has the format <tt class="docutils literal"><span class="pre">%0Xu</span></tt>, <em>i.e.</em> <tt class="docutils literal"><span class="pre">X</span></tt> digits with leading zeros, and has to be the rightmost number given in this
+format in the file name. <tt class="docutils literal"><span class="pre">X</span></tt> has to be at least 4. The highest treatable run number is <span class="math">\(2^{32}-1 = 4294967295\)</span>.</li>
+<li>In order to keep <tt class="docutils literal"><span class="pre">msr2data</span></tt> working properly the msr files should only contain <em>one</em> STATISTIC block at the end of the file and <em>one</em> FITPARAMETER block
+right after the TITLE — <tt class="docutils literal"><span class="pre">musrfit</span></tt> itself allows to have more creative msr files...</li>
+<li>The msr-file generation from a template takes only care of runs given on the <em>first</em> line of a <tt class="docutils literal"><span class="pre">RUN</span> <span class="pre">block</span></tt>. <a class="reference internal" href="user-manual.html#msr-addrun"><em>ADDRUN</em></a> statements are simply
+copied! Since this is most probably <em>not</em> what one likes to do, it is suggested <em>not</em> to use the <tt class="docutils literal"><span class="pre">fit-&lt;template&gt;</span></tt> and <tt class="docutils literal"><span class="pre">msr-&lt;template&gt;</span></tt> options if
+ADDRUN statements were present in the template file.</li>
+<li><tt class="docutils literal"><span class="pre">msr2data</span></tt> will write only up to two successive empty lines in newly generated msr files. In case more subsequent empty lines are encountered in a template file,
+these are not copied! Actually, this measure is not a limitation but has been introduced to keep the msr files in a reasonable shape.</li>
 </ul>
 </div>
 <div class="section" id="the-graphical-user-interface-for-msr2data-provided-by-musredit">
 <h2>The Graphical User Interface for msr2data Provided by musredit<a class="headerlink" href="#the-graphical-user-interface-for-msr2data-provided-by-musredit" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="musredit.html#musredit-sec"><span class="std std-ref">musredit</span></a>, designed especially for the manipulation of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> msr files and graphical front ends to <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>, offer an almost
-self-explanatory graphical user interface to <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> depicted below:</p>
-<img alt="_images/msr2data-GUI.svg" src="_images/msr2data-GUI.svg" /><ol class="arabic simple">
-<li><p>and 2. Choose one of the ways to specify your list of runs as described under <a class="reference internal" href="#msr2data-basic-usage"><span class="std std-ref">basic usage</span></a>.</p></li>
+<p><a class="reference internal" href="musredit.html#musredit-sec"><em>musredit</em></a>, designed especially for the manipulation of <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr files and graphical front ends to <tt class="docutils literal"><span class="pre">musrfit</span></tt>, offer an almost
+self-explanatory graphical user interface to <tt class="docutils literal"><span class="pre">msr2data</span></tt> depicted below:</p>
+<img src="_images/msr2data-GUI.svg" /><ol class="arabic simple">
+<li>and 2. Choose one of the ways to specify your list of runs as described under <a class="reference internal" href="#msr2data-basic-usage"><em>basic usage</em></a>.</li>
 </ol>
 <ol class="arabic simple" start="3">
-<li><p>Give the file extension here, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">_zf</span></code> for files like <code class="docutils literal notranslate"><span class="pre">8472_zf.msr</span></code>. If the files do not have an extension this
-field stays empty. <code class="docutils literal notranslate"><span class="pre">musredit</span></code> takes care of passing the “” to <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> as mentioned above.</p></li>
-<li><p>Activates the <code class="docutils literal notranslate"><span class="pre">fit-&lt;template&gt;</span></code> option if <code class="docutils literal notranslate"><span class="pre">&lt;template&gt;</span></code> is entered. In case the option <code class="docutils literal notranslate"><span class="pre">Chain</span> <span class="pre">Fit</span></code> is <em>not</em> set the
+<li>Give the file extension here, <em>e.g.</em> <tt class="docutils literal"><span class="pre">_zf</span></tt> for files like <tt class="docutils literal"><span class="pre">8472_zf.msr</span></tt>. If the files do not have an extension this
+field stays empty. <tt class="docutils literal"><span class="pre">musredit</span></tt> takes care of passing the &#8220;&#8221; to <tt class="docutils literal"><span class="pre">msr2data</span></tt> as mentioned above.</li>
+<li>Activates the <tt class="docutils literal"><span class="pre">fit-&lt;template&gt;</span></tt> option if <tt class="docutils literal"><span class="pre">&lt;template&gt;</span></tt> is entered. In case the option <tt class="docutils literal"><span class="pre">Chain</span> <span class="pre">Fit</span></tt> is <em>not</em> set the
 given template will be used for the input-file generation for all runs to be fitted — otherwise the output of the first
-fit serves as template for the second and so on. The template field stays empty if <em>no</em> fits should be performed!</p></li>
-<li><p>Activates the <code class="docutils literal notranslate"><span class="pre">-o</span> <span class="pre">&lt;outputFileName&gt;</span></code> option if <code class="docutils literal notranslate"><span class="pre">&lt;outputFileName&gt;</span></code> is entered. If nothing is entered the default output file <code class="docutils literal notranslate"><span class="pre">out.db</span></code> or <code class="docutils literal notranslate"><span class="pre">out.dat</span></code> is used.</p></li>
+fit serves as template for the second and so on. The template field stays empty if <em>no</em> fits should be performed!</li>
+<li>Activates the <tt class="docutils literal"><span class="pre">-o</span> <span class="pre">&lt;outputFileName&gt;</span></tt> option if <tt class="docutils literal"><span class="pre">&lt;outputFileName&gt;</span></tt> is entered. If nothing is entered the default output file <tt class="docutils literal"><span class="pre">out.db</span></tt> or <tt class="docutils literal"><span class="pre">out.dat</span></tt> is used.</li>
 </ol>
-<p>The options tags correspond essentially to the description in <a class="reference internal" href="#msr2data-opt-param"><span class="std std-ref">optional parameters</span></a>.</p>
+<p>The options tags correspond essentially to the description in <a class="reference internal" href="#msr2data-opt-param"><em>optional parameters</em></a>.</p>
 </div>
 </div>
 
@@ -357,11 +372,11 @@ fit serves as template for the second and so on. The template field stays empty 
           </div>
         </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+      <div class="sphinxsidebar">
         <div class="sphinxsidebarwrapper">
-  <h3><a href="index.html">Table of Contents</a></h3>
+  <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">msr2data - A Program for Automatically Processing Multiple <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> msr Files</a><ul>
+<li><a class="reference internal" href="#">msr2data - A Program for Automatically Processing Multiple <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr Files</a><ul>
 <li><a class="reference internal" href="#basic-types-of-usage">Basic Types of Usage</a><ul>
 <li><a class="reference internal" href="#run-list-file-structure">Run List File Structure</a></li>
 </ul>
@@ -385,28 +400,29 @@ fit serves as template for the second and so on. The template field stays empty 
   <h4>Next topic</h4>
   <p class="topless"><a href="any2many.html"
                         title="next chapter">any2many - a Universal μSR-file-format converter</a></p>
-  <div role="note" aria-label="source link">
-    <h3>This Page</h3>
-    <ul class="this-page-menu">
-      <li><a href="_sources/msr2data.rst.txt"
-            rel="nofollow">Show Source</a></li>
-    </ul>
-   </div>
-<div id="searchbox" style="display: none" role="search">
-  <h3 id="searchlabel">Quick search</h3>
-    <div class="searchformwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/msr2data.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
     <form class="search" action="search.html" method="get">
-      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="text" name="q" />
       <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
     </form>
-    </div>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
+    <div class="related">
       <h3>Navigation</h3>
       <ul>
         <li class="right" style="margin-right: 10px">
@@ -418,13 +434,13 @@ fit serves as template for the second and so on. The template field stays empty 
         <li class="right" >
           <a href="mupp.html" title="mupp - μSR Parameter Plotter"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">musrfit 1.6.3 documentation</a> &#187;</li> 
+        <li><a href="index.html">musrfit 1.6.4 documentation</a> &raquo;</li> 
       </ul>
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2020, Andreas Suter.
-      Last updated on Jul 27, 2020.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 2.2.2.
+    <div class="footer">
+        &copy; Copyright 2020, Andreas Suter.
+      Last updated on Aug 29, 2020.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

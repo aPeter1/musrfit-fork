@@ -12,6 +12,12 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.6.4, 2020/08/29
+=============================
+
+Allow to view time spectra and Fourier theory only calculated at the data points 
+via the option '-1' or '--one_to_one'.
+
 Release of V1.6.3, 2020/07/27
 =============================
 

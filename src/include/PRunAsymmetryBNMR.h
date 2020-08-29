@@ -41,7 +41,7 @@ class PRunAsymmetryBNMR : public PRunBase
 {
   public:
     PRunAsymmetryBNMR();
-    PRunAsymmetryBNMR(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
+    PRunAsymmetryBNMR(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag, Bool_t theoAsData);
     virtual ~PRunAsymmetryBNMR();
 
     virtual Double_t CalcChiSquare(const std::vector<Double_t>& par);
@@ -68,6 +68,7 @@ class PRunAsymmetryBNMR : public PRunBase
     UInt_t fAlphaBetaTag; ///< \f$ 1 \to \alpha = \beta = 1\f$; \f$ 2 \to \alpha \neq 1, \beta = 1\f$; \f$ 3 \to \alpha = 1, \beta \neq 1\f$; \f$ 4 \to \alpha \neq 1, \beta \neq 1\f$.
     UInt_t fNoOfFitBins;  ///< number of bins to be be fitted
     Int_t fPacking;       ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
+    Bool_t fTheoAsData;   ///< true=only calculate the theory points at the data points, false=calculate more points for the theory as compared to data are calculated which lead to 'nicer' Fouriers
 
     PDoubleVector fForwardp;     ///< pos hel forward histo data
     PDoubleVector fForwardpErr;  ///< pos hel forward histo errors

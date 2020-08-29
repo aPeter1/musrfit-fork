@@ -16,6 +16,7 @@
     <estimate_n0>y</estimate_n0>
     <musrview_show_fourier>n</musrview_show_fourier>
     <musrview_show_avg>n</musrview_show_avg>
+    <musrview_show_one_to_one>n</musrview_show_one_to_one>
     <enable_musrt0>y</enable_musrt0>
     <dark_theme_icons_menu>n</dark_theme_icons_menu>
     <dark_theme_icons_toolbar>n</dark_theme_icons_toolbar>

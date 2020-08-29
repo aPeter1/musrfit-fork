@@ -53,6 +53,7 @@ PRunMuMinus::PRunMuMinus() : PRunBase()
 {
   fNoOfFitBins  = 0;
   fPacking = -1;
+  fTheoAsData = false;
 
   // the 2 following variables are need in case fit range is given in bins, and since
   // the fit range can be changed in the command block, these variables need to be accessible
@@ -76,7 +77,8 @@ PRunMuMinus::PRunMuMinus() : PRunBase()
  * \param runNo number of the run within the msr-file
  * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
-PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
+PRunMuMinus::PRunMuMinus(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag, Bool_t theoAsData) :
+  PRunBase(msrInfo, rawData, runNo, tag), fTheoAsData(theoAsData)
 {
   fNoOfFitBins  = 0;
 
@@ -742,6 +744,7 @@ Bool_t PRunMuMinus::PrepareRawViewData(PRawRunData* runData, const UInt_t histoN
 
   // calculate theory
   UInt_t size = fForward.size();
+/* //as35
   Double_t factor = 1.0;
   if (fData.GetValue()->size() * 10 > fForward.size()) {
     size = fData.GetValue()->size() * 10;
@@ -751,6 +754,20 @@ Bool_t PRunMuMinus::PrepareRawViewData(PRawRunData* runData, const UInt_t histoN
   Double_t theoryValue;
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
   fData.SetTheoryTimeStep(fTimeResolution*factor);
+*/ //as35
+
+  Int_t factor = 8; // 8 times more points for the theory (if fTheoAsData == false)
+  fData.SetTheoryTimeStart(fData.GetDataTimeStart());
+  if (fTheoAsData) { // cacluate theory only at the data points
+    fData.SetTheoryTimeStep(fData.GetDataTimeStep());
+  } else {
+    // finer binning for the theory (8 times as many points = factor)
+    size *= factor;
+    fData.SetTheoryTimeStep(fData.GetDataTimeStep()/(Double_t)factor);
+  }
+
+  Double_t time;
+  Double_t theoryValue;
   for (UInt_t i=0; i<size; i++) {
     time = fData.GetTheoryTimeStart() + i*fData.GetTheoryTimeStep();
     theoryValue = fTheory->Func(time, par, fFuncValues);

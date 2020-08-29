@@ -33,7 +33,7 @@
     <item>
      <widget class="QTabWidget" name="fTabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="fGeneral_tab">
        <attribute name="title">
@@ -52,13 +52,13 @@
          <string>Change Default Search Paths</string>
         </property>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>12</x>
           <y>10</y>
           <width>415</width>
-          <height>52</height>
+          <height>62</height>
          </rect>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -217,6 +217,19 @@
         </property>
         <property name="text">
          <string>start with averaged data/Fourier</string>
+        </property>
+       </widget>
+       <widget class="QCheckBox" name="fOneToOne_checkBox">
+        <property name="geometry">
+         <rect>
+          <x>260</x>
+          <y>10</y>
+          <width>181</width>
+          <height>26</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>theo at data points only</string>
         </property>
        </widget>
       </widget>

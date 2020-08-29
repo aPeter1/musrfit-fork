@@ -49,7 +49,7 @@
 class PRunListCollection
 {
   public:
-    PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *data);
+    PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *data, Bool_t theoAsdata=false);
     virtual ~PRunListCollection();
 
     enum EDataSwitch { kIndex, kRunNo };
@@ -108,6 +108,7 @@ class PRunListCollection
     virtual const Char_t* GetYAxisTitle(const TString &runName, const UInt_t idx) const;
 
   private:
+    Bool_t fTheoAsData;     ///< if true: calculate theory points only at the data points
     PMsrHandler *fMsrInfo;  ///< pointer to the msr-file handler
     PRunDataHandler *fData; ///< pointer to the run-data handler
 

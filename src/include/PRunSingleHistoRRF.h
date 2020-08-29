@@ -39,7 +39,7 @@ class PRunSingleHistoRRF : public PRunBase
 {
   public:
     PRunSingleHistoRRF();
-    PRunSingleHistoRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
+    PRunSingleHistoRRF(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag, Bool_t theoAsData);
     virtual ~PRunSingleHistoRRF();
 
     virtual Double_t CalcChiSquare(const std::vector<Double_t>& par);
@@ -68,6 +68,7 @@ class PRunSingleHistoRRF : public PRunBase
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
     Double_t fBkgErr;       ///< estimate error on the estimated background
     Int_t fRRFPacking;      ///< RRF packing for this particular run. Given in the GLOBAL-block.
+    Bool_t fTheoAsData;     ///< true=only calculate the theory points at the data points, false=calculate more points for the theory as compared to data are calculated which lead to 'nicer' Fouriers
 
     Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
 

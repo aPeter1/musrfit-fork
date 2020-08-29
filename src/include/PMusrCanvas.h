@@ -206,12 +206,12 @@ class PMusrCanvas : public TObject, public TQObject
     PMusrCanvas();
     PMusrCanvas(const Int_t number, const Char_t* title,
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh, const Bool_t batch,
-                const Bool_t fourier=false, const Bool_t avg=false);
+                const Bool_t fourier=false, const Bool_t avg=false, const Bool_t theoAsData=false);
     PMusrCanvas(const Int_t number, const Char_t* title,
                 Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                 PMsrFourierStructure fourierDefault,
                 const PIntVector markerList, const PIntVector colorList, const Bool_t batch,
-                const Bool_t fourier=false, const Bool_t avg=false);
+                const Bool_t fourier=false, const Bool_t avg=false, const Bool_t theoAsData=false);
     virtual ~PMusrCanvas();
 
     virtual Bool_t IsValid() { return fValid; }
@@ -236,6 +236,7 @@ class PMusrCanvas : public TObject, public TQObject
     virtual void ExportData(const Char_t *fileName);
 
   private:
+    Bool_t fTheoAsData;       ///< flag if true, calculate theory points only at the data points
     Bool_t fStartWithFourier; ///< flag if true, the Fourier transform will be presented bypassing the time domain representation
     Bool_t fStartWithAvg;     ///< flag if true, the averaged data/Fourier will be presented
     Int_t  fTimeout;          ///< timeout after which the Done signal should be emited. If timeout <= 0, no timeout is taking place

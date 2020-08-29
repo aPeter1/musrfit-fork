@@ -140,6 +140,8 @@ bool PAdminXMLParser::startElement()
     fKeyWord = eMusrviewShowFourier;
   } else if (qName == "musrview_show_avg") {
     fKeyWord = eMusrviewShowAvg;
+  } else if (qName == "musrview_show_one_to_one") {
+    fKeyWord = eMusrviewShowOneToOne;
   } else if (qName == "enable_musrt0") {
     fKeyWord = eEnableMusrT0;
   } else if (qName == "dark_theme_icons_menu") {
@@ -314,6 +316,13 @@ bool PAdminXMLParser::characters()
       else
         flag = false;
       fAdmin->setMusrviewShowAvgFlag(flag);
+      break;
+    case eMusrviewShowOneToOne:
+      if (str == "y")
+        flag = true;
+      else
+        flag = false;
+      fAdmin->setMusrviewShowOneToOneFlag(flag);
       break;
     case eEnableMusrT0:
       if (str == "y")

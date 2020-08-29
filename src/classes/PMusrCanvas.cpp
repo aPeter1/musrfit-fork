@@ -187,8 +187,9 @@ PMusrCanvas::PMusrCanvas()
  */
 PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
-                         const Bool_t batch, const Bool_t fourier, const Bool_t avg) :
-    fStartWithFourier(fourier), fStartWithAvg(avg),
+                         const Bool_t batch, const Bool_t fourier, const Bool_t avg,
+                         const Bool_t theoAsData) :
+    fTheoAsData(theoAsData), fStartWithFourier(fourier), fStartWithAvg(avg),
     fBatchMode(batch), fPlotNumber(number)
 {
   fTimeout = 0;
@@ -244,8 +245,9 @@ PMusrCanvas::PMusrCanvas(const Int_t number, const Char_t* title,
                          Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh,
                          PMsrFourierStructure fourierDefault,
                          const PIntVector markerList, const PIntVector colorList,
-                         const Bool_t batch, const Bool_t fourier, const Bool_t avg) :
-     fStartWithFourier(fourier), fStartWithAvg(avg), fBatchMode(batch),
+                         const Bool_t batch, const Bool_t fourier, const Bool_t avg,
+                         const Bool_t theoAsData) :
+     fTheoAsData(theoAsData), fStartWithFourier(fourier), fStartWithAvg(avg), fBatchMode(batch),
      fPlotNumber(number), fFourier(fourierDefault),
      fMarkerList(markerList), fColorList(colorList)
 {
@@ -3467,22 +3469,30 @@ void PMusrCanvas::HandleFourier()
       fData[i].dataFourierPhase->SetMarkerStyle(fData[i].data->GetMarkerStyle());
 
       // calculate fourier transform of the theory
-      Int_t powerPad = (Int_t)round(log((endTime-startTime)/fData[i].theory->GetBinWidth(1))/log(2))+3;
-      PFourier fourierTheory(fData[i].theory, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, powerPad);
-      if (!fourierTheory.IsValid()) {
+      PFourier *fourierTheory = nullptr;
+      if (fTheoAsData) { // theory only at the data points
+        fourierTheory = new PFourier(fData[i].theory, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, fFourier.fFourierPower);
+      } else {
+        Int_t powerPad = fFourier.fFourierPower+5; // +5 means 8 times more points on theo (+3) + 4 times more points in fourier (+2)
+        fourierTheory = new PFourier(fData[i].theory, fFourier.fUnits, startTime, endTime, fFourier.fDCCorrected, powerPad);
+      }
+      if (!fourierTheory->IsValid()) {
         std::cerr << std::endl << ">> PMusrCanvas::HandleFourier(): **SEVERE ERROR** couldn't invoke PFourier to calculate the Fourier theory ..." << std::endl;
         return;
       }
-      fourierTheory.Transform(fFourier.fApodization);
+      fourierTheory->Transform(fFourier.fApodization);
       scale = sqrt(fData[0].theory->GetBinWidth(1)/(endTime-startTime)*fData[0].theory->GetBinWidth(1)/fData[0].data->GetBinWidth(1));
       // get real part of the data
-      fData[i].theoryFourierRe = fourierTheory.GetRealFourier(scale);
+      fData[i].theoryFourierRe = fourierTheory->GetRealFourier(scale);
       // get imaginary part of the data
-      fData[i].theoryFourierIm = fourierTheory.GetImaginaryFourier(scale);
+      fData[i].theoryFourierIm = fourierTheory->GetImaginaryFourier(scale);
       // get power part of the data
-      fData[i].theoryFourierPwr = fourierTheory.GetPowerFourier(scale);
+      fData[i].theoryFourierPwr = fourierTheory->GetPowerFourier(scale);
       // get phase part of the data
-      fData[i].theoryFourierPhase = fourierTheory.GetPhaseFourier();      
+      fData[i].theoryFourierPhase = fourierTheory->GetPhaseFourier();
+
+      // clean up
+      delete fourierTheory;
 
       // set line colors for the theory
       fData[i].theoryFourierRe->SetLineColor(fData[i].theory->GetLineColor());

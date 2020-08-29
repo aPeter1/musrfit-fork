@@ -48,6 +48,7 @@ class PPrefsDialog : public QDialog, private Ui::PPrefsDialog
 
     bool getMusrviewShowFourierFlag() { return fFourier_checkBox->isChecked(); }
     bool getMusrviewShowAvgFlag()   { return fAvg_checkBox->isChecked(); }
+    bool getMusrviewShowOneToOneFlag() { return fOneToOne_checkBox->isChecked(); }
     bool getKeepMinuit2OutputFlag() { return fKeepMn2Output_checkBox->isChecked(); }
     bool getTitleFromDataFileFlag() { return fTitleFromData_checkBox->isChecked(); }
     bool getEnableMusrT0Flag()      { return fEnableMusrT0_checkBox->isChecked(); }
@@ -55,6 +56,7 @@ class PPrefsDialog : public QDialog, private Ui::PPrefsDialog
     bool getEstimateN0Flag()        { return fEstimateN0_checkBox->isChecked(); }
     bool getDarkThemeIconsMenuFlag()    { return fDarkThemeIconsMenu_checkBox->isChecked(); }
     bool getDarkThemeIconsToolbarFlag()    { return fDarkThemeIconsToolbar_checkBox->isChecked(); }
+    bool getOneToOneFlag() { return fOneToOne_checkBox->isChecked(); }
     int  getDump();
     int  getTimeout() { return fTimeout_lineEdit->text().toInt(); }
 

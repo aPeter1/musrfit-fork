@@ -39,7 +39,7 @@ class PRunSingleHisto : public PRunBase
 {
   public:
     PRunSingleHisto();
-    PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag);
+    PRunSingleHisto(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag, Bool_t theoAsData);
     virtual ~PRunSingleHisto();
 
     virtual Double_t CalcChiSquare(const std::vector<Double_t>& par);
@@ -72,6 +72,7 @@ class PRunSingleHisto : public PRunBase
     UInt_t fNoOfFitBins;    ///< number of bins to be fitted
     Double_t fBackground;   ///< needed if background range is given (units: 1/bin)
     Int_t fPacking;         ///< packing for this particular run. Either given in the RUN- or GLOBAL-block.
+    Bool_t fTheoAsData;     ///< true=only calculate the theory points at the data points, false=calculate more points for the theory as compared to data are calculated which lead to 'nicer' Fouriers
 
     Int_t fGoodBins[2];     ///< keep first/last good bins. 0=fgb, 1=lgb
 

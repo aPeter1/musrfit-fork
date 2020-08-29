@@ -40,7 +40,8 @@
  * \param msrInfo pointer to the msr-file handler
  * \param data pointer to the run-data handler
  */
-PRunListCollection::PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *data) : fMsrInfo(msrInfo), fData(data)
+PRunListCollection::PRunListCollection(PMsrHandler *msrInfo, PRunDataHandler *data, Bool_t theoAsData) :
+  fMsrInfo(msrInfo), fData(data), fTheoAsData(theoAsData)
 {
 }
 
@@ -120,32 +121,32 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
 
   switch (fitType) {
     case PRUN_SINGLE_HISTO:
-      fRunSingleHistoList.push_back(new PRunSingleHisto(fMsrInfo, fData, runNo, tag));
+      fRunSingleHistoList.push_back(new PRunSingleHisto(fMsrInfo, fData, runNo, tag, fTheoAsData));
       if (!fRunSingleHistoList[fRunSingleHistoList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_SINGLE_HISTO_RRF:
-      fRunSingleHistoRRFList.push_back(new PRunSingleHistoRRF(fMsrInfo, fData, runNo, tag));
+      fRunSingleHistoRRFList.push_back(new PRunSingleHistoRRF(fMsrInfo, fData, runNo, tag, fTheoAsData));
       if (!fRunSingleHistoRRFList[fRunSingleHistoRRFList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_ASYMMETRY:
-      fRunAsymmetryList.push_back(new PRunAsymmetry(fMsrInfo, fData, runNo, tag));
+      fRunAsymmetryList.push_back(new PRunAsymmetry(fMsrInfo, fData, runNo, tag, fTheoAsData));
       if (!fRunAsymmetryList[fRunAsymmetryList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_ASYMMETRY_RRF:
-      fRunAsymmetryRRFList.push_back(new PRunAsymmetryRRF(fMsrInfo, fData, runNo, tag));
+      fRunAsymmetryRRFList.push_back(new PRunAsymmetryRRF(fMsrInfo, fData, runNo, tag, fTheoAsData));
       if (!fRunAsymmetryRRFList[fRunAsymmetryRRFList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_ASYMMETRY_BNMR:
-      fRunAsymmetryBNMRList.push_back(new PRunAsymmetryBNMR(fMsrInfo, fData, runNo, tag));
+      fRunAsymmetryBNMRList.push_back(new PRunAsymmetryBNMR(fMsrInfo, fData, runNo, tag, fTheoAsData));
       if (!fRunAsymmetryBNMRList[fRunAsymmetryBNMRList.size()-1]->IsValid())
         success = false;
       break;
     case PRUN_MU_MINUS:
-      fRunMuMinusList.push_back(new PRunMuMinus(fMsrInfo, fData, runNo, tag));
+      fRunMuMinusList.push_back(new PRunMuMinus(fMsrInfo, fData, runNo, tag, fTheoAsData));
       if (!fRunMuMinusList[fRunMuMinusList.size()-1]->IsValid())
         success = false;
       break;

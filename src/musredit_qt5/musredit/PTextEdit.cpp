@@ -2542,6 +2542,10 @@ void PTextEdit::musrView()
   if (fAdmin->getMusrviewShowAvgFlag())
     arg << "-a";
 
+  // check if theory shall only be calculated at the data points
+  if (fAdmin->getMusrviewShowOneToOneFlag())
+    arg << "-1";
+
   QProcess *proc = new QProcess(this);
   connect(proc, SIGNAL(finished(int, QProcess::ExitStatus)), this, SLOT(musrViewFinished(int, QProcess::ExitStatus)));
 
@@ -2691,6 +2695,7 @@ void PTextEdit::musrPrefs()
     fAdmin->setDarkThemeIconsToolbarFlag(dlg->getDarkThemeIconsToolbarFlag());
     fAdmin->setMusrviewShowFourierFlag(dlg->getMusrviewShowFourierFlag());
     fAdmin->setMusrviewShowAvgFlag(dlg->getMusrviewShowAvgFlag());
+    fAdmin->setMusrviewShowOneToOneFlag(dlg->getMusrviewShowOneToOneFlag());
     fAdmin->setKeepMinuit2OutputFlag(dlg->getKeepMinuit2OutputFlag());
     fAdmin->setTitleFromDataFileFlag(dlg->getTitleFromDataFileFlag());
     fAdmin->setEnableMusrT0Flag(dlg->getEnableMusrT0Flag());

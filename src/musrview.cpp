@@ -64,6 +64,7 @@ void musrview_syntax()
   std::cout << std::endl << "       --show-dynamic-path : dumps the dynamic search paths and exit.";
   std::cout << std::endl << "       -f, --fourier: will directly present the Fourier transform of the <msr-file>.";
   std::cout << std::endl << "       -a, --avg: will directly present the averaged data/Fourier of the <msr-file>.";
+  std::cout << std::endl << "       -1, --one_to_one: calculate theory points only at data points.";
   std::cout << std::endl << "       --<graphic-format-extension>: ";
   std::cout << std::endl << "           will produce a graphics-output-file without starting a root session.";
   std::cout << std::endl << "           the name is based on the <msr-file>, e.g. 3310.msr -> 3310_0.png";
@@ -105,6 +106,7 @@ int main(int argc, char *argv[])
   char fileName[128];
   bool fourier = false;
   bool avg = false;
+  bool theoAtData = false; // theory points only at data points
   bool graphicsOutput = false;
   bool asciiOutput = false;
   char graphicsExtension[128];
@@ -149,6 +151,8 @@ int main(int argc, char *argv[])
       fourier = true;
     } else if (!strcmp(argv[i], "-a") || !strcmp(argv[i], "--avg")) {
       avg = true;
+    } else if (!strcmp(argv[i], "-1") || !strcmp(argv[i], "--one_to_one")) {
+      theoAtData = true;
     } else if (!strcmp(argv[i], "--eps") || !strcmp(argv[i], "--pdf") || !strcmp(argv[i], "--gif") ||
                !strcmp(argv[i], "--jpg") || !strcmp(argv[i], "--png") || !strcmp(argv[i], "--svg") ||
                !strcmp(argv[i], "--xpm") || !strcmp(argv[i], "--root")) {
@@ -280,7 +284,7 @@ int main(int argc, char *argv[])
   PRunListCollection *runListCollection = nullptr;
   if (result == PMUSR_SUCCESS) {
     // feed all the necessary histogramms for the view
-    runListCollection = new PRunListCollection(msrHandler, dataHandler);
+    runListCollection = new PRunListCollection(msrHandler, dataHandler, theoAtData);
     for (unsigned int i=0; i<msrHandler->GetMsrRunList()->size(); i++) {
       // if run is in plotList add it, otherwise go to the next
       runPresent = false;
@@ -324,12 +328,12 @@ int main(int argc, char *argv[])
                                      startupHandler->GetMarkerList(),
                                      startupHandler->GetColorList(),
                                      graphicsOutput||asciiOutput,
-                                     fourier, avg);
+                                     fourier, avg, theoAtData);
       else
         musrCanvas = new PMusrCanvas(i, msrHandler->GetMsrTitle()->Data(), 
                                      10+i*100, 10+i*100, 800, 600,
                                      graphicsOutput||asciiOutput,
-                                     fourier, avg);
+                                     fourier, avg, theoAtData);
 
       if (!musrCanvas->IsValid()) {
         std::cerr << std::endl << ">> musrview **SEVERE ERROR** Couldn't invoke all necessary objects, will quit.";
