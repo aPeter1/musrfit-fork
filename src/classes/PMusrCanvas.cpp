@@ -3675,6 +3675,7 @@ void PMusrCanvas::HandleFourierDifference()
       fData[i].diffFourierRe = new TH1F(name, name, fData[i].dataFourierRe->GetNbinsX(),
                                         fData[i].dataFourierRe->GetXaxis()->GetXmin(),
                                         fData[i].dataFourierRe->GetXaxis()->GetXmax());
+
       // imaginary part
       name = TString(fData[i].dataFourierIm->GetTitle()) + "_diff";
       fData[i].diffFourierIm = new TH1F(name, name, fData[i].dataFourierIm->GetNbinsX(),
@@ -3692,10 +3693,12 @@ void PMusrCanvas::HandleFourierDifference()
                                          fData[i].dataFourierPhase->GetXaxis()->GetXmax());
 
       // phase optimized real part
-      name = TString(fData[i].dataFourierPhaseOptReal->GetTitle()) + "_diff";
-      fData[i].diffFourierPhaseOptReal = new TH1F(name, name, fData[i].dataFourierPhaseOptReal->GetNbinsX(),
-                                         fData[i].dataFourierPhaseOptReal->GetXaxis()->GetXmin(),
-                                         fData[i].dataFourierPhaseOptReal->GetXaxis()->GetXmax());
+      if (fData[i].dataFourierPhaseOptReal != nullptr) {
+        name = TString(fData[i].dataFourierPhaseOptReal->GetTitle()) + "_diff";
+        fData[i].diffFourierPhaseOptReal = new TH1F(name, name, fData[i].dataFourierPhaseOptReal->GetNbinsX(),
+                                           fData[i].dataFourierPhaseOptReal->GetXaxis()->GetXmin(),
+                                           fData[i].dataFourierPhaseOptReal->GetXaxis()->GetXmax());
+      }
 
       // calculate difference
       for (UInt_t j=1; j<fData[i].dataFourierRe->GetEntries(); j++) {
@@ -3715,10 +3718,12 @@ void PMusrCanvas::HandleFourierDifference()
         theoBin = fData[i].theoryFourierPhase->FindBin(dvalx); // get the theory x-axis bin
         dval = fData[i].dataFourierPhase->GetBinContent(j) - fData[i].theoryFourierPhase->GetBinContent(theoBin);
         fData[i].diffFourierPhase->SetBinContent(j, dval);
-        dvalx = fData[i].dataFourierPhaseOptReal->GetXaxis()->GetBinCenter(j); // get x-axis value of bin j
-        theoBin = fData[i].theoryFourierPhaseOptReal->FindBin(dvalx); // get the theory x-axis bin
-        dval = fData[i].dataFourierPhaseOptReal->GetBinContent(j) - fData[i].theoryFourierPhaseOptReal->GetBinContent(theoBin);
-        fData[i].diffFourierPhaseOptReal->SetBinContent(j, dval);
+        if (fData[i].dataFourierPhaseOptReal != nullptr) {
+          dvalx = fData[i].dataFourierPhaseOptReal->GetXaxis()->GetBinCenter(j); // get x-axis value of bin j
+          theoBin = fData[i].theoryFourierPhaseOptReal->FindBin(dvalx); // get the theory x-axis bin
+          dval = fData[i].dataFourierPhaseOptReal->GetBinContent(j) - fData[i].theoryFourierPhaseOptReal->GetBinContent(theoBin);
+          fData[i].diffFourierPhaseOptReal->SetBinContent(j, dval);
+        }
       }
     }
 
@@ -3732,21 +3737,27 @@ void PMusrCanvas::HandleFourierDifference()
       fData[i].diffFourierPwr->SetLineColor(fData[i].dataFourierPwr->GetLineColor());
       fData[i].diffFourierPhase->SetMarkerColor(fData[i].dataFourierPhase->GetMarkerColor());
       fData[i].diffFourierPhase->SetLineColor(fData[i].dataFourierPhase->GetLineColor());
-      fData[i].diffFourierPhaseOptReal->SetMarkerColor(fData[i].dataFourierPhaseOptReal->GetMarkerColor());
-      fData[i].diffFourierPhaseOptReal->SetLineColor(fData[i].dataFourierPhaseOptReal->GetLineColor());
+      if (fData[i].dataFourierPhaseOptReal != nullptr) {
+        fData[i].diffFourierPhaseOptReal->SetMarkerColor(fData[i].dataFourierPhaseOptReal->GetMarkerColor());
+        fData[i].diffFourierPhaseOptReal->SetLineColor(fData[i].dataFourierPhaseOptReal->GetLineColor());
+      }
 
       // set marker size
       fData[i].diffFourierRe->SetMarkerSize(1);
       fData[i].diffFourierIm->SetMarkerSize(1);
       fData[i].diffFourierPwr->SetMarkerSize(1);
       fData[i].diffFourierPhase->SetMarkerSize(1);
-      fData[i].diffFourierPhaseOptReal->SetMarkerSize(1);
+      if (fData[i].dataFourierPhaseOptReal != nullptr) {
+        fData[i].diffFourierPhaseOptReal->SetMarkerSize(1);
+      }
       // set marker type
       fData[i].diffFourierRe->SetMarkerStyle(fData[i].dataFourierRe->GetMarkerStyle());
       fData[i].diffFourierIm->SetMarkerStyle(fData[i].dataFourierIm->GetMarkerStyle());
       fData[i].diffFourierPwr->SetMarkerStyle(fData[i].dataFourierPwr->GetMarkerStyle());
       fData[i].diffFourierPhase->SetMarkerStyle(fData[i].dataFourierPhase->GetMarkerStyle());
-      fData[i].diffFourierPhaseOptReal->SetMarkerStyle(fData[i].dataFourierPhaseOptReal->GetMarkerStyle());
+      if (fData[i].dataFourierPhaseOptReal != nullptr) {
+        fData[i].diffFourierPhaseOptReal->SetMarkerStyle(fData[i].dataFourierPhaseOptReal->GetMarkerStyle());
+      }
 
       // set diffFourierTag
       fData[i].diffFourierTag = 2; // f-d
