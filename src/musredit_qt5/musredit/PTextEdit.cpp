@@ -1376,7 +1376,6 @@ void PTextEdit::fileSaveAs()
     fFilenames.remove( currentEditor() );
     fFilenames.insert( currentEditor(), fn );
     fileSave();
-    fTabWidget->setTabText(fTabWidget->indexOf( currentEditor() ), QFileInfo(fn).fileName());
   }
 
   fileSystemWatcherActivation(); // delayed activation of fFileSystemWatcherActive
