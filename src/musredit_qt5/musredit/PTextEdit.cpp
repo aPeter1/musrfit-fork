@@ -1342,8 +1342,10 @@ void PTextEdit::fileSave()
     fileSaveAs();
   } else {
     QFile file( *fFilenames.find( currentEditor() ) );
-    if ( !file.open( QIODevice::WriteOnly ) )
+    if ( !file.open( QIODevice::WriteOnly ) ) {
+      QMessageBox::critical(this, "**ERROR**", "Couldn't save the file!\nDisk full?\nNo write access?");
       return;
+    }
     QTextStream ts( &file );
     ts << currentEditor()->toPlainText();
 
