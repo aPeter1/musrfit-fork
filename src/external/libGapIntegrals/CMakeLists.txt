@@ -41,7 +41,7 @@ add_library(GapIntegrals SHARED
 #--- set target properties, e.g. version --------------------------------------
 set_target_properties(GapIntegrals
   PROPERTIES
-    VERSION "1.0.0"
+    VERSION "1.1.0"
 )
 
 #--- make sure that the include directory is found ----------------------------
