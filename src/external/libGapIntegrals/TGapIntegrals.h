@@ -67,6 +67,62 @@ private:
 /**
  * <p>
  */
+class TGapPointPWave : public PUserFcnBase {
+
+public:
+  TGapPointPWave();
+  virtual ~TGapPointPWave();
+
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
+  double operator()(double, const std::vector<double>&) const;
+
+private:
+  TPointPWaveGapIntegralCuhre *fGapIntegral;
+  mutable std::vector<double> fTemp;
+  mutable std::vector<double>::const_iterator fTempIter;
+  mutable std::vector<double> fIntegralValues;
+  mutable std::vector<bool> fCalcNeeded;
+
+  mutable std::vector<double> fPar;
+
+  ClassDef(TGapPointPWave,1)
+};
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+class TGapLinePWave : public PUserFcnBase {
+
+public:
+  TGapLinePWave();
+  virtual ~TGapLinePWave();
+
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
+  double operator()(double, const std::vector<double>&) const;
+
+private:
+  TLinePWaveGapIntegralCuhre *fGapIntegral;
+  mutable std::vector<double> fTemp;
+  mutable std::vector<double>::const_iterator fTempIter;
+  mutable std::vector<double> fIntegralValues;
+  mutable std::vector<bool> fCalcNeeded;
+
+  mutable std::vector<double> fPar;
+
+  ClassDef(TGapLinePWave,1)
+};
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TGapDWave : public PUserFcnBase {
 
 public:
@@ -301,6 +357,50 @@ private:
 /**
  * <p>
  */
+class TLambdaPointPWave : public PUserFcnBase {
+
+public:
+  TLambdaPointPWave();
+  virtual ~TLambdaPointPWave();
+
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
+  double operator()(double, const std::vector<double>&) const;
+
+private:
+  TGapPointPWave *fLambdaInvSq;
+
+  ClassDef(TLambdaPointPWave,1)
+};
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+class TLambdaLinePWave : public PUserFcnBase {
+
+public:
+  TLambdaLinePWave();
+  virtual ~TLambdaLinePWave();
+
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
+  double operator()(double, const std::vector<double>&) const;
+
+private:
+  TGapLinePWave *fLambdaInvSq;
+
+  ClassDef(TLambdaLinePWave,1)
+};
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 class TLambdaDWave : public PUserFcnBase {
 
 public:
@@ -426,6 +526,50 @@ private:
   TGapSWave *fLambdaInvSq;
 
   ClassDef(TLambdaInvSWave,1)
+};
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+class TLambdaInvPointPWave : public PUserFcnBase {
+
+public:
+  TLambdaInvPointPWave();
+  virtual ~TLambdaInvPointPWave();
+
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
+  double operator()(double, const std::vector<double>&) const;
+
+private:
+  TGapPointPWave *fLambdaInvSq;
+
+  ClassDef(TLambdaInvPointPWave,1)
+};
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+class TLambdaInvLinePWave : public PUserFcnBase {
+
+public:
+  TLambdaInvLinePWave();
+  virtual ~TLambdaInvLinePWave();
+
+  virtual Bool_t NeedGlobalPart() const { return false; }
+  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
+  virtual Bool_t GlobalPartIsValid() const { return true; }
+
+  double operator()(double, const std::vector<double>&) const;
+
+private:
+  TGapLinePWave *fLambdaInvSq;
+
+  ClassDef(TLambdaInvLinePWave,1)
 };
 
 //--------------------------------------------------------------------

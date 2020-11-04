@@ -35,6 +35,8 @@
 #pragma link off all functions;
 
 #pragma link C++ class TGapSWave+;
+#pragma link C++ class TGapPointPWave+;
+#pragma link C++ class TGapLinePWave+;
 #pragma link C++ class TGapDWave+;
 #pragma link C++ class TGapCosSqDWave+;
 #pragma link C++ class TGapSinSqDWave+;
@@ -44,12 +46,16 @@
 #pragma link C++ class TGapPowerLaw+;
 #pragma link C++ class TGapDirtySWave+;
 #pragma link C++ class TLambdaSWave+;
+#pragma link C++ class TLambdaPointPWave+;
+#pragma link C++ class TLambdaLinePWave+;
 #pragma link C++ class TLambdaDWave+;
 #pragma link C++ class TLambdaAnSWave+;
 #pragma link C++ class TLambdaNonMonDWave1+;
 #pragma link C++ class TLambdaNonMonDWave2+;
 #pragma link C++ class TLambdaPowerLaw+;
 #pragma link C++ class TLambdaInvSWave+;
+#pragma link C++ class TLambdaInvPointPWave+;
+#pragma link C++ class TLambdaInvLinePWave+;
 #pragma link C++ class TLambdaInvDWave+;
 #pragma link C++ class TLambdaInvAnSWave+;
 #pragma link C++ class TLambdaInvNonMonDWave1+;

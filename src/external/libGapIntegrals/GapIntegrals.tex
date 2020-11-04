@@ -74,15 +74,16 @@ E-Mail:  & \verb?andreas.suter@psi.ch? &&
 \section*{\musrfithead plug-in for the calculation of the temperature dependence of $\bm{1/\lambda^2}$ for various gap symmetries}%
 
 This memo is intended to give a short summary of the background on which the \gapint plug-in for \musrfit \cite{musrfit} has been developed. The aim of this implementation is the efficient calculation of integrals of the form
-\begin{equation}\label{int}
+\begin{equation}\label{eq:int_phi}
  I(T) = 1 + \frac{1}{\pi}\int_0^{2\pi}\int_{\Delta(\varphi,T)}^{\infty}\left(\frac{\partial f}{\partial E}\right) \frac{E}{\sqrt{E^2-\Delta^2(\varphi,T)}}\mathrm{d}E\mathrm{d}\varphi\,,
 \end{equation}
 where $f = (1+\exp(E/k_{\mathrm B}T))^{-1}$, like they appear e.g. in the theoretical temperature dependence of $1/\lambda^2$~\cite{Manzano}.
-In order not to do too many unnecessary function calls during the final numerical evaluation we simplify the integral (\ref{int}) as far as possible analytically. The derivative of $f$ is given by
+For gap symmetries which involve not only a $E$- and $\varphi$-dependence but also a $\theta$-dependence, see the special section towards the end of the memo.
+In order not to do too many unnecessary function calls during the final numerical evaluation we simplify the integral (\ref{eq:int_phi}) as far as possible analytically. The derivative of $f$ is given by
 \begin{equation}\label{derivative}
 \frac{\partial f}{\partial E} = -\frac{1}{k_{\mathrm B}T}\frac{\exp(E/k_{\mathrm B}T)}{\left(1+\exp(E/k_{\mathrm B}T)\right)^2} = -\frac{1}{4k_{\mathrm B}T} \frac{1}{\cosh^2\left(E/2k_{\mathrm B}T\right)}.
 \end{equation}
-Using (\ref{derivative}) and doing the substitution $E'^2 = E^2-\Delta^2(\varphi,T)$, equation (\ref{int}) can be written as
+Using (\ref{derivative}) and doing the substitution $E'^2 = E^2-\Delta^2(\varphi,T)$, equation (\ref{eq:int_phi}) can be written as
 \begin{equation}
 \begin{split}
 I(T) & = 1 - \frac{1}{4\pi k_{\mathrm B}T}\int_0^{2\pi}\int_{\Delta(\varphi,T)}^{\infty}\frac{1}{\cosh^2\left(E/2k_{\mathrm B}T\right)}\frac{E}{\sqrt{E^2-\Delta^2(\varphi,T)}}\mathrm{d}E\mathrm{d}\varphi \\
@@ -167,6 +168,20 @@ The \gapint plug-in calculates $\tilde{I}(T)$ for the following $\Delta(\varphi)
     Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $a~(1)$, $[c_0~(1),~a_{\rm G}~(1)]$. 
     If $c_0$ and $a_{\rm G}$ are provided, the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, 
     otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
+\item[\textit{p}-wave (point) \cite{Pang2015}:]
+   \begin{equation}
+     \Delta(\theta, T) = \Delta(T) \sin(\theta)
+   \end{equation}
+   \musrfit theory line: \verb?userFcn libGapIntegrals TGapPointPWave 1 2 [3 4]?\\[1.5ex]
+    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[c_0~(1),~a_{\rm G}~(1)]$. If $c_0$ and $a_{\rm G}$ are provided, 
+    the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
+\item[\textit{p}-wave (line) \cite{Ozaki1986}:]
+   \begin{equation}
+     \Delta(\theta, T) = \Delta(T) \cos(\theta)
+   \end{equation}
+   \musrfit theory line: \verb?userFcn libGapIntegrals TGapLinePWave 1 2 [3 4]?\\[1.5ex]
+    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[c_0~(1),~a_{\rm G}~(1)]$. If $c_0$ and $a_{\rm G}$ are provided, 
+    the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
 \end{description}
 
 \noindent It is also possible to calculate a power law temperature dependence (in the two fluid approximation $n=4$) and the dirty \textit{s}-wave expression. 
@@ -193,6 +208,31 @@ Obviously for this no integration is needed.
 within the semi-classical model assuming a cylindrical Fermi surface and a mixed $d_{x^2-y^2} + s$ symmetry of the superconducting order parameter 
 (effectively: $d_{x^2-y^2}$ with shifted nodes and \textit{a}-\textit{b}-anisotropy)) see the source code.
 
+\subsection*{Gap Integrals for $\bm{\theta}$-, and $\bm{(\theta, \varphi)}$-dependent Gaps}%
+
+\noindent For the most general case for which the gap-symmetry is $(E,\varphi,\theta)$-dependent, the integral to be calculate takes the form
+
+\begin{equation}\label{eq:int_phi_theta}
+  I = 1 + \frac{1}{2\pi} \int_0^\pi \sin(\theta)\, \mathrm{d}\theta \int_0^{2\pi} \mathrm{d}\varphi \int_{\Delta(\varphi,\theta,T)}^\infty \mathrm{d}E \left\{ \left(\frac{\partial f}{\partial E}\right) \frac{E}{\sqrt{E^2 - \Delta^2(\varphi, \theta, T)}} \right\}
+\end{equation}
+
+
+\subsubsection*{Gap Integrals for $\bm{\theta}$-dpendent Gaps}%
+
+\noindent In case the gap-symmetry is only depending on $(E,\theta)$ the $\varphi$-integral can be carried out and Eq.(\ref{eq:int_phi_theta}) simplifies to
+
+\begin{equation}\label{eq:int_theta}
+  I(T) = 1 + \int_0^\pi \sin(\theta)\, \mathrm{d}\theta \int_{\Delta(\varphi,\theta,T)}^\infty \mathrm{d}E \left\{ \left(\frac{\partial f}{\partial E}\right) \frac{E}{\sqrt{E^2 - \Delta^2(\varphi, \theta, T)}} \right\}
+\end{equation}
+
+\noindent Following the same simplification steps as for Eq.(\ref{eq:int_phi}) we find
+
+\begin{equation}\label{eq:int_tilde_theta}
+ \tilde{I}(T) = 1 - \frac{\pi E_c}{4 k_{\rm B}T}\, \int_0^1 \mathrm{d}x \sin(\pi x) \int_0^1 \mathrm{d}F\, \frac{1}{\cosh^2\left(\sqrt{(E_c\cdot F)^2 + \Delta^2(\pi\cdot x, T)}/(2 k_{\rm B} T)\right)}   
+\end{equation}
+
+\noindent where $x = \theta / \pi$, and $F = E^\prime / E_c$.
+
 \subsection*{License}
 The \gapint library is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation \cite{GPL}; either version 2 of the License, or (at your option) any later version.
 
@@ -208,6 +248,8 @@ The \gapint library is free software; you can redistribute it and/or modify it u
 \bibitem{Matsui} H.~Matsui~\textit{et al.}, \textit{Direct Observation of a Nonmonotonic $d_{x^2-y^2}$-Wave Superconducting Gap in the Electron-Doped High-T$_{\mathrm c}$ Superconductor Pr$_{0.89}$LaCe$_{0.11}$CuO$_4$}, Phys.~Rev.~Lett.~\textbf{95}~(2005)~017003
 \bibitem{Eremin} I.~Eremin, E.~Tsoncheva, and A.V.~Chubukov, \textit{Signature of the nonmonotonic $d$-wave gap in electron-doped cuprates}, Phys.~Rev.~B~\textbf{77}~(2008)~024508
 \bibitem{AnisotropicSWave} ??
+\bibitem{Pang2015} G.M.~Pang, \emph{et al.}, Phys.~Rev.~B~\textbf{91}~(2015)~220502(R), and references in there.
+\bibitem{Ozaki1986} M.~Ozaki, \emph{et al.}, Prog.~Theor.~Phys.~\textbf{75}~(1986)~442.
 \bibitem{Tinkham} M.~Tinkham, \textit{Introduction to Superconductivity} $2^{\rm nd}$ ed. (Dover Publications, New York, 2004).
 \bibitem{GPL} http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 

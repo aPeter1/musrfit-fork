@@ -36,6 +36,7 @@
 #include <cmath>
 #include <vector>
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Alternative base class for 1D integrations using the GNU Scientific Library integrator.
  *    The difference to the other class is that here the integration parameters have to be supplied directly to the IntegrateFunc method.
@@ -54,6 +55,7 @@ class T2Integrator {
     static double FuncAtXgsl(double, void *);
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Method for passing the integrand function value to the integrator.
  *
@@ -69,6 +71,7 @@ inline double T2Integrator::FuncAtXgsl(double x, void *ptrPair)
   return pairOfPointers->first->FuncAtX(x, *(pairOfPointers->second));
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the integral of the function between the given boundaries
  *
@@ -93,20 +96,7 @@ inline double T2Integrator::IntegrateFunc(double x1, double x2, const std::vecto
   return value;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+//-----------------------------------------------------------------------------
 /**
  * <p>Base class for 1D integrations using the GNU Scientific Library integrator.
  *    The function which should be integrated has to be implemented in a derived class.
@@ -129,6 +119,7 @@ class TIntegrator {
     mutable double (*fFunc)(double, void *); ///< pointer to the integrand function
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Constructor of the base class for 1D integrations
  *    Allocation of memory for an integration using the adaptive 31 point Gauss-Kronrod rule
@@ -137,6 +128,7 @@ inline TIntegrator::TIntegrator() : fFunc(0) {
   fIntegrator = new ROOT::Math::GSLIntegrator(ROOT::Math::Integration::kADAPTIVE,ROOT::Math::Integration::kGAUSS31);
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Destructor of the base class for 1D integrations
  *    Clean up.
@@ -148,6 +140,7 @@ inline TIntegrator::~TIntegrator(){
   fFunc=0;
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Method for passing the integrand function value to the integrator.
  *
@@ -162,6 +155,7 @@ inline double TIntegrator::FuncAtXgsl(double x, void *obj)
   return ((TIntegrator*)obj)->FuncAtX(x);
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the integral of the function between the given boundaries
  *
@@ -177,6 +171,7 @@ inline double TIntegrator::IntegrateFunc(double x1, double x2)
   return fIntegrator->Integral(fFunc, (this), x1, x2);
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Base class for multidimensional Monte-Carlo integrations using the GNU Scientific Library integrator.
  *    The function which should be integrated has to be implemented in a derived class.
@@ -199,6 +194,7 @@ class TMCIntegrator {
     mutable double (*fFunc)(double *, size_t, void *); ///< pointer to the integrand function
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Constructor of the base class for multidimensional Monte-Carlo integrations
  *    Allocation of memory for an integration using the MISER algorithm of Press and Farrar
@@ -207,6 +203,7 @@ inline TMCIntegrator::TMCIntegrator() : fFunc(0) {
   fMCIntegrator = new ROOT::Math::GSLMCIntegrator(ROOT::Math::MCIntegration::kMISER, 1.E-6, 1.E-4, 500000);
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Destructor of the base class for 1D integrations
  *    Clean up.
@@ -218,6 +215,7 @@ inline TMCIntegrator::~TMCIntegrator(){
   fFunc=0;
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Method for passing the integrand function value to the integrator.
  *
@@ -233,6 +231,7 @@ inline double TMCIntegrator::FuncAtXgsl(double *x, size_t dim, void *obj)
   return ((TMCIntegrator*)obj)->FuncAtX(x);
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the integral of the function between the given boundaries
  *
@@ -249,6 +248,45 @@ inline double TMCIntegrator::IntegrateFunc(size_t dim, double *x1, double *x2)
   return fMCIntegrator->Integral(fFunc, dim, x1, x2, (this));
 }
 
+//-----------------------------------------------------------------------------
+/**
+ * <p>Two-dimensional integrator class for the efficient calculation of the superfluid density within the semi-classical model
+ *    assuming a cylindrical Fermi surface and a point p symmetry of the superconducting order parameter.
+ *    The integration uses the Cuhre algorithm of the Cuba library.
+ */
+class TPointPWaveGapIntegralCuhre {
+  public:
+    TPointPWaveGapIntegralCuhre() : fNDim(2) {}
+    ~TPointPWaveGapIntegralCuhre() { fPar.clear(); }
+    void SetParameters(const std::vector<double> &par) { fPar=par; }
+    static int Integrand(const int*, const double[], const int*, double[], void*);
+    double IntegrateFunc();
+
+  protected:
+    static std::vector<double> fPar; ///< parameters of the integrand
+    unsigned int fNDim; ///< dimension of the integral
+};
+
+//-----------------------------------------------------------------------------
+/**
+ * <p>Two-dimensional integrator class for the efficient calculation of the superfluid density within the semi-classical model
+ *    assuming a cylindrical Fermi surface and a line p symmetry of the superconducting order parameter.
+ *    The integration uses the Cuhre algorithm of the Cuba library.
+ */
+class TLinePWaveGapIntegralCuhre {
+  public:
+    TLinePWaveGapIntegralCuhre() : fNDim(2) {}
+    ~TLinePWaveGapIntegralCuhre() { fPar.clear(); }
+    void SetParameters(const std::vector<double> &par) { fPar=par; }
+    static int Integrand(const int*, const double[], const int*, double[], void*);
+    double IntegrateFunc();
+
+  protected:
+    static std::vector<double> fPar; ///< parameters of the integrand
+    unsigned int fNDim; ///< dimension of the integral
+};
+
+//-----------------------------------------------------------------------------
 /**
  * <p>Two-dimensional integrator class for the efficient calculation of the superfluid density within the semi-classical model
  *    assuming a cylindrical Fermi surface and a d_{x^2-y^2} symmetry of the superconducting order parameter.
@@ -267,6 +305,7 @@ class TDWaveGapIntegralCuhre {
     unsigned int fNDim; ///< dimension of the integral
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Two-dimensional integrator class for the efficient calculation of the superfluid density along the a-axis
  *    within the semi-classical model assuming a cylindrical Fermi surface and a mixed d_{x^2-y^2} + s symmetry of the
@@ -286,6 +325,7 @@ class TCosSqDWaveGapIntegralCuhre {
     unsigned int fNDim; ///< dimension of the integral
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Two-dimensional integrator class for the efficient calculation of the superfluid density along the b-axis
  *    within the semi-classical model assuming a cylindrical Fermi surface and a mixed d_{x^2-y^2} + s symmetry of the
@@ -305,6 +345,7 @@ class TSinSqDWaveGapIntegralCuhre {
     unsigned int fNDim; ///< dimension of the integral
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Two-dimensional integrator class for the efficient calculation of the superfluid density within the semi-classical model
  *    assuming a cylindrical Fermi surface and an "anisotropic s-wave" symmetry of the superconducting order parameter.
@@ -323,6 +364,7 @@ class TAnSWaveGapIntegralCuhre {
     unsigned int fNDim; ///< dimension of the integral
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Two-dimensional integrator class for the efficient calculation of the superfluid density within the semi-classical model
  *    assuming a cylindrical Fermi surface and an "anisotropic s-wave" symmetry of the superconducting order parameter.
@@ -341,6 +383,7 @@ class TAnSWaveGapIntegralDivonne {
     unsigned int fNDim; ///< dimension of the integral
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Two-dimensional integrator class for the efficient calculation of the superfluid density within the semi-classical model
  *    assuming a cylindrical Fermi surface and an "anisotropic s-wave" symmetry of the superconducting order parameter.
@@ -359,6 +402,7 @@ class TAnSWaveGapIntegralSuave {
     unsigned int fNDim; ///< dimension of the integral
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Two-dimensional integrator class for the efficient calculation of the superfluid density within the semi-classical model
  *    assuming a cylindrical Fermi surface and an "non-monotonic d-wave" symmetry of the superconducting order parameter.
@@ -377,6 +421,7 @@ class TNonMonDWave1GapIntegralCuhre {
     unsigned int fNDim; ///< dimension of the integral
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Two-dimensional integrator class for the efficient calculation of the superfluid density within the semi-classical model
  *    assuming a cylindrical Fermi surface and an "non-monotonic d-wave" symmetry of the superconducting order parameter.
@@ -395,6 +440,7 @@ class TNonMonDWave2GapIntegralCuhre {
     unsigned int fNDim; ///< dimension of the integral
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Test class for the 2D MC integration
  *    Integral: x*y dx dy
@@ -406,6 +452,7 @@ class T2DTest : public TMCIntegrator {
     double FuncAtX(double *) const;
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value---actual implementation of the function x*y
  *
@@ -419,6 +466,65 @@ inline double T2DTest::FuncAtX(double *x) const
   return x[0]*x[1];
 }
 
+//-----------------------------------------------------------------------------
+/**
+ * <p>Class for the 2D Monte-Carlo integration for the calculation of the superfluid density within the semi-classical model
+ *    assuming a cylindrical Fermi surface and a point p symmetry of the superconducting order parameter.
+ *    The integration uses the GSL integration routines.
+ */
+class TPointPWaveGapIntegral : public TMCIntegrator {
+  public:
+    TPointPWaveGapIntegral() {}
+    ~TPointPWaveGapIntegral() {}
+    double FuncAtX(double *) const;
+};
+
+//-----------------------------------------------------------------------------
+/**
+ * <p>Class for the 2D Monte-Carlo integration for the calculation of the superfluid density within the semi-classical model
+ *    assuming a cylindrical Fermi surface and a line p symmetry of the superconducting order parameter.
+ *    The integration uses the GSL integration routines.
+ */
+class TLinePWaveGapIntegral : public TMCIntegrator {
+  public:
+    TLinePWaveGapIntegral() {}
+    ~TLinePWaveGapIntegral() {}
+    double FuncAtX(double *) const;
+};
+
+//-----------------------------------------------------------------------------
+/**
+ * <p>Calculate the function value---actual implementation of the function
+ *
+ * <p><b>return:</b>
+ * - function value
+ *
+ * \param x point where the function should be evaluated
+ */
+inline double TPointPWaveGapIntegral::FuncAtX(double *x) const // x = {E, theta}, fPar = {T, Delta(T)}
+{
+  double twokt(2.0*0.08617384436*fPar[0]); // kB in meV/K
+  double deltasq(TMath::Power(fPar[1]*TMath::Sin(x[1]),2.0));
+  return -TMath::Sin(x[1])/(4.0*twokt*TMath::CosH(TMath::Sqrt(x[0]*x[0]+deltasq)/twokt)*TMath::CosH(TMath::Sqrt(x[0]*x[0]+deltasq)/twokt));
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * <p>Calculate the function value---actual implementation of the function
+ *
+ * <p><b>return:</b>
+ * - function value
+ *
+ * \param x point where the function should be evaluated
+ */
+inline double TLinePWaveGapIntegral::FuncAtX(double *x) const // x = {E, theta}, fPar = {T, Delta(T)}
+{
+  double twokt(2.0*0.08617384436*fPar[0]); // kB in meV/K
+  double deltasq(TMath::Power(fPar[1]*TMath::Cos(x[1]),2.0));
+  return -TMath::Sin(x[1])/(4.0*twokt*TMath::CosH(TMath::Sqrt(x[0]*x[0]+deltasq)/twokt)*TMath::CosH(TMath::Sqrt(x[0]*x[0]+deltasq)/twokt));
+}
+
+//-----------------------------------------------------------------------------
 /**
  * <p>Class for the 2D Monte-Carlo integration for the calculation of the superfluid density within the semi-classical model
  *    assuming a cylindrical Fermi surface and a d_{x^2-y^2} symmetry of the superconducting order parameter.
@@ -431,6 +537,7 @@ class TDWaveGapIntegral : public TMCIntegrator {
     double FuncAtX(double *) const;
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value---actual implementation of the function
  *
@@ -446,6 +553,7 @@ inline double TDWaveGapIntegral::FuncAtX(double *x) const // x = {E, phi}, fPar 
   return -1.0/(2.0*twokt*TMath::CosH(TMath::Sqrt(x[0]*x[0]+deltasq)/twokt)*TMath::CosH(TMath::Sqrt(x[0]*x[0]+deltasq)/twokt));
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Class for the 2D Monte-Carlo integration for the calculation of the superfluid density within the semi-classical model
  *    assuming a cylindrical Fermi surface and an "anisotropic s-wave" symmetry of the superconducting order parameter.
@@ -458,6 +566,7 @@ class TAnSWaveGapIntegral : public TMCIntegrator {
     double FuncAtX(double *) const;
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value---actual implementation of the function
  *
@@ -473,6 +582,7 @@ inline double TAnSWaveGapIntegral::FuncAtX(double *x) const // x = {E, phi}, fPa
   return -1.0/(2.0*twokt*TMath::CosH(TMath::Sqrt(x[0]*x[0]+deltasq)/twokt)*TMath::CosH(TMath::Sqrt(x[0]*x[0]+deltasq)/twokt));
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Class for the 1D integration of j0(a*x)*exp(-b*x)
  *    The integration uses the GSL integration routines.
@@ -486,6 +596,7 @@ class TIntBesselJ0Exp : public T2Integrator {
     double FuncAtX(double, const std::vector<double>&) const;
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value---actual implementation of the function j0(a*x)*exp(-b*x)
  *
@@ -506,6 +617,7 @@ inline double TIntBesselJ0Exp::FuncAtX(double x, const std::vector<double> &par)
   return j0 * TMath::Exp(-par[1]*x);
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Class for the 1D integration of sin(a*x)*exp(-b*x*x)
  *    The integration uses the GSL integration routines.
@@ -519,6 +631,7 @@ class TIntSinGss : public T2Integrator {
     double FuncAtX(double, const std::vector<double>&) const;
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value---actual implementation of the function sin(a*x)*exp(-b*x*x)
  *
@@ -532,6 +645,7 @@ inline double TIntSinGss::FuncAtX(double x, const std::vector<double> &par) cons
   return TMath::Sin(TMath::TwoPi()*par[0]*x) * TMath::Exp(-0.5*par[1]*par[1]*x*x);
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Class for the 1D integration of the "DeRenzi Spin Glass Interpolation Integrand"
  *    See Eq. (5) of R. De Renzi and S. Fanesi, Physica B 289-290, 209-212 (2000).
@@ -547,6 +661,7 @@ class TIntSGInterpolation : public T2Integrator {
     double FuncAtX(double, const std::vector<double>&) const;
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value---actual implementation of the function
  *
@@ -563,6 +678,7 @@ inline double TIntSGInterpolation::FuncAtX(double x, const std::vector<double> &
   return (wt*TMath::Cos(wt)-TMath::Sin(wt))/(wt*wt)*TMath::Exp(-TMath::Power(expo,par[3]))/TMath::Power(expo,(1.0-par[3]));
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Class for the 1D integration for the calculation of the superfluid density within the semi-classical model
  *    assuming a cylindrical Fermi surface and an isotropic s-wave symmetry of the superconducting order parameter.
@@ -575,6 +691,7 @@ class TGapIntegral : public TIntegrator {
     double FuncAtX(double) const; // variable: E
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value---actual implementation of the function df/dE * E / sqrt(E^2 - Delta^2)
  *
@@ -588,6 +705,7 @@ inline double TGapIntegral::FuncAtX(double e) const
   return 1.0/(TMath::Power(TMath::CosH(TMath::Sqrt(e*e+fPar[1]*fPar[1])/fPar[0]),2.0));
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Class for the 1D integration for the calculation of the uniaxial static Gauss-Kubo-Toyabe function
  *    The integration uses the GSL integration routines.
@@ -601,6 +719,7 @@ class TFirstUniaxialGssKTIntegral : public T2Integrator {
     virtual double FuncAtX(double, const std::vector<double>&) const; // variable: x
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value---actual implementation of the integrand in Eq. (7) of Solt's article
  *
@@ -618,6 +737,7 @@ inline double TFirstUniaxialGssKTIntegral::FuncAtX(double x, const std::vector<d
   return (1.0 - x*x)*(p - SsqTsq)/TMath::Power(p, 2.5)*TMath::Exp(-0.5*SsqTsq/p);
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Class for the 1D integration for the calculation of the uniaxial static Gauss-Kubo-Toyabe function
  *    The integration uses the GSL integration routines.
@@ -631,6 +751,7 @@ class TSecondUniaxialGssKTIntegral : public T2Integrator {
     virtual double FuncAtX(double, const std::vector<double>&) const; // variable: x
 };
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value---actual implementation of the integrand in Eq. (7) of Solt's article
  *

@@ -36,6 +36,8 @@
 #define TWOPI 6.28318530717958647692
 
 ClassImp(TGapSWave)
+ClassImp(TGapPointPWave)
+ClassImp(TGapLinePWave)
 ClassImp(TGapDWave)
 ClassImp(TGapCosSqDWave)
 ClassImp(TGapSinSqDWave)
@@ -46,6 +48,8 @@ ClassImp(TGapPowerLaw)
 ClassImp(TGapDirtySWave)
 
 ClassImp(TLambdaSWave)
+ClassImp(TLambdaPointPWave)
+ClassImp(TLambdaLinePWave)
 ClassImp(TLambdaDWave)
 ClassImp(TLambdaAnSWave)
 ClassImp(TLambdaNonMonDWave1)
@@ -53,6 +57,8 @@ ClassImp(TLambdaNonMonDWave2)
 ClassImp(TLambdaPowerLaw)
 
 ClassImp(TLambdaInvSWave)
+ClassImp(TLambdaInvPointPWave)
+ClassImp(TLambdaInvLinePWave)
 ClassImp(TLambdaInvDWave)
 ClassImp(TLambdaInvAnSWave)
 ClassImp(TLambdaInvNonMonDWave1)
@@ -67,6 +73,38 @@ ClassImp(TFilmMagnetizationDWave)
  */
 TGapSWave::TGapSWave() {
   TGapIntegral *gapint = new TGapIntegral();
+  fGapIntegral = gapint;
+  gapint = nullptr;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p> point p wave  gap integral
+ */
+TGapPointPWave::TGapPointPWave() {
+  TPointPWaveGapIntegralCuhre *gapint = new TPointPWaveGapIntegralCuhre();
+  fGapIntegral = gapint;
+  gapint = nullptr;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p> line p wave  gap integral
+ */
+TGapLinePWave::TGapLinePWave() {
+  TLinePWaveGapIntegralCuhre *gapint = new TLinePWaveGapIntegralCuhre();
   fGapIntegral = gapint;
   gapint = nullptr;
 
@@ -185,6 +223,22 @@ TLambdaSWave::TLambdaSWave() {
 /**
  * <p>
  */
+TLambdaPointPWave::TLambdaPointPWave() {
+  fLambdaInvSq = new TGapPointPWave();
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+TLambdaLinePWave::TLambdaLinePWave() {
+  fLambdaInvSq = new TGapLinePWave();
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaDWave::TLambdaDWave() {
   fLambdaInvSq = new TGapDWave();
 }
@@ -225,6 +279,22 @@ TLambdaInvSWave::TLambdaInvSWave() {
 /**
  * <p>
  */
+TLambdaInvPointPWave::TLambdaInvPointPWave() {
+  fLambdaInvSq = new TGapPointPWave();
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+TLambdaInvLinePWave::TLambdaInvLinePWave() {
+  fLambdaInvSq = new TGapLinePWave();
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaInvDWave::TLambdaInvDWave() {
   fLambdaInvSq = new TGapDWave();
 }
@@ -258,6 +328,36 @@ TLambdaInvNonMonDWave2::TLambdaInvNonMonDWave2() {
  * <p>
  */
 TGapSWave::~TGapSWave() {
+  delete fGapIntegral;
+  fGapIntegral = nullptr;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+TGapPointPWave::~TGapPointPWave() {
+  delete fGapIntegral;
+  fGapIntegral = nullptr;
+
+  fTemp.clear();
+  fTempIter = fTemp.end();
+  fIntegralValues.clear();
+  fCalcNeeded.clear();
+  fPar.clear();
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+TGapLinePWave::~TGapLinePWave() {
   delete fGapIntegral;
   fGapIntegral = nullptr;
 
@@ -371,6 +471,24 @@ TLambdaSWave::~TLambdaSWave() {
 /**
  * <p>
  */
+TLambdaPointPWave::~TLambdaPointPWave() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = nullptr;
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+TLambdaLinePWave::~TLambdaLinePWave() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = nullptr;
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
 TLambdaDWave::~TLambdaDWave() {
   delete fLambdaInvSq;
   fLambdaInvSq = nullptr;
@@ -408,6 +526,24 @@ TLambdaNonMonDWave2::~TLambdaNonMonDWave2() {
  * <p>
  */
 TLambdaInvSWave::~TLambdaInvSWave() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = nullptr;
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+TLambdaInvPointPWave::~TLambdaInvPointPWave() {
+  delete fLambdaInvSq;
+  fLambdaInvSq = nullptr;
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+TLambdaInvLinePWave::~TLambdaInvLinePWave() {
   delete fLambdaInvSq;
   fLambdaInvSq = nullptr;
 }
@@ -530,6 +666,162 @@ double TGapSWave::operator()(double t, const std::vector<double> &par) const {
 
 //--------------------------------------------------------------------
 /**
+ * <p>prepare the needed parameters for the integration carried out in TPointPWaveGapIntegralCuhre.
+ * For details see also the Memo GapIntegrals.pdf, , especially Eq.(19) and (20).
+ */
+double TGapPointPWave::operator()(double t, const std::vector<double> &par) const {
+
+  // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] c0 (1), [3] aG (1)]
+
+  assert((par.size() == 2) || (par.size() == 4)); // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 4 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+                                                  // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
+                                                  // c0 in the original context is c0 = (pi kB Tc) / Delta0
+  if (t <= 0.0)
+    return 1.0;
+  else if (t >= par[0])
+    return 0.0;
+
+  bool integralParChanged(false);
+
+  if (fPar.empty()) { // first time calling this routine
+    fPar = par;
+    integralParChanged = true;
+  } else { // check if Tc or Delta0 have changed
+    for (unsigned int i(0); i<par.size(); i++) {
+      if (par[i] != fPar[i]) {
+        fPar[i] = par[i];
+        integralParChanged = true;
+      }
+    }
+  }
+
+  bool newTemp(false);
+  unsigned int vectorIndex;
+
+  if (integralParChanged) {
+    fCalcNeeded.clear();
+    fCalcNeeded.resize(fTemp.size(), true);
+  }
+
+  fTempIter = find(fTemp.begin(), fTemp.end(), t);
+  if(fTempIter == fTemp.end()) {
+    fTemp.push_back(t);
+    vectorIndex = fTemp.size() - 1;
+    fCalcNeeded.push_back(true);
+    newTemp = true;
+  } else {
+    vectorIndex = fTempIter - fTemp.begin();
+  }
+
+  if (fCalcNeeded[vectorIndex]) {
+    double ds;
+    std::vector<double> intPar; // parameters for the integral, T & Delta(T)
+    intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
+    if (par.size() == 2) { // Carrington/Manzano
+      intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    } else { // Prozorov/Giannetta
+      intPar.push_back(par[1]*tanh(par[2]*sqrt(par[3]*(par[0]/t-1.0)))); // Delta0*tanh(c0*sqrt(aG*(Tc/T-1)))
+    }
+    intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
+    intPar.push_back(TMath::Pi()); // upper limit of theta-integration
+
+    fGapIntegral->SetParameters(intPar);
+    ds = 1.0-(intPar[2]*PI)/(2.0*intPar[0])*fGapIntegral->IntegrateFunc();
+
+    intPar.clear();
+
+    if (newTemp)
+      fIntegralValues.push_back(ds);
+    else
+      fIntegralValues[vectorIndex] = ds;
+
+    fCalcNeeded[vectorIndex] = false;
+  }
+
+  return fIntegralValues[vectorIndex];
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>prepare the needed parameters for the integration carried out in TLinePWaveGapIntegralCuhre.
+ * For details see also the Memo GapIntegrals.pdf, , especially Eq.(19) and (20).
+ */
+double TGapLinePWave::operator()(double t, const std::vector<double> &par) const {
+
+  // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] c0 (1), [3] aG (1)]
+
+  assert((par.size() == 2) || (par.size() == 4)); // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 4 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+                                                  // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
+                                                  // c0 in the original context is c0 = (pi kB Tc) / Delta0
+  if (t <= 0.0)
+    return 1.0;
+  else if (t >= par[0])
+    return 0.0;
+
+  bool integralParChanged(false);
+
+  if (fPar.empty()) { // first time calling this routine
+    fPar = par;
+    integralParChanged = true;
+  } else { // check if Tc or Delta0 have changed
+    for (unsigned int i(0); i<par.size(); i++) {
+      if (par[i] != fPar[i]) {
+        fPar[i] = par[i];
+        integralParChanged = true;
+      }
+    }
+  }
+
+  bool newTemp(false);
+  unsigned int vectorIndex;
+
+  if (integralParChanged) {
+    fCalcNeeded.clear();
+    fCalcNeeded.resize(fTemp.size(), true);
+  }
+
+  fTempIter = find(fTemp.begin(), fTemp.end(), t);
+  if(fTempIter == fTemp.end()) {
+    fTemp.push_back(t);
+    vectorIndex = fTemp.size() - 1;
+    fCalcNeeded.push_back(true);
+    newTemp = true;
+  } else {
+    vectorIndex = fTempIter - fTemp.begin();
+  }
+
+  if (fCalcNeeded[vectorIndex]) {
+    double ds;
+    std::vector<double> intPar; // parameters for the integral, T & Delta(T)
+    intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
+    if (par.size() == 2) { // Carrington/Manzano
+      intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
+    } else { // Prozorov/Giannetta
+      intPar.push_back(par[1]*tanh(par[2]*sqrt(par[3]*(par[0]/t-1.0)))); // Delta0*tanh(c0*sqrt(aG*(Tc/T-1)))
+    }
+    intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
+    intPar.push_back(TMath::Pi()); // upper limit of theta-integration
+
+    fGapIntegral->SetParameters(intPar);
+    ds = 1.0-(intPar[2]*PI)/(2.0*intPar[0])*fGapIntegral->IntegrateFunc();
+
+    intPar.clear();
+
+    if (newTemp)
+      fIntegralValues.push_back(ds);
+    else
+      fIntegralValues[vectorIndex] = ds;
+
+    fCalcNeeded[vectorIndex] = false;
+  }
+
+  return fIntegralValues[vectorIndex];
+}
+
+//--------------------------------------------------------------------
+/**
  * <p>prepare the needed parameters for the integration carried out in TDWaveGapIntegralCuhre.
  * For details see also the Memo GapIntegrals.pdf, especially Eq.(7) and (10).
  */
@@ -609,7 +901,6 @@ double TGapDWave::operator()(double t, const std::vector<double> &par) const {
   }
 
   return fIntegralValues[vectorIndex];
-
 }
 
 //--------------------------------------------------------------------
@@ -1103,7 +1394,40 @@ double TLambdaSWave::operator()(double t, const std::vector<double> &par) const
     return 1.0;
 
   return 1.0/sqrt((*fLambdaInvSq)(t, par));
+}
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+double TLambdaPointPWave::operator()(double t, const std::vector<double> &par) const
+{
+  assert(par.size() == 2); // two parameters: Tc, Delta0
+
+  if (t >= par[0])
+    return -1.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return 1.0/sqrt((*fLambdaInvSq)(t, par));
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+double TLambdaLinePWave::operator()(double t, const std::vector<double> &par) const
+{
+  assert(par.size() == 2); // two parameters: Tc, Delta0
+
+  if (t >= par[0])
+    return -1.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return 1.0/sqrt((*fLambdaInvSq)(t, par));
 }
 
 //--------------------------------------------------------------------
@@ -1121,7 +1445,6 @@ double TLambdaDWave::operator()(double t, const std::vector<double> &par) const
     return 1.0;
 
   return 1.0/sqrt((*fLambdaInvSq)(t, par));
-
 }
 
 //--------------------------------------------------------------------
@@ -1139,7 +1462,6 @@ double TLambdaAnSWave::operator()(double t, const std::vector<double> &par) cons
     return 1.0;
 
   return 1.0/sqrt((*fLambdaInvSq)(t, par));
-
 }
 
 //--------------------------------------------------------------------
@@ -1157,7 +1479,6 @@ double TLambdaNonMonDWave1::operator()(double t, const std::vector<double> &par)
     return 1.0;
 
   return 1.0/sqrt((*fLambdaInvSq)(t, par));
-
 }
 
 //--------------------------------------------------------------------
@@ -1175,7 +1496,6 @@ double TLambdaNonMonDWave2::operator()(double t, const std::vector<double> &par)
     return 1.0;
 
   return 1.0/sqrt((*fLambdaInvSq)(t, par));
-
 }
 
 //--------------------------------------------------------------------
@@ -1192,7 +1512,6 @@ double TLambdaPowerLaw::operator()(double t, const std::vector<double> &par) con
     return -1.0;
 
   return 1.0/sqrt(1.0 - pow(t/par[0], par[1]));
-
 }
 
 
@@ -1211,7 +1530,40 @@ double TLambdaInvSWave::operator()(double t, const std::vector<double> &par) con
     return 1.0;
 
   return sqrt((*fLambdaInvSq)(t, par));
+}
 
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+double TLambdaInvPointPWave::operator()(double t, const std::vector<double> &par) const
+{
+  assert(par.size() == 2); // two parameters: Tc, Delta0
+
+  if (t >= par[0])
+    return 0.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return sqrt((*fLambdaInvSq)(t, par));
+}
+
+//--------------------------------------------------------------------
+/**
+ * <p>
+ */
+double TLambdaInvLinePWave::operator()(double t, const std::vector<double> &par) const
+{
+  assert(par.size() == 2); // two parameters: Tc, Delta0
+
+  if (t >= par[0])
+    return 0.0;
+
+  if (t <= 0.0)
+    return 1.0;
+
+  return sqrt((*fLambdaInvSq)(t, par));
 }
 
 //--------------------------------------------------------------------
@@ -1229,7 +1581,6 @@ double TLambdaInvDWave::operator()(double t, const std::vector<double> &par) con
     return 1.0;
 
   return sqrt((*fLambdaInvSq)(t, par));
-
 }
 
 //--------------------------------------------------------------------
@@ -1247,7 +1598,6 @@ double TLambdaInvAnSWave::operator()(double t, const std::vector<double> &par) c
     return 1.0;
 
   return sqrt((*fLambdaInvSq)(t, par));
-
 }
 
 //--------------------------------------------------------------------
@@ -1265,7 +1615,6 @@ double TLambdaInvNonMonDWave1::operator()(double t, const std::vector<double> &p
     return 1.0;
 
   return sqrt((*fLambdaInvSq)(t, par));
-
 }
 
 //--------------------------------------------------------------------
@@ -1283,7 +1632,6 @@ double TLambdaInvNonMonDWave2::operator()(double t, const std::vector<double> &p
     return 1.0;
 
   return sqrt((*fLambdaInvSq)(t, par));
-
 }
 
 //--------------------------------------------------------------------
@@ -1300,7 +1648,6 @@ double TLambdaInvPowerLaw::operator()(double t, const std::vector<double> &par) 
     return 0.0;
 
   return sqrt(1.0 - pow(t/par[0], par[1]));
-
 }
 
 //--------------------------------------------------------------------

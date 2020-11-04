@@ -35,8 +35,127 @@
 #define SEED 0
 #define STATEFILE NULL
 
+
+//-----------------------------------------------------------------------------
+
+std::vector<double> TPointPWaveGapIntegralCuhre::fPar;
+
+//-----------------------------------------------------------------------------
+/**
+ * <p>Integrate the function using the Cuhre interface
+ *
+ * <p><b>return:</b>
+ * - value of the integral
+ */
+double TPointPWaveGapIntegralCuhre::IntegrateFunc()
+{
+  const unsigned int NCOMP(1);
+  const unsigned int NVEC(1);
+  const double EPSREL (1e-4);
+  const double EPSABS (1e-6);
+  const unsigned int VERBOSE (0);
+  const unsigned int LAST (4);
+  const unsigned int MINEVAL (0);
+  const unsigned int MAXEVAL (50000);
+
+  const unsigned int KEY (13);
+
+  int nregions, neval, fail;
+  double integral[NCOMP], error[NCOMP], prob[NCOMP];
+
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA, NVEC,
+    EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+    KEY, STATEFILE, SPIN,
+    &nregions, &neval, &fail, integral, error, prob);
+
+  return integral[0];
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
+ *
+ * <p><b>return:</b>
+ * - 0
+ *
+ * \param ndim number of dimensions of the integral (2 here)
+ * \param x point where the function should be evaluated
+ * \param ncomp number of components of the integrand (1 here)
+ * \param f function value
+ * \param userdata additional user parameters (required by the interface, NULL here)
+ */
+int TPointPWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, theta}, fPar = {twokBT, Delta(T), Ec, thetac}
+{
+  double sinTheta = TMath::Sin(x[1]*fPar[3]);
+  double deltasq(TMath::Power(fPar[1]*sinTheta,2.0));
+  f[0] = sinTheta/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+
+std::vector<double> TLinePWaveGapIntegralCuhre::fPar;
+
+//-----------------------------------------------------------------------------
+/**
+ * <p>Integrate the function using the Cuhre interface
+ *
+ * <p><b>return:</b>
+ * - value of the integral
+ */
+double TLinePWaveGapIntegralCuhre::IntegrateFunc()
+{
+  const unsigned int NCOMP(1);
+  const unsigned int NVEC(1);
+  const double EPSREL (1e-4);
+  const double EPSABS (1e-6);
+  const unsigned int VERBOSE (0);
+  const unsigned int LAST (4);
+  const unsigned int MINEVAL (0);
+  const unsigned int MAXEVAL (50000);
+
+  const unsigned int KEY (13);
+
+  int nregions, neval, fail;
+  double integral[NCOMP], error[NCOMP], prob[NCOMP];
+
+  Cuhre(fNDim, NCOMP, Integrand, USERDATA, NVEC,
+    EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+    KEY, STATEFILE, SPIN,
+    &nregions, &neval, &fail, integral, error, prob);
+
+  return integral[0];
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
+ *
+ * <p><b>return:</b>
+ * - 0
+ *
+ * \param ndim number of dimensions of the integral (2 here)
+ * \param x point where the function should be evaluated
+ * \param ncomp number of components of the integrand (1 here)
+ * \param f function value
+ * \param userdata additional user parameters (required by the interface, NULL here)
+ */
+int TLinePWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, theta}, fPar = {twokBT, Delta(T), Ec, thetac}
+{
+  double sinTheta = TMath::Sin(x[1]*fPar[3]);
+  double cosTheta = TMath::Cos(x[1]*fPar[3]);
+  double deltasq(TMath::Power(fPar[1]*cosTheta,2.0));
+  f[0] = sinTheta/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+
 std::vector<double> TDWaveGapIntegralCuhre::fPar;
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Integrate the function using the Cuhre interface
  *
@@ -67,6 +186,7 @@ double TDWaveGapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
  *
@@ -87,8 +207,11 @@ int TDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+
 std::vector<double> TCosSqDWaveGapIntegralCuhre::fPar;
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Integrate the function using the Cuhre interface
  *
@@ -119,6 +242,7 @@ double TCosSqDWaveGapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
  *
@@ -139,8 +263,11 @@ int TCosSqDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+
 std::vector<double> TSinSqDWaveGapIntegralCuhre::fPar;
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Integrate the function using the Cuhre interface
  *
@@ -171,6 +298,7 @@ double TSinSqDWaveGapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
  *
@@ -191,8 +319,11 @@ int TSinSqDWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+
 std::vector<double> TAnSWaveGapIntegralCuhre::fPar;
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Integrate the function using the Cuhre interface
  *
@@ -223,6 +354,7 @@ double TAnSWaveGapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
  *
@@ -243,8 +375,11 @@ int TAnSWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+
 std::vector<double> TAnSWaveGapIntegralDivonne::fPar;
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Integrate the function using the Divonne interface
  *
@@ -283,6 +418,7 @@ double TAnSWaveGapIntegralDivonne::IntegrateFunc()
   return integral[0];
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value for the use with Divonne---actual implementation of the function
  *
@@ -303,8 +439,11 @@ int TAnSWaveGapIntegralDivonne::Integrand(const int *ndim, const double x[],
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+
 std::vector<double> TAnSWaveGapIntegralSuave::fPar;
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Integrate the function using the Suave interface
  *
@@ -337,6 +476,7 @@ double TAnSWaveGapIntegralSuave::IntegrateFunc()
   return integral[0];
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value for the use with Suave---actual implementation of the function
  *
@@ -357,8 +497,11 @@ int TAnSWaveGapIntegralSuave::Integrand(const int *ndim, const double x[],
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+
 std::vector<double> TNonMonDWave1GapIntegralCuhre::fPar;
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Integrate the function using the Cuhre interface
  *
@@ -389,6 +532,7 @@ double TNonMonDWave1GapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
  *
@@ -409,8 +553,11 @@ int TNonMonDWave1GapIntegralCuhre::Integrand(const int *ndim, const double x[],
   return 0;
 }
 
+//-----------------------------------------------------------------------------
+
 std::vector<double> TNonMonDWave2GapIntegralCuhre::fPar;
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Integrate the function using the Cuhre interface
  *
@@ -441,6 +588,7 @@ double TNonMonDWave2GapIntegralCuhre::IntegrateFunc()
   return integral[0];
 }
 
+//-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
  *
