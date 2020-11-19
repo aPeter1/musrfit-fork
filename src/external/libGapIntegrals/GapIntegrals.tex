@@ -84,7 +84,7 @@ In order not to do too many unnecessary function calls during the final numerica
 \frac{\partial f}{\partial E} = -\frac{1}{k_{\mathrm B}T}\frac{\exp(E/k_{\mathrm B}T)}{\left(1+\exp(E/k_{\mathrm B}T)\right)^2} = -\frac{1}{4k_{\mathrm B}T} \frac{1}{\cosh^2\left(E/2k_{\mathrm B}T\right)}.
 \end{equation}
 Using (\ref{derivative}) and doing the substitution $E'^2 = E^2-\Delta^2(\varphi,T)$, equation (\ref{eq:int_phi}) can be written as
-\begin{equation}
+\begin{equation}\label{eq:bmw_2d}
 \begin{split}
 I(T) & = 1 - \frac{1}{4\pi k_{\mathrm B}T}\int_0^{2\pi}\int_{\Delta(\varphi,T)}^{\infty}\frac{1}{\cosh^2\left(E/2k_{\mathrm B}T\right)}\frac{E}{\sqrt{E^2-\Delta^2(\varphi,T)}}\mathrm{d}E\mathrm{d}\varphi \\
 & = 1 - \frac{1}{4\pi k_{\mathrm B}T}\int_0^{2\pi}\int_{0}^{\infty}\frac{1}{\cosh^2\left(\sqrt{E'^2+\Delta^2(\varphi,T)}/2k_{\mathrm B}T\right)}\mathrm{d}E'\mathrm{d}\varphi\,.
@@ -210,28 +210,55 @@ within the semi-classical model assuming a cylindrical Fermi surface and a mixed
 
 \subsection*{Gap Integrals for $\bm{\theta}$-, and $\bm{(\theta, \varphi)}$-dependent Gaps}%
 
-\noindent For the most general case for which the gap-symmetry is $(E,\varphi,\theta)$-dependent, the integral to be calculate takes the form
+First some general formulae as found in Ref.\,\cite{Prozorov}. It assumes an anisotropic response which can be classified in 3 directions ($a$, $b$, and $c$).
 
-\begin{equation}\label{eq:int_phi_theta}
-  I = 1 + \frac{1}{2\pi} \int_0^\pi \sin(\theta)\, \mathrm{d}\theta \int_0^{2\pi} \mathrm{d}\varphi \int_{\Delta(\varphi,\theta,T)}^\infty \mathrm{d}E \left\{ \left(\frac{\partial f}{\partial E}\right) \frac{E}{\sqrt{E^2 - \Delta^2(\varphi, \theta, T)}} \right\}
+\noindent For the case of a 2D Fermi surface (cylindrical symmetry):
+
+\begin{equation}\label{eq:n_anisotrope_2D}
+n_{aa \atop bb}(T) = 1 - \frac{1}{2\pi k_{\rm B} T} \int_0^{2\pi} \mathrm{d}\varphi\, {\cos^2(\varphi) \atop \sin^2(\varphi)} \underbrace{\int_0^\infty \mathrm{d}\varepsilon\, \left\{ \cosh\left[\frac{\sqrt{\varepsilon^2 + \Delta^2}}{2 k_{\rm B}T}\right]\right\}^{-2}}_{= G(\Delta(\varphi), T)}
 \end{equation}
 
+\noindent For the case of a 3D Fermi surface:
 
-\subsubsection*{Gap Integrals for $\bm{\theta}$-dpendent Gaps}%
+\begin{eqnarray}
+ n_{aa \atop bb}(T) &=& 1 - \frac{3}{4\pi k_{\rm B} T} \int_0^1 \mathrm{d}z\, (1-z^2) \int_0^{2\pi} \mathrm{d}\varphi\, {\cos^2(\varphi) \atop \sin^2(\varphi)} \cdot G(\Delta(z,\varphi), T) \label{eq:n_anisotrope_3D_aabb} \\
+ n_{cc}(T) &=& 1 - \frac{3}{2\pi k_{\rm B} T} \int_0^1 \mathrm{d}z\, z^2 \int_0^{2\pi} \mathrm{d}\varphi\, {\cos^2(\varphi) \atop \sin^2(\varphi)} \cdot G(\Delta(z,\varphi), T) \label{eq:n_anisotrope_3D_cc}
+\end{eqnarray}
 
-\noindent In case the gap-symmetry is only depending on $(E,\theta)$ the $\varphi$-integral can be carried out and Eq.(\ref{eq:int_phi_theta}) simplifies to
+\noindent The ``powder averaged'' superfluid density is then defined as
 
-\begin{equation}\label{eq:int_theta}
-  I(T) = 1 + \int_0^\pi \sin(\theta)\, \mathrm{d}\theta \int_{\Delta(\varphi,\theta,T)}^\infty \mathrm{d}E \left\{ \left(\frac{\partial f}{\partial E}\right) \frac{E}{\sqrt{E^2 - \Delta^2(\varphi, \theta, T)}} \right\}
+\begin{equation}
+ n_{\rm S} = \frac{1}{3}\cdot \left[ \sqrt{n_{aa} n_{bb}} + \sqrt{n_{aa} n_{cc}} + \sqrt{n_{bb} n_{cc}} \right]
 \end{equation}
 
-\noindent Following the same simplification steps as for Eq.(\ref{eq:int_phi}) we find
+\subsubsection*{Isotropic s-Wave Gap}
 
-\begin{equation}\label{eq:int_tilde_theta}
- \tilde{I}(T) = 1 - \frac{\pi E_c}{4 k_{\rm B}T}\, \int_0^1 \mathrm{d}x \sin(\pi x) \int_0^1 \mathrm{d}F\, \frac{1}{\cosh^2\left(\sqrt{(E_c\cdot F)^2 + \Delta^2(\pi\cdot x, T)}/(2 k_{\rm B} T)\right)}   
+\noindent For the 2D/3D case this means that $\Delta$ is just a constant. 
+
+\noindent For the 2D case it follows
+
+\begin{equation}
+  n_{aa \atop bb}(T) = 1 - \frac{1}{2 k_{\rm B} T} \cdot G(\Delta, T) = n_{\rm S}(T).
 \end{equation}
 
-\noindent where $x = \theta / \pi$, and $F = E^\prime / E_c$.
+\noindent This is the same as Eq.(\ref{eq:bmw_2d}), assuming a $\Delta \neq f(\varphi)$.
+
+\vspace{5mm}
+
+\noindent The 3D case for $\Delta \neq f(\theta, \varphi)$:
+
+\noindent The variable transformation $z = \cos(\theta)$ leads to $\mathrm{d}z = -\sin(\theta)\,\mathrm{d}\theta$, $z=0 \to \theta=\pi/2$, $z=1 \to \theta=0$, and hence to
+
+\begin{eqnarray*}
+ n_{aa \atop bb}(T) &=& 1 - \frac{3}{4\pi k_{\rm B} T} \underbrace{\int_0^{\pi/2} \mathrm{d}\theta \, \sin^3(\theta)}_{= 2/3} \, \underbrace{\int_0^{2\pi} \mathrm{d}\varphi {\cos^2(\varphi) \atop \sin^2(\varphi)}}_{=\pi} \cdot G(\Delta, T) \\
+ &=& 1 - \frac{1}{2 k_{\rm B} T} \cdot G(\Delta, T). \\
+ n_{cc}(T) &=& 1 - \frac{3}{2\pi k_{\rm B} T} \underbrace{\int_0^{\pi/2} \mathrm{d}\theta \, \cos^2(\theta)\sin(\theta)}_{=1/3} \, \underbrace{\int_0^{2\pi} \mathrm{d}\varphi {\cos^2(\varphi) \atop \sin^2(\varphi)}}_{=\pi} \cdot G(\Delta, T) \\
+ &=&  1 - \frac{1}{2 k_{\rm B} T} \cdot G(\Delta, T). 
+\end{eqnarray*}
+
+\noindent And hence
+
+$$ n_{\rm S}(T) = 1- \frac{1}{2 k_{\rm B} T} \cdot G(\Delta, T). $$
 
 \subsection*{License}
 The \gapint library is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation \cite{GPL}; either version 2 of the License, or (at your option) any later version.
