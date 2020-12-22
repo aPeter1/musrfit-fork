@@ -1,28 +1,12 @@
 #--- musredit for Qt > 5.0 ----------------------------------------------------
 
 #--- check if Qt5WebEngine or Qt5WebKit is present ----------------------------
-find_package(Qt5WebEngine QUIET)
-find_package(Qt5WebKit QUIET)
+#find_package(Qt5WebEngine QUIET)
+#find_package(Qt5WebKit QUIET)
 
 set(qt_libs Qt5::Core Qt5::Widgets Qt5::Network Qt5::Xml Qt5::Svg Qt5::PrintSupport)
-set(Qt5NoWeb 0)
-if (Qt5WebEngine_FOUND)
-  message("-- Qt5WebEngine is present.")
-  find_package(Qt5WebEngineWidgets QUIET CONFIG REQUIRED)
-  set(qt_libs ${qt_libs} Qt5::WebEngine Qt5::WebEngineWidgets)
-  # unset a potentially found Qt5Webkit
-  unset(Qt5WebKit_FOUND)
-elseif (Qt5WebKit_FOUND)
-  message("-- Qt5WebKit is present.")
-  find_package(Qt5WebKitWidgets QUIET CONFIG REQUIRED)
-  set(qt_libs ${qt_libs} Qt5::WebKit Qt5::WebKitWidgets)
-else (Qt5WebEngine_FOUND)
-  message("-- Neither Qt5WebEngine nor Qt5WebKit found.")
-  set(Qt5NoWeb 1)
-endif (Qt5WebEngine_FOUND)
 
 set(musredit_src
-  PHelp.cpp
   PTextEdit.cpp
   PSubTextEdit.cpp
   PAdmin.cpp

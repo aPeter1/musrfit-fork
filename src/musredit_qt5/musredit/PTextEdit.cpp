@@ -58,11 +58,13 @@
 #include <QTextDocumentFragment>
 #include <QTextList>
 #include <QProcess>
+#include <QFileSystemWatcher>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include <QtDebug>
 
 #include "PTextEdit.h"
-#include "PHelp.h"
 #include "PSubTextEdit.h"
 #include "PAdmin.h"
 #include "PFindDialog.h"
@@ -2961,8 +2963,14 @@ void PTextEdit::mupp()
  */
 void PTextEdit::helpContents()
 {
-  PHelp *help = new PHelp(fAdmin->getHelpUrl("main"), fDarkMenuIcon);
-  help->show();
+  bool ok = QDesktopServices::openUrl(QUrl(fAdmin->getHelpUrl("main"), QUrl::TolerantMode));
+  if (!ok) {
+    QString msg = QString("<p>Sorry: Couldn't open default web-browser for the help.<br>Please try: <a href=\"%1\">musrfit docu</a> in your web-browser.").arg(fAdmin->getHelpUrl("main"));
+    QMessageBox::critical( nullptr,
+                           tr("Fatal Error"),
+                           msg,
+                           tr("Quit") );
+  }
 }
 
 //----------------------------------------------------------------------------------------------------

@@ -32,10 +32,11 @@
 #include <QComboBox>
 #include <QPixmap>
 #include <QImage>
+#include <QDesktopServices>
+#include <QUrl>
 
 #include <QtDebug>
 
-#include "PHelp.h"
 #include "PGetTheoryBlockDialog.h"
 
 //----------------------------------------------------------------------------------------------------
@@ -126,12 +127,14 @@ void PGetTheoryBlockDialog::helpContent()
   if (fHelpUrl.isEmpty()) {
     QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
   } else {
-    #ifdef _WIN32GCC
-    QMessageBox::information(this, "**INFO**", "If a newer Qt version was available, a help window would be shown!");
-    #else
-    PHelp *help = new PHelp(fHelpUrl);
-    help->show();
-    #endif // _WIN32GCC
+    bool ok = QDesktopServices::openUrl(QUrl(fHelpUrl, QUrl::TolerantMode));
+    if (!ok) {
+      QString msg = QString("<p>Sorry: Couldn't open default web-browser for the help.<br>Please try: <a href=\"%1\">musrfit docu</a> in your web-browser.").arg(fHelpUrl);
+      QMessageBox::critical( nullptr,
+                             tr("Fatal Error"),
+                             msg,
+                             tr("Quit") );
+    }
   }
 }
 
