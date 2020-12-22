@@ -432,7 +432,11 @@ PmuppCollection PParamDataHandler::ReadDbFile(const QString fln, bool &valid, QS
     if (param_found && !line.isEmpty()) {
       // check if parameter or run number and title
       token.clear();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       token = line.split(",", QString::SkipEmptyParts);
+#else
+      token = line.split(",", Qt::SkipEmptyParts);
+#endif
       if (token.size()==0) {
         errorMsg = fln + QString(". No parameter tokens.");
         std::cerr << std::endl;
@@ -584,7 +588,11 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
 
   // read header information
   line = in.readLine();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   token = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+#else
+  token = line.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+#endif
 
   QVector<QString> headerInfo;
   QVector<int> headerCode; // 0=value, 1=pos/neg err, 2=pos err, 3=neg err, 4=run number
@@ -612,7 +620,11 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
       continue;
     lineNo++;
     token.clear();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     token = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+#else
+    token = line.split(QRegExp("\\s+"), Qt::SkipEmptyParts);
+#endif
     // paranoia check
     if (token.size() != headerInfo.size()) {
       errorMsg = QString("size mismatch between header and parameter int line: %1 (header=%2 / param=%3)").arg(lineNo).arg(headerInfo.size()).arg(token.size());
@@ -1037,6 +1049,11 @@ void PParamDataHandler::readFromStdErr()
 void PParamDataHandler::processDone(int exitCode, QProcess::ExitStatus exitStatus)
 {
   qInfo() << "in processDone()";
-  if ((exitStatus == QProcess::CrashExit) && (exitCode != 0))
+  if ((exitStatus == QProcess::CrashExit) && (exitCode != 0)) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     qInfo() << "**ERROR** processDone: exitCode = " << exitCode << endl;
+#else
+    qInfo() << "**ERROR** processDone: exitCode = " << exitCode << Qt::endl;
+#endif
+  }
 }

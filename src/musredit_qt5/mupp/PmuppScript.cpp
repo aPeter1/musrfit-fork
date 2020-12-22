@@ -146,7 +146,11 @@ void PmuppScript::setLoadPath(const QString cmd)
   str = str.remove("loadPath ");
 
   // tokenize path string
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   tok = str.split("/", QString::SkipEmptyParts);
+#else
+  tok = str.split("/", Qt::SkipEmptyParts);
+#endif
 
   // check if there is a bash variable which needs to be resolved
   QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
@@ -180,7 +184,11 @@ void PmuppScript::setSavePath(const QString cmd)
   str = str.remove("savePath ");
 
   // tokenize path string
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   tok = str.split("/", QString::SkipEmptyParts);
+#else
+  tok = str.split("/", Qt::SkipEmptyParts);
+#endif
 
   // check if there is a bash variable which needs to be resolved
   QProcessEnvironment procEnv = QProcessEnvironment::systemEnvironment();
@@ -230,7 +238,11 @@ int PmuppScript::loadCollection(const QString str)
 int PmuppScript::select(const QString str)
 {
   QString cmd = str;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   QStringList tok = cmd.split(' ', QString::SkipEmptyParts);
+#else
+  QStringList tok = cmd.split(' ', Qt::SkipEmptyParts);
+#endif
   if (tok.size() != 2) {
     std::cerr << std::endl << "**ERROR** wrong 'select' command syntax." << std::endl << std::endl;
     return -1;
@@ -287,7 +299,11 @@ int PmuppScript::selectAll()
 int PmuppScript::addX(const QString str)
 {
   QString cmd = str, label;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   QStringList tok = cmd.split(' ', QString::SkipEmptyParts);
+#else
+  QStringList tok = cmd.split(' ', Qt::SkipEmptyParts);
+#endif
 
   if (tok.size() != 2) {
     std::cerr << std::endl << "**ERROR** in addX: number of tokens missmatch." << std::endl << std::endl;
@@ -377,7 +393,11 @@ int PmuppScript::addY(const QString str)
 {
   QString cmd = str;
   QVector<QString> label;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   QStringList tok = cmd.split(' ', QString::SkipEmptyParts);
+#else
+  QStringList tok = cmd.split(' ', Qt::SkipEmptyParts);
+#endif
 
   if (tok.size() < 2) {
     std::cerr << std::endl << "**ERROR** in addY: number of tokens < 2." << std::endl << std::endl;
@@ -484,7 +504,11 @@ int PmuppScript::addY(const QString str)
 int PmuppScript::plot(const QString str)
 {
   QString cmd = str;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   QStringList tok = cmd.split(' ', QString::SkipEmptyParts);
+#else
+  QStringList tok = cmd.split(' ', Qt::SkipEmptyParts);
+#endif
   if (tok.size() != 2) {
     std::cerr << std::endl << "**ERROR** in plot: number of tokens != 2." << std::endl << std::endl;
     return -1;
@@ -542,7 +566,11 @@ int PmuppScript::macro(const QString str, const QString plotFln)
   QVector<PmuppColor> color = fAdmin->getColors();
 
   QString cmd = str;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   QStringList tok = cmd.split(' ', QString::SkipEmptyParts);
+#else
+  QStringList tok = cmd.split(' ', Qt::SkipEmptyParts);
+#endif
   if (tok.size() != 2) {
     std::cerr << std::endl << "**ERROR** macro command with wrong number of arguments (" << tok.size() << ")." << std::endl << std::endl;
     return -1;
@@ -559,6 +587,7 @@ int PmuppScript::macro(const QString str, const QString plotFln)
   QTextStream fout(&file);
 
   // write header
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "// --------------------------" << endl;
   fout << "// " << fln.toLatin1().constData() << endl;
   fout << "// " << QDateTime::currentDateTime().toString("yy/MM/dd - HH:mm:ss") << endl;
@@ -578,6 +607,27 @@ int PmuppScript::macro(const QString str, const QString plotFln)
   fout << "  Double_t yyPosErr[512];" << endl;
   fout << "  Double_t yyNegErr[512];" << endl;
   fout << endl;
+#else
+  fout << "// --------------------------" << Qt::endl;
+  fout << "// " << fln.toLatin1().constData() << Qt::endl;
+  fout << "// " << QDateTime::currentDateTime().toString("yy/MM/dd - HH:mm:ss") << Qt::endl;
+  fout << "// --------------------------" << Qt::endl;
+  fout << "{" << Qt::endl;
+  fout << "  gROOT->Reset();" << Qt::endl;
+  fout << Qt::endl;
+  fout << "  gStyle->SetOptTitle(0);" << Qt::endl;
+  fout << "  gStyle->SetOptDate(0);" << Qt::endl;
+  fout << "  gStyle->SetPadColor(TColor::GetColor(255,255,255));    // pad bkg to white" << Qt::endl;
+  fout << "  gStyle->SetCanvasColor(TColor::GetColor(255,255,255)); // canvas bkg to white" << Qt::endl;
+  fout << Qt::endl;
+  fout << "  Int_t nn=0, i=0;" << Qt::endl;
+  fout << "  Double_t null[512];" << Qt::endl;
+  fout << "  Double_t xx[512];" << Qt::endl;
+  fout << "  Double_t yy[512];" << Qt::endl;
+  fout << "  Double_t yyPosErr[512];" << Qt::endl;
+  fout << "  Double_t yyNegErr[512];" << Qt::endl;
+  fout << Qt::endl;
+#endif
 
   // write data
   QVector<double> xx, yy, yyPosErr, yyNegErr;
@@ -597,7 +647,12 @@ int PmuppScript::macro(const QString str, const QString plotFln)
         std::cerr << "          This should never happens." << std::endl;
         return -3;
       }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       xx = QVector<double>::fromStdVector(fVarHandler[idx].getValues());
+#else
+      QVector<double> qvec(fVarHandler[idx].getValues().begin(), fVarHandler[idx].getValues().end());
+      xx = qvec;
+#endif
     }
     // get x-axis min/max
     minMax(xx, x_min, x_max);
@@ -623,9 +678,17 @@ int PmuppScript::macro(const QString str, const QString plotFln)
           std::cerr << "          This should never happens." << std::endl;
           return -3;
         }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         yy = QVector<double>::fromStdVector(fVarHandler[idx].getValues());
         yyPosErr = QVector<double>::fromStdVector(fVarHandler[idx].getErrors());
         yyNegErr = QVector<double>::fromStdVector(fVarHandler[idx].getErrors());
+#else
+        QVector<double> qvecV(fVarHandler[idx].getValues().begin(), fVarHandler[idx].getValues().end());
+        yy = qvecV;
+        QVector<double> qvecE(fVarHandler[idx].getErrors().begin(), fVarHandler[idx].getErrors().end());
+        yyPosErr = qvecE;
+        yyNegErr = qvecE;
+#endif
       }
       // get y-axis min/max
       minMax(yy, y_min, y_max);
@@ -638,6 +701,7 @@ int PmuppScript::macro(const QString str, const QString plotFln)
         if (y_max > y_max_new)
           y_max_new = y_max;
       }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << "  // " << ++count << ". data set" << endl;
       fout << "  nn = " << xx.size() << ";" << endl;
       fout << "  // null-values" << endl;
@@ -675,6 +739,45 @@ int PmuppScript::macro(const QString str, const QString plotFln)
       fout << endl;
       fout << "  TGraphAsymmErrors *g_" << i << "_" << j << " = new TGraphAsymmErrors(nn, xx, yy, null, null, yyNegErr, yyPosErr);" << endl;
       fout << endl;
+#else
+      fout << "  // " << ++count << ". data set" << Qt::endl;
+      fout << "  nn = " << xx.size() << ";" << Qt::endl;
+      fout << "  // null-values" << Qt::endl;
+      for (int k=0; k<xx.size(); k++) {
+        fout << "  null[" << k << "]=0.0;" << Qt::endl;
+      }
+      fout << "  // x-values" << Qt::endl;
+      for (int k=0; k<xx.size(); k++) {
+        fout << "  xx[" << k << "]=" << xx[k] << ";" << Qt::endl;
+      }
+      fout << "  // y-values" << Qt::endl;
+      for (int k=0; k<yy.size(); k++) {
+        dval = yy[k];
+        if (fNorm) {
+          dval /= y_max;
+          if (dval < y_min_norm)
+            y_min_norm = dval;
+        }
+        fout << "  yy[" << k << "]=" << dval << ";" << Qt::endl;
+      }
+      fout << "  // yyNegErr-values" << Qt::endl;
+      for (int k=0; k<yyNegErr.size(); k++) {
+        dval = fabs(yyNegErr[k]);
+        if (fNorm)
+          dval /= fabs(y_max);
+        fout << "  yyNegErr[" << k << "]=" << dval << ";" << Qt::endl;
+      }
+      fout << "  // yyPosErr-values" << Qt::endl;
+      for (int k=0; k<yyPosErr.size(); k++) {
+        dval = fabs(yyPosErr[k]);
+        if (fNorm)
+          dval /= fabs(y_max);
+        fout << "  yyPosErr[" << k << "]=" << dval << ";" << Qt::endl;
+      }
+      fout << Qt::endl;
+      fout << "  TGraphAsymmErrors *g_" << i << "_" << j << " = new TGraphAsymmErrors(nn, xx, yy, null, null, yyNegErr, yyPosErr);" << Qt::endl;
+      fout << Qt::endl;
+#endif
     }
   }
 
@@ -696,6 +799,7 @@ int PmuppScript::macro(const QString str, const QString plotFln)
   }
 
   // plotting
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "  //**********" << endl;
   fout << "  // plotting " << endl;
   fout << "  //**********" << endl;
@@ -755,6 +859,67 @@ int PmuppScript::macro(const QString str, const QString plotFln)
     fout << "  c1->SaveAs(\"" << plotFln.toLatin1().constData() << "\");" << endl;
   }
   fout << "}" << endl;
+#else
+  fout << "  //**********" << Qt::endl;
+  fout << "  // plotting " << Qt::endl;
+  fout << "  //**********" << Qt::endl;
+  fout << "  TCanvas *c1 = new TCanvas(\"c1\", \"" << macroName.toLatin1().constData() << "\", 10, 10, 600, 700);" << Qt::endl;
+  fout << Qt::endl;
+
+  count = 0;
+  int rr, gg, bb;
+  for (int i=0; i<fPlotInfo.size(); i++) {
+    for (int j=0; j<fPlotInfo[i].yLabel.size(); j++) {
+      if (count == 0) {
+        if (count < marker.size()) {
+          fout << "  g_" << i << "_" << j << "->SetMarkerStyle(" << marker[count].getMarker() << ");" << Qt::endl;
+          fout << "  g_" << i << "_" << j << "->SetMarkerSize(" << marker[count].getMarkerSize() << ");" << Qt::endl;
+          color[count].getRGB(rr, gg, bb);
+          fout << "  g_" << i << "_" << j << "->SetMarkerColor(TColor::GetColor(" << rr << "," << gg << "," << bb << "));" << Qt::endl;
+          fout << "  g_" << i << "_" << j << "->SetLineColor(TColor::GetColor(" << rr << "," << gg << "," << bb << "));" << Qt::endl;
+        } else {
+          fout << "  g_" << i << "_" << j << "->SetMarkerStyle(20);" << Qt::endl;
+          fout << "  g_" << i << "_" << j << "->SetMarkerSize(1.3);" << Qt::endl;
+          fout << "  g_" << i << "_" << j << "->SetMarkerColor(TColor::GetColor(0,0,0));" << Qt::endl;
+          fout << "  g_" << i << "_" << j << "->SetLineColor(TColor::GetColor(0,0,0));" << Qt::endl;
+        }
+        fout << "  g_" << i << "_" << j << "->SetFillColor(kWhite);" << Qt::endl;
+        fout << "  g_" << i << "_" << j << "->GetXaxis()->SetTitle(\"" << getNicerLabel(fPlotInfo[0].xLabel).toLatin1().data() << "\");" << Qt::endl;
+        fout << "  g_" << i << "_" << j << "->GetXaxis()->SetTitleSize(0.05);" << Qt::endl;
+        fout << "  g_" << i << "_" << j << "->GetXaxis()->SetDecimals(kTRUE);" << Qt::endl;
+        fout << "  g_" << i << "_" << j << "->GetXaxis()->SetLimits(" << x_min << "," << x_max << ");" << Qt::endl;
+        fout << "  g_" << i << "_" << j << "->GetYaxis()->SetTitle(\"" << getNicerLabel(fPlotInfo[0].yLabel[0]).toLatin1().data() << "\");" << Qt::endl;
+        fout << "  g_" << i << "_" << j << "->GetYaxis()->SetTitleSize(0.05);" << Qt::endl;
+        fout << "  g_" << i << "_" << j << "->GetYaxis()->SetTitleOffset(1.30);" << Qt::endl;
+        fout << "  g_" << i << "_" << j << "->GetYaxis()->SetRangeUser(" << y_min << "," << y_max << ");" << Qt::endl;
+        fout << "  g_" << i << "_" << j << "->Draw(\"AP\");" << Qt::endl;
+      } else {
+        if (count < marker.size()) {
+          fout << "  g_" << i << "_" << j << "->SetMarkerStyle(" << marker[count].getMarker() << ");" << Qt::endl;
+          fout << "  g_" << i << "_" << j << "->SetMarkerSize(" << marker[count].getMarkerSize() << ");" << Qt::endl;
+          color[count].getRGB(rr, gg, bb);
+          fout << "  g_" << i << "_" << j << "->SetMarkerColor(TColor::GetColor(" << rr << "," << gg << "," << bb << "));" << Qt::endl;
+          fout << "  g_" << i << "_" << j << "->SetLineColor(TColor::GetColor(" << rr << "," << gg << "," << bb << "));" << Qt::endl;
+        } else {
+          fout << "  g_" << i << "_" << j << "->SetMarkerStyle(20);" << Qt::endl;
+          fout << "  g_" << i << "_" << j << "->SetMarkerSize(1.3);" << Qt::endl;
+          fout << "  g_" << i << "_" << j << "->SetMarkerColor(TColor::GetColor(0,0,0));" << Qt::endl;
+          fout << "  g_" << i << "_" << j << "->SetLineColor(TColor::GetColor(0,0,0));" << Qt::endl;
+        }
+        fout << "  g_" << i << "_" << j << "->SetFillColor(kWhite);" << Qt::endl;
+        fout << "  g_" << i << "_" << j << "->Draw(\"Psame\");" << Qt::endl;
+      }
+      count++;
+    }
+  }
+  fout << "  c1->SetMargin(0.15, 0.05, 0.12, 0.05);" << Qt::endl;
+  fout << "  c1->Update();" << Qt::endl;
+  if (!plotFln.isEmpty()) {
+    fout << Qt::endl;
+    fout << "  c1->SaveAs(\"" << plotFln.toLatin1().constData() << "\");" << Qt::endl;
+  }
+  fout << "}" << Qt::endl;
+#endif
 
   return 0;
 }
@@ -771,7 +936,11 @@ int PmuppScript::var_cmd(const QString str)
   int idx=0;
 
   // get linked collection index for further use
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   tok = str.split(' ', QString::SkipEmptyParts);
+#else
+  tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
   if (tok[1].endsWith("Err")) // error variable no need to do something
     return 0;
   idx = getCollectionIndex(tok[1]);
@@ -962,7 +1131,11 @@ int PmuppScript::getCollectionIndex(const QString var_name)
     cmd = fScript.at(i);
     if (cmd.startsWith("col")) {
       tok.clear();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = cmd.split(' ', QString::SkipEmptyParts);
+#else
+      tok = cmd.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok[3] == var_name) {
         idx = tok[1].toInt(&ok);
         if (!ok) {

@@ -478,7 +478,11 @@ int PMusrStep::readMsrFile()
     }
 
     if (parameter) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       strL = str.split(" ", QString::SkipEmptyParts);
+#else
+      strL = str.split(" ", Qt::SkipEmptyParts);
+#endif
       if ((strL.size() != 5) && (strL.size() != 7)) {
         fin.close();
         return -2;

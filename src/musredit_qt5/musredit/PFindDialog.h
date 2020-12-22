@@ -42,7 +42,7 @@ class PFindDialog : public QDialog, private Ui::PFindDialog
   Q_OBJECT
 
   public:
-    PFindDialog(PFindReplaceData *data, const bool selection, QWidget *parent = 0, Qt::WindowFlags f = 0);
+    PFindDialog(PFindReplaceData *data, const bool selection, QWidget *parent = nullptr);
     virtual ~PFindDialog() {}
 
     virtual PFindReplaceData *getData();

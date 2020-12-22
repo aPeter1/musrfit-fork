@@ -40,7 +40,7 @@ class PReplaceConfirmationDialog : public QDialog, public Ui::PReplaceConfirmati
   Q_OBJECT
 
   public:
-    PReplaceConfirmationDialog(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    PReplaceConfirmationDialog(QWidget *parent = nullptr);
     virtual ~PReplaceConfirmationDialog() {}
 };
 

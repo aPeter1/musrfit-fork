@@ -318,15 +318,28 @@ void PChangeDefaultPathsDialog::saveDefaultPathList()
     if (!str.trimmed().startsWith("<data_path>")) {
       // if not data_path was present, add the new data_paths just before the end of the musrfit_start.xml close tag
       if ((dataPathPresent == false) && (str.trimmed().startsWith("</musrfit>"))) {
-        for (int j=0; j<fSearchPath_listWidget->count(); j++)
+        for (int j=0; j<fSearchPath_listWidget->count(); j++) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
           out << "    <data_path>" << fSearchPath_listWidget->item(j)->text() << "</data_path>" << endl;
+#else
+          out << "    <data_path>" << fSearchPath_listWidget->item(j)->text() << "</data_path>" << Qt::endl;
+#endif
+        }
       }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       out << fileContent[i] << endl;
+#else
+      out << fileContent[i] << Qt::endl;
+#endif
     } else {
       if (first) {
         first = false;
         for (int j=0; j<fSearchPath_listWidget->count(); j++)
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
           out << "    <data_path>" << fSearchPath_listWidget->item(j)->text() << "</data_path>" << endl;
+#else
+          out << "    <data_path>" << fSearchPath_listWidget->item(j)->text() << "</data_path>" << Qt::endl;
+#endif
       }
     }
   }

@@ -38,7 +38,7 @@ class PMusrEditAbout : public QDialog, private Ui::PMusrEditAbout
   Q_OBJECT
 
   public:
-    PMusrEditAbout(QWidget *parent = 0, Qt::WindowFlags f = 0);
+    PMusrEditAbout(QWidget *parent = nullptr);
     virtual ~PMusrEditAbout() {}
 
 };

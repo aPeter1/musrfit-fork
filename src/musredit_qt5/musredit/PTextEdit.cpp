@@ -84,8 +84,8 @@
  * \param parent pointer to the parent object
  * \param f qt windows flags
  */
-PTextEdit::PTextEdit( QWidget *parent, Qt::WindowFlags f )
-    : QMainWindow( parent, f )
+PTextEdit::PTextEdit( QWidget *parent )
+    : QMainWindow( parent )
 {
   bool gotTheme = getTheme();
 
@@ -1743,7 +1743,7 @@ void PTextEdit::editFind()
   if (!fFindReplaceData->fromCursor)
     currentEditor()->textCursor().setPosition(0);
 
-  QTextDocument::FindFlags flags = nullptr;
+  QTextDocument::FindFlags flags;
   if (fFindReplaceData->caseSensitive)
     flags |= QTextDocument::FindCaseSensitively;
   else if (fFindReplaceData->findBackwards)
@@ -1760,7 +1760,7 @@ void PTextEdit::editFind()
  */
 void PTextEdit::editFindNext()
 {
-  QTextDocument::FindFlags flags = nullptr;
+  QTextDocument::FindFlags flags;
   if (fFindReplaceData->caseSensitive)
     flags |= QTextDocument::FindCaseSensitively;
   else if (fFindReplaceData->wholeWordsOnly)
@@ -1775,7 +1775,7 @@ void PTextEdit::editFindNext()
  */
 void PTextEdit::editFindPrevious()
 {
-  QTextDocument::FindFlags flags = nullptr;
+  QTextDocument::FindFlags flags;
   if (fFindReplaceData->caseSensitive)
     flags |= QTextDocument::FindCaseSensitively;
   else if (fFindReplaceData->wholeWordsOnly)
@@ -2936,6 +2936,8 @@ void PTextEdit::mupp()
   cmd = QString("/Applications/mupp.app/Contents/MacOS/mupp");
 #endif
 
+  QStringList arg;
+
   QProcess *proc = new QProcess(this);
 
   QString workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
@@ -2945,7 +2947,7 @@ void PTextEdit::mupp()
   env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
   proc->setProcessEnvironment(env);
   proc->setWorkingDirectory(workDir);
-  proc->start(cmd);
+  proc->start(cmd, arg);
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd);
@@ -3186,7 +3188,7 @@ void PTextEdit::replaceAll()
   currentEditor()->moveCursor(QTextCursor::Start);
 
   // construct search flags
-  QTextDocument::FindFlags flags = 0;
+  QTextDocument::FindFlags flags;
   if (fFindReplaceData->caseSensitive)
     flags |= QTextDocument::FindCaseSensitively;
   else if (fFindReplaceData->findBackwards)
@@ -3357,10 +3359,18 @@ QStringList PTextEdit::getRunList(QString runListStr, bool &ok)
   ok = true;
 
   // first split space separated parts
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   QStringList tok = runListStr.split(' ', QString::SkipEmptyParts);
+#else
+  QStringList tok = runListStr.split(' ', Qt::SkipEmptyParts);
+#endif
   for (int i=0; i<tok.size(); i++) {
     if (tok[i].contains('-')) { // list given, hence need to expand
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       QStringList runListTok = tok[i].split('-', QString::SkipEmptyParts);
+#else
+      QStringList runListTok = tok[i].split('-', Qt::SkipEmptyParts);
+#endif
       if (runListTok.size() != 2) { // error
         ok = false;
         result.clear();

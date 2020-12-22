@@ -64,7 +64,7 @@ class PTextEdit : public QMainWindow
   Q_OBJECT
 
 public:
-  PTextEdit( QWidget *parent = nullptr, Qt::WindowFlags f = nullptr );
+  PTextEdit( QWidget *parent = nullptr );
   virtual ~PTextEdit() {}
 
 public slots:

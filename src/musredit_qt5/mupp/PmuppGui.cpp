@@ -233,8 +233,7 @@ PVarErrorDialog::PVarErrorDialog(QString errMsg)
  * \param parent pointer to the parent object
  * \param f qt windows flags
  */
-PmuppGui::PmuppGui( QStringList fln, QWidget *parent, Qt::WindowFlags f )
-    : QMainWindow( parent, f )
+PmuppGui::PmuppGui(QStringList fln)
 {
   QDateTime dt = QDateTime::currentDateTime();
   fDatime = dt.toTime_t();
@@ -945,6 +944,7 @@ void PmuppGui::writeCmdHistory()
 
   // write header
   QDateTime dt = QDateTime::currentDateTime();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "% mupp history file" << endl;
   fout << "% " << dt.toString("HH:mm:ss - yy/MM/dd") << endl;
 
@@ -953,6 +953,16 @@ void PmuppGui::writeCmdHistory()
     fout << fCmdHistory[i] << endl;
 
   fout << "% end mupp history file" << endl;
+#else
+  fout << "% mupp history file" << Qt::endl;
+  fout << "% " << dt.toString("HH:mm:ss - yy/MM/dd") << Qt::endl;
+
+  // write history
+  for (int i=0; i<fCmdHistory.size(); i++)
+    fout << fCmdHistory[i] << Qt::endl;
+
+  fout << "% end mupp history file" << Qt::endl;
+#endif
 
   file.close();
 }
@@ -1461,7 +1471,12 @@ QVector<double> PmuppGui::getValues(QString collName, QString paramName, bool &o
     for (int i=0; i<fVarHandler.size(); i++) {
       if ((fVarHandler[i].getCollName() == collName) &&
           (fVarHandler[i].getVarName() == paramName)) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         values = QVector<double>::fromStdVector(fVarHandler[i].getValues());
+#else
+        QVector<double> qvec(fVarHandler[i].getValues().begin(), fVarHandler[i].getValues().end());
+        values = qvec;
+#endif
       }
     }
   }
@@ -1495,7 +1510,12 @@ QVector<double> PmuppGui::getPosErr(QString collName, QString paramName, bool &o
     for (int i=0; i<fVarHandler.size(); i++) {
       if ((fVarHandler[i].getCollName() == collName) &&
           (fVarHandler[i].getVarName() == paramName)) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         values = QVector<double>::fromStdVector(fVarHandler[i].getErrors());
+#else
+        QVector<double> qvec(fVarHandler[i].getErrors().begin(), fVarHandler[i].getErrors().end());
+        values = qvec;
+#endif
       }
     }
   }
@@ -1529,7 +1549,12 @@ QVector<double> PmuppGui::getNegErr(QString collName, QString paramName, bool &o
     for (int i=0; i<fVarHandler.size(); i++) {
       if ((fVarHandler[i].getCollName() == collName) &&
           (fVarHandler[i].getVarName() == paramName)) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         values = QVector<double>::fromStdVector(fVarHandler[i].getErrors());
+#else
+        QVector<double> qvec(fVarHandler[i].getErrors().begin(), fVarHandler[i].getErrors().end());
+        values = qvec;
+#endif
       }
     }
   }
@@ -1823,6 +1848,7 @@ void PmuppGui::createMacro()
 
   QTextStream fout(&file);
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "// " << fMacroName.toLatin1().data() << endl;
   fout << "// " << QDateTime::currentDateTime().toString("yy/MM/dd - HH:mm:ss") << endl;
   fout << "// " << endl;
@@ -1840,6 +1866,25 @@ void PmuppGui::createMacro()
   fout << "  Double_t yy[512];" << endl;
   fout << "  Double_t yyPosErr[512];" << endl;
   fout << "  Double_t yyNegErr[512];" << endl;
+#else
+  fout << "// " << fMacroName.toLatin1().data() << Qt::endl;
+  fout << "// " << QDateTime::currentDateTime().toString("yy/MM/dd - HH:mm:ss") << Qt::endl;
+  fout << "// " << Qt::endl;
+  fout << "{" << Qt::endl;
+  fout << "  gROOT->Reset();" << Qt::endl;
+  fout << Qt::endl;
+  fout << "  gStyle->SetOptTitle(0);" << Qt::endl;
+  fout << "  gStyle->SetOptDate(0);" << Qt::endl;
+  fout << "  gStyle->SetPadColor(TColor::GetColor(255,255,255));    // pad bkg to white" << Qt::endl;
+  fout << "  gStyle->SetCanvasColor(TColor::GetColor(255,255,255)); // canvas bkg to white" << Qt::endl;
+  fout << Qt::endl;
+  fout << "  Int_t nn=0, i=0;" << Qt::endl;
+  fout << "  Double_t null[512];" << Qt::endl;
+  fout << "  Double_t xx[512];" << Qt::endl;
+  fout << "  Double_t yy[512];" << Qt::endl;
+  fout << "  Double_t yyPosErr[512];" << Qt::endl;
+  fout << "  Double_t yyNegErr[512];" << Qt::endl;
+#endif
   // create all the necessary TGraph's
   int collTag = -1, pos;
   QString collName("");
@@ -1894,40 +1939,98 @@ void PmuppGui::createMacro()
       yLabel = substituteDefaultLabels(yLabel);
       getMinMax(yy, yMin, yMax);
       // create TGraph objects
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << endl;
       snprintf(gLabel, sizeof(gLabel), "g_%d_%d", i, j);
       fout << "  nn = " << xx.size() << ";" << endl;
       fout << endl;
       fout << "  // null value vector" << endl;
+#else
+      fout << Qt::endl;
+      snprintf(gLabel, sizeof(gLabel), "g_%d_%d", i, j);
+      fout << "  nn = " << xx.size() << ";" << Qt::endl;
+      fout << Qt::endl;
+      fout << "  // null value vector" << Qt::endl;
+#endif
       for (int k=0; k<xx.size(); k++) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         fout << "  null[" << k << "]=0.0;" << endl;
+#else
+        fout << "  null[" << k << "]=0.0;" << Qt::endl;
+#endif
       }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << "  // xx" << endl;
+#else
+      fout << "  // xx" << Qt::endl;
+#endif
       for (int k=0; k<xx.size(); k++) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         fout << "  xx[" << k << "]=" << xx[k] << ";" << endl;
+#else
+        fout << "  xx[" << k << "]=" << xx[k] << ";" << Qt::endl;
+#endif
       }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << "  // yy" << endl;
+#else
+      fout << "  // yy" << Qt::endl;
+#endif
       for (int k=0; k<xx.size(); k++) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         fout << "  yy[" << k << "]=" << yy[k] << ";" << endl;
+#else
+        fout << "  yy[" << k << "]=" << yy[k] << ";" << Qt::endl;
+#endif
       }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << "  // yyPosErr" << endl;
+#else
+      fout << "  // yyPosErr" << Qt::endl;
+#endif
       for (int k=0; k<xx.size(); k++) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         fout << "  yyPosErr[" << k << "]=" << yyPosErr[k] << ";" << endl;
+#else
+        fout << "  yyPosErr[" << k << "]=" << yyPosErr[k] << ";" << Qt::endl;
+#endif
       }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << "  // yyNegErr" << endl;
+#else
+      fout << "  // yyNegErr" << Qt::endl;
+#endif
       for (int k=0; k<xx.size(); k++) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         fout << "  yyNegErr[" << k << "]=" << fabs(yyNegErr[k]) << ";" << endl;
+#else
+        fout << "  yyNegErr[" << k << "]=" << fabs(yyNegErr[k]) << ";" << Qt::endl;
+#endif
       }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << endl;
       fout << "  TGraphAsymmErrors *" << gLabel << " = new TGraphAsymmErrors(nn, xx, yy, null, null, yyNegErr, yyPosErr);" << endl;
+#else
+      fout << Qt::endl;
+      fout << "  TGraphAsymmErrors *" << gLabel << " = new TGraphAsymmErrors(nn, xx, yy, null, null, yyNegErr, yyPosErr);" << Qt::endl;
+#endif
     }
   }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << endl;
   fout << "  //***************" << endl;
   fout << "  // plotting " << endl;
   fout << "  //***************" << endl;
   fout << "  TCanvas *c1 = new TCanvas(\"c1\", \"" << fMacroName.toLatin1().data() << "\", 10, 10, 600, 700);" << endl;
   fout << endl;
+#else
+  fout << Qt::endl;
+  fout << "  //***************" << Qt::endl;
+  fout << "  // plotting " << Qt::endl;
+  fout << "  //***************" << Qt::endl;
+  fout << "  TCanvas *c1 = new TCanvas(\"c1\", \"" << fMacroName.toLatin1().data() << "\", 10, 10, 600, 700);" << Qt::endl;
+  fout << Qt::endl;
+#endif
   int idx, r, g, b;
   PmuppMarker markerObj;
   for (int i=0; i<fXY.size(); i++) {
@@ -1945,20 +2048,41 @@ void PmuppGui::createMacro()
       snprintf(gLabel, sizeof(gLabel), "g_%d_%d", i, j);
       if ((i==0) && (j==0)) { // first graph
         if (idx < marker.size()) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
           fout << "  " << gLabel << "->SetMarkerStyle(" << markerObj.getMarker() << ");" << endl;
           fout << "  " << gLabel << "->SetMarkerSize(" << markerObj.getMarkerSize() << ");" << endl;
+#else
+          fout << "  " << gLabel << "->SetMarkerStyle(" << markerObj.getMarker() << ");" << Qt::endl;
+          fout << "  " << gLabel << "->SetMarkerSize(" << markerObj.getMarkerSize() << ");" << Qt::endl;
+#endif
         } else {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
           fout << "  " << gLabel << "->SetMarkerStyle(20); // bullet" << endl;
           fout << "  " << gLabel << "->SetMarkerSize(1.5);" << endl;
+#else
+          fout << "  " << gLabel << "->SetMarkerStyle(20); // bullet" << Qt::endl;
+          fout << "  " << gLabel << "->SetMarkerSize(1.5);" << Qt::endl;
+#endif
         }
         if (idx < color.size()) {
           color[idx].getRGB(r, g, b);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
           fout << "  " << gLabel << "->SetMarkerColor(TColor::GetColor(" << r << "," << g << "," << b << "));" << endl;
           fout << "  " << gLabel << "->SetLineColor(TColor::GetColor(" << r << "," << g << "," << b << "));" << endl;
+#else
+          fout << "  " << gLabel << "->SetMarkerColor(TColor::GetColor(" << r << "," << g << "," << b << "));" << Qt::endl;
+          fout << "  " << gLabel << "->SetLineColor(TColor::GetColor(" << r << "," << g << "," << b << "));" << Qt::endl;
+#endif
         } else {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
           fout << "  " << gLabel << "->SetMarkerColor(kBlue);" << endl;
           fout << "  " << gLabel << "->SetLineColor(kBlue);" << endl;
+#else
+          fout << "  " << gLabel << "->SetMarkerColor(kBlue);" << Qt::endl;
+          fout << "  " << gLabel << "->SetLineColor(kBlue);" << Qt::endl;
+#endif
         }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         fout << "  " << gLabel << "->SetFillColor(kWhite);" << endl;
         fout << "  " << gLabel << "->GetXaxis()->SetTitle(\"" << xLabel.toLatin1().data() << "\");" << endl;
         fout << "  " << gLabel << "->GetXaxis()->SetTitleSize(0.05);" << endl;
@@ -1969,28 +2093,69 @@ void PmuppGui::createMacro()
         fout << "  " << gLabel << "->GetYaxis()->SetRangeUser(" << 0.95*yMin << ", " << 1.05*yMax << ");" << endl;
         fout << "  " << gLabel << "->GetXaxis()->SetDecimals(kTRUE);" << endl;
         fout << "  " << gLabel << "->Draw(\"AP\");" << endl;
+#else
+        fout << "  " << gLabel << "->SetFillColor(kWhite);" << Qt::endl;
+        fout << "  " << gLabel << "->GetXaxis()->SetTitle(\"" << xLabel.toLatin1().data() << "\");" << Qt::endl;
+        fout << "  " << gLabel << "->GetXaxis()->SetTitleSize(0.05);" << Qt::endl;
+        fout << "  " << gLabel << "->GetXaxis()->SetRangeUser(" << 0.95*xMin << ", " << 1.05*xMax << ");" << Qt::endl;
+        fout << "  " << gLabel << "->GetYaxis()->SetTitle(\"" << yLabel.toLatin1().data() << "\");" << Qt::endl;
+        fout << "  " << gLabel << "->GetYaxis()->SetTitleSize(0.05);" << Qt::endl;
+        fout << "  " << gLabel << "->GetYaxis()->SetTitleOffset(1.30);" << Qt::endl;
+        fout << "  " << gLabel << "->GetYaxis()->SetRangeUser(" << 0.95*yMin << ", " << 1.05*yMax << ");" << Qt::endl;
+        fout << "  " << gLabel << "->GetXaxis()->SetDecimals(kTRUE);" << Qt::endl;
+        fout << "  " << gLabel << "->Draw(\"AP\");" << Qt::endl;
+#endif
       } else { // consecutive graphs
         if (idx < marker.size()) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
           fout << "  " << gLabel << "->SetMarkerStyle(" << markerObj.getMarker() << ");" << endl;
           fout << "  " << gLabel << "->SetMarkerSize(" << markerObj.getMarkerSize() << ");" << endl;
+#else
+          fout << "  " << gLabel << "->SetMarkerStyle(" << markerObj.getMarker() << ");" << Qt::endl;
+          fout << "  " << gLabel << "->SetMarkerSize(" << markerObj.getMarkerSize() << ");" << Qt::endl;
+#endif
         } else {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
           fout << "  " << gLabel << "->SetMarkerStyle(" << 21+j << ");" << endl;
           fout << "  " << gLabel << "->SetMarkerSize(1.5);" << endl;
+#else
+          fout << "  " << gLabel << "->SetMarkerStyle(" << 21+j << ");" << Qt::endl;
+          fout << "  " << gLabel << "->SetMarkerSize(1.5);" << Qt::endl;
+#endif
         }
         if (idx < color.size()) {
           color[idx].getRGB(r, g, b);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
           fout << "  " << gLabel << "->SetMarkerColor(TColor::GetColor(" << r << "," << g << "," << b << "));" << endl;
           fout << "  " << gLabel << "->SetLineColor(TColor::GetColor(" << r << "," << g << "," << b << "));" << endl;
+#else
+          fout << "  " << gLabel << "->SetMarkerColor(TColor::GetColor(" << r << "," << g << "," << b << "));" << Qt::endl;
+          fout << "  " << gLabel << "->SetLineColor(TColor::GetColor(" << r << "," << g << "," << b << "));" << Qt::endl;
+#endif
         } else {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
           fout << "  " << gLabel << "->SetMarkerColor(kBlue);" << endl;
           fout << "  " << gLabel << "->SetLineColor(kBlue);" << endl;
+#else
+          fout << "  " << gLabel << "->SetMarkerColor(kBlue);" << Qt::endl;
+          fout << "  " << gLabel << "->SetLineColor(kBlue);" << Qt::endl;
+#endif
         }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
         fout << "  " << gLabel << "->SetFillColor(kWhite);" << endl;
         fout << "  " << gLabel << "->Draw(\"Psame\");" << endl;
+#else
+        fout << "  " << gLabel << "->SetFillColor(kWhite);" << Qt::endl;
+        fout << "  " << gLabel << "->Draw(\"Psame\");" << Qt::endl;
+#endif
       }
     }
   }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "}" << endl;
+#else
+  fout << "}" << Qt::endl;
+#endif
 
   // clear macro name
   fMacroName = QString("");
@@ -2028,17 +2193,29 @@ void PmuppGui::plot()
   }
   QTextStream fout(&file);
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "% path file name: " << pathName << endl;
   fout << "% creation time : " << QDateTime::currentDateTime().toString("yyyy.MM.dd - hh:mm:ss") << endl;
   fout << "%" << endl;
+#else
+  fout << "% path file name: " << pathName << Qt::endl;
+  fout << "% creation time : " << QDateTime::currentDateTime().toString("yyyy.MM.dd - hh:mm:ss") << Qt::endl;
+  fout << "%" << Qt::endl;
+#endif
   for (int i=0; i<fXY.size(); i++) {
     // header info
     collTag = fXY[i].getCollectionTag();
     collName = fColList->item(collTag)->text();
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << "% ---------" << endl;
     fout << "% collName = " << collName << endl;
     fout << "% start ---" << endl;
+#else
+    fout << "% ---------" << Qt::endl;
+    fout << "% collName = " << collName << Qt::endl;
+    fout << "% start ---" << Qt::endl;
+#endif
 
     // x-label
     xLabel = fXY[i].getXlabel();
@@ -2113,7 +2290,11 @@ void PmuppGui::plot()
     yyyNegErr.push_back(yyNegErr);
 
     yLabel = substituteDefaultLabels(yLabel);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << "yLabel: " << yLabel << endl;
+#else
+    fout << "yLabel: " << yLabel << Qt::endl;
+#endif
 
     // normalize if wished
     if (fNormalize) {
@@ -2140,10 +2321,18 @@ void PmuppGui::plot()
       }
       idx = yyy.size()-1;
       fout << yyy[idx][j] << ", " << yyyPosErr[idx][j] << ", " << yyyNegErr[idx][j];
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << endl;
+#else
+      fout << Qt::endl;
+#endif
     }
 
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << "% end -----" << endl;
+#else
+    fout << "% end -----" << Qt::endl;
+#endif
 
     // clear collection related vectors
     yyy.clear();
@@ -2169,7 +2358,11 @@ void PmuppGui::plot()
     return;
   }
   fout.setDevice(&file);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << QCoreApplication::applicationFilePath().toLatin1().data() << endl;
+#else
+  fout << QCoreApplication::applicationFilePath().toLatin1().data() << Qt::endl;
+#endif
   file.close();
 
   key = ftok(QCoreApplication::applicationFilePath().toLatin1().data(), fMuppInstance);
@@ -2274,7 +2467,11 @@ void PmuppGui::handleCmds()
   } else if (!cmd.compare("plot", Qt::CaseInsensitive)) {
     plot();
   } else if (cmd.startsWith("macro")) { // cmd: macro <fln>
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
+#endif
     if (tok.size() != 2) {
       QMessageBox::critical(this, "ERROR", QString("wrong macro cmd: %1.\nPlease check the help.").arg(cmd));
       return;
@@ -2284,7 +2481,11 @@ void PmuppGui::handleCmds()
   } else if (cmd.startsWith("path")) { // cmd: path <macro_path>
     QMessageBox::information(0, "INFO", "set's eventually the path for the macros to be saved.");
     // will set the path to where to save the macro
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
+#endif
     if (tok.size() != 2) {
       QMessageBox::critical(this, "ERROR", QString("wrong path cmd: %1.\nPlease check the help.").arg(cmd));
       return;
@@ -2310,13 +2511,21 @@ void PmuppGui::handleCmds()
   } else if (cmd.startsWith("select") || cmd.startsWith("sc")) {
     selectCollection(cmd);
   } else if (cmd.startsWith("x")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
+#endif
     if (tok.size() > 1)
       addX(tok[1]);
     else
       QMessageBox::critical(0, "ERROR", QString("Found command 'x' without variable."));
   } else if (cmd.startsWith("y")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
+#endif
     if (tok.size() > 1)
       addY(tok[1]);
     else
@@ -2324,19 +2533,31 @@ void PmuppGui::handleCmds()
   } else if (cmd.startsWith("ditto")) {
     addDitto();
   } else if (cmd.startsWith("rmx")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
+#endif
     if (tok.size() > 1)
       removeX(tok[1]);
     else
       QMessageBox::critical(0, "ERROR", QString("Found command 'rmx' without variable."));
   } else if (cmd.startsWith("rmy")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
+#endif
     if (tok.size() > 1)
       removeY(tok[1]);
     else
       QMessageBox::critical(0, "ERROR", QString("Found command 'rmy' without variable."));
   } else if (cmd.startsWith("norm")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     QStringList tok = cmd.split(" ", QString::SkipEmptyParts);
+#else
+    QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
+#endif
     if (tok.size() != 2) {
       QMessageBox::critical(this, "**ERROR**", "found wrong norm cmd, will ignore it.");
       return;

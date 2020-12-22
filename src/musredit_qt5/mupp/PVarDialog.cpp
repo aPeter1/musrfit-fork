@@ -49,7 +49,11 @@ PShowVarNameDialog::PShowVarNameDialog(PCollInfo &info)
   // if fCollName is a path name, extract the fln
   QString collNameStr(info.fCollName);
   if (collNameStr.contains("/")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     QStringList tok = collNameStr.split('/', QString::SkipEmptyParts);
+#else
+    QStringList tok = collNameStr.split('/', Qt::SkipEmptyParts);
+#endif
     collNameStr = tok[tok.count()-1];
   }
   QLabel *collName = new QLabel(collNameStr);
@@ -281,7 +285,11 @@ bool PVarDialog::basic_check()
   }
 
   // tokenize variable input
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   QStringList strList = varStr.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
+#else
+  QStringList strList = varStr.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+#endif
 
   // check if there are ANY var definitions
   ok = false;

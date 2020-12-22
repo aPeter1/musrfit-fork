@@ -660,7 +660,11 @@ bool PInstrumentDefXMLParser::characters()
     fSetup->setLgb(ival);
     break;
   case eBkgRange:
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     strList = str.split(' ', QString::SkipEmptyParts);
+#else
+    strList = str.split(' ', Qt::SkipEmptyParts);
+#endif
     if (strList.size() != 2) {
       errMsg = QString("Found wrong Asymmetry background range: '%1'").arg(str);
       QMessageBox::critical(0, "ERROR", errMsg);

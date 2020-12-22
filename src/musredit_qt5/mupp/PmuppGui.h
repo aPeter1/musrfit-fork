@@ -132,7 +132,7 @@ class PmuppGui : public QMainWindow
   Q_OBJECT
 
 public:
-  PmuppGui(QStringList fln, QWidget *parent = 0, Qt::WindowFlags f = 0);
+  PmuppGui(QStringList fln);
   virtual ~PmuppGui();
 
 public slots:

@@ -191,7 +191,11 @@ int mupp_script_syntax_check(QStringList &list)
     tok.clear();
     str = list.at(i);
     if (str.startsWith("loadPath")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(' ', QString::SkipEmptyParts);
+#else
+      tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok.size() < 2) {
         std::cerr << std::endl;
         std::cerr << "****************" << std::endl;
@@ -216,7 +220,11 @@ int mupp_script_syntax_check(QStringList &list)
         }
       }
     } else if (str.startsWith("load")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(' ', QString::SkipEmptyParts);
+#else
+      tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok.size() < 2) {
         std::cerr << std::endl;
         std::cerr << "****************" << std::endl;
@@ -226,7 +234,11 @@ int mupp_script_syntax_check(QStringList &list)
       }
       noOfCollections++;
     } else if (str.startsWith("x")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(' ', QString::SkipEmptyParts);
+#else
+      tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok.size() != 2) {
         std::cerr << std::endl;
         std::cerr << "****************" << std::endl;
@@ -235,7 +247,11 @@ int mupp_script_syntax_check(QStringList &list)
         return -1;
       }
     } else if (str.startsWith("y")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(' ', QString::SkipEmptyParts);
+#else
+      tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok.size() < 2) {
         std::cerr << std::endl;
         std::cerr << "****************" << std::endl;
@@ -244,7 +260,11 @@ int mupp_script_syntax_check(QStringList &list)
         return -1;
       }
     } else if (str.startsWith("select ")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(' ', QString::SkipEmptyParts);
+#else
+      tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok.size() != 2) {
         std::cerr << std::endl;
         std::cerr << "****************" << std::endl;
@@ -261,7 +281,11 @@ int mupp_script_syntax_check(QStringList &list)
         return -1;
       }
     } else if (str.startsWith("savePath")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(' ', QString::SkipEmptyParts);
+#else
+      tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok.size() != 2) {
         std::cerr << std::endl;
         std::cerr << "****************" << std::endl;
@@ -270,7 +294,11 @@ int mupp_script_syntax_check(QStringList &list)
         return -1;
       }
     } else if (str.startsWith("plot")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(' ', QString::SkipEmptyParts);
+#else
+      tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok.size() != 2) {
         std::cerr << std::endl;
         std::cerr << "****************" << std::endl;
@@ -280,7 +308,11 @@ int mupp_script_syntax_check(QStringList &list)
       }
       // check extension
       tok.clear();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split('.', QString::SkipEmptyParts);
+#else
+      tok = str.split('.', Qt::SkipEmptyParts);
+#endif
       QString ext = tok.at(tok.size()-1);
       ext = ext.toLower();
       if ((ext != "pdf") && (ext != "jpg") && (ext != "png") && (ext != "svg") && (ext != "gif")) {
@@ -292,7 +324,11 @@ int mupp_script_syntax_check(QStringList &list)
         return -2;
       }
     } else if (str.startsWith("macro")) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(' ', QString::SkipEmptyParts);
+#else
+      tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok.size() != 2) {
         std::cerr << std::endl;
         std::cerr << "****************" << std::endl;
@@ -302,7 +338,11 @@ int mupp_script_syntax_check(QStringList &list)
       }
       // check extension
       tok.clear();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split('.', QString::SkipEmptyParts);
+#else
+      tok = str.split('.', Qt::SkipEmptyParts);
+#endif
       QString ext = tok.at(tok.size()-1);
       ext = ext.toLower();
       if (ext != "c") {
@@ -317,7 +357,11 @@ int mupp_script_syntax_check(QStringList &list)
       // nothing-to-be-done
     } else if (str.startsWith("var")) {
       tok.clear();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(' ', QString::SkipEmptyParts);
+#else
+      tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok.size() < 2) {
         std::cerr << std::endl;
         std::cerr << "****************" << std::endl;
@@ -332,7 +376,11 @@ int mupp_script_syntax_check(QStringList &list)
       // the parsing etc is dealt within the scripting class
     } else if (str.startsWith("col")) {
       tok.clear();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(' ', QString::SkipEmptyParts);
+#else
+      tok = str.split(' ', Qt::SkipEmptyParts);
+#endif
       if (tok.size() != 4) {
         std::cerr << std::endl;
         std::cerr << "****************" << std::endl;

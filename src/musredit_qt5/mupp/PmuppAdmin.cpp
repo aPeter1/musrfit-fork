@@ -208,7 +208,11 @@ bool PmuppAdminXMLParser::characters()
         fAdmin->setTheme(false);
       break;
     case eMarker:
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(",", QString::SkipEmptyParts);
+#else
+    tok = str.split(",", Qt::SkipEmptyParts);
+#endif
 
       if ((tok.count() != 1) && (tok.count() != 2)) {
         return false;
@@ -227,7 +231,11 @@ bool PmuppAdminXMLParser::characters()
       fAdmin->setMarker(ival, dval);
       break;
     case eColor:
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       tok = str.split(",", QString::SkipEmptyParts);
+#else
+    tok = str.split(",", Qt::SkipEmptyParts);
+#endif
 
       if ((tok.count() != 3) && (tok.count() != 4)) {
         return false;
@@ -533,8 +541,13 @@ void PmuppAdmin::saveRecentFiles()
       return;
     }
     fin.setDevice(&file);
-    for (int i=0; i<data.size(); i++)
+    for (int i=0; i<data.size(); i++) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fin << data[i] << endl;
+#else
+      fin << data[i] << Qt::endl;
+#endif
+    }
     file.close();
   } else {
     QString msg("Failed to write mupp_startup.xml. Neither a local nor a global copy found.");
@@ -592,7 +605,11 @@ void PmuppAdmin::createMuppStartupFile()
   QString line;
   while (!fin.atEnd()) {
     line = fin.readLine();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << line << endl;
+#else
+    fout << line << Qt::endl;
+#endif
   }
 
   file.close();

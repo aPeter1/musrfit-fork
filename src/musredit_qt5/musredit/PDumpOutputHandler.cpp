@@ -85,7 +85,12 @@ PDumpOutputHandler::PDumpOutputHandler(QVector<QString> &cmd)
                 tr("Quit") );
     done(0);
   }
+
+#if (QT_VERSION < QT_VERSION_CHECK(5, 2, 0))
   fProcPID = fProc->pid();
+#else
+  fProcPID = fProc->processId();
+#endif
 }
 
 //----------------------------------------------------------------------------------------------------
@@ -97,7 +102,11 @@ PDumpOutputHandler::~PDumpOutputHandler()
   if (fProc->state() == QProcess::Running) {
     fProc->terminate();
     if (!fProc->waitForFinished()) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       qDebug() << "fProc still running, will call kill." << endl;
+#else
+      qDebug() << "fProc still running, will call kill." << Qt::endl;
+#endif
       fProc->kill();
     }
     fProc->waitForFinished();
@@ -105,7 +114,11 @@ PDumpOutputHandler::~PDumpOutputHandler()
   if (fProc->state() == QProcess::Running) {
     QString cmd = "kill -9 "+ QString("%1").arg(fProcPID);
     QString msg = "fProc still running even after Qt kill, will try system kill cmd: "+cmd;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     qDebug() << msg << endl;
+#else
+    qDebug() << msg << Qt::endl;
+#endif
     system(cmd.toLatin1());
   }
   if (fProc) {

@@ -42,8 +42,8 @@
  * \param parent pointer to the parent object
  * \param f qt windows flag
  */
-PReplaceDialog::PReplaceDialog(PFindReplaceData *data, const bool selection, QWidget *parent, Qt::WindowFlags f) :
-    QDialog(parent, f), fData(data)
+PReplaceDialog::PReplaceDialog(PFindReplaceData *data, const bool selection, QWidget *parent) :
+    QDialog(parent), fData(data)
 {
   setupUi(this);
 

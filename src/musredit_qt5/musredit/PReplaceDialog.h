@@ -38,7 +38,7 @@ class PReplaceDialog : public QDialog, private Ui::PReplaceDialog
   Q_OBJECT
 
   public:
-    PReplaceDialog(PFindReplaceData *data, const bool selection, QWidget *parent = 0, Qt::WindowFlags f = 0);
+    PReplaceDialog(PFindReplaceData *data, const bool selection, QWidget *parent = nullptr);
     virtual ~PReplaceDialog() {}
 
     virtual PFindReplaceData *getData();

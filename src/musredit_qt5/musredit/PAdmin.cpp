@@ -1017,8 +1017,13 @@ int PAdmin::savePrefs(QString pref_fln)
       return 0;
     }
     fin.setDevice(&file);
-    for (int i=0; i<data.size(); i++)
+    for (int i=0; i<data.size(); i++) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fin << data[i] << endl;
+#else
+      fin << data[i] << Qt::endl;
+#endif
+    }
     file.close();
   } else {
     QString msg("Failed to write musredit_startup.xml. Neither a local nor a global copy found.");
@@ -1106,8 +1111,13 @@ void PAdmin::saveRecentFiles()
       return;
     }
     fin.setDevice(&file);
-    for (int i=0; i<data.size(); i++)
+    for (int i=0; i<data.size(); i++) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fin << data[i] << endl;
+#else
+      fin << data[i] << Qt::endl;
+#endif
+    }
     file.close();
   } else {
     QString msg("Failed to write musredit_startup.xml. Neither a local nor a global copy found.");
@@ -1176,7 +1186,11 @@ void PAdmin::createMusreditStartupFile()
         line.replace("12", "16");
       }
     }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << line << endl;
+#else
+    fout << line << Qt::endl;
+#endif
   }
 
   file.close();

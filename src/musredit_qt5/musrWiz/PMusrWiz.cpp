@@ -920,7 +920,11 @@ void PTheoPage::checkTheory()
           return;
         }
     } else { // assume musrfit functions here
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       QStringList strList = line[i].split(" ", QString::SkipEmptyParts);
+#else
+      QStringList strList = line[i].split(" ", Qt::SkipEmptyParts);
+#endif
       func = fAdmin->getMusrfitFunc(strList[0]);
       if (func.getName() == "UnDef") { // function not found
         QString str = QString("**ERROR** in line %1, '%2' is not a recognized musrfit function.").arg(i+1).arg(line[i]);
@@ -998,7 +1002,11 @@ QString PTheoPage::getTheoryFunction(int idx)
  */
 bool PTheoPage::analyzeTokens(QString str, int noOfTokens)
 {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   QStringList tok = str.trimmed().split(" ", QString::SkipEmptyParts);
+#else
+  QStringList tok = str.trimmed().split(" ", Qt::SkipEmptyParts);
+#endif
 
   bool ok;
   // check if line is of the form 'funX' or 'mapX'
@@ -2070,6 +2078,7 @@ int PMusrWiz::writeMsrFileSingleHisto()
   QString line = QString("###############################################################");
 
   // write title
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << fMsrData->getMsrFileName() << endl;
   fout << line << endl;
 
@@ -2095,6 +2104,33 @@ int PMusrWiz::writeMsrFileSingleHisto()
     fout << qSetFieldWidth(0);
     fout << endl;
   }
+#else
+  fout << fMsrData->getMsrFileName() << Qt::endl;
+  fout << line << Qt::endl;
+
+  // write parameter block
+  fout << "FITPARAMETER" << Qt::endl;
+  fout << "#      Nr. Name       Value      Step       Pos_Error   Boundaries" << Qt::endl;
+  PParam param;
+  // global fit parameters
+  for (int i=0; i<fMsrData->getNoOfParam(); i++) {
+    param = fMsrData->getParam(i);
+    fout << qSetFieldWidth(9);
+    fout << Qt::right << param.getNumber();
+    fout << qSetFieldWidth(0) << "  ";
+    fout << qSetFieldWidth(11);
+    fout << Qt::left << param.getName();
+    fout << Qt::left << param.getValue();
+    fout << Qt::left << param.getStep();
+    fout << Qt::left << param.getPosErr();
+    if (!param.getBoundLow().isEmpty())
+      fout << Qt::left << param.getBoundLow();
+    if (!param.getBoundHigh().isEmpty())
+      fout << Qt::left << param.getBoundHigh();
+    fout << qSetFieldWidth(0);
+    fout << Qt::endl;
+  }
+#endif
 
   // detector specific fit parameters
   QString str;
@@ -2135,9 +2171,14 @@ int PMusrWiz::writeMsrFileSingleHisto()
     detector = setup->getDetector(i);
     detectorName = detector->getName();
     // name comment
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << "# " << detectorName << endl;
+#else
+    fout << "# " << detectorName << Qt::endl;
+#endif
 
     // first all maps
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     for (int j=0; j<fMsrData->getNoOfMap(); j++) {
       map = fMsrData->getMap(j);
       fout << qSetFieldWidth(9);
@@ -2166,57 +2207,139 @@ int PMusrWiz::writeMsrFileSingleHisto()
       }
       fout << qSetFieldWidth(0);
       fout << endl;
+#else
+    for (int j=0; j<fMsrData->getNoOfMap(); j++) {
+      map = fMsrData->getMap(j);
+      fout << qSetFieldWidth(9);
+      fout << Qt::right << fMsrData->getNoOfParam() + 1 + j + (fMsrData->getNoOfMap()+2)*i;
+      fout << qSetFieldWidth(0) << "  ";
+      fout << qSetFieldWidth(11);
+      str = map.getName() + QString("_%1").arg(detectorName);
+      fout << Qt::left << str;
+      if (map.getName().startsWith("ph", Qt::CaseInsensitive) ||
+          map.getName().startsWith("relph", Qt::CaseInsensitive)) {
+        fout << Qt::left << detector->getRelGeomPhase();
+        // if RelPh is found, the first will be fixed to 0
+        if (map.getName().startsWith("relph", Qt::CaseInsensitive) && (i==0))
+          fout << Qt::left << 0.0;
+        else
+          fout << Qt::left << 12.3;
+        fout << Qt::left << "none";
+      } else {
+        fout << Qt::left << map.getValue();
+        fout << Qt::left << map.getStep();
+        fout << Qt::left << map.getPosErr();
+        if (map.getBoundLow() != "")
+          fout << Qt::left << map.getBoundLow();
+        if (map.getBoundHigh() != "")
+          fout << Qt::left << map.getBoundHigh();
+      }
+      fout << qSetFieldWidth(0);
+      fout << Qt::endl;
+#endif
     }
 
     // write N0 and N_bkg
     fout << qSetFieldWidth(9);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << right << fMsrData->getNoOfParam() + fMsrData->getNoOfMap() + 1 + (fMsrData->getNoOfMap()+2)*i;
+#else
+    fout << Qt::right << fMsrData->getNoOfParam() + fMsrData->getNoOfMap() + 1 + (fMsrData->getNoOfMap()+2)*i;
+#endif
     fout << qSetFieldWidth(0) << "  ";
     fout << qSetFieldWidth(11);
     str = QString("N0_%1").arg(detectorName);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << left << str;
     fout << left << "123.4";
     fout << left << "1.0";
     fout << left << "none";
     fout << qSetFieldWidth(0);
     fout << endl;
+#else
+    fout << Qt::left << str;
+    fout << Qt::left << "123.4";
+    fout << Qt::left << "1.0";
+    fout << Qt::left << "none";
+    fout << qSetFieldWidth(0);
+    fout << Qt::endl;
+#endif
 
     fout << qSetFieldWidth(9);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << right << fMsrData->getNoOfParam() + fMsrData->getNoOfMap() + 2 + (fMsrData->getNoOfMap()+2)*i;
+#else
+    fout << Qt::right << fMsrData->getNoOfParam() + fMsrData->getNoOfMap() + 2 + (fMsrData->getNoOfMap()+2)*i;
+#endif
     fout << qSetFieldWidth(0) << "  ";
     fout << qSetFieldWidth(11);
     str = QString("N_bkg_%1").arg(detectorName);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << left << str;
     fout << left << "1.234";
     fout << left << "0.1";
     fout << left << "none";
     fout << qSetFieldWidth(0);
     fout << endl;
+#else
+    fout << Qt::left << str;
+    fout << Qt::left << "1.234";
+    fout << Qt::left << "0.1";
+    fout << Qt::left << "none";
+    fout << qSetFieldWidth(0);
+    fout << Qt::endl;
+#endif
   }
 
   fout.setFieldWidth(0);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << endl << line << endl;
+#else
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write theory block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "THEORY" << endl;
   fout << fMsrData->getTheory() << endl;
   fout << endl << line << endl;
+#else
+  fout << "THEORY" << Qt::endl;
+  fout << fMsrData->getTheory() << Qt::endl;
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write functions block
   if (fMsrData->getNoOfFunc() > 0) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << "FUNCTIONS" << endl;
     for (int i=0; i<fMsrData->getNoOfFunc(); i++) {
       fout << fMsrData->getFunc(fMsrData->getFuncNo(i)) << endl;
     }
     fout << endl << line << endl;
+#else
+    fout << "FUNCTIONS" << Qt::endl;
+    for (int i=0; i<fMsrData->getNoOfFunc(); i++) {
+      fout << fMsrData->getFunc(fMsrData->getFuncNo(i)) << Qt::endl;
+    }
+    fout << Qt::endl << line << Qt::endl;
+#endif
   }
 
   // write global block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "GLOBAL" << endl;
   fout << "fittype        " << fMsrData->getFitType()-1 << endl;
   fout << "fit            " << fMsrData->getFitStart() << "   " << fMsrData->getFitEnd() << endl;
   fout << "packing        " << fMsrData->getPacking() << endl;
   fout << endl << line << endl;
+#else
+  fout << "GLOBAL" << Qt::endl;
+  fout << "fittype        " << fMsrData->getFitType()-1 << Qt::endl;
+  fout << "fit            " << fMsrData->getFitStart() << "   " << fMsrData->getFitEnd() << Qt::endl;
+  fout << "packing        " << fMsrData->getPacking() << Qt::endl;
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write run block(s)
   int t0 = 0;
@@ -2229,15 +2352,26 @@ int PMusrWiz::writeMsrFileSingleHisto()
   for (int i=0; i<noOfDetec; i++) {
     detector = setup->getDetector(i);
     detectorNo = detector->getForwards();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << "RUN " << runName << endl;
+#else
+    fout << "RUN " << runName << Qt::endl;
+#endif
     fout << "map         ";
     fout << qSetFieldWidth(10);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     for (int j=0; j<fMsrData->getNoOfMap(); j++)
        fout << left << fMsrData->getNoOfParam()+ 1 + (fMsrData->getNoOfMap()+2)*i + j;
     fout << qSetFieldWidth(0) << endl;
+#else
+    for (int j=0; j<fMsrData->getNoOfMap(); j++)
+       fout << Qt::left << fMsrData->getNoOfParam()+ 1 + (fMsrData->getNoOfMap()+2)*i + j;
+    fout << qSetFieldWidth(0) << Qt::endl;
+#endif
     fout << "forward     ";
     for (int j=0; j<detectorNo.size()-1; j++)
       fout << detectorNo[j] << "  ";
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << detectorNo[detectorNo.size()-1] << endl;
     fout << "norm        " << fMsrData->getNoOfParam() + fMsrData->getNoOfMap() + 1 + (fMsrData->getNoOfMap()+2)*i << endl;
     fout << "backgr.fit  " << fMsrData->getNoOfParam() + fMsrData->getNoOfMap() + 2 + (fMsrData->getNoOfMap()+2)*i << endl;
@@ -2252,32 +2386,77 @@ int PMusrWiz::writeMsrFileSingleHisto()
       fout << "#-----------------------------------------------" << endl;
     else
       fout << endl << line << endl;
+#else
+    fout << detectorNo[detectorNo.size()-1] << Qt::endl;
+    fout << "norm        " << fMsrData->getNoOfParam() + fMsrData->getNoOfMap() + 1 + (fMsrData->getNoOfMap()+2)*i << Qt::endl;
+    fout << "backgr.fit  " << fMsrData->getNoOfParam() + fMsrData->getNoOfMap() + 2 + (fMsrData->getNoOfMap()+2)*i << Qt::endl;
+    if (fMsrData->getT0Tag() == T0_ENTER_WIZ) {
+      fout << "data        " << t0+fgbOffset << "   " << lgb << Qt::endl;
+      fout << "t0          " << t0 << Qt::endl;
+    } else if (fMsrData->getT0Tag() == T0_FROM_MUSR_T0) {
+      fout << "data        120  " << lgb << Qt::endl;
+      fout << "t0          100  " << Qt::endl;
+    }
+    if (i<noOfDetec-1)
+      fout << "#-----------------------------------------------" << Qt::endl;
+    else
+      fout << Qt::endl << line << Qt::endl;
+#endif
   }
 
   // write command block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "COMMANDS" << endl;
   fout << fMsrData->getCmd() << endl;
   fout << endl << line << endl;
+#else
+  fout << "COMMANDS" << Qt::endl;
+  fout << fMsrData->getCmd() << Qt::endl;
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write plot block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "PLOT " << fMsrData->getFitType()-1 << endl;
   fout << "lifetimecorrection" << endl;
   fout << "runs   1-" << setup->getNoOfLogicalDetectors() << endl;
   fout << "range  0.0  " << fMsrData->getFitEnd() << endl;
   fout << "view_packing " << fMsrData->getPacking() << endl;
   fout << endl << line << endl;
+#else
+  fout << "PLOT " << fMsrData->getFitType()-1 << Qt::endl;
+  fout << "lifetimecorrection" << Qt::endl;
+  fout << "runs   1-" << setup->getNoOfLogicalDetectors() << Qt::endl;
+  fout << "range  0.0  " << fMsrData->getFitEnd() << Qt::endl;
+  fout << "view_packing " << fMsrData->getPacking() << Qt::endl;
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write fourier block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "FOURIER" << endl;
   fout << "units            MHz" << endl;
   fout << "fourier_power    12" << endl;
   fout << "apodization      NONE" << endl;
   fout << "plot             POWER" << endl;
   fout << endl << line << endl;
+#else
+  fout << "FOURIER" << Qt::endl;
+  fout << "units            MHz" << Qt::endl;
+  fout << "fourier_power    12" << Qt::endl;
+  fout << "apodization      NONE" << Qt::endl;
+  fout << "plot             POWER" << Qt::endl;
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write statistic block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "STATISTIC --- " << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << endl;
   fout << "*** FIT DID NOT CONVERGE ***" << endl;
+#else
+  fout << "STATISTIC --- " << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << Qt::endl;
+  fout << "*** FIT DID NOT CONVERGE ***" << Qt::endl;
+#endif
 
   fln.close();
 
@@ -2303,20 +2482,35 @@ int PMusrWiz::writeMsrFileAsymmetry()
   QString line = QString("###############################################################");
 
   // write title
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << fMsrData->getMsrFileName() << endl;
   fout << line << endl;
+#else
+  fout << fMsrData->getMsrFileName() << Qt::endl;
+  fout << line << Qt::endl;
+#endif
 
   // write parameter block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "FITPARAMETER" << endl;
   fout << "#      Nr. Name       Value      Step       Pos_Error   Boundaries" << endl;
+#else
+  fout << "FITPARAMETER" << Qt::endl;
+  fout << "#      Nr. Name       Value      Step       Pos_Error   Boundaries" << Qt::endl;
+#endif
   PParam param;
   // global fit parameters
   for (int i=0; i<fMsrData->getNoOfParam(); i++) {
     param = fMsrData->getParam(i);
     fout << qSetFieldWidth(9);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << right << param.getNumber();
+#else
+    fout << Qt::right << param.getNumber();
+#endif
     fout << qSetFieldWidth(0) << "  ";
     fout << qSetFieldWidth(11);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << left << param.getName();
     fout << left << param.getValue();
     fout << left << param.getStep();
@@ -2327,6 +2521,18 @@ int PMusrWiz::writeMsrFileAsymmetry()
       fout << left << param.getBoundHigh();
     fout << qSetFieldWidth(0);
     fout << endl;
+#else
+    fout << Qt::left << param.getName();
+    fout << Qt::left << param.getValue();
+    fout << Qt::left << param.getStep();
+    fout << Qt::left << param.getPosErr();
+    if (!param.getBoundLow().isEmpty())
+      fout << Qt::left << param.getBoundLow();
+    if (!param.getBoundHigh().isEmpty())
+      fout << Qt::left << param.getBoundHigh();
+    fout << qSetFieldWidth(0);
+    fout << Qt::endl;
+#endif
   }
 
   // detector specific fit parameters
@@ -2368,31 +2574,53 @@ int PMusrWiz::writeMsrFileAsymmetry()
     detector = setup->getAsymDetector(i);
     detectorName = detector->getName();
     // name comment
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << "# " << detectorName << endl;
+#else
+    fout << "# " << detectorName << Qt::endl;
+#endif
 
     // first all maps
 
     // write Alpha (mandatory)
     fout << qSetFieldWidth(9);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << right << fMsrData->getNoOfParam() + 1 + (fMsrData->getNoOfMap()+1)*i;
+#else
+    fout << Qt::right << fMsrData->getNoOfParam() + 1 + (fMsrData->getNoOfMap()+1)*i;
+#endif
     fout << qSetFieldWidth(0) << "  ";
     fout << qSetFieldWidth(11);
     str = QString("Alpha_%1").arg(detectorName);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << left << str;
     fout << left << detector->getAlpha();
     fout << left << "0.01";
     fout << left << "none";
     fout << qSetFieldWidth(0);
     fout << endl;
+#else
+    fout << Qt::left << str;
+    fout << Qt::left << detector->getAlpha();
+    fout << Qt::left << "0.01";
+    fout << Qt::left << "none";
+    fout << qSetFieldWidth(0);
+    fout << Qt::endl;
+#endif
 
     // write user defined maps
     for (int j=0; j<fMsrData->getNoOfMap(); j++) {
       map = fMsrData->getMap(j);
       fout << qSetFieldWidth(9);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << right << fMsrData->getNoOfParam() + 2 + j + (fMsrData->getNoOfMap()+1)*i;
+#else
+      fout << Qt::right << fMsrData->getNoOfParam() + 2 + j + (fMsrData->getNoOfMap()+1)*i;
+#endif
       fout << qSetFieldWidth(0) << "  ";
       fout << qSetFieldWidth(11);
       str = map.getName() + QString("_%1").arg(detectorName);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << left << str;
       if (map.getName().startsWith("ph", Qt::CaseInsensitive) ||
           map.getName().startsWith("relph", Qt::CaseInsensitive)) {
@@ -2413,32 +2641,84 @@ int PMusrWiz::writeMsrFileAsymmetry()
       }
       fout << qSetFieldWidth(0);
       fout << endl;
+#else
+      fout << Qt::left << str;
+      if (map.getName().startsWith("ph", Qt::CaseInsensitive) ||
+          map.getName().startsWith("relph", Qt::CaseInsensitive)) {
+        fout << Qt::left << detector->getRelGeomPhase();
+        if (map.getName().startsWith("relph", Qt::CaseInsensitive) && (i==0))
+          fout << Qt::left << 0.0;
+        else
+          fout << Qt::left << 12.3;
+        fout << Qt::left << "none";
+      } else {
+        fout << Qt::left << map.getValue();
+        fout << Qt::left << map.getStep();
+        fout << Qt::left << map.getPosErr();
+        if (map.getBoundLow() != "")
+          fout << Qt::left << map.getBoundLow();
+        if (map.getBoundHigh() != "")
+          fout << Qt::left << map.getBoundHigh();
+      }
+      fout << qSetFieldWidth(0);
+      fout << Qt::endl;
+#endif
     }
   }
 
   fout.setFieldWidth(0);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << endl << line << endl;
+#else
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write theory block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "THEORY" << endl;
   fout << fMsrData->getTheory();
   fout << endl << line << endl;
+#else
+  fout << "THEORY" << Qt::endl;
+  fout << fMsrData->getTheory();
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write functions block
   if (fMsrData->getNoOfFunc() > 0) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << "FUNCTIONS" << endl;
+#else
+    fout << "FUNCTIONS" << Qt::endl;
+#endif
     for (int i=0; i<fMsrData->getNoOfFunc(); i++) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << fMsrData->getFunc(fMsrData->getFuncNo(i)) << endl;
+#else
+      fout << fMsrData->getFunc(fMsrData->getFuncNo(i)) << Qt::endl;
+#endif
     }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << endl << line << endl;
+#else
+    fout << Qt::endl << line << Qt::endl;
+#endif
   }
 
   // write global block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "GLOBAL" << endl;
   fout << "fittype        " << fMsrData->getFitType()-1 << endl;
   fout << "fit            " << fMsrData->getFitStart() << "   " << fMsrData->getFitEnd() << endl;
   fout << "packing        " << fMsrData->getPacking() << endl;
   fout << endl << line << endl;
+#else
+  fout << "GLOBAL" << Qt::endl;
+  fout << "fittype        " << fMsrData->getFitType()-1 << Qt::endl;
+  fout << "fit            " << fMsrData->getFitStart() << "   " << fMsrData->getFitEnd() << Qt::endl;
+  fout << "packing        " << fMsrData->getPacking() << Qt::endl;
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write run block(s)
   int t0 = 0;
@@ -2452,11 +2732,17 @@ int PMusrWiz::writeMsrFileAsymmetry()
     detector = setup->getAsymDetector(i);
     detectorNoF = detector->getForwards();
     detectorNoB = detector->getBackwards();
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << "RUN " << runName << endl;
     fout << "alpha       " << fMsrData->getNoOfParam() + 1 + (fMsrData->getNoOfMap()+1)*i << endl;
+#else
+    fout << "RUN " << runName << Qt::endl;
+    fout << "alpha       " << fMsrData->getNoOfParam() + 1 + (fMsrData->getNoOfMap()+1)*i << Qt::endl;
+#endif
 
     fout << "map         ";
     fout << qSetFieldWidth(10);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     if (fMsrData->getNoOfMap() == 0) {
       fout << left << "0    0    0    0    0    0    0    0    0    0";
     } else {
@@ -2464,34 +2750,76 @@ int PMusrWiz::writeMsrFileAsymmetry()
         fout << left << fMsrData->getNoOfParam() + 2 + (fMsrData->getNoOfMap()+1)*i + j;
     }
     fout << qSetFieldWidth(0) << endl;
+#else
+    if (fMsrData->getNoOfMap() == 0) {
+      fout << Qt::left << "0    0    0    0    0    0    0    0    0    0";
+    } else {
+      for (int j=0; j<fMsrData->getNoOfMap(); j++)
+        fout << Qt::left << fMsrData->getNoOfParam() + 2 + (fMsrData->getNoOfMap()+1)*i + j;
+    }
+    fout << qSetFieldWidth(0) << Qt::endl;
+#endif
     fout << "forward     ";
     for (int j=0; j<detectorNoF.size()-1; j++)
       fout << detectorNoF[j] << "  ";
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << detectorNoF[detectorNoF.size()-1] << endl;
+#else
+    fout << detectorNoF[detectorNoF.size()-1] << Qt::endl;
+#endif
     fout << "backward    ";
     for (int j=0; j<detectorNoB.size()-1; j++)
       fout << detectorNoB[j] << "  ";
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     fout << detectorNoB[detectorNoB.size()-1] << endl;
     fout << "background  " << setup->getBkgStartBin() << "      " << setup->getBkgEndBin() << "    " << setup->getBkgStartBin() << "      " << setup->getBkgEndBin() << endl;
+#else
+    fout << detectorNoB[detectorNoB.size()-1] << Qt::endl;
+    fout << "background  " << setup->getBkgStartBin() << "      " << setup->getBkgEndBin() << "    " << setup->getBkgStartBin() << "      " << setup->getBkgEndBin() << Qt::endl;
+#endif
     if (fMsrData->getT0Tag() == T0_ENTER_WIZ) {
-      fout << "data        " << t0+fgbOffset << "   " << lgb << "    " << t0+fgbOffset << "   " << lgb << "  " << t0+fgbOffset << "   " << lgb << "    " << t0+fgbOffset << "   " << lgb << endl;;
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+      fout << "data        " << t0+fgbOffset << "   " << lgb << "    " << t0+fgbOffset << "   " << lgb << "  " << t0+fgbOffset << "   " << lgb << "    " << t0+fgbOffset << "   " << lgb << endl;
       fout << "t0          " << t0 << "   " << t0 << endl;
+#else
+      fout << "data        " << t0+fgbOffset << "   " << lgb << "    " << t0+fgbOffset << "   " << lgb << "  " << t0+fgbOffset << "   " << lgb << "    " << t0+fgbOffset << "   " << lgb << Qt::endl;
+      fout << "t0          " << t0 << "   " << t0 << Qt::endl;
+#endif
     } else if (fMsrData->getT0Tag() == T0_FROM_MUSR_T0) { // musrt0 shall be called
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
       fout << "data        120  " << lgb << "   120  " << lgb << endl;
       fout << "t0          100     100" << endl;
+#else
+      fout << "data        120  " << lgb << "   120  " << lgb << Qt::endl;
+      fout << "t0          100     100" << Qt::endl;
+#endif
     }
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     if (i<noOfDetec-1)
       fout << "#-----------------------------------------------" << endl;
     else
       fout << endl << line << endl;
+#else
+    if (i<noOfDetec-1)
+      fout << "#-----------------------------------------------" << Qt::endl;
+    else
+      fout << Qt::endl << line << Qt::endl;
+#endif
   }
 
   // write command block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "COMMANDS" << endl;
   fout << fMsrData->getCmd() << endl;
   fout << endl << line << endl;
+#else
+  fout << "COMMANDS" << Qt::endl;
+  fout << fMsrData->getCmd() << Qt::endl;
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write plot block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "PLOT " << fMsrData->getFitType()-1 << endl;
   fout << "lifetimecorrection" << endl;
   if (setup->getNoOfLogicalAsymDetectors() > 1)
@@ -2501,18 +2829,43 @@ int PMusrWiz::writeMsrFileAsymmetry()
   fout << "range  0.0  " << fMsrData->getFitEnd() << endl;
   fout << "view_packing " << fMsrData->getPacking() << endl;
   fout << endl << line << endl;
+#else
+  fout << "PLOT " << fMsrData->getFitType()-1 << Qt::endl;
+  fout << "lifetimecorrection" << Qt::endl;
+  if (setup->getNoOfLogicalAsymDetectors() > 1)
+    fout << "runs   1-" << setup->getNoOfLogicalAsymDetectors() << Qt::endl;
+  else
+    fout << "runs   1" << Qt::endl;
+  fout << "range  0.0  " << fMsrData->getFitEnd() << Qt::endl;
+  fout << "view_packing " << fMsrData->getPacking() << Qt::endl;
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write fourier block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "FOURIER" << endl;
   fout << "units            MHz" << endl;
   fout << "fourier_power    12" << endl;
   fout << "apodization      NONE" << endl;
   fout << "plot             POWER" << endl;
   fout << endl << line << endl;
+#else
+  fout << "FOURIER" << Qt::endl;
+  fout << "units            MHz" << Qt::endl;
+  fout << "fourier_power    12" << Qt::endl;
+  fout << "apodization      NONE" << Qt::endl;
+  fout << "plot             POWER" << Qt::endl;
+  fout << Qt::endl << line << Qt::endl;
+#endif
 
   // write statistic block
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
   fout << "STATISTIC --- " << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << endl;
   fout << "*** FIT DID NOT CONVERGE ***" << endl;
+#else
+  fout << "STATISTIC --- " << QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss") << Qt::endl;
+  fout << "*** FIT DID NOT CONVERGE ***" << Qt::endl;
+#endif
 
   fln.close();
 

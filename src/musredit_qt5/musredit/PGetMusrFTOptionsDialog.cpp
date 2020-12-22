@@ -331,7 +331,11 @@ QStringList PGetMusrFTOptionsDialog::getMusrFTOptions()
   // histo list
   if (fHistoList_lineEdit->text().length() > 0) {
     cmd << "--histo";
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     strList = fHistoList_lineEdit->text().split(" ", QString::SkipEmptyParts);
+#else
+    strList = fHistoList_lineEdit->text().split(" ", Qt::SkipEmptyParts);
+#endif
     for (int i=0; i<strList.size(); i++)
       cmd << strList[i];
   }
@@ -347,7 +351,11 @@ QStringList PGetMusrFTOptionsDialog::getMusrFTOptions()
   // t0 list
   if (fT0_lineEdit->text().length() > 0) {
     cmd << "--t0";
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
     strList = fT0_lineEdit->text().split(" ", QString::SkipEmptyParts);
+#else
+    strList = fT0_lineEdit->text().split(" ", Qt::SkipEmptyParts);
+#endif
     for (int i=0; i<strList.size(); i++)
       cmd << strList[i];
   }
