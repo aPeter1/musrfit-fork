@@ -1314,7 +1314,7 @@ void PmuppGui::addVar()
   // call variable dialog
   if (fVarDlg != nullptr) {
     delete fVarDlg;
-    fVarDlg == nullptr;
+    fVarDlg = nullptr;
   }
   fVarDlg = new PVarDialog(collection_list, fDarkTheme);
   connect(fVarDlg, SIGNAL(check_request(QString,QVector<int>)), this, SLOT(check(QString,QVector<int>)));
