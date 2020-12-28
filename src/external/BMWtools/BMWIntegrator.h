@@ -259,8 +259,9 @@ class TPointPWaveGapIntegralCuhre {
     TPointPWaveGapIntegralCuhre() : fNDim(2) {}
     ~TPointPWaveGapIntegralCuhre() { fPar.clear(); }
     void SetParameters(const std::vector<double> &par) { fPar=par; }
-    static int Integrand(const int*, const double[], const int*, double[], void*);
-    double IntegrateFunc();
+    static int Integrand_aa(const int*, const double[], const int*, double[], void*);
+    static int Integrand_cc(const int*, const double[], const int*, double[], void*);
+    double IntegrateFunc(int tag);
 
   protected:
     static std::vector<double> fPar; ///< parameters of the integrand
@@ -278,8 +279,9 @@ class TLinePWaveGapIntegralCuhre {
     TLinePWaveGapIntegralCuhre() : fNDim(2) {}
     ~TLinePWaveGapIntegralCuhre() { fPar.clear(); }
     void SetParameters(const std::vector<double> &par) { fPar=par; }
-    static int Integrand(const int*, const double[], const int*, double[], void*);
-    double IntegrateFunc();
+    static int Integrand_aa(const int*, const double[], const int*, double[], void*);
+    static int Integrand_cc(const int*, const double[], const int*, double[], void*);
+    double IntegrateFunc(int tag);
 
   protected:
     static std::vector<double> fPar; ///< parameters of the integrand

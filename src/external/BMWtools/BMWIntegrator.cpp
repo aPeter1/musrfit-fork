@@ -47,7 +47,7 @@ std::vector<double> TPointPWaveGapIntegralCuhre::fPar;
  * <p><b>return:</b>
  * - value of the integral
  */
-double TPointPWaveGapIntegralCuhre::IntegrateFunc()
+double TPointPWaveGapIntegralCuhre::IntegrateFunc(int tag)
 {
   const unsigned int NCOMP(1);
   const unsigned int NVEC(1);
@@ -63,10 +63,16 @@ double TPointPWaveGapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand, USERDATA, NVEC,
-    EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY, STATEFILE, SPIN,
-    &nregions, &neval, &fail, integral, error, prob);
+  if (tag == 0)
+    Cuhre(fNDim, NCOMP, Integrand_aa, USERDATA, NVEC,
+      EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+      KEY, STATEFILE, SPIN,
+      &nregions, &neval, &fail, integral, error, prob);
+  else
+    Cuhre(fNDim, NCOMP, Integrand_cc, USERDATA, NVEC,
+      EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+      KEY, STATEFILE, SPIN,
+      &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
 }
@@ -74,6 +80,7 @@ double TPointPWaveGapIntegralCuhre::IntegrateFunc()
 //-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
+ * for p-wave point, aa==bb component
  *
  * <p><b>return:</b>
  * - 0
@@ -84,12 +91,35 @@ double TPointPWaveGapIntegralCuhre::IntegrateFunc()
  * \param f function value
  * \param userdata additional user parameters (required by the interface, NULL here)
  */
-int TPointPWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[], void *userdata) // x = {E, theta}, fPar = {twokBT, Delta(T), Ec, thetac}
+int TPointPWaveGapIntegralCuhre::Integrand_aa(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, z}, fPar = {twokBT, Delta(T), Ec, zc}
 {
-  double sinTheta = TMath::Sin(x[1]*fPar[3]);
-  double deltasq(TMath::Power(fPar[1]*sinTheta,2.0));
-  f[0] = sinTheta/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
+  double z = x[1]*fPar[3];
+  double deltasq(pow(sqrt(1.0-z*z)*fPar[1],2.0));
+  f[0] = (1.0-z*z)/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
+ * for p-wave point, cc component
+ *
+ * <p><b>return:</b>
+ * - 0
+ *
+ * \param ndim number of dimensions of the integral (2 here)
+ * \param x point where the function should be evaluated
+ * \param ncomp number of components of the integrand (1 here)
+ * \param f function value
+ * \param userdata additional user parameters (required by the interface, NULL here)
+ */
+int TPointPWaveGapIntegralCuhre::Integrand_cc(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, z}, fPar = {twokBT, Delta(T), Ec, zc}
+{
+  double z = x[1]*fPar[3];
+  double deltasq(pow(sqrt(1.0-z*z)*fPar[1],2.0));
+  f[0] = (z*z)/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
   return 0;
 }
 
@@ -104,7 +134,7 @@ std::vector<double> TLinePWaveGapIntegralCuhre::fPar;
  * <p><b>return:</b>
  * - value of the integral
  */
-double TLinePWaveGapIntegralCuhre::IntegrateFunc()
+double TLinePWaveGapIntegralCuhre::IntegrateFunc(int tag)
 {
   const unsigned int NCOMP(1);
   const unsigned int NVEC(1);
@@ -120,10 +150,16 @@ double TLinePWaveGapIntegralCuhre::IntegrateFunc()
   int nregions, neval, fail;
   double integral[NCOMP], error[NCOMP], prob[NCOMP];
 
-  Cuhre(fNDim, NCOMP, Integrand, USERDATA, NVEC,
-    EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
-    KEY, STATEFILE, SPIN,
-    &nregions, &neval, &fail, integral, error, prob);
+  if (tag == 0)
+    Cuhre(fNDim, NCOMP, Integrand_aa, USERDATA, NVEC,
+      EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+      KEY, STATEFILE, SPIN,
+      &nregions, &neval, &fail, integral, error, prob);
+  else
+    Cuhre(fNDim, NCOMP, Integrand_cc, USERDATA, NVEC,
+      EPSREL, EPSABS, VERBOSE | LAST, MINEVAL, MAXEVAL,
+      KEY, STATEFILE, SPIN,
+      &nregions, &neval, &fail, integral, error, prob);
 
   return integral[0];
 }
@@ -131,6 +167,7 @@ double TLinePWaveGapIntegralCuhre::IntegrateFunc()
 //-----------------------------------------------------------------------------
 /**
  * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
+ * for p-wave line, aa==bb component
  *
  * <p><b>return:</b>
  * - 0
@@ -141,13 +178,35 @@ double TLinePWaveGapIntegralCuhre::IntegrateFunc()
  * \param f function value
  * \param userdata additional user parameters (required by the interface, NULL here)
  */
-int TLinePWaveGapIntegralCuhre::Integrand(const int *ndim, const double x[],
-                      const int *ncomp, double f[], void *userdata) // x = {E, theta}, fPar = {twokBT, Delta(T), Ec, thetac}
+int TLinePWaveGapIntegralCuhre::Integrand_aa(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, z}, fPar = {twokBT, Delta(T), Ec, zc}
 {
-  double sinTheta = TMath::Sin(x[1]*fPar[3]);
-  double cosTheta = TMath::Cos(x[1]*fPar[3]);
-  double deltasq(TMath::Power(fPar[1]*cosTheta,2.0));
-  f[0] = sinTheta/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
+  double z = x[1]*fPar[3];
+  double deltasq(pow(z*fPar[1],2.0));
+  f[0] = (1.0-z*z)/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
+  return 0;
+}
+
+//-----------------------------------------------------------------------------
+/**
+ * <p>Calculate the function value for the use with Cuhre---actual implementation of the function
+ * for p-wave line, cc component
+ *
+ * <p><b>return:</b>
+ * - 0
+ *
+ * \param ndim number of dimensions of the integral (2 here)
+ * \param x point where the function should be evaluated
+ * \param ncomp number of components of the integrand (1 here)
+ * \param f function value
+ * \param userdata additional user parameters (required by the interface, NULL here)
+ */
+int TLinePWaveGapIntegralCuhre::Integrand_cc(const int *ndim, const double x[],
+                      const int *ncomp, double f[], void *userdata) // x = {E, z}, fPar = {twokBT, Delta(T), Ec, zc}
+{
+  double z = x[1]*fPar[3];
+  double deltasq(pow(z*fPar[1],2.0));
+  f[0] = (z*z)/TMath::Power(TMath::CosH(TMath::Sqrt(x[0]*x[0]*fPar[2]*fPar[2]+deltasq)/fPar[0]),2.0);
   return 0;
 }
 

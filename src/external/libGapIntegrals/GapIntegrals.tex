@@ -170,18 +170,20 @@ The \gapint plug-in calculates $\tilde{I}(T)$ for the following $\Delta(\varphi)
     otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
 \item[\textit{p}-wave (point) \cite{Pang2015}:]
    \begin{equation}
-     \Delta(\theta, T) = \Delta(T) \sin(\theta)
+     \Delta(\theta, T) = \Delta(T) \sin(\theta) = \Delta(T) \cdot \sqrt{1-z^2}
    \end{equation}
-   \musrfit theory line: \verb?userFcn libGapIntegrals TGapPointPWave 1 2 [3 4]?\\[1.5ex]
-    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[c_0~(1),~a_{\rm G}~(1)]$. If $c_0$ and $a_{\rm G}$ are provided, 
-    the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
+   \musrfit theory line: \verb?userFcn libGapIntegrals TGapPointPWave 1 2 [3 [4 5]]?\\[1.5ex]
+    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, [ \verb?orientation_tag?, $[c_0~(1),~a_{\rm G}~(1)]$]. If $c_0$ and $a_{\rm G}$ are provided, 
+    the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized. \\
+    \verb?orientation_tag?: $0=\{aa,bb\}$, $1=cc$, and the default $2=$ average (see Eq.\ (\ref{eq:n_avg}))
 \item[\textit{p}-wave (line) \cite{Ozaki1986}:]
    \begin{equation}
-     \Delta(\theta, T) = \Delta(T) \cos(\theta)
+     \Delta(\theta, T) = \Delta(T) \cos(\theta) = \Delta(T) \cdot z
    \end{equation}
-   \musrfit theory line: \verb?userFcn libGapIntegrals TGapLinePWave 1 2 [3 4]?\\[1.5ex]
-    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, $[c_0~(1),~a_{\rm G}~(1)]$. If $c_0$ and $a_{\rm G}$ are provided, 
-    the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized.
+   \musrfit theory line: \verb?userFcn libGapIntegrals TGapLinePWave 1 2 [3 [4 5]]?\\[1.5ex]
+    Parameters: $T_{\mathrm c}~(\mathrm{K})$, $\Delta_0~(\mathrm{meV})$, [ \verb?orientation_tag?, $[c_0~(1),~a_{\rm G}~(1)]$]. If $c_0$ and $a_{\rm G}$ are provided, 
+    the temperature dependence according to Eq.(\ref{eq:gapT_Prozorov}) will be used, otherwise Eq.(\ref{eq:gapT_Manzano}) will be utilized. \\
+    \verb?orientation_tag?: $0=\{aa,bb\}$, $1=cc$, and the default $2=$ average (see Eq.\ (\ref{eq:n_avg}))
 \end{description}
 
 \noindent It is also possible to calculate a power law temperature dependence (in the two fluid approximation $n=4$) and the dirty \textit{s}-wave expression. 
@@ -222,12 +224,12 @@ n_{aa \atop bb}(T) = 1 - \frac{1}{2\pi k_{\rm B} T} \int_0^{2\pi} \mathrm{d}\var
 
 \begin{eqnarray}
  n_{aa \atop bb}(T) &=& 1 - \frac{3}{4\pi k_{\rm B} T} \int_0^1 \mathrm{d}z\, (1-z^2) \int_0^{2\pi} \mathrm{d}\varphi\, {\cos^2(\varphi) \atop \sin^2(\varphi)} \cdot G(\Delta(z,\varphi), T) \label{eq:n_anisotrope_3D_aabb} \\
- n_{cc}(T) &=& 1 - \frac{3}{2\pi k_{\rm B} T} \int_0^1 \mathrm{d}z\, z^2 \int_0^{2\pi} \mathrm{d}\varphi\, {\cos^2(\varphi) \atop \sin^2(\varphi)} \cdot G(\Delta(z,\varphi), T) \label{eq:n_anisotrope_3D_cc}
+ n_{cc}(T) &=& 1 - \frac{3}{2\pi k_{\rm B} T} \int_0^1 \mathrm{d}z\, z^2 \int_0^{2\pi} \mathrm{d}\varphi\, \cos^2(\varphi) \cdot G(\Delta(z,\varphi), T) \label{eq:n_anisotrope_3D_cc}
 \end{eqnarray}
 
 \noindent The ``powder averaged'' superfluid density is then defined as
 
-\begin{equation}
+\begin{equation}\label{eq:n_avg}
  n_{\rm S} = \frac{1}{3}\cdot \left[ \sqrt{n_{aa} n_{bb}} + \sqrt{n_{aa} n_{cc}} + \sqrt{n_{bb} n_{cc}} \right]
 \end{equation}
 
@@ -252,13 +254,24 @@ n_{aa \atop bb}(T) = 1 - \frac{1}{2\pi k_{\rm B} T} \int_0^{2\pi} \mathrm{d}\var
 \begin{eqnarray*}
  n_{aa \atop bb}(T) &=& 1 - \frac{3}{4\pi k_{\rm B} T} \underbrace{\int_0^{\pi/2} \mathrm{d}\theta \, \sin^3(\theta)}_{= 2/3} \, \underbrace{\int_0^{2\pi} \mathrm{d}\varphi {\cos^2(\varphi) \atop \sin^2(\varphi)}}_{=\pi} \cdot G(\Delta, T) \\
  &=& 1 - \frac{1}{2 k_{\rm B} T} \cdot G(\Delta, T). \\
- n_{cc}(T) &=& 1 - \frac{3}{2\pi k_{\rm B} T} \underbrace{\int_0^{\pi/2} \mathrm{d}\theta \, \cos^2(\theta)\sin(\theta)}_{=1/3} \, \underbrace{\int_0^{2\pi} \mathrm{d}\varphi {\cos^2(\varphi) \atop \sin^2(\varphi)}}_{=\pi} \cdot G(\Delta, T) \\
+ n_{cc}(T) &=& 1 - \frac{3}{2\pi k_{\rm B} T} \underbrace{\int_0^{\pi/2} \mathrm{d}\theta \, \cos^2(\theta)\sin(\theta)}_{=1/3} \, \underbrace{\int_0^{2\pi} \mathrm{d}\varphi \cos^2(\varphi)}_{=\pi} \cdot G(\Delta, T) \\
  &=&  1 - \frac{1}{2 k_{\rm B} T} \cdot G(\Delta, T). 
 \end{eqnarray*}
 
 \noindent And hence
 
 $$ n_{\rm S}(T) = 1- \frac{1}{2 k_{\rm B} T} \cdot G(\Delta, T). $$
+
+\subsubsection*{3D Fermi Surface Gap $\mathbf{\Delta \neq f(\bm\varphi)}$}
+
+For this case the superfluid density integrals reduce to ($z=\cos(\theta)$)
+
+\begin{eqnarray}
+  n_{aa \atop bb}(T) &=& 1 - \frac{3}{4 k_{\rm B} T} \int_0^1 \mathrm{d}z\, (1-z^2) \cdot G(\Delta(z, T),T) \\
+  n_{cc}(T) &=& 1 - \frac{3}{2 k_{\rm B} T} \int_0^1 \mathrm{d}z\, z^2 \cdot G(\Delta(z, T),T)
+\end{eqnarray}
+
+
 
 \subsection*{License}
 The \gapint library is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation \cite{GPL}; either version 2 of the License, or (at your option) any later version.

@@ -671,16 +671,22 @@ double TGapSWave::operator()(double t, const std::vector<double> &par) const {
  */
 double TGapPointPWave::operator()(double t, const std::vector<double> &par) const {
 
-  // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] c0 (1), [3] aG (1)]
+  // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] orientation tag, [[3] c0 (1), [4] aG (1)]]
 
-  assert((par.size() == 2) || (par.size() == 4)); // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
-                                                  // 4 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+  assert((par.size() >= 2) && (par.size() <= 5)); // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 4 or 5 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
                                                   // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
                                                   // c0 in the original context is c0 = (pi kB Tc) / Delta0
+                                                  // orientation tag: 0=aa,bb; 1=cc; 2=(sqrt[aa bb] + sqrt[aa cc] + sqrt[bb cc])/3 (default)
   if (t <= 0.0)
     return 1.0;
   else if (t >= par[0])
     return 0.0;
+
+  // check if orientation tag is given
+  int orientation_tag(2);
+  if ((par.size()==3) || (par.size()==5))
+    orientation_tag = static_cast<int>(par[2]);
 
   bool integralParChanged(false);
 
@@ -715,19 +721,27 @@ double TGapPointPWave::operator()(double t, const std::vector<double> &par) cons
   }
 
   if (fCalcNeeded[vectorIndex]) {
-    double ds;
+    double ds, ds1;
     std::vector<double> intPar; // parameters for the integral, T & Delta(T)
     intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
-    if (par.size() == 2) { // Carrington/Manzano
+    if ((par.size() == 2) || (par.size() == 3)) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
       intPar.push_back(par[1]*tanh(par[2]*sqrt(par[3]*(par[0]/t-1.0)))); // Delta0*tanh(c0*sqrt(aG*(Tc/T-1)))
     }
     intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
-    intPar.push_back(TMath::Pi()); // upper limit of theta-integration
+    intPar.push_back(1.0); // upper limit of theta-integration
 
     fGapIntegral->SetParameters(intPar);
-    ds = 1.0-(intPar[2]*PI)/(2.0*intPar[0])*fGapIntegral->IntegrateFunc();
+    if (orientation_tag == 0) // aa,bb
+      ds = 1.0-(intPar[2]*3.0)/(2.0*intPar[0])*fGapIntegral->IntegrateFunc(0); // integral prefactor is by 2 lower [Eqs.(19,20)] since intPar[0]==2kB T!
+    else if (orientation_tag == 1) // cc
+      ds = 1.0-(intPar[2]*3.0)/(intPar[0])*fGapIntegral->IntegrateFunc(1); // integral prefactor is by 2 lower [Eqs.(19,20)] since intPar[0]==2kB T!
+    else { // average
+      ds = 1.0-(intPar[2]*3.0)/(2.0*intPar[0])*fGapIntegral->IntegrateFunc(0); // integral prefactor is by 2 lower [Eqs.(19,20)] since intPar[0]==2kB T!
+      ds1 = 1.0-(intPar[2]*3.0)/(intPar[0])*fGapIntegral->IntegrateFunc(1); // integral prefactor is by 2 lower [Eqs.(19,20)] since intPar[0]==2kB T!
+      ds = (ds + 2.0 * sqrt(ds*ds1))/3.0; // since aa==bb the avg looks like this
+    }
 
     intPar.clear();
 
@@ -745,27 +759,34 @@ double TGapPointPWave::operator()(double t, const std::vector<double> &par) cons
 //--------------------------------------------------------------------
 /**
  * <p>prepare the needed parameters for the integration carried out in TLinePWaveGapIntegralCuhre.
- * For details see also the Memo GapIntegrals.pdf, , especially Eq.(19) and (20).
+ * For details see also the Memo GapIntegrals.pdf, especially Eq.(19) and (20).
  */
 double TGapLinePWave::operator()(double t, const std::vector<double> &par) const {
 
-  // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] c0 (1), [3] aG (1)]
+  // parameters: [0] Tc (K), [1] Delta0 (meV), [[2] orientation tag, [[3] c0 (1), [4] aG (1)]]
 
-  assert((par.size() == 2) || (par.size() == 4)); // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
-                                                  // 4 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
+  assert((par.size() >= 2) && (par.size() <= 5)); // 2 parameters: see A.~Carrington and F.~Manzano, Physica~C~\textbf{385}~(2003)~205
+                                                  // 4 or 5 parameters: see R. Prozorov and R. Giannetta, Supercond. Sci. Technol. 19 (2006) R41-R67
                                                   // and Erratum Supercond. Sci. Technol. 21 (2008) 082003
                                                   // c0 in the original context is c0 = (pi kB Tc) / Delta0
+                                                  // orientation tag: 0=aa,bb; 1=cc; 2=(sqrt[aa bb] + sqrt[aa cc] + sqrt[bb cc])/3 (default)
   if (t <= 0.0)
     return 1.0;
   else if (t >= par[0])
     return 0.0;
 
-  bool integralParChanged(false);
+
+  // check if orientation tag is given
+  int orientation_tag(2);
+  if ((par.size()==3) || (par.size()==5))
+    orientation_tag = static_cast<int>(par[2]);
+
+  bool integralParChanged(false);  
 
   if (fPar.empty()) { // first time calling this routine
     fPar = par;
     integralParChanged = true;
-  } else { // check if Tc or Delta0 have changed
+  } else { // check if parameter have changed
     for (unsigned int i(0); i<par.size(); i++) {
       if (par[i] != fPar[i]) {
         fPar[i] = par[i];
@@ -793,19 +814,27 @@ double TGapLinePWave::operator()(double t, const std::vector<double> &par) const
   }
 
   if (fCalcNeeded[vectorIndex]) {
-    double ds;
+    double ds, ds1;
     std::vector<double> intPar; // parameters for the integral, T & Delta(T)
     intPar.push_back(0.172346648*t); // 2 kB T, kB in meV/K = 0.086173324 meV/K
-    if (par.size() == 2) { // Carrington/Manzano
+    if ((par.size() == 2) || (par.size() == 3)) { // Carrington/Manzano
       intPar.push_back(par[1]*tanh(1.82*pow(1.018*(par[0]/t-1.0),0.51)));
     } else { // Prozorov/Giannetta
-      intPar.push_back(par[1]*tanh(par[2]*sqrt(par[3]*(par[0]/t-1.0)))); // Delta0*tanh(c0*sqrt(aG*(Tc/T-1)))
+      intPar.push_back(par[1]*tanh(par[3]*sqrt(par[4]*(par[0]/t-1.0)))); // Delta0*tanh(c0*sqrt(aG*(Tc/T-1)))
     }
     intPar.push_back(4.0*(t+intPar[1])); // upper limit of energy-integration: cutoff energy
-    intPar.push_back(TMath::Pi()); // upper limit of theta-integration
+    intPar.push_back(1.0); // upper limit of z-integration
 
     fGapIntegral->SetParameters(intPar);
-    ds = 1.0-(intPar[2]*PI)/(2.0*intPar[0])*fGapIntegral->IntegrateFunc();
+    if (orientation_tag == 0) // aa,bb
+      ds = 1.0-(intPar[2]*3.0)/(2.0*intPar[0])*fGapIntegral->IntegrateFunc(0); // integral prefactor is by 2 lower [Eqs.(19,20)] since intPar[0]==2kB T!
+    else if (orientation_tag == 1) // cc
+      ds = 1.0-(intPar[2]*3.0)/(intPar[0])*fGapIntegral->IntegrateFunc(1); // integral prefactor is by 2 lower [Eqs.(19,20)] since intPar[0]==2kB T!
+    else { // average
+      ds = 1.0-(intPar[2]*3.0)/(2.0*intPar[0])*fGapIntegral->IntegrateFunc(0); // integral prefactor is by 2 lower [Eqs.(19,20)] since intPar[0]==2kB T!
+      ds1 = 1.0-(intPar[2]*3.0)/(intPar[0])*fGapIntegral->IntegrateFunc(1); // integral prefactor is by 2 lower [Eqs.(19,20)] since intPar[0]==2kB T!
+      ds = (ds + 2.0 * sqrt(ds*ds1))/3.0; // since aa==bb the avg looks like this
+    }
 
     intPar.clear();
 
