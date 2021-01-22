@@ -191,7 +191,7 @@ endif (qt_based_tools)
 #--- if NeXus check also for HDF4, HDF5, and MXML -----------------------------
 if (nexus)
   find_package(HDF5 COMPONENTS CXX REQUIRED )
-#as35  find_package(HDF4 REQUIRED)
+  find_package(HDF4 REQUIRED)
   find_package(NeXus REQUIRED)
   add_definitions(-DPNEXUS_ENABLED)
 endif (nexus)
