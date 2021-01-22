@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   id="svg2"
+   viewBox="0 0 22.000001 22"
+   height="22"
+   width="22">
+  <defs
+     id="defs4">
+    <marker
+       style="overflow:visible"
+       id="Arrow1Sstart"
+       refX="0.0"
+       refY="0.0"
+       orient="auto">
+      <path
+         transform="scale(0.2) translate(6,0)"
+         style="fill-rule:evenodd;stroke:#da4453;stroke-width:1pt;stroke-opacity:1;fill:#da4453;fill-opacity:1"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         id="path8245" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow2Mstart"
+       refX="0.0"
+       refY="0.0"
+       orient="auto">
+      <path
+         transform="scale(0.6) translate(0,0)"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         style="fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round;stroke:#da4453;stroke-opacity:1;fill:#da4453;fill-opacity:1"
+         id="path8257" />
+    </marker>
+    <marker
+       style="overflow:visible;"
+       id="Arrow1Lend"
+       refX="0.0"
+       refY="0.0"
+       orient="auto">
+      <path
+         transform="scale(0.8) rotate(180) translate(12.5,0)"
+         style="fill-rule:evenodd;stroke:#da4453;stroke-width:1pt;stroke-opacity:1;fill:#000000;fill-opacity:1"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         id="path8236" />
+    </marker>
+  </defs>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     transform="translate(0,-1030.3622)"
+     id="layer1">
+    <path
+       id="path4601-7"
+       d="m 1.0000001,1046.8622 20.0000009,0"
+       style="fill:none;fill-rule:evenodd;stroke:#4d4d4d;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <text
+       id="text4724"
+       y="1036.2686"
+       x="0.94835383"
+       style="font-style:normal;font-weight:normal;font-size:11.01786137px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       xml:space="preserve"><tspan
+         style="font-size:6.61071682px"
+         y="1036.2686"
+         x="0.94835383"
+         id="tspan4726">ASYM</tspan></text>
+    <path
+       id="path4728"
+       d="m 1.4141413,1039.7861 c 0,0 1.0772835,-1.5925 1.8711944,-1.9274 0.7939109,-0.3349 1.4159197,-0.3425 2,0 0.5840803,0.3425 1.3569471,1.5015 1.7423887,2.4169 0.6346204,1.5071 1.0553199,2.8205 1.5925059,4.2271 0.3464191,0.9071 0.7122543,1.8144 1.0515223,2.7167 0.5309984,1.4121 1.1249884,3.518 2.6135834,3.6393 0.939695,0.077 1.607175,-1.1429 2,-2 0.555871,-1.2128 0.833338,-3.9038 2.412178,-4.6487 0.371791,-0.1754 0.873132,0.016 1.206089,0.2576 1.00329,0.7266 1.413053,2.0599 1.871195,3.2108 0.276062,0.6935 0.510538,2.1803 0.510538,2.1803 l 0,0 0,0"
+       style="fill:none;fill-rule:evenodd;stroke:#da4453;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  </g>
+</svg>

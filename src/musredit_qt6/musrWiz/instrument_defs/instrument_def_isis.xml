@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<instrument_def_isis xmlns="http://www.isis.stfc.ac.uk/instruments/hifi/">
+  <institute>ISIS</institute>
+   <!-- +++++++++++++++++++++++++++ H I F I ++++++++++++++++++++++++++++++++++++ -->
+   <instrument name="HIFI">
+     <run_name_template>HIFINNNNNNNN</run_name_template>
+     <beamline>HIFI</beamline>
+     <data_file_format>NEXUS</data_file_format>
+     <tf>
+       <no_of_detectors>128</no_of_detectors>
+       <fgb_offset>0</fgb_offset>
+       <lgb>2047</lgb>
+       <logic_detector name="L" rel_phase="0" forward="5 6 7 8 9 10 11 12 13 52 53 54 55 56 57 58 59 60" note="green"/>
+       <logic_detector name="R" rel_phase="90" forward="21 22 23 24 25 26 27 28 29 36 37 38 39 40 41 42 43 44" note="green"/>
+     </tf>
+     <zf>
+       <!-- not yet defined -->
+     </zf>
+     <lf>
+       <!-- not yet defined -->
+     </lf>
+   </instrument>
+</instrument_def_isis>

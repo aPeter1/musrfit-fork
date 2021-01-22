@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<mupp xmlns="http://lmu.web.psi.ch/musrfit/user/MUSR/WebHome.html">
+    <comment>
+        Defines default settings for the mupp helper program for musrfit
+    </comment>
+    <recent_files>
+    </recent_files>
+    <dark_theme>no</dark_theme>
+    <root_settings>
+        <marker_list>
+            <!-- Root marker numbers -->
+            <marker>20,1.3</marker> <!-- full circle -->            
+            <marker>21,1.3</marker> <!-- full square -->
+            <marker>22,1.5</marker> <!-- full triangle -->
+            <marker>23,1.5</marker> <!-- full triangle down -->
+            <marker>34,1.3</marker> <!-- full cross -->
+            <marker>47,1.3</marker> <!-- full cross at 45° -->
+            <marker>24,1.3</marker> <!-- open circle -->
+            <marker>25,1.3</marker> <!-- open square -->
+            <marker>26,1.5</marker> <!-- open triangle -->
+            <marker>27,1.5</marker> <!-- open diamond -->
+            <marker>28,1.5</marker> <!-- open cross -->
+            <marker>29,1.5</marker> <!-- full star -->
+            <marker>30,1.5</marker> <!-- open star -->
+            <marker>2,1.5</marker>  <!-- thin cross -->
+            <marker>3,1.5</marker>  <!-- thin star -->
+            <marker>5,1.5</marker>  <!-- thin x -->
+        </marker_list>
+        <color_list>
+            <!-- Color as RGB coded string -->
+            <color>0,0,0,kBlack</color>
+            <color>255,0,0,kRed</color>
+            <color>0,0,255,kBlue</color>
+            <color>0,255,0,kGreen</color>
+            <color>255,0,255,kMagenta</color>
+            <color>0,255,255,kCyan</color>
+            <color>153,0,255,kViolet-3</color>
+            <color>102,102,51,kYellow-1</color>
+            <color>51,102,51,kGreen-1,</color>
+            <color>153,0,0,kRed+2</color>    
+        </color_list>
+    </root_settings>
+</mupp>

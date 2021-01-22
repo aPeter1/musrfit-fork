@@ -1,7 +1,9 @@
 #--- add further sub-directories ----------------------------------------------
 add_subdirectory(classes)
 add_subdirectory(external)
-if (Qt5Core_FOUND)
+if (Qt6Core_FOUND)
+  add_subdirectory(musredit_qt6)
+elseif (Qt5Core_FOUND)
   add_subdirectory(musredit_qt5)
 elseif (Qt4_FOUND)
   add_subdirectory(musredit)

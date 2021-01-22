@@ -1,0 +1,11 @@
+#ifndef VERSION_H
+#define VERSION_H
+
+#define MUPP_PREFIX "@CMAKE_INSTALL_PREFIX@"
+#define MUPP_VERSION "@MUPP_VERSION@"
+
+#define GIT_BRANCH "@GIT_BRANCH@"
+#define GIT_COMMIT_HASH @GIT_COMMIT_HASH@
+
+#endif
+

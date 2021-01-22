@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PReplaceConfirmationDialog</class>
+ <widget class="QDialog" name="PReplaceConfirmationDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>513</width>
+    <height>65</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Replace Confirmation - musredit</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../musredit.qrc">
+    <normaloff>:/images/musrfit.xpm</normaloff>:/images/musrfit.xpm</iconset>
+  </property>
+  <widget class="QLabel" name="fTextLabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>461</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Found an occurrence of your search term.What do you want to do?</string>
+   </property>
+  </widget>
+  <widget class="Line" name="line">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>20</y>
+     <width>521</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="fReplace_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>7</x>
+     <y>35</y>
+     <width>81</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&amp;Replace</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="fReplaceAndClose_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>87</x>
+     <y>35</y>
+     <width>131</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Re&amp;place and Close</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="fReplaceAll_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>217</x>
+     <y>35</y>
+     <width>97</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Replace &amp;All</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="fFindNext_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>317</x>
+     <y>35</y>
+     <width>91</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&amp;Find Next</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="fClose_pushButton">
+   <property name="geometry">
+    <rect>
+     <x>407</x>
+     <y>35</y>
+     <width>97</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>&amp;Close</string>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../musredit.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>fClose_pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>PReplaceConfirmationDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>457</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>468</x>
+     <y>71</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

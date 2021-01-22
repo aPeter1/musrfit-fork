@@ -1,0 +1,20 @@
+# This is a comment
+
+loadPath ./
+
+load YBCO-40nm-T5K-FC150mT-Escan.db
+load YBCO-40nm-T30K-FC150mT-Escan.db
+load YBCO-40nm-T60K-FC150mT-Escan.db
+load YBCO-40nm-T120K-FC150mT-Escan.db
+
+selectAll
+
+x dataE
+y Field
+
+savePath ./
+plot FieldVsEnergy.pdf
+
+macro FieldVsEnergy.C
+
+# end

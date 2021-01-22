@@ -1,0 +1,1 @@
+A wizard to create msr-files for a given instrument from scratch

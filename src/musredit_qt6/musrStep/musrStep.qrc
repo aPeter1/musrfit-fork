@@ -1,0 +1,8 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>icons/musrStep-22x22.svg</file>
+    <file>icons/musrStep-22x22-dark.svg</file>
+    <file>icons/musrStep-32x32.svg</file>
+    <file>icons/musrStep-32x32-dark.svg</file>
+</qresource>
+</RCC>
