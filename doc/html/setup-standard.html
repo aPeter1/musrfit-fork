@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Setting up musrfit on Different Platforms &mdash; musrfit 1.6.4 documentation</title>
+    <title>Setting up musrfit on Different Platforms &mdash; musrfit 1.6.5 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.6.4',
+        VERSION:     '1.6.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="musrfit 1.6.4 documentation" href="index.html" />
+    <link rel="top" title="musrfit 1.6.5 documentation" href="index.html" />
     <link rel="next" title="Setting up musrfit / DKS: High Speed Fitting with GPU’s" href="setup-dks.html" />
     <link rel="prev" title="Documentation of user libs (user functions)" href="user-libs.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="user-libs.html" title="Documentation of user libs (user functions)"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">musrfit 1.6.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.6.5 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -106,7 +106,7 @@ Currently the <tt class="docutils literal"><span class="pre">MXML</span></tt> su
 <p>If <em>optionally</em> the editor and graphical user interface <tt class="docutils literal"><span class="pre">musrgui</span></tt> / <tt class="docutils literal"><span class="pre">musredit</span></tt> is going to be installed there is one further requirement:</p>
 <dl class="docutils" id="index-11">
 <dt><strong>Qt</strong></dt>
-<dd>A cross-platform application and user interface framework. <em>Required version ≥ 4.6</em> (musredit) (see <a class="reference external" href="http://qt.io/">Qt</a>).</dd>
+<dd>A cross-platform application and user interface framework. <em>Required version ≥ 4.6</em> (musredit) (see <a class="reference external" href="http://qt.io/">Qt</a>). Currently the <strong>Qt5</strong> is the main development part. Qt6 just kicked in, but is not widely available yet.</dd>
 </dl>
 <p>Each of the following sections focusing on the installation of <tt class="docutils literal"><span class="pre">musrfit</span></tt> on the different operating systems will also give a brief introduction on the installation of the requirements before the actual musrfit installation is described.</p>
 </div>
@@ -150,7 +150,7 @@ from the shell will do the trick (never type the &#8216;$&#8217; it is the shell
 <p>For <strong>Qt5</strong>:</p>
 <blockquote>
 <div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ yum install epel-release
-$ yum install git cmake boost-devel gsl-devel fftw-devel libxml2-devel qt5-qtbase-devel qt5-qtsvg-devel qt5-qtwebkit-devel
+$ yum install git cmake boost-devel gsl-devel fftw-devel libxml2-devel qt5-qtbase-devel qt5-qtsvg-devel
 </pre></div>
 </div>
 </div></blockquote>
@@ -165,7 +165,7 @@ the installation would look like:</p>
 </div></blockquote>
 <p>For <strong>Qt5</strong>:</p>
 <blockquote>
-<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install git cmake libboost-dev libgsl-dev libfftw3-dev libxml2-dev qt5-default qtbase5-dev libqt5svg5-dev libqt5webkit5-dev
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install git cmake libboost-dev libgsl-dev libfftw3-dev libxml2-dev qt5-default qtbase5-dev libqt5svg5-dev
 </pre></div>
 </div>
 </div></blockquote>
@@ -339,7 +339,7 @@ switch is not provided is <tt class="docutils literal"><span class="pre">BMWlibs
 <dd>Will try to get <tt class="docutils literal"><span class="pre">musredit</span></tt>, <tt class="docutils literal"><span class="pre">musrWiz</span></tt>, <tt class="docutils literal"><span class="pre">musrStep</span></tt>, and <tt class="docutils literal"><span class="pre">mupp</span></tt> installed, if <tt class="docutils literal"><span class="pre">Qt</span></tt> is found.
 By default this is enabled. Again &lt;value&gt;=0 means disabled, &lt;value&gt;=1 enabled.</dd>
 <dt><strong>-Dqt_version=&lt;value&gt;</strong></dt>
-<dd>Allows to specify which <tt class="docutils literal"><span class="pre">Qt</span></tt> version shall be tried. &lt;value&gt; can take the values: <tt class="docutils literal"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5</span></tt>.
+<dd>Allows to specify which <tt class="docutils literal"><span class="pre">Qt</span></tt> version shall be tried. &lt;value&gt; can take the values: <tt class="docutils literal"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6</span></tt>.
 If the value is set to <tt class="docutils literal"><span class="pre">AUTO</span></tt>, this highest installed version is chosen, otherwise the specified version is used.</dd>
 <dt><strong>-Dtry_OpenMP=&lt;value&gt;</strong></dt>
 <dd>Will check if <tt class="docutils literal"><span class="pre">OpenMP</span></tt> support is possible, and if yes use it. The default is enabled</dd>
@@ -380,23 +380,10 @@ detailed information on this XML file refer to the <a class="reference internal"
 <div class="section" id="musredit">
 <span id="index-20"></span><h3>musredit<a class="headerlink" href="#musredit" title="Permalink to this headline">¶</a></h3>
 <p>In the latest version of <tt class="docutils literal"><span class="pre">musrfit</span></tt> the configure script tries to determine automatically the highest available <tt class="docutils literal"><span class="pre">Qt</span></tt> version.
-In case this is found, the editor <tt class="docutils literal"><span class="pre">musredit</span></tt> is built already together with <tt class="docutils literal"><span class="pre">musrfit</span></tt>.
-To install this editor separately, <em>i.e.</em> by &#8220;hand&#8221; do</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit/src/musredit_qt5
-$ <span class="c1"># for some distributions you will need qmake-qt5 for the next command</span>
-$ qmake musredit.pro
-</pre></div>
+In case this is found, the editor <tt class="docutils literal"><span class="pre">musredit</span></tt> is built already together with <tt class="docutils literal"><span class="pre">musrfit</span></tt>.</p>
 </div>
-<p>If everything went fine, <tt class="docutils literal"><span class="pre">musredit</span></tt> can be compiled and installed:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ make
-$ make install
-</pre></div>
-</div>
-<p>In case one does not like the executable <tt class="docutils literal"><span class="pre">musredit</span></tt> to be copied to the default installation directory <tt class="docutils literal"><span class="pre">$ROOTSYS/bin</span></tt>
-the last <em>make install</em> can be skipped and the executable can be copied somewhere else instead.</p>
-</div>
-<div class="section" id="musrgui-obsolate">
-<h3>musrgui (obsolate)<a class="headerlink" href="#musrgui-obsolate" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="musrgui-depreciated">
+<h3>musrgui (depreciated)<a class="headerlink" href="#musrgui-depreciated" title="Permalink to this headline">¶</a></h3>
 <p>If <tt class="docutils literal"><span class="pre">Qt4.6</span></tt> or higher is not available but <tt class="docutils literal"><span class="pre">Qt3</span></tt> is set up <tt class="docutils literal"><span class="pre">musrgui</span></tt> can be installed. For this please
 follow the instructions for the <tt class="docutils literal"><span class="pre">musredit</span></tt> installation where simply every <tt class="docutils literal"><span class="pre">musredit</span></tt> occurrence has to
 be replaced by <tt class="docutils literal"><span class="pre">musrgui</span></tt>. If there are problems during the <tt class="docutils literal"><span class="pre">qmake</span></tt> step, <em>e.g.</em>
@@ -603,7 +590,7 @@ The default setting, <em>i.e.</em> the switch is not provided is <tt class="docu
 <dd>Will try to get <tt class="docutils literal"><span class="pre">musredit</span></tt>, <tt class="docutils literal"><span class="pre">musrWiz</span></tt>, <tt class="docutils literal"><span class="pre">musrStep</span></tt>, and <tt class="docutils literal"><span class="pre">mupp</span></tt> installed, if <tt class="docutils literal"><span class="pre">Qt</span></tt> is found.
 By default this is <em>enabled</em>. Again &lt;value&gt;=0 means disabled, &lt;value&gt;=1 enabled.</dd>
 <dt><strong>-Dqt_version=&lt;value&gt;</strong></dt>
-<dd>Allows to specify which <tt class="docutils literal"><span class="pre">Qt</span></tt> version shall be tried. &lt;value&gt; can take the values: <tt class="docutils literal"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5</span></tt>.
+<dd>Allows to specify which <tt class="docutils literal"><span class="pre">Qt</span></tt> version shall be tried. &lt;value&gt; can take the values: <tt class="docutils literal"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6</span></tt>.
 If the value is set to <tt class="docutils literal"><span class="pre">AUTO</span></tt>, this highest installed version is chosen, otherwise the specified version is used.</dd>
 <dt><strong>-Dtry_OpenMP=&lt;value&gt;</strong></dt>
 <dd>Will check if <tt class="docutils literal"><span class="pre">OpenMP</span></tt> support is possible, and if yes use it. The default is <em>enabled</em>.</dd>
@@ -652,7 +639,7 @@ musredit <span class="p">&amp;</span>
 </div>
 </div>
 <div class="section" id="id12">
-<h3>musrgui (obsolate)<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<h3>musrgui (depreciated)<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
 <p>If <tt class="docutils literal"><span class="pre">Qt4.5</span></tt> or higher is not available but <tt class="docutils literal"><span class="pre">Qt3</span></tt> is set up <tt class="docutils literal"><span class="pre">musrgui</span></tt> can be installed. For this
 please follow the instructions for the <tt class="docutils literal"><span class="pre">musredit</span></tt> installation where simply every <tt class="docutils literal"><span class="pre">musredit</span></tt> occurrence
 has to be replaced by <tt class="docutils literal"><span class="pre">musrgui</span></tt>, and <tt class="docutils literal"><span class="pre">qt4</span></tt> is replaced by <tt class="docutils literal"><span class="pre">qt3</span></tt>.</p>
@@ -684,6 +671,11 @@ and <tt class="docutils literal"><span class="pre">C:\cygwin\bin\bash.exe</span>
 </div>
 <div class="section" id="mac-os-x-macos">
 <h2>Mac OS X / macOS<a class="headerlink" href="#mac-os-x-macos" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">macOS 11 alias <strong>Big Sur</strong>: <tt class="docutils literal"><span class="pre">musrfit</span></tt> is ready for <strong>Big Sur</strong> on Intel based macs. The <tt class="docutils literal"><span class="pre">DKS</span></tt> version of
+<tt class="docutils literal"><span class="pre">musrfit</span></tt> for macOS <strong>Big Sur</strong> is ready as well.</p>
+</div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">macOS Catalina is slightly different in some aspects, so if it happens that you have it installed, please
@@ -753,7 +745,7 @@ add a new line pointing to your local copy, <em>e.g.</em></p>
 </ol>
 <p>Then the MacPorts system should be set up and can be used to install additional software.</p>
 <p>The installation of the software mentioned above is then done in the terminal:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port -v install pkgconfig autoconf automake libtool cmake fftw-3 fftw-3-single gsl boost libxml2 qt5 qt5-qtsvg qt5-qtwebengine
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port -v install pkgconfig autoconf automake libtool cmake fftw-3 fftw-3-single gsl boost libxml2 qt5 qt5-qtsvg
 </pre></div>
 </div>
 <p>With <tt class="docutils literal"><span class="pre">Qt5</span></tt>, <tt class="docutils literal"><span class="pre">musredit</span></tt> will be installed. If it happens that you used <tt class="docutils literal"><span class="pre">musrgui</span></tt> in the past,
@@ -927,8 +919,7 @@ is necessary to compile a few packages from source since no binary packages are 
 automatically by the FinkCommander after you have chosen the software packages for installation:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span>autoconf automake cmake boost1.63-nopython boost1.63.nopython-shlibs fftw3 fftw3-shlibs gsl gsl-shlibs
 libtool2 libtool2-shlibs libxml2 libxml2-bin libxml2-shlibs pkgconfig qt5-mac-qtbase qt5-mac-qtbase-dev-tools
-qt5-mac-qtsvg qt5-mac-qtsvg-shlibs qt5-mac-qtwebengine qt5-mac-qtwebengine-shlibs qt5-mac-qtwebenginecore-shlibs
-qt5-mac-qtwebenginewidgets-shlibs
+qt5-mac-qtsvg qt5-mac-qtsvg-shlibs
 </pre></div>
 </div>
 <p>Under OS X 10.6 Snow Leopard it will <em>not</em> be possible to install <tt class="docutils literal"><span class="pre">qt3mac</span></tt> since the system is by default a 64-bit
@@ -1112,7 +1103,7 @@ switch is not provided is <tt class="docutils literal"><span class="pre">BMWlibs
 <dd>Will try to get <tt class="docutils literal"><span class="pre">musredit</span></tt>, <tt class="docutils literal"><span class="pre">musrWiz</span></tt>, <tt class="docutils literal"><span class="pre">musrStep</span></tt>, and <tt class="docutils literal"><span class="pre">mupp</span></tt> installed, if <tt class="docutils literal"><span class="pre">Qt</span></tt> is found.
 By default this is enabled. Again &lt;value&gt;=0 means disabled, &lt;value&gt;=1 enabled.</dd>
 <dt><strong>-Dqt_version=&lt;value&gt;</strong></dt>
-<dd>Allows to specify which <tt class="docutils literal"><span class="pre">Qt</span></tt> version shall be tried. &lt;value&gt; can take the values: <tt class="docutils literal"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5</span></tt>.
+<dd>Allows to specify which <tt class="docutils literal"><span class="pre">Qt</span></tt> version shall be tried. &lt;value&gt; can take the values: <tt class="docutils literal"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6</span></tt>.
 If the value is set to <tt class="docutils literal"><span class="pre">AUTO</span></tt>, this highest installed version is chosen, otherwise the specified version is used.</dd>
 <dt><strong>-Dtry_OpenMP=&lt;value&gt;</strong></dt>
 <dd>Will check if <tt class="docutils literal"><span class="pre">OpenMP</span></tt> support is possible, and if yes use it. The default is enabled</dd>
@@ -1223,7 +1214,7 @@ $ musrview test-histo-ROOT-NPP.msr
 </ul>
 </li>
 <li><a class="reference internal" href="#musredit">musredit</a></li>
-<li><a class="reference internal" href="#musrgui-obsolate">musrgui (obsolate)</a></li>
+<li><a class="reference internal" href="#musrgui-depreciated">musrgui (depreciated)</a></li>
 <li><a class="reference internal" href="#check-the-installation">Check the installation</a></li>
 </ul>
 </li>
@@ -1240,7 +1231,7 @@ $ musrview test-histo-ROOT-NPP.msr
 </ul>
 </li>
 <li><a class="reference internal" href="#index-26">musredit</a></li>
-<li><a class="reference internal" href="#id12">musrgui (obsolate)</a></li>
+<li><a class="reference internal" href="#id12">musrgui (depreciated)</a></li>
 <li><a class="reference internal" href="#id13">Check the installation</a></li>
 <li><a class="reference internal" href="#potential-problems">Potential Problems</a></li>
 </ul>
@@ -1311,12 +1302,12 @@ $ musrview test-histo-ROOT-NPP.msr
         <li class="right" >
           <a href="user-libs.html" title="Documentation of user libs (user functions)"
              >previous</a> |</li>
-        <li><a href="index.html">musrfit 1.6.4 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.6.5 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2020, Andreas Suter.
-      Last updated on Aug 29, 2020.
+        &copy; Copyright 2021, Andreas Suter.
+      Last updated on Jan 23, 2021.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
