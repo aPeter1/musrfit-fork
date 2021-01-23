@@ -9,7 +9,7 @@ elseif (Qt4_FOUND)
   add_subdirectory(musredit)
 elseif (QT_FOUND)
   add_subdirectory(musrgui)
-endif (Qt5Core_FOUND)
+endif ()
 
 #--- define the musrfit libs --------------------------------------------------
 set(MUSRFIT_LIBS ${MUSRFIT_LIBS} mud)
