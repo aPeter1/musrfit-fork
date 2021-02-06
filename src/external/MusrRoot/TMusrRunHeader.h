@@ -133,6 +133,8 @@ public:
   virtual Bool_t ExtractAll(TFolder *folder);
   virtual Bool_t ExtractHeaderInformation(TObjArray *headerInfo, TString path);
 
+  virtual TString GetTypeOfPath(TString pathName);
+
   virtual void Get(TString pathName, TString &value, Bool_t &ok);
   virtual void Get(TString pathName, Int_t &value, Bool_t &ok);
   virtual void Get(TString pathName, Double_t &value, Bool_t &ok);

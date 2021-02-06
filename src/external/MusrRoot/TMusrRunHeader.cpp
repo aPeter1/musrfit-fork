@@ -395,6 +395,68 @@ Bool_t TMusrRunHeader::FillFolder(TFolder *folder)
 }
 
 //--------------------------------------------------------------------------
+// GetTypeOfPath (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Get type of path-name, e.g. RunInfo/Sample Name.
+ *
+ * @param pathName path-name for which the type is requested
+ *
+ * @return the type, or 'undef' if path-name is not found.
+ */
+TString TMusrRunHeader::GetTypeOfPath(TString pathName)
+{
+  TString type("undef");
+
+  // find pathName
+  for (Int_t i=0; i<fStringObj.size(); i++) {
+    if (fStringObj[i].GetPathName() == pathName) {
+      type = fStringObj[i].GetType();
+      return type;
+    }
+  }
+  for (Int_t i=0; i<fIntObj.size(); i++) {
+    if (fIntObj[i].GetPathName() == pathName) {
+      type = fIntObj[i].GetType();
+      return type;
+    }
+  }
+  for (Int_t i=0; i<fDoubleObj.size(); i++) {
+    if (fDoubleObj[i].GetPathName() == pathName) {
+      type = fDoubleObj[i].GetType();
+      return type;
+    }
+  }
+  for (Int_t i=0; i<fMusrRunPhysQuantityObj.size(); i++) {
+    if (fMusrRunPhysQuantityObj[i].GetPathName() == pathName) {
+      type = fMusrRunPhysQuantityObj[i].GetType();
+      return type;
+    }
+  }
+  for (Int_t i=0; i<fStringVectorObj.size(); i++) {
+    if (fStringVectorObj[i].GetPathName() == pathName) {
+      type = fStringVectorObj[i].GetType();
+      return type;
+    }
+  }
+  for (Int_t i=0; i<fIntVectorObj.size(); i++) {
+    if (fIntVectorObj[i].GetPathName() == pathName) {
+      type = fIntVectorObj[i].GetType();
+      return type;
+    }
+  }
+  for (Int_t i=0; i<fDoubleVectorObj.size(); i++) {
+    if (fDoubleVectorObj[i].GetPathName() == pathName) {
+      type = fDoubleVectorObj[i].GetType();
+      return type;
+    }
+  }
+
+
+  return type;
+}
+
+//--------------------------------------------------------------------------
 // Get (public)
 //--------------------------------------------------------------------------
 /**
