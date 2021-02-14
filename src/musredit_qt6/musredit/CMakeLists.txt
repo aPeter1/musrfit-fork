@@ -84,7 +84,11 @@ set_property(SOURCE ui_PMsr2DataDialog.h PROPERTY SKIP_AUTOMOC ON)
 set_property(SOURCE ui_PChangeDefaultPathsDialog.h PROPERTY SKIP_AUTOMOC ON)
 set_property(SOURCE qrc_musredit.cpp PROPERTY SKIP_AUTOMOC ON)
 
-set(macosx_icon icons/musredit.icns)
+if (${CMAKE_HOST_SYSTEM_VERSION} GREATER_EQUAL "20.3.0")
+  set(macosx_icon icons/musredit-bigsur.icns)
+else()
+  set(macosx_icon icons/musredit.icns)
+endif()      	
 if (APPLE)
   add_executable(musredit MACOSX_BUNDLE
     ${musredit_src}
@@ -117,7 +121,11 @@ if (APPLE)
     MACOSX_BUNDLE TRUE
     MACOSX_BUNDLE_BUNDLE_NAME "musredit"
     MACOSX_BUNDLE_INFO_STRING "musrfit: musredit simplifies the handling of the msr-files for uSR fitting."
-    MACOSX_BUNDLE_ICON_FILE "musredit.icns"
+    if (${CMAKE_HOST_SYSTEM_VERSION} GREATER_EQUAL "20.3.0")
+      MACOSX_BUNDLE_ICON_FILE "musredit-bigsur.icns"
+    else()
+      MACOSX_BUNDLE_ICON_FILE "musredit.icns"
+    endif()	    
     MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_VERSION}"
     MACOSX_BUNDLE_GUI_IDENTIFIER "ch.psi.lmu.musredit"
     MACOSX_BUNDLE_COPYRIGHT "Andreas Suter"
