@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2020 by Andreas Suter                              *
+ *   Copyright (C) 2007-2021 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -429,7 +429,7 @@ void PMusrRoot2Xml::CheckClass(TObject *obj, TString str, UInt_t offset)
     offset += 2;
     str = offsetStr + "<" + entryTag + ">";
     fXmlData.push_back(str.Data());
-    DumpEntry(dynamic_cast<TObjArray*>(obj), offset);
+    DumpEntry(dynamic_cast<TObject*>(obj), offset);
     str = offsetStr + "</" + entryTag + ">";
     fXmlData.push_back(str.Data());
   }
