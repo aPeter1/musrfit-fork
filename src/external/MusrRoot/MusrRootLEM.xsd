@@ -101,8 +101,8 @@
       <xs:element name="Generic_Validator_URL" type="TString"/>
       <xs:element name="Specific_Validator_URL" type="TString"/>
       <xs:element name="Generator" type="TString"/>
-      <xs:element name="Proposal Number" type="Int_t" minOccurs="0" maxOccurs="1"/>
-      <xs:element name="Main Proposer" type="TString" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Proposal_Number" type="Int_t" minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Main_Proposer" type="TString" minOccurs="0" maxOccurs="unbounded"/>
       <xs:element name="File_Name" type="TString"/>
       <xs:element name="Run_Title" type="TString"/>
       <xs:element name="Run_Number" type="Int_t"/>
