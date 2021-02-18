@@ -15,8 +15,10 @@
   
   <xs:complexType name="musrRoot">
     <xs:sequence>
-      <xs:element ref="histos"/>
-      <xs:element name="RunHeader" type="runHeaderFolder"/>
+      <xs:choice>
+        <xs:element ref="histos"/>
+        <xs:element name="RunHeader" type="runHeaderFolder"/>
+      </xs:choice>
       <xs:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/> <!-- here can go any additional stuff you like -->
     </xs:sequence>  
   </xs:complexType>
