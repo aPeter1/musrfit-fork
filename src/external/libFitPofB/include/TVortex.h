@@ -43,10 +43,6 @@ public:
   TBulkTriVortexLondon();
   ~TBulkTriVortexLondon();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -75,10 +71,6 @@ class TBulkSqVortexLondon : public PUserFcnBase {
 public:
   TBulkSqVortexLondon();
   ~TBulkSqVortexLondon();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -109,10 +101,6 @@ public:
   TBulkTriVortexML();
   ~TBulkTriVortexML();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -141,10 +129,6 @@ class TBulkTriVortexAGL : public PUserFcnBase {
 public:
   TBulkTriVortexAGL();
   ~TBulkTriVortexAGL();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -175,10 +159,6 @@ public:
   TBulkTriVortexAGLII();
   ~TBulkTriVortexAGLII();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -207,10 +187,6 @@ class TBulkTriVortexNGL : public PUserFcnBase {
 public:
   TBulkTriVortexNGL();
   ~TBulkTriVortexNGL();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 

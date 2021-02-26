@@ -43,11 +43,6 @@ class PSkewedLorentzian : public PUserFcnBase
 
     virtual Bool_t IsValid() { return fValid; }
 
-    // global user-function-access functions, here without any functionality
-    virtual Bool_t NeedGlobalPart() const { return false; }
-    void SetGlobalPart(std::vector<void*> &globalPart, UInt_t idx) { }
-    Bool_t GlobalPartIsValid() const { return true; }
-
     // function operator
     Double_t operator()(Double_t, const std::vector<Double_t>&) const;
 

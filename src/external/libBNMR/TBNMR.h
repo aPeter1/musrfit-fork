@@ -55,10 +55,6 @@ public:
   ExpRlx(){}
   ~ExpRlx(){}
 
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
-
   // function operator
   double operator()(double, const std::vector<double>&) const;
 
@@ -72,10 +68,6 @@ public:
   // default constructor and destructor
   SExpRlx(){}
   ~SExpRlx(){}
-
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
 
   // function operator
   double operator()(double, const std::vector<double>&) const;

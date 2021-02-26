@@ -58,10 +58,6 @@ public:
   TLFStatGssKT();
   ~TLFStatGssKT();
 
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -84,10 +80,6 @@ class TLFStatExpKT : public PUserFcnBase {
 public:
   TLFStatExpKT();
   ~TLFStatExpKT();
-
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -118,10 +110,6 @@ class TLFDynGssKT : public PUserFcnBase {
 public:
   TLFDynGssKT();
   ~TLFDynGssKT();
-
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -171,10 +159,6 @@ class TLFDynExpKT : public PUserFcnBase {
 public:
   TLFDynExpKT();
   ~TLFDynExpKT();
-
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -227,10 +211,6 @@ public:
   TLFDynSG();
   ~TLFDynSG();
 
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -254,10 +234,6 @@ class TLFSGInterpolation : public PUserFcnBase {
 public:
   TLFSGInterpolation();
   ~TLFSGInterpolation();
-
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 

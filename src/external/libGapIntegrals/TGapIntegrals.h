@@ -45,10 +45,6 @@ public:
   TGapSWave();
   virtual ~TGapSWave();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -72,10 +68,6 @@ class TGapPointPWave : public PUserFcnBase {
 public:
   TGapPointPWave();
   virtual ~TGapPointPWave();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -101,10 +93,6 @@ public:
   TGapLinePWave();
   virtual ~TGapLinePWave();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -128,10 +116,6 @@ class TGapDWave : public PUserFcnBase {
 public:
   TGapDWave();
   virtual ~TGapDWave();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -157,10 +141,6 @@ public:
   TGapCosSqDWave();
   virtual ~TGapCosSqDWave();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -184,10 +164,6 @@ class TGapSinSqDWave : public PUserFcnBase {
 public:
   TGapSinSqDWave();
   virtual ~TGapSinSqDWave();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -213,10 +189,6 @@ public:
   TGapAnSWave();
   virtual ~TGapAnSWave();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -241,10 +213,6 @@ public:
   TGapNonMonDWave1();
   virtual ~TGapNonMonDWave1();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -268,10 +236,6 @@ class TGapNonMonDWave2 : public PUserFcnBase {
 public:
   TGapNonMonDWave2();
   virtual ~TGapNonMonDWave2();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -298,10 +262,6 @@ public:
   TGapPowerLaw() {}
   virtual ~TGapPowerLaw() {}
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -318,10 +278,6 @@ class TGapDirtySWave : public PUserFcnBase {
 public:
   TGapDirtySWave() {}
   virtual ~TGapDirtySWave() {}
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -341,10 +297,6 @@ public:
   TLambdaSWave();
   virtual ~TLambdaSWave();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -362,10 +314,6 @@ class TLambdaPointPWave : public PUserFcnBase {
 public:
   TLambdaPointPWave();
   virtual ~TLambdaPointPWave();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -385,10 +333,6 @@ public:
   TLambdaLinePWave();
   virtual ~TLambdaLinePWave();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -406,10 +350,6 @@ class TLambdaDWave : public PUserFcnBase {
 public:
   TLambdaDWave();
   virtual ~TLambdaDWave();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -429,10 +369,6 @@ public:
   TLambdaAnSWave();
   virtual ~TLambdaAnSWave();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -450,10 +386,6 @@ class TLambdaNonMonDWave1 : public PUserFcnBase {
 public:
   TLambdaNonMonDWave1();
   virtual ~TLambdaNonMonDWave1();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -473,10 +405,6 @@ public:
   TLambdaNonMonDWave2();
   virtual ~TLambdaNonMonDWave2();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -495,10 +423,6 @@ public:
   TLambdaPowerLaw() {}
   virtual ~TLambdaPowerLaw() {}
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -515,10 +439,6 @@ class TLambdaInvSWave : public PUserFcnBase {
 public:
   TLambdaInvSWave();
   virtual ~TLambdaInvSWave();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -538,10 +458,6 @@ public:
   TLambdaInvPointPWave();
   virtual ~TLambdaInvPointPWave();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -559,10 +475,6 @@ class TLambdaInvLinePWave : public PUserFcnBase {
 public:
   TLambdaInvLinePWave();
   virtual ~TLambdaInvLinePWave();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -582,10 +494,6 @@ public:
   TLambdaInvDWave();
   virtual ~TLambdaInvDWave();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -603,10 +511,6 @@ class TLambdaInvAnSWave : public PUserFcnBase {
 public:
   TLambdaInvAnSWave();
   virtual ~TLambdaInvAnSWave();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -626,10 +530,6 @@ public:
   TLambdaInvNonMonDWave1();
   virtual ~TLambdaInvNonMonDWave1();
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -647,10 +547,6 @@ class TLambdaInvNonMonDWave2 : public PUserFcnBase {
 public:
   TLambdaInvNonMonDWave2();
   virtual ~TLambdaInvNonMonDWave2();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 
@@ -670,10 +566,6 @@ public:
   TLambdaInvPowerLaw() {}
   virtual ~TLambdaInvPowerLaw() {}
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
 
 private:
@@ -690,10 +582,6 @@ class TFilmMagnetizationDWave : public PUserFcnBase {
 public:
   TFilmMagnetizationDWave();
   virtual ~TFilmMagnetizationDWave();
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
 

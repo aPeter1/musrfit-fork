@@ -42,12 +42,12 @@
 class PUserFcnBase : public TObject
 {
   public:
-    PUserFcnBase();
-    virtual ~PUserFcnBase();
+    PUserFcnBase() {}
+    virtual ~PUserFcnBase() {}
 
-    virtual Bool_t NeedGlobalPart() const = 0; ///< if a user function needs a global part this function should return true, otherwise false
-    virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) = 0; ///< if a user function is using a global part, this function is used to invoke and retrieve the proper global object
-    virtual Bool_t GlobalPartIsValid() const = 0; ///< if a user function is using a global part, this function returns if the global object part is valid
+    virtual Bool_t NeedGlobalPart() const { return false; } ///< if a user function needs a global part this function should return true, otherwise false (default: false)
+    virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) {} ///< if a user function is using a global part, this function is used to invoke and retrieve the proper global object
+    virtual Bool_t GlobalPartIsValid() const { return false; } ///< if a user function is using a global part, this function returns if the global object part is valid (default: false)
 
     virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const = 0;
 

@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2013-2019 by Andreas Suter                              *
+ *   Copyright (C) 2013-2021 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -42,11 +42,6 @@ class PPhotoMeissner : public PUserFcnBase
     virtual ~PPhotoMeissner();
 
     virtual Bool_t IsValid() { return fValid; }
-
-    // global user-function-access functions, here without any functionality
-    virtual Bool_t NeedGlobalPart() const { return false; }
-    void SetGlobalPart(std::vector<void*> &globalPart, UInt_t idx) { }
-    Bool_t GlobalPartIsValid() const { return true; }
 
     // function operator
     Double_t operator()(Double_t, const std::vector<Double_t>&) const;

@@ -44,10 +44,6 @@ class PGbGLF : public PUserFcnBase
     PGbGLF() {}
     virtual ~PGbGLF() {}
 
-    virtual Bool_t NeedGlobalPart() const { return false; }
-    virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) {}
-    virtual Bool_t GlobalPartIsValid() const { return true; }
-
     virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
 
   private:

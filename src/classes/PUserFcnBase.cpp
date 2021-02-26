@@ -35,26 +35,6 @@
 ClassImp(PUserFcnBase)
 
 //--------------------------------------------------------------------------
-// Constructor
-//--------------------------------------------------------------------------
-/**
- * <p>Constructor
- */
-PUserFcnBase::PUserFcnBase()
-{
-}
-
-//--------------------------------------------------------------------------
-// Destructor
-//--------------------------------------------------------------------------
-/**
- * <p>Destructor
- */
-PUserFcnBase::~PUserFcnBase()
-{
-}
-
-//--------------------------------------------------------------------------
 // This function is a replacement for the ParseFile method of TSAXParser.
 // It is needed because in certain environments ParseFile does not work but ParseBuffer does.
 //--------------------------------------------------------------------------

@@ -38,10 +38,6 @@ public:
   TMeanFieldsForScHalfSpace();
   ~TMeanFieldsForScHalfSpace() {delete fImpProfile; fImpProfile = 0;}
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
   double CalcMeanB (double, const TLondon1D_HS&) const;
 
@@ -57,10 +53,6 @@ public:
   // default constructor
   TMeanFieldsForScSingleLayer();
   ~TMeanFieldsForScSingleLayer() {delete fImpProfile; fImpProfile = 0;}
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
   double CalcMeanB (double, const std::vector<double>&, const std::vector<double>&, const TLondon1D_1L&) const;
@@ -78,10 +70,6 @@ public:
   TMeanFieldsForScBilayer();
   ~TMeanFieldsForScBilayer() {delete fImpProfile; fImpProfile = 0;}
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
   double CalcMeanB (double, const std::vector<double>&, const std::vector<double>&, const TLondon1D_2L&, double) const;
 
@@ -98,10 +86,6 @@ public:
   TMeanFieldsForScTrilayer();
   ~TMeanFieldsForScTrilayer() {delete fImpProfile; fImpProfile = 0;}
 
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
-
   double operator()(double, const std::vector<double>&) const;
   double CalcMeanB (double, const std::vector<double>&, const std::vector<double>&, const TLondon1D_3L&) const;
 
@@ -117,10 +101,6 @@ public:
   // default constructor
   TMeanFieldsForScTrilayerWithInsulator();
   ~TMeanFieldsForScTrilayerWithInsulator() {delete fImpProfile; fImpProfile = 0;}
-
-  virtual Bool_t NeedGlobalPart() const { return false; }
-  virtual void SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) { }
-  virtual Bool_t GlobalPartIsValid() const { return true; }
 
   double operator()(double, const std::vector<double>&) const;
   double CalcMeanB (double, const std::vector<double>&, const std::vector<double>&, const TLondon1D_3LwInsulator&) const;

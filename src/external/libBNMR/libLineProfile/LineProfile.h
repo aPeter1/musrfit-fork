@@ -51,12 +51,6 @@ Double_t IAsym_high(Double_t, Double_t, Double_t, Double_t);
 class LineGauss : public PUserFcnBase {
 
 public:
-
-  // global user-function-access functions, here without any functionality
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void*> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
-
   // function operator
   Double_t operator()(Double_t, const vector<Double_t>&) const;
 
@@ -68,12 +62,6 @@ public:
 class LineLaplace : public PUserFcnBase {
 
 public:
-
-  // global user-function-access functions, here without any functionality
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void*> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
-
   // function operator
   Double_t operator()(Double_t, const vector<Double_t>&) const;
 
@@ -85,11 +73,6 @@ public:
 class LineLorentzian : public PUserFcnBase {
 
 public:
-  // global user-function-access functions, here without any functionality
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void*> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
-
   // function operator
   Double_t operator()(Double_t, const vector<Double_t>&) const;
 
@@ -101,11 +84,6 @@ public:
 class LineSkewLorentzian : public PUserFcnBase {
 
 public:
-  // global user-function-access functions, here without any functionality
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void*> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
-
   // function operator
   Double_t operator()(Double_t, const vector<Double_t>&) const;
 
@@ -118,11 +96,6 @@ public:
 class LineSkewLorentzian2 : public PUserFcnBase {
 
 public:
-  // global user-function-access functions, here without any functionality
-  Bool_t NeedGlobalPart() const { return false; }
-  void SetGlobalPart(vector<void*> &globalPart, UInt_t idx) { }
-  Bool_t GlobalPartIsValid() const { return true; }
-
   // function operator
   Double_t operator()(Double_t, const vector<Double_t>&) const;
 

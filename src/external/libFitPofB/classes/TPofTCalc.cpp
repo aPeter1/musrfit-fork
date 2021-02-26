@@ -206,7 +206,7 @@ double TPofTCalc::Eval(double t) const {
   if (i < fNFFT/2){
     return fPT[i]+(fPT[i+1]-fPT[i])/(fT[i+1]-fT[i])*(t-fT[i]);
   }
-  std::cout << "TPofTCalc::Eval: No data for the time " << t << " us available! Returning -999.0 ..." << std::endl;
+//as35  std::cout << "TPofTCalc::Eval: No data for the time " << t << " us available! Returning -999.0 ..." << std::endl;
   return -999.0;
 }
 
