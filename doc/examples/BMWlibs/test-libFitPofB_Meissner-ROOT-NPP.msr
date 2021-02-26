@@ -4,19 +4,19 @@ FITPARAMETER
 #       No Name        Value     Step        Pos_Error   Boundaries
         1 field       94.717    0           none        
         2 deadlayer   10.5      0           none        
-        3 lambda      115.96    -0.92       0.88        
+        3 lambda      115.98    -0.65       0.63        
 
 # E = 22keV
 
         4 phase22     25.4956   0           none        
-        5 asym22      0.1047    -0.0029     0.0030      0       0.3     
-        6 rate22      0.559     -0.032      0.033       
-        7 NormL22     753.00    -0.86       0.87        
-        8 BGL22       51.08     -0.13       0.13        
-        9 NormR22     545.93    -0.77       0.76        
-       10 BGR22       38.60     -0.11       0.12        
-       11 relasyR22   1.068     -0.038      0.039       0.2     2       
-       12 relphaR22   162.8     -1.5        1.5         110     210     
+        5 asym22      0.1047    -0.0021     0.0021      0       0.3     
+        6 rate22      0.558     -0.023      0.023       
+        7 NormL22     752.98    -0.61       0.61        
+        8 BGL22       51.114    -0.094      0.094       
+        9 NormR22     545.95    -0.54       0.54        
+       10 BGR22       38.634    -0.082      0.082       
+       11 relasyR22   1.068     -0.027      0.027       0.2     2       
+       12 relphaR22   162.8     -1.1        1.1         110     210     
        13 energy22    22        0           none        
 
        14 one         1         0           none        
@@ -35,53 +35,48 @@ fun2 = map1 + map5
 fun3 = par1 * gamma_mu
 
 ###############################################################
-RUN data/lem09_his_0916 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+GLOBAL
 fittype         0         (single histogram fit)
-norm            7
-backgr.fit      8
-lifetimecorrection
-map             4    5    6   14   15   13    0    0    0    0
-forward         1 
-background      65000   66500   
-data            3419    63000   
-t0              3419.0  
-fit             0.15    10     
-packing         150
-
-RUN data/lem09_his_0916 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-norm            9
-backgr.fit      10
-lifetimecorrection
-map             4    5    6   11   12   13    0    0    0    0
-forward         3 
-background      65000   66500   
 data            3419    63000   
 t0              3419.0  
 fit             0.15    10     
 packing         150
 
 ###############################################################
+RUN data/lem09_his_0916 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+norm            7
+backgr.fit      8
+map             4    5    6   14   15   13    0    0    0    0
+forward         1 
+
+RUN data/lem09_his_0916 MUE4 PSI ROOT-NPP   (name beamline institute data-file-format)
+norm            9
+backgr.fit      10
+map             4    5    6   11   12   13    0    0    0    0
+forward         3 
+
+###############################################################
 COMMANDS
-#MAX_LIKELIHOOD
+MAX_LIKELIHOOD
 MINIMIZE
 MINOS
 SAVE
 
 ###############################################################
 FOURIER
-units            Gauss   # units either 'Gauss', 'MHz', or 'Mc/s'
+units            Gauss   # units either 'Gauss', 'Tesla', 'MHz', or 'Mc/s'
 fourier_power    10
 apodization      WEAK    # NONE, WEAK, MEDIUM, STRONG
-plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE, PHASE_OPT_REAL
 phase            par4
 range            0    200
 
 ###############################################################
 PLOT 0   (single histo plot)
-runs     1   2   
+lifetimecorrection
+runs        1   2
 range    0   4   -0.25   0.25
 
 ###############################################################
-STATISTIC --- 2013-11-12 10:25:11
-  chisq = 696.9, NDF = 663, chisq/NDF = 1.051076
+STATISTIC --- 2021-02-26 14:50:08
+  maxLH = 695.5, NDF = 663, maxLH/NDF = 1.049008
