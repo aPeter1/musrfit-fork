@@ -241,9 +241,9 @@ $ <span class="nb">cd</span> Apps
 $ git clone http://github.com/root-project/root.git
 $ <span class="nb">cd</span> root
 $ git tag -l
-$ <span class="c1"># git tag -l will list all available tags. In the next command choose the tag v6-16-00</span>
+$ <span class="c1"># git tag -l will list all available tags. In the next command choose the tag v6-22-06</span>
 $ <span class="c1"># or the latest official release number</span>
-$ git checkout -b v6-16-00 v6-16-00
+$ git checkout -b v6-22-06 v6-22-06
 $ <span class="c1"># now ROOT is ready to be configured. Below you will find the minimal ROOT configuration needed.</span>
 $ <span class="c1"># since we are using cmake build now, first we will need to create the build directory.</span>
 $ mkdir root_build
@@ -784,9 +784,9 @@ it is at the time of writting <tt class="docutils literal"><span class="pre">roo
 <tt class="docutils literal"><span class="pre">ROOT</span></tt> will be installed under <tt class="docutils literal"><span class="pre">/Application</span></tt> as owner root. In order to ease your life for the
 steps to follow and assuming you are the only guy working on your Mac, you could change the owner and group of the <tt class="docutils literal"><span class="pre">ROOT</span></tt> directory:</p>
 <div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /Applications
-$ sudo chown -R &lt;username&gt; root_v6.16.00
-$ sudo chgrp -R staff root_v6.16.00
-$ sudo ln -s root_v6.16.00 root
+$ sudo chown -R &lt;username&gt; root_v6.22.00
+$ sudo chgrp -R staff root_v6.22.00
+$ sudo ln -s root_v6.22.00 root
 </pre></div>
 </div>
 </div>
@@ -803,14 +803,14 @@ comments will be added starting with a &#8216;#&#8217; which can be omitted. The
 $ git clone http://github.com/root-project/root.git
 $ <span class="nb">cd</span> root
 $ git tag -l
-$ <span class="c1"># git tag -l will list all available tags. In the next command choose the tag v6-10-xx</span>
-$ <span class="c1"># where xx is the highest listed number, e.g. v6-16-00</span>
-$ git checkout -b v6-16-00 v6-16-00
+$ <span class="c1"># git tag -l will list all available tags. In the next command choose the tag v6-xx-yy</span>
+$ <span class="c1"># where xx is the highest listed number, e.g. v6-22-06</span>
+$ git checkout -b v6-22-06 v6-22-06
 $ <span class="c1"># now ROOT is ready to be configured. Below you will find the minimal ROOT configuration needed.</span>
 $ <span class="c1"># We will use the cmake out-of-source approach here.</span>
 $ mkdir root_build
 $ <span class="nb">cd</span> root_build
-$ cmake ../ -Dgminimal<span class="o">=</span>ON -Dasimage<span class="o">=</span>ON -Dmathmore<span class="o">=</span>ON -Dminuit2<span class="o">=</span>ON -Dxml<span class="o">=</span>ON -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$HOME</span>/Applications/root/root_exec
+$ cmake ../ -Dgminimal<span class="o">=</span><span class="m">1</span> -Dasimage<span class="o">=</span><span class="m">1</span> -Dmathmore<span class="o">=</span><span class="m">1</span> -Dminuit2<span class="o">=</span><span class="m">1</span> -Dxml<span class="o">=</span><span class="m">1</span> -Dopengl<span class="o">=</span><span class="m">1</span> -Dbuiltin_glew<span class="o">=</span><span class="m">1</span> -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$HOME</span>/Applications/root/root_exec
 $ <span class="c1"># next will be the make. If running on a multicore CPU you can speed up tremendously by calling</span>
 $ <span class="c1"># make with the option -j &lt;number&gt;, where &lt;number&gt; is the number of threads which you want to give,</span>
 $ <span class="c1"># e.g. make -j8</span>
@@ -996,14 +996,14 @@ comments will be added starting with a &#8216;#&#8217; which can be omitted. The
 $ git clone http://github.com/root-project/root.git
 $ <span class="nb">cd</span> root
 $ git tag -l
-$ <span class="c1"># git tag -l will list all available tags. In the next command choose the tag v6-10-xx</span>
-$ <span class="c1"># where xx is the highest listed number, e.g. v6-16-00</span>
-$ git checkout -b v6-16-00 v6-16-00
+$ <span class="c1"># git tag -l will list all available tags. In the next command choose the tag v6-xx-yy</span>
+$ <span class="c1"># where xx is the highest listed number, e.g. v6-22-06</span>
+$ git checkout -b v6-22-06 v6-22-06
 $ <span class="c1"># now ROOT is ready to be configured. Below you will find the minimal ROOT configuration needed.</span>
 $ <span class="c1"># We will use the cmake out-of-source approach here.</span>
 $ mkdir root_build
 $ <span class="nb">cd</span> root_build
-$ cmake ../ -Dgminimal<span class="o">=</span>ON -Dasimage<span class="o">=</span>ON -Dmathmore<span class="o">=</span>ON -Dminuit2<span class="o">=</span>ON -Dxml<span class="o">=</span>ON -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$HOME</span>/Applications/root/root_exec
+$ cmake ../ -Dgminimal<span class="o">=</span><span class="m">1</span> -Dasimage<span class="o">=</span><span class="m">1</span> -Dmathmore<span class="o">=</span><span class="m">1</span> -Dminuit2<span class="o">=</span><span class="m">1</span> -Dxml<span class="o">=</span><span class="m">1</span> -Dopengl<span class="o">=</span><span class="m">1</span> -Dbuiltin_glew<span class="o">=</span><span class="m">1</span> -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$HOME</span>/Applications/root/root_exec
 $ <span class="c1"># next will be the make. If running on a multicore CPU you can speed up tremendously by calling</span>
 $ <span class="c1"># make with the option -j &lt;number&gt;, where &lt;number&gt; is the number of threads which you want to give,</span>
 $ <span class="c1"># e.g. make -j8</span>
@@ -1307,7 +1307,7 @@ $ musrview test-histo-ROOT-NPP.msr
     </div>
     <div class="footer">
         &copy; Copyright 2021, Andreas Suter.
-      Last updated on Jan 23, 2021.
+      Last updated on Mar 01, 2021.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>

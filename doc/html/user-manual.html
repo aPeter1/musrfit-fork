@@ -2242,11 +2242,6 @@ In this abstract base class a function operator is defined that takes two argume
   <span class="n">TMyFunction</span><span class="p">(){}</span>
   <span class="o">~</span><span class="n">TMyFunction</span><span class="p">(){}</span>
 
-  <span class="c1">// global user-function-access functions, here without any functionality</span>
-  <span class="n">Bool_t</span> <span class="n">NeedGlobalPart</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span> <span class="p">}</span>
-  <span class="kt">void</span> <span class="n">SetGlobalPart</span><span class="p">(</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">*&gt;</span> <span class="o">&amp;</span><span class="n">globalPart</span><span class="p">,</span> <span class="n">UInt_t</span> <span class="n">idx</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
-  <span class="n">Bool_t</span> <span class="n">GlobalPartIsValid</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">true</span><span class="p">;</span> <span class="p">}</span>
-
   <span class="c1">// function operator</span>
   <span class="n">Double_t</span> <span class="k">operator</span><span class="p">()(</span><span class="n">Double_t</span><span class="p">,</span> <span class="k">const</span> <span class="n">vector</span><span class="o">&lt;</span><span class="n">Double_t</span><span class="o">&gt;&amp;</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
 
@@ -2562,7 +2557,7 @@ In case this cannot be ensured, the parallelization can be disabled by <em>&#821
     </div>
     <div class="footer">
         &copy; Copyright 2021, Andreas Suter.
-      Last updated on Jan 23, 2021.
+      Last updated on Feb 26, 2021.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
