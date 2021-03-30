@@ -5,7 +5,7 @@ if (CMAKE_VERSION GREATER_EQUAL 3.12)
   cmake_policy(SET CMP0075 NEW)
 endif (CMAKE_VERSION GREATER_EQUAL 3.12)
 
-project(musrfit VERSION 1.6.5 LANGUAGES C CXX)
+project(musrfit VERSION 1.7.0 LANGUAGES C CXX)
 
 #--- musrfit specific options -------------------------------------------------
 option(nexus "build optional NeXus support. Needed for ISIS" OFF)
@@ -83,7 +83,12 @@ if (ROOT_mathmore_FOUND)
 endif (ROOT_mathmore_FOUND)
 
 #--- check for boost ----------------------------------------------------------
-find_package(Boost REQUIRED)
+find_package(Boost REQUIRED
+  COMPONENTS 
+    system
+    filesystem
+)
+message(STATUS "Boost libs: ${Boost_LIBRARIES}")
 
 #--- check for gsl ------------------------------------------------------------
 find_package(GSL REQUIRED)
