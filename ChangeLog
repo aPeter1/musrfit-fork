@@ -12,6 +12,11 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.7.0, 2021/03/30
+=============================
+
+Centralize the rge-handling for user functions.
+
 Release of V1.6.5, 2021/01/22
 =============================
 
