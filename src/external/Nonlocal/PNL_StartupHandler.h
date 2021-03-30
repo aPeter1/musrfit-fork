@@ -5,8 +5,6 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
@@ -36,13 +34,11 @@
 #include <TQObject.h>
 #include <TString.h>
 
-#include "PNonlocal.h"
-
 class PNL_StartupHandler : public TObject
 {
   public:
     PNL_StartupHandler();
-    virtual ~PNL_StartupHandler();
+    virtual ~PNL_StartupHandler() {}
 
     virtual void OnStartDocument(); // SLOT
     virtual void OnEndDocument(); // SLOT
@@ -58,26 +54,18 @@ class PNL_StartupHandler : public TObject
     virtual bool IsValid() { return fIsValid; }
     virtual TString GetStartupFilePath() { return fStartupFilePath; }
     virtual const Int_t GetFourierPoints() const { return fFourierPoints; }
-    virtual const PStringVector GetTrimSpDataPathList() const { return fTrimSpDataPathList; }
-    virtual const PDoubleVector GetTrimSpDataVectorList() const { return fTrimSpDataEnergyList; }
-
     virtual bool StartupFileFound() { return fStartupFileFound; }
 
   private:
-    enum EKeyWords {eEmpty, eComment, eFourierPoints, eDataPath, eEnergy};
+    enum EKeyWords {eEmpty, eFourierPoints};
     EKeyWords      fKey;
 
-    bool fIsValid;
+    bool fIsValid{true};
 
-    bool    fStartupFileFound;
-    TString fStartupFilePath;
+    bool    fStartupFileFound{false};
+    TString fStartupFilePath{""};
 
-    Int_t fFourierPoints;
-    TString fTrimSpDataPath;
-    PStringVector fTrimSpDataPathList;
-    PDoubleVector fTrimSpDataEnergyList;
-
-    bool StartupFileExists(char *fln);
+    Int_t fFourierPoints{0};
 
   ClassDef(PNL_StartupHandler, 1)
 };

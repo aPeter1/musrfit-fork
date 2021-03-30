@@ -2,6 +2,7 @@
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
+set(MUSRFIT_CLASSES ${CMAKE_SOURCE_DIR}/src/classes)
 set(NONLOCAL_INC ${CMAKE_SOURCE_DIR}/src/external/Nonlocal)
 # ROOT requires that the dictonary header files are found at configuration time.
 # Hence, target_include_directories cannot be used here because, targets are 
@@ -30,13 +31,24 @@ root_generate_dictionary(
   LINKDEF PNL_StartupHandlerLinkDef.h
   MODULE PNL_StartupHandler
 )
+root_generate_dictionary(
+  PRgeHandlerDict 
+  PRgeHandler.h 
+  OPTIONS 
+    -I${NONLOCAL_INC} 
+    -I${MUSRFIT_INC}
+    -I${CMAKE_CURRENT_SOURCE_DIR}
+    -inlineInputHeader
+  LINKDEF ${MUSRFIT_INC}/PRgeHandlerLinkDef.h
+  MODULE PRgeHandler
+)
 
 #--- create pkg-config info ---------------------------------------------------
 set(prefix "${CMAKE_INSTALL_PREFIX}")   
 set(exec_prefix "\$\{prefix\}")
 set(libdir "\$\{exec_prefix\}/lib")
 set(includedir "\$\{prefix\}/include")   
-set(PNL_PIPPARDFITTER_VERSION "1.0.0")
+set(PNL_PIPPARDFITTER_VERSION "1.1.0")
 set(PNL_PIPPARDFITTER_LIBRARY_NAME "PNL_PippardFitter")
 configure_file("PNL_PippardFitter.pc.in" "PNL_PippardFitter.pc" @ONLY)
 
@@ -44,7 +56,8 @@ configure_file("PNL_PippardFitter.pc.in" "PNL_PippardFitter.pc" @ONLY)
 add_library(PNL_PippardFitter SHARED
   PNL_PippardFitter.cpp
   PNL_PippardFitterDict.cxx
-  PNL_RgeHandler.cpp
+  ${MUSRFIT_CLASSES}/PRgeHandler.cpp
+  PRgeHandlerDict.cxx
   PNL_StartupHandler.cpp
   PNL_StartupHandlerDict.cxx
 )
@@ -63,7 +76,7 @@ set_target_properties(PNL_PippardFitter
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PNL_PippardFitter ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
+target_link_libraries(PNL_PippardFitter ${Boost_LIBRARIES} ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
 
 #--- install PNL_PippardFitter solib ------------------------------------------
 install(TARGETS PNL_PippardFitter DESTINATION lib)
@@ -73,6 +86,8 @@ install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/libPNL_PippardFitter_rdict.pcm 
         ${CMAKE_CURRENT_BINARY_DIR}/libPNL_PippardFitter.rootmap
         ${CMAKE_CURRENT_BINARY_DIR}/libPNL_StartupHandler_rdict.pcm 
+        ${CMAKE_CURRENT_BINARY_DIR}/libPRgeHandler.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPRgeHandler_rdict.pcm 
         ${CMAKE_CURRENT_BINARY_DIR}/libPNL_StartupHandler.rootmap
   DESTINATION lib
 )
@@ -80,9 +95,7 @@ install(
 #--- install PNL_PippardFitter header -----------------------------------------
 install(
   FILES
-    PNonlocal.h 
     PNL_PippardFitter.h 
-    PNL_RgeHandler.h
     PNL_StartupHandler.h
   DESTINATION 
     include

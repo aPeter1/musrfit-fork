@@ -36,9 +36,10 @@
 //#endif
 #include <fftw3.h>
 
+#include "PMusr.h"
 #include "PUserFcnBase.h"
 #include "PNL_StartupHandler.h"
-#include "PNL_RgeHandler.h"
+#include "PRgeHandler.h"
 
 class PNL_PippardFitterGlobal
 {
@@ -49,15 +50,15 @@ class PNL_PippardFitterGlobal
     Bool_t IsValid() { return fValid; }
     virtual void SetTempExponent(const Double_t nn) { f_nn = nn; }
     virtual void CalculateField(const std::vector<Double_t> &param) const;
-    virtual Int_t GetEnergyIndex(const Double_t energy) { return fRgeHandler->GetRgeEnergyIndex(energy); }
-    virtual Double_t GetMuonStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->GetRgeValue(energyIndex, z); }
+    virtual Int_t GetEnergyIndex(const Double_t energy) { return fRgeHandler->GetEnergyIndex(energy); }
+    virtual Double_t GetMuonStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->Get_n(energyIndex, z); }
     virtual Double_t GetMagneticField(const Double_t z) const;    
 
   private:
     Bool_t fValid;
 
     PNL_StartupHandler *fStartupHandler;
-    PNL_RgeHandler *fRgeHandler;
+    PRgeHandler *fRgeHandler;
 
     mutable std::vector<Double_t> fPreviousParam;
 
@@ -89,7 +90,7 @@ class PNL_PippardFitter : public PUserFcnBase
     virtual ~PNL_PippardFitter();
 
     virtual Bool_t NeedGlobalPart() const { return true; }
-    virtual void SetGlobalPart(vector<void*> &globalPart, UInt_t idx);
+    virtual void SetGlobalPart(std::vector<void*> &globalPart, UInt_t idx);
     virtual Bool_t GlobalPartIsValid() const;
 
     virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;

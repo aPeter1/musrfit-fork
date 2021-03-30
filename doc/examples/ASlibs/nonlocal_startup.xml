@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nonlocal xmlns="http://nemu.web.psi.ch/musrfit/nonlocal">
     <comment>
-        $Id: nonlocal_startup.xml 4047 2009-07-02 13:36:18Z nemu $
+        nonlocal_startup.xml
     </comment>
     <nonlocal_par>
         <fourier_points>262144</fourier_points>
     </nonlocal_par>
-    <trim_sp_part>
-        <data_path>profiles/Sn_E</data_path>
+    <trim_sp>
+        <data_path>./profiles/</data_path>
+        <rge_fln_pre>Sn_E</rge_fln_pre>
         <energy_list>
 	    <energy>1000</energy>
 	    <energy>2000</energy>
@@ -22,5 +23,5 @@
 	    <energy>25000</energy>
 	    <energy>27300</energy>
         </energy_list>
-    </trim_sp_part>
+    </trim_sp>
 </nonlocal>

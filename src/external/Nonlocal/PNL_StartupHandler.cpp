@@ -32,6 +32,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <boost/filesystem.hpp>
+
 #include "PNL_StartupHandler.h"
 
 ClassImpQ(PNL_StartupHandler)
@@ -44,44 +46,24 @@ ClassImpQ(PNL_StartupHandler)
  */
 PNL_StartupHandler::PNL_StartupHandler()
 {
-  fIsValid = true;
-
-  fStartupFileFound = false;
-  fStartupFilePath = "";
-
-  fFourierPoints = 0;
-  fTrimSpDataPath = TString("");
-
   // get default path (for the moment only linux like)
   char startup_path_name[512];
   char *home_str=0;
 
   // check if the startup file is found in the current directory
   strcpy(startup_path_name, "./nonlocal_startup.xml");
-  if (StartupFileExists(startup_path_name)) {
+  if (boost::filesystem::exists(startup_path_name)) {
     fStartupFileFound = true;
     fStartupFilePath = TString(startup_path_name);
   } else { // startup file is not found in the current directory
     std::cout << std::endl << "PNL_StartupHandler(): **WARNING** Couldn't find nonlocal_startup.xml in the current directory, will try default one." << std::endl;
     home_str = getenv("HOME");
     snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/nonlocal_startup.xml", home_str);
-    if (StartupFileExists(startup_path_name)) {
+    if (boost::filesystem::exists(startup_path_name)) {
       fStartupFileFound = true;
       fStartupFilePath = TString(startup_path_name);
     }
   }
-}
-
-//--------------------------------------------------------------------------
-// Destructor
-//--------------------------------------------------------------------------
-/**
- *
- */
-PNL_StartupHandler::~PNL_StartupHandler()
-{
-  fTrimSpDataPathList.clear();
-  fTrimSpDataEnergyList.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -124,10 +106,6 @@ void PNL_StartupHandler::OnStartElement(const char *str, const TList *attributes
 {
   if (!strcmp(str, "fourier_points")) {
     fKey = eFourierPoints;
-  } else if (!strcmp(str, "data_path")) {
-    fKey = eDataPath;
-  } else if (!strcmp(str, "energy")) {
-    fKey = eEnergy;
   }
 }
 
@@ -164,23 +142,6 @@ void PNL_StartupHandler::OnCharacters(const char *str)
       } else {
         std::cout << std::endl << "PNL_StartupHandler::OnCharacters: **ERROR** when finding fourier_points:";
         std::cout << std::endl << "\"" << str << "\" is not a number, will ignore it and use the default value.";
-        std::cout << std::endl;
-      }
-      break;
-    case eDataPath:
-      fTrimSpDataPath = str;
-      break;
-    case eEnergy:
-      tstr = str;
-      if (tstr.IsFloat()) {
-        fTrimSpDataEnergyList.push_back(tstr.Atof());
-        tstr = fTrimSpDataPath;
-        tstr += str;
-        tstr += ".rge";
-        fTrimSpDataPathList.push_back(tstr);
-      } else {
-        std::cout << std::endl << "PNL_StartupHandler::OnCharacters: **ERROR** when finding energy:";
-        std::cout << std::endl << "\"" << str << "\" is not a floating point number, will ignore it and use the default value.";
         std::cout << std::endl;
       }
       break;
@@ -255,29 +216,6 @@ void PNL_StartupHandler::OnFatalError(const char *str)
 void PNL_StartupHandler::OnCdataBlock(const char *str, Int_t len)
 {
   // nothing to be done for now
-}
-
-//--------------------------------------------------------------------------
-// StartupFileExists
-//--------------------------------------------------------------------------
-/**
- * <p>
- *
- */
-bool PNL_StartupHandler::StartupFileExists(char *fln)
-{
-  bool result = false;
-
-  std::ifstream ifile(fln);
-
-  if (ifile.fail()) {
-    result = false;
-  } else {
-    result = true;
-    ifile.close();
-  }
-
-  return result;
 }
 
 // -------------------------------------------------------------------------

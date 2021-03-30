@@ -31,7 +31,6 @@
 #include <cmath>
 
 #include <iostream>
-using namespace std;
 
 #include <TSAXParser.h>
 #include <TMath.h>
@@ -67,8 +66,8 @@ PNL_PippardFitterGlobal::PNL_PippardFitterGlobal()
   Int_t status = parseXmlFile(saxParser, startup_path_name);
   // check for parse errors
   if (status) { // error
-    cout << endl << ">> PNL_PippardFitterGlobal::PNL_PippardFitterGlobal: **WARNING** Reading/parsing nonlocal_startup.xml failed.";
-    cout << endl;
+    std::cout << std::endl << ">> PNL_PippardFitterGlobal::PNL_PippardFitterGlobal: **WARNING** Reading/parsing nonlocal_startup.xml failed.";
+    std::cout << std::endl;
     fValid = false;
   }
 
@@ -80,20 +79,20 @@ PNL_PippardFitterGlobal::PNL_PippardFitterGlobal()
 
   // check if everything went fine with the startup handler
   if (!fStartupHandler->IsValid()) {
-    cout << endl << ">> PNL_PippardFitterGlobal::PNL_PippardFitterGlobal **PANIC ERROR**";
-    cout << endl << ">>   startup handler too unhappy. Will terminate unfriendly, sorry.";
-    cout << endl;
+    std::cout << std::endl << ">> PNL_PippardFitterGlobal::PNL_PippardFitterGlobal **PANIC ERROR**";
+    std::cout << std::endl << ">>   startup handler too unhappy. Will terminate unfriendly, sorry.";
+    std::cout << std::endl;
     fValid = false;
   }
 
   fFourierPoints = fStartupHandler->GetFourierPoints();
 
   // load all the TRIM.SP rge-files
-  fRgeHandler = new PNL_RgeHandler(fStartupHandler->GetTrimSpDataPathList(), fStartupHandler->GetTrimSpDataVectorList());
+  fRgeHandler = new PRgeHandler("./nonlocal_startup.xml");
   if (!fRgeHandler->IsValid()) {
-    cout << endl << ">> PNL_PippardFitterGlobal::PNL_PippardFitterGlobal **PANIC ERROR**";
-    cout << endl << ">>  rge data handler too unhappy. Will terminate unfriendly, sorry.";
-    cout << endl;
+    std::cout << std::endl << ">> PNL_PippardFitterGlobal::PNL_PippardFitterGlobal **PANIC ERROR**";
+    std::cout << std::endl << ">>  rge data handler too unhappy. Will terminate unfriendly, sorry.";
+    std::cout << std::endl;
     fValid = false;
   }
 
@@ -182,16 +181,16 @@ void PNL_PippardFitterGlobal::CalculateField(const std::vector<Double_t> &param)
   if (fFieldq == 0) {
     fFieldq = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * fFourierPoints);
     if (fFieldq == 0) {
-      cout << endl << "PPippard::CalculateField(): **ERROR** couldn't allocate memory for fFieldq";
-      cout << endl;
+      std::cout << std::endl << "PPippard::CalculateField(): **ERROR** couldn't allocate memory for fFieldq";
+      std::cout << std::endl;
       return;
     }
   }
   if (fFieldB == 0) {
     fFieldB = (fftw_complex *) fftw_malloc(sizeof(fftw_complex) * fFourierPoints);
     if (fFieldB == 0) {
-      cout << endl << "PPippard::CalculateField(): **ERROR** couldn't allocate memory for fFieldB";
-      cout << endl;
+      std::cout << std::endl << "PPippard::CalculateField(): **ERROR** couldn't allocate memory for fFieldB";
+      std::cout << std::endl;
       return;
     }
   }
@@ -387,7 +386,7 @@ PNL_PippardFitter::~PNL_PippardFitter()
  * \param globalPart
  * \param idx
  */
-void PNL_PippardFitter::SetGlobalPart(vector<void*> &globalPart, UInt_t idx)
+void PNL_PippardFitter::SetGlobalPart(std::vector<void*> &globalPart, UInt_t idx)
 {
   fIdxGlobal = static_cast<Int_t>(idx);
 
@@ -395,10 +394,10 @@ void PNL_PippardFitter::SetGlobalPart(vector<void*> &globalPart, UInt_t idx)
     fPippardFitterGlobal = new PNL_PippardFitterGlobal();
     if (fPippardFitterGlobal == 0) {
       fValid = false;
-      cerr << endl << ">> PNL_PippardFitter::SetGlobalPart(): **ERROR** Couldn't invoke global user function object, sorry ..." << endl;
+      std::cerr << std::endl << ">> PNL_PippardFitter::SetGlobalPart(): **ERROR** Couldn't invoke global user function object, sorry ..." << std::endl;
     } else if (!fPippardFitterGlobal->IsValid()) {
       fValid = false;
-      cerr << endl << ">> PNL_PippardFitter::SetGlobalPart(): **ERROR** initialization of global user function object failed, sorry ..." << endl;
+      std::cerr << std::endl << ">> PNL_PippardFitter::SetGlobalPart(): **ERROR** initialization of global user function object failed, sorry ..." << std::endl;
     } else {
       fValid = true;
       fInvokedGlobal = true;
@@ -447,7 +446,7 @@ Double_t PNL_PippardFitter::operator()(Double_t t, const std::vector<Double_t> &
   fPippardFitterGlobal->CalculateField(param);
   Int_t energyIndex = fPippardFitterGlobal->GetEnergyIndex(param[0]);
   if (energyIndex == -1) { // energy not found
-    cerr << endl << ">> PNL_PippardFitter::operator() energy " << param[0] << " not found. Will terminate." << endl;
+    std::cerr << std::endl << ">> PNL_PippardFitter::operator() energy " << param[0] << " not found. Will terminate." << std::endl;
     assert(0);
   }
 

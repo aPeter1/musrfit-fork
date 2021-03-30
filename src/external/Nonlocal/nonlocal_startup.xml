@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nonlocal xmlns="http://nemu.web.psi.ch/musrfit/nonlocal">
     <comment>
-        trim.sp meta information
+        Fourier and TrimSp information
     </comment>
     <nonlocal_par>
         <fourier_points>262144</fourier_points>
     </nonlocal_par>
-    <trim_sp_part>
-        <data_path>/afs/psi.ch/project/nemu/analysis/2009/Nonlocal/trimsp/InSne</data_path>
+    <trim_sp>
+        <data_path>./profiles/</data_path>
+        <rge_fln_pre>Sn_E</rge_fln_pre>
         <energy_list>
-            <energy>2.5</energy>
-            <energy>4.0</energy>
-            <energy>6.0</energy>
-            <energy>8.0</energy>
-            <energy>10.0</energy>
-            <energy>12.5</energy>
-            <energy>14.1</energy>
-            <energy>17.5</energy>
-            <energy>22.0</energy>
-            <energy>25.0</energy>
-            <energy>28.2</energy>
+	    <energy>1000</energy>
+	    <energy>2000</energy>
+            <energy>4000</energy>
+            <energy>6000</energy>
+            <energy>8000</energy>
+            <energy>10000</energy>
+            <energy>12000</energy>
+            <energy>14100</energy>
+	    <energy>18000</energy>
+            <energy>22000</energy>
+	    <energy>25000</energy>
+	    <energy>27300</energy>
         </energy_list>
-    </trim_sp_part>
+    </trim_sp>
 </nonlocal>
