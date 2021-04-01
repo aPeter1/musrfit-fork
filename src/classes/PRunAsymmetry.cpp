@@ -1297,7 +1297,7 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
 
   // calculate theory
   Double_t time;
-  UInt_t size = runData->GetDataBin(histoNo[0])->size();
+  UInt_t size = runData->GetDataBin(histoNo[0])->size()/packing;
   Int_t factor = 8; // 8 times more points for the theory (if fTheoAsData == false)
 
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());

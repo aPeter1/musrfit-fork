@@ -1315,7 +1315,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
 
   // calculate theory
   Double_t theoryValue;
-  UInt_t size = fForward.size();
+  UInt_t size = fForward.size()/packing;
   Int_t factor = 8; // 8 times more points for the theory (if fTheoAsData == false)
   UInt_t rebinRRF = 0;
 
