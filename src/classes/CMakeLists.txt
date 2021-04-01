@@ -185,7 +185,7 @@ if (OpenMP_FOUND)
 endif (OpenMP_FOUND)
 
 target_link_libraries(PUserFcnBase ${ROOT_LIBRARIES})
-target_link_libraries(PRgeHandler ${ROOT_LIBRARIES})
+target_link_libraries(PRgeHandler ${Boost_LIBRARIES} ${ROOT_LIBRARIES})
 target_link_libraries(PMusr ${DependOnLibs})
 
 #--- install PUserFcnBase solib -----------------------------------------------

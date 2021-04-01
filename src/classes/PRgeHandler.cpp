@@ -536,10 +536,10 @@ Double_t PRgeHandler::Get_n(const Double_t energy, const Double_t z)
       break;
     }
   }
-  if (idx != -1)
-    return Get_n(idx, z);
+  if (idx == -1)
+    return 0.0;
 
-  return -1.0;
+  return Get_n(idx, z);
 }
 
 //--------------------------------------------------------------------------
@@ -555,7 +555,7 @@ Double_t PRgeHandler::Get_n(const Double_t energy, const Double_t z)
 Double_t PRgeHandler::Get_n(const Int_t idx, const Double_t z)
 {
   if ((idx < 0) || (idx >= fData.size()))
-    return -1.0;
+    return 0.0;
 
   if ((z < 0.0) || (z > GetZmax(idx)))
     return 0.0;
@@ -570,7 +570,7 @@ Double_t PRgeHandler::Get_n(const Int_t idx, const Double_t z)
 
   Double_t nn=0.0;
   if (pos < 0) {
-    nn = 0.0;
+    nn = fData[idx].nn[0] * z/(fData[idx].depth[1]-fData[idx].depth[0]);
   } else { // linear interpolation
     nn = fData[idx].nn[pos] +
          (fData[idx].nn[pos+1] - fData[idx].nn[pos]) *
