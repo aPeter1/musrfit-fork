@@ -21,16 +21,6 @@ root_generate_dictionary(
   LINKDEF ${PHOTO_MEISSNER_INC}/PPhotoMeissnerLinkDef.h
   MODULE PPhotoMeissner
 )
-root_generate_dictionary(
-  PStartupHandler_PMDict 
-  PStartupHandler_PM.h 
-  OPTIONS
-    -I${MUSRFIT_INC}
-    -I${PHOTO_MEISSNER_INC}
-    -inlineInputHeader
-  LINKDEF ${PHOTO_MEISSNER_INC}/PStartupHandler_PMLinkDef.h
-  MODULE PStartupHandler_PM
-)
 
 #--- create pkg-config info ---------------------------------------------------
 set(prefix "${CMAKE_INSTALL_PREFIX}")   
@@ -45,8 +35,6 @@ configure_file("PPhotoMeissner.pc.in" "PPhotoMeissner.pc" @ONLY)
 add_library(PPhotoMeissner SHARED
   PPhotoMeissner.cpp
   PPhotoMeissnerDict.cxx
-  PStartupHandler_PM.cpp
-  PStartupHandler_PMDict.cxx
 )
 
 #--- set target properties, e.g. version --------------------------------------
@@ -67,7 +55,7 @@ target_include_directories(
 
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(PPhotoMeissner 
-   ${FFTW3_LIBRARY} ${GSL_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase
+   ${FFTW3_LIBRARY} ${GSL_LIBRARY} ${ROOT_LIBRARIES} PRgeHandler PUserFcnBase
 )
 
 #--- install PPhotoMeissner solib ---------------------------------------------
@@ -77,8 +65,6 @@ install(TARGETS PPhotoMeissner DESTINATION lib)
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/libPPhotoMeissner_rdict.pcm 
         ${CMAKE_CURRENT_BINARY_DIR}/libPPhotoMeissner.rootmap
-        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_PM_rdict.pcm 
-        ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_PM.rootmap
   DESTINATION lib
 )
 
@@ -86,7 +72,6 @@ install(
 install(
   FILES 
     ${CMAKE_CURRENT_SOURCE_DIR}/../include/PPhotoMeissner.h 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../include/PStartupHandler_PM.h
   DESTINATION 
     include
 )

@@ -3,8 +3,9 @@
   <comment>
     contains the needed trim.sp meta-file information 
   </comment>
-  <trim_sp_part>
-    <data_path>./trimsp/YBCO_E</data_path>
+  <trim_sp>
+    <data_path>./trimsp</data_path>
+    <rge_fln_pre>YBCO_E</rge_fln_pre>
     <energy_list>
       <energy>1000</energy>
       <energy>3000</energy>
@@ -16,5 +17,5 @@
       <energy>20300</energy>
       <energy>24300</energy>
     </energy_list>
-  </trim_sp_part>
+  </trim_sp>
 </photo_meissner>

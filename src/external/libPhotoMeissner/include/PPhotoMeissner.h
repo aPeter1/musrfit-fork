@@ -33,7 +33,7 @@
 #include <vector>
 
 #include "PUserFcnBase.h"
-#include "PStartupHandler_PM.h"
+#include "PRgeHandler.h"
 
 class PPhotoMeissner : public PUserFcnBase
 {
@@ -44,12 +44,12 @@ class PPhotoMeissner : public PUserFcnBase
     virtual Bool_t IsValid() { return fValid; }
 
     // function operator
-    Double_t operator()(Double_t, const std::vector<Double_t>&) const;
+    Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
 
   private:
-    PStartupHandler_PM *fStartupHandler;
+    PRgeHandler *fRgeHandler{nullptr};
 
-    Bool_t   fValid;      ///< flag indicating if initialization went through smoothly
+    Bool_t   fValid{true};      ///< flag indicating if initialization went through smoothly
 
     constexpr static const Double_t fDegToRad = 0.0174532925199432955;
     constexpr static const Double_t fTwoPi = 6.28318530717958623;

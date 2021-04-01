@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2013 by Andreas Suter                                   *
+ *   Copyright (C) 2013-2021 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -30,15 +30,11 @@
 #include <cmath>
 #include <cassert>
 #include <iostream>
-using namespace std;
 
 #include <gsl/gsl_sf_bessel.h>
 
-#include <TSAXParser.h>
-
 #include "PMusr.h"
-
-#include "../include/PPhotoMeissner.h"
+#include "PPhotoMeissner.h"
 
 
 ClassImp(PPhotoMeissner) // for ROOT dictionary
@@ -51,38 +47,14 @@ ClassImp(PPhotoMeissner) // for ROOT dictionary
  */
 PPhotoMeissner::PPhotoMeissner()
 {
-  // init
-  fStartupHandler = 0;
-  fValid = true;
-
   // read XML startup file
-  char startup_path_name[128];
-  TSAXParser *saxParser = new TSAXParser();
-  fStartupHandler = new PStartupHandler_PM();
-  strcpy(startup_path_name, fStartupHandler->GetStartupFilePath().Data());
-  saxParser->ConnectToHandler("PStartupHandler_PM", fStartupHandler);
-  //Int_t status = saxParser->ParseFile(startup_path_name);
-  // parsing the file as above seems to lead to problems in certain environments;
-  // use the parseXmlFile function instead (see PUserFcnBase.cpp for the definition)
-  Int_t status = parseXmlFile(saxParser, startup_path_name);
-  // check for parse errors
-  if (status) { // error
-    cout << endl << ">> PPhotoMeissner::PPhotoMeissner: **WARNING** Reading/parsing photoMeissner_startup.xml failed.";
-    cout << endl;
-    fValid = false;
-  }
-
-  // clean up
-  if (saxParser) {
-    delete saxParser;
-    saxParser = 0;
-  }
+  fRgeHandler = new PRgeHandler("./photoMeissner_startup.xml");
 
   // check if everything went fine with the startup handler
-  if (!fStartupHandler->IsValid()) {
-    cout << endl << ">> PPhotoMeissner::PPhotoMeissner **PANIC ERROR**";
-    cout << endl << ">>   startup handler too unhappy. Will terminate unfriendly, sorry.";
-    cout << endl;
+  if (!fRgeHandler->IsValid()) {
+    std::cout << std::endl << ">> PPhotoMeissner::PPhotoMeissner **PANIC ERROR**";
+    std::cout << std::endl << ">>   startup handler too unhappy. Will terminate unfriendly, sorry.";
+    std::cout << std::endl;
     fValid = false;
   }
 }
@@ -95,8 +67,8 @@ PPhotoMeissner::PPhotoMeissner()
  */
 PPhotoMeissner::~PPhotoMeissner()
 {
-  if (fStartupHandler)
-    delete fStartupHandler;
+  if (fRgeHandler)
+    delete fRgeHandler;
 }
 
 //--------------------------------------------------------------------------
@@ -108,9 +80,9 @@ PPhotoMeissner::~PPhotoMeissner()
  * \param t
  * \param par
  */
-Double_t PPhotoMeissner::operator()(Double_t t, const vector<Double_t> &par) const
+Double_t PPhotoMeissner::operator()(Double_t t, const std::vector<Double_t> &par) const
 {
-  // expected parameters: (0) implantation energy (kV), (1) dead layer (nm), (2) Bext (G), (3) lambdaLondon (nm),
+  // expected parameters: (0) implantation energy (eV), (1) dead layer (nm), (2) Bext (G), (3) lambdaLondon (nm),
   //                      (4) lambdaPhoto (nm), (5) z0 (nm), (6) detector phase (°), [(7) layer thickness]
   assert((par.size() == 7) || (par.size() == 8));
 
@@ -122,39 +94,33 @@ Double_t PPhotoMeissner::operator()(Double_t t, const vector<Double_t> &par) con
   Double_t dz = 1.0; // go in 1A steps
   Double_t zz = 0.0;
   Double_t nn = 0.0;
-  Double_t sum = 0.0;
   Double_t BB = 0.0;
   Double_t gamma = fTwoPi*GAMMA_BAR_MUON;
+  int idx = fRgeHandler->GetEnergyIndex(par[0]);
 
   int done = 0;
   if (par.size() == 7) { // semi-infinite sample
     do {
-      nn = fStartupHandler->GetRgeValue(par[0], zz);
+      nn = fRgeHandler->Get_n(idx, zz);
       BB = FieldHalfSpace(zz, par);
       result += nn*cos(gamma*BB*t+fDegToRad*par[6]);
       zz += dz;
-      sum += nn;
       if (nn == 0.0)
         done++;
     } while (done < 5);
   } else { // film
     do {
-      nn = fStartupHandler->GetRgeValue(par[0], zz);
+      nn = fRgeHandler->Get_n(idx, zz);
       BB = FieldFilm(zz, par);
       result += nn*cos(gamma*BB*t+fDegToRad*par[6]);
       zz += dz;
-      sum += nn;
       if (nn == 0.0)
         done++;
     } while (done < 5);
   }
 
-  if (sum == 0.0) {
-    cerr << endl << ">> PPhotoMeissner::operator(): **PANIC ERROR** sum of RGE values == 0!" << endl;
-    assert(0);
-  }
 
-  return result/sum;
+  return result;
 }
 
 //--------------------------------------------------------------------------
@@ -180,7 +146,7 @@ Double_t PPhotoMeissner::InuMinus(const Double_t nu, const Double_t x) const
  *
  * \param par
  */
-Double_t PPhotoMeissner::FieldFilm(const Double_t z, const vector<Double_t> &par) const
+Double_t PPhotoMeissner::FieldFilm(const Double_t z, const std::vector<Double_t> &par) const
 {
   // prevent dividing by zero
   double lamL = par[3];
@@ -217,7 +183,7 @@ Double_t PPhotoMeissner::FieldFilm(const Double_t z, const vector<Double_t> &par
  *
  * \param par
  */
-Double_t PPhotoMeissner::FieldHalfSpace(const Double_t z, const vector<Double_t> &par) const
+Double_t PPhotoMeissner::FieldHalfSpace(const Double_t z, const std::vector<Double_t> &par) const
 {
   // prevent dividing by zero
   double lamL = par[3];
