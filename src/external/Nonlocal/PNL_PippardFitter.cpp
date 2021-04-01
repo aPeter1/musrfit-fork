@@ -50,10 +50,6 @@ ClassImp(PNL_PippardFitterGlobal)
  */
 PNL_PippardFitterGlobal::PNL_PippardFitterGlobal()
 {
-  fValid = true;
-  fStartupHandler = 0;
-  fRgeHandler = 0;
-
   // read XML startup file
   char startup_path_name[128];
   TSAXParser *saxParser = new TSAXParser();
@@ -349,19 +345,6 @@ Double_t PNL_PippardFitterGlobal::XiP_T(const Double_t xi0, const Double_t meanF
 ClassImp(PNL_PippardFitter)
 
 //--------------------------------------------------------------------------
-// Constructor
-//--------------------------------------------------------------------------
-/**
- *
- */
-PNL_PippardFitter::PNL_PippardFitter()
-{
-  fValid = false;
-  fInvokedGlobal = false;
-  fPippardFitterGlobal = 0;
-}
-
-//--------------------------------------------------------------------------
 // Destructor
 //--------------------------------------------------------------------------
 /**
@@ -392,7 +375,7 @@ void PNL_PippardFitter::SetGlobalPart(std::vector<void*> &globalPart, UInt_t idx
 
   if ((Int_t)globalPart.size() <= fIdxGlobal) {
     fPippardFitterGlobal = new PNL_PippardFitterGlobal();
-    if (fPippardFitterGlobal == 0) {
+    if (fPippardFitterGlobal == nullptr) {
       fValid = false;
       std::cerr << std::endl << ">> PNL_PippardFitter::SetGlobalPart(): **ERROR** Couldn't invoke global user function object, sorry ..." << std::endl;
     } else if (!fPippardFitterGlobal->IsValid()) {

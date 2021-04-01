@@ -55,10 +55,10 @@ class PNL_PippardFitterGlobal
     virtual Double_t GetMagneticField(const Double_t z) const;    
 
   private:
-    Bool_t fValid;
+    Bool_t fValid{true};
 
-    PNL_StartupHandler *fStartupHandler;
-    PRgeHandler *fRgeHandler;
+    PNL_StartupHandler *fStartupHandler{nullptr};
+    PRgeHandler *fRgeHandler{nullptr};
 
     mutable std::vector<Double_t> fPreviousParam;
 
@@ -86,7 +86,7 @@ class PNL_PippardFitterGlobal
 class PNL_PippardFitter : public PUserFcnBase
 {
   public:
-    PNL_PippardFitter();
+    PNL_PippardFitter() {}
     virtual ~PNL_PippardFitter();
 
     virtual Bool_t NeedGlobalPart() const { return true; }
@@ -96,11 +96,11 @@ class PNL_PippardFitter : public PUserFcnBase
     virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
 
   private:
-    Bool_t fValid;
-    Bool_t fInvokedGlobal;
+    Bool_t fValid{true};
+    Bool_t fInvokedGlobal{false};
     Int_t fIdxGlobal;
 
-    PNL_PippardFitterGlobal *fPippardFitterGlobal;
+    PNL_PippardFitterGlobal *fPippardFitterGlobal{nullptr};
 
   ClassDef(PNL_PippardFitter, 1)
 };
