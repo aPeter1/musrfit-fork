@@ -89,7 +89,7 @@ PMagProximityFitterGlobal::PMagProximityFitterGlobal()
   }
 
   // load all the TRIM.SP rge-files
-  fRgeHandler = new PMPRgeHandler(fStartupHandler->GetTrimSpDataPathList(), fStartupHandler->GetTrimSpDataVectorList());
+  fRgeHandler = new PRgeHandler();
   if (!fRgeHandler->IsValid()) {
     std::cout << std::endl << ">> PMagProximityFitterGlobal::PMagProximityFitterGlobal **PANIC ERROR**";
     std::cout << std::endl << ">>  rge data handler too unhappy. Will terminate unfriendly, sorry.";

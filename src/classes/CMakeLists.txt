@@ -1,4 +1,4 @@
-#--- build the PMusr and PUserFcnBase libs ------------------------------------
+#--- build the PMusr, PUserFcnBase, and PRgeHandler libs ----------------------
 
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
@@ -53,6 +53,18 @@ root_generate_dictionary(
     -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC}
   MODULE PUserFcnBase
 )
+root_generate_dictionary(
+  PRgeHandlerDict 
+  PRgeHandler.h 
+  OPTIONS 
+    -I${NONLOCAL_INC} 
+    -I${MUSRFIT_INC}
+    -I${CMAKE_CURRENT_SOURCE_DIR}
+    -inlineInputHeader
+  LINKDEF ${MUSRFIT_INC}/PRgeHandlerLinkDef.h
+  MODULE PRgeHandler
+)
+
 
 #--- create pkg-config info ---------------------------------------------------
 set(prefix "${CMAKE_INSTALL_PREFIX}")   
@@ -64,6 +76,8 @@ set(MUSR_LIBRARY_NAME "PMusr")
 configure_file("PMusr.pc.in" "PMusr.pc" @ONLY)
 set(USERFCN_LIBRARY_NAME "PUserFcnBase")
 configure_file("PUserFcnBase.pc.in" "PUserFcnBase.pc" @ONLY)
+set(PRGEHANDLER_LIBRARY_NAME "PRgeHandler")
+configure_file("PRgeHandler.pc.in" "PRgeHandler.pc" @ONLY)
 
 #--- lib creation -------------------------------------------------------------
 add_library(PMusr SHARED
@@ -117,6 +131,11 @@ add_library(PUserFcnBase SHARED
   PUserFcnBaseDict.cxx
 )
 
+add_library(PRgeHandler SHARED
+  PRgeHandler.cpp
+  PRgeHandlerDict.cxx
+)
+
 #--- set target properties, e.g. version --------------------------------------
 set_target_properties(PMusr
   PROPERTIES
@@ -126,9 +145,18 @@ set_target_properties(PUserFcnBase
   PROPERTIES
     VERSION ${MUSR_VERSION}
 )
+set_target_properties(PRgeHandler
+  PROPERTIES
+    VERSION ${MUSR_VERSION}
+)
+
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PUserFcnBase BEFORE PRIVATE $<BUILD_INTERFACE:${MUSRFIT_INC}>
+)
+
+target_include_directories(
+  PRgeHandler BEFORE PRIVATE $<BUILD_INTERFACE:${MUSRFIT_INC}>
 )
 
 #--- add OpenMP compile options if needed -------------------------------------
@@ -157,10 +185,14 @@ if (OpenMP_FOUND)
 endif (OpenMP_FOUND)
 
 target_link_libraries(PUserFcnBase ${ROOT_LIBRARIES})
+target_link_libraries(PRgeHandler ${ROOT_LIBRARIES})
 target_link_libraries(PMusr ${DependOnLibs})
 
 #--- install PUserFcnBase solib -----------------------------------------------
 install(TARGETS PUserFcnBase DESTINATION lib)
+
+#--- install PRgeHandler solib -----------------------------------------------
+install(TARGETS PRgeHandler DESTINATION lib)
 
 #--- install PMusr solib ------------------------------------------------------
 install(TARGETS PMusr DESTINATION lib)
@@ -173,6 +205,8 @@ install(
         ${CMAKE_CURRENT_BINARY_DIR}/libPMusrCanvas.rootmap
         ${CMAKE_CURRENT_BINARY_DIR}/libPMusrT0_rdict.pcm
         ${CMAKE_CURRENT_BINARY_DIR}/libPMusrT0.rootmap
+        ${CMAKE_CURRENT_BINARY_DIR}/libPRgeHandler_rdict.pcm
+        ${CMAKE_CURRENT_BINARY_DIR}/libPRgeHandler.rootmap
         ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler_rdict.pcm
         ${CMAKE_CURRENT_BINARY_DIR}/libPStartupHandler.rootmap
         ${CMAKE_CURRENT_BINARY_DIR}/libPUserFcnBase_rdict.pcm
@@ -195,6 +229,7 @@ install(
         ${MUSRFIT_INC}/PMusr.h
         ${MUSRFIT_INC}/PMusrT0.h
         ${MUSRFIT_INC}/PPrepFourier.h
+        ${MUSRFIT_INC}/PRgeHandler.h
         ${MUSRFIT_INC}/PRunAsymmetry.h
         ${MUSRFIT_INC}/PRunAsymmetryBNMR.h
         ${MUSRFIT_INC}/PRunAsymmetryRRF.h
@@ -214,6 +249,7 @@ install(
 #--- install pkg-config info --------------------------------------------------
 install(
   FILES ${CMAKE_CURRENT_BINARY_DIR}/PUserFcnBase.pc
+        ${CMAKE_CURRENT_BINARY_DIR}/PRgeHandler.pc
         ${CMAKE_CURRENT_BINARY_DIR}/PMusr.pc
   DESTINATION lib/pkgconfig
 )

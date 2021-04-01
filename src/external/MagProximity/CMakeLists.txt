@@ -38,7 +38,6 @@ configure_file("PMagProximityFitter.pc.in" "PMagProximityFitter.pc" @ONLY)
 add_library(PMagProximityFitter SHARED
   PMagProximityFitter.cpp
   PMagProximityFitterDict.cxx
-  PMPRgeHandler.cpp
   PMPStartupHandler.cpp
   PMPStartupHandlerDict.cxx
 )
@@ -57,7 +56,7 @@ set_target_properties(PMagProximityFitter
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PMagProximityFitter ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
+target_link_libraries(PMagProximityFitter ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PRgeHandler PUserFcnBase)
 
 #--- install PMagProximityFitter solib ----------------------------------------
 install(TARGETS PMagProximityFitter DESTINATION lib)
@@ -76,7 +75,6 @@ install(
   FILES
     PMagProximity.h 
     PMagProximityFitter.h 
-    PMPRgeHandler.h
     PMPStartupHandler.h
   DESTINATION 
     include

@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PRgeHandler
+Description: C++ shared library providing the support for handling of TrimSP rge-files
+Version: @MUSR_VERSION@
+Libs: -L${libdir} -l@PRGEHANDLER_LIBRARY_NAME@
+Cflags: -I${includedir}

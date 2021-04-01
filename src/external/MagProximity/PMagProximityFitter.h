@@ -32,7 +32,7 @@
 
 #include "PUserFcnBase.h"
 #include "PMPStartupHandler.h"
-#include "PMPRgeHandler.h"
+#include "PRgeHandler.h"
 
 class PMagProximityFitterGlobal
 {
@@ -42,15 +42,15 @@ class PMagProximityFitterGlobal
 
     Bool_t IsValid() { return fValid; }
     virtual void CalculateField(const std::vector<Double_t> &param) const;
-    virtual Int_t GetEnergyIndex(const Double_t energy) { return fRgeHandler->GetRgeEnergyIndex(energy); }
-    virtual Double_t GetMuonStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->GetRgeValue(energyIndex, z); }
+    virtual Int_t GetEnergyIndex(const Double_t energy) { return fRgeHandler->GetEnergyIndex(energy); }
+    virtual Double_t GetMuonStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->Get_n(energyIndex, z); }
     virtual Double_t GetMagneticField(const Double_t z) const;
 
   private:
     Bool_t fValid;
 
     PMPStartupHandler *fStartupHandler;
-    PMPRgeHandler *fRgeHandler;
+    PRgeHandler *fRgeHandler;
 
     mutable std::vector<Double_t> fPreviousParam;
 

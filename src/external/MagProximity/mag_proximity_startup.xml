@@ -3,13 +3,14 @@
     <comment>
       contains meta file infromation of the needed trim.sp files.
     </comment>
-    <trim_sp_part>
-        <data_path>/mnt/home/nemu/analysis/2010/EuS-Co/trimsp2/EuS-Co_E</data_path>
+    <trim_sp>
+        <data_path>/afs/psi.ch/project/nemu/analysis/2010/EuS-Co/trimsp2</data_path>
+        <rge_fln_pre>EuS-Co_E</rge_fln_pre>
         <energy_list>
             <energy>5030</energy>
             <energy>6330</energy>
             <energy>7530</energy>
             <energy>8730</energy>
         </energy_list>
-    </trim_sp_part>
+    </trim_sp>
 </mag_proximity>
