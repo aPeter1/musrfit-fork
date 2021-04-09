@@ -84,11 +84,12 @@ endif (ROOT_mathmore_FOUND)
 
 #--- the next check is need to set a flag, since root 6.24 (minuit2) breaks
 #--- the backwards compatibility. --------------------------------------------- 
-if (ROOT_VERSION VERSION_LESS "6.24")
+if (ROOT_VERSION VERSION_LESS "6.23")
   set(ROOT_GRTEQ_24 0)
 else ()  
   set(ROOT_GRTEQ_24 1)
 endif ()
+set(ROOT_GRTEQ_24 ${ROOT_GRTEQ_24} CACHE INTERNAL "ROOT Version check")
 
 #--- check for boost ----------------------------------------------------------
 find_package(Boost REQUIRED
