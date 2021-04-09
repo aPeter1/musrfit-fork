@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>User manual &mdash; musrfit 1.6.5 documentation</title>
+    <title>User manual &mdash; musrfit 1.7.1 documentation</title>
     
     <link rel="stylesheet" href="_static/nature.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.6.5',
+        VERSION:     '1.7.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="musrfit 1.6.5 documentation" href="index.html" />
+    <link rel="top" title="musrfit 1.7.1 documentation" href="index.html" />
     <link rel="next" title="Documentation of user libs (user functions)" href="user-libs.html" />
     <link rel="prev" title="Tutorial for musrfit" href="tutorial.html" /> 
   </head>
@@ -41,7 +41,7 @@
         <li class="right" >
           <a href="tutorial.html" title="Tutorial for musrfit"
              accesskey="P">previous</a> |</li>
-        <li><a href="index.html">musrfit 1.6.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.7.1 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -2450,9 +2450,152 @@ parallelized and the operator() is expected to evaluate to reasonable values for
 In case this cannot be ensured, the parallelization can be disabled by <em>&#8211;disable-omp</em> on the configure level of the program installation.</p>
 </div>
 </div>
+<div class="section" id="rge-file-handler-for-low-energy-mgrsr">
+<span id="rge-handler"></span><span id="index-78"></span><h3>rge-file handler for Low-Energy μSR<a class="headerlink" href="#rge-file-handler-for-low-energy-mgrsr" title="Permalink to this headline">¶</a></h3>
+<p>In the case of LE-μSR, the muon stopping distribution might have a profound impact on the muon polarization function <span class="math">\(P(t)\)</span>. In case of transverse field μSR measurements it can be written as</p>
+<div class="math">
+\[P(t) = \int_0^\infty n(z) \cos(\gamma_\mu B(z) t + \varphi) \, dz\]</div>
+<p>where <span class="math">\(n(z)\)</span> is the normaized muon stopping distribution obtained from the Monte-Carlo code <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt>. Normalized means</p>
+<div class="math">
+\[\int_0^\infty n(z) \, dz = 1.\]</div>
+<p><span class="math">\(\gamma_\mu = 2 \pi \times 135.54\)</span> MHz/T is the gyromagnetic ratio of the muon and <span class="math">\(\varphi\)</span>
+is the initial phase of the muon spins with respect to the positron detector. Typically <span class="math">\(B(z)\)</span> is the function which needs to be dealt with in a specific user function. A simple example would be the Meissner screening of a superconductor, for which</p>
+<div class="math">
+\[B(z) = B_0\, \exp(-z/\lambda),\]</div>
+<p>with <span class="math">\(B_0\)</span> being the applied magnetic field, and <span class="math">\(\lambda\)</span> is the magnetic penetration depth.</p>
+<p>This means that one needs to deal with the <span class="math">\(n(z)\)</span> objects in all these user functions. <span class="math">\(n(z)\)</span> does not only depend on the depth, but also on the implantation energy <span class="math">\(E_{\rm impl}\)</span>. For a real experiment this means that one is calculating a collection (various energies) of muon stopping distribution profiles with <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt>. In the language of <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt>, these files are called rge-files.</p>
+<p>Since this is often needed in a detailed analysis of LE-μSR spectra, there is a special rge-file handler class implemented which deals with the loading, normalization and interpolation of these <span class="math">\(n(z, E_{\rm impl})\)</span> objects. The essential user-interface of this class with the name <tt class="docutils literal"><span class="pre">PRgeHandler</span></tt> is given
+here:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">PRgeHandler</span> <span class="o">:</span> <span class="k">public</span> <span class="n">TObject</span>
+<span class="p">{</span>
+  <span class="k">public</span><span class="o">:</span>
+    <span class="n">PRgeHandler</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">fln</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="o">~</span><span class="n">PRgeHandler</span><span class="p">()</span> <span class="p">{}</span>
+
+    <span class="k">virtual</span> <span class="kt">bool</span> <span class="n">IsValid</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">fValid</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">virtual</span> <span class="n">PRgeDataList</span> <span class="n">GetRgeData</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">fData</span><span class="p">;</span> <span class="p">}</span>
+    <span class="k">virtual</span> <span class="n">Double_t</span> <span class="n">GetZmax</span><span class="p">(</span><span class="k">const</span> <span class="n">Double_t</span> <span class="n">energy</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="n">Double_t</span> <span class="nf">GetZmax</span><span class="p">(</span><span class="k">const</span> <span class="n">Int_t</span> <span class="n">idx</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="n">Double_t</span> <span class="nf">Get_n</span><span class="p">(</span><span class="k">const</span> <span class="n">Double_t</span> <span class="n">energy</span><span class="p">,</span> <span class="k">const</span> <span class="n">Double_t</span> <span class="n">z</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="n">Double_t</span> <span class="nf">Get_n</span><span class="p">(</span><span class="k">const</span> <span class="n">Int_t</span> <span class="n">idx</span><span class="p">,</span> <span class="k">const</span> <span class="n">Double_t</span> <span class="n">z</span><span class="p">);</span>
+    <span class="k">virtual</span> <span class="n">Int_t</span> <span class="nf">GetEnergyIndex</span><span class="p">(</span><span class="k">const</span> <span class="n">Double_t</span> <span class="n">energy</span><span class="p">);</span>
+
+  <span class="k">private</span><span class="o">:</span>
+    <span class="kt">bool</span> <span class="n">fValid</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span>
+    <span class="n">PRgeDataList</span> <span class="n">fData</span><span class="p">;</span>
+
+    <span class="k">virtual</span> <span class="kt">bool</span> <span class="nf">ReadRgeFile</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">fln</span><span class="p">,</span> <span class="n">PRgeData</span> <span class="o">&amp;</span><span class="n">data</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>The rge-file objects are loaded internally (see below) and can easily be accessed via this interface. The <span class="math">\(n(z, E_{\rm impl})\)</span> data can either be accessed via <tt class="docutils literal"><span class="pre">Get_n(const</span> <span class="pre">Double_t</span> <span class="pre">energy,</span> <span class="pre">const</span> <span class="pre">Double_t</span> <span class="pre">z)</span></tt>, i.e. via the implantation energy (given in eV), or via <tt class="docutils literal"><span class="pre">Get_n(const</span> <span class="pre">Int_t</span> <span class="pre">idx,</span> <span class="pre">const</span> <span class="pre">Double_t</span> <span class="pre">z)</span></tt> with the index <tt class="docutils literal"><span class="pre">idx</span></tt> which is the energy index of the collection. Both this routines deliver <span class="math">\(n(z, E_{\rm impl})\)</span> in normalized form. The on via the energy index is slightly more efficient. The routine <tt class="docutils literal"><span class="pre">GetEnergyIndex(const</span> <span class="pre">Double_t</span> <span class="pre">energy)</span></tt> allows the get the proper energy index of the collection.</p>
+<p>In order that class can find the rge-files at runtime, a xml-file is needed when calling the constructor. Very often, specific user-function need some additional input which is not delivered via the msr-files, but via a startup xml-file. In this case the rge-file will be just a part of the startup xml-file. For instance in the case of the Nonlocal Meissner screening user-function class, this looks like this</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;nonlocal</span> <span class="na">xmlns=</span><span class="s">&quot;http://nemu.web.psi.ch/musrfit/nonlocal&quot;</span><span class="nt">&gt;</span>
+  <span class="nt">&lt;comment&gt;</span>
+      Fourier and TrimSp information
+  <span class="nt">&lt;/comment&gt;</span>
+  <span class="nt">&lt;nonlocal_par&gt;</span>
+      <span class="nt">&lt;fourier_points&gt;</span>262144<span class="nt">&lt;/fourier_points&gt;</span>
+  <span class="nt">&lt;/nonlocal_par&gt;</span>
+  <span class="nt">&lt;trim_sp&gt;</span>
+      <span class="nt">&lt;data_path&gt;</span>./profiles/<span class="nt">&lt;/data_path&gt;</span>
+      <span class="nt">&lt;rge_fln_pre&gt;</span>Sn_E<span class="nt">&lt;/rge_fln_pre&gt;</span>
+      <span class="nt">&lt;energy_list&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>1000<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>2000<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>4000<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>6000<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>8000<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>10000<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>12000<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>14100<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>18000<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>22000<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>25000<span class="nt">&lt;/energy&gt;</span>
+          <span class="nt">&lt;energy&gt;</span>27300<span class="nt">&lt;/energy&gt;</span>
+      <span class="nt">&lt;/energy_list&gt;</span>
+  <span class="nt">&lt;/trim_sp&gt;</span>
+<span class="nt">&lt;/nonlocal&gt;</span>
+</pre></div>
+</div>
+<p>The relevant portion for the rge-file handler class is starting with the xml tag <tt class="docutils literal"><span class="pre">&lt;trim_sp&gt;</span></tt> and contains four further tags:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">&lt;data_path&gt;</span></tt>: Here the path where to find the rge-files needs to be given</li>
+<li><tt class="docutils literal"><span class="pre">&lt;rge_fln_pre&gt;</span></tt>: Start portion of the rge-file name.</li>
+<li><tt class="docutils literal"><span class="pre">&lt;energy_list&gt;</span></tt>: This will embrace all the implantation energies available.</li>
+<li><tt class="docutils literal"><span class="pre">&lt;energy&gt;</span></tt>: A single energy (in eV)</li>
+</ul>
+<p>In the given example the files are searched for in the sub-directory call <tt class="docutils literal"><span class="pre">profiles</span></tt> of the current directory. The rge-files have file names like
+<tt class="docutils literal"><span class="pre">Sn_E1000.rge</span></tt>, <tt class="docutils literal"><span class="pre">Sn_E2000.rge</span></tt>, etc.</p>
+<p>In the aforementioned Nonlocal Meissner screening class, in the constructor you will find the following invocation of the rge-handler object:</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">PNL_PippardFitterGlobal</span><span class="o">::</span><span class="n">PNL_PippardFitterGlobal</span><span class="p">()</span>
+<span class="p">{</span>
+ <span class="p">...</span>
+
+  <span class="c1">// load all the TRIM.SP rge-files</span>
+  <span class="n">fRgeHandler</span> <span class="o">=</span> <span class="k">new</span> <span class="n">PRgeHandler</span><span class="p">(</span><span class="s">&quot;./nonlocal_startup.xml&quot;</span><span class="p">);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">fRgeHandler</span><span class="o">-&gt;</span><span class="n">IsValid</span><span class="p">())</span> <span class="p">{</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;&gt;&gt; PNL_PippardFitterGlobal::PNL_PippardFitterGlobal **PANIC ERROR**&quot;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;&gt;&gt;  rge data handler too unhappy. Will terminate unfriendly, sorry.&quot;</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">fValid</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+  <span class="p">}</span>
+
+  <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>And in the <tt class="docutils literal"><span class="pre">operator()</span></tt> function call which calculates the muon spin polarization, it will look like this</p>
+<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">Double_t</span> <span class="n">PNL_PippardFitter</span><span class="o">::</span><span class="k">operator</span><span class="p">()(</span><span class="n">Double_t</span> <span class="n">t</span><span class="p">,</span> <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">Double_t</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">param</span><span class="p">)</span> <span class="k">const</span>
+<span class="p">{</span>
+  <span class="p">...</span>
+
+  <span class="c1">// calculate field if parameter have changed</span>
+  <span class="n">fPippardFitterGlobal</span><span class="o">-&gt;</span><span class="n">CalculateField</span><span class="p">(</span><span class="n">param</span><span class="p">);</span>
+  <span class="n">Int_t</span> <span class="n">energyIndex</span> <span class="o">=</span> <span class="n">fPippardFitterGlobal</span><span class="o">-&gt;</span><span class="n">GetEnergyIndex</span><span class="p">(</span><span class="n">param</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">energyIndex</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// energy not found</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">cerr</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;&gt;&gt; PNL_PippardFitter::operator() energy &quot;</span> <span class="o">&lt;&lt;</span> <span class="n">param</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="s">&quot; not found. Will terminate.&quot;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+    <span class="n">assert</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="p">...</span>
+
+  <span class="c1">// calcualte polarization</span>
+  <span class="n">Bool_t</span> <span class="n">done</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+  <span class="n">Double_t</span> <span class="n">pol</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">dPol</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">;</span>
+  <span class="n">Double_t</span> <span class="n">z</span><span class="o">=</span><span class="mf">0.0</span><span class="p">;</span>
+  <span class="n">Int_t</span> <span class="n">terminate</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="n">Double_t</span> <span class="n">dz</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">;</span>
+
+  <span class="k">do</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">z</span> <span class="o">&lt;</span> <span class="n">param</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span> <span class="p">{</span> <span class="c1">// z &lt; dead-layer</span>
+      <span class="n">dPol</span> <span class="o">=</span> <span class="n">fPippardFitterGlobal</span><span class="o">-&gt;</span><span class="n">GetMuonStoppingDensity</span><span class="p">(</span><span class="n">energyIndex</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">GAMMA_MU</span> <span class="o">*</span> <span class="n">param</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">param</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">*</span> <span class="n">DEGREE2RAD</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">dPol</span> <span class="o">=</span> <span class="n">fPippardFitterGlobal</span><span class="o">-&gt;</span><span class="n">GetMuonStoppingDensity</span><span class="p">(</span><span class="n">energyIndex</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="n">GAMMA_MU</span> <span class="o">*</span> <span class="n">param</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">*</span> <span class="n">fPippardFitterGlobal</span><span class="o">-&gt;</span><span class="n">GetMagneticField</span><span class="p">(</span><span class="n">z</span><span class="o">-</span><span class="n">param</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">param</span><span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="o">*</span> <span class="n">DEGREE2RAD</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">z</span> <span class="o">+=</span> <span class="n">dz</span><span class="p">;</span>
+    <span class="n">pol</span> <span class="o">+=</span> <span class="n">dPol</span><span class="p">;</span>
+
+    <span class="c1">// change in polarization is very small hence start termination counting</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">fabs</span><span class="p">(</span><span class="n">dPol</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0e-9</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">terminate</span><span class="o">++</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">terminate</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">terminate</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">)</span> <span class="c1">// polarization died out hence one can stop</span>
+      <span class="n">done</span> <span class="o">=</span> <span class="nb">true</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">done</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">pol</span><span class="o">*</span><span class="n">dz</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="technical-description-of-the-musrfit-framework">
-<span id="technical-musrfit"></span><span id="index-78"></span><h2>Technical Description of the musrfit framework<a class="headerlink" href="#technical-description-of-the-musrfit-framework" title="Permalink to this headline">¶</a></h2>
+<span id="technical-musrfit"></span><span id="index-79"></span><h2>Technical Description of the musrfit framework<a class="headerlink" href="#technical-description-of-the-musrfit-framework" title="Permalink to this headline">¶</a></h2>
 <p>A technical description of the musrfit framework can be found on its own <a class="reference external" href="http://lmu.web.psi.ch/musrfit/technical/index.html">docu</a>.</p>
 </div>
 </div>
@@ -2505,6 +2648,7 @@ In case this cannot be ensured, the parallelization can be disabled by <em>&#821
 <li><a class="reference internal" href="#id38">User Functions</a><ul>
 <li><a class="reference internal" href="#user-function-without-global-user-function-object-access">User Function without global user-function-object access</a></li>
 <li><a class="reference internal" href="#user-function-with-global-user-function-object-access">User Function with global user-function-object access</a></li>
+<li><a class="reference internal" href="#rge-file-handler-for-low-energy-mgrsr">rge-file handler for Low-Energy μSR</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#technical-description-of-the-musrfit-framework">Technical Description of the musrfit framework</a></li>
@@ -2552,12 +2696,12 @@ In case this cannot be ensured, the parallelization can be disabled by <em>&#821
         <li class="right" >
           <a href="tutorial.html" title="Tutorial for musrfit"
              >previous</a> |</li>
-        <li><a href="index.html">musrfit 1.6.5 documentation</a> &raquo;</li> 
+        <li><a href="index.html">musrfit 1.7.1 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2021, Andreas Suter.
-      Last updated on Feb 26, 2021.
+      Last updated on Apr 09, 2021.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
