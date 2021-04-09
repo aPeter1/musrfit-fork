@@ -776,7 +776,7 @@ int main(int argc, char *argv[])
       return 0;
     } else if (!strcmp(argv[i], "--version") || !strcmp(argv[i], "-v")) {
 #ifdef HAVE_CONFIG_H
-      std::cout << std::endl << "dump_header version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
+      std::cout << std::endl << "dump_header version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << ", ROOT version: " << ROOT_VERSION_USED << std::endl << std::endl;
 #else
       std::cout << std::endl << "dump_header git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #endif

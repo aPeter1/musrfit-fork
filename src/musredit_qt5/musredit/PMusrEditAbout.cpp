@@ -27,6 +27,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
+#include "config.h"
 #include "git-revision.h"
 #include "PMusrEditAbout.h"
 
@@ -40,6 +41,8 @@ PMusrEditAbout::PMusrEditAbout(QWidget *parent) : QDialog(parent)
 
   fGitBranch_label->setText(QString("git-branch: %1").arg(GIT_BRANCH));
   fGitRev_label->setText(QString("git-rev: %1").arg(GIT_CURRENT_SHA1));
+  fMusrfitVersion_label->setText(QString("musrfit-version: %1").arg(PACKAGE_VERSION));
+  fRootVersion_label->setText(QString("ROOT-version: %1").arg(ROOT_VERSION_USED));
 
   setModal(true);
 }

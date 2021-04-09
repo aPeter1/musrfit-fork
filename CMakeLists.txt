@@ -5,7 +5,7 @@ if (CMAKE_VERSION GREATER_EQUAL 3.12)
   cmake_policy(SET CMP0075 NEW)
 endif (CMAKE_VERSION GREATER_EQUAL 3.12)
 
-project(musrfit VERSION 1.7.0 LANGUAGES C CXX)
+project(musrfit VERSION 1.7.1 LANGUAGES C CXX)
 
 #--- musrfit specific options -------------------------------------------------
 option(nexus "build optional NeXus support. Needed for ISIS" OFF)

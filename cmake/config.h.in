@@ -1,6 +1,7 @@
 // config.h
 
 #define PACKAGE_VERSION "@PROJECT_VERSION@"
+#define ROOT_VERSION_USED "@ROOT_VERSION@"
 
 // define to 1 if you have <alloca.h> and it should be used 
 #cmakedefine HAVE_ALLOCA_H 1
