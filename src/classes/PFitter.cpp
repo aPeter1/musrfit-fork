@@ -1840,7 +1840,11 @@ Bool_t PFitter::ExecutePrintLevel(UInt_t lineNo)
     return false;
   }
 
+#ifdef ROOT_GRTEQ_24
+  ROOT::Minuit2::MnPrint::SetGlobalLevel(fPrintLevel);
+#else
   ROOT::Minuit2::MnPrint::SetLevel(fPrintLevel);
+#endif
 
   // clean up
   if (tokens) {

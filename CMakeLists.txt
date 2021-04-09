@@ -82,6 +82,14 @@ if (ROOT_mathmore_FOUND)
   include(${ROOT_USE_FILE})
 endif (ROOT_mathmore_FOUND)
 
+#--- the next check is need to set a flag, since root 6.24 (minuit2) breaks
+#--- the backwards compatibility. --------------------------------------------- 
+if (ROOT_VERSION VERSION_LESS "6.24")
+  set(ROOT_GRTEQ_24 0)
+else ()  
+  set(ROOT_GRTEQ_24 1)
+endif ()
+
 #--- check for boost ----------------------------------------------------------
 find_package(Boost REQUIRED
   COMPONENTS 
@@ -119,7 +127,7 @@ if (qt_based_tools)
   # check for any Qt, i.e. AUTO
   if (qt_version STREQUAL AUTO)
     # try Qt6
-    find_package(Qt6Core)
+    find_package(Qt6Core QUIET)
     if (Qt6Core_FOUND)
       find_package(Qt6Widgets CONFIG REQUIRED)
       find_package(Qt6Xml CONFIG REQUIRED)
@@ -129,7 +137,7 @@ if (qt_based_tools)
     endif (Qt6Core_FOUND)
     # try Qt5
     if (NOT Qt6Core_FOUND)
-      find_package(Qt5Core)
+      find_package(Qt5Core QUIET)
       if (Qt5Core_FOUND)
         find_package(Qt5Widgets CONFIG REQUIRED)
         find_package(Qt5Xml CONFIG REQUIRED)
