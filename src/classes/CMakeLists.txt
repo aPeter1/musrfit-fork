@@ -159,6 +159,11 @@ target_include_directories(
   PRgeHandler BEFORE PRIVATE $<BUILD_INTERFACE:${MUSRFIT_INC}>
 )
 
+#--- add ROOT Version >= 6.24 compile options if needed -----------------------
+if (ROOT_GRTEQ_24)
+  target_compile_options(PMusr BEFORE PRIVATE "-DROOT_GRTEQ_24")
+endif(ROOT_GRTEQ_24)
+
 #--- add OpenMP compile options if needed -------------------------------------
 if (OpenMP_FOUND)
   target_compile_options(PMusr PUBLIC ${OpenMP_CXX_FLAGS})
