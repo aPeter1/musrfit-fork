@@ -6668,6 +6668,9 @@ void PMsrHandler::MakeDetectorGroupingString(TString str, PIntVector &group, TSt
     str = "";
   }
 
+  if (group.size()==0)
+    return;
+
   UInt_t i=0, j=0;
   do {
     j = i;
