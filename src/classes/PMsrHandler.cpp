@@ -6674,10 +6674,12 @@ void PMsrHandler::MakeDetectorGroupingString(TString str, PIntVector &group, TSt
   UInt_t i=0, j=0;
   do {
     j = i;
-    while (group[j]+1 == group[j+1]) {
-      j++;
-      if (j == group.size()-1)
-        break;
+    if (j+1 < group.size()) {
+      while (group[j]+1 == group[j+1]) {
+        j++;
+        if (j == group.size()-1)
+          break;
+      }
     }
 
     if (j >= i+2) {
