@@ -14,21 +14,21 @@ option(BMWlibs "build optional BMWlibs" OFF)
 option(BNMRlibs "build optional beta-NMR libs" OFF)
 option(qt_based_tools "try to install Qt based tools (musredit, musrWiz, musrStep, mupp)" ON)
 option(try_OpenMP "try to use OpenMP if available" ON)
-# define qt_version with possible values 'auto' or version '3', '4', '5'
+# define qt_version with possible values 'auto' or version '3', '4', '5', '6'
 set(qt_version AUTO CACHE STRING "provide a specific Qt version to be used.")
-set_property(CACHE qt_version PROPERTY STRINGS AUTO 3 4 5)
+set_property(CACHE qt_version PROPERTY STRINGS AUTO 3 4 5 6)
 
 #--- set a default build type if none was specified ---------------------------
 set(default_build_type "Release")
- 
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
   set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
       STRING "Choose the type of build." FORCE)
   # Set the possible values of build type for cmake-gui
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
     "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-endif()
+endif ()
 
 #--- perform some checks and generate the config.h ----------------------------
 
