@@ -12,7 +12,19 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
-Release of V1.7.0, 2021/03/30
+Release of V1.7.2, 2021/04/16
+=============================
+
+add a full dummy user function class with a global part. This can be used as 
+a starting point to develop new polarization functions. 
+Currently no rge-handling present.
+
+Release of V1.7.1, 2021/04/09
+=============================
+
+update of the docu. More version info. Dealing with the upcoming ROOT V6.24.
+
+Release of V1.7.0, 2021/04/30
 =============================
 
 Centralize the rge-handling for user functions.
