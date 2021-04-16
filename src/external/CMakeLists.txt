@@ -29,3 +29,7 @@ if (nexus)
   add_subdirectory(nexus)
 endif (nexus)
 
+if (DummyUserFcn)
+  add_subdirectory(DummyUserFcn)
+endif (DummyUserFcn)
+
