@@ -1,0 +1,99 @@
+/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+Simple Example for a User Function *with* a Global Part
+
+/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+This is a full implementation of a user function with a global part.
+For a general intro to user function, please check the manual under
+
+http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#id38
+
+The implemented user function is
+
+exp(-lambda*t)
+
+with lambda, being the only parameter.
+
+Short description of the PDummyUserFcn and PDummyUserFcnGlobal classes.
+
+PDummyUserFcn:
+-------------
+
+This class derives from the PUserFcnBase which is necessary to make this
+user function available to musrfit.
+
+The three functions:
+
+    virtual Bool_t NeedGlobalPart() const { return true; }
+    virtual void SetGlobalPart(std::vector<void*> &globalPart, UInt_t idx);
+    virtual Bool_t GlobalPartIsValid() const;
+
+are used to bind the global part of the user function.
+
+The method
+
+    virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
+
+is called by musrfit when evaluate the function.
+
+The private variables:
+
+    Bool_t fValid{true};
+    Bool_t fInvokedGlobal{false};
+    Int_t fIdxGlobal;
+
+    PDummyUserFcnGlobal *fDummyUserFcnGlobal{nullptr};
+
+have the following purpose:
+
+    fValid is a boolean variable holding the state of the user function. 
+           If true, it means that the user function is useable. In case
+           something would go wrong during the initialization stage fValid
+           is set to false, and no calculation will take place!
+    fInvokedGlobal is a boolean variable which is set to true is the global
+           part of the user function is properly invoked.
+    fIdxGlobal holds the index of the global user function part.
+ 
+PDummyUserFcnGlobal:
+-------------------
+
+This class holds the gloabl user function part, which handles the actual 
+calculation of the user function.
+
+    CalculatePol(const std::vector<Double_t> &param) const; -> carries out the
+          necessary calculations of this user function. This is ONLY carried 
+          out if the parameter set has changed!
+
+    GetPolValue(const Double_t t) const; -> This is used in the operator() of
+          the user function to get the value of the user function (here a 
+          value of a polarization function exp()).
+
+    mutable std::vector<Double_t> fPreviousParam; -> holds the previous 
+          parmeter set in order to check if a parameter set has changed.
+
+    mutable std::vector<Double_t> fPol; -> lookup table for the polarization
+          function for the current parameter set.
+
+How to build:
+------------
+
+When configure musrfit, there is a switch DummyUserFcn available which
+needs to be enabled (default: OFF), e.g.
+
+cmake ../ -DCMAKE_INSTALL_PREFIX=$ROOTSYS -Dnexus=1 -DDummyUserFcn=1
+
+Files:
+-----
+  CMakeLists.txt <- this File is needed to allow to build an install
+                    this dummy example with the cmake build system.
+  inc/PDummyUserFcn.h  <- header file definig the needed classes for
+                          the user function and its globale part. 
+  inc/PDummyUserFcnLinkDef.h <- Needed as a glue to generate the necessary
+                                root dictionaries.
+  src/CMakeLists.txt <- needed for the cmake build/install process.
+  src/PDummyUserFcn.cpp <- source code which implements all the necessary
+                           parts of the user function.
+  src/PDummyUserFcn.pc.in <- cmake input file to generate the propoer 
+                             pkg-config file for the library
+

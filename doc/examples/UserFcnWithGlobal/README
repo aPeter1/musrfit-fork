@@ -1,0 +1,18 @@
+/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+Simple Example for a User Function *with* a Global Part
+
+/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/_/
+
+The source code is found under 
+
+<musrfit-dir>src/external/DummyUserFcn
+
+For details see there.
+
+This dummy user function implements an exp(-lambda*t)
+in the global part. This is the most efficient way, 
+since the function time vector is only calculated once
+when the parameter (lambda) changes. For all the 
+subsequent calls a lookup table is used to return the
+value of the user function.
