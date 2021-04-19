@@ -116,6 +116,13 @@ MuSR_td_PSI_bin::MuSR_td_PSI_bin()
    file_name.close();
    delete [] buffer_file;
 
+   if (format_id[0] == '1') {
+     if (format_id[1] != 'N') {
+       std::cout << "**WARNING** found '" << format_id << "'. Will change it to '1N'" << std::endl;
+       format_id[1] = 'N';
+     }
+   }
+
    // file may either be PSI binary format
    if (strncmp(format_id,"1N",2) == 0)
    {
@@ -305,6 +312,9 @@ int MuSR_td_PSI_bin::readbin(const char * fileName)
   // fill header data into member variables
   strncpy(format_id,buffer_file,2);
   format_id[2] = '\0';
+
+  if (format_id[1] != 'N') // the warning is already issued in read()
+    format_id[1] = 'N';
 
   if (strcmp(format_id,"1N") != 0)
   {
