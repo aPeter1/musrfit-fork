@@ -2,6 +2,7 @@
 
 #define PACKAGE_VERSION "@PROJECT_VERSION@"
 #define ROOT_VERSION_USED "@ROOT_VERSION@"
+#define BUILD_TYPE "@CMAKE_BUILD_TYPE@"
 
 // define to 1 if minor ROOT6 version is >= 24
 #define ROOT_GRTEQ_24 @ROOT_GRTEQ_24@

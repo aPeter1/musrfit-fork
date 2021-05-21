@@ -41,7 +41,7 @@ PMusrEditAbout::PMusrEditAbout(QWidget *parent) : QDialog(parent)
 
   fGitBranch_label->setText(QString("git-branch: %1").arg(GIT_BRANCH));
   fGitRev_label->setText(QString("git-rev: %1").arg(GIT_CURRENT_SHA1));
-  fMusrfitVersion_label->setText(QString("musrfit-version: %1").arg(PACKAGE_VERSION));
+  fMusrfitVersion_label->setText(QString("musrfit-version: %1 (%2)").arg(PACKAGE_VERSION).arg(BUILD_TYPE));
   fRootVersion_label->setText(QString("ROOT-version: %1").arg(ROOT_VERSION_USED));
 
   setModal(true);
