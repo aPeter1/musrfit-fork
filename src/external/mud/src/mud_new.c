@@ -27,13 +27,11 @@
  *   v1.2a  01-Mar-2000  DA   Add handling of unidentified sections (don't quit)
  */
 
+
 #include "mud.h"
 
-
 MUD_SEC*
-MUD_new( secID, instanceID )
-    UINT32 secID;
-    UINT32 instanceID;
+MUD_new( UINT32 secID, UINT32 instanceID )
 {
     MUD_SEC* pMUD_new;
     MUD_PROC proc;
@@ -43,78 +41,78 @@ MUD_new( secID, instanceID )
     {
 	case MUD_SEC_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC ) );
-	    proc = MUD_SEC_proc;
+	    proc = (MUD_PROC)MUD_SEC_proc;
 	    sizeOf = sizeof( MUD_SEC );
 	    break;
 	case MUD_SEC_FIXED_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_FIXED ) );
-	    proc = MUD_SEC_FIXED_proc;
+	    proc = (MUD_PROC)MUD_SEC_FIXED_proc;
 	    sizeOf = sizeof( MUD_SEC_FIXED );
 	    break;
 	case MUD_SEC_GRP_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_GRP ) );
-	    proc = MUD_SEC_GRP_proc;
+	    proc = (MUD_PROC)MUD_SEC_GRP_proc;
 	    sizeOf = sizeof( MUD_SEC_GRP );
 	    break;
 	case MUD_SEC_EOF_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_EOF ) );
-	    proc = MUD_SEC_EOF_proc;
+	    proc = (MUD_PROC)MUD_SEC_EOF_proc;
 	    sizeOf = sizeof( MUD_SEC_EOF );
 	    break;
 	case MUD_SEC_CMT_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_CMT ) );
-	    proc = MUD_SEC_CMT_proc;
+	    proc = (MUD_PROC)MUD_SEC_CMT_proc;
 	    sizeOf = sizeof( MUD_SEC_CMT );
 	    break;
 	case MUD_SEC_GEN_RUN_DESC_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_GEN_RUN_DESC ) );
-	    proc = MUD_SEC_GEN_RUN_DESC_proc;
+	    proc = (MUD_PROC)MUD_SEC_GEN_RUN_DESC_proc;
 	    sizeOf = sizeof( MUD_SEC_GEN_RUN_DESC );
 	    break;
 	case MUD_SEC_GEN_HIST_HDR_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_GEN_HIST_HDR ) );
-	    proc = MUD_SEC_GEN_HIST_HDR_proc;
+	    proc = (MUD_PROC)MUD_SEC_GEN_HIST_HDR_proc;
 	    sizeOf = sizeof( MUD_SEC_GEN_HIST_HDR );
 	    break;
 	case MUD_SEC_GEN_HIST_DAT_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_GEN_HIST_DAT ) );
-	    proc = MUD_SEC_GEN_HIST_DAT_proc;
+	    proc = (MUD_PROC)MUD_SEC_GEN_HIST_DAT_proc;
 	    sizeOf = sizeof( MUD_SEC_GEN_HIST_DAT );
 	    break;
 	case MUD_SEC_GEN_SCALER_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_GEN_SCALER ) );
-	    proc = MUD_SEC_GEN_SCALER_proc;
+	    proc = (MUD_PROC)MUD_SEC_GEN_SCALER_proc;
 	    sizeOf = sizeof( MUD_SEC_GEN_SCALER );
 	    break;
 	case MUD_SEC_GEN_IND_VAR_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_GEN_IND_VAR ) );
-	    proc = MUD_SEC_GEN_IND_VAR_proc;
+	    proc = (MUD_PROC)MUD_SEC_GEN_IND_VAR_proc;
 	    sizeOf = sizeof( MUD_SEC_GEN_IND_VAR );
 	    break;
 	case MUD_SEC_GEN_ARRAY_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_GEN_ARRAY ) );
-	    proc = MUD_SEC_GEN_ARRAY_proc;
+	    proc = (MUD_PROC)MUD_SEC_GEN_ARRAY_proc;
 	    sizeOf = sizeof( MUD_SEC_GEN_ARRAY );
 	    break;
 	case MUD_SEC_TRI_TI_RUN_DESC_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_TRI_TI_RUN_DESC ) );
-	    proc = MUD_SEC_TRI_TI_RUN_DESC_proc;
+	    proc = (MUD_PROC)MUD_SEC_TRI_TI_RUN_DESC_proc;
 	    sizeOf = sizeof( MUD_SEC_TRI_TI_RUN_DESC );
 	    break;
 /*
 	case MUD_SEC_CAMP_NUM_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_CAMP_NUM ) );
-	    proc = MUD_SEC_CAMP_NUM_proc;
+	    proc = (MUD_PROC)MUD_SEC_CAMP_NUM_proc;
 	    sizeOf = sizeof( MUD_SEC_CAMP_NUM );
 	    break;
 	case MUD_SEC_CAMP_STR_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_CAMP_STR ) );
-	    proc = MUD_SEC_CAMP_STR_proc;
+	    proc = (MUD_PROC)MUD_SEC_CAMP_STR_proc;
 	    sizeOf = sizeof( MUD_SEC_CAMP_STR );
 	    break;
 	case MUD_SEC_CAMP_SEL_ID:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_CAMP_SEL ) );
-	    proc = MUD_SEC_CAMP_SEL_proc;
+	    proc = (MUD_PROC)MUD_SEC_CAMP_SEL_proc;
 	    sizeOf = sizeof( MUD_SEC_CAMP_SEL );
 	    break;
 */
@@ -122,7 +120,7 @@ MUD_new( secID, instanceID )
 /* add action for unknown */
 	default:
 	    pMUD_new = (MUD_SEC*)zalloc( sizeof( MUD_SEC_UNKNOWN ) );
-	    proc = MUD_SEC_UNKNOWN_proc;
+	    proc = (MUD_PROC)MUD_SEC_UNKNOWN_proc;
 	    sizeOf = sizeof( MUD_SEC_UNKNOWN );
 	    break;
 
@@ -137,5 +135,4 @@ MUD_new( secID, instanceID )
 
     return( pMUD_new );
 }
-
 

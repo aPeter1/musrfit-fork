@@ -1,18 +1,38 @@
 #ifndef _MUD_H_
 #define _MUD_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /*
- * v1.2
+ * mud.h  Declarations for MUD 
+ * v1.3
+ *
+ *   Copyright (C) 1994-2021 TRIUMF (Vancouver, Canada)
+ *
+ *   Authors: T. Whidden, D. Arseneau, S. Daviel
+ *   
+ *   Released under the GNU LGPL - see http://www.gnu.org/licenses
+ *
+ *   This program is free software; you can distribute it and/or modify it under 
+ *   the terms of the Lesser GNU General Public License as published by the Free 
+ *   Software Foundation; either version 2 of the License, or any later version. 
+ *   Accordingly, this program is distributed in the hope that it will be useful, 
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *   or FITNESS FOR A PARTICULAR PURPOSE. See the Lesser GNU General Public License 
+ *   for more details.
  *
  * revisions:
  * 01-mar-2000   DJA  add UNKNOWN section, with no ID 
  * 11-oct-2000   DJA  add MUD_FMT_RAL_ID; MUD_setSizes
  * 22-Apr-2003   DJA  add MUD_openReadWrite, MUD_openInOut
+ * 25-Nov-2009   DJA  64-bit linux
+ * 25-Jun-2017   DJA  Allow use in C++ (ROOT); shared lib.
+ * 14-Aug-2019   DJA  Use stdint.h, casts in printf
  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+#ifdef __CINT__
+typedef char* caddr_t;
+#endif /* __CINT __ */
 
 /*
  *  FORMAT IDs - Must be unique!
@@ -94,30 +114,48 @@ extern "C" {
 #include <stddef.h>
 #include <sys/types.h>
 
+#ifndef NOSTDINT
+/* If there is no stdint.h, define NOSTDINT, as with "make NOSTDINT=1" */
+#include <stdint.h>
+#endif
+
 /*
  *  MUD types
  */
+
+#ifdef _STDINT_H
+typedef int			STATUS;
+typedef int8_t			INT8;
+typedef uint8_t			UINT8;
+typedef int16_t			INT16;
+typedef uint16_t 		UINT16;
+typedef int32_t			INT32;
+typedef uint32_t		UINT32;
+typedef float			REAL32;
+typedef double			REAL64;
+#else /*no stding.h */
 typedef int			STATUS;
 typedef char			INT8;
 typedef unsigned char		UINT8;
 typedef short			INT16;
 typedef unsigned short		UINT16;
-#if defined(__alpha) || defined(__x86_64__) || defined(__amd64) || defined(__ia64)
+#if defined(__alpha) || defined(__linux) || defined(__MACH__) || defined(__arm64)
 typedef int			INT32;
 typedef unsigned int		UINT32;
 #else
 typedef long			INT32;
 typedef unsigned long		UINT32;
-#endif /* defined(__alpha) || defined(__x86_64__) || defined(__amd64) || defined(__ia64) */
+#endif /* __alpha || __linux || __MACH__*/
 typedef float			REAL32;
 typedef double			REAL64;
+#if (defined(__alpha)&&defined(vms)) || defined(__BORLANDC__) || defined(__TURBOC__)
+typedef char* 			caddr_t;
+#endif
+#endif /* _STDINT_HNOSTDINT */
 typedef UINT32                  TIME;
 #ifndef BOOL_DEFINED
 #define BOOL_DEFINED
 typedef UINT32                  BOOL;
-#endif
-#if (defined(__alpha)&&defined(vms)) || defined(__BORLANDC__) || defined(__TURBOC__)
-typedef char* 			caddr_t;
 #endif
 
 #ifndef FALSE
@@ -146,10 +184,10 @@ typedef char* 			caddr_t;
 /*
  *  c_utils.h,  Defines for C utilities
  */
-#if defined(vms) || defined(__MSDOS__) || defined(_MSC_VER)
+#if defined(vms) || defined(__MSDOS__)
 #define bcopy( b1, b2, len )		memcpy(b2,b1,len)
 #define bzero( b, len )			memset(b,(char)0,len)
-#endif /* vms || __MSDOS__ || _MSC_VER */
+#endif /* vms || __MSDOS__ */
 #ifndef _C_UTILS_H_   /* conflict with c_utils.h */
 #define _max( a, b )			( ( (a) > (b) ) ? (a) : (b) )
 #define _min( a, b )			( ( (a) < (b) ) ? (a) : (b) )
@@ -157,11 +195,12 @@ typedef char* 			caddr_t;
 #define _swap32( l )                    (((UINT32)l>>16)+((UINT32)l<<16))
 #define _swap16( s )                    (((UINT16)s>>8)+((UINT16)s<<8))
 #endif
-#define _free(objp)			if(objp!=NULL){free(objp);objp=NULL;}
-#define  _roundUp( n, r )		( (r) * (int)( ((n)+(r)-1) / (r) ) )
+
+#define _free(objp)			if((void*)(objp)!=(void*)NULL){free((void*)(objp));objp=NULL;}
+#define _roundUp( n, r )		( (r) * (int)( ((n)+(r)-1) / (r) ) )
 
 #define zalloc( n )			memset((void*)malloc(n),0,n)
-#if defined(vms) || (defined(mips)&&!defined(__sgi)) || ((defined(__MSDOS__) || defined(_MSC_VER))&&defined(__STDC__))
+#if defined(vms) || (defined(mips)&&!defined(__sgi)) || (defined(__MSDOS__)&&defined(__STDC__))
 #define strdup( s )			strcpy((char*)malloc(strlen(s)+1),s)
 #endif /* vms || mips&&!sgi */
 /*#endif */
@@ -388,8 +427,7 @@ typedef struct {
 #define MUD_instanceID( pM )	(((MUD_SEC*)pM)->core.instanceID)
 
 
-#if defined(__MSDOS__) || defined(__i386__) || defined(__i586__) || defined(__i686__) || defined(vax) || defined(__alpha) || defined(__x86_64__) || defined(__amd64) \
-                       || (defined(__mips)&&!defined(__sgi))
+#if defined(__MSDOS__) || defined(__i386__) || defined(__i586__) || defined(__i686__) || defined(vax) || defined(__alpha) || defined(__amd64) || defined(__arm64) || (defined(__mips)&&!defined(__sgi))
 #define MUD_LITTLE_ENDIAN 1
 #else
 #define MUD_BIG_ENDIAN 1
@@ -524,9 +562,9 @@ int MUD_SEC_GEN_HIST_unpack _ANSI_ARGS_(( int num , int inBinSize , void* inHist
 int MUD_SEC_TRI_TI_RUN_DESC_proc _ANSI_ARGS_(( MUD_OPT op , BUF *pBuf , MUD_SEC_TRI_TI_RUN_DESC *pMUD ));
 
 /* gmf_time.c */
-void GMF_MKTIME _ANSI_ARGS_(( time_t* out , INT32* input ));
-void GMF_TIME _ANSI_ARGS_(( time_t* out ));
-void GMF_LOCALTIME _ANSI_ARGS_(( time_t* in , INT32 *out ));
+void GMF_MKTIME _ANSI_ARGS_(( TIME* out , INT32* input ));
+void GMF_TIME _ANSI_ARGS_(( TIME* out ));
+void GMF_LOCALTIME _ANSI_ARGS_(( TIME* in , INT32 *out ));
 
 /* mud_friendly.c */
 int MUD_openRead _ANSI_ARGS_(( char* filename, UINT32* pType ));

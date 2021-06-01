@@ -23,10 +23,10 @@
  *   v1.2   08-Oct-2000  [D. Arseneau] Add MUD_setSizes
  *   v1.3   22-Apr-2003  [D. Arseneau] Add MUD_openInOut
  *          25-Nov-2009  [D. Arseneau] Handle larger size_t
+ *          04-May-2016  [D. Arseneau] Edits for C++ use
  */
 
 
-#include <stdio.h>
 #include "mud.h"
 
 #ifdef NO_STDARG
@@ -35,11 +35,10 @@
 #include <stdarg.h>
 #endif /* NO_STDARG */
 
-/* #define DEBUG 1   /* un-comment for debug */ 
+/* #define DEBUG 1 */  /* un-comment for debug */ 
 
 FILE*
-MUD_openInput( inFile )
-    char* inFile;
+MUD_openInput( char* inFile )
 {
     FILE* fin;
 
@@ -53,8 +52,7 @@ MUD_openInput( inFile )
 
 /* This is the same as MUD_openInput except for access mode */
 FILE*
-MUD_openInOut( inFile )
-    char* inFile;
+MUD_openInOut( char* inFile )
 {
     FILE* fin;
 
@@ -68,8 +66,7 @@ MUD_openInOut( inFile )
 
 
 FILE* 
-MUD_openOutput( outFile )
-    char* outFile;
+MUD_openOutput( char* outFile )
 {
     FILE* fout;
 
@@ -83,8 +80,7 @@ MUD_openOutput( outFile )
 
 
 void
-MUD_free( pMUD )
-    void* pMUD;
+MUD_free( void* pMUD )
 {
     if( pMUD != NULL ) MUD_free( ((MUD_SEC*)pMUD)->core.pNext );
     else return;
@@ -101,10 +97,7 @@ MUD_free( pMUD )
 
 
 BOOL
-MUD_encode( pBuf, pMUD, io_opt )
-    BUF* pBuf;
-    void* pMUD;
-    MUD_IO_OPT io_opt;
+MUD_encode( BUF* pBuf, void* pMUD, MUD_IO_OPT io_opt )
 {
     if( pMUD == NULL ) return( TRUE );
 
@@ -130,7 +123,7 @@ MUD_encode( pBuf, pMUD, io_opt )
 	printf( "MUD_encode:  buf.buf  = %08X\n", pBuf->buf );
 #endif /* DEBUG */
 
-    MUD_CORE_proc( MUD_ENCODE, pBuf, pMUD );
+    MUD_CORE_proc( MUD_ENCODE, pBuf, (MUD_SEC*)pMUD );
     (*((MUD_SEC*)pMUD)->core.proc)( MUD_ENCODE, pBuf, (void*)pMUD );
 
     if( ( MUD_secID( pMUD ) == MUD_SEC_GRP_ID ) && 
@@ -155,8 +148,7 @@ MUD_encode( pBuf, pMUD, io_opt )
 
 
 void*
-MUD_decode( pBuf )
-    BUF* pBuf;
+MUD_decode( BUF* pBuf )
 {
     MUD_SEC* pMUD;
     MUD_SEC mud;
@@ -199,23 +191,20 @@ MUD_decode( pBuf )
 
 
 int
-MUD_getSize( pMUD )
-    void* pMUD;
+MUD_getSize( void* pMUD )
 {
-    return( MUD_CORE_proc( MUD_GET_SIZE, NULL, pMUD ) +
-	    (*((MUD_SEC*)pMUD)->core.proc)( MUD_GET_SIZE, NULL, (void*)pMUD ) );
+    return( MUD_CORE_proc( MUD_GET_SIZE, NULL, (MUD_SEC*)pMUD ) +
+	    (*((MUD_SEC*)pMUD)->core.proc)( MUD_GET_SIZE, NULL, pMUD ) );
 }
 
 
 void
-MUD_show( pMUD, io_opt )
-    void* pMUD;
-    MUD_IO_OPT io_opt;
+MUD_show( void* pMUD, MUD_IO_OPT io_opt )
 {
     if( pMUD == NULL ) return;
 
-    MUD_CORE_proc( MUD_SHOW, NULL, pMUD );
-    (*((MUD_SEC*)pMUD)->core.proc)( MUD_SHOW, NULL, (void*)pMUD );
+    MUD_CORE_proc( MUD_SHOW, NULL, (MUD_SEC*)pMUD );
+    (*((MUD_SEC*)pMUD)->core.proc)( MUD_SHOW, NULL, pMUD );
 
     printf( "\n" );
 
@@ -233,14 +222,12 @@ MUD_show( pMUD, io_opt )
 }
 
 void
-MUD_heads( pMUD, io_opt )
-    void* pMUD;
-    MUD_IO_OPT io_opt;
+MUD_heads( void* pMUD, MUD_IO_OPT io_opt )
 {
     if( pMUD == NULL ) return;
 
-    MUD_CORE_proc( MUD_HEADS, NULL, pMUD );
-    (*((MUD_SEC*)pMUD)->core.proc)( MUD_HEADS, NULL, (void*)pMUD );
+    MUD_CORE_proc( MUD_HEADS, NULL, (MUD_SEC*)pMUD );
+    (*((MUD_SEC*)pMUD)->core.proc)( MUD_HEADS, NULL, pMUD );
 
     if( ( MUD_secID( pMUD ) == MUD_SEC_GRP_ID ) && 
 	( io_opt == MUD_ALL ) )
@@ -260,8 +247,7 @@ MUD_heads( pMUD, io_opt )
  *  MUD_writeEnd() - called after all writes to file
  */	  
 BOOL
-MUD_writeEnd( fout )
-    FILE* fout;
+MUD_writeEnd( FILE* fout )
 {
     MUD_SEC_EOF* pMUD_eof;
 
@@ -282,9 +268,7 @@ MUD_writeEnd( fout )
  *  MUD_writeFile() - use for completely assembled groups/sections
  */	  
 BOOL
-MUD_writeFile( fout, pMUD_head )
-    FILE* fout;
-    void* pMUD_head;
+MUD_writeFile( FILE* fout, void* pMUD_head )
 {
     rewind( fout );
     if( !MUD_write( fout, pMUD_head, MUD_ALL ) ) return( FALSE );
@@ -296,10 +280,7 @@ MUD_writeFile( fout, pMUD_head )
  *  MUD_write() - use for completely assembled groups/sections
  */	  
 BOOL
-MUD_write( fout, pMUD, io_opt )
-    FILE* fout;
-    void* pMUD;
-    MUD_IO_OPT io_opt;
+MUD_write( FILE* fout, void* pMUD, MUD_IO_OPT io_opt )
 {
     BUF buf;
 
@@ -328,12 +309,8 @@ MUD_write( fout, pMUD, io_opt )
  *	MUD_writeEnd()
  */
 BOOL
-MUD_writeGrpStart( fout, pMUD_parentGrp, 
-		   pMUD_grp, numMems )
-    FILE* fout;
-    MUD_SEC_GRP* pMUD_parentGrp;
-    MUD_SEC_GRP* pMUD_grp;
-    int numMems;
+MUD_writeGrpStart( FILE* fout, MUD_SEC_GRP* pMUD_parentGrp, 
+		   MUD_SEC_GRP* pMUD_grp, int numMems )
 {
     pMUD_grp->pParent = pMUD_parentGrp;
 
@@ -352,9 +329,7 @@ MUD_writeGrpStart( fout, pMUD_parentGrp,
 
 
 void
-addIndex( pMUD_grp, pMUD )
-    MUD_SEC_GRP* pMUD_grp;
-    void* pMUD;
+addIndex( MUD_SEC_GRP* pMUD_grp, void* pMUD )
 {
     MUD_INDEX** ppMUD_index;
 
@@ -373,10 +348,7 @@ addIndex( pMUD_grp, pMUD )
  *  MUD_writeGrpMem() - use for writes of unassembled groups
  */	  
 BOOL
-MUD_writeGrpMem( fout, pMUD_grp, pMUD )
-    FILE* fout;
-    MUD_SEC_GRP* pMUD_grp;
-    void* pMUD;
+MUD_writeGrpMem( FILE* fout, MUD_SEC_GRP* pMUD_grp, void* pMUD )
 {
     ((MUD_SEC*)pMUD)->core.size = MUD_getSize( pMUD );
 
@@ -401,9 +373,7 @@ MUD_writeGrpMem( fout, pMUD_grp, pMUD )
  *  MUD_writeGrpEnd() - use for writes of unassembled groups
  */	  
 BOOL
-MUD_writeGrpEnd( fout, pMUD_grp )
-    FILE* fout;
-    MUD_SEC_GRP* pMUD_grp;
+MUD_writeGrpEnd( FILE* fout, MUD_SEC_GRP* pMUD_grp )
 {
     int pos;
 
@@ -425,8 +395,7 @@ MUD_writeGrpEnd( fout, pMUD_grp )
 
 
 void*
-MUD_readFile( fin )
-    FILE* fin;
+MUD_readFile( FILE* fin )
 {
     rewind( fin );
 
@@ -435,9 +404,7 @@ MUD_readFile( fin )
 
 
 void*
-MUD_read( fin, io_opt )
-    FILE* fin;
-    MUD_IO_OPT io_opt;
+MUD_read( FILE* fin, MUD_IO_OPT io_opt )
 {
     BUF buf;
     MUD_SEC* pMUD_new;
@@ -455,11 +422,13 @@ MUD_read( fin, io_opt )
      */	  
     if( ( pos = ftell( fin ) ) == EOF ) return( NULL );
     if( fread( &size, 4, 1, fin ) == 0 ) return( NULL );
+#if !defined(__arm64)
     bdecode_4( &size, &size );    /* byte ordering !!! */
+#endif // !defined(__arm64)
     if( fseek( fin, pos, 0 ) == EOF ) return( NULL );
 
 #ifdef DEBUG
-    printf( "MUD_read: got %d\n", size );
+    printf( "MUD_read: got %lu\n", (unsigned long)(size) );
     printf( "          pos = %d\n", pos );
     printf( "          reading the section ...\n" );
 #endif /* DEBUG */
@@ -572,8 +541,7 @@ MUD_read( fin, io_opt )
  */
 
 UINT32
-MUD_setSizes( pMUD )
-    void* pMUD;
+MUD_setSizes( void* pMUD )
 {
     MUD_SEC*    pMember;
     MUD_INDEX*  pGrpIndex;
@@ -624,8 +592,7 @@ MUD_setSizes( pMUD )
 
 
 MUD_SEC*
-MUD_peekCore( fin )
-    FILE* fin;
+MUD_peekCore( FILE* fin )
 {
     static MUD_SEC mud;
     int pos;
@@ -847,12 +814,8 @@ MUD_fseek( FILE* fio, ... )
 
 
 MUD_SEC*
-fseekNext( fio, pMUD_parent, 
-	   secID, instanceID )
-    FILE* fio;
-    MUD_SEC_GRP* pMUD_parent;
-    UINT32 secID;
-    UINT32 instanceID;
+fseekNext( FILE* fio, MUD_SEC_GRP* pMUD_parent, 
+	   UINT32 secID, UINT32 instanceID )
 {
     MUD_SEC* pMUD;
     MUD_INDEX* pMUD_index;
@@ -920,8 +883,7 @@ fseekNext( fio, pMUD_parent,
 
 
 int
-MUD_fseekFirst( fio )
-    FILE* fio;
+MUD_fseekFirst( FILE* fio )
 {
     int size;
 
@@ -935,9 +897,7 @@ MUD_fseekFirst( fio )
 
 
 void
-MUD_add( ppMUD_head, pMUD_new )
-    void** ppMUD_head;
-    void* pMUD_new;
+MUD_add( void** ppMUD_head, void* pMUD_new )
 {
     MUD_SEC** ppMUD;
 
@@ -952,8 +912,7 @@ MUD_add( ppMUD_head, pMUD_new )
 
 
 int
-MUD_totSize( pMUD )
-    void* pMUD;
+MUD_totSize( void* pMUD )
 {
     return( ( MUD_secID( pMUD ) == MUD_SEC_GRP_ID ) ? 
 		MUD_size( pMUD ) + ((MUD_SEC_GRP*)pMUD)->memSize : 
@@ -962,14 +921,13 @@ MUD_totSize( pMUD )
 
 
 void
-MUD_addToGroup( pMUD_grp, pMUD )
-    MUD_SEC_GRP* pMUD_grp;
-    void* pMUD;
+MUD_addToGroup( MUD_SEC_GRP* pMUD_grp, void* pMUD )
 {
     MUD_SEC** ppMUD;
 
     if( pMUD == NULL ) return;
 
+    /* possible addition: ((MUD_SEC*)pMUD)->core.pNext = NULL; */
     ((MUD_SEC*)pMUD)->core.size = MUD_getSize( pMUD );
 
     for( ppMUD = &pMUD_grp->pMem; 
@@ -985,9 +943,7 @@ MUD_addToGroup( pMUD_grp, pMUD )
 
 
 void
-MUD_assignCore( pMUD1, pMUD2 )
-    MUD_SEC* pMUD1;
-    MUD_SEC* pMUD2;
+MUD_assignCore( MUD_SEC* pMUD1, MUD_SEC* pMUD2 )
 {
     bcopy( &pMUD1->core.size, &pMUD2->core.size, 
 	    MUD_CORE_proc( MUD_GET_SIZE, NULL, NULL ) );
@@ -995,10 +951,7 @@ MUD_assignCore( pMUD1, pMUD2 )
 
 
 int
-MUD_CORE_proc( op, pBuf, pMUD )
-    MUD_OPT op;
-    BUF* pBuf;
-    MUD_SEC* pMUD;
+MUD_CORE_proc( MUD_OPT op, BUF* pBuf, MUD_SEC* pMUD )
 {
     int size;
 
@@ -1019,12 +972,13 @@ MUD_CORE_proc( op, pBuf, pMUD )
 	case MUD_GET_SIZE:
 	    size = 3*sizeof(UINT32);
 #ifdef DEBUG
-    printf("MUD_CORE_proc: MUD_GET_SIZE returns size=%d\n",size);
+            printf("MUD_CORE_proc: MUD_GET_SIZE returns size=%d\n",size);
 #endif /* DEBUG */            
 	    return( size );
 	case MUD_SHOW:
-	    printf( "  CORE: size=[%ld], secID=[0x%08lX], instanceID=[0x%08lX]\n",
-		    pMUD->core.size, pMUD->core.secID, pMUD->core.instanceID );
+	    printf( "  CORE: size=[%lu], secID=[0x%08lX], instanceID=[0x%08lX]\n",
+		    (unsigned long)(pMUD->core.size), (unsigned long)(pMUD->core.secID), 
+                    (unsigned long)(pMUD->core.instanceID) );
 	    break;
 	case MUD_HEADS:
 	    break;
@@ -1034,10 +988,7 @@ MUD_CORE_proc( op, pBuf, pMUD )
 
 
 int
-MUD_INDEX_proc( op, pBuf, pMUD )
-    MUD_OPT op;
-    BUF* pBuf;
-    MUD_INDEX* pMUD;
+MUD_INDEX_proc( MUD_OPT op, BUF* pBuf, MUD_INDEX* pMUD )
 {
     int size;
 
@@ -1065,8 +1016,9 @@ MUD_INDEX_proc( op, pBuf, pMUD )
 	    size = 3*sizeof(UINT32);
 	    return( size );
 	case MUD_SHOW:
-	    printf( "  INDEX: offset=[%ld], secID=[0x%08lX], instanceID=[0x%08lX]\n",
-		    pMUD->offset, pMUD->secID, pMUD->instanceID );
+	    printf( "  INDEX: offset=[%lu], secID=[0x%08lX], instanceID=[0x%08lX]\n",
+		    (unsigned long)(pMUD->offset), (unsigned long)(pMUD->secID), 
+                    (unsigned long)(pMUD->instanceID) );
 	    break;
 	case MUD_HEADS:
 	    break;

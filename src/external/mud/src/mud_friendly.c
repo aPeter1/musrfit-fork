@@ -3,14 +3,14 @@
  *
  *    A friendly programming interface to the MUD library
  *
- *  Copyright (c) 1996-2010 TRIUMF Cyclotron Facility
+ *  Copyright (c) 1996-2020 TRIUMF Cyclotron Facility
  *
  *  Author: 
  *    Ted Whidden, TRIUMF Data Acquisition Group
  *    Donald Arseneau, TRIUMF CMMS
  *    4004 Wesbrook Mall, Vancouver, BC, Canada, V6T 2A3
  *
-*
+ *
  *   Released under the GNU LGPL - see http://www.gnu.org/licenses
  *
  *   This program is free software; you can distribute it and/or modify it under
@@ -30,7 +30,8 @@
  *                            string "get" functions, and use strncpy, but 
  *                            always terminate.
  *    22-Apr-2003  v1.6  DJA  Add mud_openReadWrite
- *    22-Aug-2010  v1.7  DJA  Add mud_openReadWrite
+ *    25-May-2011  v1.7  DJA  Fix cast in MUD_setHistSecondsPerBin
+ *    15-Oct-2020  v1.8  DF   Fix group/instance numbers in _sea_cmtgrp
  *
  *  Description:
  *
@@ -226,18 +227,15 @@
 #define MUD_FILE_READ  1
 #define MUD_FILE_WRITE 2
 
-static FILE* mud_f[MUD_MAX_FILES] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+static FILE* mud_f[MUD_MAX_FILES] = { 0 };
 static MUD_SEC_GRP* pMUD_fileGrp[MUD_MAX_FILES];
 
 #define _strncpy( To, From, Len) strncpy( To, From, Len )[Len-1]='\0'
 
 int 
-MUD_openRead( filename, pType )
-    char* filename;
-    UINT32* pType;
+MUD_openRead( char* filename, UINT32* pType )
 {
   int fd;
-  FILE* fin;
 
   for( fd = 0; fd < MUD_MAX_FILES; fd++ ) 
   {
@@ -254,8 +252,8 @@ MUD_openRead( filename, pType )
    *  i.e., only read when needed, keep track of 
    *  what's already read.
    */
-  pMUD_fileGrp[fd] = MUD_readFile( mud_f[fd] );
-  if( pMUD_fileGrp[fd] == NULL ) 
+  pMUD_fileGrp[fd] = (MUD_SEC_GRP*)MUD_readFile( mud_f[fd] );
+  if( pMUD_fileGrp[fd] == NULL )
   {
     fclose( mud_f[fd] );
     mud_f[fd] = NULL;
@@ -268,12 +266,9 @@ MUD_openRead( filename, pType )
 }
 
 int 
-MUD_openReadWrite( filename, pType )
-    char* filename;
-    UINT32* pType;
+MUD_openReadWrite( char* filename, UINT32* pType )
 {
   int fd;
-  FILE* fin;
 
   for( fd = 0; fd < MUD_MAX_FILES; fd++ ) 
   {
@@ -287,7 +282,7 @@ MUD_openReadWrite( filename, pType )
   /*
    *  Just read the whole file.  Must do so in ReadWrite version.
    */
-  pMUD_fileGrp[fd] = MUD_readFile( mud_f[fd] );
+  pMUD_fileGrp[fd] = (MUD_SEC_GRP*)MUD_readFile( mud_f[fd] );
   if( pMUD_fileGrp[fd] == NULL ) 
   {
     fclose( mud_f[fd] );
@@ -302,12 +297,9 @@ MUD_openReadWrite( filename, pType )
 
 
 int 
-MUD_openWrite( filename, type )
-    char* filename;
-    UINT32 type;
+MUD_openWrite( char* filename, UINT32 type )
 {
   int fd;
-  FILE* fin;
 
   for( fd = 0; fd < MUD_MAX_FILES; fd++ ) 
   {
@@ -331,8 +323,7 @@ MUD_openWrite( filename, type )
 
 
 int 
-MUD_closeRead( fd )
-    int fd;
+MUD_closeRead( int fd )
 {
   if( ( fd < 0 ) || ( fd >= MUD_MAX_FILES ) || ( mud_f[fd] == NULL ) ) 
   {
@@ -356,8 +347,7 @@ MUD_closeRead( fd )
 
 
 int 
-MUD_closeWrite( fd )
-    int fd;
+MUD_closeWrite( int fd )
 {
   if( ( fd < 0 ) || ( fd >= MUD_MAX_FILES ) || ( mud_f[fd] == NULL ) ) 
   {
@@ -389,9 +379,7 @@ MUD_closeWrite( fd )
 }
 
 int 
-MUD_closeWriteFile( fd, outname )
-    int fd;
-    char* outname;
+MUD_closeWriteFile( int fd, char* outname )
 {
   if( ( fd < 0 ) || ( fd >= MUD_MAX_FILES ) || ( mud_f[fd] == NULL ) ) 
   {
@@ -445,14 +433,14 @@ MUD_closeWriteFile( fd, outname )
   switch( MUD_instanceID( pMUD_fileGrp[fd] ) ) \
   { \
     case MUD_FMT_TRI_TI_ID: \
-      pMUD_idesc = MUD_search( pMUD_fileGrp[fd]->pMem, \
+      pMUD_idesc = (MUD_SEC_TRI_TI_RUN_DESC*)MUD_search( pMUD_fileGrp[fd]->pMem,             \
                               MUD_SEC_TRI_TI_RUN_DESC_ID, (UINT32)1, \
                               (UINT32)0 ); \
       if( pMUD_idesc == NULL ) return( 0 ); \
       break; \
     case MUD_FMT_TRI_TD_ID: \
     default: \
-      pMUD_desc = MUD_search( pMUD_fileGrp[fd]->pMem, \
+      pMUD_desc = (MUD_SEC_GEN_RUN_DESC*)MUD_search( pMUD_fileGrp[fd]->pMem,           \
                               MUD_SEC_GEN_RUN_DESC_ID, (UINT32)1, \
                               (UINT32)0 ); \
       if( pMUD_desc == NULL ) return( 0 ); \
@@ -461,26 +449,24 @@ MUD_closeWriteFile( fd, outname )
 
 
 #define _sea_gdesc( fd ) \
-  pMUD_desc = MUD_search( pMUD_fileGrp[fd]->pMem, \
+  pMUD_desc = (MUD_SEC_GEN_RUN_DESC*)MUD_search( pMUD_fileGrp[fd]->pMem, \
                               MUD_SEC_GEN_RUN_DESC_ID, (UINT32)1, \
                               (UINT32)0 ); \
   if( pMUD_desc == NULL ) return( 0 )
 
 
 #define _sea_idesc( fd ) \
-  pMUD_idesc = MUD_search( pMUD_fileGrp[fd]->pMem, \
+  pMUD_idesc = (MUD_SEC_TRI_TI_RUN_DESC*)MUD_search( pMUD_fileGrp[fd]->pMem, \
                               MUD_SEC_TRI_TI_RUN_DESC_ID, (UINT32)1, \
                               (UINT32)0 ); \
   if( pMUD_idesc == NULL ) return( 0 )
 
 
 #define _desc_uint_getproc( name, var ) \
-int name( fd, var ) \
-    int fd; \
-    UINT32* var; \
+  int name( int fd, UINT32* var) \
 { \
-  MUD_SEC_GEN_RUN_DESC* pMUD_desc; \
-  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc; \
+  MUD_SEC_GEN_RUN_DESC* pMUD_desc=0; \
+  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc=0; \
   _check_fd( fd ); \
   _sea_desc( fd ); \
   switch( MUD_instanceID( pMUD_fileGrp[fd] ) ) \
@@ -493,12 +479,10 @@ int name( fd, var ) \
 
 
 #define _desc_uint_setproc( name, var ) \
-int name( fd, var ) \
-    int fd; \
-    UINT32 var; \
+int name( int fd, UINT32 var) \
 { \
-  MUD_SEC_GEN_RUN_DESC* pMUD_desc; \
-  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc; \
+  MUD_SEC_GEN_RUN_DESC* pMUD_desc=0; \
+  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc=0; \
   _check_fd( fd ); \
   _sea_desc( fd ); \
   switch( MUD_instanceID( pMUD_fileGrp[fd] ) ) \
@@ -511,12 +495,10 @@ int name( fd, var ) \
 
 
 #define _desc_char_getproc( name, var ) \
-int name( fd, var, strdim ) \
-    int fd, strdim; \
-    char* var; \
+int name( int fd, char* var, int strdim ) \
 { \
-  MUD_SEC_GEN_RUN_DESC* pMUD_desc; \
-  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc; \
+  MUD_SEC_GEN_RUN_DESC* pMUD_desc=0; \
+  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc=0; \
   _check_fd( fd ); \
   _sea_desc( fd ); \
   switch( MUD_instanceID( pMUD_fileGrp[fd] ) ) \
@@ -529,12 +511,10 @@ int name( fd, var, strdim ) \
 
 
 #define _desc_char_setproc( name, var ) \
-int name( fd, var ) \
-    int fd; \
-    char* var; \
+int name( int fd, char* var ) \
 { \
-  MUD_SEC_GEN_RUN_DESC* pMUD_desc; \
-  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc; \
+  MUD_SEC_GEN_RUN_DESC* pMUD_desc=0; \
+  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc=0; \
   _check_fd( fd ); \
   _sea_desc( fd ); \
   switch( MUD_instanceID( pMUD_fileGrp[fd] ) ) \
@@ -549,11 +529,9 @@ int name( fd, var ) \
 
 
 #define _gdesc_char_getproc( name, var ) \
-int name( fd, var, strdim ) \
-    int fd, strdim; \
-    char* var; \
+int name( int fd, char* var, int strdim ) \
 { \
-  MUD_SEC_GEN_RUN_DESC* pMUD_desc; \
+  MUD_SEC_GEN_RUN_DESC* pMUD_desc=0; \
   _check_fd( fd ); \
   _sea_gdesc( fd ); \
   _strncpy( var, pMUD_desc->var, strdim ); \
@@ -562,11 +540,9 @@ int name( fd, var, strdim ) \
 
 
 #define _gdesc_char_setproc( name, var ) \
-int name( fd, var ) \
-    int fd; \
-    char* var; \
+int name( int fd, char* var ) \
 { \
-  MUD_SEC_GEN_RUN_DESC* pMUD_desc; \
+  MUD_SEC_GEN_RUN_DESC* pMUD_desc=0; \
   _check_fd( fd ); \
   _sea_gdesc( fd ); \
   _free( pMUD_desc->var ); \
@@ -576,11 +552,9 @@ int name( fd, var ) \
 
 
 #define _idesc_char_getproc( name, var ) \
-int name( fd, var, strdim ) \
-    int fd, strdim;\
-    char* var;\
+int name( int fd, char* var, int strdim ) \
 { \
-  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc; \
+  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc=0; \
   _check_fd( fd ); \
   _sea_idesc( fd ); \
   _strncpy( var, pMUD_idesc->var, strdim ); \
@@ -589,11 +563,9 @@ int name( fd, var, strdim ) \
 
 
 #define _idesc_char_setproc( name, var ) \
-int name( fd, var ) \
-    int fd;\
-    char* var;\
+int name( int fd, char* var ) \
 { \
-  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc; \
+  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc=0; \
   _check_fd( fd ); \
   _sea_idesc( fd ); \
   _free( pMUD_idesc->var ); \
@@ -603,19 +575,17 @@ int name( fd, var ) \
 
 
 int
-MUD_getRunDesc( fd, pType )
-    int fd;
-    UINT32* pType;
+MUD_getRunDesc( int fd, UINT32* pType )
 {
-  MUD_SEC_GEN_RUN_DESC* pMUD_desc;
-  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc;
+  MUD_SEC_GEN_RUN_DESC* pMUD_desc=0;
+  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc=0;
 
   _check_fd( fd );
 
   switch( MUD_instanceID( pMUD_fileGrp[fd] ) )
   {
     case MUD_FMT_TRI_TI_ID:
-      pMUD_idesc = MUD_search( pMUD_fileGrp[fd]->pMem,
+      pMUD_idesc = (MUD_SEC_TRI_TI_RUN_DESC*)MUD_search( pMUD_fileGrp[fd]->pMem,
                               MUD_SEC_TRI_TI_RUN_DESC_ID, (UINT32)1,
                               (UINT32)0 );
       if( pMUD_idesc == NULL ) return( 0 );
@@ -623,7 +593,7 @@ MUD_getRunDesc( fd, pType )
       break;
     case MUD_FMT_TRI_TD_ID:
     default:
-      pMUD_desc = MUD_search( pMUD_fileGrp[fd]->pMem,
+      pMUD_desc = (MUD_SEC_GEN_RUN_DESC*)MUD_search( pMUD_fileGrp[fd]->pMem,
                               MUD_SEC_GEN_RUN_DESC_ID, (UINT32)1,
                               (UINT32)0 );
       if( pMUD_desc == NULL ) return( 0 );
@@ -635,28 +605,27 @@ MUD_getRunDesc( fd, pType )
 }
 
 int
-MUD_setRunDesc( fd, type )
-    int fd;
-    UINT32 type;
+MUD_setRunDesc( int fd, UINT32 type )
 {
-  void* pMUD_desc;
+  MUD_SEC_GEN_RUN_DESC* pMUD_desc=0;
+  MUD_SEC_TRI_TI_RUN_DESC* pMUD_idesc=0;
 
   _check_fd( fd );
 
   switch( MUD_instanceID( pMUD_fileGrp[fd] ) )
   {
     case MUD_FMT_TRI_TI_ID:
-      pMUD_desc = (void*)MUD_new( MUD_SEC_TRI_TI_RUN_DESC_ID, 1 );
-      if( pMUD_desc == NULL ) return( 0 );
+      pMUD_idesc = (MUD_SEC_TRI_TI_RUN_DESC*)MUD_new( MUD_SEC_TRI_TI_RUN_DESC_ID, 1 );
+      if( pMUD_idesc == NULL ) return( 0 );
+      MUD_addToGroup( pMUD_fileGrp[fd], pMUD_idesc );
       break;
     case MUD_FMT_TRI_TD_ID:
     default:
-      pMUD_desc = (void*)MUD_new( MUD_SEC_GEN_RUN_DESC_ID, 1 );
+      pMUD_desc = (MUD_SEC_GEN_RUN_DESC*)MUD_new( MUD_SEC_GEN_RUN_DESC_ID, 1 );
       if( pMUD_desc == NULL ) return( 0 );
+      MUD_addToGroup( pMUD_fileGrp[fd], pMUD_desc );
       break;
   }
-
-  MUD_addToGroup( pMUD_fileGrp[fd], pMUD_desc );
 
   return( 1 );
 }
@@ -714,14 +683,14 @@ _idesc_char_setproc( MUD_setComment3, comment3 )
  *  Comments
  */
 #define _sea_cmtgrp( fd ) \
-  pMUD_cmtGrp = MUD_search( pMUD_fileGrp[fd]->pMem, \
-                          MUD_GRP_CMT_ID, (UINT32)1, \
+  pMUD_cmtGrp = (MUD_SEC_GRP*)MUD_search( pMUD_fileGrp[fd]->pMem,       \
+                          MUD_SEC_GRP_ID, MUD_GRP_CMT_ID, \
                           (UINT32)0 ); \
   if( pMUD_cmtGrp == NULL ) return( 0 )
 
 
 #define _sea_cmt( fd, n ) \
-  pMUD_cmt = MUD_search( pMUD_cmtGrp->pMem, \
+  pMUD_cmt = (MUD_SEC_CMT*)MUD_search( pMUD_cmtGrp->pMem, \
                          MUD_SEC_CMT_ID, (UINT32)n, \
                          (UINT32)0 ); \
   if( pMUD_cmt == NULL ) return( 0 )
@@ -729,13 +698,10 @@ _idesc_char_setproc( MUD_setComment3, comment3 )
 
 #define _cmt_uint_getproc( name, var ) \
 int \
-name( fd, num, var ) \
-    int fd;\
-    int num;\
-    UINT32* var;\
+name( int fd, int num, UINT32* var ) \
 { \
-  MUD_SEC_GRP* pMUD_cmtGrp; \
-  MUD_SEC_CMT* pMUD_cmt; \
+  MUD_SEC_GRP* pMUD_cmtGrp=0; \
+  MUD_SEC_CMT* pMUD_cmt=0; \
   _check_fd( fd ); \
   _sea_cmtgrp( fd ); \
   _sea_cmt( fd, num ); \
@@ -746,13 +712,10 @@ name( fd, num, var ) \
 
 #define _cmt_uint_setproc( name, var ) \
 int \
-name( fd, num, var ) \
-    int fd;\
-    int num;\
-    UINT32 var;\
+name( int fd, int num, UINT32 var ) \
 { \
-  MUD_SEC_GRP* pMUD_cmtGrp; \
-  MUD_SEC_CMT* pMUD_cmt; \
+  MUD_SEC_GRP* pMUD_cmtGrp=0; \
+  MUD_SEC_CMT* pMUD_cmt=0; \
   _check_fd( fd ); \
   _sea_cmtgrp( fd ); \
   _sea_cmt( fd, num ); \
@@ -763,13 +726,10 @@ name( fd, num, var ) \
 
 #define _cmt_char_getproc( name, var ) \
 int \
-name( fd, num, var, strdim ) \
-    int fd, strdim;\
-    int num;\
-    char* var;\
+name( int fd, int num, char* var, int strdim ) \
 { \
-  MUD_SEC_GRP* pMUD_cmtGrp; \
-  MUD_SEC_CMT* pMUD_cmt; \
+  MUD_SEC_GRP* pMUD_cmtGrp=0; \
+  MUD_SEC_CMT* pMUD_cmt=0; \
   _check_fd( fd ); \
   _sea_cmtgrp( fd ); \
   _sea_cmt( fd, num ); \
@@ -779,13 +739,10 @@ name( fd, num, var, strdim ) \
 
 #define _cmt_char_setproc( name, var ) \
 int \
-name( fd, num, var ) \
-    int fd;\
-    int num;\
-    char* var;\
+name( int fd, int num, char* var ) \
 { \
-  MUD_SEC_GRP* pMUD_cmtGrp; \
-  MUD_SEC_CMT* pMUD_cmt; \
+  MUD_SEC_GRP* pMUD_cmtGrp=0; \
+  MUD_SEC_CMT* pMUD_cmt=0; \
   _check_fd( fd ); \
   _sea_cmtgrp( fd ); \
   _sea_cmt( fd, num ); \
@@ -795,12 +752,9 @@ name( fd, num, var ) \
 }
 
 int 
-MUD_getComments( fd, pType, pNum )
-    int fd;
-    UINT32* pType;
-    UINT32* pNum;
+MUD_getComments( int fd, UINT32* pType, UINT32* pNum )
 {
-  MUD_SEC_GRP* pMUD_cmtGrp;
+  MUD_SEC_GRP* pMUD_cmtGrp=0;
 
   _check_fd( fd );
   _sea_cmtgrp( fd );
@@ -811,13 +765,10 @@ MUD_getComments( fd, pType, pNum )
 }
 
 int 
-MUD_setComments( fd, type, num )
-    int fd;
-    UINT32 type;
-    UINT32 num;
+MUD_setComments( int fd, UINT32 type, UINT32 num )
 {
-  MUD_SEC_GRP* pMUD_cmtGrp;
-  MUD_SEC_CMT* pMUD_cmt;
+  MUD_SEC_GRP* pMUD_cmtGrp=0;
+  MUD_SEC_CMT* pMUD_cmt=0;
   int i;
 
   _check_fd( fd );
@@ -863,13 +814,13 @@ _cmt_char_setproc( MUD_setCommentBody, comment )
   switch( MUD_instanceID( pMUD_fileGrp[fd] ) ) \
   { \
     case MUD_FMT_TRI_TI_ID: \
-      pMUD_histGrp = MUD_search( pMUD_fileGrp[fd]->pMem, \
+      pMUD_histGrp = (MUD_SEC_GRP*)MUD_search( pMUD_fileGrp[fd]->pMem,  \
                                  MUD_SEC_GRP_ID, MUD_GRP_TRI_TI_HIST_ID, \
                                  (UINT32)0 ); \
       break; \
     case MUD_FMT_TRI_TD_ID: \
     default: \
-      pMUD_histGrp = MUD_search( pMUD_fileGrp[fd]->pMem, \
+      pMUD_histGrp = (MUD_SEC_GRP*)MUD_search( pMUD_fileGrp[fd]->pMem, \
                                  MUD_SEC_GRP_ID, MUD_GRP_TRI_TD_HIST_ID, \
                                  (UINT32)0 ); \
       break; \
@@ -883,7 +834,7 @@ _cmt_char_setproc( MUD_setCommentBody, comment )
     case MUD_FMT_TRI_TI_ID: \
     case MUD_FMT_TRI_TD_ID: \
     default: \
-      pMUD_histHdr = MUD_search( pMUD_histGrp->pMem, \
+      pMUD_histHdr = (MUD_SEC_GEN_HIST_HDR*)MUD_search( pMUD_histGrp->pMem, \
                                  MUD_SEC_GEN_HIST_HDR_ID, (UINT32)n, \
                                  (UINT32)0 ); \
       break; \
@@ -893,13 +844,10 @@ _cmt_char_setproc( MUD_setCommentBody, comment )
 
 #define _hist_uint_getproc( name, var ) \
 int \
-name( fd, num, var ) \
-    int fd;\
-    int num;\
-    UINT32* var;\
+name( int fd, int num, UINT32* var ) \
 { \
-  MUD_SEC_GRP* pMUD_histGrp; \
-  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr; \
+  MUD_SEC_GRP* pMUD_histGrp=0; \
+  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr=0; \
   _check_fd( fd ); \
   _sea_histgrp( fd ); \
   _sea_histhdr( fd, num ); \
@@ -909,13 +857,10 @@ name( fd, num, var ) \
 
 #define _hist_uint_setproc( name, var ) \
 int \
-name( fd, num, var ) \
-    int fd;\
-    int num;\
-    UINT32 var;\
+name( int fd, int num, UINT32 var ) \
 { \
-  MUD_SEC_GRP* pMUD_histGrp; \
-  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr; \
+  MUD_SEC_GRP* pMUD_histGrp=0; \
+  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr=0; \
   _check_fd( fd ); \
   _sea_histgrp( fd ); \
   _sea_histhdr( fd, num ); \
@@ -925,10 +870,7 @@ name( fd, num, var ) \
 
 #define _hist_char_getproc( name, var ) \
 int \
-name( fd, num, var, strdim ) \
-    int fd, strdim;\
-    int num;\
-    char* var;\
+name( int fd, int num, char* var, int strdim ) \
 { \
   MUD_SEC_GRP* pMUD_histGrp; \
   MUD_SEC_GEN_HIST_HDR* pMUD_histHdr; \
@@ -941,13 +883,10 @@ name( fd, num, var, strdim ) \
 
 #define _hist_char_setproc( name, var ) \
 int \
-name( fd, num, var ) \
-    int fd;\
-    int num;\
-    char* var;\
+name( int fd, int num, char* var ) \
 { \
-  MUD_SEC_GRP* pMUD_histGrp; \
-  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr; \
+  MUD_SEC_GRP* pMUD_histGrp=0; \
+  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr=0; \
   _check_fd( fd ); \
   _sea_histgrp( fd ); \
   _sea_histhdr( fd, num ); \
@@ -957,12 +896,9 @@ name( fd, num, var ) \
 }
 
 int 
-MUD_getHists( fd, pType, pNum )
-    int fd;
-    UINT32* pType;
-    UINT32* pNum;
+MUD_getHists( int fd, UINT32* pType, UINT32* pNum )
 {
-  MUD_SEC_GRP* pMUD_histGrp;
+  MUD_SEC_GRP* pMUD_histGrp=0;
   _check_fd( fd );
   _sea_histgrp( fd );
   *pType = MUD_instanceID( pMUD_histGrp );
@@ -981,14 +917,11 @@ MUD_getHists( fd, pType, pNum )
 }
 
 int 
-MUD_setHists( fd, type, num )
-    int fd;
-    UINT32 type;
-    UINT32 num;
+MUD_setHists( int fd, UINT32 type, UINT32 num )
 {
   MUD_SEC_GRP* pMUD_grp;
-  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr;
-  MUD_SEC_GEN_HIST_DAT* pMUD_histDat;
+  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr=0;
+  MUD_SEC_GEN_HIST_DAT* pMUD_histDat=0;
   int i;
 
   _check_fd( fd );
@@ -1048,17 +981,14 @@ _hist_uint_setproc( MUD_setHistNumEvents, nEvents )
 _hist_char_setproc( MUD_setHistTitle, title )
 
 int 
-MUD_getHistpData( fd, num, ppData )
-    int fd;
-    int num;
-    void** ppData;
+MUD_getHistpData( int fd, int num, void** ppData )
 {
-  MUD_SEC_GRP* pMUD_histGrp;
-  MUD_SEC_GEN_HIST_DAT* pMUD_histDat;
+  MUD_SEC_GRP* pMUD_histGrp=0;
+  MUD_SEC_GEN_HIST_DAT* pMUD_histDat=0;
   _check_fd( fd );
   _sea_histgrp( fd );
   
-  pMUD_histDat = MUD_search( pMUD_histGrp->pMem,
+  pMUD_histDat = (MUD_SEC_GEN_HIST_DAT*)MUD_search( pMUD_histGrp->pMem,
                              MUD_SEC_GEN_HIST_DAT_ID, (UINT32)num,
                              (UINT32)0 );
   if( pMUD_histDat == NULL ) return( 0 );
@@ -1068,43 +998,37 @@ MUD_getHistpData( fd, num, ppData )
 }
 
 int 
-MUD_setHistpData( fd, num, pData )
-    int fd;
-    int num;
-    void* pData;
+MUD_setHistpData( int fd, int num, void* pData )
 {
-  MUD_SEC_GRP* pMUD_histGrp;
-  MUD_SEC_GEN_HIST_DAT* pMUD_histDat;
+  MUD_SEC_GRP* pMUD_histGrp=0;
+  MUD_SEC_GEN_HIST_DAT* pMUD_histDat=0;
   _check_fd( fd );
   _sea_histgrp( fd );
   
-  pMUD_histDat = MUD_search( pMUD_histGrp->pMem,
+  pMUD_histDat = (MUD_SEC_GEN_HIST_DAT*)MUD_search( pMUD_histGrp->pMem,
                              MUD_SEC_GEN_HIST_DAT_ID, (UINT32)num,
                              (UINT32)0 );
   if( pMUD_histDat == NULL ) return( 0 );
 
-  pMUD_histDat->pData = pData;
+  pMUD_histDat->pData = (caddr_t)pData;
   return( 1 );
 }
 
 int 
-MUD_getHistData( fd, num, pData )
-    int fd;
-    int num;
-    void* pData;
+MUD_getHistData( int fd, int num, void* pData )
 {
-  MUD_SEC_GRP* pMUD_histGrp;
-  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr;
-  MUD_SEC_GEN_HIST_DAT* pMUD_histDat;
+  MUD_SEC_GRP* pMUD_histGrp=0;
+  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr=0;
+  MUD_SEC_GEN_HIST_DAT* pMUD_histDat=0;
   _check_fd( fd );
   _sea_histgrp( fd );
   
-  pMUD_histHdr = MUD_search( pMUD_histGrp->pMem,
+  pMUD_histHdr = (MUD_SEC_GEN_HIST_HDR*)MUD_search( pMUD_histGrp->pMem,
                              MUD_SEC_GEN_HIST_HDR_ID, (UINT32)num,
                              (UINT32)0 );
   if( pMUD_histHdr == NULL ) return( 0 );
 
-  pMUD_histDat = MUD_search( pMUD_histGrp->pMem,
+  pMUD_histDat = (MUD_SEC_GEN_HIST_DAT*)MUD_search( pMUD_histGrp->pMem,
                              MUD_SEC_GEN_HIST_DAT_ID, (UINT32)num,
                              (UINT32)0 );
   if( pMUD_histDat == NULL ) return( 0 );
@@ -1120,23 +1044,20 @@ MUD_getHistData( fd, num, pData )
 }
 
 int 
-MUD_setHistData( fd, num, pData )
-    int fd;
-    int num;
-    void* pData;
+MUD_setHistData( int fd, int num, void* pData )
 {
-  MUD_SEC_GRP* pMUD_histGrp;
-  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr;
-  MUD_SEC_GEN_HIST_DAT* pMUD_histDat;
+  MUD_SEC_GRP* pMUD_histGrp=0;
+  MUD_SEC_GEN_HIST_HDR* pMUD_histHdr=0;
+  MUD_SEC_GEN_HIST_DAT* pMUD_histDat=0;
   _check_fd( fd );
   _sea_histgrp( fd );
   
-  pMUD_histHdr = MUD_search( pMUD_histGrp->pMem,
+  pMUD_histHdr = (MUD_SEC_GEN_HIST_HDR*)MUD_search( pMUD_histGrp->pMem,
                              MUD_SEC_GEN_HIST_HDR_ID, (UINT32)num,
                              (UINT32)0 );
   if( pMUD_histHdr == NULL ) return( 0 );
 
-  pMUD_histDat = MUD_search( pMUD_histGrp->pMem,
+  pMUD_histDat = (MUD_SEC_GEN_HIST_DAT*)MUD_search( pMUD_histGrp->pMem,
                              MUD_SEC_GEN_HIST_DAT_ID, (UINT32)num,
                              (UINT32)0 );
   if( pMUD_histDat == NULL ) return( 0 );
@@ -1166,10 +1087,7 @@ MUD_setHistData( fd, num, pData )
 }
 
 int 
-MUD_getHistpTimeData( fd, num, ppTimeData )
-    int fd;
-    int num;
-    UINT32** ppTimeData;
+MUD_getHistpTimeData( int fd, int num, UINT32** ppTimeData )
 {
   /* return pointer to time history data for a histogram */
   /* not implemented */
@@ -1177,10 +1095,7 @@ MUD_getHistpTimeData( fd, num, ppTimeData )
 }
 
 int 
-MUD_getHistTimeData( fd, num, pTimeData )
-    int fd;
-    int num;
-    UINT32* pTimeData;
+MUD_getHistTimeData( int fd, int num, UINT32* pTimeData )
 {
   /* return pointer to time history data for a histogram */
   /* not implemented */
@@ -1188,10 +1103,7 @@ MUD_getHistTimeData( fd, num, pTimeData )
 }
 
 int 
-MUD_setHistpTimeData( fd, num, pTimeData )
-    int fd;
-    int num;
-    UINT32* pTimeData;
+MUD_setHistpTimeData( int fd, int num, UINT32* pTimeData )
 {
   /* return pointer to time history data for a histogram */
   /* not implemented */
@@ -1199,10 +1111,7 @@ MUD_setHistpTimeData( fd, num, pTimeData )
 }
 
 int 
-MUD_setHistTimeData( fd, num, pTimeData )
-    int fd;
-    int num;
-    UINT32* pTimeData;
+MUD_setHistTimeData( int fd, int num, UINT32* pTimeData )
 {
   /* return pointer to time history data for a histogram */
   /* not implemented */
@@ -1214,12 +1123,7 @@ MUD_setHistTimeData( fd, num, pTimeData )
  *  (not success/failure)
  */
 int 
-MUD_pack( num, inBinSize, inArray, outBinSize, outArray )
-    int num;
-    int inBinSize;
-    void* inArray;
-    int outBinSize;
-    void* outArray;
+MUD_pack( int num, int inBinSize, void*inArray, int outBinSize, void* outArray )
 {
   return( MUD_SEC_GEN_HIST_pack( num, inBinSize, inArray,
                                  outBinSize, outArray ) );
@@ -1227,12 +1131,7 @@ MUD_pack( num, inBinSize, inArray, outBinSize, outArray )
 
 
 int 
-MUD_unpack( num, inBinSize, inArray, outBinSize, outArray )
-    int num;
-    int inBinSize;
-    void* inArray;
-    int outBinSize;
-    void* outArray;
+MUD_unpack( int num, int inBinSize, void* inArray, int outBinSize, void* outArray )
 {
   return( MUD_SEC_GEN_HIST_unpack( num, inBinSize, inArray,
                                    outBinSize, outArray ) );
@@ -1247,7 +1146,7 @@ MUD_unpack( num, inBinSize, inArray, outBinSize, outArray )
   { \
     case MUD_FMT_TRI_TD_ID: \
     default: \
-      pMUD_scalGrp = MUD_search( pMUD_fileGrp[fd]->pMem, \
+      pMUD_scalGrp = (MUD_SEC_GRP*)MUD_search( pMUD_fileGrp[fd]->pMem,              \
                                  MUD_SEC_GRP_ID, MUD_GRP_TRI_TD_SCALER_ID, \
                                  (UINT32)0 ); \
       break; \
@@ -1260,7 +1159,7 @@ MUD_unpack( num, inBinSize, inArray, outBinSize, outArray )
   { \
     case MUD_FMT_TRI_TD_ID: \
     default: \
-      pMUD_scal = MUD_search( pMUD_scalGrp->pMem, \
+      pMUD_scal = (MUD_SEC_GEN_SCALER*)MUD_search( pMUD_scalGrp->pMem,                \
                                  MUD_SEC_GEN_SCALER_ID, (UINT32)n, \
                                  (UINT32)0 ); \
       break; \
@@ -1269,12 +1168,9 @@ MUD_unpack( num, inBinSize, inArray, outBinSize, outArray )
 
 
 int 
-MUD_getScalers( fd, pType, pNum )
-    int fd;
-    UINT32* pType;
-    UINT32* pNum;
+MUD_getScalers( int fd, UINT32* pType, UINT32* pNum )
 {
-  MUD_SEC_GRP* pMUD_scalGrp;
+  MUD_SEC_GRP* pMUD_scalGrp=0;
 
   _check_fd( fd );
   _sea_scalgrp( fd );
@@ -1285,13 +1181,10 @@ MUD_getScalers( fd, pType, pNum )
 }
 
 int 
-MUD_setScalers( fd, type, num )
-    int fd;
-    UINT32 type;
-    UINT32 num;
+MUD_setScalers( int fd, UINT32 type, UINT32 num )
 {
-  MUD_SEC_GRP* pMUD_grp;
-  MUD_SEC_GEN_SCALER* pMUD_scal;
+  MUD_SEC_GRP* pMUD_grp=0;
+  MUD_SEC_GEN_SCALER* pMUD_scal=0;
   int i;
 
   _check_fd( fd );
@@ -1316,13 +1209,10 @@ MUD_setScalers( fd, type, num )
 }
 
 int 
-MUD_getScalerLabel( fd, num, label, strdim )
-    int fd, strdim;
-    int num;
-    char* label;
+MUD_getScalerLabel( int fd, int num, char* label, int strdim )
 {
-  MUD_SEC_GRP* pMUD_scalGrp;
-  MUD_SEC_GEN_SCALER* pMUD_scal;
+  MUD_SEC_GRP* pMUD_scalGrp=0;
+  MUD_SEC_GEN_SCALER* pMUD_scal=0;
 
   _check_fd( fd );
   _sea_scalgrp( fd );
@@ -1333,13 +1223,10 @@ MUD_getScalerLabel( fd, num, label, strdim )
 }
 
 int 
-MUD_setScalerLabel( fd, num, label )
-    int fd;
-    int num;
-    char* label;
+MUD_setScalerLabel( int fd, int num, char* label )
 {
-  MUD_SEC_GRP* pMUD_scalGrp;
-  MUD_SEC_GEN_SCALER* pMUD_scal;
+  MUD_SEC_GRP* pMUD_scalGrp=0;
+  MUD_SEC_GEN_SCALER* pMUD_scal=0;
 
   _check_fd( fd );
   _sea_scalgrp( fd );
@@ -1351,13 +1238,10 @@ MUD_setScalerLabel( fd, num, label )
 }
 
 int 
-MUD_getScalerCounts( fd, num, pCounts )
-    int fd;
-    int num;
-    UINT32* pCounts;
+MUD_getScalerCounts( int fd, int num, UINT32* pCounts )
 {
-  MUD_SEC_GRP* pMUD_scalGrp;
-  MUD_SEC_GEN_SCALER* pMUD_scal;
+  MUD_SEC_GRP* pMUD_scalGrp=0;
+  MUD_SEC_GEN_SCALER* pMUD_scal=0;
 
   _check_fd( fd );
   _sea_scalgrp( fd );
@@ -1370,13 +1254,10 @@ MUD_getScalerCounts( fd, num, pCounts )
 }
 
 int 
-MUD_setScalerCounts( fd, num, pCounts )
-    int fd;
-    int num;
-    UINT32* pCounts;
+MUD_setScalerCounts( int fd, int num, UINT32* pCounts )
 {
-  MUD_SEC_GRP* pMUD_scalGrp;
-  MUD_SEC_GEN_SCALER* pMUD_scal;
+  MUD_SEC_GRP* pMUD_scalGrp=0;
+  MUD_SEC_GEN_SCALER* pMUD_scal=0;
 
   _check_fd( fd );
   _sea_scalgrp( fd );
@@ -1396,13 +1277,13 @@ MUD_setScalerCounts( fd, num, pCounts )
   switch( MUD_instanceID( pMUD_fileGrp[fd] ) ) \
   { \
     case MUD_FMT_TRI_TI_ID: \
-      pMUD_indVarGrp = MUD_search( pMUD_fileGrp[fd]->pMem, \
+      pMUD_indVarGrp = (MUD_SEC_GRP*)MUD_search( pMUD_fileGrp[fd]->pMem, \
                                  MUD_SEC_GRP_ID, MUD_GRP_GEN_IND_VAR_ARR_ID, \
                                  (UINT32)0 ); \
       break; \
     case MUD_FMT_TRI_TD_ID: \
     default: \
-      pMUD_indVarGrp = MUD_search( pMUD_fileGrp[fd]->pMem, \
+      pMUD_indVarGrp = (MUD_SEC_GRP*)MUD_search( pMUD_fileGrp[fd]->pMem, \
                                  MUD_SEC_GRP_ID, MUD_GRP_GEN_IND_VAR_ID, \
                                  (UINT32)0 ); \
       break; \
@@ -1416,7 +1297,7 @@ MUD_setScalerCounts( fd, num, pCounts )
     case MUD_FMT_TRI_TD_ID: \
     case MUD_FMT_TRI_TI_ID: \
     default: \
-      pMUD_indVar = MUD_search( pMUD_indVarGrp->pMem, \
+      pMUD_indVar = (MUD_SEC_GEN_IND_VAR*)MUD_search( pMUD_indVarGrp->pMem, \
                                  MUD_SEC_GEN_IND_VAR_ID, (UINT32)n, \
                                  (UINT32)0 ); \
       break; \
@@ -1429,7 +1310,7 @@ MUD_setScalerCounts( fd, num, pCounts )
   { \
     case MUD_FMT_TRI_TI_ID: \
     default: \
-      pMUD_array = MUD_search( pMUD_indVarGrp->pMem, \
+      pMUD_array = (MUD_SEC_GEN_ARRAY*)MUD_search( pMUD_indVarGrp->pMem, \
                                MUD_SEC_GEN_ARRAY_ID, (UINT32)n, \
                                (UINT32)0 ); \
       break; \
@@ -1439,13 +1320,10 @@ MUD_setScalerCounts( fd, num, pCounts )
 
 #define _indvar_doub_getproc( name, var ) \
 int \
-name( fd, num, var ) \
-    int fd;\
-    int num;\
-    double* var;\
+name( int fd, int num, double* var ) \
 { \
-  MUD_SEC_GRP* pMUD_indVarGrp; \
-  MUD_SEC_GEN_IND_VAR* pMUD_indVar; \
+  MUD_SEC_GRP* pMUD_indVarGrp=0; \
+  MUD_SEC_GEN_IND_VAR* pMUD_indVar=0; \
   _check_fd( fd ); \
   _sea_indvargrp( fd ); \
   _sea_indvar( fd, num ); \
@@ -1455,13 +1333,10 @@ name( fd, num, var ) \
 
 #define _indvar_doub_setproc( name, var ) \
 int \
-name( fd, num, var ) \
-    int fd;\
-    int num;\
-    double var;\
+name( int fd, int num, double var ) \
 { \
-  MUD_SEC_GRP* pMUD_indVarGrp; \
-  MUD_SEC_GEN_IND_VAR* pMUD_indVar; \
+  MUD_SEC_GRP* pMUD_indVarGrp=0; \
+  MUD_SEC_GEN_IND_VAR* pMUD_indVar=0; \
   _check_fd( fd ); \
   _sea_indvargrp( fd ); \
   _sea_indvar( fd, num ); \
@@ -1472,13 +1347,10 @@ name( fd, num, var ) \
 
 #define _indvar_char_getproc( name, var ) \
 int \
-name( fd, num, var, strdim ) \
-    int fd, strdim;\
-    int num;\
-    char* var;\
+name( int fd, int num, char* var, int strdim ) \
 { \
-  MUD_SEC_GRP* pMUD_indVarGrp; \
-  MUD_SEC_GEN_IND_VAR* pMUD_indVar; \
+  MUD_SEC_GRP* pMUD_indVarGrp=0; \
+  MUD_SEC_GEN_IND_VAR* pMUD_indVar=0; \
   _check_fd( fd ); \
   _sea_indvargrp( fd ); \
   _sea_indvar( fd, num ); \
@@ -1488,13 +1360,10 @@ name( fd, num, var, strdim ) \
 
 #define _indvar_char_setproc( name, var ) \
 int \
-name( fd, num, var ) \
-    int fd;\
-    int num;\
-    char* var;\
+name( int fd, int num, char* var ) \
 { \
-  MUD_SEC_GRP* pMUD_indVarGrp; \
-  MUD_SEC_GEN_IND_VAR* pMUD_indVar; \
+  MUD_SEC_GRP* pMUD_indVarGrp=0; \
+  MUD_SEC_GEN_IND_VAR* pMUD_indVar=0; \
   _check_fd( fd ); \
   _sea_indvargrp( fd ); \
   _sea_indvar( fd, num ); \
@@ -1506,13 +1375,10 @@ name( fd, num, var ) \
 
 #define _indvardat_uint_getproc( name, var ) \
 int \
-name( fd, n, var ) \
-    int fd;\
-    int n;\
-    UINT32* var;\
+name( int fd, int n, UINT32* var ) \
 { \
-  MUD_SEC_GRP* pMUD_indVarGrp; \
-  MUD_SEC_GEN_ARRAY* pMUD_array; \
+  MUD_SEC_GRP* pMUD_indVarGrp=0; \
+  MUD_SEC_GEN_ARRAY* pMUD_array=0; \
   _check_fd( fd ); \
   _sea_indvargrp( fd ); \
   _sea_indvardat( fd, n ); \
@@ -1522,13 +1388,10 @@ name( fd, n, var ) \
 
 #define _indvardat_uint_setproc( name, var ) \
 int \
-name( fd, n, var ) \
-    int fd;\
-    int n;\
-    UINT32 var;\
+name( int fd, int n, UINT32 var ) \
 { \
-  MUD_SEC_GRP* pMUD_indVarGrp; \
-  MUD_SEC_GEN_ARRAY* pMUD_array; \
+  MUD_SEC_GRP* pMUD_indVarGrp=0; \
+  MUD_SEC_GEN_ARRAY* pMUD_array=0; \
   _check_fd( fd ); \
   _sea_indvargrp( fd ); \
   _sea_indvardat( fd, n ); \
@@ -1538,12 +1401,9 @@ name( fd, n, var ) \
 
 
 int 
-MUD_getIndVars( fd, pType, pNum )
-    int fd;
-    UINT32* pType;
-    UINT32* pNum;
+MUD_getIndVars( int fd, UINT32* pType, UINT32* pNum )
 {
-  MUD_SEC_GRP* pMUD_indVarGrp;
+  MUD_SEC_GRP* pMUD_indVarGrp=0;
 
   _check_fd( fd );
   _sea_indvargrp( fd );
@@ -1566,14 +1426,11 @@ MUD_getIndVars( fd, pType, pNum )
 }
 
 int 
-MUD_setIndVars( fd, type, num )
-    int fd;
-    UINT32 type;
-    UINT32 num;
+MUD_setIndVars( int fd, UINT32 type, UINT32 num )
 {
-  MUD_SEC_GRP* pMUD_grp;
-  MUD_SEC_GEN_IND_VAR* pMUD_indVar;
-  MUD_SEC_GEN_ARRAY* pMUD_array;
+  MUD_SEC_GRP* pMUD_grp=0;
+  MUD_SEC_GEN_IND_VAR* pMUD_indVar=0;
+  MUD_SEC_GEN_ARRAY* pMUD_array=0;
   int i;
 
   _check_fd( fd );
@@ -1636,13 +1493,10 @@ _indvardat_uint_setproc( MUD_setIndVarElemSize, elemSize )
 _indvardat_uint_setproc( MUD_setIndVarDataType, type )
 
 int
-MUD_getIndVarpData( fd, num, ppData )
-    int fd;
-    int num;
-    void** ppData;
+MUD_getIndVarpData( int fd, int num, void** ppData )
 {
-  MUD_SEC_GRP* pMUD_indVarGrp; 
-  MUD_SEC_GEN_ARRAY* pMUD_array; 
+  MUD_SEC_GRP* pMUD_indVarGrp=0; 
+  MUD_SEC_GEN_ARRAY* pMUD_array=0; 
   _check_fd( fd ); 
   _sea_indvargrp( fd ); 
   _sea_indvardat( fd, num ); 
@@ -1651,13 +1505,10 @@ MUD_getIndVarpData( fd, num, ppData )
 }
 
 int
-MUD_setIndVarpData( fd, num, pData )
-    int fd;
-    int num;
-    void* pData;
+MUD_setIndVarpData( int fd, int num, void* pData )
 {
-  MUD_SEC_GRP* pMUD_indVarGrp; 
-  MUD_SEC_GEN_ARRAY* pMUD_array; 
+  MUD_SEC_GRP* pMUD_indVarGrp=0; 
+  MUD_SEC_GEN_ARRAY* pMUD_array=0; 
   _check_fd( fd ); 
   _sea_indvargrp( fd ); 
   _sea_indvardat( fd, num ); 
@@ -1666,13 +1517,10 @@ MUD_setIndVarpData( fd, num, pData )
 }
 
 int
-MUD_getIndVarData( fd, num, pData )
-    int fd;
-    int num;
-    void* pData;
+MUD_getIndVarData( int fd, int num, void* pData )
 {
-  MUD_SEC_GRP* pMUD_indVarGrp; 
-  MUD_SEC_GEN_ARRAY* pMUD_array; 
+  MUD_SEC_GRP* pMUD_indVarGrp=0; 
+  MUD_SEC_GEN_ARRAY* pMUD_array=0; 
   _check_fd( fd ); 
   _sea_indvargrp( fd ); 
   _sea_indvardat( fd, num ); 
@@ -1696,13 +1544,10 @@ MUD_getIndVarData( fd, num, pData )
 }
 
 int
-MUD_setIndVarData( fd, num, pData )
-    int fd;
-    int num;
-    void* pData;
+MUD_setIndVarData( int fd, int num, void* pData )
 {
-  MUD_SEC_GRP* pMUD_indVarGrp; 
-  MUD_SEC_GEN_ARRAY* pMUD_array; 
+  MUD_SEC_GRP* pMUD_indVarGrp=0; 
+  MUD_SEC_GEN_ARRAY* pMUD_array=0; 
   _check_fd( fd ); 
   _sea_indvargrp( fd ); 
   _sea_indvardat( fd, num ); 
@@ -1736,13 +1581,10 @@ MUD_setIndVarData( fd, num, pData )
 }
 
 int
-MUD_getIndVarpTimeData( fd, num, ppData )
-    int fd;
-    int num;
-    UINT32** ppData;
+MUD_getIndVarpTimeData( int fd, int num, UINT32** ppData )
 {
-  MUD_SEC_GRP* pMUD_indVarGrp; 
-  MUD_SEC_GEN_ARRAY* pMUD_array; 
+  MUD_SEC_GRP* pMUD_indVarGrp=0; 
+  MUD_SEC_GEN_ARRAY* pMUD_array=0; 
   _check_fd( fd ); 
   _sea_indvargrp( fd ); 
   _sea_indvardat( fd, num ); 
@@ -1751,13 +1593,10 @@ MUD_getIndVarpTimeData( fd, num, ppData )
 }
 
 int
-MUD_setIndVarpTimeData( fd, num, pData )
-    int fd;
-    int num;
-    UINT32* pData;
+MUD_setIndVarpTimeData( int fd, int num, UINT32* pData )
 {
-  MUD_SEC_GRP* pMUD_indVarGrp; 
-  MUD_SEC_GEN_ARRAY* pMUD_array; 
+  MUD_SEC_GRP* pMUD_indVarGrp=0; 
+  MUD_SEC_GEN_ARRAY* pMUD_array=0; 
   _check_fd( fd ); 
   _sea_indvargrp( fd ); 
   _sea_indvardat( fd, num ); 
@@ -1766,13 +1605,10 @@ MUD_setIndVarpTimeData( fd, num, pData )
 }
 
 int
-MUD_getIndVarTimeData( fd, num, pData )
-    int fd;
-    int num;
-    UINT32* pData;
+MUD_getIndVarTimeData( int fd, int num, UINT32* pData )
 {
-  MUD_SEC_GRP* pMUD_indVarGrp; 
-  MUD_SEC_GEN_ARRAY* pMUD_array; 
+  MUD_SEC_GRP* pMUD_indVarGrp=0; 
+  MUD_SEC_GEN_ARRAY* pMUD_array=0; 
   _check_fd( fd ); 
   _sea_indvargrp( fd ); 
   _sea_indvardat( fd, num ); 
@@ -1786,13 +1622,10 @@ MUD_getIndVarTimeData( fd, num, pData )
 }
 
 int
-MUD_setIndVarTimeData( fd, num, pData )
-    int fd;
-    int num;
-    UINT32* pData;
+MUD_setIndVarTimeData( int fd, int num, UINT32* pData )
 {
-  MUD_SEC_GRP* pMUD_indVarGrp; 
-  MUD_SEC_GEN_ARRAY* pMUD_array; 
+  MUD_SEC_GRP* pMUD_indVarGrp=0; 
+  MUD_SEC_GEN_ARRAY* pMUD_array=0; 
 
   _check_fd( fd ); 
   _sea_indvargrp( fd ); 
@@ -1815,7 +1648,7 @@ MUD_getHistSecondsPerBin( int fd, int num, REAL64* pSecondsPerBin )
   int i;
   UINT32 fsPerBin;
 
-  if( i = MUD_getHistFsPerBin( fd, num, &fsPerBin ) )
+  if( (i = MUD_getHistFsPerBin( fd, num, &fsPerBin )) )
   {
     if( fsPerBin < 16 )
     {

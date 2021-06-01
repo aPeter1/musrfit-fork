@@ -21,15 +21,11 @@
  *  license (unrestricted use).
  */
 
-#include <stdio.h>
-
 #include "mud.h"
 
 
 void
-bdecode_2( b, p )
-    void* b;
-    void* p;
+bdecode_2( void* b, void* p )
 {
 #ifdef MUD_BIG_ENDIAN
   UINT16 i;
@@ -42,9 +38,7 @@ bdecode_2( b, p )
 }
 
 void
-bencode_2( b, p )
-    void* b;
-    void* p;
+bencode_2( void* b, void* p )
 {
 #ifdef MUD_BIG_ENDIAN
   UINT16 i;
@@ -63,9 +57,7 @@ bencode_2( b, p )
 }
 
 void
-bdecode_4( b, p )
-    void* b;
-    void* p;
+bdecode_4( void* b,void*  p )
 {
 #ifdef MUD_BIG_ENDIAN
   UINT32 i;
@@ -78,9 +70,7 @@ bdecode_4( b, p )
 }
 
 void
-bencode_4( b, p )
-    void* b;
-    void* p;
+bencode_4( void* b, void* p )
 {
 #ifdef MUD_BIG_ENDIAN
   UINT32 i;
@@ -93,9 +83,7 @@ bencode_4( b, p )
 }
 
 void
-bdecode_8( b, p )
-    void* b;
-    void* p;
+bdecode_8( void* b, void* p )
 {
 #ifdef MUD_BIG_ENDIAN
   UINT32 i[2], i2[2];
@@ -109,9 +97,7 @@ bdecode_8( b, p )
 }
 
 void
-bencode_8( b, p )
-    void* b;
-    void* p;
+bencode_8( void* b, void* p )
 {
 #ifdef MUD_BIG_ENDIAN
   UINT32 i[2], i2[2];
@@ -126,9 +112,7 @@ bencode_8( b, p )
 
 
 void
-decode_str( pB, ps )
-    BUF* pB;
-    char** ps;
+decode_str( BUF* pB, char** ps )
 {
     MUD_STR_LEN_TYPE len;
 
@@ -153,9 +137,7 @@ decode_str( pB, ps )
 
 
 void
-encode_str( pB, ps )
-    BUF* pB;
-    char** ps;
+encode_str( BUF* pB, char** ps )
 {
     MUD_STR_LEN_TYPE len;
 
@@ -223,16 +205,13 @@ static struct sgl_limits {
 #endif /* !VMS */
 
 void
-bencode_float( buf, fp )
-    char* buf;
-    float* fp;
+bencode_float( char* buf, float* fp )
 {
 #ifndef VMS
   struct ieee_single is;
   struct vax_single vs;
   struct sgl_limits *lim;
   int i;
-  UINT16 sa[2], sb[2];
 #endif /* !VMS */
 
 #ifdef VMS
@@ -262,9 +241,7 @@ shipit:
 }
 
 void
-encode_float( pBuf, fp )
-    BUF* pBuf;
-    float* fp;
+encode_float( BUF* pBuf, float* fp )
 {
   bencode_float( &(pBuf->buf[pBuf->pos]), fp );
   pBuf->pos += 4;
@@ -272,9 +249,7 @@ encode_float( pBuf, fp )
 }
 
 void
-bdecode_float( buf, fp )
-    char* buf;
-    float* fp;
+bdecode_float( char* buf, float* fp )
 {
 #ifndef VMS
   struct ieee_single *isp;
@@ -315,9 +290,7 @@ shipit:
 }
 
 void
-decode_float( pBuf, fp )
-    BUF* pBuf;
-    float* fp;
+decode_float( BUF* pBuf, float* fp )
 {
   bdecode_float( &(pBuf->buf[pBuf->pos]), fp );
   pBuf->pos += 4;
@@ -392,16 +365,13 @@ static struct dbl_limits {
 
 
 void
-bencode_double( buf, dp )
-    char* buf;
-    double* dp;
+bencode_double( char* buf, double* dp )
 {
 #ifndef VMS
   struct ieee_double id;
   struct vax_double vd;
   register struct dbl_limits *lim;
   int i;
-  UINT16 sa[4], sb[4];
 #endif /* !VMS */
 
 #ifdef VMS
@@ -434,9 +404,7 @@ shipit:
 }
 
 void
-encode_double( pBuf, fp )
-    BUF* pBuf;
-    double* fp;
+encode_double( BUF* pBuf, double* fp )
 {
   bencode_double( &(pBuf->buf[pBuf->pos]), fp );
   pBuf->pos += 8;
@@ -444,16 +412,13 @@ encode_double( pBuf, fp )
 }
 
 void
-bdecode_double( buf, dp )
-    char* buf;
-    double* dp;
+bdecode_double( char* buf, double* dp )
 {
 #ifndef VMS
-  struct ieee_double id, *idp;
+  struct ieee_double *idp;
   struct vax_double vd;
   register struct dbl_limits *lim;
   int i;
-  UINT16 sa[4], sb[4];
 #endif /* !VMS */
 
 #ifdef VMS
@@ -486,9 +451,7 @@ shipit:
 }
 
 void
-decode_double( pBuf, fp )
-    BUF* pBuf;
-    double* fp;
+decode_double( BUF* pBuf, double* fp )
 {
   bdecode_double( &(pBuf->buf[pBuf->pos]), fp );
   pBuf->pos += 8;
