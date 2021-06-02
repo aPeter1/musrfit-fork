@@ -447,7 +447,8 @@ int dump_header_mud(const std::string fileName, const std::string fileFormat)
   // start time
   time_t tval;
   struct tm *dt;
-  success = MUD_getTimeBegin( fh, (UINT32*)&tval );
+  success = MUD_getTimeBegin( fh, &val );
+  tval = static_cast<time_t>(val);
   if (success) {
     dt = localtime(static_cast<const time_t*>(&tval));
     assert(dt);
@@ -457,7 +458,8 @@ int dump_header_mud(const std::string fileName, const std::string fileFormat)
     std::cout << std::endl << "Run Start Time     : ???";
   }
   // stop time
-  success = MUD_getTimeEnd( fh, (UINT32*)&tval );
+  success = MUD_getTimeEnd( fh, &val );
+  tval = static_cast<time_t>(val);
   if (success) {
     dt = localtime(static_cast<const time_t*>(&tval));
     assert(dt);
