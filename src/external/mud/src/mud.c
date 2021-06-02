@@ -422,9 +422,7 @@ MUD_read( FILE* fin, MUD_IO_OPT io_opt )
      */	  
     if( ( pos = ftell( fin ) ) == EOF ) return( NULL );
     if( fread( &size, 4, 1, fin ) == 0 ) return( NULL );
-#if !defined(__arm64)
     bdecode_4( &size, &size );    /* byte ordering !!! */
-#endif // !defined(__arm64)
     if( fseek( fin, pos, 0 ) == EOF ) return( NULL );
 
 #ifdef DEBUG
