@@ -818,10 +818,10 @@ PNeXusDetector2::PNeXusDetector2()
   fNoOfBins = -1;
 
   fT0Tag = -1;
-  fT0 = 0;
-  fFirstGoodBin = 0;
-  fLastGoodBin = 0;
-  fHisto = 0;
+  fT0 = nullptr;
+  fFirstGoodBin = nullptr;
+  fLastGoodBin = nullptr;
+  fHisto = nullptr;
 }
 
 //------------------------------------------------------------------------------------------
@@ -837,19 +837,19 @@ PNeXusDetector2::~PNeXusDetector2()
 
   if (fT0) {
     delete [] fT0;
-    fT0 = 0;
+    fT0 = nullptr;
   }
   if (fFirstGoodBin) {
     delete [] fFirstGoodBin;
-    fFirstGoodBin = 0;
+    fFirstGoodBin = nullptr;
   }
   if (fLastGoodBin) {
     delete [] fLastGoodBin;
-    fLastGoodBin = 0;
+    fLastGoodBin = nullptr;
   }
   if (fHisto) {
     delete [] fHisto;
-    fHisto = 0;
+    fHisto = nullptr;
   }
 }
 
@@ -919,10 +919,16 @@ bool PNeXusDetector2::IsValid(bool strict)
  */
 int PNeXusDetector2::GetT0(int idxp, int idxs)
 {
-  int result = -1;
+  int result = -1;  
+
+  if (fT0Tag == 1) { // there is only ONE t0 present
+    if (fT0 != nullptr)
+      result = *fT0;
+    return result;
+  }
 
   if ((idxp < 0) && (idxs < 0)) { // assumption: there is only ONE t0 for all spectra
-    if (fT0 != 0) {
+    if (fT0 != nullptr) {
       result = *fT0;
     }
   } else if ((idxp < 0) && (idxs >= 0)) { // assumption: t0's are represented as t0[ns]
@@ -1031,17 +1037,24 @@ int PNeXusDetector2::GetFirstGoodBin(int idxp, int idxs)
 {
   int result = -1;
 
+  if (fT0Tag == 1) { // there is only ONE t0 present
+    if (fT0 != nullptr)
+      result = *fFirstGoodBin;
+    return result;
+  }
+
   if ((idxp < 0) && (idxs < 0)) { // assumption: there is only ONE t0 for all spectra
-    if (fFirstGoodBin != 0) {
+    if (fFirstGoodBin != nullptr) {
       result = *fFirstGoodBin;
     }
   } else if ((idxp < 0) && (idxs >= 0)) { // assumptions: fgb's are represented as fgb[ns]
-    if (idxs < fNoOfSpectra) {
+    if ((idxs < fNoOfSpectra) && (fFirstGoodBin != nullptr)) {
       result = *(fFirstGoodBin+idxs);
     }
   } else if ((idxp >= 0) && (idxs >= 0)) { // assumption: fgb's are represented as fgb[np][ns]
     if ((idxp < fNoOfPeriods) || (idxs < fNoOfSpectra)) {
-      result = *(fFirstGoodBin+idxp*fNoOfSpectra+idxs);
+      if (fFirstGoodBin != nullptr)
+        result = *(fFirstGoodBin+idxp*fNoOfSpectra+idxs);
     }
   } else {
     result = -1;
@@ -1141,17 +1154,24 @@ int PNeXusDetector2::GetLastGoodBin(int idxp, int idxs)
 {
   int result = -1;
 
+  if (fT0Tag == 1) { // there is only ONE t0 present
+    if (fT0 != nullptr)
+      result = *fLastGoodBin;
+    return result;
+  }
+
   if ((idxp < 0) && (idxs < 0)) { // assumption: there is only ONE t0 for all spectra
-    if (fLastGoodBin != 0) {
+    if (fLastGoodBin != nullptr) {
       result = *fLastGoodBin;
     }
   } else if ((idxp < 0) && (idxs >= 0)) { // assumption: lgb's are represented as lgb[ns]
-    if (idxs < fNoOfSpectra) {
+    if ((idxs < fNoOfSpectra) && (fLastGoodBin != nullptr)) {
       result = *(fLastGoodBin+idxs);
     }
   } else if ((idxp >= 0) && (idxs >= 0)) { // assumption: lgb's are represented as lgb[np][ns]
     if ((idxp < fNoOfPeriods) || (idxs < fNoOfSpectra)) {
-      result = *(fLastGoodBin+idxp*fNoOfSpectra+idxs);
+      if (fLastGoodBin != nullptr)
+        result = *(fLastGoodBin+idxp*fNoOfSpectra+idxs);
     }
   } else {
     result = -1;
@@ -3398,6 +3418,14 @@ int PNeXus::ReadFileIdf2()
     return NX_ERROR;
   }
 
+  // beamline
+  if (SearchInGroup("beamline", "name", nxname, nxclass, dataType)) {
+    if (!ErrorHandler(NXopendata(fFileHandle, "beamline"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'beamline' data in NXentry!")) return NX_ERROR;
+    if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'beamline' data in NXentry!")) return NX_ERROR;
+    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'beamline' data in NXentry!")) return NX_ERROR;
+    fNxEntry2->GetInstrument()->GetBeamline()->SetName(str);
+  }
+
   // definition
   if (!ErrorHandler(NXopendata(fFileHandle, "definition"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'definition' data in NXentry!")) return NX_ERROR;
   if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'definition' data in NXentry!")) return NX_ERROR;
@@ -3576,26 +3604,37 @@ int PNeXus::ReadFileIdf2()
   // close group NXsource
   NXclosegroup(fFileHandle);
 
+
   // open group NXbeamline
-  if (!ErrorHandler(NXopengroup(fFileHandle, "beamline", "NXbeamline"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup beamline in NXinstrument!")) return NX_ERROR;
+  if (SearchInGroup("beamline", "name", nxname, nxclass, dataType)) {
+    if (!ErrorHandler(NXopengroup(fFileHandle, "beamline", "NXbeamline"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup beamline in NXinstrument!")) return NX_ERROR;
 
-  // beamline name
-  if (!ErrorHandler(NXopendata(fFileHandle, "beamline"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'beamline' data in NXbeamline!")) return NX_ERROR;
-  if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'beamline' data in NXbeamline!")) return NX_ERROR;
-  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'beamline' data in NXbeamline!")) return NX_ERROR;
-  fNxEntry2->GetInstrument()->GetBeamline()->SetName(str);
+    // beamline name
+    if (!ErrorHandler(NXopendata(fFileHandle, "beamline"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'beamline' data in NXbeamline!")) return NX_ERROR;
+    if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'beamline' data in NXbeamline!")) return NX_ERROR;
+    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'beamline' data in NXbeamline!")) return NX_ERROR;
+    fNxEntry2->GetInstrument()->GetBeamline()->SetName(str);
 
-  // close group NXbeamline
-  NXclosegroup(fFileHandle);
+    // close group NXbeamline
+    NXclosegroup(fFileHandle);
+  } else {
+    std::cerr << "**WARNING** in class NXinstrument the object NXbeamline with name 'beamline' is missing!" << std::endl;
+    std::cerr << "            Complain at the facility where you got this data file from!" << std::endl;
+  }
 
-  // open group NXdetector
+  // open group NXdetector in instrument (NXinstrument)
   if (!ErrorHandler(NXopengroup(fFileHandle, "detector_1", "NXdetector"), PNEXUS_GROUP_OPEN_ERROR, "couldn't open NeXus subgroup detector_1 in NXinstrument!")) return NX_ERROR;
 
   // description
-  if (!ErrorHandler(NXopendata(fFileHandle, "description"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'description' data in NXdetector!")) return NX_ERROR;
-  if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'description' data in NXdetector!")) return NX_ERROR;
-  if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'description' data in NXdetector!")) return NX_ERROR;
-  fNxEntry2->GetInstrument()->GetDetector()->SetDescription(str);
+  if (SearchInGroup("description", "name", nxname, nxclass, dataType)) {
+    if (!ErrorHandler(NXopendata(fFileHandle, "description"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'description' data in NXdetector!")) return NX_ERROR;
+    if (!ErrorHandler(GetStringData(str), PNEXUS_GET_DATA_ERROR, "couldn't read 'description' data in NXdetector!")) return NX_ERROR;
+    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'description' data in NXdetector!")) return NX_ERROR;
+    fNxEntry2->GetInstrument()->GetDetector()->SetDescription(str);
+  } else {
+    std::cerr << "**WARNING** in class NXdetector to object NX_CHAR with name 'description' is missing!" << std::endl;
+    std::cerr << "            Complain at the facility where you got this data file from!" << std::endl;
+  }
 
   // get the time resolution. This is a little bit complicated since it is either present as 'histogram_resolution' or needs to be extracted from the 'raw_time' vector
   // 1st check if 'histogram_resolution' is found
@@ -3607,10 +3646,10 @@ int PNeXus::ReadFileIdf2()
     fNxEntry2->GetInstrument()->GetDetector()->SetTimeResolution((double)fval, str);
   } else if (SearchInGroup("resolution", "name", nxname, nxclass, dataType)) { // 2nd check if 'resolution' is found
     if (!ErrorHandler(NXopendata(fFileHandle, "resolution"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'resolution' data in NXdetector!")) return NX_ERROR;
-    if (!ErrorHandler(NXgetdata(fFileHandle, &fval), PNEXUS_GET_DATA_ERROR, "couldn't read 'resolution' data in NXdetector!")) return NX_ERROR;
+    if (!ErrorHandler(NXgetdata(fFileHandle, &ival), PNEXUS_GET_DATA_ERROR, "couldn't read 'resolution' data in NXdetector!")) return NX_ERROR;
     if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read time resolution units in NXdetector!")) return NX_ERROR;
     if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'resolution' data in NXdetector!")) return NX_ERROR;
-    fNxEntry2->GetInstrument()->GetDetector()->SetTimeResolution((double)fval, str);
+    fNxEntry2->GetInstrument()->GetDetector()->SetTimeResolution((double)ival, str);
   } else { // 3nd 'histogram_resolution' is not present, hence extract the time resolution from the 'raw_time' vector
     if (!ErrorHandler(NXopendata(fFileHandle, "raw_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'raw_time' data in NXdetector!")) return NX_ERROR;
     std::vector<double> rawTime;
@@ -3625,6 +3664,51 @@ int PNeXus::ReadFileIdf2()
   if (!ErrorHandler(NXopendata(fFileHandle, "counts"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'counts' data in NXdetector!")) return NX_ERROR;
   // check the dimensions of 'counts'
   if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'counts' info in NXdetector!")) return NX_ERROR;
+
+  // check if last_good_bin, first_good_bin, and t0_bins are defined as attributes
+  int attLen = 1, attType = NX_INT32;
+  if (SearchAttrInData("first_good_bin", attLen, attType)) {
+    char  cstr[1204];
+    memset(cstr, '\0', sizeof(cstr));
+    strncpy(cstr, "first_good_bin", sizeof(cstr));
+    status = NXgetattr(fFileHandle, cstr, (void*)&ival, &attLen, &attType);
+
+    fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(1); // a single set for t0, fgb, lgb is likely given
+    int *i_data_ptr = new int;
+    *i_data_ptr = ival;
+    if (!fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(i_data_ptr)) {
+      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
+      return NX_ERROR;
+    }
+  }
+  if (SearchAttrInData("last_good_bin", attLen, attType)) {
+    char  cstr[1204];
+    memset(cstr, '\0', sizeof(cstr));
+    strncpy(cstr, "last_good_bin", sizeof(cstr));
+    status = NXgetattr(fFileHandle, cstr, (void*)&ival, &attLen, &attType);
+
+    fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(1); // a single set for t0, fgb, lgb is likely given
+    int *i_data_ptr = new int;
+    *i_data_ptr = ival;
+    if (!fNxEntry2->GetInstrument()->GetDetector()->SetLastGoodBin(i_data_ptr)) {
+      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
+      return NX_ERROR;
+    }
+  }
+  if (SearchAttrInData("t0_bin", attLen, attType)) {
+    char  cstr[1204];
+    memset(cstr, '\0', sizeof(cstr));
+    strncpy(cstr, "t0_bin", sizeof(cstr));
+    status = NXgetattr(fFileHandle, cstr, (void*)&ival, &attLen, &attType);
+
+    fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(1); // a single set for t0, fgb, lgb is likely given
+    int *i_data_ptr = new int;
+    *i_data_ptr = ival;
+    if (!fNxEntry2->GetInstrument()->GetDetector()->SetT0(i_data_ptr)) {
+      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
+      return NX_ERROR;
+    }
+  }
 
   // calculate the needed size
   size = dims[0];
@@ -3713,320 +3797,323 @@ int PNeXus::ReadFileIdf2()
 
   if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'spectrum_index' data in NXdetector!")) return NX_ERROR;
 
-  // handle t0's
-  if (SearchInGroup("time_zero_bin", "name", nxname, nxclass, dataType)) { // check for 'time_zero_bin'
-    if (!ErrorHandler(NXopendata(fFileHandle, "time_zero_bin"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'time_zero_bin' data in NXdetector!")) return NX_ERROR;
+  // only handle t0, fgb, lgb, if they are not already set as an attribute of /raw_data_1/instrument/detector_1/counts
+  if (fNxEntry2->GetInstrument()->GetDetector()->GetT0Tag() == -1) {
+    // handle t0's
+    if (SearchInGroup("time_zero_bin", "name", nxname, nxclass, dataType)) { // check for 'time_zero_bin'
+      if (!ErrorHandler(NXopendata(fFileHandle, "time_zero_bin"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'time_zero_bin' data in NXdetector!")) return NX_ERROR;
 
-    // check the dimensions of the 'time_zero_bin' vector
-    if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'time_zero_bin' info in NXdetector!")) return NX_ERROR;
+      // check the dimensions of the 'time_zero_bin' vector
+      if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'time_zero_bin' info in NXdetector!")) return NX_ERROR;
 
-    if ((rank == 1) && (dims[0] == 1)) { // single t0 entry
-      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(1);
-    } else if ((rank == 1) && (dims[0] > 1)) { // t0 of the form t0[ns]
-      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(2);
-    } else if (rank == 2) { // t0 of the form t0[np][ns]
-      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(3);
+      if ((rank == 1) && (dims[0] == 1)) { // single t0 entry
+        fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(1);
+      } else if ((rank == 1) && (dims[0] > 1)) { // t0 of the form t0[ns]
+        fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(2);
+      } else if (rank == 2) { // t0 of the form t0[np][ns]
+        fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(3);
+      } else {
+        std::cerr << std::endl << ">> **ERROR** found 'time_zero_bin' info in NXdetector with rank=" << rank << ". Do not know how to handle." << std::endl;
+        return NX_ERROR;
+      }
+
+      // calculate the needed size
+      size = dims[0];
+      for (int i=1; i<rank; i++)
+        size *= dims[i];
+      noOfElements = size;
+      size *= GetDataSize(type);
+
+      // allocate locale memory to get the data
+      char *data_ptr = new char[size];
+      if (data_ptr == nullptr) {
+        return NX_ERROR;
+      }
+
+      // get the data
+      int *i_data_ptr = (int*) data_ptr;
+      int status = NXgetdata(fFileHandle, i_data_ptr);
+      if (status != NX_OK) {
+        return NX_ERROR;
+      }
+
+      if (!fNxEntry2->GetInstrument()->GetDetector()->SetT0(i_data_ptr)) {
+        std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
+        return NX_ERROR;
+      }
+
+      // clean up
+      if (data_ptr) {
+        delete [] data_ptr;
+        data_ptr = nullptr;
+      }
+
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'time_zero_bin' data in NXdetector!")) return NX_ERROR;
+    } else if (SearchInGroup("time_zero", "name", nxname, nxclass, dataType)) { // check for 'time_zero'
+      if (!ErrorHandler(NXopendata(fFileHandle, "time_zero"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'time_zero' data in NXdetector!")) return NX_ERROR;
+      // check the dimensions of the 'time_zero' vector
+      if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'time_zero' info in NXdetector!")) return NX_ERROR;
+
+      if ((rank == 1) && (dims[0] == 1)) { // single t0 entry
+        fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(1);
+      } else if ((rank == 1) && (dims[0] > 1)) { // t0 of the form t0[ns]
+        fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(2);
+      } else if (rank == 2) { // t0 of the form t0[np][ns]
+        fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(3);
+      } else {
+        std::cerr << std::endl << ">> **ERROR** found 'time_zero' info in NXdetector with rank=" << rank << ". Do not know how to handle." << std::endl;
+        return NX_ERROR;
+      }
+
+      // calculate the needed size
+      size = dims[0];
+      for (int i=1; i<rank; i++)
+        size *= dims[i];
+      noOfElements = size;
+      size *= GetDataSize(type);
+
+      // allocate locale memory to get the data
+      char *data_ptr = new char[size];
+      if (data_ptr == nullptr) {
+        return NX_ERROR;
+      }
+
+      // get the data
+      float *f_data_ptr = (float*) data_ptr;
+      int status = NXgetdata(fFileHandle, f_data_ptr);
+      if (status != NX_OK) {
+        return NX_ERROR;
+      }
+
+      if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read 'time_zero' units in NXdetector!")) return NX_ERROR;
+
+      // Set T0's
+      // check that the necessary time resolution is present
+      if (fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str) == 0.0) {
+        std::cerr << std::endl << ">> **ERROR** trying to set T0's based on 'time_zero'. Need a valid time resolution to do so, but this is not given." << std::endl;
+        return NX_ERROR;
+      }
+      // set the t0's based on the t0 time stamp and the time resolution
+      int *pt0 = nullptr;
+      if (rank == 1) {
+        pt0 = new int;
+        *pt0 = (int)(*f_data_ptr / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
+      } else { // rank == 2
+        pt0 = new int[noOfElements];
+        for (int i=0; i<noOfElements; i++) {
+          *(pt0+i) = (int)(*(f_data_ptr+i) / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
+        }
+      }
+
+      if (!fNxEntry2->GetInstrument()->GetDetector()->SetT0(pt0)) {
+        std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
+        return NX_ERROR;
+      }
+
+      // clean up
+      if (data_ptr) {
+        delete [] data_ptr;
+        data_ptr = nullptr;
+      }
+
+      std::cerr << std::endl << ">> **WARNING** found only 'time_zero' will convert it to 'time_zero_bin' values" << std::endl;
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'time_zero' data in NXdetector!")) return NX_ERROR;
     } else {
-      std::cerr << std::endl << ">> **ERROR** found 'time_zero_bin' info in NXdetector with rank=" << rank << ". Do not know how to handle." << std::endl;
-      return NX_ERROR;
+      std::cerr << std::endl << ">> **WARNING** found neither 'time_zero_bin' nor 'time_zero' values ..." << std::endl;
     }
 
-    // calculate the needed size
-    size = dims[0];
-    for (int i=1; i<rank; i++)
-      size *= dims[i];
-    noOfElements = size;
-    size *= GetDataSize(type);
+    // handle first good bin
+    if (SearchInGroup("first_good_bin", "name", nxname, nxclass, dataType)) {
+      if (!ErrorHandler(NXopendata(fFileHandle, "first_good_bin"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'first_good_bin' data in NXdetector!")) return NX_ERROR;
 
-    // allocate locale memory to get the data
-    char *data_ptr = new char[size];
-    if (data_ptr == nullptr) {
-      return NX_ERROR;
-    }
+      // check the dimensions of the 'first_good_bin' vector
+      if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'first_good_bin' info in NXdetector!")) return NX_ERROR;
 
-    // get the data
-    int *i_data_ptr = (int*) data_ptr;
-    int status = NXgetdata(fFileHandle, i_data_ptr);
-    if (status != NX_OK) {
-      return NX_ERROR;
-    }
+      // calculate the needed size
+      size = dims[0];
+      for (int i=1; i<rank; i++)
+        size *= dims[i];
+      noOfElements = size;
+      size *= GetDataSize(type);
 
-    if (!fNxEntry2->GetInstrument()->GetDetector()->SetT0(i_data_ptr)) {
-      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
-      return NX_ERROR;
-    }
+      // allocate locale memory to get the data
+      char *data_ptr = new char[size];
+      if (data_ptr == nullptr) {
+        return NX_ERROR;
+      }
 
-    // clean up
-    if (data_ptr) {
-      delete [] data_ptr;
-      data_ptr = nullptr;
-    }
+      // get the data
+      int *i_data_ptr = (int*) data_ptr;
+      int status = NXgetdata(fFileHandle, i_data_ptr);
+      if (status != NX_OK) {
+        return NX_ERROR;
+      }
 
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'time_zero_bin' data in NXdetector!")) return NX_ERROR;
-  } else if (SearchInGroup("time_zero", "name", nxname, nxclass, dataType)) { // check for 'time_zero'
-    if (!ErrorHandler(NXopendata(fFileHandle, "time_zero"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'time_zero' data in NXdetector!")) return NX_ERROR;
-    // check the dimensions of the 'time_zero' vector
-    if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'time_zero' info in NXdetector!")) return NX_ERROR;
+      if (!fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(i_data_ptr)) {
+        std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
+        return NX_ERROR;
+      }
 
-    if ((rank == 1) && (dims[0] == 1)) { // single t0 entry
-      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(1);
-    } else if ((rank == 1) && (dims[0] > 1)) { // t0 of the form t0[ns]
-      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(2);
-    } else if (rank == 2) { // t0 of the form t0[np][ns]
-      fNxEntry2->GetInstrument()->GetDetector()->SetT0Tag(3);
+      if (data_ptr) {
+        delete [] data_ptr;
+        data_ptr = nullptr;
+      }
+
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'first_good_bin' data in NXdetector!")) return NX_ERROR;
+    } else if (SearchInGroup("first_good_time", "name", nxname, nxclass, dataType)) {
+      if (!ErrorHandler(NXopendata(fFileHandle, "first_good_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'first_good_time' data in NXdetector!")) return NX_ERROR;
+
+      // check the dimensions of the 'first_good_time' vector
+      if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'first_good_time' info in NXdetector!")) return NX_ERROR;
+
+      // calculate the needed size
+      size = dims[0];
+      for (int i=1; i<rank; i++)
+        size *= dims[i];
+      noOfElements = size;
+      size *= GetDataSize(type);
+
+      // allocate locale memory to get the data
+      char *data_ptr = new char[size];
+      if (data_ptr == nullptr) {
+        return NX_ERROR;
+      }
+
+      // get the data
+      float *f_data_ptr = (float*) data_ptr;
+      int status = NXgetdata(fFileHandle, f_data_ptr);
+      if (status != NX_OK) {
+        return NX_ERROR;
+      }
+
+      // set the fgb's based on the fgb time stamp and the time resolution
+      int *p_fgb = nullptr;
+      if (rank == 1) {
+        p_fgb = new int;
+        *p_fgb = (int)(*f_data_ptr / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
+      } else { // rank == 2
+        p_fgb = new int[noOfElements];
+        for (int i=0; i<noOfElements; i++) {
+          *(p_fgb+i) = (int)(*(f_data_ptr+i) / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
+        }
+      }
+
+      if (!fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(p_fgb)) {
+        std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
+        return NX_ERROR;
+      }
+
+      // clean up
+      if (p_fgb) {
+        delete [] p_fgb;
+        p_fgb = 0;
+      }
+      if (data_ptr) {
+        delete [] data_ptr;
+        data_ptr = nullptr;
+      }
+
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'first_good_time' data in NXdetector!")) return NX_ERROR;
     } else {
-      std::cerr << std::endl << ">> **ERROR** found 'time_zero' info in NXdetector with rank=" << rank << ". Do not know how to handle." << std::endl;
-      return NX_ERROR;
+      std::cerr << std::endl << ">> **WARNING** found neither 'first_good_bin' nor 'first_good_time' values ..." << std::endl;
     }
 
-    // calculate the needed size
-    size = dims[0];
-    for (int i=1; i<rank; i++)
-      size *= dims[i];
-    noOfElements = size;
-    size *= GetDataSize(type);
+    // handle last good bin
+    if (SearchInGroup("last_good_bin", "name", nxname, nxclass, dataType)) {
+      if (!ErrorHandler(NXopendata(fFileHandle, "last_good_bin"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'last_good_bin' data in NXdetector!")) return NX_ERROR;
 
-    // allocate locale memory to get the data
-    char *data_ptr = new char[size];
-    if (data_ptr == nullptr) {
-      return NX_ERROR;
-    }
+      // check the dimensions of the 'last_good_bin' vector
+      if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'last_good_bin' info in NXdetector!")) return NX_ERROR;
 
-    // get the data
-    float *f_data_ptr = (float*) data_ptr;
-    int status = NXgetdata(fFileHandle, f_data_ptr);
-    if (status != NX_OK) {
-      return NX_ERROR;
-    }
+      // calculate the needed size
+      size = dims[0];
+      for (int i=1; i<rank; i++)
+        size *= dims[i];
+      noOfElements = size;
+      size *= GetDataSize(type);
 
-    if (!ErrorHandler(GetStringAttr("units", str), PNEXUS_GET_ATTR_ERROR, "couldn't read 'time_zero' units in NXdetector!")) return NX_ERROR;
-
-    // Set T0's
-    // check that the necessary time resolution is present
-    if (fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str) == 0.0) {
-      std::cerr << std::endl << ">> **ERROR** trying to set T0's based on 'time_zero'. Need a valid time resolution to do so, but this is not given." << std::endl;
-      return NX_ERROR;
-    }
-    // set the t0's based on the t0 time stamp and the time resolution
-    int *pt0 = nullptr;
-    if (rank == 1) {
-      pt0 = new int;
-      *pt0 = (int)(*f_data_ptr / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
-    } else { // rank == 2
-      pt0 = new int[noOfElements];
-      for (int i=0; i<noOfElements; i++) {
-        *(pt0+i) = (int)(*(f_data_ptr+i) / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
+      // allocate locale memory to get the data
+      char *data_ptr = new char[size];
+      if (data_ptr == nullptr) {
+        return NX_ERROR;
       }
-    }
 
-    if (!fNxEntry2->GetInstrument()->GetDetector()->SetT0(pt0)) {
-      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
-      return NX_ERROR;
-    }
-
-    // clean up
-    if (data_ptr) {
-      delete [] data_ptr;
-      data_ptr = nullptr;
-    }
-
-    std::cerr << std::endl << ">> **WARNING** found only 'time_zero' will convert it to 'time_zero_bin' values" << std::endl;
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'time_zero' data in NXdetector!")) return NX_ERROR;
-  } else {
-    std::cerr << std::endl << ">> **WARNING** found neither 'time_zero_bin' nor 'time_zero' values ..." << std::endl;
-  }
-
-  // handle first good bin
-  if (SearchInGroup("first_good_bin", "name", nxname, nxclass, dataType)) {
-    if (!ErrorHandler(NXopendata(fFileHandle, "first_good_bin"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'first_good_bin' data in NXdetector!")) return NX_ERROR;
-
-    // check the dimensions of the 'first_good_bin' vector
-    if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'first_good_bin' info in NXdetector!")) return NX_ERROR;
-
-    // calculate the needed size
-    size = dims[0];
-    for (int i=1; i<rank; i++)
-      size *= dims[i];
-    noOfElements = size;
-    size *= GetDataSize(type);
-
-    // allocate locale memory to get the data
-    char *data_ptr = new char[size];
-    if (data_ptr == nullptr) {
-      return NX_ERROR;
-    }
-
-    // get the data
-    int *i_data_ptr = (int*) data_ptr;
-    int status = NXgetdata(fFileHandle, i_data_ptr);
-    if (status != NX_OK) {
-      return NX_ERROR;
-    }
-
-    if (!fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(i_data_ptr)) {
-      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
-      return NX_ERROR;
-    }
-
-    if (data_ptr) {
-      delete [] data_ptr;
-      data_ptr = nullptr;
-    }
-
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'first_good_bin' data in NXdetector!")) return NX_ERROR;
-  } else if (SearchInGroup("first_good_time", "name", nxname, nxclass, dataType)) {
-    if (!ErrorHandler(NXopendata(fFileHandle, "first_good_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'first_good_time' data in NXdetector!")) return NX_ERROR;
-
-    // check the dimensions of the 'first_good_time' vector
-    if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'first_good_time' info in NXdetector!")) return NX_ERROR;
-
-    // calculate the needed size
-    size = dims[0];
-    for (int i=1; i<rank; i++)
-      size *= dims[i];
-    noOfElements = size;
-    size *= GetDataSize(type);
-
-    // allocate locale memory to get the data
-    char *data_ptr = new char[size];
-    if (data_ptr == nullptr) {
-      return NX_ERROR;
-    }
-
-    // get the data
-    float *f_data_ptr = (float*) data_ptr;
-    int status = NXgetdata(fFileHandle, f_data_ptr);
-    if (status != NX_OK) {
-      return NX_ERROR;
-    }
-
-    // set the fgb's based on the fgb time stamp and the time resolution
-    int *p_fgb = nullptr;
-    if (rank == 1) {
-      p_fgb = new int;
-      *p_fgb = (int)(*f_data_ptr / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
-    } else { // rank == 2
-      p_fgb = new int[noOfElements];
-      for (int i=0; i<noOfElements; i++) {
-        *(p_fgb+i) = (int)(*(f_data_ptr+i) / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
+      // get the data
+      int *i_data_ptr = (int*) data_ptr;
+      int status = NXgetdata(fFileHandle, i_data_ptr);
+      if (status != NX_OK) {
+        return NX_ERROR;
       }
-    }
 
-    if (!fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(p_fgb)) {
-      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
-      return NX_ERROR;
-    }
-
-    // clean up
-    if (p_fgb) {
-      delete [] p_fgb;
-      p_fgb = 0;
-    }
-    if (data_ptr) {
-      delete [] data_ptr;
-      data_ptr = nullptr;
-    }
-
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'first_good_time' data in NXdetector!")) return NX_ERROR;
-  } else {
-    std::cerr << std::endl << ">> **WARNING** found neither 'first_good_bin' nor 'first_good_time' values ..." << std::endl;
-  }
-
-  // handle last good bin
-  if (SearchInGroup("last_good_bin", "name", nxname, nxclass, dataType)) {
-    if (!ErrorHandler(NXopendata(fFileHandle, "last_good_bin"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'last_good_bin' data in NXdetector!")) return NX_ERROR;
-
-    // check the dimensions of the 'last_good_bin' vector
-    if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'last_good_bin' info in NXdetector!")) return NX_ERROR;
-
-    // calculate the needed size
-    size = dims[0];
-    for (int i=1; i<rank; i++)
-      size *= dims[i];
-    noOfElements = size;
-    size *= GetDataSize(type);
-
-    // allocate locale memory to get the data
-    char *data_ptr = new char[size];
-    if (data_ptr == nullptr) {
-      return NX_ERROR;
-    }
-
-    // get the data
-    int *i_data_ptr = (int*) data_ptr;
-    int status = NXgetdata(fFileHandle, i_data_ptr);
-    if (status != NX_OK) {
-      return NX_ERROR;
-    }
-
-    if (!fNxEntry2->GetInstrument()->GetDetector()->SetLastGoodBin(i_data_ptr)) {
-      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
-      return NX_ERROR;
-    }
-
-    // clean up
-    if (data_ptr) {
-      delete [] data_ptr;
-      data_ptr = nullptr;
-    }
-
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'last_good_bin' data in NXdetector!")) return NX_ERROR;
-  } else if (SearchInGroup("last_good_time", "name", nxname, nxclass, dataType)) {
-    if (!ErrorHandler(NXopendata(fFileHandle, "last_good_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'last_good_time' data in NXdetector!")) return NX_ERROR;
-
-    // check the dimensions of the 'last_good_time' vector
-    if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'last_good_time' info in NXdetector!")) return NX_ERROR;
-
-    // calculate the needed size
-    size = dims[0];
-    for (int i=1; i<rank; i++)
-      size *= dims[i];
-    noOfElements = size;
-    size *= GetDataSize(type);
-
-    // allocate locale memory to get the data
-    char *data_ptr = new char[size];
-    if (data_ptr == nullptr) {
-      return NX_ERROR;
-    }
-
-    // get the data
-    float *f_data_ptr = (float*) data_ptr;
-    int status = NXgetdata(fFileHandle, f_data_ptr);
-    if (status != NX_OK) {
-      return NX_ERROR;
-    }
-
-    // set the lgb's based on the lgb time stamp and the time resolution
-    int *p_lgb = nullptr;
-    if (rank == 1) {
-      p_lgb = new int;
-      *p_lgb = (int)(*f_data_ptr / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
-    } else { // rank == 2
-      p_lgb = new int[noOfElements];
-      for (int i=0; i<noOfElements; i++) {
-        *(p_lgb+i) = (int)(*(f_data_ptr+i) / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
+      if (!fNxEntry2->GetInstrument()->GetDetector()->SetLastGoodBin(i_data_ptr)) {
+        std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
+        return NX_ERROR;
       }
-    }
 
-    if (fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(p_lgb)) {
-      std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
-      return NX_ERROR;
-    }
+      // clean up
+      if (data_ptr) {
+        delete [] data_ptr;
+        data_ptr = nullptr;
+      }
 
-    // clean up
-    if (p_lgb) {
-      delete [] p_lgb;
-      p_lgb = 0;
-    }
-    if (data_ptr) {
-      delete [] data_ptr;
-      data_ptr = nullptr;
-    }
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'last_good_bin' data in NXdetector!")) return NX_ERROR;
+    } else if (SearchInGroup("last_good_time", "name", nxname, nxclass, dataType)) {
+      if (!ErrorHandler(NXopendata(fFileHandle, "last_good_time"), PNEXUS_OPEN_DATA_ERROR, "couldn't open 'last_good_time' data in NXdetector!")) return NX_ERROR;
 
-    if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'last_good_time' data in NXdetector!")) return NX_ERROR;
-  } else {
-    std::cerr << std::endl << ">> **WARNING** found neither 'last_good_bin' nor 'last_good_time' values ..." << std::endl;
+      // check the dimensions of the 'last_good_time' vector
+      if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get 'last_good_time' info in NXdetector!")) return NX_ERROR;
+
+      // calculate the needed size
+      size = dims[0];
+      for (int i=1; i<rank; i++)
+        size *= dims[i];
+      noOfElements = size;
+      size *= GetDataSize(type);
+
+      // allocate locale memory to get the data
+      char *data_ptr = new char[size];
+      if (data_ptr == nullptr) {
+        return NX_ERROR;
+      }
+
+      // get the data
+      float *f_data_ptr = (float*) data_ptr;
+      int status = NXgetdata(fFileHandle, f_data_ptr);
+      if (status != NX_OK) {
+        return NX_ERROR;
+      }
+
+      // set the lgb's based on the lgb time stamp and the time resolution
+      int *p_lgb = nullptr;
+      if (rank == 1) {
+        p_lgb = new int;
+        *p_lgb = (int)(*f_data_ptr / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
+      } else { // rank == 2
+        p_lgb = new int[noOfElements];
+        for (int i=0; i<noOfElements; i++) {
+          *(p_lgb+i) = (int)(*(f_data_ptr+i) / (float)fNxEntry2->GetInstrument()->GetDetector()->GetTimeResolution(str));
+        }
+      }
+
+      if (fNxEntry2->GetInstrument()->GetDetector()->SetFirstGoodBin(p_lgb)) {
+        std::cerr << std::endl << ">> **ERROR** " << fNxEntry2->GetInstrument()->GetDetector()->GetErrorMsg() << std::endl;
+        return NX_ERROR;
+      }
+
+      // clean up
+      if (p_lgb) {
+        delete [] p_lgb;
+        p_lgb = 0;
+      }
+      if (data_ptr) {
+        delete [] data_ptr;
+        data_ptr = nullptr;
+      }
+
+      if (!ErrorHandler(NXclosedata(fFileHandle), PNEXUS_CLOSE_DATA_ERROR, "couldn't close 'last_good_time' data in NXdetector!")) return NX_ERROR;
+    } else {
+      std::cerr << std::endl << ">> **WARNING** found neither 'last_good_bin' nor 'last_good_time' values ..." << std::endl;
+    }
   }
 
   // close group NXdetector
