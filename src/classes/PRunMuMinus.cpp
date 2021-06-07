@@ -604,8 +604,8 @@ Bool_t PRunMuMinus::PrepareFitData(PRawRunData* runData, const UInt_t histoNo)
   Int_t t0 = static_cast<Int_t>(fT0s[0]);
   Double_t value = 0.0;
   // data start at data_start-t0
-  // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.SetDataTimeStart(fTimeResolution*(static_cast<Double_t>(fGoodBins[0])-static_cast<Double_t>(t0)+static_cast<Double_t>(fPacking-1)/2.0));
+  // data start time = (binStart - 0.5) + pack/2 - t0, with pack and binStart used as double
+  fData.SetDataTimeStart(fTimeResolution*((static_cast<Double_t>(fGoodBins[0])-0.5) + static_cast<Double_t>(fPacking)/2.0 - static_cast<Double_t>(t0)));
   fData.SetDataTimeStep(fTimeResolution*fPacking);
   for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
     if (fPacking == 1) {
@@ -710,9 +710,8 @@ Bool_t PRunMuMinus::PrepareRawViewData(PRawRunData* runData, const UInt_t histoN
   // everything looks fine, hence fill data set
   Int_t t0 = static_cast<Int_t>(fT0s[0]);
   Double_t value = 0.0;
-  // data start at data_start-t0
-  // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.SetDataTimeStart(fTimeResolution*(static_cast<Double_t>(start)-static_cast<Double_t>(t0)+static_cast<Double_t>(packing-1)/2.0));
+  // data start time = (binStart - 0.5) + pack/2 - t0, with pack and binStart used as double
+  fData.SetDataTimeStart(fTimeResolution*((static_cast<Double_t>(start)-0.5) + static_cast<Double_t>(packing)/2.0 - static_cast<Double_t>(t0)));
   fData.SetDataTimeStep(fTimeResolution*packing);
 
   for (Int_t i=start; i<end; i++) {

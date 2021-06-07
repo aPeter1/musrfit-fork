@@ -888,7 +888,7 @@ Bool_t PRunSingleHisto::PrepareFitData(PRawRunData* runData, const UInt_t histoN
     normalizer = fPacking * (fTimeResolution * 1.0e3); // fTimeResolution us->ns
   // data start at data_start-t0
   // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.SetDataTimeStart(fTimeResolution*(static_cast<Double_t>(fGoodBins[0])-static_cast<Double_t>(t0)+static_cast<Double_t>(fPacking-1)/2.0));
+  fData.SetDataTimeStart(fTimeResolution*((static_cast<Double_t>(fGoodBins[0])-0.5) + static_cast<Double_t>(fPacking)/2.0 - static_cast<Double_t>(t0)));
   fData.SetDataTimeStep(fTimeResolution*fPacking);
   for (Int_t i=fGoodBins[0]; i<fGoodBins[1]; i++) {
     if (fPacking == 1) {
@@ -991,9 +991,8 @@ Bool_t PRunSingleHisto::PrepareRawViewData(PRawRunData* runData, const UInt_t hi
   // everything looks fine, hence fill data set
   Int_t t0 = static_cast<Int_t>(fT0s[0]);
   Double_t value = 0.0;
-  // data start at data_start-t0
-  // time shifted so that packing is included correctly, i.e. t0 == t0 after packing
-  fData.SetDataTimeStart(fTimeResolution*(static_cast<Double_t>(start)-static_cast<Double_t>(t0)+static_cast<Double_t>(packing-1)/2.0));
+  // data start time = (binStart - 0.5) + pack/2 - t0, with pack and binStart used as double
+  fData.SetDataTimeStart(fTimeResolution*((static_cast<Double_t>(start)-0.5) + static_cast<Double_t>(packing)/2.0 - static_cast<Double_t>(t0)));
   fData.SetDataTimeStep(fTimeResolution*packing);
 
   for (Int_t i=start; i<end; i++) {
@@ -1247,8 +1246,8 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   Double_t rrf_val = 0.0;
   Double_t time = 0.0;
 
-  // data start at data_start-t0 shifted by (pack-1)/2
-  fData.SetDataTimeStart(fTimeResolution*(static_cast<Double_t>(start)-static_cast<Double_t>(t0)+static_cast<Double_t>(packing-1)/2.0));
+  // data start time = (binStart - 0.5) + pack/2 - t0, with pack and binStart used as double
+  fData.SetDataTimeStart(fTimeResolution*((static_cast<Double_t>(start)-0.5) + static_cast<Double_t>(packing)/2.0 - static_cast<Double_t>(t0)));
   fData.SetDataTimeStep(fTimeResolution*packing);
 
   // data is always normalized to (per nsec!!)
@@ -1257,7 +1256,8 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
     for (Int_t i=start; i<end; i++) {
       if (((i-start) % packing == 0) && (i != start)) { // fill data
         value *= dataNorm;
-        time = ((static_cast<Double_t>(i)-static_cast<Double_t>(packing-1)/2.0)-t0)*fTimeResolution;
+        // since the packing counter is already at the end of the bin, the time needs be shifted back by pack*time_resolution
+        time = (((static_cast<Double_t>(i)-0.5) + static_cast<Double_t>(packing)/2.0 - static_cast<Double_t>(t0)))*fTimeResolution - static_cast<Double_t>(packing)*fTimeResolution;
         expval = TMath::Exp(+time/tau)/N0;
         fData.AppendValue(-1.0+expval*(value-bkg));
         fData.AppendErrorValue(expval*TMath::Sqrt(value*dataNorm));
@@ -1316,7 +1316,7 @@ Bool_t PRunSingleHisto::PrepareViewData(PRawRunData* runData, const UInt_t histo
   // calculate theory
   Double_t theoryValue;
   UInt_t size = fForward.size()/packing;
-  Int_t factor = 8; // 8 times more points for the theory (if fTheoAsData == false)
+  const Int_t factor = 8; // 8 times more points for the theory (if fTheoAsData == false)
   UInt_t rebinRRF = 0;
 
   if (wRRF == 0) { // no RRF

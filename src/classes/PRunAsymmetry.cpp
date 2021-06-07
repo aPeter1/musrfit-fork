@@ -781,7 +781,21 @@ Bool_t PRunAsymmetry::PrepareData()
  */
 Bool_t PRunAsymmetry::SubtractFixBkg()
 {
+  if (fRunInfo->GetBkgFix(0) == PMUSR_UNDEFINED) {
+    std::cerr << "PRunAsymmetry::SubtractFixBkg(): **ERROR** no fixed bkg for forward set. Will do nothing here." << std::endl;
+    return false;
+  }
+  if (fRunInfo->GetBkgFix(1) == PMUSR_UNDEFINED) {
+    std::cerr << "PRunAsymmetry::SubtractFixBkg(): **ERROR** no fixed bkg for backward set. Will do nothing here." << std::endl;
+    std::cerr << "   you need an entry like:" << std::endl;
+    std::cerr << "   backgr.fix      2  3" << std::endl;
+    std::cerr << "   i.e. two entries for forward and backward." << std::endl;
+    return false;
+  }
+
+
   Double_t dval;
+
   for (UInt_t i=0; i<fForward.size(); i++) {
     // keep the error, and make sure that the bin is NOT empty
     if (fForward[i] != 0.0)
@@ -1005,8 +1019,8 @@ Bool_t PRunAsymmetry::PrepareFitData()
   Double_t asym;
   Double_t f, b, ef, eb;
   // fill data time start, and step
-  // data start at data_start-t0 shifted by (pack-1)/2
-  fData.SetDataTimeStart(fTimeResolution*(static_cast<Double_t>(fGoodBins[0])-fT0s[0]+static_cast<Double_t>(fPacking-1)/2.0));
+  // data start time = (binStart - 0.5) + pack/2 - t0, with pack and binStart used as double
+  fData.SetDataTimeStart(fTimeResolution*((static_cast<Double_t>(fGoodBins[0])-0.5) + static_cast<Double_t>(fPacking)/2.0 - static_cast<Double_t>(fT0s[0])));
   fData.SetDataTimeStep(fTimeResolution*static_cast<Double_t>(fPacking));
   for (UInt_t i=0; i<noOfBins; i++) {
     // to make the formulae more readable
@@ -1207,8 +1221,8 @@ Bool_t PRunAsymmetry::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2])
   Double_t asym;
   Double_t f, b, ef, eb, alpha = 1.0, beta = 1.0;
   // set data time start, and step
-  // data start at data_start-t0
-  fData.SetDataTimeStart(fTimeResolution*(static_cast<Double_t>(start[0])-t0[0]+static_cast<Double_t>(packing-1)/2.0));
+  // data start time = (binStart - 0.5) + pack/2 - t0, with pack and binStart used as double
+  fData.SetDataTimeStart(fTimeResolution*((static_cast<Double_t>(start[0])-0.5) + static_cast<Double_t>(packing)/2.0 - static_cast<Double_t>(t0[0])));
   fData.SetDataTimeStep(fTimeResolution*static_cast<Double_t>(packing));
 
   // get the proper alpha and beta
@@ -1586,8 +1600,8 @@ Bool_t PRunAsymmetry::PrepareRRFViewData(PRawRunData* runData, UInt_t histoNo[2]
   }
 
   // set data time start, and step
-  // data start at data_start-t0
-  fData.SetDataTimeStart(fTimeResolution*(start[0]-t0[0]+static_cast<Double_t>(packing-1)/2.0));
+  // data start time = (binStart - 0.5) + pack/2 - t0, with pack and binStart used as double
+  fData.SetDataTimeStart(fTimeResolution*((static_cast<Double_t>(start[0])-0.5) + static_cast<Double_t>(packing)/2.0 - static_cast<Double_t>(t0[0])));
   fData.SetDataTimeStep(fTimeResolution*static_cast<Double_t>(packing));
 
   // ------------------------------------------------------------
