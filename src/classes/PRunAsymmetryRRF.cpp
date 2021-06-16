@@ -584,16 +584,6 @@ Bool_t PRunAsymmetryRRF::PrepareData()
       return false;
     }
   }
-  if (forwardHistoNo.size() != backwardHistoNo.size()) {
-    std::cerr << std::endl << ">> PRunAsymmetryRRF::PrepareData(): **PANIC ERROR**:";
-    std::cerr << std::endl << ">> # of forward histograms different from # of backward histograms.";
-    std::cerr << std::endl << ">> Will quit :-(";
-    std::cerr << std::endl;
-    // clean up
-    forwardHistoNo.clear();
-    backwardHistoNo.clear();
-    return false;
-  }
 
   // keep the time resolution in (us)
   fTimeResolution = runData->GetTimeResolution()/1.0e3;
@@ -608,11 +598,13 @@ Bool_t PRunAsymmetryRRF::PrepareData()
   // keep the histo of each group at this point (addruns handled below)
   std::vector<PDoubleVector> forward, backward;
   forward.resize(forwardHistoNo.size());   // resize to number of groups
-  backward.resize(backwardHistoNo.size()); // resize to numer of groups
   for (UInt_t i=0; i<forwardHistoNo.size(); i++) {
     forward[i].resize(runData->GetDataBin(forwardHistoNo[i])->size());
-    backward[i].resize(runData->GetDataBin(backwardHistoNo[i])->size());
     forward[i]  = *runData->GetDataBin(forwardHistoNo[i]);
+  }
+  backward.resize(backwardHistoNo.size()); // resize to number of groups
+  for (UInt_t i=0; i<backwardHistoNo.size(); i++) {
+    backward[i].resize(runData->GetDataBin(backwardHistoNo[i])->size());
     backward[i] = *runData->GetDataBin(backwardHistoNo[i]);
   }
 
@@ -1281,7 +1273,11 @@ Bool_t PRunAsymmetryRRF::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *glob
   // feed all T0's
   // first init T0's, T0's are stored as (forward T0, backward T0, etc.)
   fT0s.clear();
-  fT0s.resize(2*forwardHistoNo.size());
+  // this strange fT0 size estimate is needed in case #forw histos != #back histos
+  size_t size = 2*forwardHistoNo.size();
+  if (backwardHistoNo.size() > forwardHistoNo.size())
+    size = 2*backwardHistoNo.size();
+  fT0s.resize(size);
   for (UInt_t i=0; i<fT0s.size(); i++) {
     fT0s[i] = -1.0;
   }
@@ -1348,6 +1344,8 @@ Bool_t PRunAsymmetryRRF::GetProperT0(PRawRunData* runData, PMsrGlobalBlock *glob
       std::cerr << std::endl;
       return false;
     }
+  }
+  for (UInt_t i=0; i<backwardHistoNo.size(); i++) {
     if ((fT0s[2*i+1] < 0) || (fT0s[2*i+1] > static_cast<Int_t>(runData->GetDataBin(backwardHistoNo[i])->size()))) {
       std::cerr << std::endl << ">> PRunAsymmetryRRF::PrepareData(): **ERROR** t0 data bin (" << fT0s[2*i+1] << ") doesn't make any sense!";
       std::cerr << std::endl << ">> backwardHistoNo " << backwardHistoNo[i];
