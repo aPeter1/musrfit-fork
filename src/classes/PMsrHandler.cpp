@@ -6334,16 +6334,7 @@ Bool_t PMsrHandler::CheckHistoGrouping()
 {
   Bool_t result = true;
 
-  for (UInt_t i=0; i<fRuns.size(); i++) {
-    if (fRuns[i].GetFitType() == MSR_FITTYPE_ASYM || fRuns[i].GetFitType() == MSR_FITTYPE_BNMR) {
-      if (fRuns[i].GetForwardHistoNoSize() != fRuns[i].GetBackwardHistoNoSize()) {
-        std::cerr << std::endl << ">> PMsrHandler::CheckHistoGrouping: **ERROR** # of forward histos != # of backward histos.";
-        std::cerr << std::endl << ">> Run #" << i+1;
-        std::cerr << std::endl;
-        result = false;
-        break;
-      }
-    }
+  for (UInt_t i=0; i<fRuns.size(); i++) {    
     // check grouping entries are not identical, e.g. forward 1 1 2
     if (fRuns[i].GetForwardHistoNoSize() > 1) {
       for (UInt_t j=0; j<fRuns[i].GetForwardHistoNoSize(); j++) {
