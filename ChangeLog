@@ -12,11 +12,16 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.7.4, 2021/06/16
+=============================
+
+allow in asymmetry fits #forward groups != #backward groups
+
 Release of V1.7.3, 2021/06/01
 =============================
 
 making musrfit Apple Silicon M1 ready. Currently there is still an open issue 
-with NeXus.
+with NeXus (HDF4 only).
 
 Release of V1.7.2, 2021/04/16
 =============================
