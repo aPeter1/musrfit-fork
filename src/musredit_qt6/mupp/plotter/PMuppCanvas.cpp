@@ -651,7 +651,51 @@ void PMuppCanvas::ExportData()
   fi.fOverwrite = true;
   new TGFileDialog(0, fImp, kFDSave, &fi);
   if (fi.fFilename && strlen(fi.fFilename)) {
-    // still missing, as35
-    new TGMsgBox(gClient->GetRoot(), 0, "ExportData", "NOT YET IMPLEMENTED", kMBIconAsterisk);
+    std::ofstream fout(fi.fFilename, std::ios_base::out);
+    // write header
+    fout << "% ";
+    for (int i=0; i<fPlotData.size(); i++) {
+      fout << fPlotData[i].xLabel.Data() << ", ";
+      for (int j=0; j<fPlotData[i].yLabel.size(); j++) {
+        if ((i == fPlotData.size()-1) && (j == fPlotData[i].yLabel.size()-1))
+          fout << fPlotData[i].yLabel[j].Data() << ", " << fPlotData[i].yLabel[j].Data() << "ErrPos, " << fPlotData[i].yLabel[j].Data() << "ErrNeg";
+        else
+          fout << fPlotData[i].yLabel[j].Data() << ", " << fPlotData[i].yLabel[j].Data() << "ErrPos, " << fPlotData[i].yLabel[j].Data() << "ErrNeg, ";
+      }
+    }
+    fout << std::endl;
+
+    // search the longest data set
+    Int_t maxLength=0;
+    for (int i=0; i<fPlotData.size(); i++) {
+      if (maxLength < fPlotData[i].xValue.size())
+        maxLength = fPlotData[i].xValue.size();
+    }
+    // write data
+    for (int i=0; i<maxLength; i++) { // maximal data set length
+      for (int j=0; j<fPlotData.size(); j++) { // number of x-data sets
+        // write x-value
+        if (i < fPlotData[j].xValue.size()) // make sure that the entry exists
+          fout << fPlotData[j].xValue[i] << ", ";
+        else
+          fout << " , ";
+        // write y-value and y-value error
+        for (int k=0; k<fPlotData[j].yValue.size(); k++) { // number of y-data sets
+          if ((j == fPlotData.size()-1) && (k == fPlotData[j].yValue.size()-1))
+            if (i < fPlotData[j].yValue[k].size())
+              fout << fPlotData[j].yValue[k][i].y << ", " << fPlotData[j].yValue[k][i].eYpos << ", " << fPlotData[j].yValue[k][i].eYneg;
+            else
+              fout << ", , , ";
+          else
+            if (i < fPlotData[j].yValue[k].size())
+              fout << fPlotData[j].yValue[k][i].y << ", " << fPlotData[j].yValue[k][i].eYpos << ", " << fPlotData[j].yValue[k][i].eYneg << ", ";
+            else
+              fout << ", , , ";
+        }
+      }
+      fout << std::endl;
+    }
+
+    fout.close();
   }
 }
