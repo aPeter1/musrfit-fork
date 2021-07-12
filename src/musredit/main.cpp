@@ -32,7 +32,9 @@ using namespace std;
 
 #include <QApplication>
 
+#ifdef HAVE_GIT_REV_H
 #include "../include/git-revision.h"
+#endif
 #include "PTextEdit.h"
 #include "PFitOutputHandler.h"
 
@@ -53,7 +55,11 @@ int main( int argc, char ** argv )
       cout << endl << endl;
       return 0;
     } else if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")) {
+#ifdef HAVE_GIT_REV_H
       cout << endl << "musredit git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1;
+#else
+      cout << endl << "musredit version: unknown. ";
+#endif
       cout << endl << endl;
       return 0;
     }

@@ -28,7 +28,9 @@
  ***************************************************************************/
 
 #include "config.h"
+#ifdef HAVE_GIT_REV_H
 #include "git-revision.h"
+#endif
 #include "PMusrEditAbout.h"
 
 //---------------------------------------------------------------------------
@@ -39,8 +41,13 @@ PMusrEditAbout::PMusrEditAbout(QWidget *parent) : QDialog(parent)
 {
   setupUi(this);
 
+#ifdef HAVE_GIT_REV_H
   fGitBranch_label->setText(QString("git-branch: %1").arg(GIT_BRANCH));
   fGitRev_label->setText(QString("git-rev: %1").arg(GIT_CURRENT_SHA1));
+#else
+  fGitBranch_label->setText(QString("git-branch: unknown"));
+  fGitRev_label->setText(QString("git-rev: unknown"));
+#endif
   fMusrfitVersion_label->setText(QString("musrfit-version: %1 (%2)").arg(PACKAGE_VERSION).arg(BUILD_TYPE));
   fRootVersion_label->setText(QString("ROOT-version: %1").arg(ROOT_VERSION_USED));
 

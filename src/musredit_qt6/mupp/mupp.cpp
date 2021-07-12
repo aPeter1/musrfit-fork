@@ -41,6 +41,9 @@
 #include <QTimer>
 
 #include "mupp_version.h"
+#ifdef HAVE_GIT_REV_H
+#include "git-revision.h"
+#endif
 #include "PmuppScript.h"
 #include "PmuppGui.h"
 
@@ -477,7 +480,11 @@ int main(int argc, char *argv[])
       mupp_syntax();
       return 0;
     } else if (!qstrcmp(argv[1], "-v") || !qstrcmp(argv[1], "--version")) {
-      std::cout << std::endl << "mupp version: " << MUPP_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_COMMIT_HASH << std::endl << std::endl;
+#ifdef HAVE_GIT_REV_H
+      std::cout << std::endl << "mupp version: " << MUPP_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
+#else
+      std::cout << std::endl << "mupp version: " << MUPP_VERSION << std::endl << std::endl;
+#endif
       return 0;
     } else if (!qstrcmp(argv[1], "-s") || !qstrcmp(argv[1], "--script")) {
       if (argc != 3) {

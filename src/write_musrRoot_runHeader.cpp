@@ -41,7 +41,10 @@
 #include <TFile.h>
 #include <TFolder.h>
 
+#ifdef HAVE_GIT_REV_H
 #include "git-revision.h"
+#endif
+
 #include "PMusr.h"
 #include "TMusrRunHeader.h"
 
@@ -61,9 +64,17 @@ int main(int argc, char *argv[])
 
   if (!strcmp(argv[1], "--version")) {
 #ifdef HAVE_CONFIG_H
+#ifdef HAVE_GIT_REV_H
     std::cout << std::endl << "write_musrRoot_runHeader version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << " (" << BUILD_TYPE << "), ROOT version: " << ROOT_VERSION_USED << std::endl << std::endl;
 #else
+    std::cout << std::endl << "write_musrRoot_runHeader version: " << PACKAGE_VERSION << " (" << BUILD_TYPE << "), ROOT version: " << ROOT_VERSION_USED << std::endl << std::endl;
+#endif
+#else
+#ifdef HAVE_GIT_REV_H
     std::cout << std::endl << "write_musrRoot_runHeader git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
+#else
+    std::cout << std::endl << "write_musrRoot_runHeader version: unknown." << std::endl << std::endl;
+#endif
 #endif
     return 0;
   }

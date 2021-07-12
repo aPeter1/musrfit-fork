@@ -44,7 +44,10 @@
 #include <TObjString.h>
 #include <TSAXParser.h>
 
+#ifdef HAVE_GIT_REV_H
 #include "git-revision.h"
+#endif
+
 #include "PMusr.h"
 #include "PStartupHandler.h"
 #include "PMsrHandler.h"
@@ -297,9 +300,17 @@ Int_t musrFT_parse_options(Int_t argc, Char_t *argv[], musrFT_startup_param &sta
     tstr = argv[i];
     if (tstr.BeginsWith("--version")) {
 #ifdef HAVE_CONFIG_H
+#ifdef HAVE_GIT_REV_H
       std::cout << std::endl << "musrFT version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << " (" << BUILD_TYPE << "), ROOT version: " << ROOT_VERSION_USED << std::endl << std::endl;
 #else
+      std::cout << std::endl << "musrFT version: " << PACKAGE_VERSION << " (" << BUILD_TYPE << "), ROOT version: " << ROOT_VERSION_USED << std::endl << std::endl;
+#endif
+#else
+#ifdef HAVE_GIT_REV_H
       std::cout << std::endl << "musrFT git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
+#else
+      std::cout << std::endl << "musrFT version: unknown." << std::endl << std::endl;
+#endif
 #endif
       return 1;
     } else if (tstr.BeginsWith("--help")) {

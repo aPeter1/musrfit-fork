@@ -220,6 +220,15 @@ endif (nexus)
 set(HAVE_CONFIG_H 1 CACHE INTERNAL "config.h is available")
 configure_file(${CMAKE_SOURCE_DIR}/cmake/config.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
+#--- check if project source is a git repo ------------------------------------
+if (EXISTS "${CMAKE_SOURCE_DIR}/.git/HEAD")
+  message(STATUS "is a git repo")
+  set(IS_GIT_REPO 1)
+else ()
+  message(STATUS "is NOT a git repo")
+  set(IS_GIT_REPO 0)
+endif ()
+
 #--- propagate to the sub-directories -----------------------------------------
 add_subdirectory(src)
 

@@ -41,7 +41,10 @@
 #include <TSAXParser.h>
 #include <TROOT.h>
 
+#ifdef HAVE_GIT_REV_H
 #include "git-revision.h"
+#endif
+
 #include "PMusr.h"
 #include "PStartupHandler.h"
 #include "PMsrHandler.h"
@@ -135,9 +138,17 @@ int main(int argc, char *argv[])
       }
     } else if (!strcmp(argv[i], "--version")) {
 #ifdef HAVE_CONFIG_H
+#ifdef HAVE_GIT_REV_H
       std::cout << std::endl << "musrview version: " << PACKAGE_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << " (" << BUILD_TYPE << "), ROOT version: " << ROOT_VERSION_USED << std::endl << std::endl;
 #else
+      std::cout << std::endl << "musrview version: " << PACKAGE_VERSION << " (" << BUILD_TYPE << "), ROOT version: " << ROOT_VERSION_USED << std::endl << std::endl;
+#endif
+#else
+#ifdef HAVE_GIT_REV_H
       std::cout << std::endl << "musrview git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
+#else
+      std::cout << std::endl << "musrview version: unknown." << std::endl << std::endl;
+#endif
 #endif
       return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--show-dynamic-path")) {

@@ -58,6 +58,9 @@
 #include <QtDebug>
 
 #include "mupp_version.h"
+#ifdef HAVE_GIT_REV_H
+#include "git-revision.h"
+#endif
 #include "PmuppGui.h"
 
 //----------------------------------------------------------------------------------------------------
@@ -779,7 +782,11 @@ void PmuppGui::helpCmds()
  */
 void PmuppGui::helpAbout()
 {
+#ifdef HAVE_GIT_REV_H
   QMessageBox::information(this, "about", QString("mupp: created by Andreas Suter.\nVersion: %1\nBranch: %2\nHash: %3").arg(MUPP_VERSION).arg(GIT_BRANCH).arg(GIT_COMMIT_HASH));
+#else
+  QMessageBox::information(this, "about", QString("mupp: created by Andreas Suter.\nVersion: %1").arg(MUPP_VERSION));
+#endif
 }
 
 //-----------------------------------------------------------------------------

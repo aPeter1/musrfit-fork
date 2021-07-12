@@ -31,7 +31,9 @@
 
 #include <QApplication>
 
+#ifdef HAVE_GIT_REV_H
 #include "git-revision.h"
+#endif
 #include "PTextEdit.h"
 #include "PFitOutputHandler.h"
 
@@ -52,7 +54,11 @@ int main( int argc, char ** argv )
       std::cout << std::endl << std::endl;
       return 0;
     } else if (!strcmp(argv[1], "--version") || !strcmp(argv[1], "-v")) {
+#ifdef HAVE_GIT_REV_H
       std::cout << std::endl << "musredit git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1;
+#else
+      std::cout << std::endl << "musredit git-branch: unknown, git-rev: unknown.";
+#endif
       std::cout << std::endl << std::endl;
       return 0;
     }

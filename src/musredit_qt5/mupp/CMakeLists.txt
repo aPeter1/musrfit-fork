@@ -61,11 +61,19 @@ else (APPLE)
   add_executable(mupp ${GENERATED_HEADER_FILES} ${MUPP_SOURCE_FILES} qrc_mupp.cpp)
 endif (APPLE)
 
+#--- check if project source is repo ------------------------------------------
+if (IS_GIT_REPO)
+  set(HAVE_GIT_REV_H "-DHAVE_GIT_REV_H")  
+else (IS_GIT_REPO)
+  set(HAVE_GIT_REV_H "")  
+endif (IS_GIT_REPO)
+
 #--- compiler option to workaround a little cast problem for some 
 #--- boost/compiler combinations ----------------------------------------------
 target_compile_options(mupp
   PRIVATE
-    "-fpermissive"  
+    "-fpermissive"
+    "${HAVE_GIT_REV_H}"  
 )
 
 #--- add the variable related sources -----------------------------------------

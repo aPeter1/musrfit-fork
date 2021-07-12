@@ -6,7 +6,10 @@
 #include <QMessageBox>
 #include <QObject>
 
+#ifdef HAVE_GIT_REV_H
 #include "git-revision.h"
+#endif
+
 #include "musrWiz.h"
 #include "PAdmin.h"
 #include "PMusrWiz.h"
@@ -53,7 +56,11 @@ int main(int argc, char *argv[])
 
   if (argc == 2) {
     if (!strcmp(argv[1], "--version") || (!strcmp(argv[1], "-v"))) {
+#ifdef HAVE_GIT_REV_H
       std::cout << std::endl << "musrWiz - git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
+#else
+      std::cout << std::endl << "musrWiz - git-branch: unknown, git-rev: unknown." << std::endl << std::endl;
+#endif
       return 0;
     } else if (!strcmp(argv[1], "--help")) {
       musrWiz_syntax();
