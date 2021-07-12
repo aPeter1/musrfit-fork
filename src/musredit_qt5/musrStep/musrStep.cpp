@@ -5,7 +5,9 @@
 
 #include <QtDebug>
 
+#ifdef HAVE_GIT_REV_H
 #include "git-revision.h"
+#endif
 #include "PMusrStep.h"
 
 //-------------------------------------------------------------------------
@@ -29,7 +31,11 @@ int main(int argc, char *argv[])
     return 1;
   } else {
     if (!strcmp(argv[1], "--version") || (!strcmp(argv[1], "-v"))) {
-      std::cout << std::endl << "musrStep git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
+#ifdef HAVE_GIT_REV_H
+      std::cout << std::endl << "musrStep - git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
+#else
+      std::cout << std::endl << "musrStep - git-branch: unknown, git-rev: unknown" << std::endl << std::endl;
+#endif
       return 0;
     } else if (!strcmp(argv[1], "--help") || (!strcmp(argv[1], "-h"))) {
       musrStep_syntax();

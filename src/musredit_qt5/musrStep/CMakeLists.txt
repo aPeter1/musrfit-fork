@@ -1,5 +1,12 @@
 #--- musrStep for Qt > 5.0 ----------------------------------------------------
 
+#--- check if project source is repo ------------------------------------------
+if (IS_GIT_REPO)
+  set(HAVE_GIT_REV_H "-DHAVE_GIT_REV_H")  
+else (IS_GIT_REPO)
+  set(HAVE_GIT_REV_H "")  
+endif (IS_GIT_REPO)
+
 set(qt_libs Qt5::Core Qt5::Widgets Qt5::Svg)
 
 set(musrStep_src
@@ -45,6 +52,11 @@ target_include_directories(musrStep
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/..>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../..>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../include>
+)
+
+target_compile_options(musrWiz
+  PRIVATE
+    "${HAVE_GIT_REV_H}"  
 )
 
 target_link_libraries(musrStep ${qt_libs})
