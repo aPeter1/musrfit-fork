@@ -46,14 +46,16 @@ if (IS_GIT_REPO)
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/git-revision.h
   )
   set(HAVE_GIT_REV_H "-DHAVE_GIT_REV_H")  
+  set(GIT_REV_H "git-revision.h")
 else (IS_GIT_REPO)
   set(HAVE_GIT_REV_H "")  
+  set(GIT_REV_H "")
 endif (IS_GIT_REPO)
 
 #--- end create git-revision.h ------------------------------------------------
 
 #--- add all executables ------------------------------------------------------
-add_executable(any2many git-revision.h any2many.cpp)
+add_executable(any2many ${GIT_REV_H} any2many.cpp)
 target_compile_options(any2many BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(any2many 
   BEFORE PRIVATE
@@ -65,7 +67,7 @@ target_include_directories(any2many
 )
 target_link_libraries(any2many ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 
-add_executable(dump_header git-revision.h dump_header.cpp)
+add_executable(dump_header ${GIT_REV_H} dump_header.cpp)
 target_compile_options(dump_header BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(dump_header 
   BEFORE PRIVATE 
@@ -83,7 +85,7 @@ target_include_directories(dump_header
 )
 target_link_libraries(dump_header ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 
-add_executable(msr2data git-revision.h msr2data.cpp)
+add_executable(msr2data ${GIT_REV_H} msr2data.cpp)
 target_compile_options(msr2data BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(msr2data 
   BEFORE PRIVATE 
@@ -98,7 +100,7 @@ target_link_libraries(msr2data ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 add_executable(msr2msr msr2msr.cpp)
 target_link_libraries(msr2msr ${ROOT_LIBRARIES})
 
-add_executable(musrfit git-revision.h musrfit.cpp)
+add_executable(musrfit ${GIT_REV_H} musrfit.cpp)
 target_compile_options(musrfit BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(musrfit 
   BEFORE PRIVATE 
@@ -110,7 +112,7 @@ target_include_directories(musrfit
 )
 target_link_libraries(musrfit ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 
-add_executable(musrFT git-revision.h musrFT.cpp)
+add_executable(musrFT ${GIT_REV_H} musrFT.cpp)
 target_compile_options(musrFT BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(musrFT 
   BEFORE PRIVATE 
@@ -122,7 +124,7 @@ target_include_directories(musrFT
 )
 target_link_libraries(musrFT  ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 
-add_executable(musrRootValidation git-revision.h musrRootValidation.cpp)
+add_executable(musrRootValidation ${GIT_REV_H} musrRootValidation.cpp)
 target_compile_options(musrRootValidation BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(musrRootValidation 
   BEFORE PRIVATE
@@ -134,7 +136,7 @@ target_include_directories(musrRootValidation
 )
 target_link_libraries(musrRootValidation ${ROOT_LIBRARIES} ${MUSRFIT_LIBS} ${LIBXML2_LIBRARIES})
 
-add_executable(musrt0 git-revision.h musrt0.cpp)
+add_executable(musrt0 ${GIT_REV_H} musrt0.cpp)
 target_compile_options(musrt0 BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(musrt0 
   BEFORE PRIVATE 
@@ -146,7 +148,7 @@ target_include_directories(musrt0
 )
 target_link_libraries(musrt0 ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 
-add_executable(musrview git-revision.h musrview.cpp)
+add_executable(musrview ${GIT_REV_H} musrview.cpp)
 target_compile_options(musrview BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(musrview 
   BEFORE PRIVATE
@@ -158,7 +160,7 @@ target_include_directories(musrview
 )
 target_link_libraries(musrview  ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 
-add_executable(write_musrRoot_runHeader git-revision.h write_musrRoot_runHeader.cpp)
+add_executable(write_musrRoot_runHeader ${GIT_REV_H} write_musrRoot_runHeader.cpp)
 target_compile_options(write_musrRoot_runHeader BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(write_musrRoot_runHeader 
   BEFORE PRIVATE
