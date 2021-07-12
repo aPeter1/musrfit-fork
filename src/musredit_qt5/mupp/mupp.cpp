@@ -529,7 +529,7 @@ int main(int argc, char *argv[])
       return 0;
     } else if (!qstrcmp(argv[1], "-v") || !qstrcmp(argv[1], "--version")) {
 #ifdef HAVE_GIT_REV_H
-      std::cout << std::endl << "mupp version: " << MUPP_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_COMMIT_HASH << std::endl << std::endl;
+      std::cout << std::endl << "mupp version: " << MUPP_VERSION << ", git-branch: " << GIT_BRANCH << ", git-rev: " << GIT_CURRENT_SHA1 << std::endl << std::endl;
 #else
       std::cout << std::endl << "mupp version: " << MUPP_VERSION << std::endl << std::endl;
 #endif

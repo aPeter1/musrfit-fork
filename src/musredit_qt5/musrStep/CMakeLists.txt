@@ -54,7 +54,7 @@ target_include_directories(musrStep
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../../include>
 )
 
-target_compile_options(musrWiz
+target_compile_options(musrStep
   PRIVATE
     "${HAVE_GIT_REV_H}"  
 )

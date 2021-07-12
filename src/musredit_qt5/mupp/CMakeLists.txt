@@ -83,6 +83,7 @@ add_subdirectory(var)
 target_include_directories(mupp 
   BEFORE PRIVATE
     $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../..>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/var/include>
 )
