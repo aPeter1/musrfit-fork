@@ -704,12 +704,16 @@ std::string dump_create_fln(std::string runNo, std::string year, std::string fil
 
   char fln[64];
   char ptatdc[8];
+  memset(ptatdc, '\0', sizeof(ptatdc));
   if (pta)
     strcpy(ptatdc, "pta");
   else
     strcpy(ptatdc, "tdc");
   if (boost::iequals(fileFormat, "MusrRoot") || boost::iequals(fileFormat, "ROOT")) {
-    snprintf(fln, sizeof(fln), "lem%02d_his_%04d.root", yearShort, iRunNo);
+    if (instrument == "") // i.e. LEM
+      snprintf(fln, sizeof(fln), "lem%02d_his_%04d.root", yearShort, iRunNo);
+    else
+      snprintf(fln, sizeof(fln), "deltat_%s_%s_%s_%04d.root", ptatdc, instrument.c_str(), year.c_str(), iRunNo);
   } else if (boost::iequals(fileFormat, "NeXus")) {
     snprintf(fln, sizeof(fln), "%s.nxs", runNo.c_str());
   } else if (boost::iequals(fileFormat, "PSI-BIN")) {
@@ -975,7 +979,10 @@ int main(int argc, char *argv[])
     for (unsigned int i=0; i<pathList.size(); i++) {
       if (boost::iequals(fileFormat, "MusrRoot") || boost::iequals(fileFormat, "ROOT") ||
           boost::iequals(fileFormat, "WKM")) {
-        pathFln = pathList[i] + "/" + year + "/" + fileName;
+        if (instrument == "") // i.e. LEM
+          pathFln = pathList[i] + "/" + year + "/" + fileName;
+        else
+          pathFln = pathList[i] + "/d" + year + "/tdc/root/" + fileName;
       } else {
         if (pta)
           pathFln = pathList[i] + "/d" + year + "/pta/" + fileName;
