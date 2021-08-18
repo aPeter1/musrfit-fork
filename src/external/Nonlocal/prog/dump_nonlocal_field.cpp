@@ -48,6 +48,10 @@
 #include "git-revision.h"
 #endif
 
+//-----------------------------------------------------------------------------
+/**
+ * <p>dump_nonlocal_field synatx console output.
+ */
 void dnlf_syntax()
 {
   std::cout << std::endl;
@@ -60,6 +64,15 @@ void dnlf_syntax()
   std::cout << std::endl << std::endl;
 }
 
+//-----------------------------------------------------------------------------
+/**
+ * <p> reads the msr-file and estracts the necessary parameter information.
+ *
+ * @param fln msr-file name
+ * @param param parameter vector needed to calculate the magnetic field
+ *
+ * @return true, if everything went smoothly, false otherwise.
+ */
 bool dnlf_read_msr(const std::string fln, std::vector<double> &param)
 {
   std::ifstream fin(fln.c_str(), std::ifstream::in);
