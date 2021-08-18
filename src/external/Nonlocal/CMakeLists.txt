@@ -1,5 +1,7 @@
 # - Nonlocal library ----------------------------------------------------------
 
+add_subdirectory(prog)
+
 #--- generate necessary dictionaries ------------------------------------------
 set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 set(NONLOCAL_INC ${CMAKE_SOURCE_DIR}/src/external/Nonlocal)

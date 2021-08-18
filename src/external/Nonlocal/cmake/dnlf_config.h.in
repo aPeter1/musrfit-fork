@@ -1,0 +1,4 @@
+// dnlf_config.h
+
+#define PROJECT_VERSION "@PROJECT_VERSION@"
+
