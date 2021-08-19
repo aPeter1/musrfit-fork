@@ -22,6 +22,8 @@ target_include_directories(dump_nonlocal_field
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/..>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
 )
 target_link_libraries(dump_nonlocal_field ${ROOT_LIBRARIES} ${MUSRFIT_LIBS} PNL_PippardFitter)
 
