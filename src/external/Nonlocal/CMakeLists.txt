@@ -38,7 +38,7 @@ set(prefix "${CMAKE_INSTALL_PREFIX}")
 set(exec_prefix "\$\{prefix\}")
 set(libdir "\$\{exec_prefix\}/lib")
 set(includedir "\$\{prefix\}/include")   
-set(PNL_PIPPARDFITTER_VERSION "1.1.0")
+set(PNL_PIPPARDFITTER_VERSION "1.2.0")
 set(PNL_PIPPARDFITTER_LIBRARY_NAME "PNL_PippardFitter")
 configure_file("PNL_PippardFitter.pc.in" "PNL_PippardFitter.pc" @ONLY)
 
