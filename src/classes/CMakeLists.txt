@@ -59,6 +59,7 @@ root_generate_dictionary(
   OPTIONS 
     -I${NONLOCAL_INC} 
     -I${MUSRFIT_INC}
+    -I${FFTW3_INCLUDE_DIR}
     -I${CMAKE_CURRENT_SOURCE_DIR}
     -inlineInputHeader
   LINKDEF ${MUSRFIT_INC}/PRgeHandlerLinkDef.h
