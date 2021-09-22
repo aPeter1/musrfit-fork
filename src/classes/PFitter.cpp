@@ -361,7 +361,6 @@ void PFitter::GetPhaseParams()
   fPhase.resize(fRunInfo->GetNoOfParams());
   for (unsigned int i=0; i<fPhase.size(); i++)
     fPhase[i] = false;
-  std::cout << "debug> fPhase.size()=" << fPhase.size() << std::endl;
 
   // analyze theory block for parameters. Phases are present in the following
   // default functions:
@@ -379,16 +378,13 @@ void PFitter::GetPhaseParams()
         line.Contains("skewedGss") || line.Contains("skg ") ||
         line.Contains("staticNKTF") || line.Contains("snktf ") ||
         line.Contains("dynamicNKTF") || line.Contains("dnktf ")) { // phase is 1st param
-      std::cout << "debug> line: " << line.View() << std::endl;
       pos = 1;
     }
     if (line.Contains("internFld") || line.Contains("if ") ||
         line.Contains("internBsl") || line.Contains("ib ")) { // phase is 2nd param
-      std::cout << "debug> line: " << line.View() << std::endl;
       pos = 2;
     }
     if (line.Contains("muMinusExpTF") || line.Contains("mmsetf ")) { // phase is 5th param
-      std::cout << "debug> line: " << line.View() << std::endl;
       pos = 5;
     }
 
@@ -404,7 +400,6 @@ void PFitter::GetPhaseParams()
     if (tok->GetEntries() > pos) {
       ostr = dynamic_cast<TObjString*>(tok->At(pos));
       str = ostr->GetString();
-      std::cout << "debug>> ostr=" << str.View() << std::endl;
     }
     // clean up
     delete tok;
@@ -414,20 +409,17 @@ void PFitter::GetPhaseParams()
     if (str.Contains("fun")) { // function
       PIntVector parVec = GetParFromFun(str);
       for (int i=0; i<parVec.size(); i++) {
-        std::cout << "debug> par from fun: " << parVec[i] << std::endl;
         if (parVec[i] <= fRunInfo->GetNoOfParams())
           fPhase[parVec[i]-1] = true;
       }
     } else if (str.Contains("map")) { // map
       PIntVector parVec = GetParFromMap(str);
       for (int i=0; i<parVec.size(); i++) {
-        std::cout << "debug> par from map: " << parVec[i] << std::endl;
         if (parVec[i] <= fRunInfo->GetNoOfParams())
           fPhase[parVec[i]-1] = true;
       }
     } else { // must be a number
       int idx = str.Atoi();
-      std::cout << "debug> idx=" << idx << std::endl;
       if (idx == 0) { // something went wrong, str is not an integer
         std::cerr << "PFitter::GetPhaseParams(): **ERROR** str=" << str.View() << " is not an integer!" << std::endl;
         return;
@@ -440,9 +432,6 @@ void PFitter::GetPhaseParams()
       fPhase[idx] = true;
     }
   }
-
-  for (int i=0; i<fPhase.size(); i++)
-    std::cout << i+1 << ": " << fPhase[i] << std::endl;
 }
 
 //--------------------------------------------------------------------------
@@ -466,7 +455,6 @@ PIntVector PFitter::GetParFromFun(const TString funStr)
 
   for (int i=0; i<funList->size(); i++) {
     if (funList->at(i).fLine.Contains(funStr)) {
-      std::cout << "debug> funList " << i << ": " << funList->at(i).fLine.View() << std::endl;
       // tokenize function string
       tok = funList->at(i).fLine.Tokenize(" =+-*/");
       if (tok == nullptr) {
@@ -479,7 +467,6 @@ PIntVector PFitter::GetParFromFun(const TString funStr)
         str = ostr->GetString();
         // parse tok for parX
         if (str.Contains("par")) {
-          std::cout << "debug> fun tok contains par: " << str.View() << std::endl;
           // find start idx of par in token
           Ssiz_t idx = str.Index("par");
           idx += 3;
@@ -487,12 +474,10 @@ PIntVector PFitter::GetParFromFun(const TString funStr)
           do {
             parStr += str[idx];
           } while (isdigit(str[idx++]));
-          std::cout << "debug> par idx = " << parStr.View() << std::endl;
           parVec.push_back(parStr.Atoi());
         }
         // parse tok for mapX
         if (str.Contains("map")) {
-          std::cout << "debug> fun tok contains map: " << str.View() << std::endl;
           // find start idx of par in token
           Ssiz_t idx = str.Index("map");
           idx += 3;
@@ -500,7 +485,6 @@ PIntVector PFitter::GetParFromFun(const TString funStr)
           do {
             mapStr += str[idx];
           } while (isdigit(str[idx++]));
-          std::cout << "debug> map string from fun: " << mapStr.View() << std::endl;
           PIntVector mapParVec = GetParFromMap(mapStr);
           for (int k=0; k<mapParVec.size(); k++) {
             parVec.push_back(mapParVec[k]);
@@ -533,7 +517,6 @@ PIntVector PFitter::GetParFromMap(const TString mapStr)
 
   TString str = mapStr;
   str.Remove(0,3); // remove map from string
-  std::cout << "debug> mapX: X=" << str << std::endl;
 
   int idx=str.Atoi();
   if (idx == 0) {
