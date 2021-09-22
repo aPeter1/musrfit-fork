@@ -155,6 +155,13 @@ class PFitter
     Bool_t fSectorFlag; ///< sector command present flag    
     std::vector<PSectorChisq> fSector; ///< stores all chisq/maxLH sector information
 
+    std::vector<bool> fPhase; ///< flag array in which an entry is true if the related parameter value is a phase
+
+    // phase related functions
+    void GetPhaseParams();
+    PIntVector GetParFromFun(const TString funStr);
+    PIntVector GetParFromMap(const TString mapStr);
+
     // commands
     Bool_t CheckCommands();
     Bool_t SetParameters();

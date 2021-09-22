@@ -313,6 +313,9 @@ PFitter::PFitter(PMsrHandler *runInfo, PRunListCollection *runListCollection, Bo
     return;
   }
 
+  // create phase bool array
+  GetPhaseParams();
+
   // create fit function object
   fFitterFcn = new PFitterFcn(runListCollection, fUseChi2);
   if (!fFitterFcn) {
@@ -344,6 +347,226 @@ PFitter::~PFitter()
     delete fFitterFcn;
     fFitterFcn = nullptr;
   }
+}
+
+//--------------------------------------------------------------------------
+// GetPhaseParams (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Checks which parameters are phases. This information is needed to
+ * restrict the phases to the intervall -360 to +360 degrees.
+ */
+void PFitter::GetPhaseParams()
+{
+  fPhase.resize(fRunInfo->GetNoOfParams());
+  for (unsigned int i=0; i<fPhase.size(); i++)
+    fPhase[i] = false;
+  std::cout << "debug> fPhase.size()=" << fPhase.size() << std::endl;
+
+  // analyze theory block for parameters. Phases are present in the following
+  // default functions:
+  // user functions cannot be checked!
+  PMsrLines *theo = fRunInfo->GetMsrTheory();
+  TObjArray *tok = nullptr;
+  TObjString *ostr = nullptr;
+  TString str;
+  int pos = -1;
+  for (unsigned int i=0; i<theo->size(); i++) {
+    pos = -1;
+    TString line = theo->at(i).fLine;
+    if (line.Contains("TFieldCos") || line.Contains("tf ") ||
+        line.Contains("bessel") || line.Contains("b ") ||
+        line.Contains("skewedGss") || line.Contains("skg ") ||
+        line.Contains("staticNKTF") || line.Contains("snktf ") ||
+        line.Contains("dynamicNKTF") || line.Contains("dnktf ")) { // phase is 1st param
+      std::cout << "debug> line: " << line.View() << std::endl;
+      pos = 1;
+    }
+    if (line.Contains("internFld") || line.Contains("if ") ||
+        line.Contains("internBsl") || line.Contains("ib ")) { // phase is 2nd param
+      std::cout << "debug> line: " << line.View() << std::endl;
+      pos = 2;
+    }
+    if (line.Contains("muMinusExpTF") || line.Contains("mmsetf ")) { // phase is 5th param
+      std::cout << "debug> line: " << line.View() << std::endl;
+      pos = 5;
+    }
+
+    if (pos == -1)
+      continue;
+
+    // extract phase token
+    tok = line.Tokenize(" \t");
+    if (tok == nullptr) {
+      std::cerr << "PFitter::GetPhaseParams(): **ERROR** couldn't tokenize theory line string." << std::endl;
+      return;
+    }
+    if (tok->GetEntries() > pos) {
+      ostr = dynamic_cast<TObjString*>(tok->At(pos));
+      str = ostr->GetString();
+      std::cout << "debug>> ostr=" << str.View() << std::endl;
+    }
+    // clean up
+    delete tok;
+    tok = nullptr;
+
+    // decode phase token. It can be funX, mapX, or a number
+    if (str.Contains("fun")) { // function
+      PIntVector parVec = GetParFromFun(str);
+      for (int i=0; i<parVec.size(); i++) {
+        std::cout << "debug> par from fun: " << parVec[i] << std::endl;
+        if (parVec[i] <= fRunInfo->GetNoOfParams())
+          fPhase[parVec[i]-1] = true;
+      }
+    } else if (str.Contains("map")) { // map
+      PIntVector parVec = GetParFromMap(str);
+      for (int i=0; i<parVec.size(); i++) {
+        std::cout << "debug> par from map: " << parVec[i] << std::endl;
+        if (parVec[i] <= fRunInfo->GetNoOfParams())
+          fPhase[parVec[i]-1] = true;
+      }
+    } else { // must be a number
+      int idx = str.Atoi();
+      std::cout << "debug> idx=" << idx << std::endl;
+      if (idx == 0) { // something went wrong, str is not an integer
+        std::cerr << "PFitter::GetPhaseParams(): **ERROR** str=" << str.View() << " is not an integer!" << std::endl;
+        return;
+      }
+      idx -= 1; // param start at 1, vector at 0
+      if (idx >= fRunInfo->GetNoOfParams()) { // idx is out-of-range
+        std::cerr << "PFitter::GetPhaseParams(): **ERROR** idx=" << idx << " is > #param = " << fRunInfo->GetNoOfParams() << "!" << std::endl;
+        return;
+      }
+      fPhase[idx] = true;
+    }
+  }
+
+  for (int i=0; i<fPhase.size(); i++)
+    std::cout << i+1 << ": " << fPhase[i] << std::endl;
+}
+
+//--------------------------------------------------------------------------
+// GetParFromFun (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Extract from string funX the function number. Base on the function number
+ * the paramter numbers will be collected.
+ *
+ * @param funStr string of the form funX, where X is the function number
+ * @return a vector of all the parameter numbers related to funX
+ */
+PIntVector PFitter::GetParFromFun(const TString funStr)
+{
+  PIntVector parVec;
+
+  PMsrLines *funList = fRunInfo->GetMsrFunctions();
+  TObjArray *tok = nullptr;
+  TObjString *ostr = nullptr;
+  TString str;
+
+  for (int i=0; i<funList->size(); i++) {
+    if (funList->at(i).fLine.Contains(funStr)) {
+      std::cout << "debug> funList " << i << ": " << funList->at(i).fLine.View() << std::endl;
+      // tokenize function string
+      tok = funList->at(i).fLine.Tokenize(" =+-*/");
+      if (tok == nullptr) {
+        std::cerr << "PFitter::GetParFromFun(): **ERROR** couldn't tokenize function string." << std::endl;
+        return parVec;
+      }
+
+      for (int j=1; j<tok->GetEntries(); j++) {
+        ostr = dynamic_cast<TObjString*>(tok->At(j));
+        str = ostr->GetString();
+        // parse tok for parX
+        if (str.Contains("par")) {
+          std::cout << "debug> fun tok contains par: " << str.View() << std::endl;
+          // find start idx of par in token
+          Ssiz_t idx = str.Index("par");
+          idx += 3;
+          TString parStr("");
+          do {
+            parStr += str[idx];
+          } while (isdigit(str[idx++]));
+          std::cout << "debug> par idx = " << parStr.View() << std::endl;
+          parVec.push_back(parStr.Atoi());
+        }
+        // parse tok for mapX
+        if (str.Contains("map")) {
+          std::cout << "debug> fun tok contains map: " << str.View() << std::endl;
+          // find start idx of par in token
+          Ssiz_t idx = str.Index("map");
+          idx += 3;
+          TString mapStr("map");
+          do {
+            mapStr += str[idx];
+          } while (isdigit(str[idx++]));
+          std::cout << "debug> map string from fun: " << mapStr.View() << std::endl;
+          PIntVector mapParVec = GetParFromMap(mapStr);
+          for (int k=0; k<mapParVec.size(); k++) {
+            parVec.push_back(mapParVec[k]);
+          }
+        }
+      }
+
+      // clean up
+      delete tok;
+      tok = nullptr;
+    }
+  }
+
+  return parVec;
+}
+
+//--------------------------------------------------------------------------
+// GetParFromMap (private)
+//--------------------------------------------------------------------------
+/**
+ * <p>Extract from string mapX the map number. Based on the map number the
+ * parameter numbers will be collected.
+ *
+ * @param mapStr string of the form mapX, where X is the map number
+ * @return a vector of all the parameter numbers related to mapX
+ */
+PIntVector PFitter::GetParFromMap(const TString mapStr)
+{
+  PIntVector parVec;
+
+  TString str = mapStr;
+  str.Remove(0,3); // remove map from string
+  std::cout << "debug> mapX: X=" << str << std::endl;
+
+  int idx=str.Atoi();
+  if (idx == 0) {
+    std::cerr << "PFitter::GetParFromMap(): **ERROR** couldn't get propper index from mapX!" << std::endl;
+    return parVec;
+  }
+
+  idx -= 1; // map starts at 1, map vector at 0
+
+  // go through all the runs and collect the parameters from the map vectors
+  PMsrRunList *runList = fRunInfo->GetMsrRunList();
+  if (runList == nullptr) {
+    std::cerr << "PFitter::GetParFromMap(): **ERROR** couldn't get required run list information!" << std::endl;
+    return parVec;
+  }
+
+  PIntVector *map = nullptr;
+  for (int i=0; i<runList->size(); i++) {
+    map = runList->at(i).GetMap();
+    if (map == nullptr) {
+      std::cerr << "PFitter::GetParFromMap(): **ERROR** couldn't get required map information (idx=" << i << ")!" << std::endl;
+      parVec.clear();
+      return parVec;
+    }
+    if (idx >= map->size()) {
+      std::cerr << "PFitter::GetParFromMap(): **ERROR** requested map index (idx=" << idx << ") out-of-range (" << map->size() << ")!" << std::endl;
+      parVec.clear();
+      return parVec;
+    }
+    parVec.push_back(map->at(idx));
+  }
+
+  return parVec;
 }
 
 //--------------------------------------------------------------------------
@@ -1608,7 +1831,12 @@ Bool_t PFitter::ExecuteMigrad()
 
   // fill run info
   for (UInt_t i=0; i<fParams.size(); i++) {
-    fRunInfo->SetMsrParamValue(i, min.UserState().Value(i));
+    Double_t dval = min.UserState().Value(i);
+    if (fPhase[i]) {
+      Int_t m = (Int_t)(dval/360.0);
+      dval = dval - m*360.0;
+    }
+    fRunInfo->SetMsrParamValue(i, dval);
     fRunInfo->SetMsrParamStep(i, min.UserState().Error(i));
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
@@ -1684,7 +1912,12 @@ Bool_t PFitter::ExecuteMinimize()
 
   // fill run info
   for (UInt_t i=0; i<fParams.size(); i++) {
-    fRunInfo->SetMsrParamValue(i, min.UserState().Value(i));
+    Double_t dval = min.UserState().Value(i);
+    if (fPhase[i]) {
+      Int_t m = (Int_t)(dval/360.0);
+      dval = dval - m*360.0;
+    }
+    fRunInfo->SetMsrParamValue(i, dval);
     fRunInfo->SetMsrParamStep(i, min.UserState().Error(i));
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
@@ -2392,7 +2625,12 @@ Bool_t PFitter::ExecuteSimplex()
 
   // fill run info
   for (UInt_t i=0; i<fParams.size(); i++) {
-    fRunInfo->SetMsrParamValue(i, min.UserState().Value(i));
+    Double_t dval = min.UserState().Value(i);
+    if (fPhase[i]) {
+      Int_t m = (Int_t)(dval/360.0);
+      dval = dval - m*360.0;
+    }
+    fRunInfo->SetMsrParamValue(i, dval);
     fRunInfo->SetMsrParamStep(i, min.UserState().Error(i));
     fRunInfo->SetMsrParamPosErrorPresent(i, false);
   }
