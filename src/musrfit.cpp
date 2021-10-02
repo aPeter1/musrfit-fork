@@ -31,6 +31,10 @@
 #include "config.h"
 #endif
 
+#ifdef HAVE_GOMP
+#include <omp.h>
+#endif
+
 #include <cstdio>
 #include <cstdlib>
 //#include <string.h>
@@ -92,6 +96,7 @@ void musrfit_syntax()
   std::cout << std::endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [-t, --title-from-data-file]";
   std::cout << std::endl << "                            [-e, --estimateN0] [-p, --per-run-block-chisq]";
   std::cout << std::endl << "                            [--dump <type>] [--timeout <timeout_tag>] |";
+  std::cout << std::endl << "                            -n, --no-of-cores-avail |";
   std::cout << std::endl << "                            --nexus-support | --show-dynamic-path | --version | --help";
   std::cout << std::endl << "       <msr-file>: msr input file";
   std::cout << std::endl << "       'musrfit <msr-file>' will execute musrfit";
@@ -111,6 +116,7 @@ void musrfit_syntax()
   std::cout << std::endl << "              is present in the data file.";
   std::cout << std::endl << "       -e, --estimateN0: estimate N0 for single histogram fits.";
   std::cout << std::endl << "       -p, --per-run-block-chisq: will write per run block chisq to the msr-file.";
+  std::cout << std::endl << "       -n, --no-of-cores-avail: print out how many cores are available (only vaild for OpenMP)";
   std::cout << std::endl << "       --dump <type> is writing a data file with the fit data and the theory";
   std::cout << std::endl << "              <type> can be 'ascii', 'root'";
   std::cout << std::endl << "       --timeout <timeout_tag>: overwrites to predefined timeout of " << timeout << " (sec).";
@@ -524,6 +530,17 @@ int main(int argc, char *argv[])
       startup_options.estimateN0 = true;
     } else if (!strcmp(argv[i], "-p") || !strcmp(argv[i], "--per-run-block-chisq")) {
       startup_options.writeExpectedChisq = true;
+    } else if (!strcmp(argv[i], "-n") || !strcmp(argv[i], "--no-of-cores-avail")) {
+#ifdef HAVE_GOMP
+        std::cout << std::endl;
+        std::cout << "musrfit: maxmimal number of cores for OpenMP available: " << omp_get_num_procs() << std::endl;
+        std::cout << std::endl;
+#else
+        std::cout << std::endl;
+        std::cout << "musrfit: this option is only vaild if OpenMP is present. This seems not to be the case here. Sorry!" << std::endl;
+        std::cout << std::endl;
+#endif
+      return PMUSR_SUCCESS;
     } else if (!strcmp(argv[i], "--timeout")) {
       if (i<argc-1) {
         TString str(argv[i+1]);
