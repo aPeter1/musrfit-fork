@@ -96,7 +96,7 @@ void musrfit_syntax()
   std::cout << std::endl << "usage: musrfit [<msr-file> [-k, --keep-mn2-ouput] [-c, --chisq-only] [-t, --title-from-data-file]";
   std::cout << std::endl << "                            [-e, --estimateN0] [-p, --per-run-block-chisq]";
   std::cout << std::endl << "                            [--dump <type>] [--timeout <timeout_tag>] |";
-  std::cout << std::endl << "                            -n, --no-of-cores-avail |";
+  std::cout << std::endl << "                            -n, --no-of-cores-avail | -u, --use-no-of-threads <number> |";
   std::cout << std::endl << "                            --nexus-support | --show-dynamic-path | --version | --help";
   std::cout << std::endl << "       <msr-file>: msr input file";
   std::cout << std::endl << "       'musrfit <msr-file>' will execute musrfit";
@@ -117,6 +117,9 @@ void musrfit_syntax()
   std::cout << std::endl << "       -e, --estimateN0: estimate N0 for single histogram fits.";
   std::cout << std::endl << "       -p, --per-run-block-chisq: will write per run block chisq to the msr-file.";
   std::cout << std::endl << "       -n, --no-of-cores-avail: print out how many cores are available (only vaild for OpenMP)";
+  std::cout << std::endl << "       -u, --use-no-of-threads <number>:";
+  std::cout << std::endl << "              <number>: number of threads to be used (OpenMP). Needs to be <= max. number of cores.";
+  std::cout << std::endl << "              If OpenMP is enable, the maximal number of cores is used, if it is not limited by this option.";
   std::cout << std::endl << "       --dump <type> is writing a data file with the fit data and the theory";
   std::cout << std::endl << "              <type> can be 'ascii', 'root'";
   std::cout << std::endl << "       --timeout <timeout_tag>: overwrites to predefined timeout of " << timeout << " (sec).";
@@ -454,7 +457,12 @@ int main(int argc, char *argv[])
   bool timeout_enabled = true;
   PStartupOptions startup_options;
   startup_options.writeExpectedChisq = false;
-  startup_options.estimateN0 = false;
+  startup_options.estimateN0 = false;  
+  int number_of_cores=1;
+
+#ifdef HAVE_GOMP
+  number_of_cores = omp_get_num_procs();
+#endif
 
   TString dump("");
   char filename[1024];
@@ -522,7 +530,7 @@ int main(int argc, char *argv[])
         dump = TString(argv[i+1]);
         i++;
       } else {
-        std::cerr << std::endl << "musrfit: **ERROR** found option --dump without <type>" << std::endl;
+        std::cerr << std::endl << ">> musrfit: **ERROR** found option --dump without <type>" << std::endl;
         show_syntax = true;
         break;
       }
@@ -537,10 +545,37 @@ int main(int argc, char *argv[])
         std::cout << std::endl;
 #else
         std::cout << std::endl;
-        std::cout << "musrfit: this option is only vaild if OpenMP is present. This seems not to be the case here. Sorry!" << std::endl;
+        std::cout << ">> musrfit: this option is only vaild if OpenMP is present. This seems not to be the case here. Sorry!" << std::endl;
         std::cout << std::endl;
 #endif
       return PMUSR_SUCCESS;
+    } else if (!strcmp(argv[i], "-u") || !strcmp(argv[i], "--use-no-of-threads")) {
+      if (i<argc-1) {
+        TString str(argv[i+1]);
+        if (str.IsFloat()) {
+          int ival = str.Atoi();
+          if (ival <= 0) {
+            std::cerr << std::endl << ">> musrfit: **ERROR** found option --use-no-of-threads with <number> <= 0" << std::endl;
+            std::cerr << "                      This doesn't make any sense." << std::endl;
+            show_syntax = true;
+            break;
+          } else if (ival > number_of_cores) {
+            std::cerr << std::endl << ">> musrfit: **WARNING** found option --use-no-of-threads with <number>=" << ival << " > max available cores=" << number_of_cores << "." << std::endl;
+            std::cerr << "                        Will set <number> to max available cores." << std::endl;
+          } else {
+            number_of_cores = ival;
+          }
+        } else {
+          std::cerr << std::endl << ">> musrfit: **ERROR** found option --use-no-of-threads where <number> it not a number: '" << argv[i+1] << "'" << std::endl;
+          show_syntax = true;
+          break;
+        }
+        i++;
+      } else {
+        std::cerr << std::endl << ">> musrfit: **ERROR** found option --use-no-of-threads without <number>" << std::endl;
+        show_syntax = true;
+        break;
+      }
     } else if (!strcmp(argv[i], "--timeout")) {
       if (i<argc-1) {
         TString str(argv[i+1]);
@@ -551,13 +586,13 @@ int main(int argc, char *argv[])
             std::cout << std::endl << ">> musrfit: timeout disabled." << std::endl;
           }
         } else {
-          std::cerr << std::endl << "musrfit: **ERROR** found option --timeout with unsupported <timeout_tag> = " << argv[i+1] << std::endl;
+          std::cerr << std::endl << ">> musrfit: **ERROR** found option --timeout with unsupported <timeout_tag> = " << argv[i+1] << std::endl;
           show_syntax = true;
           break;
         }
         i++;
       } else {
-        std::cerr << std::endl << "musrfit: **ERROR** found option --timeout without <timeout_tag>" << std::endl;
+        std::cerr << std::endl << ">> musrfit: **ERROR** found option --timeout without <timeout_tag>" << std::endl;
         show_syntax = true;
         break;
       }
@@ -582,7 +617,7 @@ int main(int argc, char *argv[])
   if (!dump.IsNull()) {
     dump.ToLower();
     if (!dump.Contains("ascii") && !dump.Contains("root")) {
-      std::cerr << std::endl << "musrfit: **ERROR** found option --dump with unsupported <type> = " << dump << std::endl;
+      std::cerr << std::endl << ">> musrfit: **ERROR** found option --dump with unsupported <type> = " << dump << std::endl;
       musrfit_syntax();
       return PMUSR_WRONG_STARTUP_SYNTAX;
     }
@@ -626,6 +661,11 @@ int main(int argc, char *argv[])
       }
     }
   }
+
+#ifdef HAVE_GOMP
+  // set omp_set_num_threads
+  omp_set_num_threads(number_of_cores);
+#endif
 
   // read msr-file
   PMsrHandler *msrHandler = nullptr;

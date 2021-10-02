@@ -730,7 +730,7 @@ Bool_t PFitter::DoFit()
 
   // debugging information
   #ifdef HAVE_GOMP
-  std::cout << std::endl << ">> Number of available threads for the function optimization: " << omp_get_num_procs() << std::endl;
+  std::cout << std::endl << ">> Number of available threads for the function optimization: " << omp_get_max_threads() << std::endl;
   #endif
 
   // real fit wanted
