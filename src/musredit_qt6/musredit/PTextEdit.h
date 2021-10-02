@@ -67,6 +67,9 @@ public:
   PTextEdit( QWidget *parent = nullptr );
   virtual ~PTextEdit() {}
 
+  int getEditW() { return fEditW; }
+  int getEditH() { return fEditH; }
+
 public slots:
   void aboutToQuit();
 
@@ -170,6 +173,7 @@ private:
   QTimer fFileSystemWatcherTimeout; ///< timer used to re-enable file system watcher. Needed to delay the re-enabling
   QString fLastDirInUse; ///< string holding the path from where the last file was loaded.
   QStringList fMusrFTPrevCmd;
+  int fEditW, fEditH;
 
   QMap<QString, QAction*> fActions;
   QAction *fMusrT0Action;

@@ -68,7 +68,7 @@ int main( int argc, char ** argv )
 
   PTextEdit *mw = new PTextEdit();
   mw->setWindowTitle( "MusrFit Editor" );
-  mw->resize( 800, 800 );
+  mw->resize( mw->getEditW(), mw->getEditH() );
   mw->show();
 
   a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );

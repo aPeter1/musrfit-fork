@@ -20,7 +20,9 @@
     <enable_musrt0>y</enable_musrt0>
     <dark_theme_icons_menu>n</dark_theme_icons_menu>
     <dark_theme_icons_toolbar>n</dark_theme_icons_toolbar>
-  </general>
+    <edit_w>900</edit_w>
+    <edit_h>800</edit_h>
+ </general>
   <recent_files>
     <path_file_name>@DOCDIR@/examples/test-histo-PSI-BIN.msr</path_file_name>
   </recent_files>

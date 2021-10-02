@@ -150,6 +150,10 @@ bool PAdminXMLParser::startElement()
     fKeyWord = eDarkThemeIconsMenu;
   } else if (qName == "dark_theme_icons_toolbar") {
     fKeyWord = eDarkThemeIconsToolbar;
+  } else if (qName == "edit_w") {
+    fKeyWord = eEditW;
+  } else if (qName == "edit_h") {
+    fKeyWord = eEditH;
   } else if (qName =="keep_minuit2_output") {
     fKeyWord = eKeepMinuit2Output;
   } else if (qName == "dump_ascii") {
@@ -347,6 +351,16 @@ bool PAdminXMLParser::characters()
       else
         flag = false;
       fAdmin->setDarkThemeIconsToolbarFlag(flag);
+      break;
+    case eEditW:
+      ival = QString(str.toLatin1()).trimmed().toInt(&ok);
+      if (ok)
+        fAdmin->setEditWidth(ival);
+      break;
+    case eEditH:
+      ival = QString(str.toLatin1()).trimmed().toInt(&ok);
+      if (ok)
+        fAdmin->setEditHeight(ival);
       break;
     case eKeepMinuit2Output:
       if (str == "y")
@@ -602,6 +616,8 @@ void PAdminXMLParser::dump()
   std::cout << "debug> enable_musrt0 : " << fAdmin->getEnableMusrT0Flag() << std::endl;
   std::cout << "debug> dark_theme_icons_menu : " << fAdmin->getDarkThemeIconsMenuFlag() << std::endl;
   std::cout << "debug> dark_theme_icons_toolbar : " << fAdmin->getDarkThemeIconsToolbarFlag() << std::endl;
+  std::cout << "debug> edit_w : " << fAdmin->getEditWidth() << std::endl;
+  std::cout << "debug> edit_h : " << fAdmin->getEditHeight() << std::endl;
   std::cout << "debug> +++++++++++++++++++++++" << std::endl;
   std::cout << "debug> recent_files:" << std::endl;
   for (int i=0; i<fAdmin->getNumRecentFiles(); i++) {

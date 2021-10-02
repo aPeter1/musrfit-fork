@@ -102,6 +102,10 @@ PTextEdit::PTextEdit( QWidget *parent )
     fDarkToolBarIcon = fAdmin->getDarkThemeIconsToolbarFlag();
   }
 
+  // keep the default editor width/height
+  fEditW = fAdmin->getEditWidth();
+  fEditH = fAdmin->getEditHeight();
+
   // enable file system watcher. Needed to get notification if the msr-file is changed outside of musrfit at runtime
   fFileSystemWatcherActive = true;
   fFileSystemWatcher = new QFileSystemWatcher();

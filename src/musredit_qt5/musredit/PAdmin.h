@@ -73,7 +73,7 @@ class PAdminXMLParser
     enum EAdminKeyWords {eEmpty, eTimeout, eKeepMinuit2Output, eDumpAscii, eDumpRoot,
                          eTitleFromDataFile, eChisqPreRunBlock, eEstimateN0,
                          eMusrviewShowFourier, eMusrviewShowAvg, eMusrviewShowOneToOne, eEnableMusrT0,
-                         eDarkThemeIconsMenu, eDarkThemeIconsToolbar,
+                         eDarkThemeIconsMenu, eDarkThemeIconsToolbar, eEditW, eEditH,
                          eFontName, eFontSize, eExecPath, eDefaultSavePath,
                          eRecentFile, eBeamline, eInstitute, eFileFormat, eLifetimeCorrection,
                          eTheoFuncPixmapPath, eFunc, eFuncName, eFuncComment, eFuncLabel,
@@ -132,6 +132,8 @@ class PAdmin : public QObject
     bool    getChisqPerRunBlockFlag() { return fChisqPreRunBlock; }
     bool    getDarkThemeIconsMenuFlag() { return fDarkThemeIconsMenu; }
     bool    getDarkThemeIconsToolbarFlag() { return fDarkThemeIconsToolbar; }
+    int     getEditWidth() { return fEditWidth; }
+    int     getEditHeight() { return fEditHeight; }
     QString getBeamline() { return fBeamline; }
     QString getInstitute() { return fInstitute; }
     QString getFileFormat() { return fFileFormat; }
@@ -158,6 +160,8 @@ class PAdmin : public QObject
     void setChisqPerRunBlockFlag(const bool flag) { fChisqPreRunBlock = flag; }
     void setDarkThemeIconsMenuFlag(const bool flag) { fDarkThemeIconsMenu = flag; }
     void setDarkThemeIconsToolbarFlag(const bool flag) { fDarkThemeIconsToolbar = flag; }
+    void setEditWidth(const int width) { fEditWidth = width; }
+    void setEditHeight(const int height) { fEditHeight = height; }
 
     void setFontName(const QString str) { fFontName = str; }
     void setFontSize(const int ival) { fFontSize = ival; }
@@ -204,6 +208,8 @@ class PAdmin : public QObject
     bool fEnableMusrT0;         ///< flag indicating if musrT0 shall be enabled at startup from within musredit (default: yes).
     bool fDarkThemeIconsMenu;   ///< flag indicating if dark theme icons shall be used in the menu (default: no)
     bool fDarkThemeIconsToolbar; ///< flag indicating if dark theme icons shall be used in the toolbar (default: no)
+    int  fEditWidth;            ///< startup edit width
+    int  fEditHeight;           ///< startup edit height
 
     QString fBeamline;   ///< name of the beamline. Used to generate default run header lines.
     QString fInstitute;  ///< name of the institute. Used to generate default run header lines.
