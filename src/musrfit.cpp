@@ -560,8 +560,13 @@ int main(int argc, char *argv[])
             show_syntax = true;
             break;
           } else if (ival > number_of_cores) {
+#ifdef HAVE_GOMP
             std::cerr << std::endl << ">> musrfit: **WARNING** found option --use-no-of-threads with <number>=" << ival << " > max available cores=" << number_of_cores << "." << std::endl;
             std::cerr << "                        Will set <number> to max available cores." << std::endl;
+#else
+            std::cerr << std::endl << ">> musrfit: **WARNING** option --use-no-of-threads can only be used if OpenMP is available." << std::endl;
+            std::cerr << "            Here it is not the case, and hence this option will be ignored." << std::endl;
+#endif
           } else {
             number_of_cores = ival;
           }
