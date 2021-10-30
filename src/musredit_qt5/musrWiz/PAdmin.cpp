@@ -534,7 +534,7 @@ bool PInstrumentDefXMLParser::startElement()
         return false;
       backward.push_back(ival);
     }
-    detect.setForwards(backward);
+    detect.setBackwards(backward);
     // detector alpha
     str = qAttr.value("alpha").toString();
     dval = str.toDouble(&ok);
