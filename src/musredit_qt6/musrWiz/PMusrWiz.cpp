@@ -2263,7 +2263,7 @@ int PMusrWiz::writeMsrFileSingleHisto()
   fout << "PLOT " << fMsrData->getFitType()-1 << Qt::endl;
   fout << "lifetimecorrection" << Qt::endl;
   fout << "runs   1-" << setup->getNoOfLogicalDetectors() << Qt::endl;
-  fout << "range  0.0  " << fMsrData->getFitEnd() << Qt::endl;
+  fout << "range  0.0  " << fMsrData->getFitEnd() << " -0.35 0.35" << Qt::endl;
   fout << "view_packing " << fMsrData->getPacking() << Qt::endl;
   fout << Qt::endl << line << Qt::endl;
 
@@ -2498,7 +2498,7 @@ int PMusrWiz::writeMsrFileAsymmetry()
     fout << "runs   1-" << setup->getNoOfLogicalAsymDetectors() << Qt::endl;
   else
     fout << "runs   1" << Qt::endl;
-  fout << "range  0.0  " << fMsrData->getFitEnd() << Qt::endl;
+  fout << "range  0.0  " << fMsrData->getFitEnd() << " -0.35 0.35" << Qt::endl;
   fout << "view_packing " << fMsrData->getPacking() << Qt::endl;
   fout << Qt::endl << line << Qt::endl;
 
