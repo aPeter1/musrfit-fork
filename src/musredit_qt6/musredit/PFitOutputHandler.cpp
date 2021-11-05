@@ -65,7 +65,11 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QVector<QString> 
 
   // make sure that the system environment variables are properly set
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_DARWIN)
+  env.insert("DYLD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("DYLD_LIBRARY_PATH"));
+#else
   env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+#endif
   fProc->setProcessEnvironment(env);
   fProc->setWorkingDirectory(workingDirectory);
 

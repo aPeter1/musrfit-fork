@@ -2416,7 +2416,7 @@ void PmuppGui::startMuppPlot()
 {
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
   QString cmd = QString("%1/bin/mupp_plot").arg(MUPP_PREFIX);
-#if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
+#if defined(Q_OS_DARWIN)
   cmd = QString("/Applications/mupp.app/Contents/MacOS/mupp_plot");
 #endif
   QString workDir = QString("./");
@@ -2432,7 +2432,11 @@ void PmuppGui::startMuppPlot()
   }
 
   // make sure that the system environment variables are properly set
+#if defined(Q_OS_DARWIN)
+  env.insert("DYLD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("DYLD_LIBRARY_PATH"));
+#else
   env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+#endif
   fMuppPlot->setProcessEnvironment(env);
   fMuppPlot->setWorkingDirectory(workDir);
   fMuppPlot->start(cmd, arg);

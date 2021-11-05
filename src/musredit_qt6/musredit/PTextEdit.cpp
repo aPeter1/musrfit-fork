@@ -1989,7 +1989,7 @@ void PTextEdit::textSize( const QString &p )
 void PTextEdit::musrWiz()
 {
   QString cmd = fAdmin->getExecPath() + "/musrWiz";
-#if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
+#if defined(Q_OS_DARWIN)
   cmd = QString("/Applications/musrWiz.app/Contents/MacOS/musrWiz");
 #endif
   QString workDir = "./"; // think about it!!
@@ -2008,7 +2008,11 @@ void PTextEdit::musrWiz()
 
   // make sure that the system environment variables are properly set
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_DARWIN)
+  env.insert("DYLD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("DYLD_LIBRARY_PATH"));
+#else
   env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+#endif
   proc->setProcessEnvironment(env);
   proc->setWorkingDirectory(workDir);
   proc->start(cmd, arg);
@@ -2563,7 +2567,11 @@ void PTextEdit::musrView()
 
   // make sure that the system environment variables are properly set
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_DARWIN)
+  env.insert("DYLD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("DYLD_LIBRARY_PATH"));
+#else
   env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+#endif
   proc->setProcessEnvironment(env);
   proc->setWorkingDirectory(workDir);
   proc->start(cmd, arg);
@@ -2634,7 +2642,11 @@ void PTextEdit::musrT0()
 
   // make sure that the system environment variables are properly set
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_DARWIN)
+  env.insert("DYLD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("DYLD_LIBRARY_PATH"));
+#else
   env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+#endif
   proc->setProcessEnvironment(env);
   proc->setWorkingDirectory(workDir);
   proc->start(cmd, arg);
@@ -2671,7 +2683,11 @@ void PTextEdit::musrFT()
     proc->setStandardErrorFile("musrFT.log");
     QString cmd = fAdmin->getExecPath() + "/musrFT";
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_DARWIN)
+    env.insert("DYLD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("DYLD_LIBRARY_PATH"));
+#else
     env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+#endif
     proc->setProcessEnvironment(env);
     proc->start(cmd, fMusrFTPrevCmd);
     if (!proc->waitForStarted()) {
@@ -2764,7 +2780,7 @@ void PTextEdit::musrSetSteps()
 
   // fill the command queue
   QString cmd = fAdmin->getExecPath() + "/musrStep";
-#if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
+#if defined(Q_OS_DARWIN)
   cmd = QString("/Applications/musrStep.app/Contents/MacOS/musrStep");
 #endif
   QString workDir = QFileInfo(*fFilenames.find( currentEditor() )).absolutePath();
@@ -2790,7 +2806,11 @@ void PTextEdit::musrSetSteps()
 
   // make sure that the system environment variables are properly set
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_DARWIN)
+  env.insert("DYLD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("DYLD_LIBRARY_PATH"));
+#else
   env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+#endif
   proc->setProcessEnvironment(env);
   proc->setWorkingDirectory(workDir);
   proc->start(cmd, arg);
@@ -2941,7 +2961,7 @@ void PTextEdit::mupp()
 {
   QString cmd("");
   cmd = fAdmin->getExecPath() + "/mupp";
-#if defined(Q_OS_DARWIN) || defined(Q_OS_MAC)
+#if defined(Q_OS_DARWIN)
   cmd = QString("/Applications/mupp.app/Contents/MacOS/mupp");
 #endif
 
@@ -2953,7 +2973,11 @@ void PTextEdit::mupp()
 
   // make sure that the system environment variables are properly set
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_DARWIN)
+  env.insert("DYLD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("DYLD_LIBRARY_PATH"));
+#else
   env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+#endif
   proc->setProcessEnvironment(env);
   proc->setWorkingDirectory(workDir);
   proc->start(cmd, arg);

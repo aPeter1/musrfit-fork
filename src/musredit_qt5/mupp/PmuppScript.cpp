@@ -536,7 +536,11 @@ int PmuppScript::plot(const QString str)
   arg << "-q";
 
   QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_DARWIN)
+  env.insert("DYLD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("DYLD_LIBRARY_PATH"));
+#else
   env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+#endif
   proc->setProcessEnvironment(env);
   proc->setWorkingDirectory(fSavePath);
   proc->start(exec_cmd, arg);

@@ -297,7 +297,11 @@ bool PParamDataHandler::ReadParamFile(const QStringList fln, QString &errorMsg)
     connect( fProc, SIGNAL( finished(int, QProcess::ExitStatus) ), this, SLOT( processDone(int, QProcess::ExitStatus) ) );
 
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#if defined(Q_OS_DARWIN)
+    env.insert("DYLD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("DYLD_LIBRARY_PATH"));
+#else
     env.insert("LD_LIBRARY_PATH", env.value("ROOTSYS") + "/lib:" + env.value("LD_LIBRARY_PATH"));
+#endif
     cmd = env.value("MUSRFITPATH") + QString("/msr2data");
     if (!QFile::exists(cmd)) { // MUSRFITPATH not set?
       // try ROOTSYS

@@ -1947,7 +1947,7 @@ PMusrWiz::PMusrWiz(PAdmin *admin, PMsrData *msrData, QWidget *parent) :
   fAdmin(admin),
   fMsrData(msrData)
 {
-#ifndef Q_OS_MAC
+#ifndef Q_OS_DARWIN
   setWizardStyle(ModernStyle);
 #endif
 
