@@ -12,6 +12,16 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.7.6, 2021/10/02
+=============================
+
+new: choose number of threads from the commandline for OpenMP. 
+
+Release of V1.7.5, 2021/09/22
+=============================
+
+make sure that phases stay within +-360 degrees. 
+
 Release of V1.7.4, 2021/06/16
 =============================
 
