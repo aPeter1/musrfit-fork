@@ -110,7 +110,7 @@ PTextEdit::PTextEdit( QWidget *parent )
   fFileSystemWatcherActive = true;
   fFileSystemWatcher = new QFileSystemWatcher();
   if (fFileSystemWatcher == nullptr) {
-    QMessageBox::information(this, "**ERROR**", "Couldn't invoke QFileSystemWatcher!");
+    QMessageBox::information(this, "ERROR", "Couldn't invoke QFileSystemWatcher!");
   } else {
     connect( fFileSystemWatcher, SIGNAL(fileChanged(const QString&)), this, SLOT(fileChanged(const QString&)));
   }
@@ -1280,7 +1280,7 @@ void PTextEdit::fileOpenRecent()
 void PTextEdit::fileReload()
 {
   if ( fFilenames.find( currentEditor() ) == fFilenames.end() ) {
-    QMessageBox::critical(this, "**ERROR**", "Cannot reload a file not previously saved ;-)");
+    QMessageBox::critical(this, "ERROR", "Cannot reload a file not previously saved ;-)");
   } else {
     int index = fTabWidget->currentIndex();
     QString fln = *fFilenames.find( currentEditor() );
@@ -1308,7 +1308,7 @@ void PTextEdit::fileOpenPrefs()
   } else if (result == 0) { // default dir
     fln = fAdmin->getDefaultPrefPathName();
     msg = QString("Current Default Preferences Path-Name:\n") + fln;
-    if (QMessageBox::information(this, "Info", msg, QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel)
+    if (QMessageBox::information(this, "INFO", msg, QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel)
       return;
   } else if (result == 1) { // custom dir
     fln = QFileDialog::getOpenFileName( this, tr("Open Prefs"),
@@ -1318,7 +1318,7 @@ void PTextEdit::fileOpenPrefs()
 
   if (fAdmin->loadPrefs(fln)) {
     msg = QString("Prefs from '") + fln + QString("' loaded.");
-    QMessageBox::information(nullptr, "Info", msg);
+    QMessageBox::information(nullptr, "INFO", msg);
   }
 
   // make sure that dark/plain icon scheme is properly loaded
@@ -1354,7 +1354,7 @@ void PTextEdit::fileSave()
   } else {
     QFile file( *fFilenames.find( currentEditor() ) );
     if ( !file.open( QIODevice::WriteOnly ) ) {
-      QMessageBox::critical(this, "**ERROR**", "Couldn't save the file!\nDisk full?\nNo write access?");
+      QMessageBox::critical(this, "ERROR", "Couldn't save the file!\nDisk full?\nNo write access?");
       return;
     }
     QTextStream ts( &file );
@@ -1411,7 +1411,7 @@ void PTextEdit::fileSavePrefs()
   } else if (result == 0) { // default dir
     fln = fAdmin->getDefaultPrefPathName();
     msg = QString("Current Default Preferences Path-Name:\n") + fln;
-    if (QMessageBox::information(this, "Info", msg, QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel)
+    if (QMessageBox::information(this, "INFO", msg, QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel)
       return;
   } else if (result == 1) { // custom dir
     fln = QFileDialog::getSaveFileName( this,
@@ -1422,7 +1422,7 @@ void PTextEdit::fileSavePrefs()
   if ( !fln.isEmpty() ) {
     fAdmin->savePrefs(fln);
     msg = QString("Prefs to '") + fln + QString("' saved.");
-    QMessageBox::information(nullptr, "Info", msg);
+    QMessageBox::information(nullptr, "INFO", msg);
   }
 }
 
@@ -1515,10 +1515,10 @@ void PTextEdit::fileClose(const bool check)
   int idx = fTabWidget->currentIndex();
 
   if ((fTabWidget->tabText(idx).indexOf("*")>0) && check) {
-    int result = QMessageBox::warning(this, "**WARNING**", 
+    int result = QMessageBox::warning(this, "WARNING",
                    "Do you really want to close this file.\nChanges will be lost",
-                   "Close", "Cancel");
-    if (result == 1) // Cancel
+                   QMessageBox::Close, QMessageBox::Cancel);
+    if (result == QMessageBox::Cancel)
       return;
   }
 
@@ -1545,10 +1545,10 @@ void PTextEdit::fileCloseAll()
   // check if there are any unsaved tabs
   for (int i=0; i<fTabWidget->count(); i++) {
     if (fTabWidget->tabText(i).indexOf("*") > 0) {
-      int result = QMessageBox::warning(this, "**WARNING**",
+      int result = QMessageBox::warning(this, "WARNING",
                      "Do you really want to close all files.\nChanges of unsaved files will be lost",
-                     "Close", "Cancel");
-      if (result == 1) // Cancel
+                     QMessageBox::Close, QMessageBox::Cancel);
+      if (result == QMessageBox::Cancel)
         return;
       break;
     }
@@ -1582,10 +1582,10 @@ void PTextEdit::fileCloseAllOthers()
   // check if there are any unsaved tabs
   for (int i=0; i<fTabWidget->count(); i++) {
     if (fTabWidget->tabText(i).indexOf("*") > 0) {
-      int result = QMessageBox::warning(this, "**WARNING**",
+      int result = QMessageBox::warning(this, "WARNING",
                      "Do you really want to close all files.\nChanges of unsaved files will be lost",
-                     "Close", "Cancel");
-      if (result == 1) // Cancel
+                     QMessageBox::Close, QMessageBox::Cancel);
+      if (result == QMessageBox::Cancel)
         return;
       break;
     }
@@ -1625,10 +1625,10 @@ void PTextEdit::fileExit()
   // check if there are still some modified files open
   for (int i=0; i < fTabWidget->count(); i++) {
     if (fTabWidget->tabText(i).indexOf("*") > 0) {
-      int result = QMessageBox::warning(this, "**WARNING**", 
+      int result = QMessageBox::warning(this, "WARNING",
                      "Do you really want to exit from the applcation.\nChanges will be lost",
-                     "Exit", "Cancel");
-      if (result == 1) // Cancel
+                     QMessageBox::Close, QMessageBox::Cancel);
+      if (result == QMessageBox::Cancel)
         return;
       break;
     }
@@ -1726,13 +1726,13 @@ void PTextEdit::editFind()
   }
 
   if (fFindReplaceData == nullptr) {
-    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke find data structure, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(this, "ERROR", "Couldn't invoke find data structure, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
     return;
   }
 
   PFindDialog *dlg = new PFindDialog(fFindReplaceData, currentEditor()->textCursor().hasSelection());
   if (dlg == nullptr) {
-    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke find dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(this, "ERROR", "Couldn't invoke find dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
     return;
   }
 
@@ -1818,13 +1818,13 @@ void PTextEdit::editFindAndReplace()
   }
 
   if (fFindReplaceData == nullptr) {
-    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke find&replace data structure, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(this, "ERROR", "Couldn't invoke find&replace data structure, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
     return;
   }
 
   PReplaceDialog *dlg = new PReplaceDialog(fFindReplaceData, currentEditor()->textCursor().hasSelection());
   if (dlg == nullptr) {
-    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke find&replace dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(this, "ERROR", "Couldn't invoke find&replace dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
     return;
   }
 
@@ -1998,7 +1998,7 @@ void PTextEdit::musrWiz()
 
   QProcess *proc = new QProcess(this);
   if (proc == nullptr) {
-    QMessageBox::critical(nullptr, "**ERROR**", "Couldn't invoke QProcess!");
+    QMessageBox::critical(nullptr, "ERROR", "Couldn't invoke QProcess!");
     return;
   }
 
@@ -2019,10 +2019,7 @@ void PTextEdit::musrWiz()
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( nullptr,
-                           tr("Fatal error"),
-                           msg,
-                           tr("Quit") );
+    QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     return;
   }
 }
@@ -2044,7 +2041,7 @@ void PTextEdit::musrCalcChisq()
 
   QString tabLabel = fTabWidget->tabText(fTabWidget->currentIndex());
   if (tabLabel == "noname") {
-    QMessageBox::critical(this, "**ERROR**", "For a fit a real msr-file is needed.");
+    QMessageBox::critical(this, "ERROR", "For a fit a real msr-file is needed.");
     return;
   } else if (tabLabel == "noname*") {
     fileSaveAs();
@@ -2077,7 +2074,7 @@ void PTextEdit::musrFit()
 
   QString tabLabel = fTabWidget->tabText(fTabWidget->currentIndex());
   if (tabLabel == "noname") {
-    QMessageBox::critical(this, "**ERROR**", "For a fit a real msr-file is needed.");
+    QMessageBox::critical(this, "ERROR", "For a fit a real msr-file is needed.");
     return;
   } else if (tabLabel == "noname*") {
     fileSaveAs();
@@ -2196,7 +2193,7 @@ void PTextEdit::musrMsr2Data()
   PMsr2DataDialog *dlg = new PMsr2DataDialog(fMsr2DataParam, fAdmin->getHelpUrl("msr2data"));
 
   if (dlg == nullptr) {
-    QMessageBox::critical(this, "**ERROR**", "Couldn't invoke msr2data dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(this, "ERROR", "Couldn't invoke msr2data dialog, sorry :-(", QMessageBox::Ok, QMessageBox::NoButton);
     return;
   }
 
@@ -2218,7 +2215,7 @@ void PTextEdit::musrMsr2Data()
     // analyze parameters
     switch (dlg->getRunTag()) {
       case -1: // not valid
-        QMessageBox::critical(this, "**ERROR**",
+        QMessageBox::critical(this, "ERROR",
            "No valid run list input found :-(\nCannot do anything.",
            QMessageBox::Ok, QMessageBox::NoButton);
         return;
@@ -2231,13 +2228,13 @@ void PTextEdit::musrMsr2Data()
         fi.setFile(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + runListFileName);
         if (!fi.exists()) {
           str = QString("Run List File '%1' doesn't exist.").arg(runListFileName);
-          QMessageBox::critical(this, "**ERROR**",
+          QMessageBox::critical(this, "ERROR",
                 str, QMessageBox::Ok, QMessageBox::NoButton);
           return;
         }
         break;
       default: // never should reach this point
-        QMessageBox::critical(this, "**ERROR**",
+        QMessageBox::critical(this, "ERROR",
            "No idea how you could reach this point.\nPlease contact the developers.",
            QMessageBox::Ok, QMessageBox::NoButton);
         return;
@@ -2428,7 +2425,7 @@ void PTextEdit::musrMsr2Data()
             file = new QFile(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fMsr2DataParam->runListFileName);
             if (!file->open(QIODevice::ReadOnly)) {
               str = QString("Couldn't open run list file %1, sorry.").arg(fMsr2DataParam->runListFileName);
-              QMessageBox::critical(this, "**ERROR**", str.toLatin1(), QMessageBox::Ok, QMessageBox::NoButton);
+              QMessageBox::critical(this, "ERROR", str.toLatin1(), QMessageBox::Ok, QMessageBox::NoButton);
               return;
             }
 
@@ -2478,7 +2475,7 @@ void PTextEdit::musrMsr2Data()
             file = new QFile(QFileInfo(*fFilenames.find( currentEditor() )).absolutePath() + "/" + fMsr2DataParam->runListFileName);
             if (!file->open(QIODevice::ReadOnly)) {
               str = QString("Couldn't open run list file %1, sorry.").arg(fMsr2DataParam->runListFileName);
-              QMessageBox::critical(this, "**ERROR**", str.toLatin1(), QMessageBox::Ok, QMessageBox::NoButton);
+              QMessageBox::critical(this, "ERROR", str.toLatin1(), QMessageBox::Ok, QMessageBox::NoButton);
               return;
             }
 
@@ -2526,7 +2523,7 @@ void PTextEdit::musrView()
 
   QString tabLabel = fTabWidget->tabText(fTabWidget->currentIndex());
   if (tabLabel == "noname") {
-    QMessageBox::critical(this, "**ERROR**", "For a view a real mlog/msr-file is needed.");
+    QMessageBox::critical(this, "ERROR", "For a view a real mlog/msr-file is needed.");
     return;
   } else if (tabLabel == "noname*") {
     fileSaveAs();
@@ -2578,10 +2575,7 @@ void PTextEdit::musrView()
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( nullptr,
-                           tr("Fatal error"),
-                           msg,
-                           tr("Quit") );
+    QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     return;
   }
 }
@@ -2599,7 +2593,7 @@ void PTextEdit::musrViewFinished(int exitCode, QProcess::ExitStatus)
     msg += QString("* cannot read data-file.\n");
     msg += QString("* many more things can go wrong.\n");
     msg += QString("Please check!");
-    QMessageBox::critical(nullptr, tr("Fatal Error"), msg, tr("Quit"));
+    QMessageBox::critical(nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close);
   }
 }
 
@@ -2614,7 +2608,7 @@ void PTextEdit::musrT0()
 
   QString tabLabel = fTabWidget->tabText(fTabWidget->currentIndex());
   if (tabLabel == "noname") {
-    QMessageBox::critical(this, "**ERROR**", "For a view a real mlog/msr-file is needed.");
+    QMessageBox::critical(this, "ERROR", "For a view a real mlog/msr-file is needed.");
     return;
   } else if (tabLabel == "noname*") {
     fileSaveAs();
@@ -2653,10 +2647,7 @@ void PTextEdit::musrT0()
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( nullptr,
-                           tr("Fatal error"),
-                           msg,
-                           tr("Quit") );
+    QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     return;
   }
 }
@@ -2672,7 +2663,7 @@ void PTextEdit::musrFT()
   PGetMusrFTOptionsDialog *dlg = new PGetMusrFTOptionsDialog(*fFilenames.find( currentEditor() ), fMusrFTPrevCmd, fAdmin->getHelpUrl("musrFT"));
 
   if (dlg == nullptr) {
-    QMessageBox::critical(this, "**ERROR** musrFT", "Couldn't invoke musrFT Options Dialog.");
+    QMessageBox::critical(this, "ERROR musrFT", "Couldn't invoke musrFT Options Dialog.");
     return;
   }
 
@@ -2693,10 +2684,7 @@ void PTextEdit::musrFT()
     if (!proc->waitForStarted()) {
       // error handling
       QString msg(tr("Could not execute the output command: ")+cmd[0]);
-      QMessageBox::critical( nullptr,
-                             tr("Fatal error"),
-                             msg,
-                             tr("Quit") );
+      QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
       return;
     }
   }
@@ -2714,7 +2702,7 @@ void PTextEdit::musrPrefs()
   PPrefsDialog *dlg = new PPrefsDialog(fAdmin);
 
   if (dlg == nullptr) {
-    QMessageBox::critical(this, "**ERROR** musrPrefs", "Couldn't invoke Preferences Dialog.");
+    QMessageBox::critical(this, "ERROR musrPrefs", "Couldn't invoke Preferences Dialog.");
     return;
   }
 
@@ -2770,7 +2758,7 @@ void PTextEdit::musrSetSteps()
   // make sure I have a saved msr-file to work on
   QString tabLabel = fTabWidget->tabText(fTabWidget->currentIndex());
   if (tabLabel == "noname") {
-    QMessageBox::critical(this, "**ERROR**", "For musrStep a real mlog/msr-file is needed.");
+    QMessageBox::critical(this, "ERROR", "For musrStep a real mlog/msr-file is needed.");
     return;
   } else if (tabLabel == "noname*") {
     fileSaveAs();
@@ -2796,7 +2784,7 @@ void PTextEdit::musrSetSteps()
 
   QProcess *proc = new QProcess(this);
   if (proc == nullptr) {
-    QMessageBox::critical(nullptr, "**ERROR**", "Couldn't invoke QProcess!");
+    QMessageBox::critical(nullptr, "ERROR", "Couldn't invoke QProcess!");
     return;
   }
 
@@ -2817,10 +2805,7 @@ void PTextEdit::musrSetSteps()
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( nullptr,
-                           tr("Fatal error"),
-                           msg,
-                           tr("Quit") );
+    QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     return;
   }
 }
@@ -2984,10 +2969,7 @@ void PTextEdit::mupp()
   if (!proc->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd);
-    QMessageBox::critical( nullptr,
-                           tr("Fatal error"),
-                           msg,
-                           tr("Quit") );
+    QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     return;
   }
 }
@@ -3001,10 +2983,7 @@ void PTextEdit::helpContents()
   bool ok = QDesktopServices::openUrl(QUrl(fAdmin->getHelpUrl("main"), QUrl::TolerantMode));
   if (!ok) {
     QString msg = QString("<p>Sorry: Couldn't open default web-browser for the help.<br>Please try: <a href=\"%1\">musrfit docu</a> in your web-browser.").arg(fAdmin->getHelpUrl("main"));
-    QMessageBox::critical( nullptr,
-                           tr("Fatal Error"),
-                           msg,
-                           tr("Quit") );
+    QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
   }
 }
 
@@ -3037,7 +3016,7 @@ void PTextEdit::helpAboutQt()
 void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
 {
   if (exitStatus == QProcess::CrashExit) {
-    QMessageBox::critical(nullptr, "**FATAL**", "musrWiz returned CrashExit.");
+    QMessageBox::critical(nullptr, "FATAL ERROR", "musrWiz returned CrashExit.");
     return;
   }
 
@@ -3053,7 +3032,7 @@ void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
   std::ifstream fin(pathName.toLatin1().data(), std::ifstream::in);
   if (!fin.is_open()) {
     errMsg = QString("PTextEdit::exitStatusMusrWiz: couldn't read %1 file.").arg(pathName);
-    QMessageBox::critical(nullptr, "**ERROR**", errMsg);
+    QMessageBox::critical(nullptr, "ERROR", errMsg);
     return;
   }
   char line[128];
@@ -3088,7 +3067,7 @@ void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
   QFile logFile(pathName);
   if (!logFile.remove()) {
     errMsg = QString("PTextEdit::exitStatusMusrWiz: couldn't delete %1 file.").arg(pathName);
-    QMessageBox::critical(nullptr, "**ERROR**", errMsg);
+    QMessageBox::critical(nullptr, "ERROR", errMsg);
   }
 }
 
@@ -3101,7 +3080,7 @@ void PTextEdit::exitStatusMusrWiz(int exitCode, QProcess::ExitStatus exitStatus)
 void PTextEdit::exitStatusMusrSetSteps(int exitCode, QProcess::ExitStatus exitStatus)
 {
   if (exitStatus == QProcess::CrashExit) {
-    QMessageBox::critical(nullptr, "**FATAL**", "musrStep returned CrashExit.");
+    QMessageBox::critical(nullptr, "FATAL ERROR", "musrStep returned CrashExit.");
     return;
   }
 
@@ -3260,7 +3239,7 @@ void PTextEdit::fileChanged(const QString &fileName)
   fFileSystemWatcherActive = false;
 
   QString str = "File '" + fileName + "' changed on the system.\nDo you want to reload it?";
-  int result = QMessageBox::question(this, "**INFO**", str, QMessageBox::Yes, QMessageBox::No);
+  int result = QMessageBox::question(this, "INFO", str, QMessageBox::Yes, QMessageBox::No);
   if (result == QMessageBox::Yes) {
     // find correct file
     int idx = -1;

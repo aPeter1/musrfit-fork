@@ -252,7 +252,7 @@ void PSubTextEdit::insertAsymRunBlock()
     if (valid) {
       str += workStr;
     } else {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "Given map not valid, will add a default map line",
          QMessageBox::Ok, QMessageBox::NoButton);
       str += "map             0  0  0  0  0  0  0  0  0  0\n";
@@ -268,7 +268,7 @@ void PSubTextEdit::insertAsymRunBlock()
     workStr = dlg->getBackground(valid);
     str += workStr;
     if (!valid) {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "Either <b>background</b> or <b>backgr.fix</b> is needed!\nWill set <b>background</b> to 0..10, please correct!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -278,7 +278,7 @@ void PSubTextEdit::insertAsymRunBlock()
     if (valid) {
       str += workStr;
     } else {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "Not all Data entries are present.Fix is needed!\nWill not set anything!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -288,7 +288,7 @@ void PSubTextEdit::insertAsymRunBlock()
     if (present) {
       str += workStr;
     } else {
-      QMessageBox::warning(this, "**ERROR**",
+      QMessageBox::warning(this, "ERROR",
          "T0's not given, assume that they are present in the data file!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -297,7 +297,7 @@ void PSubTextEdit::insertAsymRunBlock()
     workStr = dlg->getFitRange(valid);
     str += workStr;
     if (!valid) {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "No valid fit range is given.Fix is needed!\nWill add a default one!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -306,7 +306,7 @@ void PSubTextEdit::insertAsymRunBlock()
     workStr = dlg->getPacking(present);
     str += workStr;
     if (!present) {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "No valid packing/binning is given.Fix is needed!\nWill add a default one!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -347,7 +347,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
     if (valid) {
       str += workStr;
     } else {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "Given map not valid, will add a default map line",
          QMessageBox::Ok, QMessageBox::NoButton);
       str += "map             0  0  0  0  0  0  0  0  0  0\n";
@@ -375,7 +375,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
     workStr = dlg->getBackground(valid);
     str += workStr;
     if (!valid) {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "Either <b>background</b>, <b>backgr.fix</b>, or <b>backgr.fit</b> is needed!\nWill set <b>background</b> to 0..10, please correct!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -385,7 +385,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
     if (present) {
       str += workStr;
     } else {
-      QMessageBox::warning(this, "**ERROR**",
+      QMessageBox::warning(this, "ERROR",
          "T0's not given, assume that they are present in the data file!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -395,7 +395,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
     if (valid) {
       str += workStr;
     } else {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "Not all Data entries are present.Fix is needed!\nWill not set anything!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -404,7 +404,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
     workStr = dlg->getFitRange(valid);
     str += workStr;
     if (!valid) {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "No valid fit range is given.Fix is needed!\nWill add a default one!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -413,7 +413,7 @@ void PSubTextEdit::insertSingleHistRunBlock()
     workStr = dlg->getPacking(present);
     str += workStr;
     if (!present) {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "No valid packing/binning is given.Fix is needed!\nWill add a default one!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -453,7 +453,7 @@ void PSubTextEdit::insertNonMusrRunBlock()
     if (valid) {
       str += workStr;
     } else {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "Given map not valid, will add a default map line",
          QMessageBox::Ok, QMessageBox::NoButton);
       str += "map             0  0  0  0  0  0  0  0  0  0\n";
@@ -464,7 +464,7 @@ void PSubTextEdit::insertNonMusrRunBlock()
     if (valid) {
       str += workStr;
     } else {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "Not all xy-data entries are present.Fix is needed!\nWill not set anything!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }
@@ -473,7 +473,7 @@ void PSubTextEdit::insertNonMusrRunBlock()
     workStr = dlg->getFitRange(valid);
     str += workStr;
     if (!valid) {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "No valid fit range is given.Fix is needed!\nWill add a default one!",
          QMessageBox::Ok, QMessageBox::NoButton);
     }

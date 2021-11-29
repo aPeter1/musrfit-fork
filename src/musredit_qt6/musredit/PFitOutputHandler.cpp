@@ -87,10 +87,7 @@ PFitOutputHandler::PFitOutputHandler(QString workingDirectory, QVector<QString> 
   if ( !fProc->waitForStarted() ) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( nullptr,
-                tr("Fatal error"),
-                msg,
-                tr("Quit") );
+    QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     done(0);
   }
   fProcPID = fProc->processId();

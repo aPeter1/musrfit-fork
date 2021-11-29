@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
           arguments << pathFln;
           QProcess::startDetached(musrt0, arguments, "./");
         } else {
-          QMessageBox::warning(0, "WARNING", "Couldn't find musrt0 :-(.\n Only the msr-file has been generated.");
+          QMessageBox::warning(nullptr, "WARNING", "Couldn't find musrt0 :-(.\n Only the msr-file has been generated.");
         }
       }
     }

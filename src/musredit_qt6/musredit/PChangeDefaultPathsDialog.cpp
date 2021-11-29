@@ -92,7 +92,7 @@ bool PDefaultPathsXMLParser::parse(QIODevice *device)
   if (fXml.hasError()) {
     QString msg;
     msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
-    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(nullptr, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
     return false;
   }
 
@@ -204,7 +204,7 @@ PDefaultPaths::PDefaultPaths() : QObject()
   PDefaultPathsXMLParser handler(fPrefPathName, this);
   if (!handler.isValid()) {
     fValid = false;
-    QMessageBox::critical(0, "ERROR",
+    QMessageBox::critical(nullptr, "ERROR",
                           "Error parsing musrfit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
                           QMessageBox::Ok, QMessageBox::NoButton);
     return;

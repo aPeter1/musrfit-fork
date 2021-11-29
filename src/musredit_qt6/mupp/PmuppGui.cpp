@@ -1082,7 +1082,7 @@ void PmuppGui::addX(QString param)
   if (!param.isEmpty()) {
     // check that param exists
     if (fParamList->findItems(param, Qt::MatchCaseSensitive).empty()) {
-      QMessageBox::critical(this, "**ERROR**", QString("Parameter X '%1' not found").arg(param));
+      QMessageBox::critical(this, "ERROR", QString("Parameter X '%1' not found").arg(param));
       return;
     }
     paramName = param;
@@ -1125,7 +1125,7 @@ void PmuppGui::addY(QString param)
   if (!param.isEmpty()) {
     // check that param exists
     if (fParamList->findItems(param, Qt::MatchCaseSensitive).empty()) {
-      QMessageBox::critical(this, "**ERROR**", QString("Parameter Y '%1' not found").arg(param));
+      QMessageBox::critical(this, "ERROR", QString("Parameter Y '%1' not found").arg(param));
       return;
     }
     paramName = param;
@@ -1141,7 +1141,7 @@ void PmuppGui::addY(QString param)
 
   // make sure that any x-parameter selection is already present
   if (fViewX->count() == 0) {
-    QMessageBox::warning(this, "**WARNING**", "It is compulsory to have at least one x-parameter set\nbefore trying to add a y-parameter.");
+    QMessageBox::warning(this, "WARNING", "It is compulsory to have at least one x-parameter set\nbefore trying to add a y-parameter.");
     return;
   }
 
@@ -1150,7 +1150,7 @@ void PmuppGui::addY(QString param)
   if (idx == -1)
     return;
   if (fXY[idx].getCollectionTag() != fColList->currentRow()) {
-    QMessageBox::warning(this, "**WARNING**", "x/y parameters need to originate from the same collection.");
+    QMessageBox::warning(this, "WARNING", "x/y parameters need to originate from the same collection.");
     return;
   }
 
@@ -1338,7 +1338,7 @@ void PmuppGui::check(QString varStr, QVector<int> idx)
     }
   }
   if (count == idx.size()) {
-    QMessageBox::information(this, "**INFO**", "Parsing successful.");
+    QMessageBox::information(this, "INFO", "Parsing successful.");
   }
   fVarDlg->raise();
   fVarDlg->setFocus();
@@ -1750,7 +1750,7 @@ void PmuppGui::dropOnViewY(QListWidgetItem *item)
   if (fViewX->count() == 0) {
     fViewY->removeItemWidget(item);
     delete item;
-    QMessageBox::warning(this, "**WARNING**", "It is compulsory to have at least one x-parameter set\nbefore trying to add a y-parameter.");
+    QMessageBox::warning(this, "WARNING", "It is compulsory to have at least one x-parameter set\nbefore trying to add a y-parameter.");
     return;
   }
 
@@ -1826,7 +1826,7 @@ void PmuppGui::createMacro()
 
   QFile file(fMacroName);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    QMessageBox::critical(this, "**ERROR**", "Couldn't open macro file for writting.");
+    QMessageBox::critical(this, "ERROR", "Couldn't open macro file for writting.");
     return;
   }
 
@@ -1869,7 +1869,7 @@ void PmuppGui::createMacro()
     xx = getValues(collName, xLabel, ok);
     if (!ok) {
       QString msg = QString("Couldn't get x-axis data from '%1', coll: '%2'").arg(xLabel).arg(collName);
-      QMessageBox::critical(this, "**ERROR**", msg);
+      QMessageBox::critical(this, "ERROR", msg);
       return;
     }
     getMinMax(xx, xMin, xMax);
@@ -1886,19 +1886,19 @@ void PmuppGui::createMacro()
       yy = getValues(collName, yLabel, ok);
       if (!ok) {
         QString msg = QString("Couldn't get y-axis data from '%1', coll: '%2'").arg(yLabel).arg(collName);
-        QMessageBox::critical(this, "**ERROR**", msg);
+        QMessageBox::critical(this, "ERROR", msg);
         return;
       }
       yyPosErr = getPosErr(collName, yLabel, ok);
       if (!ok) {
         QString msg = QString("Couldn't get y-axis pos. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
-        QMessageBox::critical(this, "**ERROR**", msg);
+        QMessageBox::critical(this, "ERROR", msg);
         return;
       }
       yyNegErr = getNegErr(collName, yLabel, ok);
       if (!ok) {
         QString msg = QString("Couldn't get y-axis neg. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
-        QMessageBox::critical(this, "**ERROR**", msg);
+        QMessageBox::critical(this, "ERROR", msg);
         return;
       }
       yLabel = substituteDefaultLabels(yLabel);
@@ -2015,7 +2015,7 @@ void PmuppGui::plot()
 {
   // check if there is something to be plotted
   if (fXY.size() == 0) {
-    QMessageBox::information(this, "plot", "No parameter list present.");
+    QMessageBox::information(this, "PLOT", "No parameter list present.");
     return;
   }
 
@@ -2058,7 +2058,7 @@ void PmuppGui::plot()
     xx = getValues(collName, xLabel, ok);
     if (!ok) {
       QString msg = QString("Couldn't get x-axis data from '%1', coll: '%2'").arg(xLabel).arg(collName);
-      QMessageBox::critical(this, "**ERROR**", msg);
+      QMessageBox::critical(this, "ERROR", msg);
       return;
     }
 
@@ -2073,21 +2073,21 @@ void PmuppGui::plot()
       yy = getValues(collName, yLabel, ok);
       if (!ok) {
         QString msg = QString("Couldn't get y-axis data from '%1', coll: '%2'").arg(yLabel).arg(collName);
-        QMessageBox::critical(this, "**ERROR**", msg);
+        QMessageBox::critical(this, "ERROR", msg);
         return;
       }
       yyy.push_back(yy);
       yyPosErr = getPosErr(collName, yLabel, ok);
       if (!ok) {
         QString msg = QString("Couldn't get y-axis pos. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
-        QMessageBox::critical(this, "**ERROR**", msg);
+        QMessageBox::critical(this, "ERROR", msg);
         return;
       }
       yyyPosErr.push_back(yyPosErr);
       yyNegErr = getNegErr(collName, yLabel, ok);
       if (!ok) {
         QString msg = QString("Couldn't get y-axis neg. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
-        QMessageBox::critical(this, "**ERROR**", msg);
+        QMessageBox::critical(this, "ERROR", msg);
         return;
       }
       yyyNegErr.push_back(yyNegErr);
@@ -2103,21 +2103,21 @@ void PmuppGui::plot()
     yy = getValues(collName, yLabel, ok);
     if (!ok) {
       QString msg = QString("Couldn't get y-axis data from '%1', coll: '%2'").arg(yLabel).arg(collName);
-      QMessageBox::critical(this, "**ERROR**", msg);
+      QMessageBox::critical(this, "ERROR", msg);
       return;
     }
     yyy.push_back(yy);
     yyPosErr = getPosErr(collName, yLabel, ok);
     if (!ok) {
       QString msg = QString("Couldn't get y-axis pos. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
-      QMessageBox::critical(this, "**ERROR**", msg);
+      QMessageBox::critical(this, "ERROR", msg);
       return;
     }
     yyyPosErr.push_back(yyPosErr);
     yyNegErr = getNegErr(collName, yLabel, ok);
     if (!ok) {
       QString msg = QString("Couldn't get y-axis neg. error data from '%1', coll: '%2'").arg(yLabel).arg(collName);
-      QMessageBox::critical(this, "**ERROR**", msg);
+      QMessageBox::critical(this, "ERROR", msg);
       return;
     }
     yyyNegErr.push_back(yyNegErr);
@@ -2237,7 +2237,7 @@ void PmuppGui::startMuppPlot()
 
   fMuppPlot = new QProcess(this);
   if (fMuppPlot == nullptr) {
-    QMessageBox::critical(0, "**ERROR**", "Couldn't invoke QProcess for mupp_plot!");
+    QMessageBox::critical(this, "ERROR", "Couldn't invoke QProcess for mupp_plot!");
     return;
   }
 
@@ -2253,10 +2253,7 @@ void PmuppGui::startMuppPlot()
   if (!fMuppPlot->waitForStarted()) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd);
-    QMessageBox::critical( 0,
-                          tr("Fatal error"),
-                          msg,
-                          tr("Quit") );
+    QMessageBox::critical(this, tr("FATAL ERROR"), msg, QMessageBox::Close );
     return;
   }
 }
@@ -2296,7 +2293,7 @@ void PmuppGui::handleCmds()
     fMacroName = tok[1];
     createMacro();
   } else if (cmd.startsWith("path")) { // cmd: path <macro_path>
-    QMessageBox::information(0, "INFO", "set's eventually the path for the macros to be saved.");
+    QMessageBox::information(this , "INFO", "set's eventually the path for the macros to be saved.");
     // will set the path to where to save the macro
     QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
     if (tok.size() != 2) {
@@ -2316,7 +2313,7 @@ void PmuppGui::handleCmds()
       QString fullPath = env.value(envVar); // get environment variable value if present, otherwise "" is returned
       if (fullPath.isEmpty()) {
         fMacroPath = "";
-        QMessageBox::critical(0, "ERROR", QString("Environment variable '%1' not present. Typo?!").arg(envVar.prepend("$")));
+        QMessageBox::critical(this, "ERROR", QString("Environment variable '%1' not present. Typo?!").arg(envVar.prepend("$")));
         return;
       }
       fMacroPath.replace(envVar.prepend("$"), fullPath);
@@ -2328,13 +2325,13 @@ void PmuppGui::handleCmds()
     if (tok.size() > 1)
       addX(tok[1]);
     else
-      QMessageBox::critical(0, "ERROR", QString("Found command 'x' without variable."));
+      QMessageBox::critical(this, "ERROR", QString("Found command 'x' without variable."));
   } else if (cmd.startsWith("y")) {
     QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
     if (tok.size() > 1)
       addY(tok[1]);
     else
-      QMessageBox::critical(0, "ERROR", QString("Found command 'y' without variable."));
+      QMessageBox::critical(this, "ERROR", QString("Found command 'y' without variable."));
   } else if (cmd.startsWith("ditto")) {
     addDitto();
   } else if (cmd.startsWith("rmx")) {
@@ -2342,17 +2339,17 @@ void PmuppGui::handleCmds()
     if (tok.size() > 1)
       removeX(tok[1]);
     else
-      QMessageBox::critical(0, "ERROR", QString("Found command 'rmx' without variable."));
+      QMessageBox::critical(this, "ERROR", QString("Found command 'rmx' without variable."));
   } else if (cmd.startsWith("rmy")) {
     QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
     if (tok.size() > 1)
       removeY(tok[1]);
     else
-      QMessageBox::critical(0, "ERROR", QString("Found command 'rmy' without variable."));
+      QMessageBox::critical(this, "ERROR", QString("Found command 'rmy' without variable."));
   } else if (cmd.startsWith("norm")) {
     QStringList tok = cmd.split(" ", Qt::SkipEmptyParts);
     if (tok.size() != 2) {
-      QMessageBox::critical(this, "**ERROR**", "found wrong norm cmd, will ignore it.");
+      QMessageBox::critical(this, "ERROR", "found wrong norm cmd, will ignore it.");
       return;
     }
     if (!tok[1].trimmed().compare("true", Qt::CaseInsensitive)) {
@@ -2360,7 +2357,7 @@ void PmuppGui::handleCmds()
     } else if (!tok[1].trimmed().compare("false", Qt::CaseInsensitive)) {
       fNormalizeAction->setChecked(false);
     } else {
-      QMessageBox::critical(this, "**ERROR**", "found wrong norm cmd, will ignore it.");
+      QMessageBox::critical(this, "ERROR", "found wrong norm cmd, will ignore it.");
       return;
     }
   } else if (cmd.startsWith("add var")) {
@@ -2626,7 +2623,7 @@ void PmuppGui::selectCollection(QString cmd)
     if (ival < fColList->count())
       fColList->setCurrentRow(ival);
     else
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
             QString("Found Row Selection %1 which is > #Selections=%2").arg(ival).arg(fColList->count()));
   } else { // assume it is a collection name
     for (int i=0; i<fColList->count(); i++) {

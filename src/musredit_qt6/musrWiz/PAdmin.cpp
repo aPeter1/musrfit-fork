@@ -96,7 +96,7 @@ bool PFuncXMLParser::parse(QIODevice *device)
   if (fXml.hasError()) {
     QString msg;
     msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
-    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(nullptr, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
     return false;
   }
 
@@ -140,7 +140,7 @@ bool PFuncXMLParser::startElement()
     QXmlStreamAttributes qAttr = fXml.attributes();
     if (qAttr.count() != 2) {
       errMsg = QString("theo_map should have 2 attributes, called 'no', and 'name', found %1").arg(qAttr.count());
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     PParam map;
@@ -149,7 +149,7 @@ bool PFuncXMLParser::startElement()
     ival = str.toInt(&ok);
     if (!ok) {
       errMsg = QString("theo_map attribute 'no' is not a number (%1)").arg(str);
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     map.setNumber(ival);
@@ -160,7 +160,7 @@ bool PFuncXMLParser::startElement()
     // check that all necessary attributes where found
     if ((map.getName() == "UnDef") || (map.getNumber() == -1)) {
       errMsg = QString("found theo_map with missing attribute(s)");
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     fTheoTemplate.appendMap(map);
@@ -168,7 +168,7 @@ bool PFuncXMLParser::startElement()
     QXmlStreamAttributes qAttr = fXml.attributes();
     if ((qAttr.count() != 4) && (qAttr.count() != 6)) {
       errMsg = QString("template_param should have 4 or 6 attributes, called\n'no', 'name', 'value', 'step', ['boundLow', 'boundHigh'] found %1").arg(qAttr.count());
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     PParam param;
@@ -177,7 +177,7 @@ bool PFuncXMLParser::startElement()
     ival = str.toInt(&ok);
     if (!ok) {
       errMsg = QString("template_param attribute 'no' is not a number (%1)").arg(str);
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     param.setNumber(ival);
@@ -189,7 +189,7 @@ bool PFuncXMLParser::startElement()
     dval = str.toDouble(&ok);
     if (!ok) {
       errMsg = QString("template_param attribute 'value' is not a number (%1)").arg(str);
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     param.setValue(dval);
@@ -198,7 +198,7 @@ bool PFuncXMLParser::startElement()
     dval = str.toDouble(&ok);
     if (!ok) {
       errMsg = QString("template_param attribute 'step' is not a number (%1)").arg(str);
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     param.setStep(dval);
@@ -378,7 +378,7 @@ bool PInstrumentDefXMLParser::parse(QIODevice *device)
   if (fXml.hasError()) {
     QString msg;
     msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
-    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(nullptr, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
     return false;
   }
 
@@ -419,12 +419,12 @@ bool PInstrumentDefXMLParser::startElement()
     QXmlStreamAttributes qAttr = fXml.attributes();
     if (qAttr.count() != 1) {
       errMsg = QString("instrument should have 1 attribute, called 'name', found %1").arg(qAttr.count());
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     if (fInstituteName == "") {
       errMsg = QString("found instrument without institute set.");
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     // create an instrument object
@@ -633,13 +633,13 @@ bool PInstrumentDefXMLParser::characters()
   case eNoOfDetectors:
     if (fSetup == 0) {
       errMsg = "setup object not found.";
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     ival = str.toInt(&ok);
     if (!ok) {
       errMsg = QString("Setup Error: No of Detectors = '%1', which is not an int.").arg(str);
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     fSetup->setNoOfDetectors(ival);
@@ -664,7 +664,7 @@ bool PInstrumentDefXMLParser::characters()
     strList = str.split(' ', Qt::SkipEmptyParts);
     if (strList.size() != 2) {
       errMsg = QString("Found wrong Asymmetry background range: '%1'").arg(str);
-      QMessageBox::critical(0, "ERROR", errMsg);
+      QMessageBox::critical(nullptr, "ERROR", errMsg);
       return false;
     }
     start = strList[0].toInt(&ok);
@@ -692,7 +692,7 @@ bool PInstrumentDefXMLParser::characters()
 bool PInstrumentDefXMLParser::endDocument()
 {
   if (fInstituteName == "") {
-    QMessageBox::critical(0, "FATAL ERROR", "Didn't find any institute name in the instrument definitions.");
+    QMessageBox::critical(nullptr, "FATAL ERROR", "Didn't find any institute name in the instrument definitions.");
     return false;
   }
 
@@ -765,7 +765,7 @@ bool PMusrWizDefaultXMLParser::parse(QIODevice *device)
   if (fXml.hasError()) {
     QString msg;
     msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
-    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(nullptr, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
     return false;
   }
 
@@ -876,7 +876,7 @@ PAdmin::PAdmin() : QObject()
     path = std::getenv("HOME");
     pathFln = path + "/.musrfit/musrWiz/musrWiz.xml";
     if (loadMusrWizDefault(pathFln)) {
-      QMessageBox::warning(0, "WARNING", "Couldn't find musrWiz.xml file.");
+      QMessageBox::warning(nullptr, "WARNING", "Couldn't find musrWiz.xml file.");
     }
   }
 
@@ -889,7 +889,7 @@ PAdmin::PAdmin() : QObject()
     pathFln = path + "/.musrfit/musrWiz/musrfit_funcs.xml";
     if (loadMusrfitFunc(pathFln)) {
       fValid = false;
-      QMessageBox::critical(0, "FATAL ERROR", "Couldn't find any musrfit function definitions.");
+      QMessageBox::critical(nullptr, "FATAL ERROR", "Couldn't find any musrfit function definitions.");
       return;
     }
   }
@@ -918,7 +918,7 @@ PAdmin::PAdmin() : QObject()
   }
 
   if (count == 0) {
-    QMessageBox::critical(0, "FATAL ERROR", "Couldn't find any instrument definition.");
+    QMessageBox::critical(nullptr, "FATAL ERROR", "Couldn't find any instrument definition.");
     fValid = false;
   }
 }
@@ -1215,7 +1215,7 @@ int PAdmin::loadMusrWizDefault(QString fln)
         cout << "**INFO** '" << pathName.toLatin1().data() << "' did not exist, hence it is created." << endl;
       } else {
         QString msg = QString("Couldn't create '%1'. Please check.").arg(pathName);
-        QMessageBox::critical(0, "ERROR", msg);
+        QMessageBox::critical(nullptr, "ERROR", msg);
         return 1;
       }
     }
@@ -1224,7 +1224,7 @@ int PAdmin::loadMusrWizDefault(QString fln)
   PMusrWizDefaultXMLParser handler(fln, this);
   if (!handler.isValid()) {
     QString errMsg = QString("Error parsing %1 file.").arg(fln);
-    QMessageBox::critical(0, "ERROR", errMsg);
+    QMessageBox::critical(nullptr, "ERROR", errMsg);
     return 1;
   }
   return 0;
@@ -1248,7 +1248,7 @@ int PAdmin::loadMusrfitFunc(QString fln)
         cout << "**INFO** '" << pathName.toLatin1().data() << "' did not exist, hence it is created." << endl;
       } else {
         QString msg = QString("Couldn't create '%1'. Please check.").arg(pathName);
-        QMessageBox::critical(0, "ERROR", msg);
+        QMessageBox::critical(nullptr, "ERROR", msg);
         return 1;
       }
     }
@@ -1257,7 +1257,7 @@ int PAdmin::loadMusrfitFunc(QString fln)
   PFuncXMLParser handler(fln, this);
   if (!handler.isValid()) {
     QString errMsg = QString("Error parsing %1 musrfit func file.").arg(fln);
-    QMessageBox::critical(0, "ERROR", errMsg);
+    QMessageBox::critical(nullptr, "ERROR", errMsg);
     return 1;
   }
   return 0;
@@ -1286,7 +1286,7 @@ int PAdmin::loadInstrumentDef(QString path, QString fln)
         cout << "**INFO** '" << pathName.toLatin1().data() << "' did not exist, hence it is created." << endl;
       } else {
         QString msg = QString("Couldn't create '%1'. Please check.").arg(pathName);
-        QMessageBox::critical(0, "ERROR", msg);
+        QMessageBox::critical(nullptr, "ERROR", msg);
         return 1;
       }
     } else {
@@ -1297,7 +1297,7 @@ int PAdmin::loadInstrumentDef(QString path, QString fln)
   PInstrumentDefXMLParser handler(pathFln, this);
   if (!handler.isValid()) {
     QString errMsg = QString("Error parsing %1 instrument def file.").arg(pathFln);
-    QMessageBox::critical(0, "ERROR", errMsg);
+    QMessageBox::critical(nullptr, "ERROR", errMsg);
     return 1;
   }
 

@@ -167,7 +167,7 @@ PMusrStep::PMusrStep(const char *fln, QWidget *parent) :
     fValid = true;
   } else {
     QString msg = QString("Failed to read msr-file: %1 (status=%2)").arg(fMsrFileName).arg(status);
-    QMessageBox::critical(0, "ERROR", msg);
+    QMessageBox::critical(nullptr, "ERROR", msg);
   }
 
   int height;
@@ -261,7 +261,7 @@ void PMusrStep::handleCellChanged(int row, int column)
     if ((fParamTable->item(row, column)->checkState() == Qt::Checked) &&
         ((str == "0") || (str == "0.0"))) {
       fParamTable->item(row, column)->setCheckState(Qt::Unchecked);
-      QMessageBox::warning(0, "WARNING", "You cannot select a fixed value (step == 0).");
+      QMessageBox::warning(nullptr, "WARNING", "You cannot select a fixed value (step == 0).");
     }
   } else if (column == 2) {
     str = fParamTable->item(row, column)->text();

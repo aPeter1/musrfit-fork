@@ -100,7 +100,7 @@ bool PAdminXMLParser::parse(QIODevice *device)
   if (fXml.hasError()) {
     QString msg;
     msg = QString("%1 Line %2, column %3").arg(fXml.errorString()).arg(fXml.lineNumber()).arg(fXml.columnNumber());
-    QMessageBox::critical(0, "**ERROR**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::critical(nullptr, "ERROR", msg, QMessageBox::Ok, QMessageBox::NoButton);
     return false;
   }
 
@@ -699,14 +699,14 @@ QString PAdminXMLParser::expandPath(const QString &str)
       token.remove('$');
       if (!procEnv.contains(token)) {
         msg = QString("Couldn't find '%1'. Some things might not work properly").arg(token);
-        QMessageBox::warning(0, "**WARNING**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+        QMessageBox::warning(nullptr, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
         newStr = "";
         break;
       }
       path = procEnv.value(token, "");
       if (path.isEmpty()) {
         msg = QString("Couldn't expand '%1'. Some things might not work properly").arg(token);
-        QMessageBox::warning(0, "**WARNING**", msg, QMessageBox::Ok, QMessageBox::NoButton);
+        QMessageBox::warning(nullptr, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
         newStr = "";
         break;
       }
@@ -807,9 +807,9 @@ PAdmin::PAdmin() : QObject()
   QFileInfo info(str);
   if (info.exists()) {
     if (!info.isExecutable())
-      QMessageBox::critical(0, "ERROR", "musrfit found but not recognized as executable.\nPlease check!");
+      QMessageBox::critical(nullptr, "ERROR", "musrfit found but not recognized as executable.\nPlease check!");
   } else {
-    QMessageBox::critical(0, "ERROR", "musrfit not found.\nHave you set the necessary system variables properly?\nPlease check the manual.\nBefore you can use musrfit, this needs to be fixed.");
+    QMessageBox::critical(nullptr, "ERROR", "musrfit not found.\nHave you set the necessary system variables properly?\nPlease check the manual.\nBefore you can use musrfit, this needs to be fixed.");
   }
 
   // check if system variables are set properly
@@ -827,7 +827,7 @@ PAdmin::PAdmin() : QObject()
   }
   if (sysVarMissing) {
     msg += "Please set this/these system variables.";
-    QMessageBox::warning(0, "WARNING", msg);
+    QMessageBox::warning(nullptr, "WARNING", msg);
   }
 }
 
@@ -907,13 +907,13 @@ int PAdmin::loadPrefs(QString fln)
   if (QFile::exists(fln)) { // administration file present
     PAdminXMLParser handler(fln, this);
     if (!handler.isValid()) {
-      QMessageBox::critical(0, "**ERROR**",
+      QMessageBox::critical(nullptr, "ERROR",
                             "Error parsing musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
                             QMessageBox::Ok, QMessageBox::NoButton);
       return 0;
     }
   } else {
-    QMessageBox::critical(0, "**ERROR**",
+    QMessageBox::critical(nullptr, "ERROR",
                           "Couldn't find the musredit_startup.xml settings file.\nProbably a few things will not work porperly.\nPlease fix this first.",
                           QMessageBox::Ok, QMessageBox::NoButton);
     return 0;
@@ -1042,7 +1042,7 @@ int PAdmin::savePrefs(QString pref_fln)
     file.close();
   } else {
     QString msg("Failed to write musredit_startup.xml. Neither a local nor a global copy found.");
-    QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::warning(nullptr, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
   }
 
   return 1;
@@ -1132,7 +1132,7 @@ void PAdmin::saveRecentFiles()
     file.close();
   } else {
     QString msg("Failed to write musredit_startup.xml. Neither a local nor a global copy found.");
-    QMessageBox::warning(0, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
+    QMessageBox::warning(nullptr, "WARNING", msg, QMessageBox::Ok, QMessageBox::NoButton);
   }
 }
 
@@ -1161,13 +1161,13 @@ void PAdmin::createMusreditStartupFile()
   QFile fres(":/musredit_startup.xml.in");
   if (!fres.exists()) {
     QString msg = QString("Neither couldn't find nor create musredit_startup.xml. Things are likely not to work.");
-    QMessageBox::critical(0, "ERROR", msg);
+    QMessageBox::critical(nullptr, "ERROR", msg);
     return;
   }
 
   if (!fres.open(QIODevice::ReadOnly | QIODevice::Text)) {
     QString msg = QString("Couldn't open internal resource file musredit_startup.xml.in. Things are likely not to work.");
-    QMessageBox::critical(0, "ERROR", msg);
+    QMessageBox::critical(nullptr, "ERROR", msg);
     return;
   }
   // text stream for fres

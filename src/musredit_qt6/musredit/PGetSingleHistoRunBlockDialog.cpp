@@ -281,15 +281,12 @@ QString PGetSingleHistoRunBlockDialog::getLifetimeCorrection(bool &present)
 void PGetSingleHistoRunBlockDialog::helpContent()
 {
   if (fHelpUrl.isEmpty()) {
-    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+    QMessageBox::information(this, "INFO", "Will eventually show a help window");
   } else {
     bool ok = QDesktopServices::openUrl(QUrl(fHelpUrl, QUrl::TolerantMode));
     if (!ok) {
       QString msg = QString("<p>Sorry: Couldn't open default web-browser for the help.<br>Please try: <a href=\"%1\">musrfit docu</a> in your web-browser.").arg(fHelpUrl);
-      QMessageBox::critical( nullptr,
-                             tr("Fatal Error"),
-                             msg,
-                             tr("Quit") );
+      QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     }
   }
 }

@@ -97,7 +97,7 @@ void PGetPlotBlockDialog::addPlot()
   // lower x-/time range
   str = fXRangeLow_lineEdit->text();
   if (str.isEmpty()) {
-    QMessageBox::critical(this, "**ERROR**",
+    QMessageBox::critical(this, "ERROR",
        "empty lower time-/x-range name not allowed!",
        QMessageBox::Ok, QMessageBox::NoButton);
     return;
@@ -111,7 +111,7 @@ void PGetPlotBlockDialog::addPlot()
   // upper x-/time range
   str = fXRangeUp_lineEdit->text();
   if (str.isEmpty()) {
-    QMessageBox::critical(this, "**ERROR**",
+    QMessageBox::critical(this, "ERROR",
        "empty upper time-/x-range name not allowed!",
        QMessageBox::Ok, QMessageBox::NoButton);
     return;
@@ -125,7 +125,7 @@ void PGetPlotBlockDialog::addPlot()
   // check y-range: either none given or both
   if ((fYRangeLow_lineEdit->text().isEmpty() && !fYRangeUp_lineEdit->text().isEmpty()) ||
       (!fYRangeLow_lineEdit->text().isEmpty() && fYRangeUp_lineEdit->text().isEmpty())) {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "Only fully empty y-range, or give lower AND upper y-range is acceptable!\n Will ignore the y-range",
          QMessageBox::Ok, QMessageBox::NoButton);
   } else if (!fYRangeLow_lineEdit->text().isEmpty() && !fYRangeUp_lineEdit->text().isEmpty()) {
@@ -159,15 +159,12 @@ void PGetPlotBlockDialog::addPlot()
 void PGetPlotBlockDialog::helpContent()
 {
   if (fHelpUrl.isEmpty()) {
-    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+    QMessageBox::information(this, "INFO", "Will eventually show a help window");
   } else {
     bool ok = QDesktopServices::openUrl(QUrl(fHelpUrl, QUrl::TolerantMode));
     if (!ok) {
       QString msg = QString("<p>Sorry: Couldn't open default web-browser for the help.<br>Please try: <a href=\"%1\">musrfit docu</a> in your web-browser.").arg(fHelpUrl);
-      QMessageBox::critical( nullptr,
-                             tr("Fatal Error"),
-                             msg,
-                             tr("Quit") );
+      QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     }
   }
 }

@@ -553,7 +553,7 @@ void PIntroPage::handleFitType(int idx)
 {
   if ( (idx != FIT_TYPE_SINGLE_HISTO) &&
        (idx != FIT_TYPE_ASYMMETRY) ){
-    QMessageBox::warning(0, "WARNING", "Currently only fit type: single histo and asymmetry available.");
+    QMessageBox::warning(this, "WARNING", "Currently only fit type: single histo and asymmetry available.");
     fFitType->setCurrentIndex(FIT_TYPE_SINGLE_HISTO);
   }
 }
@@ -580,7 +580,7 @@ void PIntroPage::checkSetup(int idx)
   case MEASURE_LF:
     setup = instru->getLFSetups();
     measure = "LF";
-    QMessageBox::information(0, "INFO", "Not yet implemented.");
+    QMessageBox::information(this, "INFO", "Not yet implemented.");
     break;
   case MEASURE_UNDEF:
   default:
@@ -589,7 +589,7 @@ void PIntroPage::checkSetup(int idx)
 
   if (setup.size() == 0) {
     QString msg = QString("Didn't find any setup for:\nInstitute: %1\nInstrument: %2").arg(fInstitute->currentText()).arg(fInstrument->currentText());
-    QMessageBox::critical(0, "ERROR", msg);
+    QMessageBox::critical(this, "ERROR", msg);
     return;
   } else if (setup.size() == 1) {
     if (setup[0].getName() == "Default") {
@@ -907,7 +907,7 @@ void PTheoPage::checkTheory()
       ok = analyzeTokens(line[i], 0);
       if (!ok) {
         QString str = QString("**ERROR** in line %1.\n funX takes no parameter.").arg(i+1);
-        QMessageBox::critical(0, "Check Theory", str);
+        QMessageBox::critical(this, "Check Theory", str);
         // eventually it would be nice to highlight the faulty line
         return;
       }
@@ -915,7 +915,7 @@ void PTheoPage::checkTheory()
         ok = analyzeTokens(line[i], 0);
         if (!ok) {
           QString str = QString("**ERROR** in line %1.\n mapX takes no parameter.").arg(i+1);
-          QMessageBox::critical(0, "Check Theory", str);
+          QMessageBox::critical(this, "Check Theory", str);
           // eventually it would be nice to highlight the faulty line
           return;
         }
@@ -924,14 +924,14 @@ void PTheoPage::checkTheory()
       func = fAdmin->getMusrfitFunc(strList[0]);
       if (func.getName() == "UnDef") { // function not found
         QString str = QString("**ERROR** in line %1, '%2' is not a recognized musrfit function.").arg(i+1).arg(line[i]);
-        QMessageBox::critical(0, "Check Theory", str);
+        QMessageBox::critical(this, "Check Theory", str);
         // eventually it would be nice to highlight the faulty line
         return;
       }
       ok = analyzeTokens(line[i], func.getNoOfParam());
       if (!ok) {
         QString str = QString("**ERROR** in line %1.\n %2 takes %3 parameter.").arg(i+1).arg(func.getName()).arg(func.getNoOfParam());
-        QMessageBox::critical(0, "Check Theory", str);
+        QMessageBox::critical(this, "Check Theory", str);
         // eventually it would be nice to highlight the faulty line
         return;
       }
@@ -952,7 +952,7 @@ void PTheoPage::checkTheory()
 
   QObject *obj = sender();
   if (obj == fCheckTheo)
-    QMessageBox::information(0, "Check Theory", "Theory seems to be OK.");
+    QMessageBox::information(this, "Check Theory", "Theory seems to be OK.");
 }
 
 //-------------------------------------------------------------------------
@@ -1013,7 +1013,7 @@ bool PTheoPage::analyzeTokens(QString str, int noOfTokens)
         dealWithMap(tok[0], stokNo, 0);
       } else {
         QString msg = QString("Found map of the form '%1'.\nThis is NOT a legal map!").arg(tok[0]);
-        QMessageBox::critical(0, "analyzeTokens", msg);
+        QMessageBox::critical(this, "analyzeTokens", msg);
         return false;
       }
     } else if (tok[0].startsWith("fun")) {
@@ -1024,7 +1024,7 @@ bool PTheoPage::analyzeTokens(QString str, int noOfTokens)
         dealWithFun(stokNo);
       } else {
         QString msg = QString("Found fun of the form '%1'.\nThis is NOT a legal function!").arg(tok[0]);
-        QMessageBox::critical(0, "analyzeTokens", msg);
+        QMessageBox::critical(this, "analyzeTokens", msg);
         return false;
       }
     }
@@ -1043,7 +1043,7 @@ bool PTheoPage::analyzeTokens(QString str, int noOfTokens)
       dealWithParam(tok[0], paramNo, i);
     } else if (!tok[i].startsWith("map") && !tok[i].startsWith("fun")) {
       QString msg = QString("Found parameter of the form '%1'.\nThis is NOT a legal parameter!").arg(tok[i]);
-      QMessageBox::critical(0, "analyzeTokens", msg);
+      QMessageBox::critical(this, "analyzeTokens", msg);
       return false;
     }
   }
@@ -1060,7 +1060,7 @@ bool PTheoPage::analyzeTokens(QString str, int noOfTokens)
         dealWithMap(tok[0], mapNo, i);
       } else {
         QString msg = QString("Found map of the form '%1'.\nThis is NOT a legal map!").arg(tok[i]);
-        QMessageBox::critical(0, "analyzeTokens", msg);
+        QMessageBox::critical(this, "analyzeTokens", msg);
         return false;
       }
     }
@@ -1078,7 +1078,7 @@ bool PTheoPage::analyzeTokens(QString str, int noOfTokens)
         dealWithFun(funNo);
       } else {
         QString msg = QString("Found function of the form '%1'.\nThis is NOT a legal function!").arg(tok[i]);
-        QMessageBox::critical(0, "analyzeTokens", msg);
+        QMessageBox::critical(this, "analyzeTokens", msg);
         return false;
       }
     }
@@ -2015,7 +2015,7 @@ int PMusrWiz::writeMsrFile(int result)
   // no msr-file name given, hence generate it
   if (fMsrData->getMsrFileName() == QString("")) {
     if (fMsrData->getRunNumber() == -1) {
-      QMessageBox::critical(0, "ERROR", "No run number given! Won't do anything.");
+      QMessageBox::critical(this, "ERROR", "No run number given! Won't do anything.");
       return -2;
     }
     fMsrData->setMsrFileName(QString("%1").arg(fMsrData->getRunNumber()));
@@ -2062,7 +2062,7 @@ int PMusrWiz::writeMsrFileSingleHisto()
   QFile fln(pathFileName);
 
   if (!fln.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    QMessageBox::critical(0, "ERROR", "Cannot open file for writting.");
+    QMessageBox::critical(this, "ERROR", "Cannot open file for writting.");
     return -3;
   }
 
@@ -2104,7 +2104,7 @@ int PMusrWiz::writeMsrFileSingleHisto()
   PInstrument *instru = fAdmin->getInstrument(fMsrData->getInstitute(), fMsrData->getInstrument());
   if (instru == 0) {
     QString msg = QString("No setups found for %1: %2").arg(fMsrData->getInstitute(), fMsrData->getInstrument());
-    QMessageBox::critical(0, "ERROR", msg);
+    QMessageBox::critical(this, "ERROR", msg);
     return -4;
   }
   PSetup *setup = 0;
@@ -2124,7 +2124,7 @@ int PMusrWiz::writeMsrFileSingleHisto()
   }
   if (setup == 0) {
     QString msg = QString("No setups found for %1: %2: %3").arg(fMsrData->getInstitute(), fMsrData->getInstrument()).arg(fMsrData->getSetup());
-    QMessageBox::critical(0, "ERROR", msg);
+    QMessageBox::critical(this, "ERROR", msg);
     return -5;
   }
   int noOfDetec = setup->getNoOfLogicalDetectors();
@@ -2295,7 +2295,7 @@ int PMusrWiz::writeMsrFileAsymmetry()
   QFile fln(pathFileName);
 
   if (!fln.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    QMessageBox::critical(0, "ERROR", "Cannot open file for writting.");
+    QMessageBox::critical(this, "ERROR", "Cannot open file for writting.");
     return -3;
   }
 
@@ -2337,7 +2337,7 @@ int PMusrWiz::writeMsrFileAsymmetry()
   PInstrument *instru = fAdmin->getInstrument(fMsrData->getInstitute(), fMsrData->getInstrument());
   if (instru == 0) {
     QString msg = QString("No setups found for %1: %2").arg(fMsrData->getInstitute(), fMsrData->getInstrument());
-    QMessageBox::critical(0, "ERROR", msg);
+    QMessageBox::critical(this, "ERROR", msg);
     return -4;
   }
   PSetup *setup = 0;
@@ -2357,7 +2357,7 @@ int PMusrWiz::writeMsrFileAsymmetry()
   }
   if (setup == 0) {
     QString msg = QString("No setups found for %1: %2: %3").arg(fMsrData->getInstitute(), fMsrData->getInstrument()).arg(fMsrData->getSetup());
-    QMessageBox::critical(0, "ERROR", msg);
+    QMessageBox::critical(this, "ERROR", msg);
     return -5;
   }
   int noOfDetec = setup->getNoOfLogicalAsymDetectors();
@@ -2579,5 +2579,5 @@ QString PMusrWiz::getRunName(PInstrument *instru)
  */
 void PMusrWiz::help()
 {
-  QMessageBox::information(0, "Help", "Eventually there will be a help here.");
+  QMessageBox::information(this, "Help", "Eventually there will be a help here.");
 }

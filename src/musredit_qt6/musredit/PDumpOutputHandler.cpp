@@ -83,10 +83,7 @@ PDumpOutputHandler::PDumpOutputHandler(QVector<QString> &cmd)
   if ( !fProc->waitForStarted() ) {
     // error handling
     QString msg(tr("Could not execute the output command: ")+cmd[0]);
-    QMessageBox::critical( 0,
-                tr("Fatal error"),
-                msg,
-                tr("Quit") );
+    QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     done(0);
   }
 

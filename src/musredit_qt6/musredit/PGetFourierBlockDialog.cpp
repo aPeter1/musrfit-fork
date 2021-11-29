@@ -82,14 +82,14 @@ void PGetFourierBlockDialog::checkPhaseParameter()
       ival = str.toInt(&ok);
       if (!ok) {
         fPhase_lineEdit->clear();
-        QMessageBox::critical(this, "**ERROR**",
+        QMessageBox::critical(this, "ERROR",
                               "Allowed phase entries are either a parameter number,\n or an parXX entry, where XX is a parameter number",
                               QMessageBox::Ok, QMessageBox::NoButton);
         fPhase_lineEdit->setFocus();
       }
     } else { // neither a parXX nor a number
       fPhase_lineEdit->clear();
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
                             "Allowed phase entries are either a parameter number,\n or an parXX entry, where XX is a parameter number",
                             QMessageBox::Ok, QMessageBox::NoButton);
         fPhase_lineEdit->setFocus();
@@ -130,15 +130,12 @@ void PGetFourierBlockDialog::fillFourierBlock()
 void PGetFourierBlockDialog::helpContent()
 {
   if (fHelpUrl.isEmpty()) {
-    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+    QMessageBox::information(this, "INFO", "Will eventually show a help window");
   } else {
     bool ok = QDesktopServices::openUrl(QUrl(fHelpUrl, QUrl::TolerantMode));
     if (!ok) {
       QString msg = QString("<p>Sorry: Couldn't open default web-browser for the help.<br>Please try: <a href=\"%1\">musrfit docu</a> in your web-browser.").arg(fHelpUrl);
-      QMessageBox::critical( nullptr,
-                             tr("Fatal Error"),
-                             msg,
-                             tr("Quit") );
+      QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     }
   }
 }

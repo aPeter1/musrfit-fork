@@ -105,7 +105,7 @@ void PGetParameterBlockDialog::paramAdd()
   // get name
   str = fName_lineEdit->text();
   if (str.isEmpty()) {
-    QMessageBox::critical(this, "**ERROR**",
+    QMessageBox::critical(this, "ERROR",
        "empty parameter name not allowed!",
        QMessageBox::Ok, QMessageBox::NoButton);
     return;
@@ -120,7 +120,7 @@ void PGetParameterBlockDialog::paramAdd()
   // get value
   str = fValue_lineEdit->text();
   if (str.isEmpty()) {
-    QMessageBox::critical(this, "**ERROR**",
+    QMessageBox::critical(this, "ERROR",
        "empty parameter value not allowed!",
        QMessageBox::Ok, QMessageBox::NoButton);
     return;
@@ -135,7 +135,7 @@ void PGetParameterBlockDialog::paramAdd()
   // get step
   str = fStep_lineEdit->text();
   if (str.isEmpty()) {
-    QMessageBox::critical(this, "**ERROR**",
+    QMessageBox::critical(this, "ERROR",
        "empty parameter step not allowed!",
        QMessageBox::Ok, QMessageBox::NoButton);
     return;
@@ -156,7 +156,7 @@ void PGetParameterBlockDialog::paramAdd()
     bool ok;
     double val = str.toDouble(&ok);
     if (!ok && (str != "none")) {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "invalid lower boundary! Must be a double are the key word 'none'",
          QMessageBox::Ok, QMessageBox::NoButton);
       return;
@@ -172,7 +172,7 @@ void PGetParameterBlockDialog::paramAdd()
     str = fUpper_lineEdit->text();
     val = str.toDouble(&ok);
     if (!ok && (str != "none")) {
-      QMessageBox::critical(this, "**ERROR**",
+      QMessageBox::critical(this, "ERROR",
          "invalid upper boundary! Must be a double are the key word 'none'",
          QMessageBox::Ok, QMessageBox::NoButton);
       return;
@@ -218,15 +218,12 @@ void PGetParameterBlockDialog::paramAdd()
 void PGetParameterBlockDialog::helpContent()
 {
   if (fHelpUrl.isEmpty()) {
-    QMessageBox::information(this, "**INFO**", "Will eventually show a help window");
+    QMessageBox::information(this, "INFO", "Will eventually show a help window");
   } else {
     bool ok = QDesktopServices::openUrl(QUrl(fHelpUrl, QUrl::TolerantMode));
     if (!ok) {
       QString msg = QString("<p>Sorry: Couldn't open default web-browser for the help.<br>Please try: <a href=\"%1\">musrfit docu</a> in your web-browser.").arg(fHelpUrl);
-      QMessageBox::critical( nullptr,
-                             tr("Fatal Error"),
-                             msg,
-                             tr("Quit") );
+      QMessageBox::critical( nullptr, tr("FATAL ERROR"), msg, QMessageBox::Close );
     }
   }
 }
