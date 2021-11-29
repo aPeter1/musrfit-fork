@@ -61,8 +61,12 @@ PAdminXMLParser::PAdminXMLParser(const QString& fln, PAdmin *admin) : fAdmin(adm
   fFunc = false;
 
   QFile file(fln);
-  if (!file.open(QFile::ReadOnly | QFile::Text)) {
-    // warning and create default - STILL MISSING
+  if (!file.open(QFile::ReadOnly | QFile::Text) || (file.size()==0)) {
+    // warning and create default
+    QMessageBox::StandardButton ret = QMessageBox::warning(nullptr, "WARNING", "The musredit_startup.xml is corrupted. Create a default one?", QMessageBox::Yes | QMessageBox::No);
+    if (ret == QMessageBox::Yes) {
+      fAdmin->createMusreditStartupFile();
+    }
   }
 
   fValid = parse(&file);
