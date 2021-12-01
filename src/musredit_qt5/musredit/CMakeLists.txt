@@ -1,11 +1,22 @@
-#--- musredit for Qt > 5.0 ----------------------------------------------------
+#--- musredit for Qt = 5.x ----------------------------------------------------
 
 #--- check if project source is repo ------------------------------------------
 if (IS_GIT_REPO)
-  set(HAVE_GIT_REV_H "-DHAVE_GIT_REV_H")  
+  set(HAVE_GIT_REV_H "-DHAVE_GIT_REV_H")
 else (IS_GIT_REPO)
-  set(HAVE_GIT_REV_H "")  
+  set(HAVE_GIT_REV_H "")
 endif (IS_GIT_REPO)
+
+#--- instruct CMake to run moc automatically when needed ----------------------
+set(CMAKE_AUTOMOC ON)
+#--- create code from a list of Qt designer ui files --------------------------
+set(CMAKE_AUTOUIC ON)
+#--- add forms to the uic search path -----------------------------------------
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/forms)
+#--- deal with the resources --------------------------------------------------
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(qt_libs Qt5::Core Qt5::Widgets Qt5::Network Qt5::Xml Qt5::Svg Qt5::PrintSupport)
 
@@ -52,64 +63,28 @@ set(musredit_ui
   forms/PGetFourierBlockDialog.ui
   forms/PGetPlotBlockDialog.ui
   forms/PMsr2DataDialog.ui
-  forms/PChangeDefaultPathsDialog.ui  
+  forms/PChangeDefaultPathsDialog.ui
 )
-
-# Instruct CMake to run moc automatically when needed
-set(CMAKE_AUTOMOC ON)
-
-#[==[ 
-# as35 currently CMAKE_AUTOUIC -> ON doesn't work since it requires the ui-files
-#      in the same directory as the cpp-files.
-# Create code from a list of Qt designer ui files
-set(CMAKE_AUTOUIC ON)
-#]==]
-set(CMAKE_AUTOUIC OFF)
-
-# call qt/uic
-qt5_wrap_ui(out_ui ${musredit_ui})
-# add qt/rcc
-qt5_add_resources(musredit_rcc musredit.qrc)
-
-# remove generated files from automoc and autouic
-set_property(SOURCE ui_PFindDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PReplaceDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PReplaceConfirmationDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PMusrEditAbout.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PPrefsDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetMusrFTOptionsDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetTitleBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetParameterBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetTheoryBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetFunctionsBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetAsymmetryRunBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetSingleHistoRunBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetNonMusrRunBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetFourierBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetPlotBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PMsr2DataDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PChangeDefaultPathsDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE qrc_musredit.cpp PROPERTY SKIP_AUTOMOC ON)
 
 if (APPLE)
   if (${CMAKE_HOST_SYSTEM_VERSION} GREATER_EQUAL "20.3.0")
     set(macosx_icon_name musredit-bigsur.icns)
-  else()	
+  else()
     set(macosx_icon_name musredit.icns)
   endif()
   set(macosx_icon "icons/${macosx_icon_name}")
 message(STATUS "macosx_icon: ${macosx_icon}")
   add_executable(musredit MACOSX_BUNDLE
     ${musredit_src}
-    ${out_ui}
-    ${musredit_rcc}
+    ${musredit_ui}
+    musredit.qrc
     ${macosx_icon}
   )
 else (APPLE)
-  add_executable(musredit 
+  add_executable(musredit
     ${musredit_src}
-    ${out_ui}
-    ${musredit_rcc}
+    ${musredit_ui}
+    musredit.qrc
   )
 endif (APPLE)
 
@@ -125,10 +100,10 @@ target_include_directories(musredit
 
 target_compile_options(musredit
   PRIVATE
-    "${HAVE_GIT_REV_H}"  
+    "${HAVE_GIT_REV_H}"
 )
 
-target_link_libraries(musredit ${qt_libs})
+target_link_libraries(musredit PRIVATE ${qt_libs})
 
 #--- installation info --------------------------------------------------------
 if (APPLE)
@@ -164,4 +139,3 @@ install(
     ${CMAKE_INSTALL_PREFIX}/share/doc/musrfit
   MESSAGE_NEVER
 )
-

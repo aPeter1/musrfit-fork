@@ -1,4 +1,4 @@
-#--- musredit for Qt > 6.0 ----------------------------------------------------
+#--- musredit for Qt = 6.x ----------------------------------------------------
 
 #--- check if project source is repo ------------------------------------------
 if (IS_GIT_REPO)
@@ -6,6 +6,17 @@ if (IS_GIT_REPO)
 else (IS_GIT_REPO)
   set(HAVE_GIT_REV_H "")  
 endif (IS_GIT_REPO)
+
+#--- instruct CMake to run moc automatically when needed ----------------------
+set(CMAKE_AUTOMOC ON)
+#--- create code from a list of Qt designer ui files --------------------------
+set(CMAKE_AUTOUIC ON)
+#--- add forms to the uic search path -----------------------------------------
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/forms)
+#--- deal with the resources --------------------------------------------------
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(qt_libs Qt6::Core Qt6::Widgets Qt6::Network Qt6::Xml Qt6::Svg Qt6::PrintSupport)
 
@@ -55,42 +66,6 @@ set(musredit_ui
   forms/PChangeDefaultPathsDialog.ui  
 )
 
-# Instruct CMake to run moc automatically when needed
-set(CMAKE_AUTOMOC ON)
-
-#[==[ 
-# as35 currently CMAKE_AUTOUIC -> ON doesn't work since it requires the ui-files
-#      in the same directory as the cpp-files.
-# Create code from a list of Qt designer ui files
-set(CMAKE_AUTOUIC ON)
-#]==]
-set(CMAKE_AUTOUIC OFF)
-
-# call qt/uic
-qt6_wrap_ui(out_ui ${musredit_ui})
-# add qt/rcc
-qt6_add_resources(musredit_rcc musredit.qrc)
-
-# remove generated files from automoc and autouic
-set_property(SOURCE ui_PFindDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PReplaceDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PReplaceConfirmationDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PMusrEditAbout.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PPrefsDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetMusrFTOptionsDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetTitleBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetParameterBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetTheoryBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetFunctionsBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetAsymmetryRunBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetSingleHistoRunBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetNonMusrRunBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetFourierBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PGetPlotBlockDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PMsr2DataDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE ui_PChangeDefaultPathsDialog.h PROPERTY SKIP_AUTOMOC ON)
-set_property(SOURCE qrc_musredit.cpp PROPERTY SKIP_AUTOMOC ON)
-
 if (APPLE)
   if (${CMAKE_HOST_SYSTEM_VERSION} GREATER_EQUAL "20.3.0")
     set(macosx_icon_name musredit-bigsur.icns)
@@ -100,15 +75,15 @@ if (APPLE)
   set(macosx_icon "icons/${macosx_icon_name}")      	
   add_executable(musredit MACOSX_BUNDLE
     ${musredit_src}
-    ${out_ui}
-    ${musredit_rcc}
+    ${musredit_ui}
+    musredit.qrc
     ${macosx_icon}
   )
 else (APPLE)
   add_executable(musredit 
     ${musredit_src}
-    ${out_ui}
-    ${musredit_rcc}
+    ${musredit_ui}
+    musredit.qrc
   )
 endif (APPLE)
 
@@ -127,7 +102,7 @@ target_compile_options(musredit
     "${HAVE_GIT_REV_H}"  
 )
 
-target_link_libraries(musredit ${qt_libs})
+target_link_libraries(musredit PRIVATE ${qt_libs})
 
 #--- installation info --------------------------------------------------------
 if (APPLE)

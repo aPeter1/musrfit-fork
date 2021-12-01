@@ -1,9 +1,11 @@
-#--- mupp for Qt > 6.0 --------------------------------------------------------
+#--- mupp for Qt = 6.x --------------------------------------------------------
 
 #--- Find includes in corresponding build directories -------------------------
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 #--- instruct CMake to run moc automatically when needed ----------------------
 set(CMAKE_AUTOMOC ON)
+#--- deal with the resources --------------------------------------------------
+set(CMAKE_AUTORCC ON)
 
 #--- define mupp version ------------------------------------------------------
 set(mupp_VERSION 1.0.0)
@@ -34,9 +36,6 @@ add_custom_target(
 
 add_subdirectory(plotter)
 
-qt6_add_resources(qrc_mupp.cpp mupp.qrc)
-set_property(SOURCE qrc_mupp.cpp PROPERTY SKIP_AUTOMOC ON) # needed for cmake 3.x
-
 set(GENERATED_HEADER_FILES
   mupp_version.h
 )
@@ -55,10 +54,10 @@ if (APPLE)
   set(RESOURCE_FILES icons/mupp.icns)
   add_executable(mupp 
      MACOSX_BUNDLE ${GENERATED_HEADER_FILES} ${MUPP_SOURCE_FILES} 
-     qrc_mupp.cpp ${RESOURCE_FILES}
+     mupp.qrc ${RESOURCE_FILES}
   )
 else (APPLE)
-  add_executable(mupp ${GENERATED_HEADER_FILES} ${MUPP_SOURCE_FILES} qrc_mupp.cpp)
+  add_executable(mupp ${GENERATED_HEADER_FILES} ${MUPP_SOURCE_FILES} mupp.qrc)
 endif (APPLE)
 
 #--- check if project source is repo ------------------------------------------
@@ -89,7 +88,7 @@ target_include_directories(mupp
 )
 
 #--- use the Widgets and XML modules from Qt5 ---------------------------------
-target_link_libraries(mupp Qt6::Widgets Qt6::Xml)
+target_link_libraries(mupp PRIVATE Qt6::Widgets Qt6::Xml)
 
 #--- if macOS make an app rather than just a command line executable ----------
 set_target_properties(mupp PROPERTIES

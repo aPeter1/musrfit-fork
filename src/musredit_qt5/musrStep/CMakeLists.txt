@@ -1,4 +1,4 @@
-#--- musrStep for Qt > 5.0 ----------------------------------------------------
+#--- musrStep for Qt = 5.x ----------------------------------------------------
 
 #--- check if project source is repo ------------------------------------------
 if (IS_GIT_REPO)
@@ -7,6 +7,13 @@ else (IS_GIT_REPO)
   set(HAVE_GIT_REV_H "")  
 endif (IS_GIT_REPO)
 
+#--- instruct CMake to run moc automatically when needed ----------------------
+set(CMAKE_AUTOMOC ON)
+#--- deal with the resources --------------------------------------------------
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
 set(qt_libs Qt5::Core Qt5::Widgets Qt5::Svg)
 
 set(musrStep_src
@@ -14,34 +21,17 @@ set(musrStep_src
   musrStep.cpp
 )
 
-# Instruct CMake to run moc automatically when needed
-set(CMAKE_AUTOMOC ON)
-
-#[==[ 
-# as35 currently CMAKE_AUTOUIC -> ON doesn't work since it requires the ui-files
-#      in the same directory as the cpp-files.
-# Create code from a list of Qt designer ui files
-set(CMAKE_AUTOUIC ON)
-#]==]
-set(CMAKE_AUTOUIC OFF)
-
-# add qt/rcc
-qt5_add_resources(musrStep_rcc musrStep.qrc)
-
-# remove generated files from automoc and autouic
-set_property(SOURCE qrc_musrStep.cpp PROPERTY SKIP_AUTOMOC ON)
-
 set(macosx_icon icons/musrStep.icns)
 if (APPLE)
   add_executable(musrStep MACOSX_BUNDLE
     ${musrStep_src}
-    ${musrStep_rcc}
+    musrStep.qrc
     ${macosx_icon}
   )
 else (APPLE)
   add_executable(musrStep 
     ${musrStep_src}
-    ${musrStep_rcc}
+    musrStep.qrc
   )
 endif (APPLE)
 
@@ -59,7 +49,7 @@ target_compile_options(musrStep
     "${HAVE_GIT_REV_H}"  
 )
 
-target_link_libraries(musrStep ${qt_libs})
+target_link_libraries(musrStep PRIVATE ${qt_libs})
 
 #--- installation info --------------------------------------------------------
 if (APPLE)
