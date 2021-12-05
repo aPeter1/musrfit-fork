@@ -653,8 +653,7 @@ void PTextEdit::setupTextActions()
 
   fComboFont = new QComboBox();
   fComboFont->setEditable(true);
-  QFontDatabase db;
-  fComboFont->addItems( db.families() );
+  fComboFont->addItems( QFontDatabase::families() );
   connect( fComboFont, SIGNAL( currentTextChanged( const QString & ) ),
            this, SLOT( textFamily( const QString & ) ) );
   QLineEdit *edit = fComboFont->lineEdit();
@@ -666,7 +665,7 @@ void PTextEdit::setupTextActions()
 
   fComboSize = new QComboBox( tb );
   fComboSize->setEditable(true);
-  QList<int> sizes = db.standardSizes();
+  QList<int> sizes = QFontDatabase::standardSizes();
   QList<int>::Iterator it = sizes.begin();
   for ( ; it != sizes.end(); ++it )
     fComboSize->addItem( QString::number( *it ) );
