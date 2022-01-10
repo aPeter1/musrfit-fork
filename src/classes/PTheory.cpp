@@ -2160,51 +2160,71 @@ Double_t PTheory::InternalBessel(Double_t t, const PDoubleVector& paramValues, c
  * \param paramValues parameter values
  * \param funcValues vector with the functions (i.e. functions of the parameters)
  */
-Double_t PTheory::SkewedGauss(Double_t t, const PDoubleVector& paramValues, const PDoubleVector& funcValues) const
-{
-  // expected parameters: phase frequency sigma- sigma+ [tshift]
-
+Double_t PTheory::SkewedGauss(Double_t t, const PDoubleVector &paramValues,
+                              const PDoubleVector &funcValues) const {
+  // Expected parameters: phase, frequency, sigma-, sigma+, [tshift].
+  // To be stored in the array "val" as:
+  // val[0] = phase
+  // val[1] = frequency
+  // val[2] = sigma-
+  // val[3] = sigma+
+  // val[4] = tshift [optional]
   Double_t val[5];
-  Double_t skg;
 
+  // Check that we have the correct number of fit parameters.
   assert(fParamNo.size() <= 5);
 
-  // check if FUNCTIONS are used
-  for (UInt_t i=0; i<fParamNo.size(); i++) {
+  // Check if FUNCTIONS are used.
+  for (UInt_t i = 0; i < fParamNo.size(); i++) {
     if (fParamNo[i] < MSR_PARAM_FUN_OFFSET) { // parameter or resolved map
       val[i] = paramValues[fParamNo[i]];
     } else { // function
-      val[i] = funcValues[fParamNo[i]-MSR_PARAM_FUN_OFFSET];
+      val[i] = funcValues[fParamNo[i] - MSR_PARAM_FUN_OFFSET];
     }
   }
 
+  // Apply the tshift (if required).
+  Double_t tt = t;
+  if (fParamNo.size() == 5) {
+    tt = t - val[4];
+  }
 
-  Double_t tt;
-  if (fParamNo.size() == 4) // no tshift
-    tt = t;
-  else // tshift present
-    tt = t-val[4];
+  // Evaluate the skewed Gaussian!
 
-  // val[2] = sigma-, val[3] = sigma+
-  Double_t zp = fabs(val[3])*tt/SQRT_TWO; // sigma+
-  Double_t zm = fabs(val[2])*tt/SQRT_TWO; // sigma-
-  Double_t gp = TMath::Exp(-0.5*TMath::Power(tt*val[3], 2.0)); // gauss sigma+
-  Double_t gm = TMath::Exp(-0.5*TMath::Power(tt*val[2], 2.0)); // gauss sigma-
-  Double_t wp = fabs(val[3])/(fabs(val[2])+fabs(val[3])); // sigma+ / (sigma+ + sigma-)
-  Double_t wm = 1.0-wp;
-  Double_t phase = DEG_TO_RAD*val[0];
-  Double_t freq  = TWO_PI*val[1];
+  // First, calculate some "helper" terms.
+  Double_t sigma_p = std::abs(val[3]);
+  Double_t sigma_m = std::abs(val[2]);
+  Double_t arg_p = sigma_p * tt;
+  Double_t arg_m = sigma_m * tt;
+  Double_t z_p = arg_p / SQRT_TWO;                 // sigma+
+  Double_t z_m = arg_m / SQRT_TWO;                 // sigma-
+  Double_t g_p = TMath::Exp(-0.5 * arg_p * arg_p); // gauss sigma+
+  Double_t g_m = TMath::Exp(-0.5 * arg_m * arg_m); // gauss sigma-
+  Double_t w_p = sigma_p / (sigma_p + sigma_m);
+  Double_t w_m = 1.0 - w_p;
+  Double_t phase = DEG_TO_RAD * val[0];
+  Double_t freq = TWO_PI * val[1];
 
-  if ((zp >= 25.0) || (zm >= 25.0)) // needed to prevent crash of 1F1
-    skg = 2.0e6;
-  else if (fabs(val[2]) == fabs(val[3])) // sigma+ == sigma- -> Gaussian
-    skg = TMath::Cos(phase+freq*tt) * gp;
-  else
-    skg = TMath::Cos(phase+freq*tt) * (wm*gm + wp*gp) +
-          TMath::Sin(phase+freq*tt) * (wm*gm*2.0*zm/SQRT_PI*ROOT::Math::conf_hyperg(0.5,1.5,zm*zm) -
-                                       wp*gp*2.0*zp/SQRT_PI*ROOT::Math::conf_hyperg(0.5,1.5,zp*zp));
+  // Evalute the EVEN frequency component of the skewed Gaussian.
+  Double_t skg_cos = TMath::Cos(phase + freq * tt) * (w_m * g_m + w_p * g_p);
 
-  return skg;
+  // Evalute the ODD frequency component of the skewed Gaussian.
+  constexpr Double_t z_max = 26.7776;
+  // Note: the check against z_max is needed to prevent floating-point overflow
+  // in the return value of ROOT::Math::conf_hyperg(1/2, 3/2, z * z)
+  // (i.e., confluent hypergeometric function of the first kind, 1F1).
+  // In the case that z > z_max, use the maximum value of "Double_t".
+  Double_t skg_sin =
+      TMath::Sin(phase + freq * tt) *
+      ((w_m * g_m * 2.0 * z_m / SQRT_PI) *
+           (z_m > z_max ? std::numeric_limits<Double_t>::max()
+                        : ROOT::Math::conf_hyperg(0.5, 1.5, z_m * z_m)) -
+       (w_p * g_p * 2.0 * z_p / SQRT_PI) *
+           (z_p > z_max ? std::numeric_limits<Double_t>::max()
+                        : ROOT::Math::conf_hyperg(0.5, 1.5, z_p * z_p)));
+
+  // return the skewed Gaussian: skg = skg_cos + skg_sin.
+  return skg_cos + skg_sin;
 }
 
 //--------------------------------------------------------------------------
