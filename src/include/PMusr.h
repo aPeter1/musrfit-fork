@@ -61,14 +61,20 @@
 #define PRUN_ASYMMETRY_BNMR   5
 #define PRUN_NON_MUSR         8
 
-// muon life time in (us), see PRL99, 032001 (2007)
-#define PMUON_LIFETIME 2.197019
+// muon lifetime in (us) - see e.g.:
+// R. Carey et al., SciPost Phys. Proc. 5, 016 (2021).
+// https://doi.org/10.21468/SciPostPhysProc.5.016
+#define PMUON_LIFETIME 2.1969803
 
-// muon gyromagnetic ratio, see gamma_mu = 2.0 mu_mu / hbar
-// mu_mu = -4.49044807(15) 1e-26 J/T (see http://physics.nist.gov/cgi-bin/cuu/Results?search_for=muon)
-// hbar  = 1.054571726(47) 1e-34 Js  (see http://physics.nist.gov/cgi-bin/cuu/Value?hbar|search_for=universal_in!)
-// gamma_muon / (2 pi) = 1.355342e-2 (MHz/G)
-#define GAMMA_BAR_MUON  1.35538817e-2
+// muon gyromagnetic ratio: gamma_mu = 2.0 * mu_mu / hbar - see e.g.:
+// E. Tiesinga et al., Rev. Mod. Phys. 93, 025010 (2021).
+// https://doi.org/10.1103/RevModPhys.93.025010
+// https://physics.nist.gov/cuu/Constants/index.html
+// mu_mu = -4.490 448 30(10) * 1e-26 J/T
+// hbar  =  1.054 571 817... * 1e-34 J*s
+// gamma_muon / (2 pi) = 135.538 809 4(30)      MHz/T
+//                     =   0.013 553 880 94(30) MHz/G
+#define GAMMA_BAR_MUON 1.355388094e-2
 
 // accelerator cycles in (us), needed to determine proper background
 #define ACCEL_PERIOD_PSI     0.01975
