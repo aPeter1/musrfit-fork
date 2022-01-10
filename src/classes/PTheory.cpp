@@ -2213,18 +2213,20 @@ Double_t PTheory::SkewedGauss(Double_t t, const PDoubleVector &paramValues,
   // Note: the check against z_max is needed to prevent floating-point overflow
   // in the return value of ROOT::Math::conf_hyperg(1/2, 3/2, z * z)
   // (i.e., confluent hypergeometric function of the first kind, 1F1).
-  // In the case that z > z_max, use the maximum value of "Double_t".
+  // In the case that z > z_max, return zero (otherwise there is some
+  // numeric discontinuity at later times).
   Double_t skg_sin =
       TMath::Sin(phase + freq * tt) *
-      ((w_m * g_m * 2.0 * z_m / SQRT_PI) *
-           (z_m > z_max ? std::numeric_limits<Double_t>::max()
-                        : ROOT::Math::conf_hyperg(0.5, 1.5, z_m * z_m)) -
-       (w_p * g_p * 2.0 * z_p / SQRT_PI) *
-           (z_p > z_max ? std::numeric_limits<Double_t>::max()
-                        : ROOT::Math::conf_hyperg(0.5, 1.5, z_p * z_p)));
+      ((z_m > z_max) or (z_p > z_max)
+           ? 0.0
+           : (w_m * g_m * 2.0 * z_m / SQRT_PI) *
+                     ROOT::Math::conf_hyperg(0.5, 1.5, z_m * z_m) -
+                 (w_p * g_p * 2.0 * z_p / SQRT_PI) *
+                     ROOT::Math::conf_hyperg(0.5, 1.5, z_p * z_p));
 
-  // return the skewed Gaussian: skg = skg_cos + skg_sin.
-  return skg_cos + skg_sin;
+  // Return the skewed Gaussian: skg = skg_cos + skg_sin.
+  // Also check that skg_sin is finite!
+  return skg_cos + (std::isfinite(skg_sin) ? skg_sin : 0.0);
 }
 
 //--------------------------------------------------------------------------
