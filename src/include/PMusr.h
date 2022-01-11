@@ -62,9 +62,10 @@
 #define PRUN_NON_MUSR         8
 
 // muon lifetime in (us) - see e.g.:
-// R. Carey et al., SciPost Phys. Proc. 5, 016 (2021).
-// https://doi.org/10.21468/SciPostPhysProc.5.016
-#define PMUON_LIFETIME 2.1969803
+// P. A. Zyla et al. (Particle Data Group), Prog. Theor. Exp. Phys. 2020, 083C01 (2020).
+// https://doi.org/10.1093/ptep/ptaa104
+// https://pdg.lbl.gov/2021/
+#define PMUON_LIFETIME 2.1969811
 
 // muon gyromagnetic ratio: gamma_mu = 2.0 * mu_mu / hbar - see e.g.:
 // E. Tiesinga et al., Rev. Mod. Phys. 93, 025010 (2021).
