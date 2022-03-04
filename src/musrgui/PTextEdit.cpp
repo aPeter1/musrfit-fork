@@ -358,7 +358,7 @@ void PTextEdit::setupMusrActions()
   menu->insertSeparator();
   tb->addSeparator();
 
-  a = new QAction( QPixmap::fromMimeSource( "musrcalcchisq.xpm" ), tr( "Calculate Chisq" ), ALT + Key_C, this, "cacluates for the given parameters chiSq/maxLH" );
+  a = new QAction( QPixmap::fromMimeSource( "musrcalcchisq.xpm" ), tr( "Calculate Chisq" ), ALT + Key_C, this, "calculates for the given parameters chiSq/maxLH" );
   connect( a, SIGNAL( activated() ), this, SLOT( musrCalcChisq() ) );
   a->addTo( tb );
   a->addTo( menu );

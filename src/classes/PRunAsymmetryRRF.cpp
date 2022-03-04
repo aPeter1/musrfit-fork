@@ -1224,7 +1224,7 @@ Bool_t PRunAsymmetryRRF::PrepareViewData(PRawRunData* runData, UInt_t histoNo[2]
   UInt_t size = runData->GetDataBin(histoNo[0])->size();
   Int_t factor = 8; // 8 times more points for the theory (if fTheoAsData == false)
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
-  if (fTheoAsData) { // cacluate theory only at the data points
+  if (fTheoAsData) { // calculate theory only at the data points
     fData.SetTheoryTimeStep(fData.GetDataTimeStep());
   } else {
     // finer binning for the theory (8 times as many points = factor)

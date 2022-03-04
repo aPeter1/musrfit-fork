@@ -757,7 +757,7 @@ Bool_t PRunMuMinus::PrepareRawViewData(PRawRunData* runData, const UInt_t histoN
 
   Int_t factor = 8; // 8 times more points for the theory (if fTheoAsData == false)
   fData.SetTheoryTimeStart(fData.GetDataTimeStart());
-  if (fTheoAsData) { // cacluate theory only at the data points
+  if (fTheoAsData) { // calculate theory only at the data points
     fData.SetTheoryTimeStep(fData.GetDataTimeStep());
   } else {
     // finer binning for the theory (8 times as many points = factor)
