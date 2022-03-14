@@ -436,6 +436,8 @@ Bool_t PRunDataHandler::ReadFilesMsr()
         success = ReadAsciiFile();
       } else if (!runList->at(i).GetFileFormat(j)->CompareTo("db")) {
         success = ReadDBFile();
+      } else if (!runList->at(i).GetFileFormat(j)->CompareTo("dat")) {
+        success = ReadDatFile();
       } else {
         success = false;
       }
@@ -994,6 +996,8 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     ext = TString("dat");
   else if (!runInfo.GetFileFormat(idx)->CompareTo("db"))
     ext = TString("db");
+  else if (!runInfo.GetFileFormat(idx)->CompareTo("dat"))
+    ext = TString("dat");
   else
     success = false;
 
@@ -1018,6 +1022,7 @@ Bool_t PRunDataHandler::FileExistsCheck(PMsrRunBlock &runInfo, const UInt_t idx)
     std::cerr << std::endl << ">>   MDU-ASCII  -> psi mdu ascii file format";
     std::cerr << std::endl << ">>   ASCII      -> column like file format";
     std::cerr << std::endl << ">>   DB         -> triumf db file \"format\"";
+    std::cerr << std::endl << ">>   DAT        -> csv like file \"format\" as exported by msr2data.";
     std::cerr << std::endl;
     return success;
   }
@@ -4234,6 +4239,18 @@ Bool_t PRunDataHandler::ReadDBFile()
   runData.SetRunName(fRunName);
 
   fData.push_back(runData);
+
+  return success;
+}
+
+//--------------------------------------------------------------------------
+// ReadDBFile (private)
+//--------------------------------------------------------------------------
+Bool_t PRunDataHandler::ReadDatFile()
+{
+  Bool_t success = true;
+
+  std::cerr << "debug> in PRunDataHandler::ReadDatFile(). Not yet implemented..." << std::endl;
 
   return success;
 }

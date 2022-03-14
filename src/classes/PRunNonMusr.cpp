@@ -198,6 +198,9 @@ Bool_t PRunNonMusr::PrepareData()
 {
   Bool_t success = true;
 
+  if (!fValid)
+    return false;
+
   if (fRunInfo->GetRunNameSize() > 1) { // ADDRUN present which is not supported for NonMusr
     std::cerr << std::endl << ">> PRunNonMusr::PrepareData(): **WARNING** ADDRUN NOT SUPPORTED FOR THIS FIT TYPE, WILL IGNORE IT." << std::endl;
   }
