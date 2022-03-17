@@ -4,7 +4,7 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: PDummyUserFcn
-Description: C++ shared library providing the spin valve fitter class
+Description: C++ shared library providing the dummy user fcn fitter class
 Version: @P_DUMMY_USER_FUNC_VERSION@
 Libs: -L${libdir} -l@P_DUMMY_USER_FUNC_LIBRARY_NAME@
 Cflags: -I${includedir}
