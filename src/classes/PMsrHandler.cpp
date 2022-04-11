@@ -6728,9 +6728,9 @@ TString PMsrHandler::BeautifyFourierPhaseParameterString()
 
     if (phaseIter) {
       if (phaseRef != -1) {
-        str = TString::Format("parR(%d, %d, %d)", fFourier.fPhaseParamNo[0], offset, fFourier.fPhaseParamNo.size());
+        str = TString::Format("parR(%d, %d, %lu)", fFourier.fPhaseParamNo[0], offset, fFourier.fPhaseParamNo.size());
       } else {
-        str = TString::Format("par(%d, %d, %d)", fFourier.fPhaseParamNo[0], offset, fFourier.fPhaseParamNo.size());
+        str = TString::Format("par(%d, %d, %lu)", fFourier.fPhaseParamNo[0], offset, fFourier.fPhaseParamNo.size());
       }
     } else {
       str = TString("");
