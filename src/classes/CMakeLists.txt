@@ -153,11 +153,14 @@ set_target_properties(PRgeHandler
 
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
-  PUserFcnBase BEFORE PRIVATE $<BUILD_INTERFACE:${MUSRFIT_INC}>
+  PUserFcnBase BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${MUSRFIT_INC}>
 )
 
 target_include_directories(
-  PRgeHandler BEFORE PRIVATE $<BUILD_INTERFACE:${MUSRFIT_INC}>
+  PRgeHandler BEFORE PRIVATE 
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${MUSRFIT_INC}>
 )
 
 #--- add ROOT Version >= 6.24 compile options if needed -----------------------
