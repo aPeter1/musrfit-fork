@@ -1308,7 +1308,9 @@ bool PMsr2Data::PrepareGlobalInputFile(unsigned int tempRun, const std::string &
       std::ostringstream oss;
       oss << path << "musrfit" << " " << *fRunVectorIter << "-OneRunFit" << fFileExtension << ".msr";
       std::cout << std::endl << ">> msr2data: **INFO** Calling " << oss.str() << std::endl;
-      system(oss.str().c_str());
+      if (system(oss.str().c_str()) == -1) {
+        std::cerr << std::endl << "**ERROR** system call: " << oss.str().c_str() << " failed." << std::endl;
+      }
 
       ++fRunVectorIter;
     }

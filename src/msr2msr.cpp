@@ -574,10 +574,16 @@ bool msr2msr_finalize_theory(char *fln, int theoryTag, int noOfAddionalParams)
 
   // cp __temp.msr fln
   sprintf(str, "cp __temp.msr %s", fln);
-  system(str);
+  if (system(str) == -1) {
+    std::cerr << "**ERROR** cmd: " << str << " failed." << std::endl;
+    return false;
+  }
   // rm __temp.msr
   strcpy(str, "rm __temp.msr");
-  system(str);
+  if (system(str) == -1) {
+    std::cerr << "**ERROR** cmd: " << str << " failed." << std::endl;
+    return false;
+  }
 
   return true;
 }
@@ -704,7 +710,10 @@ int main(int argc, char *argv[])
   // check if conversion seems to be OK
   if (!success) {
     sprintf(str, "rm -rf %s", argv[2]);
-    system(str);
+    if (system(str) == -1) {
+      std::cerr << "**ERROR** cmd: " << str << " failed." << std::endl;
+      return 0;
+    }
   }
 
   if (theoryTag != -1) {

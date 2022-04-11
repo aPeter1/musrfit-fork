@@ -724,7 +724,9 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
         sprintf(cmd, "tar -zcf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[0].Data());
       else // bzip2
         sprintf(cmd, "tar -jcf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[0].Data());
-      system(cmd);
+      if (system(cmd) == -1) {
+        std::cerr << "**ERROR** cmd: " << cmd << " failed." << std::endl;
+      }
     } else {
       fln += TString(".tar");
       for (UInt_t i=0; i<fAny2ManyInfo->outPathFileName.size(); i++) {
@@ -733,7 +735,9 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
         } else {
           sprintf(cmd, "tar -rf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[i].Data());
         }
-        system(cmd);
+        if (system(cmd) == -1) {
+          std::cerr << "**ERROR** cmd: " << cmd << " failed." << std::endl;
+        }
       }
       if (fAny2ManyInfo->compressionTag == 1) { // gzip
         sprintf(cmd, "gzip %s", fln.Data());
@@ -742,7 +746,9 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
         sprintf(cmd, "bzip2 -z %s", fln.Data());
         fln += ".bz2";
       }
-      system(cmd);
+      if (system(cmd) == -1) {
+        std::cerr << "**ERROR** cmd: " << cmd << " failed." << std::endl;
+      }
     }
 
     // check if the compressed file shall be streamed to the stdout

@@ -893,7 +893,9 @@ int main(int argc, char *argv[])
         std::ostringstream oss;
         oss << path << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
         std::cout << std::endl << ">> msr2data: **INFO** Calling " << oss.str() << std::endl;
-        system(oss.str().c_str());
+        if (system(oss.str().c_str()) == -1) {
+          std::cerr << "**ERROR** cmd: " << oss.str().c_str() << " failed." << std::endl;
+        }
       }
     }
 
@@ -982,7 +984,9 @@ int main(int argc, char *argv[])
           std::ostringstream oss;
           oss << path << "musrfit" << " " << strInfile.str() << " " << musrfitOptions;
           std::cout << std::endl << ">> msr2data: **INFO** Calling " << oss.str() << std::endl;
-          system(oss.str().c_str());
+          if (system(oss.str().c_str()) == -1) {
+            std::cerr << "**ERROR** cmd: " << oss.str().c_str() << " failed." << std::endl;
+          }
         }
       }
 

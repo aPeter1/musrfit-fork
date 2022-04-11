@@ -126,7 +126,13 @@ PFitOutputHandler::~PFitOutputHandler()
 #else
     qDebug() << msg << Qt::endl;
 #endif
-    system(cmd.toLatin1());
+    if (system(cmd.toLatin1()) == -1) {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+      qDebug() << "**ERROR** " << msg << " - failed!" << endl;
+#else
+      qDebug() << "**ERROR** " << msg << " - failed!" << Qt::endl;
+#endif
+    }
   }
   if (fProc) {
     delete fProc;
