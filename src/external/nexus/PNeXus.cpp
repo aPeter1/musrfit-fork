@@ -2761,7 +2761,7 @@ int PNeXus::ReadFileIdf1()
   char cstr[128];
   int ival;
   float fval;
-  int attlen, atttype;
+  int attlen, atttype, rank, dims[32];
   NXname data_value, nxAttrName;
 
   // open file
@@ -2775,7 +2775,7 @@ int PNeXus::ReadFileIdf1()
 
   // collect the NXroot attribute information
   do {
-    status = NXgetnextattr(fFileHandle, nxAttrName, &attlen, &atttype);
+    status = NXgetnextattra(fFileHandle, nxAttrName, &rank, dims, &atttype);
     if (status == NX_OK) {
       if (!strcmp(nxAttrName, "HDF_version")) {
         attlen = VGNAMELENMAX - 1;
@@ -3153,7 +3153,7 @@ int PNeXus::ReadFileIdf1()
   // get data
 
   // get information of the current nexus entity
-  int rank, type, dims[32], size, noOfElements;
+  int type, size, noOfElements;
   if (!ErrorHandler(NXgetinfo(fFileHandle, &rank, dims, &type), PNEXUS_GET_META_INFO_ERROR, "couldn't get data info!")) return NX_ERROR;
 
   // calculate the needed size
@@ -3354,7 +3354,7 @@ int PNeXus::ReadFileIdf2()
 
   // collect the NXroot attribute information
   do {
-    status = NXgetnextattr(fFileHandle, nxAttrName, &attlen, &atttype);
+    status = NXgetnextattra(fFileHandle, nxAttrName, &rank, dims, &atttype);
     if (status == NX_OK) {
       if (!strcmp(nxAttrName, "HDF_version")) {
         attlen = VGNAMELENMAX - 1;
@@ -5432,21 +5432,23 @@ bool PNeXus::SearchInGroup(std::string str, std::string tag, NXname &nxname, NXn
  * - false otherwise
  *
  * \param str label of the attribute to be looked for
- * \param length of the attribute data it entry is found
+ * \param length of the attribute data if entry is found
  * \param dataType of the entry if entry is found
  */
 bool PNeXus::SearchAttrInData(std::string str, int &length, int &dataType)
 {
   bool found = false;
-  int status;
+  int status, rank, dims[32];
   char name[128];
 
   memset(name, 0, sizeof(name));
 
   NXinitattrdir(fFileHandle);
   do {
-    status = NXgetnextattr(fFileHandle, name, &length, &dataType);
+    status = NXgetnextattra(fFileHandle, name, &rank, dims, &dataType);
     if (!str.compare(name)) {
+      if (rank == 1)
+        length = dims[0];
       found = true;
       break;
     }
