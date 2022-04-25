@@ -1225,7 +1225,6 @@ void PMusrCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
       PlotFourierDifference();
       break;
     case kFourierDiff: // show difference between the Fourier data and the Fourier theory
-      CleanupFourierDifference();
       HandleFourierDifference();
       PlotFourierDifference();
       break;
@@ -3866,7 +3865,7 @@ void PMusrCanvas::HandleAverage()
   }
   if (fData[0].diffFourierRe != nullptr) {
     name = TString(fData[0].diffFourierRe->GetTitle()) + "_avg";
-    fDataAvg.diff = new TH1F(name, name, fData[0].diffFourierRe->GetNbinsX(),
+    fDataAvg.diffFourierRe = new TH1F(name, name, fData[0].diffFourierRe->GetNbinsX(),
                              fData[0].diffFourierRe->GetXaxis()->GetXmin(),
                              fData[0].diffFourierRe->GetXaxis()->GetXmax());
   }
@@ -4126,10 +4125,10 @@ void PMusrCanvas::HandleAverage()
       fDataAvg.diffFourierPhase->SetBinContent(i, dval/fData.size());
     }
     // set marker color, line color, maker size, marker type
-    fDataAvg.diffFourierPhase->SetMarkerColor(fData[0].dataFourierPhase->GetMarkerColor());
-    fDataAvg.diffFourierPhase->SetLineColor(fData[0].dataFourierPhase->GetLineColor());
-    fDataAvg.diffFourierPhase->SetMarkerSize(fData[0].dataFourierPhase->GetMarkerSize());
-    fDataAvg.diffFourierPhase->SetMarkerStyle(fData[0].dataFourierPhase->GetMarkerStyle());
+    fDataAvg.diffFourierPhase->SetMarkerColor(fData[0].diffFourierPhase->GetMarkerColor());
+    fDataAvg.diffFourierPhase->SetLineColor(fData[0].diffFourierPhase->GetLineColor());
+    fDataAvg.diffFourierPhase->SetMarkerSize(fData[0].diffFourierPhase->GetMarkerSize());
+    fDataAvg.diffFourierPhase->SetMarkerStyle(fData[0].diffFourierPhase->GetMarkerStyle());
   }
   if (fDataAvg.diffFourierPhaseOptReal != nullptr) {
     for (Int_t i=0; i<fData[0].diffFourierPhaseOptReal->GetNbinsX(); i++) {
