@@ -828,7 +828,7 @@ typedef struct {
   TString inTemplate;        ///< holds the input file template
   TString outTemplate;       ///< holds the output file template
   TString year;              ///< holds the information about the year to be used
-  PIntVector runList;        ///< holds the run number list to be converted
+  PUIntVector runList;       ///< holds the run number list to be converted
   PIntVector groupHistoList; ///< holds the histo group list offset (used to define for MusrRoot files, what to be exported)
   PStringVector inFileName;  ///< holds the file name of the input data file
   TString outFileName;       ///< holds the output file name

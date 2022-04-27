@@ -66,9 +66,12 @@ void any2many_syntax()
   std::cout << std::endl << "                e.g. 2010/lem10_his_0111.root 2010/lem10_his_0112.root";
   std::cout << std::endl << "          -o <outputFileName> : this option only makes sense, if <filenameList-input>";
   std::cout << std::endl << "                is a single input file name!";
-  std::cout << std::endl << "          -r <runList-input> : where <runList-input> is a list of run numbers";
-  std::cout << std::endl << "                separated by spaces ' ' of the form:  <run1>  <run2>  <run3>";
-  std::cout << std::endl << "                etc., or a sequence of runs <runStart>-<runEnd>, e.g. 111-222";
+  std::cout << std::endl << "          -r <runList-input> : can be:";
+  std::cout << std::endl << "               (i)   <run0>, <run1>, <run2>, ... <runN> : run numbers, e.g. 123 124";
+  std::cout << std::endl << "               (ii)  <run0>-<runN> : a range, e.g. 123-125 -> 123 124 125";
+  std::cout << std::endl << "               (iii) <run0>:<runN>:<step> : a sequence, e.g. 123:127:2 -> 123 125 127";
+  std::cout << std::endl << "                     <step> will give the step width and has to be a positive number!";
+  std::cout << std::endl << "               a <runList> can also combine (i)-(iii), e.g. 123 128-130 133, etc.";
   std::cout << std::endl << "          -t <in-template> <out-template> : ";
   std::cout << std::endl << "             <in-/out-template> : template file name. Needed for run-lists in";
   std::cout << std::endl << "                order to generate the proper file names. The following template";
@@ -280,34 +283,30 @@ int main(int argc, char *argv[])
       }
     } else if (!strcmp(argv[i], "-r")) {
       if (i+1 < argc) {
-        // first check for run list sequence of the form <runStartNo>-<runEndNo>
-        int startNo, endNo;
-        status = sscanf(argv[i+1], "%d-%d", &startNo, &endNo);
-        if (status == 2) { // this is run list sequence
-          if (endNo < startNo) {
-            ival = startNo;
-            startNo = endNo;
-            endNo = ival;
-          }
-          for (int j=startNo; j<=endNo; j++)
-            info.runList.push_back(j);
-          i++;
-        } else { // check for run list of the form <run1>  <run2>  ...  <runN>
-          bool done = false;
-          int j = i+1;
-          do {
-            status = sscanf(argv[j], "%d", &ival);
-            if (status == 1) {
-              info.runList.push_back(ival);
-              j++;
-            } else {
-              done = true;
-            }
-          } while (!done && (j<argc));
-          i = j-1;
-          if (j >= argc) // make sure that counter is still in range
+        int pos{i+1};
+        std::string runStr{""};
+        // collect run list string from input
+        for (int j=i+1; j<argc; j++) {
+          pos = j;
+          if ((argv[j][0] == '-') && isalpha(argv[j][1])) { // next command
+            pos = j-1;
             break;
+          } else {
+            runStr += argv[j];
+            runStr += " ";
+          }
         }
+        // extract run list from string
+        PStringNumberList rl(runStr);
+        std::string errMsg{""};
+        if (!rl.Parse(errMsg)) {
+          std::cerr << "**ERROR** in run list: -rl " << runStr << std::endl;
+          std::cerr << errMsg << std::endl;
+          return false;
+        }
+        info.runList = rl.GetList();
+        // move the argument counter to the proper position
+        i = pos;
       } else {
         std::cerr << std::endl << ">> any2many **ERROR** found input option '-r' without any arguments" << std::endl;
         show_syntax = true;
