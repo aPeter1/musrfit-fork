@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
         if (!rl.Parse(errMsg)) {
           std::cerr << "**ERROR** in run list: -rl " << runStr << std::endl;
           std::cerr << errMsg << std::endl;
-          return false;
+          return PMUSR_WRONG_STARTUP_SYNTAX;
         }
         info.runList = rl.GetList();
         // move the argument counter to the proper position
