@@ -87,7 +87,7 @@ void dump_header_syntax()
   std::cout << std::endl << "       -rn, --runNo <runNo> : run number of the header to be dumped.";
   std::cout << std::endl << "       -fn, --fileName <fileName> : muSR data file name.";
   std::cout << std::endl << "       -ff, --fileFormat <fileFormat> : where <fileFormat> can be:";
-  std::cout << std::endl << "                     MusrRoot, NeXus, ROOT (old LEM), PSI-BIN, PSI-MDU, MUD, WKM";
+  std::cout << std::endl << "                     MusrRoot (default), NeXus, ROOT (old LEM), PSI-BIN, PSI-MDU, MUD, WKM";
   std::cout << std::endl << "                     NeXus is only supported if enabled.";
   std::cout << std::endl << "       -y, --year <year> : <year> has to be 4 digit, e.g. 2005, if provided it is used to";
   std::cout << std::endl << "                     generate the file name for the given <runNo>, otherwise the current";
@@ -884,7 +884,7 @@ int main(int argc, char *argv[])
       }
       if (strcmp(argv[i+2], "gps") && strcmp(argv[i+2], "ltf") && strcmp(argv[i+2], "dolly") &&
           strcmp(argv[i+2], "gpd") && strcmp(argv[i+2], "hifi")) {
-        std::cerr << std::endl << "**ERROR** found --psi-bulk with 2nd argument '" << argv[i+1] << "'! This is an unkown instrument." << std::endl;
+        std::cerr << std::endl << "**ERROR** found --psi-bulk with 2nd argument '" << argv[i+2] << "'! This is an unkown instrument." << std::endl;
         dump_header_syntax();
         return 1;
       }
