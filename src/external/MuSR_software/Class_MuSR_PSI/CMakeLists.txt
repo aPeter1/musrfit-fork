@@ -5,7 +5,7 @@ set(prefix "${CMAKE_INSTALL_PREFIX}")
 set(exec_prefix "\$\{prefix\}")
 set(libdir "\$\{exec_prefix\}/lib")
 set(includedir "\$\{prefix\}/include")   
-set(PSIBIN_VERSION "0.1.0")
+set(PSIBIN_VERSION "0.2.0")
 set(PSIBIN_LIBRARY_NAME "Class_MuSR_PSI")
 configure_file("Class_MuSR_PSI.pc.in" "Class_MuSR_PSI.pc" @ONLY)
 

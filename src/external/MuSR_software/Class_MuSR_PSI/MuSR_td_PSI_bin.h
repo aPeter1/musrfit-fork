@@ -10,7 +10,7 @@
 
     begin                : Alex Amato, October 2005
     modified             : Andrea Raselli, October 2009
-                         : Andreas Suter, April 2019
+                         : Andreas Suter, April 2019, May 2020
     copyright            : (C) 2005 by
     email                : alex.amato@psi.ch
 
@@ -56,57 +56,55 @@ class MuSR_td_PSI_bin {
    ~MuSR_td_PSI_bin();
 
   private:
-// ------------------------------------start of the variables
+    std::string fFilename;
+    std::string fReadStatus;
+    std::string fWriteStatus;
+    std::string fConsistencyStatus;
+    bool     fReadingOk;
+    bool     fWritingOk;
+    bool     fConsistencyOk;
 
-    std::string filename;
-    std::string readstatus;
-    std::string writestatus;
-    std::string consistencyStatus;
-    bool     readingok;
-    bool     writingok;
-    bool     consistencyOk;
+    char     fFormatId[3];
 
-    char     format_id[3];
+    int      fNumRun;
 
-    int      num_run;
+    char     fSample[11];
+    char     fTemp[11];
+    char     fField[11];
+    char     fOrient[11];
+    char     fSetup[11];
+    char     fComment[63];
 
-    char     sample[11];
-    char     temp[11];
-    char     field[11];
-    char     orient[11];
-    char     setup[11];
-    char     comment[63];
+    char     fDateStart[10];
+    char     fDateStop[10];
+    char     fTimeStart[9];
+    char     fTimeStop[9];
 
-    char     date_start[10];
-    char     date_stop[10];
-    char     time_start[9];
-    char     time_stop[9];
+    double   fBinWidth;
 
-    double   bin_width;
+    int      fNumberHisto;
+    int      fLengthHisto;
+    char     fLabelsHisto[MAXHISTO][MAXLABELSIZE];
 
-    int      number_histo;
-    int      length_histo;
-    char     labels_histo[MAXHISTO][MAXLABELSIZE];
+    int      fTotalEvents;
+    int      fEventsPerHisto[MAXHISTO];
 
-    int      total_events;
-    int      events_per_histo[MAXHISTO];
+    int      fDefaultBinning;
 
-    int      default_binning;
+    float    fRealT0[MAXHISTO];
+    int      fIntegerT0[MAXHISTO];
+    int      fFirstGood[MAXHISTO];
+    int      fLastGood[MAXHISTO];
 
-    float    real_t0[MAXHISTO];
-    int      integer_t0[MAXHISTO];
-    int      first_good[MAXHISTO];
-    int      last_good[MAXHISTO];
+    int      fNumberScaler;
+    int      fScalers[MAXSCALER];
+    char     fLabelsScalers[MAXSCALER][MAXLABELSIZE];
 
-    int      number_scaler;
-    int      scalers[MAXSCALER];
-    char     labels_scalers[MAXSCALER][MAXLABELSIZE];
+    int      fNumberTemper;
+    float    fTemper[MAXTEMPER];
+    float    fTempDeviation[MAXTEMPER];
 
-    int      number_temper;
-    float    temper[MAXTEMPER];
-    float    temp_deviation[MAXTEMPER];
-
-    int      **histo;
+    std::vector< std::vector<int> > fHisto;
 
   public:
 
@@ -118,22 +116,22 @@ class MuSR_td_PSI_bin {
      NOTE: Histogram information returned by \<pointer_to_array\> = ..._array() methods
            should be freed by  delete [] \<pointer_to_array\>;
  */
-    std::vector< std::vector<double> >  histos_vector ;
+    std::vector< std::vector<double> >  fHistosVector ;
 
 // ------------------------------------end of the variables
 
   public:
 
-    int            read(const char* fileName);      // generic read
-    int            write(const char *fileName);     // generic write
+    int            Read(const char* fileName);      // generic read
+    int            Write(const char *fileName);     // generic write
 
-    int            readbin(const char* fileName);   // read MuSR PSI bin format
-    int            writebin(const char *fileName);  // write MuSR PSI bin format
-    int            readmdu(const char* fileName);   // read MuSR mdu format
-    int            writemdu(const char* fileName);  // write MuSR mdu format
+    int            ReadBin(const char* fileName);   // read MuSR PSI bin format
+    int            WriteBin(const char *fileName);  // write MuSR PSI bin format
+    int            ReadMdu(const char* fileName);   // read MuSR mdu format
+    int            WriteMdu(const char* fileName);  // write MuSR mdu format
 
-    bool           readingOK()     const;
-    bool           writingOK()     const;
+    bool           ReadingOK()     const;
+    bool           WritingOK()     const;
     bool           CheckDataConsistency(int tag=0); // tag: 0=reasonable, 1=strict
     std::string    ReadStatus()    const;
     std::string    WriteStatus()   const;
@@ -143,57 +141,46 @@ class MuSR_td_PSI_bin {
     int            Show()          const;
     int            Clear();
 
-    int             get_histo_int(int histo_num, int j);
-    double          get_histo(int histo_num, int j);
+    int             GetHistoInt(int histo_num, int j);
+    double          GetHisto(int histo_num, int j);
 
-    int            *get_histo_array_int(int histo_num);
-    double         *get_histo_array(int histo_num, int binning);
-    int             put_histo_array_int(std::vector< std::vector<int> > histo, int tag = 0);
-    std::vector<double>  get_histo_vector(int histo_num, int binning);
-    std::vector<double>  get_histo_vector_no0(int histo_num, int binning);
+    std::vector<int>    GetHistoArrayInt(int histo_num);
+    std::vector<double> GetHistoArray(int histo_num, int binning);
+    int                 PutHistoArrayInt(std::vector< std::vector<int> > &histo, int tag = 0);
+    std::vector<double> GetHistoVector(int histo_num, int binning);
+    std::vector<double> GetHistoVectorNo0(int histo_num, int binning);
 
-    double         *get_histo_fromt0_array(int histo_num, int binning, int offset = 0);
+    double             *GetHistoFromT0Array(int histo_num, int binning, int offset = 0);
 
-    std::vector<double>  get_histo_fromt0_vector(int histo_num, int binning, int offset = 0);
+    std::vector<double> GetHistoFromT0Vector(int histo_num, int binning, int offset = 0);
 
-    double         *get_histo_goodBins_array(int histo_num, int binning);
+    double             *GetHistoGoodBinsArray(int histo_num, int binning);
 
-    std::vector<double>  get_histo_goodBins_vector(int histo_num, int binning);
+    std::vector<double> GetHistoGoodBinsVector(int histo_num, int binning);
 
-    double         *get_histo_fromt0_minus_bckgrd_array(int histo_num,
-                                                         int lower_bckgdr,
-                                                         int higher_bckgdr,
-                                                         int binning,
-                                                         int offset = 0);
+    double             *GetHistoFromT0MinusBkgArray(int histo_num,
+                                                    int lower_bckgdr,
+                                                    int higher_bckgdr,
+                                                    int binning,
+                                                    int offset = 0);
 
-   std::vector<double>  get_histo_fromt0_minus_bckgrd_vector(int histo_num,
-                                                          int lower_bckgdr,
-                                                          int higher_bckgdr,
-                                                          int binning,
-                                                          int offset = 0);
+   std::vector<double>  GetHistoFromT0MinusBkgVector(int histo_num,
+                                                     int lower_bckgdr,
+                                                     int higher_bckgdr,
+                                                     int binning,
+                                                     int offset = 0);
 
-   double         *get_histo_goodBins_minus_bckgrd_array(int histo_num,
-                                                          int lower_bckgrd,
-                                                          int higher_bckgrd,
-                                                          int binning);
+   double              *GetHistoGoodBinsMinusBkgArray(int histo_num,
+                                                      int lower_bckgrd,
+                                                      int higher_bckgrd,
+                                                      int binning);
 
-   std::vector<double>   get_histo_goodBins_minus_bckgrd_vector(int histo_num,
-                                                           int lower_bckgrd,
-                                                           int higher_bckgrd,
-                                                           int binning);
+   std::vector<double>  GetHistoGoodBinsMinusBkgVector(int histo_num,
+                                                       int lower_bckgrd,
+                                                       int higher_bckgrd,
+                                                       int binning);
 
-   double         *get_asymmetry_array(int histo_num_plus,
-                                         int histo_num_minus,
-                                         double alpha_param,
-                                         int binning,
-                                         int lower_bckgrd_plus,
-                                         int higher_bckgrd_plus,
-                                         int lower_bckgrd_minus,
-                                         int higher_bckgrd_minus,
-                                         int offset = 0,
-                                         double y_offset = 0.);
-
-   std::vector<double>  get_asymmetry_vector(int histo_num_plus,
+   double              *GetAsymmetryArray(int histo_num_plus,
                                           int histo_num_minus,
                                           double alpha_param,
                                           int binning,
@@ -204,7 +191,28 @@ class MuSR_td_PSI_bin {
                                           int offset = 0,
                                           double y_offset = 0.);
 
-   double          *get_error_asymmetry_array(int histo_num_plus,
+   std::vector<double>  GetAsymmetryVector(int histo_num_plus,
+                                           int histo_num_minus,
+                                           double alpha_param,
+                                           int binning,
+                                           int lower_bckgrd_plus,
+                                           int higher_bckgrd_plus,
+                                           int lower_bckgrd_minus,
+                                           int higher_bckgrd_minus,
+                                           int offset = 0,
+                                           double y_offset = 0.);
+
+   double              *GetErrorAsymmetryArray(int histo_num_plus,
+                                               int histo_num_minus,
+                                               double alpha_param,
+                                               int binning,
+                                               int lower_bckgrd_plus,
+                                               int higher_bckgrd_plus,
+                                               int lower_bckgrd_minus,
+                                               int higher_bckgrd_minus,
+                                               int offset = 0);
+
+   std::vector<double>  GetErrorAsymmetryVector(int histo_num_plus,
                                                 int histo_num_minus,
                                                 double alpha_param,
                                                 int binning,
@@ -214,17 +222,7 @@ class MuSR_td_PSI_bin {
                                                 int higher_bckgrd_minus,
                                                 int offset = 0);
 
-   std::vector<double>  get_error_asymmetry_vector(int histo_num_plus,
-                                                int histo_num_minus,
-                                                double alpha_param,
-                                                int binning,
-                                                int lower_bckgrd_plus,
-                                                int higher_bckgrd_plus,
-                                                int lower_bckgrd_minus,
-                                                int higher_bckgrd_minus,
-                                                int offset = 0);
-
-   double         *get_asymmetry_goodBins_array(int histo_num_plus,
+   double              *GetAsymmetryGoodBinsArray(int histo_num_plus,
                                                   int histo_num_minus,
                                                   double alpha_param,
                                                   int binning,
@@ -233,16 +231,16 @@ class MuSR_td_PSI_bin {
                                                   int lower_bckgrd_minus,
                                                   int higher_bckgrd_minus);
 
-   std::vector<double> get_asymmetry_goodBins_vector(int histo_num_plus,
-                                                  int histo_num_minus,
-                                                  double alpha_param,
-                                                  int binning,
-                                                  int lower_bckgrd_plus,
-                                                  int higher_bckgrd_plus,
-                                                  int lower_bckgrd_minus,
-                                                  int higher_bckgrd_minus);
+   std::vector<double>  GetAsymmetryGoodBinsVector(int histo_num_plus,
+                                                   int histo_num_minus,
+                                                   double alpha_param,
+                                                   int binning,
+                                                   int lower_bckgrd_plus,
+                                                   int higher_bckgrd_plus,
+                                                   int lower_bckgrd_minus,
+                                                   int higher_bckgrd_minus);
 
-    double        *get_error_asymmetry_goodBins_array(int histo_num_plus,
+    double             *GetErrorAsymmetryGoodBinsArray(int histo_num_plus,
                                                        int histo_num_minus,
                                                        double alpha_param,
                                                        int binning,
@@ -251,103 +249,103 @@ class MuSR_td_PSI_bin {
                                                        int lower_bckgrd_minus,
                                                        int higher_bckgrd_minus);
 
-   std::vector<double> get_error_asymmetry_goodBins_vector(int histo_num_plus,
-                                                        int histo_num_minus,
-                                                        double alpha_param,
-                                                        int binning,
-                                                        int lower_bckgrd_plus,
-                                                        int higher_bckgrd_plus,
-                                                        int lower_bckgrd_minus,
-                                                        int higher_bckgrd_minus);
+   std::vector<double>   GetErrorAsymmetryGoodBinsVector(int histo_num_plus,
+                                                         int histo_num_minus,
+                                                         double alpha_param,
+                                                         int binning,
+                                                         int lower_bckgrd_plus,
+                                                         int higher_bckgrd_plus,
+                                                         int lower_bckgrd_minus,
+                                                         int higher_bckgrd_minus);
 
 
-    double          get_binWidth_ps();
-    void            put_binWidth_ps(double binWidth);
-    double          get_binWidth_ns();
-    void            put_binWidth_ns(double binWidth);
-    double          get_binWidth_us();
-    void            put_binWidth_us(double binWidth);
+    double          GetBinWidthPicoSec();
+    void            PutBinWidthPicoSec(double binWidth);
+    double          GetBinWidthNanoSec();
+    void            PutBinWidthNanoSec(double binWidth);
+    double          GetBinWidthMicroSec();
+    void            PutBinWidthMicroSec(double binWidth);
 
-    int             get_histoLength_bin();
-    void            put_histoLength_bin(int val) { length_histo = val; }
+    int             GetHistoLengthBin() { return fLengthHisto; }
+    void            PutHistoLengthBin(int val) { fLengthHisto = val; }
 
-    int             get_numberHisto_int();
-    void            put_numberHisto_int(int val) { number_histo = val; }
+    int             GetNumberHistoInt() { return fNumberHisto; }
+    void            PutNumberHistoInt(int val) { fNumberHisto = val; }
 
-    std::string     get_nameHisto(int i);
-    int             put_nameHisto(std::string histoName, int i);
-    std::vector<std::string> get_histoNames_vector();
-    int             put_histoNames_vector(std::vector<std::string> &histoNames);
+    std::string     GetNameHisto(int i);
+    int             PutNameHisto(std::string histoName, int i);
+    std::vector<std::string> GetHistoNamesVector();
+    int             PutHistoNamesVector(std::vector<std::string> &histoNames);
 
-    long            get_eventsHisto_long(int i);
-    std::vector<long> get_eventsHisto_vector();
+    long            GetEventsHistoLong(int i);
+    std::vector<long> GetEventsHistoVector();
 
-    long            get_totalEvents_long();
+    long            GetTotalEventsLong() { return long(fTotalEvents); }
 
-    int             get_numberScaler_int();
-    int             put_numberScaler_int(int val);
-    std::vector<long> get_scalers_vector();
-    int             put_scalers_vector(std::vector<int> scalerData);
-    std::vector<std::string> get_scalersNames_vector();
-    int             put_scalersNames_vector(std::vector<std::string> scalersName);
+    int             GetNumberScalerInt();
+    int             PutNumberScalerInt(int val);
+    std::vector<long> GetScalersVector();
+    int             PutScalersVector(std::vector<int> scalerData);
+    std::vector<std::string> GetScalersNamesVector();
+    int             PutScalersNamesVector(std::vector<std::string> scalersName);
 
-    int             get_default_binning();
-    int             get_t0_int(int i);
-    int             put_t0_int(int histoNo, int t0);
-    std::vector<int> get_t0_vector();
-    int             put_t0_vector(std::vector<int> &t0Data);
-    double          get_t0_double(int i);
+    int             GetDefaultBinning();
+    int             GetT0Int(int i);
+    int             PutT0Int(int histoNo, int t0);
+    std::vector<int> GetT0Vector();
+    int             PutT0Vector(std::vector<int> &t0Data);
+    double          GetT0Double(int i);
 
-    int             get_max_t0_int ();
-    int             get_max_2_t0_int (int k, int j);
-    int             get_min_t0_int ();
-    int             get_min_2_t0_int (int k, int j);
+    int             GetMaxT0Int();
+    int             GetMax2T0Int (int k, int j);
+    int             GetMinT0Int();
+    int             GetMin2T0Int (int k, int j);
 
-    int             get_firstGood_int(int i);
-    std::vector<int> get_firstGood_vector();
-    int             put_firstGood_int(int i, int j);
+    int             GetFirstGoodInt(int i);
+    std::vector<int> GetFirstGoodVector();
+    int             PutFirstGoodInt(int i, int j);
 
-    int             get_lastGood_int(int i);
-    std::vector<int> get_lastGood_vector();
-    int             put_lastGood_int(int i, int j);
+    int             GetLastGoodInt(int i);
+    std::vector<int> GetLastGoodVector();
+    int             PutLastGoodInt(int i, int j);
 
-    int             get_max_lastGood_int ();
-    int             get_max_2_lastGood_int (int k, int j);
-    int             get_min_lastGood_int ();
-    int             get_min_2_lastGood_int (int k, int j);
+    int             GetMaxLastGoodInt();
+    int             GetMax2LastGoodInt (int k, int j);
+    int             GetMinLastGoodInt();
+    int             GetMin2LastGoodInt (int k, int j);
 
-    int             get_runNumber_int();
-    int             put_runNumber_int(int i);
+    int             GetRunNumberInt() { return fNumRun; }
+    int             PutRunNumberInt(int i);
 
-    std::string     get_sample();
-    int             put_sample(std::string sample);
-    std::string     get_field();
-    int             put_field(std::string field);
-    std::string     get_orient();
-    int             put_orient(std::string orientation);
-    std::string     get_temp();
-    int             put_temp(std::string temp);
-    std::string     get_setup();
-    int             put_setup(std::string setup);
-    std::string     get_comment();
-    int             put_comment(std::string comment);
+    std::string     GetSample();
+    int             PutSample(std::string sample);
+    std::string     GetField();
+    int             PutField(std::string field);
+    std::string     GetOrient();
+    int             PutOrient(std::string orientation);
+    std::string     GetTemp();
+    int             PutTemp(std::string temp);
+    std::string     GetSetup();
+    int             PutSetup(std::string setup);
+    std::string     GetComment();
+    int             PutComment(std::string comment);
 
-    std::vector<std::string>  get_timeStart_vector();
-    int             put_timeStart_vector(std::vector<std::string> timeStart);
-    std::vector<std::string>  get_timeStop_vector();
-    int             put_timeStop_vector(std::vector<std::string> timeStop);
+    std::vector<std::string>  GetTimeStartVector();
+    int             PutTimeStartVector(std::vector<std::string> timeStart);
+    std::vector<std::string>  GetTimeStopVector();
+    int             PutTimeStopVector(std::vector<std::string> timeStop);
 
-    int             get_numberTemperature_int();
-    int             put_numberTemperature_int(int noOfTemps);
-    std::vector<double>  get_temperatures_vector();
-    int             put_temperatures_vector(std::vector<double> &temps);
-    std::vector<double>  get_devTemperatures_vector();
-    int             put_devTemperatures_vector(std::vector<double> &devTemps);
+    int             GetNumberTemperatureInt() { return fNumberTemper; }
+    int             PutNumberTemperatureInt(int noOfTemps);
+    std::vector<double>  GetTemperaturesVector();
+    int             PutTemperaturesVector(std::vector<double> &temps);
+    std::vector<double>  GetDevTemperaturesVector();
+    int             PutDevTemperaturesVector(std::vector<double> &devTemps);
 
   private:
 
-    int tmax(int x, int y);
-    int tmin(int x, int y);
+    int Tmax(int x, int y);
+    int Tmin(int x, int y);
 
 } ;
 #endif
