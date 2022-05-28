@@ -37,6 +37,8 @@
 #include <TObjArray.h>
 #include <TObjString.h>
 #include <TColor.h>
+#include <TList.h>
+#include <TXMLAttr.h>
 
 #include "PStartupHandler.h"
 
@@ -173,6 +175,7 @@ PStartupHandler::~PStartupHandler()
   fDataPathList.clear();
   fMarkerList.clear();
   fColorList.clear();
+  fRunNameTemplate.clear();
 }
 
 //--------------------------------------------------------------------------
@@ -224,6 +227,15 @@ void PStartupHandler::OnStartElement(const Char_t *str, const TList *attributes)
 {
   if (!strcmp(str, "data_path")) {
     fKey = eDataPath;
+  } else if (!strcmp(str, "run_name_template")) {
+    fKey = eRunNameTemplate;
+    TXMLAttr *attr;
+    TIter next(attributes);
+    while ((attr = (TXMLAttr*) next())) {
+      if (!strcmp(attr->GetName(), "inst")) {
+        fCurrentInstrumentName = attr->GetValue();
+      }
+    }
   } else if (!strcmp(str, "marker")) {
     fKey = eMarker;
   } else if (!strcmp(str, "color")) {
@@ -272,11 +284,18 @@ void PStartupHandler::OnCharacters(const Char_t *str)
   TString    tstr;
   Int_t      color, r, g, b, ival;
 
+  PRunNameTemplate tmpl;
   switch (fKey) {
     case eDataPath:
       // check that str is a valid path
       // add str to the path list
       fDataPathList.push_back(str);
+      break;
+    case eRunNameTemplate:
+      tmpl.instrument = fCurrentInstrumentName;
+      tmpl.runNameTemplate = str;
+      fRunNameTemplate.push_back(tmpl);
+      fCurrentInstrumentName="???";
       break;
     case eMarker:
       // check that str is a number
@@ -636,6 +655,54 @@ Bool_t PStartupHandler::WriteDefaultStartupFile()
   fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/alc</data_path>" << std::endl;
   fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/hifi</data_path>" << std::endl;
   fout << "    <data_path>/afs/psi.ch/project/bulkmusr/data/lem</data_path>" << std::endl;
+  fout << "    <!-- Dolly/PSI -->" << std::endl;
+  fout << "    <run_name_template inst=\"dolly\">d%yyyy%/pie1/deltat_flc_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"dolly\">d%yyyy%/pie3/deltat_flc_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"dolly\">d%yyyy%/deltat_flc_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"dolly\">d%yyyy%/deltat_pta_dolly_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"dolly\">d%yyyy%/pta/deltat_pta_dolly_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"dolly\">d%yyyy%/pta/deltat_pta_dolly_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"dolly\">d%yyyy%/tdc/deltat_tdc_dolly_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"dolly\">d%yyyy%/tdc/root/deltat_tdc_dolly_%rrrr%.root</run_name_template>" << std::endl;
+  fout << "    <!-- Flame/PSI -->" << std::endl;
+  fout << "    <run_name_template inst=\"flame\">d%yyyy%/tdc/root/deltat_tdc_flame_%yyyy%_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <!-- GPD/PSI -->" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/deltat_mue1_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/deltat_fq_si_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/deltat_strobo_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/deltat_hp_ni_ht_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/deltat_hp_ni_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/deltat_ccr2_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/deltat_gpd_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/deltat_janis_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/deltat_janis_gpd_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/deltat_pta_gpd_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/tdc/deltat_tdc_gpd_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gpd\">d%yyyy%/tdc/root/deltat_tdc_gpd_%rrrr%.root</run_name_template>" << std::endl;
+  fout << "    <!-- GPS/PSI -->" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/deltat_ccr_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/deltat_he3_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/deltat_stutt_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/deltat_ltf_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/deltat_flc_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/deltat_flc2_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/deltat_oven_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/deltat_oven2_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/deltat_pta_gps_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/tdc/deltat_tdc_gps_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"gps\">d%yyyy%/tdc/root/deltat_tdc_gps_%yyyy%_%rrrr%.root</run_name_template>" << std::endl;
+  fout << "    <!-- HAL-9500/PSI == HIFI/PSI -->" << std::endl;
+  fout << "    <run_name_template inst=\"hifi\">d%yyyy%/tdc/deltat_hifi_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"hifi\">d%yyyy%/tdc/tdc_hifi_%yyyy%_%rrrrr%.mdu</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"hifi\">d%yyyy%/tdc/root/deltat_tdc_hifi_%yyyy%_%rrrr%.mdu</run_name_template>" << std::endl;
+  fout << "    <!-- LTF/PSI -->" << std::endl;
+  fout << "    <run_name_template inst=\"ltf\">d%yyyy%/deltat_ltf_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"ltf\">d%yyyy%/deltat_pta_ltf_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"ltf\">d%yyyy%/pta/deltat_pta_ltf_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"ltf\">d%yyyy%/tdc/deltat_tdc_ltf_%rrrr%.bin</run_name_template>" << std::endl;
+  fout << "    <!-- LEM/PSI -->" << std::endl;
+  fout << "    <run_name_template inst=\"lem\">%yyyy%/lem%yy%_his_%rrrr%.root</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"lem\">d%yyyy%/tdc/lem%yy%_his_%rrrr%.root</run_name_template>" << std::endl;
   fout << "    <fourier_settings>" << std::endl;
   fout << "        <units>Gauss</units>" << std::endl;
   fout << "        <fourier_power>0</fourier_power>" << std::endl;

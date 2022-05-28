@@ -321,7 +321,7 @@ int dump_header_psi_bin(const std::string fileName, const std::string fileFormat
   bool success = false;
 
   // read psi bin file
-  status = psiBin.read(fileName.c_str());
+  status = psiBin.Read(fileName.c_str());
   switch (status) {
     case 0: // everything perfect
       success = true;
@@ -357,15 +357,15 @@ int dump_header_psi_bin(const std::string fileName, const std::string fileFormat
   std::cout << std::endl << "-------------------";
   std::cout << std::endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
   std::cout << std::endl << "-------------------";
-  std::cout << std::endl << "Run Title          : " << psiBin.get_comment();
-  std::cout << std::endl << "Run Number         : " << psiBin.get_runNumber_int();
-  vstr = psiBin.get_timeStart_vector();
+  std::cout << std::endl << "Run Title          : " << psiBin.GetComment();
+  std::cout << std::endl << "Run Number         : " << psiBin.GetRunNumberInt();
+  vstr = psiBin.GetTimeStartVector();
   if (vstr.size() < 2) {
     std::cout << std::endl << "**ERROR** couldn't obtain \"Run Start Time\" will quit." << std::endl << std::endl;
     return 1;
   }
   std::cout << std::endl << "Run Start Time     : " << vstr[0] << "; " << vstr[1];
-  vstr = psiBin.get_timeStop_vector();
+  vstr = psiBin.GetTimeStopVector();
   if (vstr.size() < 2) {
     std::cout << std::endl << "**ERROR** couldn't obtain \"Run Stop Time\" will quit." << std::endl << std::endl;
     return 1;
@@ -382,31 +382,31 @@ int dump_header_psi_bin(const std::string fileName, const std::string fileFormat
   std::cout << std::endl << "Muon Beam Momentum : " << vstr[2];
   std::cout << std::endl << "Muon Species       : " << vstr[3];
   std::cout << std::endl << "Muon Source        : " << vstr[4];
-  std::cout << std::endl << "Setup              : " << psiBin.get_comment();
+  std::cout << std::endl << "Setup              : " << psiBin.GetComment();
   std::cout << std::endl << "Comment            : n/a";
-  std::cout << std::endl << "Sample Name        : " << psiBin.get_sample();
-  std::cout << std::endl << "Sample Orientation : " << psiBin.get_orient();
-  dVal = psiBin.get_temperatures_vector();
-  dErrVal = psiBin.get_devTemperatures_vector();
+  std::cout << std::endl << "Sample Name        : " << psiBin.GetSample();
+  std::cout << std::endl << "Sample Orientation : " << psiBin.GetOrient();
+  dVal = psiBin.GetTemperaturesVector();
+  dErrVal = psiBin.GetDevTemperaturesVector();
   if (dVal.size() != dErrVal.size()) {
-    std::cout << std::endl << "Sample Temperature : " << psiBin.get_temp();
+    std::cout << std::endl << "Sample Temperature : " << psiBin.GetTemp();
   } else {
     for (unsigned int i=0; i<dVal.size(); i++) {
       std::cout << std::endl << "Sample Temp. " << i+1 << "     : " << dVal[i] << " (" << dErrVal[i] << ") K";
     }
   }
-  std::cout << std::endl << "Sample Mag. Field  : " << psiBin.get_field();
-  std::cout << std::endl << "No of Histos       : " << psiBin.get_numberHisto_int();
-  std::cout << std::endl << "Time Resolution    : " << psiBin.get_binWidth_ns() << " ns";
-  for (int i=0; i<psiBin.get_numberHisto_int(); i++) {
+  std::cout << std::endl << "Sample Mag. Field  : " << psiBin.GetField();
+  std::cout << std::endl << "No of Histos       : " << psiBin.GetNumberHistoInt();
+  std::cout << std::endl << "Time Resolution    : " << psiBin.GetBinWidthNanoSec() << " ns";
+  for (int i=0; i<psiBin.GetNumberHistoInt(); i++) {
     std::cout << std::endl << "-------------------";
     std::cout << std::endl << "Histo No           : " << i;
-    std::cout << std::endl << "Histo Name         : " << psiBin.get_nameHisto(i);
-    std::cout << std::endl << "Histo Length       : " << psiBin.get_histoLength_bin();
-    std::cout << std::endl << "Time Zero Bin      : " << psiBin.get_t0_int(i);
-    std::cout << std::endl << "First Good Bin     : " << psiBin.get_firstGood_int(i);
-    std::cout << std::endl << "Last Good Bin      : " << psiBin.get_lastGood_int(i);
-    std::cout << std::endl << "No of Events       : " << psiBin.get_eventsHisto_long(i);
+    std::cout << std::endl << "Histo Name         : " << psiBin.GetNameHisto(i);
+    std::cout << std::endl << "Histo Length       : " << psiBin.GetHistoLengthBin();
+    std::cout << std::endl << "Time Zero Bin      : " << psiBin.GetT0Int(i);
+    std::cout << std::endl << "First Good Bin     : " << psiBin.GetFirstGoodInt(i);
+    std::cout << std::endl << "Last Good Bin      : " << psiBin.GetLastGoodInt(i);
+    std::cout << std::endl << "No of Events       : " << psiBin.GetEventsHistoLong(i);
   }
   std::cout << std::endl << "-------------------" << std::endl << std::endl;
 

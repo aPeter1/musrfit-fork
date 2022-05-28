@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2021 by Andreas Suter                              *
+ *   Copyright (C) 2007-2022 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -275,6 +275,21 @@ void PRunDataHandler::ReadData()
     else
       fAllDataAvailable = true;
   } else if (!fRunPathName.IsWhitespace()) { // i.e. file name triggered
+    if (fFileFormat == "") { // try to guess the file format if fromat hasn't been provided
+      TString ext=fRunPathName;
+      Ssiz_t pos=ext.Last('.');
+      ext.Remove(0, pos+1);
+      if (!ext.CompareTo("bin", TString::kIgnoreCase))
+        fFileFormat = "psibin";
+      else if (!ext.CompareTo("root", TString::kIgnoreCase))
+        fFileFormat = "musrroot";
+      else if (!ext.CompareTo("msr", TString::kIgnoreCase))
+        fFileFormat = "mud";
+      else if (!ext.CompareTo("nxs", TString::kIgnoreCase))
+        fFileFormat = "nexus";
+      else if (!ext.CompareTo("mdu", TString::kIgnoreCase))
+        fFileFormat = "psimdu";
+    }
     if ((fFileFormat == "MusrRoot") || (fFileFormat == "musrroot")) {
       fAllDataAvailable = ReadRootFile();
     } else if ((fFileFormat == "NeXus") || (fFileFormat == "nexus")) {
@@ -311,14 +326,101 @@ void PRunDataHandler::ConvertData()
 }
 
 //--------------------------------------------------------------------------
+// SetRunData
+//--------------------------------------------------------------------------
+/**
+ * <p>Set a raw run data set.
+ *
+ * @param data pointer to the raw run data set
+ * @param idx index to where to write it.
+ *
+ * @return true in case of success, false otherwise.
+ */
+Bool_t PRunDataHandler::SetRunData(PRawRunData *data, UInt_t idx)
+{
+  if ((idx == 0) && (fData.size() == 0)) {
+    fData.resize(1);
+  }
+  if (idx >= fData.size()) {
+    std::cerr << std::endl << ">>PRunDataHandler::SetRunData(): **ERROR** idx=" << idx << " is out-of-range (0.." << fData.size() << ")." << std::endl;
+    return false;
+  }
+
+  fData[idx] = *data;
+
+  return true;
+}
+
+//--------------------------------------------------------------------------
 // WriteData
 //--------------------------------------------------------------------------
 /**
  * <p>Write data. This routine is used to write a single file.
  */
-void PRunDataHandler::WriteData()
+Bool_t PRunDataHandler::WriteData(TString fileName)
 {
+  if ((fAny2ManyInfo == nullptr) && (fileName="")) {
+    std::cerr << std::endl << ">> PRunDataHandler::WriteData(): **ERROR** insufficient information: no fileName nor fAny2ManyInfo object.";
+    std::cerr << std::endl << "        Cannot write data under this conditions." << std::endl;
+    return false;
+  }
 
+  // get output file format tag, first try via fAny2ManyInfo
+  Int_t outTag = A2M_UNDEFINED;
+  if (fAny2ManyInfo != nullptr) {
+    if (!fAny2ManyInfo->outFormat.CompareTo("musrroot", TString::kIgnoreCase))
+      outTag = A2M_MUSR_ROOT;
+    else if (!fAny2ManyInfo->outFormat.CompareTo("psibin", TString::kIgnoreCase))
+      outTag = A2M_PSIBIN;
+    else if (!fAny2ManyInfo->outFormat.CompareTo("psimdu", TString::kIgnoreCase))
+      outTag = A2M_PSIMDU;
+    else if (!fAny2ManyInfo->outFormat.CompareTo("mud",TString::kIgnoreCase))
+      outTag = A2M_MUD;
+    else if (fAny2ManyInfo->outFormat.BeginsWith("nexus", TString::kIgnoreCase))
+      outTag = A2M_NEXUS;
+    else
+      outTag = A2M_UNDEFINED;
+  } else { // only fileName is given, try to guess from the extension
+    // STILL MISSING
+  }
+
+  if (outTag == A2M_UNDEFINED) {
+    std::cerr << std::endl << ">> PRunDataHandler::WriteData(): **ERROR** no valid output data file format found: '" << fAny2ManyInfo->outFormat.Data() << "'" << std::endl;
+    return false;
+  }
+
+  Bool_t success{true};
+  switch (outTag) {
+    case A2M_MUSR_ROOT:
+      if (fAny2ManyInfo->outFileName.Length() == 0)
+        success = WriteMusrRootFile(fileName);
+      else
+        success = WriteMusrRootFile(fAny2ManyInfo->outFileName);
+      break;
+    case A2M_PSIBIN:
+    case A2M_PSIMDU:
+      if (fAny2ManyInfo->outFileName.Length() == 0)
+        success = WritePsiBinFile(fileName);
+      else
+        success = WritePsiBinFile(fAny2ManyInfo->outFileName);
+      break;
+    case A2M_MUD:
+      if (fAny2ManyInfo->outFileName.Length() == 0)
+        success = WriteMudFile(fileName);
+      else
+        success = WriteMudFile(fAny2ManyInfo->outFileName);
+      break;
+    case A2M_NEXUS:
+      if (fAny2ManyInfo->outFileName.Length() == 0)
+        success = WriteNexusFile(fileName);
+      else
+        success = WriteNexusFile(fAny2ManyInfo->outFileName);
+      break;
+    default:
+      break;
+  }
+
+  return success;
 }
 
 //--------------------------------------------------------------------------
@@ -2683,7 +2785,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   Bool_t success;
 
   // read psi bin file
-  status = psiBin.read(fRunPathName.Data());
+  status = psiBin.Read(fRunPathName.Data());
   switch (status) {
     case 0: // everything perfect
       success = true;
@@ -2772,32 +2874,32 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   // keep run name
   runData.SetRunName(fRunName);
   // get run title
-  runData.SetRunTitle(TString(psiBin.get_comment().c_str())); // run title
+  runData.SetRunTitle(TString(psiBin.GetComment().c_str())); // run title
   // get run number
-  runData.SetRunNumber(psiBin.get_runNumber_int());
+  runData.SetRunNumber(psiBin.GetRunNumberInt());
   // get setup
-  runData.SetSetup(TString(psiBin.get_comment().c_str()));
+  runData.SetSetup(TString(psiBin.GetComment().c_str()));
   // get sample
-  runData.SetSample(TString(psiBin.get_sample().c_str()));
+  runData.SetSample(TString(psiBin.GetSample().c_str()));
   // get orientation
-  runData.SetOrientation(TString(psiBin.get_orient().c_str()));
+  runData.SetOrientation(TString(psiBin.GetOrient().c_str()));
   // get comment
-  runData.SetComment(TString(psiBin.get_comment().c_str()));
+  runData.SetComment(TString(psiBin.GetComment().c_str()));
   // set LEM specific information to default value since it is not in the file and not used...
   runData.SetEnergy(PMUSR_UNDEFINED);
   runData.SetTransport(PMUSR_UNDEFINED);
   // get field
   Double_t scale = 0.0;
-  if (psiBin.get_field().rfind("G") != std::string::npos)
+  if (psiBin.GetField().rfind("G") != std::string::npos)
     scale = 1.0;
-  if (psiBin.get_field().rfind("T") != std::string::npos)
+  if (psiBin.GetField().rfind("T") != std::string::npos)
     scale = 1.0e4;
-  status = sscanf(psiBin.get_field().c_str(), "%lf", &dval);
+  status = sscanf(psiBin.GetField().c_str(), "%lf", &dval);
   if (status == 1)
     runData.SetField(scale*dval);
   // get temperature
-  PDoubleVector tempVec(psiBin.get_temperatures_vector());
-  PDoubleVector tempDevVec(psiBin.get_devTemperatures_vector());
+  PDoubleVector tempVec(psiBin.GetTemperaturesVector());
+  PDoubleVector tempDevVec(psiBin.GetDevTemperaturesVector());
   if ((tempVec.size() > 1) && (tempDevVec.size() > 1) && tempVec[0] && tempVec[1]) {
     // take only the first two values for now...
     //maybe that's not enough - e.g. in older GPD data I saw the "correct values in the second and third entry..."
@@ -2807,16 +2909,16 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
     tempVec.clear();
     tempDevVec.clear();
   } else {
-    status = sscanf(psiBin.get_temp().c_str(), "%lfK", &dval);
+    status = sscanf(psiBin.GetTemp().c_str(), "%lfK", &dval);
     if (status == 1)
       runData.SetTemperature(0, dval, 0.0);
   }
 
   // get time resolution (ns)
-  runData.SetTimeResolution(psiBin.get_binWidth_ns());
+  runData.SetTimeResolution(psiBin.GetBinWidthNanoSec());
 
   // get start/stop time
-  std::vector<std::string> sDateTime = psiBin.get_timeStart_vector();
+  std::vector<std::string> sDateTime = psiBin.GetTimeStartVector();
   if (sDateTime.size() < 2) {
     std::cerr << std::endl << ">> **WARNING** psi-bin file: couldn't obtain run start date/time" << std::endl;
   }
@@ -2830,7 +2932,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   runData.SetStartTime(sDateTime[1]);
   sDateTime.clear();
 
-  sDateTime = psiBin.get_timeStop_vector();
+  sDateTime = psiBin.GetTimeStopVector();
   if (sDateTime.size() < 2) {
     std::cerr << std::endl << ">> **WARNING** psi-bin file: couldn't obtain run stop date/time" << std::endl;
   }
@@ -2845,7 +2947,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   sDateTime.clear();
 
   // get t0's
-  PIntVector t0 = psiBin.get_t0_vector();
+  PIntVector t0 = psiBin.GetT0Vector();
 
   if (t0.empty()) {
     std::cerr << std::endl << ">> **ERROR** psi-bin file: couldn't obtain any t0's";
@@ -2854,7 +2956,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   }
 
   // get first good bin
-  PIntVector fgb = psiBin.get_firstGood_vector();
+  PIntVector fgb = psiBin.GetFirstGoodVector();
   if (fgb.empty()) {
     std::cerr << std::endl << ">> **ERROR** psi-bin file: couldn't obtain any fgb's";
     std::cerr << std::endl;
@@ -2862,7 +2964,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   }
 
   // get last good bin
-  PIntVector lgb = psiBin.get_lastGood_vector();
+  PIntVector lgb = psiBin.GetLastGoodVector();
   if (lgb.empty()) {
     std::cerr << std::endl << ">> **ERROR** psi-bin file: couldn't obtain any lgb's";
     std::cerr << std::endl;
@@ -2872,13 +2974,12 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
   // fill raw data
   PRawRunDataSet dataSet;
   PDoubleVector histoData;
-  Int_t *histo;
-  for (Int_t i=0; i<psiBin.get_numberHisto_int(); i++) {
-    histo = psiBin.get_histo_array_int(i);
-    for (Int_t j=0; j<psiBin.get_histoLength_bin(); j++) {
+  std::vector<Int_t> histo;
+  for (Int_t i=0; i<psiBin.GetNumberHistoInt(); i++) {
+    histo = psiBin.GetHistoArrayInt(i);
+    for (Int_t j=0; j<psiBin.GetHistoLengthBin(); j++) {
       histoData.push_back(histo[j]);
     }
-    delete[] histo;
 
     // estimate T0 from maximum of the data
     Double_t maxVal = 0.0;
@@ -2891,7 +2992,7 @@ Bool_t PRunDataHandler::ReadPsiBinFile()
     }
 
     dataSet.Clear();
-    dataSet.SetName(psiBin.get_nameHisto(i).c_str());
+    dataSet.SetName(psiBin.GetNameHisto(i).c_str());
     dataSet.SetHistoNo(i+1); // i.e. hist numbering starts at 1
     if (i < static_cast<Int_t>(t0.size()))
       dataSet.SetTimeZeroBin(t0[i]);
@@ -5195,15 +5296,15 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
 
   // fill header information
   // run number
-  psibin.put_runNumber_int(fData[0].GetRunNumber());
+  psibin.PutRunNumberInt(fData[0].GetRunNumber());
   // length of histograms
   UInt_t histo0 = 1;
   if (fAny2ManyInfo->groupHistoList.size() != 0) { // red/green list found
     histo0 = fAny2ManyInfo->groupHistoList[0]+1; // take the first available red/green entry
   }
-  psibin.put_histoLength_bin(static_cast<int>(fData[0].GetDataBin(histo0)->size()/fAny2ManyInfo->rebin));
+  psibin.PutHistoLengthBin(static_cast<int>(fData[0].GetDataBin(histo0)->size()/fAny2ManyInfo->rebin));
   // number of histograms
-  psibin.put_numberHisto_int(static_cast<int>(fData[0].GetNoOfHistos()));
+  psibin.PutNumberHistoInt(static_cast<int>(fData[0].GetNoOfHistos()));
   // run title = sample (10 char) / temp (10 char) / field (10 char) / orientation (10 char)
   char cstr[11];
   // sample
@@ -5212,35 +5313,35 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   else
     strcpy(cstr, "??");
   cstr[10] = '\0';
-  psibin.put_sample(cstr);
+  psibin.PutSample(cstr);
   // temp
   if (fData[0].GetNoOfTemperatures() > 0)
     snprintf(cstr, 10, "%.1f K", fData[0].GetTemperature(0));
   else
     strcpy(cstr, "?? K");
   cstr[10] = '\0';
-  psibin.put_temp(cstr);
+  psibin.PutTemp(cstr);
   // field
   if (fData[0].GetField() > 0)
     snprintf(cstr, 10, "%.1f G", fData[0].GetField());
   else
     strcpy(cstr, "?? G");
   cstr[10] = '\0';
-  psibin.put_field(cstr);
+  psibin.PutField(cstr);
   // orientation
   if (fData[0].GetOrientation()->Length() > 0)
     strncpy(cstr, fData[0].GetOrientation()->Data(), 10);
   else
     strcpy(cstr, "??");
   cstr[10] = '\0';
-  psibin.put_orient(cstr);
+  psibin.PutOrient(cstr);
   // setup
   if (fData[0].GetSetup()->Length() > 0)
     strncpy(cstr, fData[0].GetSetup()->Data(), 10);
   else
     strcpy(cstr, "??");
   cstr[10] = '\0';
-  psibin.put_setup(cstr);
+  psibin.PutSetup(cstr);
 
   // handle PSI-BIN start/stop Time/Date. PSI-BIN requires: Time -> HH:MM:SS, and Date -> DD-MMM-YY
   //                                      internally given: Time -> HH:MM:SS, and Date -> YYYY-MM-DD
@@ -5251,7 +5352,7 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   int     year, month, day;
   
   // 28-Aug-2014, TP: the following line does not work, it generates the wrong date
-  //dt.Set(fData[0].GetStartDateTime());
+  //dt.Set(fData[0].GetStartDateTime()); //as35
   // the following generates the correct date entry
   date.Append(*fData[0].GetStartDate());
   sscanf((const char*)date.Data(),"%04d-%02d-%02d", &year, &month, &day);
@@ -5268,7 +5369,7 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   strncpy(cstr, fData[0].GetStartTime()->Data(), 8);
   cstr[8] = '\0';
   svec.push_back(cstr);
-  psibin.put_timeStart_vector(svec);
+  psibin.PutTimeStartVector(svec);
   svec.clear();
 
   // run stop date
@@ -5291,32 +5392,32 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
   strncpy(cstr, fData[0].GetStopTime()->Data(), 8);
   cstr[8] = '\0';
   svec.push_back(cstr);
-  psibin.put_timeStop_vector(svec);
+  psibin.PutTimeStopVector(svec);
   svec.clear();
 
   // number of measured temperatures
-  psibin.put_numberTemperature_int(fData[0].GetNoOfTemperatures());
+  psibin.PutNumberTemperatureInt(fData[0].GetNoOfTemperatures());
 
   // mean temperatures
   std::vector<double> dvec;
   for (UInt_t i=0; i<fData[0].GetNoOfTemperatures(); i++)
     dvec.push_back(fData[0].GetTemperature(i));
-  psibin.put_temperatures_vector(dvec);
+  psibin.PutTemperaturesVector(dvec);
 
   // standard deviation of temperatures
   dvec.clear();
   for (UInt_t i=0; i<fData[0].GetNoOfTemperatures(); i++)
     dvec.push_back(fData[0].GetTempError(i));
-  psibin.put_devTemperatures_vector(dvec);
+  psibin.PutDevTemperaturesVector(dvec);
 
   // write comment
-  psibin.put_comment(fData[0].GetRunTitle()->Data());
+  psibin.PutComment(fData[0].GetRunTitle()->Data());
 
   // write time resolution
-  psibin.put_binWidth_ns(fData[0].GetTimeResolution()*fAny2ManyInfo->rebin);
+  psibin.PutBinWidthNanoSec(fData[0].GetTimeResolution()*fAny2ManyInfo->rebin);
 
   // write scaler dummies
-  psibin.put_numberScaler_int(0);
+  psibin.PutNumberScalerInt(0);
 
   // feed detector related info like, histogram names, t0, fgb, lgb
   Int_t ival = 0;
@@ -5334,16 +5435,16 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
     str = dataSet->GetName();
     if (!str.CompareTo("n/a"))
       str.Form("Detector%3d", i+1);
-    psibin.put_nameHisto(str.Data(), i);
+    psibin.PutNameHisto(str.Data(), i);
     // time zero bin
     ival = static_cast<Int_t>(dataSet->GetTimeZeroBin()/fAny2ManyInfo->rebin);
-    psibin.put_t0_int(i, ival);
+    psibin.PutT0Int(i, ival);
     // first good bin
     ival = static_cast<Int_t>(dataSet->GetFirstGoodBin()/fAny2ManyInfo->rebin);
-    psibin.put_firstGood_int(i, ival);
+    psibin.PutFirstGoodInt(i, ival);
     // last good bin
     ival = static_cast<Int_t>(dataSet->GetLastGoodBin()/fAny2ManyInfo->rebin);
-    psibin.put_lastGood_int(i, ival);
+    psibin.PutLastGoodInt(i, ival);
   }
 
   // feed histos
@@ -5386,19 +5487,19 @@ Bool_t PRunDataHandler::WritePsiBinFile(TString fln)
       }
     }
   }
-  status = psibin.put_histo_array_int(histos);
+  status = psibin.PutHistoArrayInt(histos, 2); // tag 2 means: lift histo length restriction on only make sure it is < 32512
   if (status != 0) {
     std::cerr << std::endl << ">> PRunDataHandler::WritePsiBinFile(): " << psibin.ConsistencyStatus() << std::endl;
     return false;
   }
 
-  if (!psibin.CheckDataConsistency()) {
+  if (!psibin.CheckDataConsistency(2)) {
     std::cerr << std::endl << ">> PRunDataHandler::WritePsiBinFile(): " << psibin.ConsistencyStatus() << std::endl;
     return false;
   }
 
   // write data to file
-  status = psibin.write(fln.Data());
+  status = psibin.Write(fln.Data());
 
   if (status != 0) {
     std::cerr << std::endl << ">> PRunDataHandler::WritePsiBinFile(): " << psibin.WriteStatus() << std::endl;
@@ -5958,6 +6059,9 @@ TString PRunDataHandler::GenerateOutputFileName(const TString fileName, const TS
 {
   TString fln = fileName;
   ok = true;
+
+  if (fAny2ManyInfo == nullptr)
+    return fln;
 
   // generate output file name if needed
   if (!fAny2ManyInfo->useStandardOutput || (fAny2ManyInfo->compressionTag > 0)) {

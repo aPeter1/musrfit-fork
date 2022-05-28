@@ -82,6 +82,7 @@ configure_file("PRgeHandler.pc.in" "PRgeHandler.pc" @ONLY)
 
 #--- lib creation -------------------------------------------------------------
 add_library(PMusr SHARED
+  PFindRun.cpp
   PFitter.cpp
   PFitterFcn.cpp
   PFourier.cpp
@@ -195,7 +196,7 @@ endif (OpenMP_FOUND)
 
 target_link_libraries(PUserFcnBase ${ROOT_LIBRARIES})
 target_link_libraries(PRgeHandler ${Boost_LIBRARIES} ${ROOT_LIBRARIES})
-target_link_libraries(PMusr ${DependOnLibs})
+target_link_libraries(PMusr ${Boost_LIBRARIES} ${DependOnLibs})
 
 #--- install PUserFcnBase solib -----------------------------------------------
 install(TARGETS PUserFcnBase DESTINATION lib)

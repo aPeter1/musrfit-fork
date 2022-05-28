@@ -822,22 +822,22 @@ typedef struct {
  * <p>Holds the informations for the any2many converter program
  */
 typedef struct {
-  Bool_t useStandardOutput;  ///< flag showing if the converted shall be sent to the standard output
-  TString inFormat;          ///< holds the information about the input data file format
-  TString outFormat;         ///< holds the information about the output data file format
-  TString inTemplate;        ///< holds the input file template
-  TString outTemplate;       ///< holds the output file template
-  TString year;              ///< holds the information about the year to be used
-  PUIntVector runList;       ///< holds the run number list to be converted
-  PIntVector groupHistoList; ///< holds the histo group list offset (used to define for MusrRoot files, what to be exported)
-  PStringVector inFileName;  ///< holds the file name of the input data file
-  TString outFileName;       ///< holds the output file name
-  PStringVector outPathFileName; ///< holds the out path/file name
-  TString outPath;           ///< holds the output path
-  UInt_t rebin;              ///< holds the number of bins to be packed
-  UInt_t compressionTag;     ///< 0=no compression, 1=gzip compression, 2=bzip2 compression
-  TString compressFileName;  ///< holds the name of the outputfile name in case of compression is used
-  UInt_t idf;                ///< IDF version for NeXus files.
+  Bool_t useStandardOutput{false}; ///< flag showing if the converted shall be sent to the standard output
+  TString inFormat{""};            ///< holds the information about the input data file format
+  TString outFormat{""};           ///< holds the information about the output data file format
+  TString inTemplate{""};          ///< holds the input file template
+  TString outTemplate{""};         ///< holds the output file template
+  TString year{""};                ///< holds the information about the year to be used
+  PUIntVector runList;             ///< holds the run number list to be converted
+  PIntVector groupHistoList;       ///< holds the histo group list offset (used to define for MusrRoot files, what to be exported)
+  PStringVector inFileName;        ///< holds the file name of the input data file
+  TString outFileName{""};         ///< holds the output file name
+  PStringVector outPathFileName;   ///< holds the out path/file name
+  TString outPath{""};             ///< holds the output path
+  UInt_t rebin{1};                 ///< holds the number of bins to be packed
+  UInt_t compressionTag{0};        ///< 0=no compression, 1=gzip compression, 2=bzip2 compression
+  TString compressFileName{""};    ///< holds the name of the outputfile name in case of compression is used
+  UInt_t idf{0};                   ///< IDF version for NeXus files.
 } PAny2ManyInfo;
 
 //-------------------------------------------------------------
@@ -873,5 +873,20 @@ class PStringNumberList {
     virtual bool IsNumber(std::string &str) { return (str.find_first_not_of("0123456789") == std::string::npos); }
     virtual void StripSpaces();
 };
+
+//-------------------------------------------------------------
+/**
+ * <p> Run name template structure.
+ */
+typedef struct {
+  TString instrument{""};
+  TString runNameTemplate{""};
+} PRunNameTemplate;
+
+//-------------------------------------------------------------
+/**
+ * <p>typedef to make to code more readable: list of run name templates.
+ */
+typedef std::vector<PRunNameTemplate> PRunNameTemplateList;
 
 #endif // _PMUSR_H_

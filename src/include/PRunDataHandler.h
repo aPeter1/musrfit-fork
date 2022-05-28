@@ -53,12 +53,14 @@ class PRunDataHandler
 
     virtual void ReadData();
     virtual void ConvertData();
-    virtual void WriteData();
+    virtual Bool_t WriteData(TString fileName="");
 
     virtual Bool_t IsAllDataAvailable() const { return fAllDataAvailable; }
     virtual PRawRunData* GetRunData(const TString &runName);
     virtual PRawRunData* GetRunData(const UInt_t idx=0);
     virtual Int_t GetNoOfRunData() {return fData.size(); }
+
+    virtual Bool_t SetRunData(PRawRunData *data, UInt_t idx=0);
 
   private:
     PMsrHandler   *fMsrInfo; ///< pointer to the msr-file handler

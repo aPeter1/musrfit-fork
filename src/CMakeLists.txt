@@ -55,6 +55,18 @@ endif (IS_GIT_REPO)
 #--- end create git-revision.h ------------------------------------------------
 
 #--- add all executables ------------------------------------------------------
+add_executable(addRun ${GIT_REV_H} addRun.cpp)
+target_compile_options(addRun BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
+target_include_directories(addRun 
+  BEFORE PRIVATE
+    $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
+    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
+)
+target_link_libraries(addRun ${ROOT_LIBRARIES} ${MUSRFIT_LIBS} ${Boost_LIBRARIES})
+
 add_executable(any2many ${GIT_REV_H} any2many.cpp)
 target_compile_options(any2many BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(any2many 
@@ -176,6 +188,7 @@ target_link_libraries(write_musrRoot_runHeader ${ROOT_LIBRARIES} ${MUSRFIT_LIBS}
 #--- installation info --------------------------------------------------------
 install(
   TARGETS
+    addRun
     any2many
     dump_header
     msr2data
