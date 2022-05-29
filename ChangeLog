@@ -12,6 +12,13 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.8.0, 2022/05/22
+=============================
+
+new: addRun - allows to add runs and write it to file
+refactoring of Class_MuSR_PSI: (i) class variables and methods renamed according to ROOT
+rules. (ii) start to modernize to newer c++ standards.
+
 Release of V1.7.6, 2021/10/02
 =============================
 
