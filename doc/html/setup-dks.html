@@ -1,88 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Setting up musrfit / DKS: High Speed Fitting with GPU’s &#8212; musrfit 1.7.6 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Setting up musrfit / DKS: High Speed Fitting with GPU’s &mdash; musrfit 1.8.0 documentation</title>
+    
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="musrfit 1.8.0 documentation" href="index.html" />
     <link rel="next" title="musredit: the GUI Based Interface to musrfit" href="musredit.html" />
     <link rel="prev" title="Setting up musrfit on Different Platforms" href="setup-standard.html" /> 
-  </head><body>
-      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
-          <span>musrfit 1.7.6 documentation</span></a></h1>
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="index.html">
+          <span>musrfit 1.8.0 documentation</span></a></h1>
         <h2 class="heading"><span>Setting up musrfit / DKS: High Speed Fitting with GPU’s</span></h2>
       </div>
-      <div class="topnav" role="navigation" aria-label="top navigation">
+      <div class="topnav">
       
         <p>
-        «&#160;&#160;<a href="setup-standard.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> on Different Platforms</a>
+        «&#160;&#160;<a href="setup-standard.html">Setting up <tt class="docutils literal"><span class="pre">musrfit</span></tt> on Different Platforms</a>
         &#160;&#160;::&#160;&#160;
         <a class="uplink" href="index.html">Contents</a>
         &#160;&#160;::&#160;&#160;
-        <a href="musredit.html"><code class="docutils literal notranslate"><span class="pre">musredit</span></code>: the GUI Based Interface to <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></a>&#160;&#160;»
+        <a href="musredit.html"><tt class="docutils literal"><span class="pre">musredit</span></tt>: the GUI Based Interface to <tt class="docutils literal"><span class="pre">musrfit</span></tt></a>&#160;&#160;»
         </p>
 
       </div>
-      <div class="content" role="main">
+      <div class="content">
         
         
   <div class="section" id="setting-up-musrfit-dks-high-speed-fitting-with-gpu-s">
-<span id="setup-dks"></span><span id="index-0"></span><h1>Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> / <code class="docutils literal notranslate"><span class="pre">DKS</span></code>: High Speed Fitting with GPU’s<a class="headerlink" href="#setting-up-musrfit-dks-high-speed-fitting-with-gpu-s" title="Permalink to this headline">¶</a></h1>
-<p>In the years 2016/2017 we explored ways to speed up current fitting frameworks, especially <code class="docutils literal notranslate"><span class="pre">musrfit.</span></code>
-This allows now to analyze histogram sets of high field spectrometers like <code class="docutils literal notranslate"><span class="pre">HAL-9500</span></code> at PSI without
+<span id="setup-dks"></span><span id="index-0"></span><h1>Setting up <tt class="docutils literal"><span class="pre">musrfit</span></tt> / <tt class="docutils literal"><span class="pre">DKS</span></tt>: High Speed Fitting with GPU&#8217;s<a class="headerlink" href="#setting-up-musrfit-dks-high-speed-fitting-with-gpu-s" title="Permalink to this headline">¶</a></h1>
+<p>In the years 2016/2017 we explored ways to speed up current fitting frameworks, especially <tt class="docutils literal"><span class="pre">musrfit.</span></tt>
+This allows now to analyze histogram sets of high field spectrometers like <tt class="docutils literal"><span class="pre">HAL-9500</span></tt> at PSI without
 the <em>error-prone</em> RRF fitting (see U. Locans and A. Suter,
 <a class="reference external" href="http://dx.doi.org/10.7566/JPSCP.21.011051">musrfit - Real Time Parameter Fitting Using GPU</a>, and the
-Memo from A. Suter, “Rotating Reference Frame Fits”, in the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> source code). At the same time
+Memo from A. Suter, &#8220;Rotating Reference Frame Fits&#8221;, in the <tt class="docutils literal"><span class="pre">musrfit</span></tt> source code). At the same time
 it can help to speed-up elaborate global fits tremendously, and dealing properly with muonium. It also
 allows Apple macOS users to speed up their fitting code on the CPU. Currently it is not straight forward
-to get <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> multi-threaded under macOS since Apple doesn’t be default support <code class="docutils literal notranslate"><span class="pre">OpenMP</span></code>. <code class="docutils literal notranslate"><span class="pre">DKS</span></code>
-enables <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> to utilize <code class="docutils literal notranslate"><span class="pre">OpenCL</span></code> instead which is present on macOS by default.</p>
+to get <tt class="docutils literal"><span class="pre">musrfit</span></tt> multi-threaded under macOS since Apple doesn&#8217;t be default support <tt class="docutils literal"><span class="pre">OpenMP</span></tt>. <tt class="docutils literal"><span class="pre">DKS</span></tt>
+enables <tt class="docutils literal"><span class="pre">musrfit</span></tt> to utilize <tt class="docutils literal"><span class="pre">OpenCL</span></tt> instead which is present on macOS by default.</p>
 <div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Before you run into the shop to buy a gamer graphic card or a Tesla card, make sure that you have an
+<p class="first admonition-title">Warning</p>
+<p class="last">Before you run into the shop to buy a gamer graphic card or a Tesla card, make sure that you have an
 appropriate server with a sufficiently strong power supply!</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>However, the current <code class="docutils literal notranslate"><span class="pre">musrfit/DKS</span></code> version doesn’t yet support all theory functions on the GPU.
-In case the theory function is not yet available for the GPU, <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> will fall back to the CPU implementation.</p>
+<p class="first admonition-title">Note</p>
+<p class="last">However, the current <tt class="docutils literal"><span class="pre">musrfit/DKS</span></tt> version doesn&#8217;t yet support all theory functions on the GPU.
+In case the theory function is not yet available for the GPU, <tt class="docutils literal"><span class="pre">musrfit</span></tt> will fall back to the CPU implementation.</p>
 </div>
-<p>Conceptually the setup of <code class="docutils literal notranslate"><span class="pre">musrfit/DKS</span></code> is as following:</p>
+<p>Conceptually the setup of <tt class="docutils literal"><span class="pre">musrfit/DKS</span></tt> is as following:</p>
 <ol class="arabic simple">
-<li><p>install the latest hardware driver for your graphic card.</p></li>
-<li><p>install the GPU SDK which enables number crunching (<code class="docutils literal notranslate"><span class="pre">CUDA</span></code> for NVIDIA, <code class="docutils literal notranslate"><span class="pre">OpenCL</span></code> for AMD)</p></li>
-<li><p>install <code class="docutils literal notranslate"><span class="pre">DKS</span></code></p></li>
-<li><p>install the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> version which is <code class="docutils literal notranslate"><span class="pre">DKS</span></code> ready</p></li>
+<li>install the latest hardware driver for your graphic card.</li>
+<li>install the GPU SDK which enables number crunching (<tt class="docutils literal"><span class="pre">CUDA</span></tt> for NVIDIA, <tt class="docutils literal"><span class="pre">OpenCL</span></tt> for AMD)</li>
+<li>install <tt class="docutils literal"><span class="pre">DKS</span></tt></li>
+<li>install the <tt class="docutils literal"><span class="pre">musrfit</span></tt> version which is <tt class="docutils literal"><span class="pre">DKS</span></tt> ready</li>
 </ol>
-<p>In the following the description for the installation of <code class="docutils literal notranslate"><span class="pre">musrfit/DKS</span></code> for the following systems will be discussed in some more detail:</p>
+<p>In the following the description for the installation of <tt class="docutils literal"><span class="pre">musrfit/DKS</span></tt> for the following systems will be discussed in some more detail:</p>
 <ul class="simple">
-<li><p>NVIDIA Tesla K40c</p></li>
-<li><p>AMD Graphic Card (Radeon R9 390X)</p></li>
-<li><p>macOS in order to get <code class="docutils literal notranslate"><span class="pre">OpenCL</span></code> support</p></li>
+<li>NVIDIA Tesla K40c</li>
+<li>AMD Graphic Card (Radeon R9 390X)</li>
+<li>macOS in order to get <tt class="docutils literal"><span class="pre">OpenCL</span></tt> support</li>
 </ul>
-<p>The usage of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> with GPU acceleration and <code class="docutils literal notranslate"><span class="pre">OpenCL</span></code> support is described in the
-<a class="reference internal" href="user-manual.html#user-manual"><span class="std std-ref">User manual of the μSR data analysis software musrfit</span></a>. The additional
-<code class="docutils literal notranslate"><span class="pre">musrfit/DKS</span></code> are found <a class="reference internal" href="user-manual.html#msr-commands-block-dks"><span class="std std-ref">here</span></a>.</p>
+<p>The usage of <tt class="docutils literal"><span class="pre">musrfit</span></tt> with GPU acceleration and <tt class="docutils literal"><span class="pre">OpenCL</span></tt> support is described in the
+<a class="reference internal" href="user-manual.html#user-manual"><em>User manual of the μSR data analysis software musrfit</em></a>. The additional
+<tt class="docutils literal"><span class="pre">musrfit/DKS</span></tt> are found <a class="reference internal" href="user-manual.html#msr-commands-block-dks"><em>here</em></a>.</p>
 <div class="section" id="setting-up-musrfit-dks-for-a-tesla-k40c-nvidia">
-<span id="index-1"></span><h2>Setting up <code class="docutils literal notranslate"><span class="pre">musrfit/DKS</span></code> for a Tesla K40c (NVIDIA)<a class="headerlink" href="#setting-up-musrfit-dks-for-a-tesla-k40c-nvidia" title="Permalink to this headline">¶</a></h2>
+<span id="index-1"></span><h2>Setting up <tt class="docutils literal"><span class="pre">musrfit/DKS</span></tt> for a Tesla K40c (NVIDIA)<a class="headerlink" href="#setting-up-musrfit-dks-for-a-tesla-k40c-nvidia" title="Permalink to this headline">¶</a></h2>
 <p>It is assumed that the Tesla K40c is already physically installed on your system. For now I only
 will discuss to set it up for a Linux based system. In order to check that your operating systems
 see the card, enter the following command in the terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ lspci <span class="p">|</span> grep NVIDIA
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ lspci <span class="p">|</span> grep NVIDIA
 </pre></div>
 </div>
 <p>The response should look something like</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">05</span><span class="p">:</span><span class="mf">00.0</span> <span class="mi">3</span><span class="n">D</span> <span class="n">controller</span><span class="p">:</span> <span class="n">NVIDIA</span> <span class="n">Corporation</span> <span class="n">GK110BGL</span> <span class="p">[</span><span class="n">Tesla</span> <span class="n">K40c</span><span class="p">]</span> <span class="p">(</span><span class="n">rev</span> <span class="n">a1</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>05:00.0 3D controller: NVIDIA Corporation GK110BGL [Tesla K40c] (rev a1)
 </pre></div>
 </div>
 <p>which means that the OS physically recognizes your card.</p>
@@ -90,25 +101,25 @@ see the card, enter the following command in the terminal:</p>
 <h3>Driver Installation for the Tesla K40c<a class="headerlink" href="#driver-installation-for-the-tesla-k40c" title="Permalink to this headline">¶</a></h3>
 <p>Next, you will need to download and install the driver for your card. Select the proper operating system,
 card, etc. from the <a class="reference external" href="http://www.nvidia.com/Download/index.aspx?lang=en-us">NVIDIA download center</a>. At PSI
-we are running currently Red Hat Enterprise Linux 7.x (RHEL) for which we will get a <code class="docutils literal notranslate"><span class="pre">rpm</span></code> (something like
-<code class="docutils literal notranslate"><span class="pre">nvidia-diag-driver-local-repo-rhel7-375.66-1.x86_64.rpm</span></code>). Install it and make sure there is no conflict
+we are running currently Red Hat Enterprise Linux 7.x (RHEL) for which we will get a <tt class="docutils literal"><span class="pre">rpm</span></tt> (something like
+<tt class="docutils literal"><span class="pre">nvidia-diag-driver-local-repo-rhel7-375.66-1.x86_64.rpm</span></tt>). Install it and make sure there is no conflict
 with the nouveau driver of the system.</p>
 </div>
 <div class="section" id="installation-of-cuda">
 <span id="index-2"></span><h3>Installation of CUDA<a class="headerlink" href="#installation-of-cuda" title="Permalink to this headline">¶</a></h3>
 <p>Download the <a class="reference external" href="https://developer.nvidia.com/cuda-downloads">CUDA SDK</a> form NVIDIA for your system. Again,
-for the RHEL 7.x this is an <code class="docutils literal notranslate"><span class="pre">rpm</span></code>. After the installation of the rpm you should reboot your machine.
-Afterwards you are ready for the installation of <code class="docutils literal notranslate"><span class="pre">DKS</span></code>.</p>
+for the RHEL 7.x this is an <tt class="docutils literal"><span class="pre">rpm</span></tt>. After the installation of the rpm you should reboot your machine.
+Afterwards you are ready for the installation of <tt class="docutils literal"><span class="pre">DKS</span></tt>.</p>
 </div>
 <div class="section" id="installation-of-dks">
 <span id="index-3"></span><h3>Installation of DKS<a class="headerlink" href="#installation-of-dks" title="Permalink to this headline">¶</a></h3>
-<p>For the following list of commands the <code class="docutils literal notranslate"><span class="pre">'$'</span></code> will be given as the command prompt. <em>Do not enter it!</em>
-Also some comments will be added starting with a <code class="docutils literal notranslate"><span class="pre">'#'</span></code> which can be omitted. They are only there to
-explain what is going on. <code class="docutils literal notranslate"><span class="pre">DKS</span></code> stands for Dynamical Kernel Scheduler and provides a thin interface
-allowing host applications to incorporate GPU’s and other hardware accelerators.</p>
-<p>Details can be found in the papers listed <a class="reference internal" href="cite.html#cite"><span class="std std-ref">here</span></a>, or on the <a class="reference external" href="https://gitlab.psi.ch/uldis_l/DKS/wikis/home">DKS wiki page</a>.</p>
+<p>For the following list of commands the <tt class="docutils literal"><span class="pre">'$'</span></tt> will be given as the command prompt. <em>Do not enter it!</em>
+Also some comments will be added starting with a <tt class="docutils literal"><span class="pre">'#'</span></tt> which can be omitted. They are only there to
+explain what is going on. <tt class="docutils literal"><span class="pre">DKS</span></tt> stands for Dynamical Kernel Scheduler and provides a thin interface
+allowing host applications to incorporate GPU&#8217;s and other hardware accelerators.</p>
+<p>Details can be found in the papers listed <a class="reference internal" href="cite.html#cite"><em>here</em></a>, or on the <a class="reference external" href="https://gitlab.psi.ch/uldis_l/DKS/wikis/home">DKS wiki page</a>.</p>
 <p>In brief the installation should be something like this:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># go to whatever directory you would like to clone/install DKS</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="c1"># go to whatever directory you would like to clone/install DKS</span>
 <span class="c1"># For macOS DKS will likely to got to $HOME/Applications to be consistent with the musrfit docu for macOS</span>
 $ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps
 $ git clone https://gitlab.psi.ch/uldis_l/DKS.git
@@ -120,16 +131,16 @@ $ cmake --build ./ --clean-first
 $ make install
 </pre></div>
 </div>
-<p>Since <code class="docutils literal notranslate"><span class="pre">DKS</span></code> is installed in a non-standard path, a couple of additional small steps are required.
+<p>Since <tt class="docutils literal"><span class="pre">DKS</span></tt> is installed in a non-standard path, a couple of additional small steps are required.
 This will be different for Linux compared to macOS.</p>
 <p>For <strong>Linux:</strong></p>
-<p>add the <code class="docutils literal notranslate"><span class="pre">DKS</span></code> library path to <code class="docutils literal notranslate"><span class="pre">/etc/ld.so.conf.d/musrfit-x86_64.conf</span></code> and execute as super user</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ /sbin/ldconfig
+<p>add the <tt class="docutils literal"><span class="pre">DKS</span></tt> library path to <tt class="docutils literal"><span class="pre">/etc/ld.so.conf.d/musrfit-x86_64.conf</span></tt> and execute as super user</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ /sbin/ldconfig
 </pre></div>
 </div>
 <p>For <strong>macOS:</strong></p>
-<p>add the <code class="docutils literal notranslate"><span class="pre">DKS</span></code> path to <code class="docutils literal notranslate"><span class="pre">$HOME/.profile</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DKS</span><span class="o">=</span><span class="nv">$HOME</span>/Applications/DKS/exec
+<p>add the <tt class="docutils literal"><span class="pre">DKS</span></tt> path to <tt class="docutils literal"><span class="pre">$HOME/.profile</span></tt>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DKS</span><span class="o">=</span><span class="nv">$HOME</span>/Applications/DKS/exec
 <span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DKS</span>/lib:<span class="nv">$LD_LIBRARY_PATH</span>
 
 launchctl setenv DKS <span class="nv">$DKS</span>
@@ -139,31 +150,31 @@ launchctl setenv LD_LIBRARY_PATH <span class="nv">$LD_LIBRARY_PATH</span>
 </div>
 <div class="section" id="installation-of-musrfit-for-dks">
 <span id="musrfit-dks-install"></span><h3>Installation of musrfit for DKS<a class="headerlink" href="#installation-of-musrfit-for-dks" title="Permalink to this headline">¶</a></h3>
-<p>Most of the installation steps are the same as described for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> without GPU support.
-Here only the differences are explained. First checkout <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>, then you will need to
+<p>Most of the installation steps are the same as described for <tt class="docutils literal"><span class="pre">musrfit</span></tt> without GPU support.
+Here only the differences are explained. First checkout <tt class="docutils literal"><span class="pre">musrfit</span></tt>, then you will need to
 switch the working branch which is done by</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit
 $ git checkout dks6
 </pre></div>
 </div>
 <div class="section" id="install-via-cmake">
 <h4>Install via cmake<a class="headerlink" href="#install-via-cmake" title="Permalink to this headline">¶</a></h4>
 <p>There is on more configuration switch</p>
-<dl class="simple">
-<dt><strong>-Ddks=&lt;value&gt;</strong></dt><dd><p>it allows to enable/disable <code class="docutils literal notranslate"><span class="pre">DKS</span></code> support. The default is <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;=1</span></code>, <em>i.e.</em> enabled. To disable use <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;=0</span></code>.</p>
-</dd>
+<dl class="docutils">
+<dt><strong>-Ddks=&lt;value&gt;</strong></dt>
+<dd>it allows to enable/disable <tt class="docutils literal"><span class="pre">DKS</span></tt> support. The default is <tt class="docutils literal"><span class="pre">&lt;value&gt;=1</span></tt>, <em>i.e.</em> enabled. To disable use <tt class="docutils literal"><span class="pre">&lt;value&gt;=0</span></tt>.</dd>
 </dl>
 <p>For a typical setup on a RHEL or macOS system it could look like this</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cmake ../ -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$ROOTSYS</span> -DASlibs<span class="o">=</span><span class="m">1</span> -DBMWlibs<span class="o">=</span><span class="m">1</span> -Dnexus<span class="o">=</span><span class="m">1</span> -Ddks<span class="o">=</span><span class="m">1</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ cmake ../ -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$ROOTSYS</span> -DASlibs<span class="o">=</span><span class="m">1</span> -DBMWlibs<span class="o">=</span><span class="m">1</span> -Dnexus<span class="o">=</span><span class="m">1</span> -Ddks<span class="o">=</span><span class="m">1</span>
 </pre></div>
 </div>
 <p>After</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ cmake --build ./ --clean-first -- -j8
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ cmake --build ./ --clean-first -- -j8
 $ make install
 </pre></div>
 </div>
 <p>and updating the shared library lookup table (<em>only</em> needed for Linux)</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ /sbin/ldconfig <span class="c1"># as superuser / root</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ /sbin/ldconfig <span class="c1"># as superuser / root</span>
 </pre></div>
 </div>
 <p>you are done with the setup.</p>
@@ -171,7 +182,7 @@ $ make install
 </div>
 </div>
 <div class="section" id="setting-up-musrfit-dks-for-a-amd-graphic-card-radeon-r9-390x">
-<span id="index-4"></span><h2>Setting up <code class="docutils literal notranslate"><span class="pre">musrfit/DKS</span></code> for a AMD Graphic Card (Radeon R9 390X)<a class="headerlink" href="#setting-up-musrfit-dks-for-a-amd-graphic-card-radeon-r9-390x" title="Permalink to this headline">¶</a></h2>
+<span id="index-4"></span><h2>Setting up <tt class="docutils literal"><span class="pre">musrfit/DKS</span></tt> for a AMD Graphic Card (Radeon R9 390X)<a class="headerlink" href="#setting-up-musrfit-dks-for-a-amd-graphic-card-radeon-r9-390x" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="driver-installation-for-an-amd-graphic-card-e-g-radeon-r9-390x">
 <h3>Driver Installation for an AMD Graphic Card, <em>e.g.</em> Radeon R9 390X<a class="headerlink" href="#driver-installation-for-an-amd-graphic-card-e-g-radeon-r9-390x" title="Permalink to this headline">¶</a></h3>
 <p>This will depend slightly on the AMD Card and operating system. Here I will summaries how it was done
@@ -179,85 +190,85 @@ on a RHEL (Linux) system using a Radeon R9 390X.</p>
 <p>It is assumed that the Radeon R9 390X is already physically installed on your system. For now I only
 will discuss to set it up for a Linux based system. In order to check that your operating systems see
 the card, enter the following command in the terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ lspci <span class="p">|</span> grep AMD
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ lspci <span class="p">|</span> grep AMD
 </pre></div>
 </div>
 <p>The response should look something like</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">84</span><span class="p">:</span><span class="mf">00.0</span> <span class="n">VGA</span> <span class="n">compatible</span> <span class="n">controller</span><span class="p">:</span> <span class="n">Advanced</span> <span class="n">Micro</span> <span class="n">Devices</span><span class="p">,</span> <span class="n">Inc</span><span class="o">.</span> <span class="p">[</span><span class="n">AMD</span><span class="o">/</span><span class="n">ATI</span><span class="p">]</span> <span class="n">Hawaii</span> <span class="n">XT</span> <span class="o">/</span> <span class="n">Grenada</span> <span class="n">XT</span> <span class="p">[</span><span class="n">Radeon</span> <span class="n">R9</span> <span class="mi">290</span><span class="n">X</span><span class="o">/</span><span class="mi">390</span><span class="n">X</span><span class="p">]</span> <span class="p">(</span><span class="n">rev</span> <span class="mi">80</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>84:00.0 VGA compatible controller: Advanced Micro Devices, Inc. [AMD/ATI] Hawaii XT / Grenada XT [Radeon R9 290X/390X] (rev 80)
 </pre></div>
 </div>
 <p>which means that the OS physically recognizes your card.</p>
 <p>For RHEL7.x the AMDGPU-PRO driver should be used. It can be downloaded from <a class="reference external" href="http://support.amd.com/en-us/kb-articles/Pages/AMDGPU-PRO-RedHat-Install.aspx">AMD</a>. Unpack the driver</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tar -Jxvf amdgpu-pro-17.10-414273.tar.xz
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ tar -Jxvf amdgpu-pro-17.10-414273.tar.xz
 $ <span class="nb">cd</span> amdgpu-pro-17.10-414273
 </pre></div>
 </div>
 <p>Install the driver as root</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ./amdgpu-pro-install --compute -y
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ ./amdgpu-pro-install --compute -y
 </pre></div>
 </div>
 <p>Here I assume that the AMD graphic card is only used for computation. You need to add the following command
 in order that the user <strong>blabla</strong> (change this to the appropriate user name) can access the GPU (otherwise
 only root works):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ /sbin/usermod -a -G video blabla
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ /sbin/usermod -a -G video blabla
 </pre></div>
 </div>
 <p>Reboot the machine.</p>
 </div>
 <div class="section" id="amd-app-software-development-kit-sdk-to-enable-opencl-support">
-<h3>AMD APP Software Development Kit (SDK) to enable <code class="docutils literal notranslate"><span class="pre">OpenCL</span></code> support<a class="headerlink" href="#amd-app-software-development-kit-sdk-to-enable-opencl-support" title="Permalink to this headline">¶</a></h3>
+<h3>AMD APP Software Development Kit (SDK) to enable <tt class="docutils literal"><span class="pre">OpenCL</span></tt> support<a class="headerlink" href="#amd-app-software-development-kit-sdk-to-enable-opencl-support" title="Permalink to this headline">¶</a></h3>
 <p>The AMD APP Software Development Kit (SDK) is a complete development platform created by AMD to allow you to
 quickly and easily develop applications accelerated by AMD APP technology. The SDK provides samples, documentation,
-and other materials to quickly get you started leveraging accelerated compute using <code class="docutils literal notranslate"><span class="pre">OpenCL</span></code> or <code class="docutils literal notranslate"><span class="pre">C++</span> <span class="pre">AMP</span></code> in your
-<code class="docutils literal notranslate"><span class="pre">C/C++</span></code> applications.</p>
+and other materials to quickly get you started leveraging accelerated compute using <tt class="docutils literal"><span class="pre">OpenCL</span></tt> or <tt class="docutils literal"><span class="pre">C++</span> <span class="pre">AMP</span></tt> in your
+<tt class="docutils literal"><span class="pre">C/C++</span></tt> applications.</p>
 <p>Download the AMD APP SDK 3.0 from <a class="reference external" href="http://developer.amd.com/tools-and-sdks/opencl-zone/amd-accelerated-parallel-processing-app-sdk/">AMD-SDK</a>.</p>
 <p>Extract the installer</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tar -xvjf AMD-APP-SDKInstaller-v3.0.130.136-GA-linux64.tar.bz2
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ tar -xvjf AMD-APP-SDKInstaller-v3.0.130.136-GA-linux64.tar.bz2
 </pre></div>
 </div>
 <p>Run the installer</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ./AMD-APP-SDK-v3.0.130.136-GA-linux64.sh
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ ./AMD-APP-SDK-v3.0.130.136-GA-linux64.sh
 </pre></div>
 </div>
-<p>This will install the AMD APP SDK to <code class="docutils literal notranslate"><span class="pre">/opt/AMDAPPSDK-3.0/</span></code> where you can find the <code class="docutils literal notranslate"><span class="pre">OpenCL</span></code> include
+<p>This will install the AMD APP SDK to <tt class="docutils literal"><span class="pre">/opt/AMDAPPSDK-3.0/</span></tt> where you can find the <tt class="docutils literal"><span class="pre">OpenCL</span></tt> include
 and library files, as well as documentation and sample code. The install guide for AMD OpenCL SDK can
 be found at <a class="reference external" href="http://developer.amd.com/wordpress/media/2012/10/AMD_APP_SDK_InstallationNotes.pdf">AMD SDK Installation Notes</a>.</p>
 </div>
 <div class="section" id="installation-of-dks-and-musrfit">
 <h3>Installation of DKS and musrfit<a class="headerlink" href="#installation-of-dks-and-musrfit" title="Permalink to this headline">¶</a></h3>
-<p>To install <code class="docutils literal notranslate"><span class="pre">DKS</span></code> and <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> follow the instructions <a class="reference internal" href="#musrfit-dks-install"><span class="std std-ref">above</span></a>.</p>
+<p>To install <tt class="docutils literal"><span class="pre">DKS</span></tt> and <tt class="docutils literal"><span class="pre">musrfit</span></tt> follow the instructions <a class="reference internal" href="#musrfit-dks-install"><em>above</em></a>.</p>
 </div>
 </div>
 <div class="section" id="setting-up-musrfit-dks-for-macos-for-opencl-support">
-<span id="index-5"></span><h2>Setting up <code class="docutils literal notranslate"><span class="pre">musrfit/DKS</span></code> for macOS for OpenCL support<a class="headerlink" href="#setting-up-musrfit-dks-for-macos-for-opencl-support" title="Permalink to this headline">¶</a></h2>
-<p>Since Apple is not providing an out-of-the-box <code class="docutils literal notranslate"><span class="pre">OpenMP</span></code> support on their macOS compiler framework (Xcode),
-typically <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> is just running <em>single threaded</em>. Here <code class="docutils literal notranslate"><span class="pre">DKS</span></code> can help since it delivers <code class="docutils literal notranslate"><span class="pre">OpenCL</span></code>
-support which is present on macOS. Hence, if you would like to run <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> multi-threaded the easiest
-way is to use <code class="docutils literal notranslate"><span class="pre">DKS</span></code>.</p>
+<span id="index-5"></span><h2>Setting up <tt class="docutils literal"><span class="pre">musrfit/DKS</span></tt> for macOS for OpenCL support<a class="headerlink" href="#setting-up-musrfit-dks-for-macos-for-opencl-support" title="Permalink to this headline">¶</a></h2>
+<p>Since Apple is not providing an out-of-the-box <tt class="docutils literal"><span class="pre">OpenMP</span></tt> support on their macOS compiler framework (Xcode),
+typically <tt class="docutils literal"><span class="pre">musrfit</span></tt> is just running <em>single threaded</em>. Here <tt class="docutils literal"><span class="pre">DKS</span></tt> can help since it delivers <tt class="docutils literal"><span class="pre">OpenCL</span></tt>
+support which is present on macOS. Hence, if you would like to run <tt class="docutils literal"><span class="pre">musrfit</span></tt> multi-threaded the easiest
+way is to use <tt class="docutils literal"><span class="pre">DKS</span></tt>.</p>
 <p>Since there is no graphic card involved, you do not need any graphic card driver of additional SDK.
-The only thing you need <code class="docutils literal notranslate"><span class="pre">DKS</span></code> and the proper <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> version.</p>
-<p>The installation instruction for <code class="docutils literal notranslate"><span class="pre">DKS/musrfit</span></code> can be found <a class="reference internal" href="#musrfit-dks-install"><span class="std std-ref">here</span></a>.</p>
+The only thing you need <tt class="docutils literal"><span class="pre">DKS</span></tt> and the proper <tt class="docutils literal"><span class="pre">musrfit</span></tt> version.</p>
+<p>The installation instruction for <tt class="docutils literal"><span class="pre">DKS/musrfit</span></tt> can be found <a class="reference internal" href="#musrfit-dks-install"><em>here</em></a>.</p>
 </div>
 </div>
 
 
       </div>
-      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      <div class="bottomnav">
       
         <p>
-        «&#160;&#160;<a href="setup-standard.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> on Different Platforms</a>
+        «&#160;&#160;<a href="setup-standard.html">Setting up <tt class="docutils literal"><span class="pre">musrfit</span></tt> on Different Platforms</a>
         &#160;&#160;::&#160;&#160;
         <a class="uplink" href="index.html">Contents</a>
         &#160;&#160;::&#160;&#160;
-        <a href="musredit.html"><code class="docutils literal notranslate"><span class="pre">musredit</span></code>: the GUI Based Interface to <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></a>&#160;&#160;»
+        <a href="musredit.html"><tt class="docutils literal"><span class="pre">musredit</span></tt>: the GUI Based Interface to <tt class="docutils literal"><span class="pre">musrfit</span></tt></a>&#160;&#160;»
         </p>
 
       </div>
 
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, Andreas Suter.
-      Last updated on Oct 02, 2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    <div class="footer">
+        &copy; Copyright 2022, Andreas Suter.
+      Last updated on May 29, 2022.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

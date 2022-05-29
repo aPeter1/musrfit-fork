@@ -1,39 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Documentation of user libs (user functions) &#8212; musrfit 1.7.6 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Documentation of user libs (user functions) &mdash; musrfit 1.8.0 documentation</title>
+    
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="musrfit 1.8.0 documentation" href="index.html" />
     <link rel="next" title="Setting up musrfit on Different Platforms" href="setup-standard.html" />
     <link rel="prev" title="User manual" href="user-manual.html" /> 
-  </head><body>
-      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
-          <span>musrfit 1.7.6 documentation</span></a></h1>
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="index.html">
+          <span>musrfit 1.8.0 documentation</span></a></h1>
         <h2 class="heading"><span>Documentation of user libs (user functions)</span></h2>
       </div>
-      <div class="topnav" role="navigation" aria-label="top navigation">
+      <div class="topnav">
       
         <p>
         «&#160;&#160;<a href="user-manual.html">User manual</a>
         &#160;&#160;::&#160;&#160;
         <a class="uplink" href="index.html">Contents</a>
         &#160;&#160;::&#160;&#160;
-        <a href="setup-standard.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> on Different Platforms</a>&#160;&#160;»
+        <a href="setup-standard.html">Setting up <tt class="docutils literal"><span class="pre">musrfit</span></tt> on Different Platforms</a>&#160;&#160;»
         </p>
 
       </div>
-      <div class="content" role="main">
+      <div class="content">
         
         
   <div class="section" id="documentation-of-user-libs-user-functions">
@@ -44,44 +55,44 @@
 <span id="index-2"></span><h3>libFitPofB<a class="headerlink" href="#libfitpofb" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="introduction">
 <h4>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h4>
-<p><code class="docutils literal notranslate"><span class="pre">libFitPofB</span></code> is a collection of <code class="docutils literal notranslate"><span class="pre">C++</span></code> classes using the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> <a class="reference internal" href="user-manual.html#id38"><span class="std std-ref">user-functions</span></a>
-interface in order to facilitate the usage in conjunction with <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>. The classes contained in this
+<p><tt class="docutils literal"><span class="pre">libFitPofB</span></tt> is a collection of <tt class="docutils literal"><span class="pre">C++</span></tt> classes using the <tt class="docutils literal"><span class="pre">musrfit</span></tt> <a class="reference internal" href="user-manual.html#id38"><em>user-functions</em></a>
+interface in order to facilitate the usage in conjunction with <tt class="docutils literal"><span class="pre">musrfit</span></tt>. The classes contained in this
 library generally implement calculations of one-dimensional static magnetic field distributions
-<span class="math notranslate nohighlight">\(p(B)\)</span> which lead to the muon-spin depolarization functions</p>
-<div class="math notranslate nohighlight">
+<span class="math">\(p(B)\)</span> which lead to the muon-spin depolarization functions</p>
+<div class="math">
 \[{\cal P}(t) = \int p(B) \cos(\gamma_\mu B t + \varphi) dB,\]</div>
-<p>where <span class="math notranslate nohighlight">\(\gamma_\mu = 2 \pi \times 135.54\)</span> MHz/T is the gyromagnetic ratio of the muon and <span class="math notranslate nohighlight">\(\varphi\)</span>
+<p>where <span class="math">\(\gamma_\mu = 2 \pi \times 135.54\)</span> MHz/T is the gyromagnetic ratio of the muon and <span class="math">\(\varphi\)</span>
 is the initial phase of the muon spins with respect to the positron detector. At the moment the only available
 implementations deal with field distributions measured in local isotropic superconductors, either by means of
 low-energy μSR (see <a class="reference external" href="https://www.psi.ch/smus/lem">https://www.psi.ch/smus/lem</a>) in the Meissner state or by bulk μSR in the mixed state.
-In the following the basic usage of the library in <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> is explained—the calculations by themselves are only
+In the following the basic usage of the library in <tt class="docutils literal"><span class="pre">musrfit</span></tt> is explained—the calculations by themselves are only
 outlined. For further information please refer to the original literature and/or the source code of the implementation.</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In order to supply certain information needed for the calculations but not suited to be stored in the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>
-msr files an <code class="docutils literal notranslate"><span class="pre">XML</span></code> configuration file in the working directory is used. For details, see below.</p>
+<p class="first admonition-title">Note</p>
+<p class="last">In order to supply certain information needed for the calculations but not suited to be stored in the <tt class="docutils literal"><span class="pre">musrfit</span></tt>
+msr files an <tt class="docutils literal"><span class="pre">XML</span></tt> configuration file in the working directory is used. For details, see below.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The implementations in this library heavily rely on <a class="reference external" href="http://fftw.org/">FFTW3</a>. In principle, it always checks what
+<p class="first admonition-title">Note</p>
+<p class="last">The implementations in this library heavily rely on <a class="reference external" href="http://fftw.org/">FFTW3</a>. In principle, it always checks what
 is the best way to do efficient Fourier transforms for a given machine before the transforms are actually done. If
 repeatedly Fourier transforms of the same (sizable) length should be done, it might be worth storing the once
 obtained information in an external file and just load it the next time this information is needed
 (<a class="reference external" href="http://fftw.org/fftw3_doc/Wisdom.html">wisdom handling</a>). In case this feature shall be used, a valid wisdom
-file has to be specified in the <code class="docutils literal notranslate"><span class="pre">XML</span></code> file.</p>
+file has to be specified in the <tt class="docutils literal"><span class="pre">XML</span></tt> file.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The model functions described in the following do generally <em>not behave nicely</em> in conjunction with <code class="docutils literal notranslate"><span class="pre">MINUIT</span></code>
+<p class="first admonition-title">Note</p>
+<p class="last">The model functions described in the following do generally <em>not behave nicely</em> in conjunction with <tt class="docutils literal"><span class="pre">MINUIT</span></tt>
 function minimizations (or maximizations). The analysis process at the moment in most cases involves some
 tedious trial-and-error procedure, where the displayed MINUIT information as always deserves attention.
 This is especially true if small effects should be analyzed (<em>e.g.</em> small diamagnetic shifts in superconductors).
 The parameter uncertainty in many cases has to be estimated independently. Due to these limitations, also
-the use of the fit option of <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> <em>cannot</em> be advised.</p>
+the use of the fit option of <tt class="docutils literal"><span class="pre">msr2data</span></tt> <em>cannot</em> be advised.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>If these classes still prove useful and results obtained through them are part of scientific publications,
+<p class="first admonition-title">Note</p>
+<p class="last">If these classes still prove useful and results obtained through them are part of scientific publications,
 an acknowledgment of the use of the library is appreciated.</p>
 </div>
 </div>
@@ -89,98 +100,98 @@ an acknowledgment of the use of the library is appreciated.</p>
 <h4>LE-μSR<a class="headerlink" href="#le-mgrsr" title="Permalink to this headline">¶</a></h4>
 <div class="section" id="one-dimensional-london-model-for-the-meissner-state-of-isotropic-superconductors">
 <span id="index-3"></span><h5>One-dimensional London model for the Meissner state of isotropic superconductors<a class="headerlink" href="#one-dimensional-london-model-for-the-meissner-state-of-isotropic-superconductors" title="Permalink to this headline">¶</a></h5>
-<p>The models for analyzing LE-μSR data assume the magnetic induction <span class="math notranslate nohighlight">\(B(z)\)</span> to vary only in the
+<p>The models for analyzing LE-μSR data assume the magnetic induction <span class="math">\(B(z)\)</span> to vary only in the
 dimension parallel to the momentum of the incident muons. In such a case the magnetic field distribution is given by</p>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[p(B) = n(z) \left| \frac{dB(z)}{dz} \right|^{-1}\]</div>
-<p>where <span class="math notranslate nohighlight">\(n(z)\)</span> is the muon implantation profile simulated by <code class="docutils literal notranslate"><span class="pre">TRIM.SP</span></code>.</p>
+<p>where <span class="math">\(n(z)\)</span> is the muon implantation profile simulated by <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt>.</p>
 <p>Assuming an array of <em>N</em> isotropic local superconductors with a total thickness <em>d</em> in the Meissner state
 the magnetic induction is given by solving the 1D London equation</p>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[\frac{\partial^2}{\partial z^2}B_i(z) = \frac{1}{\lambda_i^2}B_i(z)\]</div>
 <p>for each layer <em>i</em> taking into account the boundary conditions (F. London, Superfluids: Macroscopic Theory of Superconductivity, Dover (1961), p. 34)</p>
-<div class="math notranslate nohighlight">
-\[ \begin{align}\begin{aligned}B_1(0) = B_N(d) = \mu_0H\\B_i(d_i) = B_{i+1}(d_i)\\\lambda_i^2B_i'(z)\Big\vert_{z=d_i} = \lambda_{i+1}^2B_{i+1}'(z)\Big\vert_{z=d_i},\end{aligned}\end{align} \]</div>
-<p>where the <span class="math notranslate nohighlight">\(d_i\)</span> specify the interfaces between two adjacent layers and <span class="math notranslate nohighlight">\(\lambda_i\)</span> is
-the magnetic field penetration depth in the constituent <span class="math notranslate nohighlight">\(i\)</span>.</p>
+<div class="math">
+\[B_1(0) = B_N(d) = \mu_0H\]\[B_i(d_i) = B_{i+1}(d_i)\]\[\lambda_i^2B_i'(z)\Big\vert_{z=d_i} = \lambda_{i+1}^2B_{i+1}'(z)\Big\vert_{z=d_i},\]</div>
+<p>where the <span class="math">\(d_i\)</span> specify the interfaces between two adjacent layers and <span class="math">\(\lambda_i\)</span> is
+the magnetic field penetration depth in the constituent <span class="math">\(i\)</span>.</p>
 <p>The calculation of the field distribution has been set up for a superconducting half-space as well
 as superconducting thin films with up to three superconducting layers with different penetration depths.
-The muon-spin depolarization functions are calculated using the following lines in the <code class="docutils literal notranslate"><span class="pre">THEORY</span></code> block
-of a <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> msr file:</p>
+The muon-spin depolarization functions are calculated using the following lines in the <tt class="docutils literal"><span class="pre">THEORY</span></tt> block
+of a <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr file:</p>
 <p id="index-4"><strong>Superconducting half-space</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libFitPofB</span> <span class="n">TLondon1DHS</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TLondon1DHS 1 2 3 4 5
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>phase (deg)</p></li>
-<li><p>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><span class="std std-ref">XML startup</span></a> file (keV)</p></li>
-<li><p>applied field (G)</p></li>
-<li><p>thickness of the dead layer (nm)</p></li>
-<li><p>magnetic field penetration depth (nm)</p></li>
+<li>phase (deg)</li>
+<li>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><em>XML startup</em></a> file (keV)</li>
+<li>applied field (G)</li>
+<li>thickness of the dead layer (nm)</li>
+<li>magnetic field penetration depth (nm)</li>
 </ol>
 <p id="index-5"><strong>Superconducting thin film (one layer)</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libFitPofB</span> <span class="n">TLondon1D1L</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="p">[</span><span class="n">a</span> <span class="n">b</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TLondon1D1L 1 2 3 4 5 6 [a b]
 </pre></div>
 </div>
 <p>The mandatory parameters are:</p>
 <ol class="arabic simple">
-<li><p>phase (deg)</p></li>
-<li><p>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><span class="std std-ref">XML startup</span></a> file (keV)</p></li>
-<li><p>applied field (G)</p></li>
-<li><p>thickness of the dead layer (nm)</p></li>
-<li><p>thickness of the actually superconducting layer (nm)</p></li>
-<li><p>magnetic field penetration depth (nm)</p></li>
+<li>phase (deg)</li>
+<li>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><em>XML startup</em></a> file (keV)</li>
+<li>applied field (G)</li>
+<li>thickness of the dead layer (nm)</li>
+<li>thickness of the actually superconducting layer (nm)</li>
+<li>magnetic field penetration depth (nm)</li>
 </ol>
 <p>The optional parameters are:</p>
 <ol class="loweralpha simple">
-<li><p>fraction f<sub>1</sub> of muons in the thin film contributing to the signal (0 ≤ f<sub>1</sub> ≤ 1)</p></li>
-<li><p>fraction f<sub>s</sub> of muons in the substrate contributing to the signal (0 ≤ f<sub>s</sub> ≤ 1)</p></li>
+<li>fraction f<sub>1</sub> of muons in the thin film contributing to the signal (0 ≤ f<sub>1</sub> ≤ 1)</li>
+<li>fraction f<sub>s</sub> of muons in the substrate contributing to the signal (0 ≤ f<sub>s</sub> ≤ 1)</li>
 </ol>
 <p id="index-6"><strong>Superconducting thin-film bilayer heterostructure</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libFitPofB</span> <span class="n">TLondon1D2L</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="mi">7</span> <span class="mi">8</span> <span class="p">[</span><span class="n">a</span> <span class="n">b</span> <span class="n">c</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TLondon1D2L 1 2 3 4 5 6 7 8 [a b c]
 </pre></div>
 </div>
 <p>The mandatory parameters are:</p>
 <ol class="arabic simple">
-<li><p>phase (deg)</p></li>
-<li><p>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><span class="std std-ref">XML startup</span></a> file (keV)</p></li>
-<li><p>applied field (G)</p></li>
-<li><p>thickness of the dead layer (nm)</p></li>
-<li><p>thickness of the actually superconducting first layer (nm)</p></li>
-<li><p>thickness of the actually superconducting second layer (nm)</p></li>
-<li><p>magnetic field penetration depth of the first layer (nm)</p></li>
-<li><p>magnetic field penetration depth of the second layer (nm)</p></li>
+<li>phase (deg)</li>
+<li>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><em>XML startup</em></a> file (keV)</li>
+<li>applied field (G)</li>
+<li>thickness of the dead layer (nm)</li>
+<li>thickness of the actually superconducting first layer (nm)</li>
+<li>thickness of the actually superconducting second layer (nm)</li>
+<li>magnetic field penetration depth of the first layer (nm)</li>
+<li>magnetic field penetration depth of the second layer (nm)</li>
 </ol>
 <p>The optional parameters are:</p>
 <ol class="loweralpha simple">
-<li><p>fraction f<sub>1</sub> of muons in the dead and first layer contributing to the signal (0 ≤ f<sub>1</sub> ≤ 1)</p></li>
-<li><p>fraction f<sub>2</sub> of muons in the second layer contributing to the signal (0 ≤ f<sub>2</sub> ≤ 1)</p></li>
-<li><p>fraction f<sub>s</sub> of muons in the substrate contributing to the signal (0 ≤ f<sub>s</sub> ≤ 1)</p></li>
+<li>fraction f<sub>1</sub> of muons in the dead and first layer contributing to the signal (0 ≤ f<sub>1</sub> ≤ 1)</li>
+<li>fraction f<sub>2</sub> of muons in the second layer contributing to the signal (0 ≤ f<sub>2</sub> ≤ 1)</li>
+<li>fraction f<sub>s</sub> of muons in the substrate contributing to the signal (0 ≤ f<sub>s</sub> ≤ 1)</li>
 </ol>
 <p id="index-7"><strong>Superconducting thin-film trilayer heterostructure</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libFitPofB</span> <span class="n">TLondon1D3L</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">5</span> <span class="mi">6</span> <span class="mi">7</span> <span class="mi">8</span> <span class="mi">9</span> <span class="mi">10</span> <span class="p">[</span><span class="n">a</span> <span class="n">b</span> <span class="n">c</span> <span class="n">d</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TLondon1D3L 1 2 3 4 5 6 7 8 9 10 [a b c d]
 </pre></div>
 </div>
 <p>The mandatory parameters are:</p>
 <ol class="arabic simple">
-<li><p>phase (deg)</p></li>
-<li><p>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><span class="std std-ref">XML startup</span></a> file (keV)</p></li>
-<li><p>applied field (G)</p></li>
-<li><p>thickness of the dead layer (nm)</p></li>
-<li><p>thickness of the actually superconducting first layer (nm)</p></li>
-<li><p>thickness of the actually superconducting second layer (nm)</p></li>
-<li><p>thickness of the actually superconducting third layer (nm)</p></li>
-<li><p>magnetic field penetration depth of the first layer (nm)</p></li>
-<li><p>magnetic field penetration depth of the second layer (nm)</p></li>
-<li><p>magnetic field penetration depth of the third layer (nm)</p></li>
+<li>phase (deg)</li>
+<li>muon implantation energy as specified in the <a class="reference internal" href="#bmwlibs-xml"><em>XML startup</em></a> file (keV)</li>
+<li>applied field (G)</li>
+<li>thickness of the dead layer (nm)</li>
+<li>thickness of the actually superconducting first layer (nm)</li>
+<li>thickness of the actually superconducting second layer (nm)</li>
+<li>thickness of the actually superconducting third layer (nm)</li>
+<li>magnetic field penetration depth of the first layer (nm)</li>
+<li>magnetic field penetration depth of the second layer (nm)</li>
+<li>magnetic field penetration depth of the third layer (nm)</li>
 </ol>
 <p>The optional parameters are:</p>
 <ol class="loweralpha simple">
-<li><p>fraction f<sub>1</sub> of muons in the dead and first layer contributing to the signal (0 ≤ f<sub>1</sub> ≤ 1)</p></li>
-<li><p>fraction f<sub>2</sub> of muons in the second layer contributing to the signal (0 ≤ f<sub>2</sub> ≤ 1)</p></li>
-<li><p>fraction f<sub>3</sub> of muons in the third layer contributing to the signal (0 ≤ f<sub>3</sub> ≤ 1)</p></li>
-<li><p>fraction f<sub>s</sub> of muons in the substrate contributing to the signal (0 ≤ f<sub>s</sub> ≤ 1)</p></li>
+<li>fraction f<sub>1</sub> of muons in the dead and first layer contributing to the signal (0 ≤ f<sub>1</sub> ≤ 1)</li>
+<li>fraction f<sub>2</sub> of muons in the second layer contributing to the signal (0 ≤ f<sub>2</sub> ≤ 1)</li>
+<li>fraction f<sub>3</sub> of muons in the third layer contributing to the signal (0 ≤ f<sub>3</sub> ≤ 1)</li>
+<li>fraction f<sub>s</sub> of muons in the substrate contributing to the signal (0 ≤ f<sub>s</sub> ≤ 1)</li>
 </ol>
 </div>
 </div>
@@ -191,134 +202,137 @@ of a <code class="docutils literal notranslate"><span class="pre">musrfit</span>
 <p>When investigating superconductors in the mixed state by means of conventional μSR a
 two-dimensional flux-line lattice is probed randomly by the muons. The spatial field
 distributions within such an ordered lattice are modeled using the Fourier series</p>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[B(\mathbf{r}) = \langle B \rangle \sum\limits_{\mathbf{K}}B_{\mathbf{K}}\exp(-\imath\mathbf{K}\mathbf{r}),\]</div>
-<p>where <span class="math notranslate nohighlight">\(\mathbf{r}=(x,y)\)</span>, <strong>K</strong> are the reciprocal lattice vectors of a two-dimensional
-vortex lattice and the <span class="math notranslate nohighlight">\(B_{\mathbf{K}}\)</span> are the Fourier coefficients depending on the
-magnetic penetration depth <span class="math notranslate nohighlight">\(\lambda\)</span> and the superconducting coherence length <span class="math notranslate nohighlight">\(\xi\)</span>.
-The <span class="math notranslate nohighlight">\(B_{\mathbf{K}}\)</span> for some specific models are as follows:</p>
+<p>where <span class="math">\(\mathbf{r}=(x,y)\)</span>, <strong>K</strong> are the reciprocal lattice vectors of a two-dimensional
+vortex lattice and the <span class="math">\(B_{\mathbf{K}}\)</span> are the Fourier coefficients depending on the
+magnetic penetration depth <span class="math">\(\lambda\)</span> and the superconducting coherence length <span class="math">\(\xi\)</span>.
+The <span class="math">\(B_{\mathbf{K}}\)</span> for some specific models are as follows:</p>
 <p><strong>London model with Gaussian cutoff</strong> (E.H. Brandt, <a class="reference external" href="http://dx.doi.org/10.1007/BF00683568">J. Low Temp. Phys. 73, 355 (1988)</a>.)</p>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[B_{\mathbf{K}} = \frac{\exp\left({-K^2\xi^2/2}\right)}{1 + K^2\lambda^2}\]</div>
 <p><strong>Modified London model</strong> (T.M. Riseman <em>et al.</em>, <a class="reference external" href="http://dx.doi.org/10.1103/PhysRevB.52.10569">Phys. Rev. B 52, 10569 (1995)</a>.)</p>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[B_{\mathbf{K}} = \frac{\exp\left({-K^2\xi^2/2(1-b)}\right)}{1 + K^2\lambda^2/(1-b)},\]</div>
-<p>where <span class="math notranslate nohighlight">\(b = \langle B \rangle / (\mu_0 H_{\rm c2})\)</span>.</p>
+<p>where <span class="math">\(b = \langle B \rangle / (\mu_0 H_{\rm c2})\)</span>.</p>
 <p><strong>Analytical Ginzburg-Landau model</strong> ( A. Yaouanc, P. Dalmas de Réotier and E.H. Brandt, <a class="reference external" href="http://dx.doi.org/10.1103/PhysRevB.55.11107">Phys. Rev. B 55, 11107 (1997)</a>)</p>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[B_{\mathbf{K}} = \frac{f_{\infty}K_1\left(\frac{\xi_v}{\lambda}\sqrt{f_{\infty}^2+\lambda^2K^2}\right)}{K_1\left(\frac{\xi_v}{\lambda}f_{\infty}\right)\sqrt{f_{\infty}^2+\lambda^2K^2}},\]</div>
-<p>where <span class="math notranslate nohighlight">\(f_{\infty} = 1 - b^4,~\xi_v = \xi\left(\sqrt{2}-{3\xi}/\left({4\lambda}\right)\right)\sqrt{(1+b^4)(1-2b(1-b)^2)}\)</span> and
-<span class="math notranslate nohighlight">\(K_1\)</span> is a modified Bessel function.</p>
-<p>Apart from the mentioned analytic models the <strong>numerical Ginzburg-Landau model</strong> (<a class="reference external" href="http://dx.doi.org/10.1103/PhysRevB.68.054506">E.H. Brandt, Phys. Rev. B 68, 054506 (2003).</a>) is available. In this case <span class="math notranslate nohighlight">\(B(\mathbf{r})\)</span> is obtained by an iterative minimization of the free energy of the vortex lattice.</p>
+<p>where <span class="math">\(f_{\infty} = 1 - b^4,~\xi_v = \xi\left(\sqrt{2}-{3\xi}/\left({4\lambda}\right)\right)\sqrt{(1+b^4)(1-2b(1-b)^2)}\)</span> and
+<span class="math">\(K_1\)</span> is a modified Bessel function.</p>
+<p>Apart from the mentioned analytic models the <strong>numerical Ginzburg-Landau model</strong> (<a class="reference external" href="http://dx.doi.org/10.1103/PhysRevB.68.054506">E.H. Brandt, Phys. Rev. B 68, 054506 (2003).</a>) is available. In this case <span class="math">\(B(\mathbf{r})\)</span> is obtained by an iterative minimization of the free energy of the vortex lattice.</p>
 <p><strong>Concerning the applicability (e.g. field regions) of each of the mentioned models please refer to the original publications!</strong></p>
 <p>At the moment, the calculation of the field distribution has been implemented for <em>triangular</em> flux-line lattices.
 The number of grid lines in which the inter-vortex distance is divided for the calculations to be specified through
-the <a class="reference internal" href="#bmwlibs-xml"><span class="std std-ref">XML startup</span></a>.
-The muon-spin depolarization functions finally are calculated using the following lines in the THEORY block of a <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> msr file:</p>
+the <a class="reference internal" href="#bmwlibs-xml"><em>XML startup</em></a>.
+The muon-spin depolarization functions finally are calculated using the following lines in the THEORY block of a <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr file:</p>
 <p id="index-9"><strong>2D triangular vortex lattice, London model with Gaussian cutoff</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libFitPofB</span> <span class="n">TBulkTriVortexLondon</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TBulkTriVortexLondon 1 2 3 4
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>phase (deg)</p></li>
-<li><p>mean magnetic induction (G)</p></li>
-<li><p>magnetic penetration depth (nm)</p></li>
-<li><p>Ginzburg-Landau coherence length (nm)</p></li>
+<li>phase (deg)</li>
+<li>mean magnetic induction (G)</li>
+<li>magnetic penetration depth (nm)</li>
+<li>Ginzburg-Landau coherence length (nm)</li>
 </ol>
 <p id="index-10"><strong>2D triangular vortex lattice, modified London model</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libFitPofB</span> <span class="n">TBulkTriVortexML</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TBulkTriVortexML 1 2 3 4
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>phase (deg)</p></li>
-<li><p>mean magnetic induction (G)</p></li>
-<li><p>magnetic penetration depth (nm)</p></li>
-<li><p>Ginzburg-Landau coherence length (nm)</p></li>
+<li>phase (deg)</li>
+<li>mean magnetic induction (G)</li>
+<li>magnetic penetration depth (nm)</li>
+<li>Ginzburg-Landau coherence length (nm)</li>
 </ol>
 <p id="index-11"><strong>2D triangular vortex lattice, analytic Ginzburg-Landau model</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libFitPofB</span> <span class="n">TBulkTriVortexAGL</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TBulkTriVortexAGL 1 2 3 4
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>phase (deg)</p></li>
-<li><p>mean magnetic induction (G)</p></li>
-<li><p>magnetic penetration depth (nm)</p></li>
-<li><p>Ginzburg-Landau coherence length (nm)</p></li>
+<li>phase (deg)</li>
+<li>mean magnetic induction (G)</li>
+<li>magnetic penetration depth (nm)</li>
+<li>Ginzburg-Landau coherence length (nm)</li>
 </ol>
 <p id="index-12"><strong>2D triangular vortex lattice, numerical Ginzburg-Landau model</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libFitPofB</span> <span class="n">TBulkTriVortexNGL</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libFitPofB TBulkTriVortexNGL 1 2 3 4
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>phase (deg)</p></li>
-<li><p>mean magnetic induction (G)</p></li>
-<li><p>magnetic penetration depth (nm)</p></li>
-<li><p>Ginzburg-Landau coherence length (nm)</p></li>
+<li>phase (deg)</li>
+<li>mean magnetic induction (G)</li>
+<li>magnetic penetration depth (nm)</li>
+<li>Ginzburg-Landau coherence length (nm)</li>
 </ol>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In order to improve the convergence of <code class="docutils literal notranslate"><span class="pre">MIGRAD</span></code> it has proven useful to use the log-likelihood
-maximization instead of the <span class="math notranslate nohighlight">\(\chi^2\)</span> minimization routines and to choose sufficiently large
-initial steps for the parameters. Calling <code class="docutils literal notranslate"><span class="pre">MINOS</span></code> in conjunction with these functions is futile.</p>
+<p class="first admonition-title">Note</p>
+<p class="last">In order to improve the convergence of <tt class="docutils literal"><span class="pre">MIGRAD</span></tt> it has proven useful to use the log-likelihood
+maximization instead of the <span class="math">\(\chi^2\)</span> minimization routines and to choose sufficiently large
+initial steps for the parameters. Calling <tt class="docutils literal"><span class="pre">MINOS</span></tt> in conjunction with these functions is futile.</p>
 </div>
-<p>Therefore, the <a class="reference internal" href="user-manual.html#msr-commands-block"><span class="std std-ref">COMMANDS block</span></a> of the msr file could look like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMMANDS</span>
-<span class="n">STRATEGY</span> <span class="mi">2</span>
-<span class="n">MAX_LIKELIHOOD</span>
-<span class="n">MIGRAD</span>
-<span class="n">HESSE</span>
-<span class="n">SAVE</span>
+<p>Therefore, the <a class="reference internal" href="user-manual.html#msr-commands-block"><em>COMMANDS block</em></a> of the msr file could look like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>COMMANDS
+STRATEGY 2
+MAX_LIKELIHOOD
+MIGRAD
+HESSE
+SAVE
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="the-xml-startup-file">
 <span id="bmwlibs-xml"></span><span id="index-13"></span><h4>The XML startup file<a class="headerlink" href="#the-xml-startup-file" title="Permalink to this headline">¶</a></h4>
-<p><code class="docutils literal notranslate"><span class="pre">BMW_startup.xml</span></code> is a configuration file located in the working directory. In this file some settings
+<p><tt class="docutils literal"><span class="pre">BMW_startup.xml</span></tt> is a configuration file located in the working directory. In this file some settings
 like the time and field resolution of the calculations as well as the present muon implantation profiles
 for a LE-μSR analysis have to be defined. The following XML tags are allowed to define settings:</p>
-<dl>
-<dt><strong>&lt;debug&gt;ONE_OR_ZERO&lt;/debug&gt;</strong></dt><dd><p>activate the debugging output of the settings read from the XML file by setting 1, deactivate it with 0.</p>
-</dd>
-<dt><strong>&lt;wisdom&gt;PATH_TO_FILE&lt;/wisdom&gt;</strong></dt><dd><p>specify the <code class="docutils literal notranslate"><span class="pre">PATH_TO_FILE</span></code> to an <a class="reference external" href="http://fftw.org/fftw3_doc/Wisdom.html#Wisdom">FFTW3 wisdom file</a>
-that should be used; if the <code class="docutils literal notranslate"><span class="pre">PATH_TO_FILE</span></code> is invalid, no <code class="docutils literal notranslate"><span class="pre">FFTW3</span></code> wisdom will be used.</p>
-</dd>
-<dt><strong>&lt;delta_t&gt;ResT&lt;/delta_t&gt;</strong></dt><dd><p>set the time resolution <code class="docutils literal notranslate"><span class="pre">ResT</span></code> for the calculated depolarization function in microseconds.</p>
-</dd>
-<dt><strong>&lt;delta_B&gt;ResB&lt;/delta_B&gt;</strong></dt><dd><p>set the field resolution <code class="docutils literal notranslate"><span class="pre">ResB</span></code> for the calculated field distribution in Gauss.</p>
-</dd>
-<dt><strong>&lt;VortexLattice&gt;&lt;/VortexLattice&gt;</strong></dt><dd><p>set the parameters used for the calculation of the spatial field distribution of a vortex lattice.</p>
-<dl class="simple">
-<dt><strong>&lt;N_VortexGrid&gt;N&lt;/N_VortexGrid&gt;</strong></dt><dd><p>specify the number of points <strong>N</strong> (in each of the two dimensions) for which the fields within the
-vortex lattice are calculated (inside a <strong>&lt;VortexLattice&gt;</strong> environment)</p>
-</dd>
+<dl class="docutils">
+<dt><strong>&lt;debug&gt;ONE_OR_ZERO&lt;/debug&gt;</strong></dt>
+<dd>activate the debugging output of the settings read from the XML file by setting 1, deactivate it with 0.</dd>
+<dt><strong>&lt;wisdom&gt;PATH_TO_FILE&lt;/wisdom&gt;</strong></dt>
+<dd>specify the <tt class="docutils literal"><span class="pre">PATH_TO_FILE</span></tt> to an <a class="reference external" href="http://fftw.org/fftw3_doc/Wisdom.html#Wisdom">FFTW3 wisdom file</a>
+that should be used; if the <tt class="docutils literal"><span class="pre">PATH_TO_FILE</span></tt> is invalid, no <tt class="docutils literal"><span class="pre">FFTW3</span></tt> wisdom will be used.</dd>
+<dt><strong>&lt;delta_t&gt;ResT&lt;/delta_t&gt;</strong></dt>
+<dd>set the time resolution <tt class="docutils literal"><span class="pre">ResT</span></tt> for the calculated depolarization function in microseconds.</dd>
+<dt><strong>&lt;delta_B&gt;ResB&lt;/delta_B&gt;</strong></dt>
+<dd>set the field resolution <tt class="docutils literal"><span class="pre">ResB</span></tt> for the calculated field distribution in Gauss.</dd>
+<dt><strong>&lt;VortexLattice&gt;&lt;/VortexLattice&gt;</strong></dt>
+<dd><p class="first">set the parameters used for the calculation of the spatial field distribution of a vortex lattice.</p>
+<dl class="last docutils">
+<dt><strong>&lt;N_VortexGrid&gt;N&lt;/N_VortexGrid&gt;</strong></dt>
+<dd>specify the number of points <strong>N</strong> (in each of the two dimensions) for which the fields within the
+vortex lattice are calculated (inside a <strong>&lt;VortexLattice&gt;</strong> environment)</dd>
 </dl>
 </dd>
-<dt><strong>&lt;LEM&gt;&lt;/LEM&gt;</strong></dt><dd><p>set the parameters used for the calculation of LE-μSR field distributions</p>
-<dl>
-<dt><strong>&lt;data_path&gt;DATA_PATH_PREFIX&lt;/data_path&gt;</strong></dt><dd><p>specify the <code class="docutils literal notranslate"><span class="pre">DATA_PATH_PREFIX</span></code> to the <code class="docutils literal notranslate"><span class="pre">TRIM.SP</span></code> implantation profiles (inside a <strong>&lt;LEM&gt;</strong> environment)</p>
-</dd>
-<dt><strong>&lt;N_theory&gt;N_THEORY&lt;/N_theory&gt;</strong></dt><dd><p>specify the number of points <strong>N_THEORY</strong> for which <em>B(z)</em> is calculated (inside a <strong>&lt;LEM&gt;</strong> environment)
-The specification of this number is not needed if the calculation of the inverse of <em>B(z)</em> is implemented!</p>
-</dd>
-<dt><strong>&lt;energy_list&gt;&lt;/energy_list&gt;</strong></dt><dd><p>set the energies for which <code class="docutils literal notranslate"><span class="pre">TRIM.SP</span></code> implantation profiles are available (inside a <strong>&lt;LEM&gt;</strong> environment)</p>
-<dl class="simple">
-<dt><strong>&lt;energy_label&gt;LABEL&lt;/energy_label&gt;</strong></dt><dd><p>specify the <strong>LABEL</strong> within the file name of a available <code class="docutils literal notranslate"><span class="pre">TRIM.SP</span></code> <code class="docutils literal notranslate"><span class="pre">RGE</span></code> file (inside a <strong>&lt;energy_list&gt;</strong> environment)
-The expected name of the <code class="docutils literal notranslate"><span class="pre">RGE</span></code> file will be: <code class="docutils literal notranslate"><span class="pre">DATA_PATH_PREFIX</span> <span class="pre">+</span> <span class="pre">LABEL</span> <span class="pre">+</span> <span class="pre">.rge</span></code></p>
-</dd>
-<dt><strong>&lt;energy&gt;E&lt;/energy&gt;</strong></dt><dd><p>specify the muon energy <em>E</em> (in keV) belonging to the <code class="docutils literal notranslate"><span class="pre">TRIM.SP</span></code> <code class="docutils literal notranslate"><span class="pre">RGE</span></code> file given above (inside a <strong>&lt;energy_list&gt;</strong> environment)</p>
-</dd>
+<dt><strong>&lt;LEM&gt;&lt;/LEM&gt;</strong></dt>
+<dd><p class="first">set the parameters used for the calculation of LE-μSR field distributions</p>
+<dl class="last docutils">
+<dt><strong>&lt;data_path&gt;DATA_PATH_PREFIX&lt;/data_path&gt;</strong></dt>
+<dd>specify the <tt class="docutils literal"><span class="pre">DATA_PATH_PREFIX</span></tt> to the <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt> implantation profiles (inside a <strong>&lt;LEM&gt;</strong> environment)</dd>
+<dt><strong>&lt;N_theory&gt;N_THEORY&lt;/N_theory&gt;</strong></dt>
+<dd>specify the number of points <strong>N_THEORY</strong> for which <em>B(z)</em> is calculated (inside a <strong>&lt;LEM&gt;</strong> environment)
+The specification of this number is not needed if the calculation of the inverse of <em>B(z)</em> is implemented!</dd>
+<dt><strong>&lt;energy_list&gt;&lt;/energy_list&gt;</strong></dt>
+<dd><p class="first">set the energies for which <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt> implantation profiles are available (inside a <strong>&lt;LEM&gt;</strong> environment)</p>
+<dl class="last docutils">
+<dt><strong>&lt;energy_label&gt;LABEL&lt;/energy_label&gt;</strong></dt>
+<dd>specify the <strong>LABEL</strong> within the file name of a available <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt> <tt class="docutils literal"><span class="pre">RGE</span></tt> file (inside a <strong>&lt;energy_list&gt;</strong> environment)
+The expected name of the <tt class="docutils literal"><span class="pre">RGE</span></tt> file will be: <tt class="docutils literal"><span class="pre">DATA_PATH_PREFIX</span> <span class="pre">+</span> <span class="pre">LABEL</span> <span class="pre">+</span> <span class="pre">.rge</span></tt></dd>
+<dt><strong>&lt;energy&gt;E&lt;/energy&gt;</strong></dt>
+<dd>specify the muon energy <em>E</em> (in keV) belonging to the <tt class="docutils literal"><span class="pre">TRIM.SP</span></tt> <tt class="docutils literal"><span class="pre">RGE</span></tt> file given above (inside a <strong>&lt;energy_list&gt;</strong> environment)</dd>
 </dl>
 </dd>
 </dl>
 </dd>
 </dl>
 <p>An example XML file looks as follows:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 <span class="nt">&lt;BMW&gt;</span>
   <span class="nt">&lt;debug&gt;</span>0<span class="nt">&lt;/debug&gt;</span>
   <span class="nt">&lt;wisdom&gt;</span>/home/user/WordsOfWisdom.dat<span class="nt">&lt;/wisdom&gt;</span>
@@ -351,69 +365,69 @@ The expected name of the <code class="docutils literal notranslate"><span class=
 </div>
 <div class="section" id="nonlocal-superconductivity-related-meissner-screening-functions-as-libs">
 <h2>Nonlocal superconductivity related Meissner screening functions (AS libs)<a class="headerlink" href="#nonlocal-superconductivity-related-meissner-screening-functions-as-libs" title="Permalink to this headline">¶</a></h2>
-<p>To be written yet …</p>
+<p>To be written yet ...</p>
 </div>
 <div class="section" id="functions-to-analyze-bgr-nmr-data-bnmr-libs">
 <span id="bnmr-libs"></span><span id="index-14"></span><h2>Functions to analyze β-NMR data (BNMR libs)<a class="headerlink" href="#functions-to-analyze-bgr-nmr-data-bnmr-libs" title="Permalink to this headline">¶</a></h2>
-<p>This is a collection of <code class="docutils literal notranslate"><span class="pre">C++</span></code> classes using the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> <a class="reference internal" href="user-manual.html#id38"><span class="std std-ref">user-functions</span></a>
-interface in order to facilitate the usage in conjunction with <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>. It consists of two libraries:</p>
+<p>This is a collection of <tt class="docutils literal"><span class="pre">C++</span></tt> classes using the <tt class="docutils literal"><span class="pre">musrfit</span></tt> <a class="reference internal" href="user-manual.html#id38"><em>user-functions</em></a>
+interface in order to facilitate the usage in conjunction with <tt class="docutils literal"><span class="pre">musrfit</span></tt>. It consists of two libraries:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">libBNMR</span></code> contains functions to fit spin lattice relaxation (SLR) data.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">libLineProfile</span></code> contains functions to fit resonance lineshapes.</p></li>
+<li><tt class="docutils literal"><span class="pre">libBNMR</span></tt> contains functions to fit spin lattice relaxation (SLR) data.</li>
+<li><tt class="docutils literal"><span class="pre">libLineProfile</span></tt> contains functions to fit resonance lineshapes.</li>
 </ul>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Currently it is recommended to read in the data in ASCII format as a non-μSR fit  <a class="reference internal" href="user-manual.html#non-musr-fit"><span class="std std-ref">(fit type 8)</span></a>.</p>
+<p class="first admonition-title">Note</p>
+<p class="last">Currently it is recommended to read in the data in ASCII format as a non-μSR fit  <a class="reference internal" href="user-manual.html#non-musr-fit"><em>(fit type 8)</em></a>.</p>
 </div>
 <div class="section" id="libbnmr">
 <span id="index-15"></span><h3>libBNMR<a class="headerlink" href="#libbnmr" title="Permalink to this headline">¶</a></h3>
-<p>In β-NMR the SLR is usually measured by implanting a pulse of <span class="math notranslate nohighlight">\(^8\)</span>Li with a length <span class="math notranslate nohighlight">\(t_0\)</span> into the sample.
-The asymmetry is measured both during the pulse and afterwards. For a a general spin relaxation function <span class="math notranslate nohighlight">\(f(t)\)</span> the time evolution of the asymmetry is then given by [<a class="reference external" href="http://dx.doi.org/10.1103/PhysRevLett.96.147601">Z. Salman, et al., PRL 96, 147601 (2006)</a>]:</p>
-<div class="math notranslate nohighlight" id="slr">
+<p>In β-NMR the SLR is usually measured by implanting a pulse of <span class="math">\(^8\)</span>Li with a length <span class="math">\(t_0\)</span> into the sample.
+The asymmetry is measured both during the pulse and afterwards. For a a general spin relaxation function <span class="math">\(f(t)\)</span> the time evolution of the asymmetry is then given by [<a class="reference external" href="http://dx.doi.org/10.1103/PhysRevLett.96.147601">Z. Salman, et al., PRL 96, 147601 (2006)</a>]:</p>
+<div class="math" id="slr">
 <span id="index-16"></span>\[\begin{split}P(t) = \left\{\begin{matrix}
 \frac{\int_0^t e^{-(t-t')/\tau_{\mathrm{Li}}}f(t-t')dt'}{\int_0^t e^{-t'/\tau_{\mathrm{Li}}}dt' }       &amp;  t\leq t_0\\[6pt]
 \frac{\int_0^{t_0}e^{-(t_0-t')/\tau_{\mathrm{Li}}}f(t-t')dt'}{\int_0^{t_0}e^{-t'/\tau_{\mathrm{Li}}}dt'}    &amp;  t&gt; t_0,
 \end{matrix}\right.\end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(\tau_{\mathrm{Li}}=1.21\)</span>s is the <span class="math notranslate nohighlight">\(^8\)</span>Li lifetime.</p>
+<p>where <span class="math">\(\tau_{\mathrm{Li}}=1.21\)</span>s is the <span class="math">\(^8\)</span>Li lifetime.</p>
 <div class="section" id="functions">
 <h4>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h4>
-<p>The <code class="docutils literal notranslate"><span class="pre">libBNMR</span></code> library currently contains the following functions:</p>
+<p>The <tt class="docutils literal"><span class="pre">libBNMR</span></tt> library currently contains the following functions:</p>
 <p id="index-17"><strong>Exponential relaxation</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span> <span class="n">libBNMR</span> <span class="n">ExpRlx</span> <span class="mi">1</span> <span class="mi">2</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn libBNMR ExpRlx 1 2
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>pulse length <span class="math notranslate nohighlight">\(t_0\)</span> (s)</p></li>
-<li><p>relaxation rate <span class="math notranslate nohighlight">\(\lambda\)</span> (s<span class="math notranslate nohighlight">\(^{-1}\)</span>)</p></li>
+<li>pulse length <span class="math">\(t_0\)</span> (s)</li>
+<li>relaxation rate <span class="math">\(\lambda\)</span> (s<span class="math">\(^{-1}\)</span>)</li>
 </ol>
-<p>This function implements <span class="math notranslate nohighlight">\(f(t)=e^{-\lambda t}\)</span>.</p>
+<p>This function implements <span class="math">\(f(t)=e^{-\lambda t}\)</span>.</p>
 <p id="index-18"><strong>Stretched exponential relaxation</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span> <span class="n">libBNMR</span> <span class="n">SExpRlx</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn libBNMR SExpRlx 1 2 3
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>pulse length <span class="math notranslate nohighlight">\(t_0\)</span> (s)</p></li>
-<li><p>relaxation rate <span class="math notranslate nohighlight">\(\lambda\)</span> (s<span class="math notranslate nohighlight">\(^{-1}\)</span>)</p></li>
-<li><p>stretching exponent <span class="math notranslate nohighlight">\(\beta\)</span></p></li>
+<li>pulse length <span class="math">\(t_0\)</span> (s)</li>
+<li>relaxation rate <span class="math">\(\lambda\)</span> (s<span class="math">\(^{-1}\)</span>)</li>
+<li>stretching exponent <span class="math">\(\beta\)</span></li>
 </ol>
-<p>This function implements <span class="math notranslate nohighlight">\(f(t)=e^{-(\lambda t)^{\beta}}\)</span>.</p>
+<p>This function implements <span class="math">\(f(t)=e^{-(\lambda t)^{\beta}}\)</span>.</p>
 </div>
 </div>
 <div class="section" id="liblineprofile">
 <span id="index-19"></span><h3>libLineProfile<a class="headerlink" href="#liblineprofile" title="Permalink to this headline">¶</a></h3>
-<p>In addition to some simple line shapes <code class="docutils literal notranslate"><span class="pre">libLineProfile</span></code> contains functions to fit chemical shift anisotropies in the powder average.
+<p>In addition to some simple line shapes <tt class="docutils literal"><span class="pre">libLineProfile</span></tt> contains functions to fit chemical shift anisotropies in the powder average.
 Their functional form can be found in  <a class="reference external" href="http://dx.doi.org/10.1007/978-3-642-68756-3_2">M. Mehring, Principles of High Resolution NMR in Solids (Springer 1983)</a>.</p>
 <p>For an axially symmetric interaction it is given by:</p>
-<div class="math notranslate nohighlight" id="iax">
+<div class="math" id="iax">
 <span id="index-20"></span>\[\begin{split}I_{\mathrm ax}(f)=\left\{\begin{matrix} \frac{1}{2\sqrt{(f_\parallel-f_\perp)(f-f_\perp)}}&amp; f\in(f_\perp,f_\parallel)\cup(f_\parallel,f_\perp)\\[6pt] 0 &amp; \text{otherwise}\end{matrix} \right.\end{split}\]</div>
-<p>where <span class="math notranslate nohighlight">\(f_\parallel\)</span> and <span class="math notranslate nohighlight">\(f_\perp\)</span> are the frequencies that would be observed if the field is oriented paralell or perpendicular to the symmetry axis, respectively.</p>
+<p>where <span class="math">\(f_\parallel\)</span> and <span class="math">\(f_\perp\)</span> are the frequencies that would be observed if the field is oriented paralell or perpendicular to the symmetry axis, respectively.</p>
 <div class="line-block">
-<div class="line">In case of a completely anisotropic interaction, the powder average can be described by the frequencies along the three principle axis <span class="math notranslate nohighlight">\(f_1,f_2,f_3\)</span>.</div>
-<div class="line">Assume without loss of generality that <span class="math notranslate nohighlight">\(f_1&lt;f_2&lt;f_3\)</span>, then</div>
+<div class="line">In case of a completely anisotropic interaction, the powder average can be described by the frequencies along the three principle axis <span class="math">\(f_1,f_2,f_3\)</span>.</div>
+<div class="line">Assume without loss of generality that <span class="math">\(f_1&lt;f_2&lt;f_3\)</span>, then</div>
 </div>
-<div class="math notranslate nohighlight" id="ianiso">
+<div class="math" id="ianiso">
 <span id="index-21"></span>\[\begin{split}I(f)&amp;=\left\{\begin{matrix}
   \frac{K(m)}{\pi\sqrt{(f-f_1)(f_3-f_2)}},&amp; f_3\geq f&gt;f_2 \\[9pt]
   \frac{K(m)}{\pi\sqrt{(f_3-f)(f_2-f_1)}},&amp; f_2&gt;f\geq f_1\\[9pt]
@@ -426,157 +440,157 @@ m&amp;=\left\{\begin{matrix}
 \end{matrix} \right.  \\
   \\
 K(m)&amp;=\int_0^{\pi/2}\frac{\mathrm d\varphi}{\sqrt{1-m^2\sin^2{\varphi}}},\end{split}\]</div>
-<p><span class="math notranslate nohighlight">\(K(m)\)</span> is the complete elliptic integral of the first kind.</p>
+<p><span class="math">\(K(m)\)</span> is the complete elliptic integral of the first kind.</p>
 <div class="section" id="id1">
 <h4>Functions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h4>
-<p>The <code class="docutils literal notranslate"><span class="pre">libLineProfile</span></code> library currently contains the following functions:</p>
+<p>The <tt class="docutils literal"><span class="pre">libLineProfile</span></tt> library currently contains the following functions:</p>
 <p id="index-22"><strong>Gaussian</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libLineProfile</span> <span class="n">LineGauss</span> <span class="mi">1</span> <span class="mi">2</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile LineGauss 1 2
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>center of the line <span class="math notranslate nohighlight">\(f_0\)</span></p></li>
-<li><p>FWHM of the line <span class="math notranslate nohighlight">\(\sigma\)</span></p></li>
+<li>center of the line <span class="math">\(f_0\)</span></li>
+<li>FWHM of the line <span class="math">\(\sigma\)</span></li>
 </ol>
 <div class="line-block">
 <div class="line">The height of the peak is 1.</div>
 <div class="line">The functional form is given by</div>
 </div>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[A(f)=e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}}\]</div>
 <p id="index-23"><strong>Lorentzian</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libLineProfile</span> <span class="n">LineLorentzian</span> <span class="mi">1</span> <span class="mi">2</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile LineLorentzian 1 2
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>center of the line <span class="math notranslate nohighlight">\(f_0\)</span></p></li>
-<li><p>FWHM of the line <span class="math notranslate nohighlight">\(w\)</span></p></li>
+<li>center of the line <span class="math">\(f_0\)</span></li>
+<li>FWHM of the line <span class="math">\(w\)</span></li>
 </ol>
 <div class="line-block">
 <div class="line">The height of the peak is 1.</div>
 <div class="line">The functional form is given by</div>
 </div>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[A(f)= \frac{w^2}{4(f-f_0)^2+w^2}\]</div>
 <p id="index-24"><strong>Laplacian</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libLineProfile</span> <span class="n">LineLaplace</span> <span class="mi">1</span> <span class="mi">2</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile LineLaplace 1 2
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>center of the line <span class="math notranslate nohighlight">\(f_0\)</span></p></li>
-<li><p>FWHM of the line <span class="math notranslate nohighlight">\(w\)</span></p></li>
+<li>center of the line <span class="math">\(f_0\)</span></li>
+<li>FWHM of the line <span class="math">\(w\)</span></li>
 </ol>
 <div class="line-block">
 <div class="line">The height of the peak is 1.</div>
 <div class="line">The functional form is given by</div>
 </div>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[A(f)=e^{-2\ln 2 \left|\frac{f-f_0}{w}\right|}\]</div>
 <p id="index-25"><strong>Skewed Lorentzian</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libLineProfile</span> <span class="n">LineSkewLorentzian</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile LineSkewLorentzian 1 2 3
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>center of the line <span class="math notranslate nohighlight">\(f_0\)</span></p></li>
-<li><p>width of the line <span class="math notranslate nohighlight">\(w\)</span></p></li>
-<li><p>skewness parameter <span class="math notranslate nohighlight">\(a\)</span></p></li>
+<li>center of the line <span class="math">\(f_0\)</span></li>
+<li>width of the line <span class="math">\(w\)</span></li>
+<li>skewness parameter <span class="math">\(a\)</span></li>
 </ol>
 <div class="line-block">
 <div class="line">The height of the peak is 1.</div>
 <div class="line">The functional form is given by</div>
 </div>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[A(f)=  \frac{w w_a}{4(f-f_0)^2+w_a^2}, \quad w_a=\frac{2w}{1+e^{a(f-f_0)}}\]</div>
 <p id="index-26"><strong>Skewed Lorentzian 2</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libLineProfile</span> <span class="n">LineSkewLorentzian2</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile LineSkewLorentzian2 1 2 3
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>center of the line <span class="math notranslate nohighlight">\(f_0\)</span></p></li>
-<li><p>width left of the center <span class="math notranslate nohighlight">\(w_1\)</span></p></li>
-<li><p>width right of the center <span class="math notranslate nohighlight">\(w_2\)</span></p></li>
+<li>center of the line <span class="math">\(f_0\)</span></li>
+<li>width left of the center <span class="math">\(w_1\)</span></li>
+<li>width right of the center <span class="math">\(w_2\)</span></li>
 </ol>
 <div class="line-block">
 <div class="line">The height of the peak is 1.</div>
 <div class="line">The functional form is given by</div>
 </div>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[\begin{split}A(f)=  \left\{\begin{matrix}\frac{{w_1}^2}{4{(f-f_0)}^2+{w_1}^2},&amp;f\leq f_0\\[9pt] \frac{{w_2}^2}{4{(f-f_0)}^2+{w_2}^2},&amp;f&gt;f_0\end{matrix}\right.\end{split}\]</div>
 <p id="index-27"><strong>Powder average of an axially symmetric interaction convoluted with a Lorentzian</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libLineProfile</span> <span class="n">PowderLineAxialLor</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile PowderLineAxialLor 1 2 3
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>frequency for the field oriented paralell to the symmetry axis <span class="math notranslate nohighlight">\(f_\parallel\)</span></p></li>
-<li><p>frequency for the field oriented perpendicular to the symmetry axis <span class="math notranslate nohighlight">\(f_\parallel\)</span></p></li>
-<li><p>FWHM of the Lorentzian <span class="math notranslate nohighlight">\(w\)</span></p></li>
+<li>frequency for the field oriented paralell to the symmetry axis <span class="math">\(f_\parallel\)</span></li>
+<li>frequency for the field oriented perpendicular to the symmetry axis <span class="math">\(f_\parallel\)</span></li>
+<li>FWHM of the Lorentzian <span class="math">\(w\)</span></li>
 </ol>
 <div class="line-block">
-<div class="line">The height of the peak is <span class="math notranslate nohighlight">\(\sim\)</span>1.</div>
+<div class="line">The height of the peak is <span class="math">\(\sim\)</span>1.</div>
 <div class="line">The functional form is given by</div>
 </div>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[A(f)= I_{\mathrm ax}(f)\circledast\left( \frac{w^2}{4f^2+w^2} \right)\]</div>
-<p>with <span class="math notranslate nohighlight">\(I_{\mathrm ax}(f)\)</span> defined <a class="reference internal" href="#iax"><span class="std std-ref">above</span></a>.</p>
+<p>with <span class="math">\(I_{\mathrm ax}(f)\)</span> defined <a class="reference internal" href="#iax"><em>above</em></a>.</p>
 <p id="index-28"><strong>Powder average of an axially symmetric interaction convoluted with a Gaussian</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libLineProfile</span> <span class="n">PowderLineAxialGss</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile PowderLineAxialGss 1 2 3
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p>frequency for the field oriented paralell to the symmetry axis <span class="math notranslate nohighlight">\(f_\parallel\)</span></p></li>
-<li><p>frequency for the field oriented perpendicular to the symmetry axis <span class="math notranslate nohighlight">\(f_\parallel\)</span></p></li>
-<li><p>FWHM of the Gaussian <span class="math notranslate nohighlight">\(\sigma\)</span></p></li>
+<li>frequency for the field oriented paralell to the symmetry axis <span class="math">\(f_\parallel\)</span></li>
+<li>frequency for the field oriented perpendicular to the symmetry axis <span class="math">\(f_\parallel\)</span></li>
+<li>FWHM of the Gaussian <span class="math">\(\sigma\)</span></li>
 </ol>
 <div class="line-block">
-<div class="line">The height of the peak is <span class="math notranslate nohighlight">\(\sim\)</span>1.</div>
+<div class="line">The height of the peak is <span class="math">\(\sim\)</span>1.</div>
 <div class="line">The functional form is given by</div>
 </div>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[A(f)= I_{\mathrm ax}(f)\circledast\left( e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}} \right)\]</div>
-<p>with <span class="math notranslate nohighlight">\(I_{\mathrm ax}(f)\)</span> defined <a class="reference internal" href="#iax"><span class="std std-ref">above</span></a>.</p>
+<p>with <span class="math">\(I_{\mathrm ax}(f)\)</span> defined <a class="reference internal" href="#iax"><em>above</em></a>.</p>
 <p id="index-29"><strong>Powder average of an anisotropic interaction convoluted with a Lorentzian</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libLineProfile</span> <span class="n">PowderLineAsymLor</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile PowderLineAsymLor 1 2 3 4
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(f_1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(f_1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(f_3\)</span> frequencies along the principal axes</p></li>
-<li><p>FWHM of the Lorentzian <span class="math notranslate nohighlight">\(w\)</span></p></li>
+<li><span class="math">\(f_1\)</span></li>
+<li><span class="math">\(f_1\)</span></li>
+<li><span class="math">\(f_3\)</span> frequencies along the principal axes</li>
+<li>FWHM of the Lorentzian <span class="math">\(w\)</span></li>
 </ol>
 <div class="line-block">
-<div class="line">The height of the peak is <span class="math notranslate nohighlight">\(\sim\)</span>1.</div>
+<div class="line">The height of the peak is <span class="math">\(\sim\)</span>1.</div>
 <div class="line">The functional form is given by</div>
 </div>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[A(f)= I(f)\circledast\left( \frac{w^2}{4f^2+w^2} \right)\]</div>
-<p>with <span class="math notranslate nohighlight">\(I(f)\)</span> defined <a class="reference internal" href="#ianiso"><span class="std std-ref">above</span></a>. Note that <span class="math notranslate nohighlight">\(f_1&lt;f_2&lt;f_3\)</span> is not required by the code.</p>
+<p>with <span class="math">\(I(f)\)</span> defined <a class="reference internal" href="#ianiso"><em>above</em></a>. Note that <span class="math">\(f_1&lt;f_2&lt;f_3\)</span> is not required by the code.</p>
 <p id="index-30"><strong>Powder average of an anisotropic interaction convoluted with a Gaussian</strong></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">userFcn</span>  <span class="n">libLineProfile</span> <span class="n">PowderLineAsymGss</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>userFcn  libLineProfile PowderLineAsymGss 1 2 3 4
 </pre></div>
 </div>
 <p>The parameters are:</p>
 <ol class="arabic simple">
-<li><p><span class="math notranslate nohighlight">\(f_1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(f_1\)</span></p></li>
-<li><p><span class="math notranslate nohighlight">\(f_3\)</span> frequencies along the principal axes</p></li>
-<li><p>FWHM of the Gaussian <span class="math notranslate nohighlight">\(\sigma\)</span></p></li>
+<li><span class="math">\(f_1\)</span></li>
+<li><span class="math">\(f_1\)</span></li>
+<li><span class="math">\(f_3\)</span> frequencies along the principal axes</li>
+<li>FWHM of the Gaussian <span class="math">\(\sigma\)</span></li>
 </ol>
 <div class="line-block">
-<div class="line">The height of the peak is <span class="math notranslate nohighlight">\(\sim\)</span>1.</div>
+<div class="line">The height of the peak is <span class="math">\(\sim\)</span>1.</div>
 <div class="line">The functional form is given by</div>
 </div>
-<div class="math notranslate nohighlight">
+<div class="math">
 \[A(f)= I(f)\circledast\left( e^{-\frac{4\ln 2 (f-f_0)^2}{ \sigma^2}} \right)\]</div>
-<p>with <span class="math notranslate nohighlight">\(I(f)\)</span> defined <a class="reference internal" href="#ianiso"><span class="std std-ref">above</span></a>. Note that <span class="math notranslate nohighlight">\(f_1&lt;f_2&lt;f_3\)</span> is not required by the code.</p>
+<p>with <span class="math">\(I(f)\)</span> defined <a class="reference internal" href="#ianiso"><em>above</em></a>. Note that <span class="math">\(f_1&lt;f_2&lt;f_3\)</span> is not required by the code.</p>
 </div>
 </div>
 </div>
@@ -584,22 +598,22 @@ K(m)&amp;=\int_0^{\pi/2}\frac{\mathrm d\varphi}{\sqrt{1-m^2\sin^2{\varphi}}},\en
 
 
       </div>
-      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      <div class="bottomnav">
       
         <p>
         «&#160;&#160;<a href="user-manual.html">User manual</a>
         &#160;&#160;::&#160;&#160;
         <a class="uplink" href="index.html">Contents</a>
         &#160;&#160;::&#160;&#160;
-        <a href="setup-standard.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> on Different Platforms</a>&#160;&#160;»
+        <a href="setup-standard.html">Setting up <tt class="docutils literal"><span class="pre">musrfit</span></tt> on Different Platforms</a>&#160;&#160;»
         </p>
 
       </div>
 
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, Andreas Suter.
-      Last updated on Oct 02, 2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    <div class="footer">
+        &copy; Copyright 2022, Andreas Suter.
+      Last updated on May 29, 2022.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>

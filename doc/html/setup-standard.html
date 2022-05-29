@@ -1,116 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Setting up musrfit on Different Platforms &#8212; musrfit 1.7.6 documentation</title>
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Setting up musrfit on Different Platforms &mdash; musrfit 1.8.0 documentation</title>
+    
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-    <script src="_static/jquery.js"></script>
-    <script src="_static/underscore.js"></script>
-    <script src="_static/doctools.js"></script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.8.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="musrfit 1.8.0 documentation" href="index.html" />
     <link rel="next" title="Setting up musrfit / DKS: High Speed Fitting with GPU’s" href="setup-dks.html" />
     <link rel="prev" title="Documentation of user libs (user functions)" href="user-libs.html" /> 
-  </head><body>
-      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
-          <span>musrfit 1.7.6 documentation</span></a></h1>
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="index.html">
+          <span>musrfit 1.8.0 documentation</span></a></h1>
         <h2 class="heading"><span>Setting up musrfit on Different Platforms</span></h2>
       </div>
-      <div class="topnav" role="navigation" aria-label="top navigation">
+      <div class="topnav">
       
         <p>
         «&#160;&#160;<a href="user-libs.html">Documentation of user libs (user functions)</a>
         &#160;&#160;::&#160;&#160;
         <a class="uplink" href="index.html">Contents</a>
         &#160;&#160;::&#160;&#160;
-        <a href="setup-dks.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> / <code class="docutils literal notranslate"><span class="pre">DKS</span></code>: High Speed Fitting with GPU’s</a>&#160;&#160;»
+        <a href="setup-dks.html">Setting up <tt class="docutils literal"><span class="pre">musrfit</span></tt> / <tt class="docutils literal"><span class="pre">DKS</span></tt>: High Speed Fitting with GPU&#8217;s</a>&#160;&#160;»
         </p>
 
       </div>
-      <div class="content" role="main">
+      <div class="content">
         
         
   <div class="section" id="setting-up-musrfit-on-different-platforms">
-<span id="musrfit-setup"></span><span id="index-0"></span><h1>Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> on Different Platforms<a class="headerlink" href="#setting-up-musrfit-on-different-platforms" title="Permalink to this headline">¶</a></h1>
+<span id="musrfit-setup"></span><span id="index-0"></span><h1>Setting up <tt class="docutils literal"><span class="pre">musrfit</span></tt> on Different Platforms<a class="headerlink" href="#setting-up-musrfit-on-different-platforms" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="supported-operating-systems-and-software-requirements">
 <span id="supported-operating-systems"></span><span id="index-1"></span><h2>Supported Operating Systems and Software Requirements<a class="headerlink" href="#supported-operating-systems-and-software-requirements" title="Permalink to this headline">¶</a></h2>
 <p>This page is intended to demonstrate for the interested user which steps are necessary to set up the <a class="reference external" href="http://www.gnu.org/philosophy/free-sw.html">free software</a>
-μSR data analysis framework <a class="reference internal" href="user-manual.html#user-manual"><span class="std std-ref">musrfit</span></a>. While the preferred way is to run the software on <strong>GNU/Linux</strong> or <strong>MacOS X/macOS</strong>, with some restrictions
+μSR data analysis framework <a class="reference internal" href="user-manual.html#user-manual"><em>musrfit</em></a>. While the preferred way is to run the software on <strong>GNU/Linux</strong> or <strong>MacOS X/macOS</strong>, with some restrictions
 it can also be set up under <strong>MS Windows</strong> (cygwin, only for the <em>very brave</em>, probably it is easier for most MS Windows users to install a Virtual Machine running Linux).</p>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In case musrfit should be installed according to the description found on this page, the user is strongly encouraged to <em>read completely</em> each section dealing with the
+<p class="first admonition-title">Note</p>
+<p class="last">In case musrfit should be installed according to the description found on this page, the user is strongly encouraged to <em>read completely</em> each section dealing with the
 present installation step <em>before</em> starting the installation process!</p>
 </div>
-<p>Apart from <a class="reference external" href="http://gcc.gnu.org/">GCC, the GNU Compiler Collection</a> (<code class="docutils literal notranslate"><span class="pre">gcc</span></code>, <code class="docutils literal notranslate"><span class="pre">g++</span></code>), the build tool <a class="reference external" href="https://cmake.org/">cmake</a> is needed. Furthermore the helper
+<p>Apart from <a class="reference external" href="http://gcc.gnu.org/">GCC, the GNU Compiler Collection</a> (<tt class="docutils literal"><span class="pre">gcc</span></tt>, <tt class="docutils literal"><span class="pre">g++</span></tt>), the build tool <a class="reference external" href="https://cmake.org/">cmake</a> is needed. Furthermore the helper
 tool <a class="reference external" href="http://pkg-config.freedesktop.org/wiki/">pkg-config</a> needs to be in place, and musrfit requires the installation of a few open-source libraries and programs including
 their header packages:</p>
-<dl class="simple" id="index-2">
-<dt><strong>boost C++ libraries</strong></dt><dd><p>The powerful Spirit parser framework used by musrfit is included in that collection of libraries. <em>Required version ≥ 1.33</em> (see <a class="reference external" href="http://www.boost.org/">boost C++ libraries</a>).</p>
-</dd>
+<dl class="docutils" id="index-2">
+<dt><strong>boost C++ libraries</strong></dt>
+<dd>The powerful Spirit parser framework used by musrfit is included in that collection of libraries. <em>Required version ≥ 1.33</em> (see <a class="reference external" href="http://www.boost.org/">boost C++ libraries</a>).</dd>
 </dl>
-<dl class="simple" id="index-3">
-<dt><strong>GNU Scientific Library</strong></dt><dd><p>A numerical <code class="docutils literal notranslate"><span class="pre">C</span></code> and <code class="docutils literal notranslate"><span class="pre">C++</span></code> library which provides efficient implementations of various mathematical routines. <em>Required version ≥ 1.9</em> (see <a class="reference external" href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a>).</p>
-</dd>
+<dl class="docutils" id="index-3">
+<dt><strong>GNU Scientific Library</strong></dt>
+<dd>A numerical <tt class="docutils literal"><span class="pre">C</span></tt> and <tt class="docutils literal"><span class="pre">C++</span></tt> library which provides efficient implementations of various mathematical routines. <em>Required version ≥ 1.9</em> (see <a class="reference external" href="http://www.gnu.org/software/gsl/">GNU Scientific Library</a>).</dd>
 </dl>
-<dl class="simple" id="index-4">
-<dt><strong>FFTW</strong></dt><dd><p>A <code class="docutils literal notranslate"><span class="pre">C</span></code> implementation for the fast computation of discrete Fourier transforms. <em>Required version ≥ 3.1</em> (see <a class="reference external" href="http://www.fftw.org/">FFTW</a>).</p>
-</dd>
+<dl class="docutils" id="index-4">
+<dt><strong>FFTW</strong></dt>
+<dd>A <tt class="docutils literal"><span class="pre">C</span></tt> implementation for the fast computation of discrete Fourier transforms. <em>Required version ≥ 3.1</em> (see <a class="reference external" href="http://www.fftw.org/">FFTW</a>).</dd>
 </dl>
-<dl class="simple" id="index-5">
-<dt><strong>ROOT</strong></dt><dd><p>A C++ data analysis framework developed at <a class="reference external" href="http://www.cern.ch/">CERN</a>. <em>Required version ≥ 5.22</em> (see <a class="reference external" href="http://root.cern.ch/">ROOT</a>).</p>
-</dd>
+<dl class="docutils" id="index-5">
+<dt><strong>ROOT</strong></dt>
+<dd>A C++ data analysis framework developed at <a class="reference external" href="http://www.cern.ch/">CERN</a>. <em>Required version ≥ 5.22</em> (see <a class="reference external" href="http://root.cern.ch/">ROOT</a>).</dd>
 </dl>
-<dl class="simple" id="index-6">
-<dt><strong>libxml2</strong></dt><dd><p>The <code class="docutils literal notranslate"><span class="pre">XML</span> <span class="pre">C</span></code> parser and toolkit of <a class="reference external" href="http://www.gnome.org/">gnome</a>. <em>Required version ≥ 2.0</em> (see <a class="reference external" href="http://xmlsoft.org/">libxml2</a>).</p>
-</dd>
+<dl class="docutils" id="index-6">
+<dt><strong>libxml2</strong></dt>
+<dd>The <tt class="docutils literal"><span class="pre">XML</span> <span class="pre">C</span></tt> parser and toolkit of <a class="reference external" href="http://www.gnome.org/">gnome</a>. <em>Required version ≥ 2.0</em> (see <a class="reference external" href="http://xmlsoft.org/">libxml2</a>).</dd>
 </dl>
-<p>Additionally, <em>only</em> if <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> should support reading of data files in the <cite>NeXus</cite> format the following libraries are needed:</p>
-<dl class="simple" id="index-7">
-<dt><strong>HDF4</strong></dt><dd><p>A library and multi-object file format for storing and managing data (see <a class="reference external" href="http://www.hdfgroup.org/products/hdf4/">HDF4</a>). <code class="docutils literal notranslate"><span class="pre">HDF4</span></code> is “outdated” and its support will soon be dropped. The single only reason why it is still required is that ISIS is not able to cope to implement HDF5 V2 of the NeXus muon instrument specification which has been agreed in 2012!</p>
-</dd>
+<p>Additionally, <em>only</em> if <tt class="docutils literal"><span class="pre">musrfit</span></tt> should support reading of data files in the <cite>NeXus</cite> format the following libraries are needed:</p>
+<dl class="docutils" id="index-7">
+<dt><strong>HDF4</strong></dt>
+<dd>A library and multi-object file format for storing and managing data (see <a class="reference external" href="http://www.hdfgroup.org/products/hdf4/">HDF4</a>). <tt class="docutils literal"><span class="pre">HDF4</span></tt> is &#8220;outdated&#8221; and its support will soon be dropped. The single only reason why it is still required is that ISIS is not able to cope to implement HDF5 V2 of the NeXus muon instrument specification which has been agreed in 2012!</dd>
 </dl>
-<dl class="simple" id="index-8">
-<dt><strong>HDF5</strong></dt><dd><p>A data model, library, and file format for storing and managing data (see <a class="reference external" href="https://portal.hdfgroup.org/display/support">HDF5</a>).</p>
-</dd>
+<dl class="docutils" id="index-8">
+<dt><strong>HDF5</strong></dt>
+<dd>A data model, library, and file format for storing and managing data (see <a class="reference external" href="https://portal.hdfgroup.org/display/support">HDF5</a>).</dd>
 </dl>
-<dl class="simple" id="index-9">
-<dt><strong>minixml</strong></dt><dd><p>A small <code class="docutils literal notranslate"><span class="pre">XML</span></code> library that can be used to read and write <code class="docutils literal notranslate"><span class="pre">XML</span></code> and <code class="docutils literal notranslate"><span class="pre">XML</span></code>-like data files. <em>Required version ≥ 2.2</em> (see <a class="reference external" href="http://www.minixml.org/">minixml</a>).
-Currently the <code class="docutils literal notranslate"><span class="pre">MXML</span></code> support in <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> is broken and hence you will <strong>not</strong> need to install <code class="docutils literal notranslate"><span class="pre">minixml</span></code> for the time being.</p>
-</dd>
+<dl class="docutils" id="index-9">
+<dt><strong>minixml</strong></dt>
+<dd>A small <tt class="docutils literal"><span class="pre">XML</span></tt> library that can be used to read and write <tt class="docutils literal"><span class="pre">XML</span></tt> and <tt class="docutils literal"><span class="pre">XML</span></tt>-like data files. <em>Required version ≥ 2.2</em> (see <a class="reference external" href="http://www.minixml.org/">minixml</a>).
+Currently the <tt class="docutils literal"><span class="pre">MXML</span></tt> support in <tt class="docutils literal"><span class="pre">NeXus</span></tt> is broken and hence you will <strong>not</strong> need to install <tt class="docutils literal"><span class="pre">minixml</span></tt> for the time being.</dd>
 </dl>
-<dl class="simple" id="index-10">
-<dt><strong>NeXus</strong></dt><dd><p>A common data format for neutron, x-ray, and muon science. <em>Required version ≥ 4.4</em> (see <a class="reference external" href="http://www.nexusformat.org/">NeXus</a>).</p>
-</dd>
+<dl class="docutils" id="index-10">
+<dt><strong>NeXus</strong></dt>
+<dd>A common data format for neutron, x-ray, and muon science. <em>Required version ≥ 4.4</em> (see <a class="reference external" href="http://www.nexusformat.org/">NeXus</a>).</dd>
 </dl>
-<p>If <em>optionally</em> the editor and graphical user interface <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> / <code class="docutils literal notranslate"><span class="pre">musredit</span></code> is going to be installed there is one further requirement:</p>
-<dl class="simple" id="index-11">
-<dt><strong>Qt</strong></dt><dd><p>A cross-platform application and user interface framework. <em>Required version ≥ 4.6</em> (musredit) (see <a class="reference external" href="http://qt.io/">Qt</a>). Currently the <strong>Qt5</strong> is the main development part. Qt6 just kicked in, but is not widely available yet.</p>
-</dd>
+<p>If <em>optionally</em> the editor and graphical user interface <tt class="docutils literal"><span class="pre">musrgui</span></tt> / <tt class="docutils literal"><span class="pre">musredit</span></tt> is going to be installed there is one further requirement:</p>
+<dl class="docutils" id="index-11">
+<dt><strong>Qt</strong></dt>
+<dd>A cross-platform application and user interface framework. <em>Required version ≥ 4.6</em> (musredit) (see <a class="reference external" href="http://qt.io/">Qt</a>). Currently the <strong>Qt5</strong> is the main development part. Qt6 just kicked in, but is not widely available yet.</dd>
 </dl>
-<p>Each of the following sections focusing on the installation of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> on the different operating systems will also give a brief introduction on the installation of the requirements before the actual musrfit installation is described.</p>
+<p>Each of the following sections focusing on the installation of <tt class="docutils literal"><span class="pre">musrfit</span></tt> on the different operating systems will also give a brief introduction on the installation of the requirements before the actual musrfit installation is described.</p>
 </div>
 <div class="section" id="os-restrictions">
 <span id="index-12"></span><h2>OS Restrictions<a class="headerlink" href="#os-restrictions" title="Permalink to this headline">¶</a></h2>
 <p>Before the installation procedure will be described, please note the following restrictions:</p>
-<dl class="simple">
-<dt><strong>GNU/Linux</strong></dt><dd><p>No serious problems are currently known. Tested distributions: <a class="reference external" href="https://www.redhat.com/de/technologies/linux-platforms/enterprise-linux">RHEL</a>, <a class="reference external" href="https://getfedora.org/">Fedora</a>,
+<dl class="docutils">
+<dt><strong>GNU/Linux</strong></dt>
+<dd>No serious problems are currently known. Tested distributions: <a class="reference external" href="https://www.redhat.com/de/technologies/linux-platforms/enterprise-linux">RHEL</a>, <a class="reference external" href="https://getfedora.org/">Fedora</a>,
 <a class="reference external" href="https://www.debian.org/">Debian</a>, <a class="reference external" href="https://www.ubuntu.com/">Ubuntu</a>, <a class="reference external" href="https://linuxmint.com/">Mint</a>, <a class="reference external" href="https://en.opensuse.org/Main_Page">openSUSE</a>,
-and <cite>manjaro &lt;https://de.manjaro.org/&gt;</cite>.</p>
-</dd>
-<dt><strong>Mac OS X/macOS</strong></dt><dd><p>No serious problems are currently known for macOS ≥ 10.6. <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> is ARM M1 ready.</p>
-</dd>
-<dt><strong>MS Windows</strong></dt><dd><p>Native <em>MS Windows</em> support is currently not available. Potential ways to get <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> running are:</p>
-<ul class="simple">
-<li><p>via installation of Linux via the Microsoft App store for Windows 10.</p></li>
-<li><p>via installation of the virtual machine on which you install Linux (probably the easiest for most Windows users).</p></li>
-<li><p>via <a class="reference external" href="https://www.cygwin.com/">cygwin</a>.</p></li>
+and <cite>manjaro &lt;https://de.manjaro.org/&gt;</cite>.</dd>
+<dt><strong>Mac OS X/macOS</strong></dt>
+<dd>No serious problems are currently known for macOS ≥ 10.6. <tt class="docutils literal"><span class="pre">musrfit</span></tt> is ARM M1 ready.</dd>
+<dt><strong>MS Windows</strong></dt>
+<dd><p class="first">Native <em>MS Windows</em> support is currently not available. Potential ways to get <tt class="docutils literal"><span class="pre">musrfit</span></tt> running are:</p>
+<ul class="last simple">
+<li>via installation of Linux via the Microsoft App store for Windows 10/11 (see <a class="reference external" href="https://docs.microsoft.com/en-us/windows/wsl/install">Install Linux on Windows with WSL</a>).</li>
+<li>via installation of the virtual machine on which you install Linux (probably the easiest for most Windows users).</li>
 </ul>
 </dd>
 </dl>
@@ -121,69 +132,69 @@ and <cite>manjaro &lt;https://de.manjaro.org/&gt;</cite>.</p>
 <span id="gnu-linux-requirements"></span><span id="index-14"></span><h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
 <div class="section" id="everything-but-root-and-nexus">
 <h4>Everything but ROOT and NeXus<a class="headerlink" href="#everything-but-root-and-nexus" title="Permalink to this headline">¶</a></h4>
-<p>Depending on the GNU/Linux distribution chosen, the above mentioned software – except <code class="docutils literal notranslate"><span class="pre">ROOT/CERN</span></code> and <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> – should be available from
+<p>Depending on the GNU/Linux distribution chosen, the above mentioned software &#8211; except <tt class="docutils literal"><span class="pre">ROOT/CERN</span></tt> and <tt class="docutils literal"><span class="pre">NeXus</span></tt> &#8211; should be available from
 the distributor and could be easily installed in the form of binary packages. If done in this way there should be taken care of installing <em>both</em>,
 the libraries and the header (dev, devel) files.</p>
 <p>On a <a class="reference external" href="https://www.redhat.com/en">Red Hat Linux</a> (or other RPM-package base Linux distributions) system the following command executed as <em>superuser</em>
-from the shell will do the trick (never type the ‘$’ it is the shell prompt of your system):</p>
+from the shell will do the trick (never type the &#8216;$&#8217; it is the shell prompt of your system):</p>
 <p>For <strong>Qt4</strong> (deprecated):</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ yum install git cmake boost-devel gsl-devel fftw-devel libxml2-devel qt-devel qtwebkit-devel
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ yum install git cmake boost-devel gsl-devel fftw-devel libxml2-devel qt-devel qtwebkit-devel
 </pre></div>
 </div>
 </div></blockquote>
 <p>For <strong>Qt5/Qt6</strong>:</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ yum install epel-release
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ yum install epel-release
 $ yum install git cmake boost-devel gsl-devel fftw-devel libxml2-devel qt5-qtbase-devel qt5-qtsvg-devel
 </pre></div>
 </div>
 </div></blockquote>
-<p>If using <code class="docutils literal notranslate"><span class="pre">Qt6</span></code> replace <code class="docutils literal notranslate"><span class="pre">qt5-qtbase-devel</span> <span class="pre">qt5-qtsvg-devel</span></code> by <code class="docutils literal notranslate"><span class="pre">qt6-qtbase-devel</span> <span class="pre">qt6-qtsvg-devel</span></code></p>
+<p>If using <tt class="docutils literal"><span class="pre">Qt6</span></tt> replace <tt class="docutils literal"><span class="pre">qt5-qtbase-devel</span> <span class="pre">qt5-qtsvg-devel</span></tt> by <tt class="docutils literal"><span class="pre">qt6-qtbase-devel</span> <span class="pre">qt6-qtsvg-devel</span></tt></p>
 <p>When dealing with a distribution that uses the dpkg/apt package manager like <a class="reference external" href="https://www.debian.org/">Debian</a> or <a class="reference external" href="https://www.ubuntu.com/">Ubuntu</a>
 the installation would look like:</p>
 <p>For <strong>Qt4</strong> (deprecated):</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ apt-get install git cmake libboost-dev libboost-filesystem-dev libboost-system-dev libgsl-dev libfftw3-dev libxml2-dev libqt4-dev libqtwebkit-dev
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install git cmake libboost-dev libboost-filesystem-dev libboost-system-dev libgsl-dev libfftw3-dev libxml2-dev libqt4-dev libqtwebkit-dev
 </pre></div>
 </div>
 </div></blockquote>
 <p>For <strong>Qt5/Qt6</strong>:</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ apt-get install git cmake libboost-dev libboost-filesystem-dev libboost-system-dev libgsl-dev libfftw3-dev libxml2-dev qt5-default qtbase5-dev libqt5svg5-dev
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install git cmake libboost-dev libboost-filesystem-dev libboost-system-dev libgsl-dev libfftw3-dev libxml2-dev qt5-default qtbase5-dev libqt5svg5-dev
 </pre></div>
 </div>
 </div></blockquote>
-<p>If using <code class="docutils literal notranslate"><span class="pre">Qt6</span></code> replace <code class="docutils literal notranslate"><span class="pre">qt5-default</span> <span class="pre">qtbase5-dev</span> <span class="pre">libqt5svg5-dev</span></code> by <code class="docutils literal notranslate"><span class="pre">qt6-default</span> <span class="pre">qtbase6-dev</span> <span class="pre">libqt6svg6-dev</span></code></p>
+<p>If using <tt class="docutils literal"><span class="pre">Qt6</span></tt> replace <tt class="docutils literal"><span class="pre">qt5-default</span> <span class="pre">qtbase5-dev</span> <span class="pre">libqt5svg5-dev</span></tt> by <tt class="docutils literal"><span class="pre">qt6-default</span> <span class="pre">qtbase6-dev</span> <span class="pre">libqt6svg6-dev</span></tt></p>
 <p>Everyone should know best himself which is the way to install distribution software on the chosen distribution.</p>
 <p>In case the distribution does not include the required software it has to be compiled from the source files. This means either to download
 the source code from the corresponding website, or to clone the git repo. If you need to follow this line, please check the install details of the corresponding package.</p>
-<p>For any further information on the standard installation of software, please refer to the web search engine of choice and ask for “install software on linux”…</p>
+<p>For any further information on the standard installation of software, please refer to the web search engine of choice and ask for &#8220;install software on linux&#8221;...</p>
 </div>
 <div class="section" id="installation-of-nexus-requirements-optional">
 <span id="index-15"></span><h4>Installation of NeXus requirements (optional)<a class="headerlink" href="#installation-of-nexus-requirements-optional" title="Permalink to this headline">¶</a></h4>
-<p><em>Only</em> if <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> should support reading/writing data files in the <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> format the further required
-software has to be set up. The required libraries and header files could either be available through the user’s
+<p><em>Only</em> if <tt class="docutils literal"><span class="pre">musrfit</span></tt> should support reading/writing data files in the <tt class="docutils literal"><span class="pre">NeXus</span></tt> format the further required
+software has to be set up. The required libraries and header files could either be available through the user&#8217;s
 GNU/Linux distribution or if this is not the case, the packages can be installed from the source code. In principle
-NeXus should support <code class="docutils literal notranslate"><span class="pre">MXML</span></code>, <code class="docutils literal notranslate"><span class="pre">HDF4</span></code>, and <code class="docutils literal notranslate"><span class="pre">HDF5</span></code>. At the time of this writing, the <code class="docutils literal notranslate"><span class="pre">MXML</span></code> support in the
-NeXus project is broken, and <code class="docutils literal notranslate"><span class="pre">HDF4</span></code> is outdated on most platforms, yet since ISIS/RAL is still <strong>not</strong> up-to-date <code class="docutils literal notranslate"><span class="pre">HDF4</span></code> still
-needs to be dragged on (comment: if you are a ISIS user, please complain about <code class="docutils literal notranslate"><span class="pre">HDF4</span></code>). Hence, the necessary packages to build <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> are <code class="docutils literal notranslate"><span class="pre">HDF4</span></code> and <code class="docutils literal notranslate"><span class="pre">HDF5</span></code>. This means, for a rpm-package based distro try something like:</p>
+NeXus should support <tt class="docutils literal"><span class="pre">MXML</span></tt>, <tt class="docutils literal"><span class="pre">HDF4</span></tt>, and <tt class="docutils literal"><span class="pre">HDF5</span></tt>. At the time of this writing, the <tt class="docutils literal"><span class="pre">MXML</span></tt> support in the
+NeXus project is broken, and <tt class="docutils literal"><span class="pre">HDF4</span></tt> is outdated on most platforms, yet since ISIS/RAL is still <strong>not</strong> up-to-date <tt class="docutils literal"><span class="pre">HDF4</span></tt> still
+needs to be dragged on (comment: if you are a ISIS user, please complain about <tt class="docutils literal"><span class="pre">HDF4</span></tt>). Hence, the necessary packages to build <tt class="docutils literal"><span class="pre">NeXus</span></tt> are <tt class="docutils literal"><span class="pre">HDF4</span></tt> and <tt class="docutils literal"><span class="pre">HDF5</span></tt>. This means, for a rpm-package based distro try something like:</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ yum install hdf-devel hdf5-devel
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ yum install hdf-devel hdf5-devel
 </pre></div>
 </div>
 </div></blockquote>
 <p>and on a deb-package based distro try something like:</p>
 <blockquote>
-<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ apt-get install libhdf4-dev libhdf5-dev
+<div><div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install libhdf4-dev libhdf5-dev
 </pre></div>
 </div>
 </div></blockquote>
 <p><strong>Only NeXus Version ≥ 4.4 is support!</strong></p>
-<p>Even though there might exist binary packages for the <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> library, it is best to build and
+<p>Even though there might exist binary packages for the <tt class="docutils literal"><span class="pre">NeXus</span></tt> library, it is best to build and
 install it directly from the source code which can be found <a class="reference external" href="https://github.com/nexusformat/code">here</a>.</p>
-<p>A brief instruction how to get <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> compiled from source (lines starting with ‘#’ are comments <em>only</em>):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> Downloads
+<p>A brief instruction how to get <tt class="docutils literal"><span class="pre">NeXus</span></tt> compiled from source (lines starting with &#8216;#&#8217; are comments <em>only</em>):</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> Downloads
 $ <span class="c1"># create a directory for the NeXus source code</span>
 $ mkdir nexus
 $ <span class="nb">cd</span> nexus
@@ -202,25 +213,25 @@ $ sudo make install
 <div class="section" id="index-16">
 <span id="id4"></span><h4>ROOT<a class="headerlink" href="#index-16" title="Permalink to this headline">¶</a></h4>
 <p>The ROOT framework may or may not be part of the GNU/Linux distribution. Some distributions are packing ROOT in a
-manner incompatible with the way it is needed by <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>, though the situation is improving. If you are
+manner incompatible with the way it is needed by <tt class="docutils literal"><span class="pre">musrfit</span></tt>, though the situation is improving. If you are
 experienced enough you can try the packed ROOT version. Often ROOT is split in many sub-packages. Install the
 necessary ones (guess from the description below). <strong>One Warning:</strong> if the ROOT packages are upgraded after a
-yum update (apt-get update; apt-get upgrade) you might need to recompile <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>. <em>If you are not sure about
+yum update (apt-get update; apt-get upgrade) you might need to recompile <tt class="docutils literal"><span class="pre">musrfit</span></tt>. <em>If you are not sure about
 all this: install ROOT from source</em>. Before installing ROOT from source you will need to install some additional header packages.</p>
-<p>For RPM based systems (RedHat, Fedora, <em>etc</em>) this will likely to be <code class="docutils literal notranslate"><span class="pre">libX11-devel</span></code>, <code class="docutils literal notranslate"><span class="pre">libXft-devel</span></code>, <code class="docutils literal notranslate"><span class="pre">libXpm-devel</span></code>, and <code class="docutils literal notranslate"><span class="pre">libXext-devel</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ yum install libX11-devel libXft-devel libXpm-devel libXext-devel
+<p>For RPM based systems (RedHat, Fedora, <em>etc</em>) this will likely to be <tt class="docutils literal"><span class="pre">libX11-devel</span></tt>, <tt class="docutils literal"><span class="pre">libXft-devel</span></tt>, <tt class="docutils literal"><span class="pre">libXpm-devel</span></tt>, and <tt class="docutils literal"><span class="pre">libXext-devel</span></tt>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ yum install libX11-devel libXft-devel libXpm-devel libXext-devel
 </pre></div>
 </div>
-<p>For a dpkg/apt based system (Debian, Ubuntu, <em>etc</em>) this will likely to be <code class="docutils literal notranslate"><span class="pre">libx11-dev</span></code>, <code class="docutils literal notranslate"><span class="pre">libxft-dev</span></code>, <code class="docutils literal notranslate"><span class="pre">libxpm-dev</span></code>, and <code class="docutils literal notranslate"><span class="pre">libxext-dev</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ apt-get install libx11-dev libxft-dev libxpm-dev libxext-dev
+<p>For a dpkg/apt based system (Debian, Ubuntu, <em>etc</em>) this will likely to be <tt class="docutils literal"><span class="pre">libx11-dev</span></tt>, <tt class="docutils literal"><span class="pre">libxft-dev</span></tt>, <tt class="docutils literal"><span class="pre">libxpm-dev</span></tt>, and <tt class="docutils literal"><span class="pre">libxext-dev</span></tt>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ apt-get install libx11-dev libxft-dev libxpm-dev libxext-dev
 </pre></div>
 </div>
-<p>Also make sure that you have installed all required packages listed under <a class="reference internal" href="#gnu-linux-requirements"><span class="std std-ref">Required Software</span></a> (<em>e.g.</em> fftw, gsl, <em>etc</em>).</p>
-<p>In the following it is assumed that <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> shall be installed under <code class="docutils literal notranslate"><span class="pre">$HOME/Apps</span></code>. If you want to install
+<p>Also make sure that you have installed all required packages listed under <a class="reference internal" href="#gnu-linux-requirements"><em>Required Software</em></a> (<em>e.g.</em> fftw, gsl, <em>etc</em>).</p>
+<p>In the following it is assumed that <tt class="docutils literal"><span class="pre">ROOT</span></tt> shall be installed under <tt class="docutils literal"><span class="pre">$HOME/Apps</span></tt>. If you want to install
 it somewhere else, just systematically replace the related terms of the following description. For the
-following list of commands the ‘$’ will be given, the command prompt. Do not enter it! Also some comments will
-be added starting with a ‘#’ which can be omitted. They are only there to explain what is going on.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>
+following list of commands the &#8216;$&#8217; will be given, the command prompt. Do not enter it! Also some comments will
+be added starting with a &#8216;#&#8217; which can be omitted. They are only there to explain what is going on.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>
 $ <span class="c1"># creat the Apps directory if not already present</span>
 $ mkdir Apps
 $ <span class="nb">cd</span> Apps
@@ -243,27 +254,27 @@ $ <span class="c1"># as a last step of the ROOT build process we need to install
 $ make install
 </pre></div>
 </div>
-<p>What is still missing is that the system should be told where to find the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> installation, therefore the following is suggested:</p>
+<p>What is still missing is that the system should be told where to find the <tt class="docutils literal"><span class="pre">ROOT</span></tt> installation, therefore the following is suggested:</p>
 <ul>
-<li><p>As superuser create a file <code class="docutils literal notranslate"><span class="pre">/etc/ld.so.conf.d/cern-root.conf</span></code> where the path to the lib directory of <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> is
-added and call <code class="docutils literal notranslate"><span class="pre">/sbin/ldconfig</span></code> afterwards. In the example mentioned above one way of doing this is
-(<code class="docutils literal notranslate"><span class="pre">&lt;home&gt;</span></code> has to be the path to your home, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">/home/luke_skywalker</span></code>):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">echo</span> <span class="s2">&quot;&lt;home&gt;/Apps/root/root_exec/lib&quot;</span> &gt;&gt; /etc/ld.so.conf.d/cern-root.conf
+<li><p class="first">As superuser create a file <tt class="docutils literal"><span class="pre">/etc/ld.so.conf.d/cern-root.conf</span></tt> where the path to the lib directory of <tt class="docutils literal"><span class="pre">ROOT</span></tt> is
+added and call <tt class="docutils literal"><span class="pre">/sbin/ldconfig</span></tt> afterwards. In the example mentioned above one way of doing this is
+(<tt class="docutils literal"><span class="pre">&lt;home&gt;</span></tt> has to be the path to your home, <em>e.g.</em> <tt class="docutils literal"><span class="pre">/home/luke_skywalker</span></tt>):</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">echo</span> <span class="s2">&quot;&lt;home&gt;/Apps/root/root_exec/lib&quot;</span> &gt;&gt; /etc/ld.so.conf.d/cern-root.conf
 $ /sbin/ldconfig
 </pre></div>
 </div>
 </li>
-<li><p>Additionally, as normal user one should append the following lines to the <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> and/or <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code>
-(<code class="docutils literal notranslate"><span class="pre">~./profile</span></code> on Debian like systems, and then either restart the shell or call the same commands once more from
+<li><p class="first">Additionally, as normal user one should append the following lines to the <tt class="docutils literal"><span class="pre">~/.bashrc</span></tt> and/or <tt class="docutils literal"><span class="pre">~/.bash_profile</span></tt>
+(<tt class="docutils literal"><span class="pre">~./profile</span></tt> on Debian like systems, and then either restart the shell or call the same commands once more from
 the shell) in order to change some path-setting environment variables:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">ROOTSYS</span><span class="o">=</span><span class="nv">$HOME</span>/Apps/root/root_exec
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">ROOTSYS</span><span class="o">=</span><span class="nv">$HOME</span>/Apps/root/root_exec
 $ <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin:<span class="nv">$PATH</span>
 </pre></div>
 </div>
 </li>
 </ul>
 <p>If an update of ROOT is needed, simple do the following:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/root
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/root
 $ git pull
 $ <span class="nb">cd</span> root_build
 $ cmake --build ./ --clean-first
@@ -273,28 +284,28 @@ $ cmake --build ./ --clean-first
 </div>
 <div class="section" id="musrfit">
 <span id="index-17"></span><h3>musrfit<a class="headerlink" href="#musrfit" title="Permalink to this headline">¶</a></h3>
-<p>When all required software has been set up you can proceed with the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> installatio. First, the most
-recent source code should be downloaded. The preferred way of doing so is to clone the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> repository via git.
-Assuming the code should be located in <code class="docutils literal notranslate"><span class="pre">$HOME/Apps</span></code> this is achieved most easily calling from the terminal</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps
+<p>When all required software has been set up you can proceed with the <tt class="docutils literal"><span class="pre">musrfit</span></tt> installatio. First, the most
+recent source code should be downloaded. The preferred way of doing so is to clone the <tt class="docutils literal"><span class="pre">musrfit</span></tt> repository via git.
+Assuming the code should be located in <tt class="docutils literal"><span class="pre">$HOME/Apps</span></tt> this is achieved most easily calling from the terminal</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps
 $ git clone https://bitbucket.org/muonspin/musrfit.git
 $ <span class="nb">cd</span> musrfit
 </pre></div>
 </div>
 <p>or</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps
 $ git clone git://gitlab.psi.ch/nemu/musrfit.git
 $ <span class="nb">cd</span> musrfit
 </pre></div>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>after cloning the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> repo you will automatically be on the
-<code class="docutils literal notranslate"><span class="pre">root6</span></code> branch. If you want to get legacy ROOT 5.34.xx support, you
+<p class="first admonition-title">Note</p>
+<p class="last">after cloning the <tt class="docutils literal"><span class="pre">musrfit</span></tt> repo you will automatically be on the
+<tt class="docutils literal"><span class="pre">root6</span></tt> branch. If you want to get legacy ROOT 5.34.xx support, you
 will needed to switch branches first.</p>
 </div>
 <p><strong>Update:</strong> If a local repository clone is already present (it needs to be newer than Dec. 2016), one can update it using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit
 $ git pull
 $ <span class="nb">cd</span> build
 $ xargs rm &lt; install_manifest.txt
@@ -305,35 +316,35 @@ $ make install
 <p>As an alternative (if git is not available), the source code can also be downloaded from the following web-page: <a class="reference external" href="https://bitbucket.org/muonspin/musrfit/downloads">musrfit at bitbucket</a></p>
 <div class="section" id="musrfit-build-with-cmake">
 <span id="index-18"></span><h4>musrfit build with cmake<a class="headerlink" href="#musrfit-build-with-cmake" title="Permalink to this headline">¶</a></h4>
-<p>Currently the following configuration switches for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> are available:</p>
-<dl class="simple">
-<dt><strong>-DCMAKE_INSTALL_PREFIX=&lt;prefix-path&gt;</strong></dt><dd><p>Specify the installation prefix, <em>i.e.</em> the place where <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> shall be installed, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">$ROOTSYS</span></code> if already defined (by default: <code class="docutils literal notranslate"><span class="pre">/usr/local</span></code>).</p>
-</dd>
-<dt><strong>-Dnexus=&lt;value&gt;</strong></dt><dd><p>enable/disable the support of <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> data files (requires the <code class="docutils literal notranslate"><span class="pre">HDF4</span></code>, <code class="docutils literal notranslate"><span class="pre">HDF5</span></code> and <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> libraries to be installed).
-&lt;value&gt;=1 enables <code class="docutils literal notranslate"><span class="pre">NeXus</span></code>, &lt;value&gt;=0 disables <code class="docutils literal notranslate"><span class="pre">NeXus</span></code>. The default setting, <em>i.e.</em> the switch is not provided is <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> support is disabled.</p>
-</dd>
-<dt><strong>-DASlibs=&lt;value&gt;</strong></dt><dd><p>enable/disable the <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code>. &lt;value&gt;=1 enables the <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code>, &lt;value&gt;=0 disables the <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code>. The default setting, <em>i.e.</em> the
-switch is not provided is <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code> support is disabled. For details see Documentation of <a class="reference internal" href="user-libs.html#user-libs"><span class="std std-ref">user libs</span></a>.</p>
-</dd>
-<dt><strong>-DBMWlibs=&lt;value&gt;</strong></dt><dd><p>enable/disable the <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code>. &lt;value&gt;=1 enables the <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code>, &lt;value&gt;=0 disables the <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code>. The default setting, <em>i.e.</em> the
-switch is not provided is <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code> support is disabled. For details see Documentation of <a class="reference internal" href="user-libs.html#user-libs"><span class="std std-ref">user libs</span></a>.</p>
-</dd>
-<dt><strong>-DBNMRlibs=&lt;value&gt;</strong></dt><dd><p>enable/disable the <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code>. &lt;value&gt;=1 enables the <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code>, &lt;value&gt;=0 disables the <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code>. The default setting,
-<em>i.e.</em> the switch is not provided is <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code> support is disabled.</p>
-</dd>
-<dt><strong>-Dqt_based_tools=&lt;value&gt;</strong></dt><dd><p>Will try to get <code class="docutils literal notranslate"><span class="pre">musredit</span></code>, <code class="docutils literal notranslate"><span class="pre">musrWiz</span></code>, <code class="docutils literal notranslate"><span class="pre">musrStep</span></code>, and <code class="docutils literal notranslate"><span class="pre">mupp</span></code> installed, if <code class="docutils literal notranslate"><span class="pre">Qt</span></code> is found.
-By default this is enabled. Again &lt;value&gt;=0 means disabled, &lt;value&gt;=1 enabled.</p>
-</dd>
-<dt><strong>-Dqt_version=&lt;value&gt;</strong></dt><dd><p>Allows to specify which <code class="docutils literal notranslate"><span class="pre">Qt</span></code> version shall be tried. &lt;value&gt; can take the values: <code class="docutils literal notranslate"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6</span></code>.
-If the value is set to <code class="docutils literal notranslate"><span class="pre">AUTO</span></code>, this highest installed version is chosen, otherwise the specified version is used.</p>
-</dd>
-<dt><strong>-Dtry_OpenMP=&lt;value&gt;</strong></dt><dd><p>Will check if <code class="docutils literal notranslate"><span class="pre">OpenMP</span></code> support is possible, and if yes use it. The default is enabled</p>
-</dd>
+<p>Currently the following configuration switches for <tt class="docutils literal"><span class="pre">musrfit</span></tt> are available:</p>
+<dl class="docutils">
+<dt><strong>-DCMAKE_INSTALL_PREFIX=&lt;prefix-path&gt;</strong></dt>
+<dd>Specify the installation prefix, <em>i.e.</em> the place where <tt class="docutils literal"><span class="pre">musrfit</span></tt> shall be installed, <em>e.g.</em> <tt class="docutils literal"><span class="pre">$ROOTSYS</span></tt> if already defined (by default: <tt class="docutils literal"><span class="pre">/usr/local</span></tt>).</dd>
+<dt><strong>-Dnexus=&lt;value&gt;</strong></dt>
+<dd>enable/disable the support of <tt class="docutils literal"><span class="pre">NeXus</span></tt> data files (requires the <tt class="docutils literal"><span class="pre">HDF4</span></tt>, <tt class="docutils literal"><span class="pre">HDF5</span></tt> and <tt class="docutils literal"><span class="pre">NeXus</span></tt> libraries to be installed).
+&lt;value&gt;=1 enables <tt class="docutils literal"><span class="pre">NeXus</span></tt>, &lt;value&gt;=0 disables <tt class="docutils literal"><span class="pre">NeXus</span></tt>. The default setting, <em>i.e.</em> the switch is not provided is <tt class="docutils literal"><span class="pre">NeXus</span></tt> support is disabled.</dd>
+<dt><strong>-DASlibs=&lt;value&gt;</strong></dt>
+<dd>enable/disable the <tt class="docutils literal"><span class="pre">ASlibs</span></tt>. &lt;value&gt;=1 enables the <tt class="docutils literal"><span class="pre">ASlibs</span></tt>, &lt;value&gt;=0 disables the <tt class="docutils literal"><span class="pre">ASlibs</span></tt>. The default setting, <em>i.e.</em> the
+switch is not provided is <tt class="docutils literal"><span class="pre">ASlibs</span></tt> support is disabled. For details see Documentation of <a class="reference internal" href="user-libs.html#user-libs"><em>user libs</em></a>.</dd>
+<dt><strong>-DBMWlibs=&lt;value&gt;</strong></dt>
+<dd>enable/disable the <tt class="docutils literal"><span class="pre">BMWlibs</span></tt>. &lt;value&gt;=1 enables the <tt class="docutils literal"><span class="pre">BMWlibs</span></tt>, &lt;value&gt;=0 disables the <tt class="docutils literal"><span class="pre">BMWlibs</span></tt>. The default setting, <em>i.e.</em> the
+switch is not provided is <tt class="docutils literal"><span class="pre">BMWlibs</span></tt> support is disabled. For details see Documentation of <a class="reference internal" href="user-libs.html#user-libs"><em>user libs</em></a>.</dd>
+<dt><strong>-DBNMRlibs=&lt;value&gt;</strong></dt>
+<dd>enable/disable the <tt class="docutils literal"><span class="pre">BNMRlibs</span></tt>. &lt;value&gt;=1 enables the <tt class="docutils literal"><span class="pre">BNMRlibs</span></tt>, &lt;value&gt;=0 disables the <tt class="docutils literal"><span class="pre">BNMRlibs</span></tt>. The default setting,
+<em>i.e.</em> the switch is not provided is <tt class="docutils literal"><span class="pre">BNMRlibs</span></tt> support is disabled.</dd>
+<dt><strong>-Dqt_based_tools=&lt;value&gt;</strong></dt>
+<dd>Will try to get <tt class="docutils literal"><span class="pre">musredit</span></tt>, <tt class="docutils literal"><span class="pre">musrWiz</span></tt>, <tt class="docutils literal"><span class="pre">musrStep</span></tt>, and <tt class="docutils literal"><span class="pre">mupp</span></tt> installed, if <tt class="docutils literal"><span class="pre">Qt</span></tt> is found.
+By default this is enabled. Again &lt;value&gt;=0 means disabled, &lt;value&gt;=1 enabled.</dd>
+<dt><strong>-Dqt_version=&lt;value&gt;</strong></dt>
+<dd>Allows to specify which <tt class="docutils literal"><span class="pre">Qt</span></tt> version shall be tried. &lt;value&gt; can take the values: <tt class="docutils literal"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6</span></tt>.
+If the value is set to <tt class="docutils literal"><span class="pre">AUTO</span></tt>, this highest installed version is chosen, otherwise the specified version is used.</dd>
+<dt><strong>-Dtry_OpenMP=&lt;value&gt;</strong></dt>
+<dd>Will check if <tt class="docutils literal"><span class="pre">OpenMP</span></tt> support is possible, and if yes use it. The default is enabled</dd>
 </dl>
-<p>Normally it should not be necessary to make use of any of the options except for specifying the installation path with <code class="docutils literal notranslate"><span class="pre">-DCMAKE_INSTALL_PREFIX</span></code>.
-<code class="docutils literal notranslate"><span class="pre">musrfit</span></code> build with <code class="docutils literal notranslate"><span class="pre">cmake</span></code> takes the <code class="docutils literal notranslate"><span class="pre">out-of-source</span></code> approach. Therefore a typical configuration / make / install process including
-<code class="docutils literal notranslate"><span class="pre">NeXus</span></code> support would look like</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit
+<p>Normally it should not be necessary to make use of any of the options except for specifying the installation path with <tt class="docutils literal"><span class="pre">-DCMAKE_INSTALL_PREFIX</span></tt>.
+<tt class="docutils literal"><span class="pre">musrfit</span></tt> build with <tt class="docutils literal"><span class="pre">cmake</span></tt> takes the <tt class="docutils literal"><span class="pre">out-of-source</span></tt> approach. Therefore a typical configuration / make / install process including
+<tt class="docutils literal"><span class="pre">NeXus</span></tt> support would look like</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit
 $ mkdir build
 $ <span class="nb">cd</span> build
 $ cmake ../ -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$ROOTSYS</span> -Dnexus<span class="o">=</span><span class="m">1</span>
@@ -349,40 +360,41 @@ $ /sbin/ldconfig                                  <span class="c1"># (as superus
 <p>In order to finish the installation of musrfit two more things should be done:</p>
 <blockquote>
 <div><ul>
-<li><p>Define the <em>MUSRFITPATH</em> environment variable containing the path to the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> executables and <code class="docutils literal notranslate"><span class="pre">XML</span></code> files.
-<em>E.g.</em> if the location of the example above is used append the following line to the <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> and
-<code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code> (and then either restart the shell, source the file, or call the same commands once more from the shell):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">MUSRFITPATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin
+<li><p class="first">Define the <em>MUSRFITPATH</em> environment variable containing the path to the <tt class="docutils literal"><span class="pre">musrfit</span></tt> executables and <tt class="docutils literal"><span class="pre">XML</span></tt> files.
+<em>E.g.</em> if the location of the example above is used append the following line to the <tt class="docutils literal"><span class="pre">~/.bashrc</span></tt> and
+<tt class="docutils literal"><span class="pre">~/.bash_profile</span></tt> (and then either restart the shell, source the file, or call the same commands once more from the shell):</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">MUSRFITPATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin
 </pre></div>
 </div>
 </li>
-<li><p>Adjust the paths where <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> will search for data files in the installed <code class="docutils literal notranslate"><span class="pre">musrfit_startup.xml</span></code>. For
-detailed information on this XML file refer to the <a class="reference internal" href="user-manual.html#musrfit-startup"><span class="std std-ref">manual</span></a>.</p></li>
+<li><p class="first">Adjust the paths where <tt class="docutils literal"><span class="pre">musrfit</span></tt> will search for data files in the installed <tt class="docutils literal"><span class="pre">musrfit_startup.xml</span></tt>. For
+detailed information on this XML file refer to the <a class="reference internal" href="user-manual.html#musrfit-startup"><em>manual</em></a>.</p>
+</li>
 </ul>
 </div></blockquote>
 </div>
 </div>
 <div class="section" id="musredit">
 <span id="index-20"></span><h3>musredit<a class="headerlink" href="#musredit" title="Permalink to this headline">¶</a></h3>
-<p>In the latest version of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> the configure script tries to determine automatically the highest available <code class="docutils literal notranslate"><span class="pre">Qt</span></code> version.
-In case this is found, the editor <code class="docutils literal notranslate"><span class="pre">musredit</span></code> is built already together with <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>.</p>
+<p>In the latest version of <tt class="docutils literal"><span class="pre">musrfit</span></tt> the configure script tries to determine automatically the highest available <tt class="docutils literal"><span class="pre">Qt</span></tt> version.
+In case this is found, the editor <tt class="docutils literal"><span class="pre">musredit</span></tt> is built already together with <tt class="docutils literal"><span class="pre">musrfit</span></tt>.</p>
 </div>
 <div class="section" id="musrgui-deprecated">
 <h3>musrgui (deprecated)<a class="headerlink" href="#musrgui-deprecated" title="Permalink to this headline">¶</a></h3>
-<p>If <code class="docutils literal notranslate"><span class="pre">Qt4.6</span></code> or higher is not available but <code class="docutils literal notranslate"><span class="pre">Qt3</span></code> is set up <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> can be installed. For this please
-follow the instructions for the <code class="docutils literal notranslate"><span class="pre">musredit</span></code> installation where simply every <code class="docutils literal notranslate"><span class="pre">musredit</span></code> occurrence has to
-be replaced by <code class="docutils literal notranslate"><span class="pre">musrgui</span></code>. If there are problems during the <code class="docutils literal notranslate"><span class="pre">qmake</span></code> step, <em>e.g.</em>
-“uic: File generated with too old version of Qt Designer”, this most probably means the <code class="docutils literal notranslate"><span class="pre">Qt4</span></code> version of <code class="docutils literal notranslate"><span class="pre">qmake</span></code>
-is being used. In order to use the <code class="docutils literal notranslate"><span class="pre">Qt3</span></code> version it should be enough to specify the full path to its location
-when calling it. Within the most GNU/Linux distributions this location will be something like <code class="docutils literal notranslate"><span class="pre">/usr/lib/qt-3.3/bin/qmake</span></code>.</p>
+<p>If <tt class="docutils literal"><span class="pre">Qt4.6</span></tt> or higher is not available but <tt class="docutils literal"><span class="pre">Qt3</span></tt> is set up <tt class="docutils literal"><span class="pre">musrgui</span></tt> can be installed. For this please
+follow the instructions for the <tt class="docutils literal"><span class="pre">musredit</span></tt> installation where simply every <tt class="docutils literal"><span class="pre">musredit</span></tt> occurrence has to
+be replaced by <tt class="docutils literal"><span class="pre">musrgui</span></tt>. If there are problems during the <tt class="docutils literal"><span class="pre">qmake</span></tt> step, <em>e.g.</em>
+&#8220;uic: File generated with too old version of Qt Designer&#8221;, this most probably means the <tt class="docutils literal"><span class="pre">Qt4</span></tt> version of <tt class="docutils literal"><span class="pre">qmake</span></tt>
+is being used. In order to use the <tt class="docutils literal"><span class="pre">Qt3</span></tt> version it should be enough to specify the full path to its location
+when calling it. Within the most GNU/Linux distributions this location will be something like <tt class="docutils literal"><span class="pre">/usr/lib/qt-3.3/bin/qmake</span></tt>.</p>
 </div>
 <div class="section" id="check-the-installation">
 <h3>Check the installation<a class="headerlink" href="#check-the-installation" title="Permalink to this headline">¶</a></h3>
 <p>In order to perform a quick test for finding out if the installation has been completed successfully, a few msr files
-together with the corresponding data files can be found in the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> source tree at <code class="docutils literal notranslate"><span class="pre">doc/examples/</span></code>.
-If <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> has been installed, just open one of the <code class="docutils literal notranslate"><span class="pre">test-*.msr</span></code> files in the editor and test the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>
+together with the corresponding data files can be found in the <tt class="docutils literal"><span class="pre">musrfit</span></tt> source tree at <tt class="docutils literal"><span class="pre">doc/examples/</span></tt>.
+If <tt class="docutils literal"><span class="pre">musrgui</span></tt> has been installed, just open one of the <tt class="docutils literal"><span class="pre">test-*.msr</span></tt> files in the editor and test the <tt class="docutils literal"><span class="pre">musrfit</span></tt>
 functionalities. Otherwise, if only the terminal should be used, as an initial test for instance the following could be done:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit/doc/examples
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit/doc/examples
 $ musrview test-histo-ROOT-NPP.msr
 </pre></div>
 </div>
@@ -391,358 +403,113 @@ $ musrview test-histo-ROOT-NPP.msr
 <div class="section" id="ms-windows">
 <h2>MS Windows<a class="headerlink" href="#ms-windows" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>The description here is only for the very brave ones. It hasn’t been tested for quite a while and therefore gives you
-rather a flavour of what needs to be done rather than a real instruction how to setup <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>. If you just need
-<code class="docutils literal notranslate"><span class="pre">musrfit</span></code> to work on a MS Windows platform, it is recommended to install it via a linux virtual machine!</p>
+<p class="first admonition-title">Note</p>
+<p class="last">For adventurous guys using Windows 10/11, there is the possibility to activate the built in Ubuntu bash-shell. It allows
+to install <tt class="docutils literal"><span class="pre">musrfit</span></tt> as described in the Linux section. For details to setup the Linux sub-system for MS Windows
+see <a class="reference external" href="https://docs.microsoft.com/en-us/windows/wsl/install">Install Linux on Windows with WSL</a>.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>For adventurous guys using Windows 10, there is the possibility to activate the built in Ubuntu bash-shell. It allows
-to install <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> as described in the Linux section.</p>
+<p class="first admonition-title">Note</p>
+<p class="last">Another possibility is to setup linux as a virtual machine with VirtualBox are other alike tools. This way you separate
+Linux / ROOT / musrfit from the default MS Windows system.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>One more advice: Please never try to install either <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> or <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> from or to a directory containing spaces
+<p class="first admonition-title">Note</p>
+<p class="last">One more advice: Please never try to install either <tt class="docutils literal"><span class="pre">ROOT</span></tt> or <tt class="docutils literal"><span class="pre">musrfit</span></tt> from or to a directory containing spaces
 in the absolute path or in case you do, do not wonder if some errors occur! msr files, however, might be saved in such
-directories like <code class="docutils literal notranslate"><span class="pre">...\My</span> <span class="pre">Documents\...</span></code></p>
-</div>
-<p>Under Windows a native installation is not supported but there is the possibility to run musrfit through <a class="reference external" href="https://www.cygwin.com/">cygwin</a>
-which has the great advantage that one gains additionally various nice UNIX tools also for other purposes.
-Please also be aware of the fact that the X server which is going to be installed with <code class="docutils literal notranslate"><span class="pre">Cygwin</span></code> has to be started
-(<em>e.g.</em> by selecting it from the “Programs” folder) before any graphical application (<code class="docutils literal notranslate"><span class="pre">musrview</span></code>, <code class="docutils literal notranslate"><span class="pre">musrgui</span></code>, etc.) is started.</p>
-<div class="section" id="id5">
-<h3>Requirements<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
-<div class="section" id="setting-up-cygwin">
-<span id="index-21"></span><h4>Setting up Cygwin<a class="headerlink" href="#setting-up-cygwin" title="Permalink to this headline">¶</a></h4>
-<p>For the start go to the Cygwin website, download the setup file and use it to install Cygwin 1.7 or newer. During the installation
-process you will be asked where you want to install Cygwin and normally the default choice should just be fine. At some point you
-will be asked which packages should be installed. Make sure that you choose at least the following (or packages with revisions close
-to the following) in order to fulfill the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> requirements and be able to work with this base system:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">a2ps</span><span class="p">,</span> <span class="n">alternatives</span><span class="p">,</span> <span class="n">autoconf</span><span class="p">,</span> <span class="n">automake</span><span class="p">,</span> <span class="n">base</span><span class="o">-</span><span class="n">cygwin</span><span class="p">,</span> <span class="n">base</span><span class="o">-</span><span class="n">files</span><span class="p">,</span> <span class="n">base</span><span class="o">-</span><span class="n">passwd</span> <span class="n">bash</span><span class="p">,</span> <span class="n">bash</span><span class="o">-</span><span class="n">completion</span><span class="p">,</span>
-<span class="n">bc</span><span class="p">,</span> <span class="n">binutils</span><span class="p">,</span> <span class="n">bison</span><span class="p">,</span> <span class="n">boost</span><span class="p">,</span> <span class="n">boost</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">bzip2</span><span class="p">,</span> <span class="n">cmake</span><span class="p">,</span> <span class="n">colorgcc</span><span class="p">,</span> <span class="n">coreutils</span><span class="p">,</span> <span class="n">curl</span><span class="p">,</span> <span class="n">cygutils</span><span class="p">,</span> <span class="n">cygwin</span><span class="p">,</span>
-<span class="n">editrights</span><span class="p">,</span> <span class="n">fftw3</span><span class="p">,</span> <span class="n">findutils</span><span class="p">,</span> <span class="n">flex</span><span class="p">,</span> <span class="n">font</span><span class="o">-</span><span class="n">adobe</span><span class="o">-</span><span class="n">dpi100</span><span class="p">,</span>   <span class="n">font</span><span class="o">-</span><span class="n">adobe</span><span class="o">-</span><span class="n">dpi75</span><span class="p">,</span> <span class="n">font</span><span class="o">-</span><span class="n">alias</span><span class="p">,</span>
-<span class="n">font</span><span class="o">-</span><span class="n">bitstream</span><span class="o">-</span><span class="n">dpi100</span><span class="p">,</span> <span class="n">font</span><span class="o">-</span><span class="n">bitstream</span><span class="o">-</span><span class="n">dpi75</span><span class="p">,</span> <span class="n">font</span><span class="o">-</span><span class="n">encodings</span><span class="p">,</span> <span class="n">font</span><span class="o">-</span><span class="n">ibm</span><span class="o">-</span><span class="n">type1</span><span class="p">,</span> <span class="n">font</span><span class="o">-</span><span class="n">sun</span><span class="o">-</span><span class="n">misc</span><span class="p">,</span> <span class="n">font</span><span class="o">-</span><span class="n">util</span><span class="p">,</span>
-<span class="n">font</span><span class="o">-</span><span class="n">xfree86</span><span class="o">-</span><span class="n">type1</span><span class="p">,</span> <span class="n">fontconfig</span><span class="p">,</span> <span class="n">freeglut</span><span class="p">,</span> <span class="n">gawk</span><span class="p">,</span> <span class="n">gcc</span><span class="o">-</span><span class="n">tools</span><span class="o">-</span><span class="n">autoconf</span><span class="p">,</span> <span class="n">gcc</span><span class="o">-</span><span class="n">tools</span><span class="o">-</span><span class="n">automake</span><span class="p">,</span> <span class="n">gcc4</span><span class="p">,</span>
-<span class="n">gcc4</span><span class="o">-</span><span class="n">core</span><span class="p">,</span> <span class="n">gcc4</span><span class="o">-</span><span class="n">fortran</span><span class="p">,</span> <span class="n">gcc4</span><span class="o">-</span><span class="n">g</span><span class="o">++</span><span class="p">,</span>   <span class="n">gccmakedep</span><span class="p">,</span> <span class="n">gd</span><span class="p">,</span> <span class="n">gettext</span><span class="p">,</span> <span class="n">ghostscript</span><span class="p">,</span> <span class="n">ghostscript</span><span class="o">-</span><span class="n">fonts</span><span class="o">-</span><span class="n">std</span><span class="p">,</span>
-<span class="n">giflib</span><span class="p">,</span> <span class="n">gmp</span><span class="p">,</span> <span class="n">grep</span><span class="p">,</span> <span class="n">groff</span><span class="p">,</span> <span class="n">gsl</span><span class="p">,</span> <span class="n">gsl</span><span class="o">-</span><span class="n">apps</span><span class="p">,</span> <span class="n">gsl</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">gv</span><span class="p">,</span> <span class="n">gzip</span><span class="p">,</span>   <span class="n">inputproto</span><span class="p">,</span> <span class="n">jasper</span><span class="p">,</span> <span class="n">jpeg</span><span class="p">,</span> <span class="n">lapack</span><span class="p">,</span>
-<span class="n">less</span><span class="p">,</span> <span class="n">libboost</span><span class="p">,</span> <span class="n">libbz2_1</span><span class="p">,</span> <span class="n">libcharset1</span><span class="p">,</span> <span class="n">libcurl4</span><span class="p">,</span> <span class="n">libfftw3</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libfftw3_3</span><span class="p">,</span> <span class="n">libgcc1</span><span class="p">,</span> <span class="n">libgd</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>
-<span class="n">libgif</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libGL</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libGL1</span><span class="p">,</span> <span class="n">libGLU</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libGLU1</span><span class="p">,</span> <span class="n">libglut</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libglut3</span><span class="p">,</span> <span class="n">libgmp</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>
-<span class="n">libgmp3</span><span class="p">,</span> <span class="n">libgomp1</span><span class="p">,</span> <span class="n">libICE</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>   <span class="n">libICE6</span><span class="p">,</span> <span class="n">libjpeg</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libjpeg62</span><span class="p">,</span> <span class="n">liblapack</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libmpfr</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>
-<span class="n">libmpfr1</span><span class="p">,</span> <span class="n">libncurses</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libncurses9</span><span class="p">,</span> <span class="n">libOSMesa</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>   <span class="n">libOSMesa7</span><span class="p">,</span> <span class="n">libpng</span><span class="p">,</span> <span class="n">libpng14</span><span class="p">,</span> <span class="n">libpng14</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>
-<span class="n">libreadline6</span><span class="p">,</span> <span class="n">libSM</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libSM6</span><span class="p">,</span> <span class="n">libssh2_1</span><span class="p">,</span> <span class="n">libstdc</span><span class="o">++</span><span class="mi">6</span><span class="p">,</span> <span class="n">libstdc</span><span class="o">++</span><span class="mi">6</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>   <span class="n">libtiff</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libtiff5</span><span class="p">,</span>
-<span class="n">libtool</span><span class="p">,</span> <span class="n">libX11</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libX11_6</span><span class="p">,</span> <span class="n">libXau</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libXau6</span><span class="p">,</span> <span class="n">libXaw7</span><span class="p">,</span> <span class="n">libxcb</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libxcb</span><span class="o">-</span><span class="n">xlib</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>
-<span class="n">libXcursor</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libXcursor1</span><span class="p">,</span> <span class="n">libXdmcp</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libXdmcp6</span><span class="p">,</span> <span class="n">libXext</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libXext6</span><span class="p">,</span> <span class="n">libXfixes</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>
-<span class="n">libXfixes3</span><span class="p">,</span> <span class="n">libXfont</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>   <span class="n">libXfont1</span><span class="p">,</span> <span class="n">libXft</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libXft2</span><span class="p">,</span> <span class="n">libXi</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libXi6</span><span class="p">,</span> <span class="n">libxkbfile1</span><span class="p">,</span>
-<span class="n">libxml2</span><span class="p">,</span> <span class="n">libxml2</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libXmu</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libXmu6</span><span class="p">,</span> <span class="n">libXpm</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>   <span class="n">libXpm4</span><span class="p">,</span> <span class="n">libXrender</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libXrender1</span><span class="p">,</span>
-<span class="n">libXt</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libXt6</span><span class="p">,</span> <span class="n">login</span><span class="p">,</span> <span class="n">m4</span><span class="p">,</span> <span class="n">make</span><span class="p">,</span> <span class="n">makedepend</span><span class="p">,</span> <span class="n">man</span><span class="p">,</span> <span class="n">mpfr</span><span class="p">,</span> <span class="n">nano</span><span class="p">,</span> <span class="n">opengl</span><span class="p">,</span> <span class="n">openssh</span><span class="p">,</span> <span class="n">openssl</span><span class="p">,</span> <span class="n">pdftk</span><span class="p">,</span>
-<span class="n">perl</span><span class="p">,</span> <span class="n">ping</span><span class="p">,</span> <span class="n">pkg</span><span class="o">-</span><span class="n">config</span><span class="p">,</span> <span class="n">psutils</span><span class="p">,</span> <span class="n">python</span><span class="p">,</span> <span class="n">qt3</span><span class="p">,</span> <span class="n">qt3</span><span class="o">-</span><span class="nb">bin</span><span class="p">,</span> <span class="n">qt3</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">readline</span><span class="p">,</span> <span class="n">rebase</span><span class="p">,</span> <span class="n">rgb</span><span class="p">,</span> <span class="n">rsync</span><span class="p">,</span> <span class="n">run</span><span class="p">,</span>
-<span class="n">screen</span><span class="p">,</span> <span class="n">sed</span><span class="p">,</span> <span class="n">subversion</span><span class="p">,</span>   <span class="n">tar</span><span class="p">,</span> <span class="n">tcltk</span><span class="p">,</span> <span class="n">terminfo</span><span class="p">,</span> <span class="n">unzip</span><span class="p">,</span> <span class="n">util</span><span class="o">-</span><span class="n">linux</span><span class="p">,</span> <span class="n">vim</span><span class="p">,</span> <span class="n">w32api</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span>
-<span class="n">X</span><span class="o">-</span><span class="n">start</span><span class="o">-</span><span class="n">menu</span><span class="o">-</span><span class="n">icons</span><span class="p">,</span> <span class="n">xauth</span><span class="p">,</span> <span class="n">xextproto</span><span class="p">,</span> <span class="n">xfontsel</span><span class="p">,</span> <span class="n">xinit</span><span class="p">,</span> <span class="n">xkbcomp</span><span class="p">,</span>   <span class="n">xkeyboard</span><span class="o">-</span><span class="n">config</span><span class="p">,</span> <span class="n">xkill</span><span class="p">,</span> <span class="n">xlogo</span><span class="p">,</span>
-<span class="n">xlsfonts</span><span class="p">,</span> <span class="n">xorg</span><span class="o">-</span><span class="n">cf</span><span class="o">-</span><span class="n">files</span><span class="p">,</span> <span class="n">xorg</span><span class="o">-</span><span class="n">scripts</span><span class="p">,</span> <span class="n">xorg</span><span class="o">-</span><span class="n">server</span><span class="p">,</span> <span class="n">xproto</span><span class="p">,</span> <span class="n">xrdb</span><span class="p">,</span> <span class="n">xrefresh</span><span class="p">,</span> <span class="n">xset</span><span class="p">,</span> <span class="n">xterm</span><span class="p">,</span> <span class="nb">zip</span><span class="p">,</span> <span class="n">zlib</span><span class="p">,</span>
-<span class="n">zlib</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">zlib0</span><span class="p">,</span> <span class="n">libQt3Support4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtAssistantClient4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtCore4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>
-<span class="n">libQtDBus4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtDesigner4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>   <span class="n">libQtGui4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtHelp4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtNetwork4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>
-<span class="n">libQtOpenGL4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtScript4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtScriptTools4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>   <span class="n">libQtSql4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtSvg4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span>
-<span class="n">libQtTest4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtWebKit4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtXml4</span><span class="o">-</span><span class="n">devel</span><span class="p">,</span> <span class="n">libQtXmlPatterns4</span><span class="o">-</span><span class="n">devel</span>
-</pre></div>
-</div>
-<p>After these installations already most of the required software is present and the Cygwin shell can be started now for the further steps!
-Inside the shell the POSIX naming convention applies, therefore, paths will be given with separating “/” instead of “&quot; in DOS. The file
-structure accessible through this shell can also be accessed through the Windows Explorer — just go to the directory which you specified
-as “cygwin root” during the installation: this is the equivalent to “/” in the shell. By default, the different hard drives or network shares
-like <code class="docutils literal notranslate"><span class="pre">C:\</span></code> can be found at <code class="docutils literal notranslate"><span class="pre">/cygdrive/c/</span></code> in the shell — the cygdrive prefix can in principle also be changed but for now we stick to the default.</p>
-<p>Since later on the boost header files should be used and in the standard Cygwin installation these are found at a version specific location,
-the later handling will be easier if a symbolic link to these files is created now in the terminal (in case it had not been present before):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ln -sf /usr/include/boost-x_yy_z/boost /usr/include/boost
-</pre></div>
-</div>
-<p>where <code class="docutils literal notranslate"><span class="pre">x_yy_z</span></code> has to be substituted by the correct version number, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">1_33_1</span></code>.</p>
-</div>
-<div class="section" id="id6">
-<h4>Everything but ROOT and NeXus<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h4>
-</div>
-<div class="section" id="index-22">
-<span id="id7"></span><h4>Installation of NeXus requirements (optional)<a class="headerlink" href="#index-22" title="Permalink to this headline">¶</a></h4>
-<p>Only if <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> should support reading data files in the <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> format the further required software has
-to be set up. Under <code class="docutils literal notranslate"><span class="pre">Cygwin</span></code> of all the required libraries only <code class="docutils literal notranslate"><span class="pre">HDF5</span></code> is available. The packages <code class="docutils literal notranslate"><span class="pre">hdf5</span></code> and
-<code class="docutils literal notranslate"><span class="pre">libhdf5-devel</span></code> can be installed through the <code class="docutils literal notranslate"><span class="pre">Cygwin</span></code> setup. One should also make sure that <code class="docutils literal notranslate"><span class="pre">bison</span></code>, <code class="docutils literal notranslate"><span class="pre">flex</span></code>
-and a package containing <code class="docutils literal notranslate"><span class="pre">/usr/lib/librpc.a</span></code> (<em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">sunrpc</span> <span class="pre">=</span> <span class="pre">4.0-3</span></code>, but <em>not</em> <code class="docutils literal notranslate"><span class="pre">sunrpc</span> <span class="pre">=</span> <span class="pre">4.0-4</span></code>) are installed.</p>
-<p><strong>Only NeXus Version ≥ 4.4 is support!</strong></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span>
-$ mkdir nexus
-$ <span class="nb">cd</span> nexus
-$ curl http://www.hdfgroup.org/ftp/lib-external/jpeg/src/jpegsrc.v6b.tar.gz -G <span class="p">|</span> tar xz
-$ <span class="nb">cd</span> jpeg-6b
-$ ./configure --prefix<span class="o">=</span>/usr/local --enable-static
-$ make
-$ make install
-$ <span class="nb">cd</span> ..
-$ <span class="c1"># create a directory for the NeXus source code</span>
-$ mkdir nexus
-$ <span class="nb">cd</span> nexus
-$ <span class="c1"># get the source code from the master repository</span>
-$ git clone https://github.com/nexusformat/code.git
-$ <span class="c1"># next we will build NeXus out-of-source</span>
-$ mkdir build
-$ <span class="nb">cd</span> build
-$ cmake -DENABLE_HDF5<span class="o">=</span><span class="m">1</span> -DENABLE_HDF4<span class="o">=</span><span class="m">1</span> -DENABLE_MXML<span class="o">=</span><span class="m">0</span> ../code
-$ make
-$ make install
-</pre></div>
-</div>
-</div>
-<div class="section" id="index-23">
-<span id="id8"></span><h4>ROOT<a class="headerlink" href="#index-23" title="Permalink to this headline">¶</a></h4>
-<p>In order to install the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> system, there are two possibilities:</p>
-<ul>
-<li><p>Download the precompiled Cygwin GCC 4.3 (or newer) package of the most recent <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> version
-from the <a class="reference external" href="https://root.cern.ch/downloading-root">web page</a> and unpack it in a <code class="docutils literal notranslate"><span class="pre">Cygwin</span></code> shell
-(in order to get the line endings correctly) at the final location. Suppose the package has been
-downloaded to <code class="docutils literal notranslate"><span class="pre">C:\</span></code> and the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> tree should be in <code class="docutils literal notranslate"><span class="pre">C:\root</span></code>, this is achieved by:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /cygdrive/c
-$ tar xzf root_v5.xx.yy.win32gcc-gcc-4.3.tar.gz
-</pre></div>
-</div>
-</li>
-<li><p>If due to some reason there was no precompiled Cygwin GCC 4.3 package available or <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> should
-be built from source, one has to visit the <a class="reference external" href="https://root.cern.ch/downloading-root">web page</a>,
-download the ‘complete source tree for all systems’ and save it for instance in <code class="docutils literal notranslate"><span class="pre">C:\</span></code>.
-Then go to the Cygwin shell and unpack this source tree, configure it (here using the minimal set of options)
-and compile it as follows right below:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /cygdrive/c
-$ tar xzf root_v5.xx.yy.source.tar.gz
-$ <span class="nb">cd</span> root
-$ ./configure win32gcc --gminimal --enable-asimage --enable-mathmore --enable-minuit2 --enable-xml
-$ make
-</pre></div>
-</div>
-</li>
-<li><p>In order to finalize the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> installation and to prepare already the installation of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> and
-<code class="docutils literal notranslate"><span class="pre">musredit</span></code> this is a good time for setting necessary environment variables for the use in Cygwin. For
-accomplishing that put the following lines at the end of the <code class="docutils literal notranslate"><span class="pre">/home/Username/.bashrc</span></code> (<code class="docutils literal notranslate"><span class="pre">C:\cygwin\home\Username\.bashrc</span></code>
-for the user <code class="docutils literal notranslate"><span class="pre">Username</span></code> and the <code class="docutils literal notranslate"><span class="pre">cygwin</span> <span class="pre">root</span></code> at <code class="docutils literal notranslate"><span class="pre">C:\cygwin</span></code>):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DISPLAY</span><span class="o">=</span>:0.0
-<span class="nb">export</span> <span class="nv">QTDIR</span><span class="o">=</span>/usr/lib/qt4
-<span class="nb">export</span> <span class="nv">ROOTSYS</span><span class="o">=</span>/cygdrive/c/root
-<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin:<span class="nv">$QTDIR</span>/bin:/usr/i686-pc-cygwin/bin:<span class="nv">$PATH</span>
-<span class="nb">export</span> <span class="nv">MUSRFITPATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin
-</pre></div>
-</div>
-</li>
-</ul>
-<p>Afterwards close the Cygwin shell and reopen it again for the installation of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>.</p>
-</div>
-</div>
-<div class="section" id="index-24">
-<span id="id9"></span><h3>musrfit<a class="headerlink" href="#index-24" title="Permalink to this headline">¶</a></h3>
-<p>First, the most recent source code should be downloaded. The preferred way of doing so is to clone the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>
-repository via git. Assuming the code should be located in <code class="docutils literal notranslate"><span class="pre">~/musrfit</span></code> this is achieved most easily calling from the terminal</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span>
-$ git clone https://bitbucket.org/muonspin/musrfit.git
-</pre></div>
-</div>
-<p>or</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span>
-$ git clone git://gitlab.psi.ch/nemu/musrfit.git
-</pre></div>
-</div>
-<p>If the repository had been checked out already before, one can update the local copy using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> musrfit
-$ git pull
-</pre></div>
-</div>
-<p>As an alternative (if git is not available), the source code can also be downloaded from the following
-web-page: <a class="reference external" href="https://bitbucket.org/muonspin/musrfit/downloads">musrfit at bitbucket</a>.</p>
-<div class="section" id="index-25">
-<span id="id10"></span><h4>musrfit build with cmake<a class="headerlink" href="#index-25" title="Permalink to this headline">¶</a></h4>
-<p>Currently the following configuration switches for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> are available:</p>
-<dl class="simple">
-<dt><strong>-DCMAKE_INSTALL_PREFIX=&lt;prefix-path&gt;</strong></dt><dd><p>Specify the installation prefix, <em>i.e.</em> the place where <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> shall be installed, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">$ROOTSYS</span></code> if already defined (by default: <code class="docutils literal notranslate"><span class="pre">/usr/local</span></code>)</p>
-</dd>
-<dt><strong>-Dnexus=&lt;value&gt;</strong></dt><dd><p>enable/disable the support of <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> data files (requires the <code class="docutils literal notranslate"><span class="pre">HDF4</span></code>, <code class="docutils literal notranslate"><span class="pre">HDF5</span></code> and <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> libraries to be installed).
-&lt;value&gt;=1 enables <code class="docutils literal notranslate"><span class="pre">NeXus</span></code>, &lt;value&gt;=0 disables <code class="docutils literal notranslate"><span class="pre">NeXus</span></code>. The default setting, <em>i.e.</em> the switch is not provided is <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> support is disabled.</p>
-</dd>
-<dt><strong>-DASlibs=&lt;value&gt;</strong></dt><dd><p>enable/disable the <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code>. &lt;value&gt;=1 enables the <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code>, &lt;value&gt;=0 disables the <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code>.
-The default setting, <em>i.e.</em> the switch is not provided is <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code> support is <em>disabled</em>. For details see Documentation of <a class="reference internal" href="user-libs.html#user-libs"><span class="std std-ref">user libs</span></a>.</p>
-</dd>
-<dt><strong>-DBMWlibs=&lt;value&gt;</strong></dt><dd><p>enable/disable the <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code>. &lt;value&gt;=1 enables the <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code>, &lt;value&gt;=0 disables the <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code>.
-The default setting, <em>i.e.</em> the switch is not provided is <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code> support is <em>disabled</em>. For details see Documentation of <a class="reference internal" href="user-libs.html#user-libs"><span class="std std-ref">user libs</span></a>.</p>
-</dd>
-<dt><strong>-DBNMRlibs=&lt;value&gt;</strong></dt><dd><p>enable/disable the <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code>. &lt;value&gt;=1 enables the <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code>, &lt;value&gt;=0 disables the <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code>.
-The default setting, <em>i.e.</em> the switch is not provided is <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code> support is <em>disabled</em>.</p>
-</dd>
-<dt><strong>-Dqt_based_tools=&lt;value&gt;</strong></dt><dd><p>Will try to get <code class="docutils literal notranslate"><span class="pre">musredit</span></code>, <code class="docutils literal notranslate"><span class="pre">musrWiz</span></code>, <code class="docutils literal notranslate"><span class="pre">musrStep</span></code>, and <code class="docutils literal notranslate"><span class="pre">mupp</span></code> installed, if <code class="docutils literal notranslate"><span class="pre">Qt</span></code> is found.
-By default this is <em>enabled</em>. Again &lt;value&gt;=0 means disabled, &lt;value&gt;=1 enabled.</p>
-</dd>
-<dt><strong>-Dqt_version=&lt;value&gt;</strong></dt><dd><p>Allows to specify which <code class="docutils literal notranslate"><span class="pre">Qt</span></code> version shall be tried. &lt;value&gt; can take the values: <code class="docutils literal notranslate"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6</span></code>.
-If the value is set to <code class="docutils literal notranslate"><span class="pre">AUTO</span></code>, this highest installed version is chosen, otherwise the specified version is used.</p>
-</dd>
-<dt><strong>-Dtry_OpenMP=&lt;value&gt;</strong></dt><dd><p>Will check if <code class="docutils literal notranslate"><span class="pre">OpenMP</span></code> support is possible, and if yes use it. The default is <em>enabled</em>.</p>
-</dd>
-</dl>
-<p>Normally it should not be necessary to make use of any of the options except for specifying the installation path with
-<code class="docutils literal notranslate"><span class="pre">-DCMAKE_INSTALL_PREFIX</span></code>. <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> build with <code class="docutils literal notranslate"><span class="pre">cmake</span></code> takes the out-of-source approach. Therefore a typical
-configuration / make / install process including <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> support would look like</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit
-$ mkdir build
-$ <span class="nb">cd</span> build
-$ cmake ../ -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$ROOTSYS</span> -Dnexus<span class="o">=</span><span class="m">1</span>
-<span class="c1"># below it is assumed that multiple cores are present, hence the -j8 option</span>
-$ cmake --build ./ --clean-first -- -j8
-$ make install
-$ /sbin/ldconfig                                  <span class="c1"># (as superuser)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="index-26">
-<span id="id11"></span><h3>musredit<a class="headerlink" href="#index-26" title="Permalink to this headline">¶</a></h3>
-<p>In the latest version of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> the configure script tries to determine automatically if
-Qt4.5 or higher is set up on the machine. In case this is found, the editor <code class="docutils literal notranslate"><span class="pre">musredit</span></code> is built
-readily with <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>. If not, try the following:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> src/musredit
-$ qmake-qt4 musredit.pro
-</pre></div>
-</div>
-<p>If everything went fine <code class="docutils literal notranslate"><span class="pre">musredit</span></code> can be compiled and installed:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ make
-$ make install
-</pre></div>
-</div>
-<p>In case one likes to get the editor started just with starting the X server from the Windows start
-menu the file <code class="docutils literal notranslate"><span class="pre">~/.startxwinrc</span></code> with the following contents can be created:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/bin/sh</span>
-
-<span class="nb">export</span> <span class="nv">DISPLAY</span><span class="o">=</span>:0.0
-<span class="nb">export</span> <span class="nv">QTDIR</span><span class="o">=</span>/usr/lib/qt4
-<span class="nb">export</span> <span class="nv">ROOTSYS</span><span class="o">=</span>/cygdrive/c/root
-<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin:<span class="nv">$QTDIR</span>/bin:/usr/i686-pc-cygwin/bin:<span class="nv">$PATH</span>
-<span class="nb">export</span> <span class="nv">MUSRFITPATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin
-
-musredit <span class="p">&amp;</span>
-</pre></div>
-</div>
-</div>
-<div class="section" id="musrgui-depreciated">
-<h3>musrgui (depreciated)<a class="headerlink" href="#musrgui-depreciated" title="Permalink to this headline">¶</a></h3>
-<p>If <code class="docutils literal notranslate"><span class="pre">Qt4.5</span></code> or higher is not available but <code class="docutils literal notranslate"><span class="pre">Qt3</span></code> is set up <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> can be installed. For this
-please follow the instructions for the <code class="docutils literal notranslate"><span class="pre">musredit</span></code> installation where simply every <code class="docutils literal notranslate"><span class="pre">musredit</span></code> occurrence
-has to be replaced by <code class="docutils literal notranslate"><span class="pre">musrgui</span></code>, and <code class="docutils literal notranslate"><span class="pre">qt4</span></code> is replaced by <code class="docutils literal notranslate"><span class="pre">qt3</span></code>.</p>
-</div>
-<div class="section" id="id12">
-<h3>Check the installation<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
-<p>In order to perform a quick test for finding out if the installation has been completed successfully,
-a few msr files together with the corresponding data files can be found in the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> source tree
-at doc/examples/.
-If <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> has been installed, just open one of the <code class="docutils literal notranslate"><span class="pre">test-*.msr</span></code> files in the editor and test
-the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> functionalities. Otherwise, if only the terminal should be used, as an initial test
-for instance the following could be done:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> doc/examples
-$ musrview test-histo-ROOT-NPP.msr
-</pre></div>
-</div>
-</div>
-<div class="section" id="potential-problems">
-<h3>Potential Problems<a class="headerlink" href="#potential-problems" title="Permalink to this headline">¶</a></h3>
-<p>It might be that especially when running on Windows 7 <code class="docutils literal notranslate"><span class="pre">musredit</span></code> and <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> produce errors like a
-“STATUS_ACCESS_VIOLATION”. In this case, try to do the following: Close all Cygwin programs (including
-the terminals and X server) and run from a Windows command prompt (cmd)</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ C:<span class="se">\c</span>ygwin<span class="se">\b</span>in<span class="se">\a</span>sh.exe /bin/rebaseall
-</pre></div>
-</div>
-<p>If this does not resolve the problem, try to change the compatibility settings of <code class="docutils literal notranslate"><span class="pre">C:\cygwin\bin\sh.exe</span></code>
-and <code class="docutils literal notranslate"><span class="pre">C:\cygwin\bin\bash.exe</span></code> so that they are executed with administrator privileges.</p>
+directories like <tt class="docutils literal"><span class="pre">...\My</span> <span class="pre">Documents\...</span></tt></p>
 </div>
 </div>
 <div class="section" id="mac-os-x-macos">
 <h2>Mac OS X / macOS<a class="headerlink" href="#mac-os-x-macos" title="Permalink to this headline">¶</a></h2>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>macOS 11.3 alias <strong>Big Sur</strong>: <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> is ready for <strong>Big Sur</strong> on Intel <strong>and</strong> M1 (Apple Silicon) based macs, both running natively.
-The <code class="docutils literal notranslate"><span class="pre">DKS</span></code> version of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> for macOS <strong>Big Sur</strong> is ready as well.</p>
+<p class="first admonition-title">Note</p>
+<p class="last">macOS 12 alias <strong>Monterey</strong>: <tt class="docutils literal"><span class="pre">musrfit</span></tt> is ready for <strong>Monterey</strong> on Intel <strong>and</strong> M1 (Apple Silicon) based macs, both running natively.
+The <tt class="docutils literal"><span class="pre">DKS</span></tt> version of <tt class="docutils literal"><span class="pre">musrfit</span></tt> for macOS <strong>Monterey</strong> is ready as well.</p>
 </div>
 <div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>macOS Catalina is slightly different in some aspects, so if it happens that you have it installed, please
-first check <a class="reference internal" href="#note-on-catalina"><span class="std std-ref">Notes on macOS Catalina</span></a> before you proceed.</p>
+<p class="first admonition-title">Note</p>
+<p class="last">macOS Catalina is slightly different in some aspects, so if it happens that you have it installed, please
+first check <a class="reference internal" href="#note-on-catalina"><em>Notes on macOS Catalina</em></a> before you proceed.</p>
 </div>
 <p>With Mac OS X / macOS the situation is up to some extent similar like on MS Windows but still different since
 Mac OS X is a UNIX system. The similarity is that also on OS X a helping framework — either <a class="reference external" href="https://www.macports.org/">MacPorts</a>
-or <a class="reference external" href="http://www.finkproject.org/">Fink</a> —  which provides open-source software is employed to fulfill the basic software requirements of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>.
+or <a class="reference external" href="http://www.finkproject.org/">Fink</a> —  which provides open-source software is employed to fulfill the basic software requirements of <tt class="docutils literal"><span class="pre">musrfit</span></tt>.
 In the following, both possibilities (using MacPorts or Fink) are described but it is emphasized here that
 it should be followed only <em>one</em> of the possible routes .</p>
 <div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>If you decide to upgrade your macOS, e.g. from <code class="docutils literal notranslate"><span class="pre">High</span> <span class="pre">Sierra</span></code> to <code class="docutils literal notranslate"><span class="pre">Mojave</span></code>, you will typically need to
-unistall <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>, <code class="docutils literal notranslate"><span class="pre">ROOT</span></code>, and <a class="reference external" href="https://www.macports.org/">MacPorts</a> / <a class="reference external" href="http://www.finkproject.org/">Fink</a> first, do the upgrade of the macOS and start the
-installation of <a class="reference external" href="https://www.macports.org/">MacPorts</a> / <a class="reference external" href="http://www.finkproject.org/">Fink</a> , <code class="docutils literal notranslate"><span class="pre">ROOT</span></code>, and <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> from scratch!</p>
+<p class="first admonition-title">Warning</p>
+<p class="last">If you decide to upgrade your macOS, e.g. from <tt class="docutils literal"><span class="pre">High</span> <span class="pre">Sierra</span></tt> to <tt class="docutils literal"><span class="pre">Mojave</span></tt>, you will typically need to
+unistall <tt class="docutils literal"><span class="pre">musrfit</span></tt>, <tt class="docutils literal"><span class="pre">ROOT</span></tt>, and <a class="reference external" href="https://www.macports.org/">MacPorts</a> / <a class="reference external" href="http://www.finkproject.org/">Fink</a> first, do the upgrade of the macOS and start the
+installation of <a class="reference external" href="https://www.macports.org/">MacPorts</a> / <a class="reference external" href="http://www.finkproject.org/">Fink</a> , <tt class="docutils literal"><span class="pre">ROOT</span></tt>, and <tt class="docutils literal"><span class="pre">musrfit</span></tt> from scratch!</p>
 </div>
 <div class="section" id="requirements-macports">
-<span id="index-27"></span><h3>Requirements (MacPorts)<a class="headerlink" href="#requirements-macports" title="Permalink to this headline">¶</a></h3>
-<p>Before proceeding with the usage of the <code class="docutils literal notranslate"><span class="pre">MacPorts</span></code> system first a few useful tools provided by Apple together
+<span id="index-21"></span><h3>Requirements (MacPorts)<a class="headerlink" href="#requirements-macports" title="Permalink to this headline">¶</a></h3>
+<p>Before proceeding with the usage of the <tt class="docutils literal"><span class="pre">MacPorts</span></tt> system first a few useful tools provided by Apple together
 with OS X (on the installation DVD/CDs) should be installed:</p>
 <blockquote>
-<div><dl>
-<dt><strong>Xcode</strong></dt><dd><p>Useful developer tools including for instance the GNU compiler collection. It can be installed via the Apple App store.
-Starting from <code class="docutils literal notranslate"><span class="pre">XCode</span></code> ≥ 4.3 the command line tools need to be installed manually. The necessary command line tools
+<div><dl class="docutils">
+<dt><strong>Xcode</strong></dt>
+<dd><p class="first">Useful developer tools including for instance the GNU compiler collection. It can be installed via the Apple App store.
+Starting from <tt class="docutils literal"><span class="pre">XCode</span></tt> ≥ 4.3 the command line tools need to be installed manually. The necessary command line tools
 can be installed via the following commands entered in the terminal</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ xcode-select --install
+<div class="last highlight-bash"><div class="highlight"><pre><span></span>$ xcode-select --install
 $ sudo xcodebuild -license
 </pre></div>
 </div>
 </dd>
 </dl>
 </div></blockquote>
-<dl class="simple">
-<dt><strong>X11</strong></dt><dd><p>The X-window system is automatically installed on 10.5 Leopard and 10.6 Snow Leopard. For some other versions you also
-will need to install <a class="reference external" href="http://xquartz.macosforge.org/trac">XQuartz</a>. If <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> runs without <code class="docutils literal notranslate"><span class="pre">XQuartz</span></code> <em>do not</em>
-install it.</p>
-</dd>
+<dl class="docutils">
+<dt><strong>X11</strong></dt>
+<dd>The X-window system is automatically installed on 10.5 Leopard and 10.6 Snow Leopard. For some other versions you also
+will need to install <a class="reference external" href="http://xquartz.macosforge.org/trac">XQuartz</a>. If <tt class="docutils literal"><span class="pre">ROOT</span></tt> runs without <tt class="docutils literal"><span class="pre">XQuartz</span></tt> <em>do not</em>
+install it.</dd>
 </dl>
-<p>After installing the <code class="docutils literal notranslate"><span class="pre">Xcode</span></code> tools go to the <a class="reference external" href="http://www.macports.org/install.php">MacPorts install page</a>, download
+<p>After installing the <tt class="docutils literal"><span class="pre">Xcode</span></tt> tools go to the <a class="reference external" href="http://www.macports.org/install.php">MacPorts install page</a>, download
 the installer for your system and follow the installation instructions on the page. By default the MacPorts system will be
-installed in <code class="docutils literal notranslate"><span class="pre">/opt/local</span></code>. To be sure that the newest version of the software is used a MacPorts upgrade should be performed
+installed in <tt class="docutils literal"><span class="pre">/opt/local</span></tt>. To be sure that the newest version of the software is used a MacPorts upgrade should be performed
 by typing in a terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo port -v selfupdate
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port -v selfupdate
 </pre></div>
 </div>
 <p><strong>Remark:</strong> MacPorts uses <a class="reference external" href="http://rsync.samba.org/">rsync</a> in order to synchronize the list of available packages. It frequently
 happens that this service is blocked by firewalls. In this case it should be possible to download a local version of the package
 repository and do the synchronization. If this step becomes necessary (<em>and only then</em>) it can be done in the following way:</p>
 <ol class="arabic">
-<li><p>Get a local version of the repository:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ svn co http://svn.macports.org/repository/macports/trunk/dports ~/dports
+<li><p class="first">Get a local version of the repository:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ svn co http://svn.macports.org/repository/macports/trunk/dports ~/dports
 </pre></div>
 </div>
 </li>
-<li><p>Edit the file <code class="docutils literal notranslate"><span class="pre">/opt/local/etc/macports/sources.conf</span></code>: At the end of the file, comment the line beginning with <code class="docutils literal notranslate"><span class="pre">rsync://</span></code> and
+<li><p class="first">Edit the file <tt class="docutils literal"><span class="pre">/opt/local/etc/macports/sources.conf</span></tt>: At the end of the file, comment the line beginning with <tt class="docutils literal"><span class="pre">rsync://</span></tt> and
 add a new line pointing to your local copy, <em>e.g.</em></p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>file:///Users/username/dports
+<div class="highlight-bash"><div class="highlight"><pre><span></span>file:///Users/username/dports
 </pre></div>
 </div>
 </li>
-<li><p>Synchronize the packages:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo port -v -d sync
+<li><p class="first">Synchronize the packages:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port -v -d sync
 </pre></div>
 </div>
 </li>
 </ol>
 <p>Then the MacPorts system should be set up and can be used to install additional software.</p>
 <p>The installation of the software mentioned above is then done in the terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo port -v install pkgconfig autoconf automake libtool cmake fftw-3 fftw-3-single gsl boost libxml2 qt5 qt5-qtsvg
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port -v install pkgconfig autoconf automake libtool cmake fftw-3 fftw-3-single gsl boost libxml2 qt5 qt5-qtsvg
 </pre></div>
 </div>
-<p>With <code class="docutils literal notranslate"><span class="pre">Qt5</span></code>, <code class="docutils literal notranslate"><span class="pre">musredit</span></code> will be installed. If it happens that you used <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> in the past,
-please change over to <code class="docutils literal notranslate"><span class="pre">musredit</span></code> since there will be no further development for <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> anymore!</p>
-<div class="section" id="index-28">
-<span id="id13"></span><h4>Installation of NeXus requirements (optional)<a class="headerlink" href="#index-28" title="Permalink to this headline">¶</a></h4>
-<p><em>Only</em> if <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> should support reading data files in the <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> format the further required packages are set up:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo port -v install hdf4 hdf5
+<p>With <tt class="docutils literal"><span class="pre">Qt5</span></tt>, <tt class="docutils literal"><span class="pre">musredit</span></tt> will be installed. If it happens that you used <tt class="docutils literal"><span class="pre">musrgui</span></tt> in the past,
+please change over to <tt class="docutils literal"><span class="pre">musredit</span></tt> since there will be no further development for <tt class="docutils literal"><span class="pre">musrgui</span></tt> anymore!</p>
+<div class="section" id="index-22">
+<span id="id6"></span><h4>Installation of NeXus requirements (optional)<a class="headerlink" href="#index-22" title="Permalink to this headline">¶</a></h4>
+<p><em>Only</em> if <tt class="docutils literal"><span class="pre">musrfit</span></tt> should support reading data files in the <tt class="docutils literal"><span class="pre">NeXus</span></tt> format the further required packages are set up:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo port -v install hdf4 hdf5
 </pre></div>
 </div>
 <p><strong>Only NeXus Version ≥ 4.4 is support!</strong></p>
 <p>To get things compiled do:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="c1"># get and install NeXus</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="c1"># get and install NeXus</span>
 $ <span class="nb">cd</span> <span class="nv">$HOME</span>/Applications
 $ <span class="c1"># get the source code from the master repository</span>
 $ git clone https://github.com/nexusformat/code.git nexus/code
@@ -756,18 +523,18 @@ $ sudo make install
 </pre></div>
 </div>
 </div>
-<div class="section" id="index-29">
-<span id="id14"></span><h4>ROOT<a class="headerlink" href="#index-29" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="index-23">
+<span id="id7"></span><h4>ROOT<a class="headerlink" href="#index-23" title="Permalink to this headline">¶</a></h4>
 <p><strong>The default ROOT version is based on ROOT 6.xx/yy!</strong></p>
 <div class="section" id="root-installed-via-package-installer">
 <h5>ROOT installed via package installer<a class="headerlink" href="#root-installed-via-package-installer" title="Permalink to this headline">¶</a></h5>
-<p>The lazy way to get <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> installed is via package installer. If your macOS is directly supported
-by the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> people you can download the package installer from the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> <a class="reference external" href="https://root.cern.ch/downloading-root">download page</a>.
-Choose the latest <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> release and download you macOS version dmg-file, <em>e.g.</em> for macOS 10.13 (High Sierra)
-it is at the time of writting <code class="docutils literal notranslate"><span class="pre">root_v6.16.00.macosx64-10.13-clang91.dmg</span></code>. After the installation
-<code class="docutils literal notranslate"><span class="pre">ROOT</span></code> will be installed under <code class="docutils literal notranslate"><span class="pre">/Application</span></code> as owner root. In order to ease your life for the
-steps to follow and assuming you are the only guy working on your Mac, you could change the owner and group of the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /Applications
+<p>The lazy way to get <tt class="docutils literal"><span class="pre">ROOT</span></tt> installed is via package installer. If your macOS is directly supported
+by the <tt class="docutils literal"><span class="pre">ROOT</span></tt> people you can download the package installer from the <tt class="docutils literal"><span class="pre">ROOT</span></tt> <a class="reference external" href="https://root.cern.ch/downloading-root">download page</a>.
+Choose the latest <tt class="docutils literal"><span class="pre">ROOT</span></tt> release and download you macOS version dmg-file, <em>e.g.</em> for macOS 10.13 (High Sierra)
+it is at the time of writting <tt class="docutils literal"><span class="pre">root_v6.16.00.macosx64-10.13-clang91.dmg</span></tt>. After the installation
+<tt class="docutils literal"><span class="pre">ROOT</span></tt> will be installed under <tt class="docutils literal"><span class="pre">/Application</span></tt> as owner root. In order to ease your life for the
+steps to follow and assuming you are the only guy working on your Mac, you could change the owner and group of the <tt class="docutils literal"><span class="pre">ROOT</span></tt> directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /Applications
 $ sudo chown -R &lt;username&gt; root_v6.22.00
 $ sudo chgrp -R staff root_v6.22.00
 $ sudo ln -s root_v6.22.00 root
@@ -776,14 +543,14 @@ $ sudo ln -s root_v6.22.00 root
 </div>
 <div class="section" id="root-installed-from-source">
 <h5>ROOT installed from source<a class="headerlink" href="#root-installed-from-source" title="Permalink to this headline">¶</a></h5>
-<p>The best way to get <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> exactly the way needed for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> is to install it from source.
+<p>The best way to get <tt class="docutils literal"><span class="pre">ROOT</span></tt> exactly the way needed for <tt class="docutils literal"><span class="pre">musrfit</span></tt> is to install it from source.
 Before describing it, please make sure that you have installed all required packages listed under
-<a class="reference internal" href="#supported-operating-systems"><span class="std std-ref">Requested Software</span></a> (<em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">fftw</span></code>, <code class="docutils literal notranslate"><span class="pre">gsl</span></code>, etc).</p>
-<p>For the following it is assumed that <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> shall be installed under <code class="docutils literal notranslate"><span class="pre">$HOME/Applications</span></code>. If you want
+<a class="reference internal" href="#supported-operating-systems"><em>Requested Software</em></a> (<em>e.g.</em> <tt class="docutils literal"><span class="pre">fftw</span></tt>, <tt class="docutils literal"><span class="pre">gsl</span></tt>, etc).</p>
+<p>For the following it is assumed that <tt class="docutils literal"><span class="pre">ROOT</span></tt> shall be installed under <tt class="docutils literal"><span class="pre">$HOME/Applications</span></tt>. If you want
 to install it somewhere else, just systematically replace the related terms of the following description.
-For the following list of commands the ‘$’ will be given, the command prompt. Do not enter it! Also some
-comments will be added starting with a ‘#’ which can be omitted. They are only there to explain what is going on.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Applications
+For the following list of commands the &#8216;$&#8217; will be given, the command prompt. Do not enter it! Also some
+comments will be added starting with a &#8216;#&#8217; which can be omitted. They are only there to explain what is going on.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Applications
 $ git clone http://github.com/root-project/root.git
 $ <span class="nb">cd</span> root
 $ git tag -l
@@ -810,12 +577,12 @@ $ make install
 <p>Since Apple in its wisdom decided that programs started from a shell are treated differently than Apps if it is coming to
 system variables, we need to work harder compared to a Linux system.</p>
 <p><strong>For Mac OS X &lt; 10.8:</strong></p>
-<p>In order to finalize the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> installation and to prepare already the installation of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> and <code class="docutils literal notranslate"><span class="pre">musredit</span></code>
+<p>In order to finalize the <tt class="docutils literal"><span class="pre">ROOT</span></tt> installation and to prepare already the installation of <tt class="docutils literal"><span class="pre">musrfit</span></tt> and <tt class="docutils literal"><span class="pre">musredit</span></tt>
 this is a good time for setting necessary environment variables for the use in Mac OS X. Here it assumed that you
-installed <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> from source. If you downloaded the binary package, you will need to adopt the paths accordingly.
+installed <tt class="docutils literal"><span class="pre">ROOT</span></tt> from source. If you downloaded the binary package, you will need to adopt the paths accordingly.
 Put the following lines (without the comments in parentheses and with the paths adjusted to your local installation)
-into the file <code class="docutils literal notranslate"><span class="pre">~/.MacOSX/environment.plist</span></code> and re-login:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+into the file <tt class="docutils literal"><span class="pre">~/.MacOSX/environment.plist</span></tt> and re-login:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 <span class="cp">&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;</span>
 <span class="nt">&lt;plist</span> <span class="na">version=</span><span class="s">&quot;1.0&quot;</span><span class="nt">&gt;</span>
 <span class="nt">&lt;dict&gt;</span>
@@ -830,20 +597,20 @@ into the file <code class="docutils literal notranslate"><span class="pre">~/.Ma
 </pre></div>
 </div>
 <p><strong>For Mac OS X ≥ 10.8:</strong></p>
-<p>One needs to add some system variables in <code class="docutils literal notranslate"><span class="pre">~/.profile</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">ROOTSYS</span><span class="o">=</span><span class="nv">$HOME</span>/Applications/root/root_exec
+<p>One needs to add some system variables in <tt class="docutils literal"><span class="pre">~/.profile</span></tt>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">ROOTSYS</span><span class="o">=</span><span class="nv">$HOME</span>/Applications/root/root_exec
 <span class="nb">export</span> <span class="nv">MUSRFITPATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin
 <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin:<span class="nv">$QTDIR</span>/bin:<span class="nv">$PATH</span>
-<span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/lib:<span class="nv">$LD_LIBRARY_PATH</span>
+<span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/lib:<span class="nv">$DYLD_LIBRARY_PATH</span>
 
 launchctl setenv ROOTSYS <span class="nv">$ROOTSYS</span>
 launchctl setenv MUSRFITPATH <span class="nv">$MUSRFITPATH</span>
 launchctl setenv PATH <span class="nv">$PATH</span>
-launchctl setenv LD_LIBRARY_PATH <span class="nv">$LD_LIBRARY_PATH</span>
+launchctl setenv DYLD_LIBRARY_PATH <span class="nv">$DYLD_LIBRARY_PATH</span>
 </pre></div>
 </div>
-<p>After this you will need to “execute” <code class="docutils literal notranslate"><span class="pre">.profile</span></code> before proceeding:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> <span class="nv">$HOME</span>/.profile
+<p>After this you will need to &#8220;execute&#8221; <tt class="docutils literal"><span class="pre">.profile</span></tt> or <tt class="docutils literal"><span class="pre">.zprofile</span></tt> before proceeding:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> <span class="nv">$HOME</span>/.profile
 </pre></div>
 </div>
 </div>
@@ -852,13 +619,15 @@ launchctl setenv LD_LIBRARY_PATH <span class="nv">$LD_LIBRARY_PATH</span>
 <span id="note-on-catalina"></span><h4>Notes on macOS Catalina<a class="headerlink" href="#notes-on-macos-catalina" title="Permalink to this headline">¶</a></h4>
 <p>Apple introduced a couple of changes on macOS Catalina compared to its previous versions of macOS which might
 be a stumble block. Here I <strong>very</strong> briefly try to add some notes in order to get a smooth installation for
-<code class="docutils literal notranslate"><span class="pre">musrfit</span></code>.</p>
+<tt class="docutils literal"><span class="pre">musrfit</span></tt>.</p>
 <ol class="arabic">
-<li><p>You should switch from the bash to the zsh. Please check, e.g. <a class="reference external" href="https://scriptingosx.com/2019/06/moving-to-zsh/">Moving to zsh</a>.</p></li>
-<li><p>Instead of <code class="docutils literal notranslate"><span class="pre">.profile</span></code> you will need to setup a <code class="docutils literal notranslate"><span class="pre">.zprofile</span></code>.</p></li>
-<li><p>macports: currently there is a little nuisance with the <code class="docutils literal notranslate"><span class="pre">fftw-3</span></code> port. My bug report is already out since a while
+<li><p class="first">You should switch from the bash to the zsh. Please check, e.g. <a class="reference external" href="https://scriptingosx.com/2019/06/moving-to-zsh/">Moving to zsh</a>.</p>
+</li>
+<li><p class="first">Instead of <tt class="docutils literal"><span class="pre">.profile</span></tt> you will need to setup a <tt class="docutils literal"><span class="pre">.zprofile</span></tt>.</p>
+</li>
+<li><p class="first">macports: currently there is a little nuisance with the <tt class="docutils literal"><span class="pre">fftw-3</span></tt> port. My bug report is already out since a while
 but no proper fix is available. The workaround to get it right is to install the port from source which is done by</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ port -s install fftw-3
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ port -s install fftw-3
 </pre></div>
 </div>
 <p>If you fail to do so, you might trigger a crash in the Fourier transform for 2^N, N=12.</p>
@@ -867,30 +636,31 @@ but no proper fix is available. The workaround to get it right is to install the
 </div>
 </div>
 <div class="section" id="requirements-fink">
-<span id="index-30"></span><h3>Requirements (Fink)<a class="headerlink" href="#requirements-fink" title="Permalink to this headline">¶</a></h3>
+<span id="index-24"></span><h3>Requirements (Fink)<a class="headerlink" href="#requirements-fink" title="Permalink to this headline">¶</a></h3>
 <p>Before proceeding with the usage of the <a class="reference external" href="http://www.finkproject.org/">Fink</a> system first a few useful tools provided by Apple together with OS X (on the installation DVD/CDs) should be installed:</p>
-<dl>
-<dt><strong>Xcode</strong></dt><dd><p>Useful developer tools including for instance the GNU compiler collection. It can be installed via the Apple App store.
-Starting from <code class="docutils literal notranslate"><span class="pre">XCode</span></code> ≥ 4.3 the command line tools need to be installed manually. The necessary command line tools
+<dl class="docutils">
+<dt><strong>Xcode</strong></dt>
+<dd><p class="first">Useful developer tools including for instance the GNU compiler collection. It can be installed via the Apple App store.
+Starting from <tt class="docutils literal"><span class="pre">XCode</span></tt> ≥ 4.3 the command line tools need to be installed manually. The necessary command line tools
 can be installed via the following commands entered in the terminal</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ xcode-select --install
+<div class="last highlight-bash"><div class="highlight"><pre><span></span>$ xcode-select --install
 $ sudo xcodebuild -license
 </pre></div>
 </div>
 </dd>
-<dt><strong>X11</strong></dt><dd><p>The X-window system is automatically installed on 10.5 Leopard and 10.6 Snow Leopard. For some other versions you also
-will need to install <a class="reference external" href="http://xquartz.macosforge.org/trac">XQuartz</a>. If <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> runs without <code class="docutils literal notranslate"><span class="pre">XQuartz</span></code> <em>do not</em>
-install it.</p>
-</dd>
+<dt><strong>X11</strong></dt>
+<dd>The X-window system is automatically installed on 10.5 Leopard and 10.6 Snow Leopard. For some other versions you also
+will need to install <a class="reference external" href="http://xquartz.macosforge.org/trac">XQuartz</a>. If <tt class="docutils literal"><span class="pre">ROOT</span></tt> runs without <tt class="docutils literal"><span class="pre">XQuartz</span></tt> <em>do not</em>
+install it.</dd>
 </dl>
-<p>After installing the <code class="docutils literal notranslate"><span class="pre">Xcode</span></code> tools go to the <a class="reference external" href="http://www.finkproject.org/download/index.php?phpLang=en">Fink download page</a>,
+<p>After installing the <tt class="docutils literal"><span class="pre">Xcode</span></tt> tools go to the <a class="reference external" href="http://www.finkproject.org/download/index.php?phpLang=en">Fink download page</a>,
 download the installer for your system and follow the installation instructions on the page. By default the Fink system is
-installed under <code class="docutils literal notranslate"><span class="pre">/sw</span></code>. After the basic setup make sure that in <code class="docutils literal notranslate"><span class="pre">/sw/etc/fink.conf</span></code> the line starting with Trees reads like:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Trees</span><span class="p">:</span> <span class="n">local</span><span class="o">/</span><span class="n">main</span> <span class="n">stable</span><span class="o">/</span><span class="n">main</span> <span class="n">stable</span><span class="o">/</span><span class="n">crypto</span> <span class="n">unstable</span><span class="o">/</span><span class="n">main</span>
+installed under <tt class="docutils literal"><span class="pre">/sw</span></tt>. After the basic setup make sure that in <tt class="docutils literal"><span class="pre">/sw/etc/fink.conf</span></tt> the line starting with Trees reads like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span>Trees: local/main stable/main stable/crypto unstable/main
 </pre></div>
 </div>
 <p>After applying the changes above to the configuration file, the Fink core system should be upgraded to its newest version by typing in a terminal:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ sudo fink selfupdate
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ sudo fink selfupdate
 </pre></div>
 </div>
 <p>Then the Fink system should be set up and can be used to install additional software.
@@ -898,18 +668,18 @@ The Fink installer package also contains a graphical user interface called FinkC
 suggested to use that for installing the following packages (or packages with revisions close to the following) — it
 is necessary to compile a few packages from source since no binary packages are available, however, this is done
 automatically by the FinkCommander after you have chosen the software packages for installation:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">autoconf</span> <span class="n">automake</span> <span class="n">cmake</span> <span class="n">boost1</span><span class="o">.</span><span class="mi">63</span><span class="o">-</span><span class="n">nopython</span> <span class="n">boost1</span><span class="o">.</span><span class="mf">63.</span><span class="n">nopython</span><span class="o">-</span><span class="n">shlibs</span> <span class="n">fftw3</span> <span class="n">fftw3</span><span class="o">-</span><span class="n">shlibs</span> <span class="n">gsl</span> <span class="n">gsl</span><span class="o">-</span><span class="n">shlibs</span>
-<span class="n">libtool2</span> <span class="n">libtool2</span><span class="o">-</span><span class="n">shlibs</span> <span class="n">libxml2</span> <span class="n">libxml2</span><span class="o">-</span><span class="nb">bin</span> <span class="n">libxml2</span><span class="o">-</span><span class="n">shlibs</span> <span class="n">pkgconfig</span> <span class="n">qt5</span><span class="o">-</span><span class="n">mac</span><span class="o">-</span><span class="n">qtbase</span> <span class="n">qt5</span><span class="o">-</span><span class="n">mac</span><span class="o">-</span><span class="n">qtbase</span><span class="o">-</span><span class="n">dev</span><span class="o">-</span><span class="n">tools</span>
-<span class="n">qt5</span><span class="o">-</span><span class="n">mac</span><span class="o">-</span><span class="n">qtsvg</span> <span class="n">qt5</span><span class="o">-</span><span class="n">mac</span><span class="o">-</span><span class="n">qtsvg</span><span class="o">-</span><span class="n">shlibs</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>autoconf automake cmake boost1.63-nopython boost1.63.nopython-shlibs fftw3 fftw3-shlibs gsl gsl-shlibs
+libtool2 libtool2-shlibs libxml2 libxml2-bin libxml2-shlibs pkgconfig qt5-mac-qtbase qt5-mac-qtbase-dev-tools
+qt5-mac-qtsvg qt5-mac-qtsvg-shlibs
 </pre></div>
 </div>
-<p>Under OS X 10.6 Snow Leopard it will <em>not</em> be possible to install <code class="docutils literal notranslate"><span class="pre">qt3mac</span></code> since the system is by default a 64-bit
-system and the old <code class="docutils literal notranslate"><span class="pre">qt3-mac</span></code> depends on software which is only available for 32-bit systems. It is suggested to
-install <code class="docutils literal notranslate"><span class="pre">qt5-mac</span></code> instead and use <code class="docutils literal notranslate"><span class="pre">musredit</span></code>.</p>
+<p>Under OS X 10.6 Snow Leopard it will <em>not</em> be possible to install <tt class="docutils literal"><span class="pre">qt3mac</span></tt> since the system is by default a 64-bit
+system and the old <tt class="docutils literal"><span class="pre">qt3-mac</span></tt> depends on software which is only available for 32-bit systems. It is suggested to
+install <tt class="docutils literal"><span class="pre">qt5-mac</span></tt> instead and use <tt class="docutils literal"><span class="pre">musredit</span></tt>.</p>
 <p>Also, due to some not fulfilled dependencies, it might not be possible to install FFTW3 through Fink. In this case
 (<em>and ONLY in THIS case</em>) simply download the FFTW3 source code from its download page and install it from a terminal
 using the following commands (for the FFTW version 3.x.y):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ tar xz fftw-3.x.y
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ tar xz fftw-3.x.y
 $ <span class="nb">cd</span> fftw-3.x.y
 $ ./configure --enable-single --enable-shared --enable-threads --prefix<span class="o">=</span>/usr/local
 $ make
@@ -919,21 +689,21 @@ $ sudo make install
 <p>Since later on the boost header files should be used and in the standard Fink installation these are found at a version
 specific location, the later handling will be easier if a symbolic link to this files is created now in the terminal
 (if it did not exist earlier), <em>e.g.</em>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ ln -sf /sw/include/boost-x_yy_z/boost /sw/include/boost
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ ln -sf /sw/include/boost-x_yy_z/boost /sw/include/boost
 </pre></div>
 </div>
-<p>where <code class="docutils literal notranslate"><span class="pre">x_yy_z</span></code> has to be substituted by the correct version number, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">1_63_0</span></code>.</p>
-<div class="section" id="index-31">
-<span id="id16"></span><h4>Installation of NeXus requirements (optional)<a class="headerlink" href="#index-31" title="Permalink to this headline">¶</a></h4>
-<p><em>Only</em> if <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> should support reading data files in the <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> format the further required
+<p>where <tt class="docutils literal"><span class="pre">x_yy_z</span></tt> has to be substituted by the correct version number, <em>e.g.</em> <tt class="docutils literal"><span class="pre">1_63_0</span></tt>.</p>
+<div class="section" id="index-25">
+<span id="id9"></span><h4>Installation of NeXus requirements (optional)<a class="headerlink" href="#index-25" title="Permalink to this headline">¶</a></h4>
+<p><em>Only</em> if <tt class="docutils literal"><span class="pre">musrfit</span></tt> should support reading data files in the <tt class="docutils literal"><span class="pre">NeXus</span></tt> format the further required
 packages can be installed through Fink (check for the most recent versions):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">libjpeg</span> <span class="n">hdf</span> <span class="n">hdf5</span><span class="o">-</span><span class="n">cpp11</span> <span class="n">hdf5</span><span class="o">-</span><span class="n">cpp11</span><span class="o">-</span><span class="n">shlibs</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>libjpeg hdf hdf5-cpp11 hdf5-cpp11-shlibs
 </pre></div>
 </div>
-<p>Unfortunately, the <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> libraries have to be compiled and installed directly from
+<p>Unfortunately, the <tt class="docutils literal"><span class="pre">NeXus</span></tt> libraries have to be compiled and installed directly from
 the source code. Given the respective version number 4.4 (which are subject to change with time)
 this can be achieved for example by:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="c1"># build NeXus</span>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="c1"># build NeXus</span>
 $ <span class="nb">cd</span> ..
 $ git clone https://github.com/nexusformat/code.git nexus/code
 $ <span class="nb">cd</span> nexus
@@ -946,34 +716,34 @@ $ sudo make install
 </pre></div>
 </div>
 </div>
-<div class="section" id="index-32">
-<span id="id17"></span><h4>ROOT<a class="headerlink" href="#index-32" title="Permalink to this headline">¶</a></h4>
+<div class="section" id="index-26">
+<span id="id10"></span><h4>ROOT<a class="headerlink" href="#index-26" title="Permalink to this headline">¶</a></h4>
 <p><strong>The default ROOT version is based on ROOT 6.xx/yy!</strong></p>
-<div class="section" id="id18">
-<h5>ROOT installed via package installer<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h5>
-<p>The lazy way to get <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> installed is via package installer. If your macOS is directly supported
-by the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> people you can download the package installer from the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> <a class="reference external" href="https://root.cern.ch/downloading-root">download page</a>.
-Choose the latest <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> release and download you macOS version dmg-file, <em>e.g.</em> for macOS 10.13 (High Sierra)
-it is at the time of writting <code class="docutils literal notranslate"><span class="pre">root_v6.16.00.macosx64-10.13-clang91.dmg</span></code>. After the installation
-<code class="docutils literal notranslate"><span class="pre">ROOT</span></code> will be installed under <code class="docutils literal notranslate"><span class="pre">/Application</span></code> as owner root. In order to ease your life for the
-steps to follow and assuming you are the only guy working on your Mac, you could change the owner and group of the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /Applications
+<div class="section" id="id11">
+<h5>ROOT installed via package installer<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h5>
+<p>The lazy way to get <tt class="docutils literal"><span class="pre">ROOT</span></tt> installed is via package installer. If your macOS is directly supported
+by the <tt class="docutils literal"><span class="pre">ROOT</span></tt> people you can download the package installer from the <tt class="docutils literal"><span class="pre">ROOT</span></tt> <a class="reference external" href="https://root.cern.ch/downloading-root">download page</a>.
+Choose the latest <tt class="docutils literal"><span class="pre">ROOT</span></tt> release and download you macOS version dmg-file, <em>e.g.</em> for macOS 10.13 (High Sierra)
+it is at the time of writting <tt class="docutils literal"><span class="pre">root_v6.16.00.macosx64-10.13-clang91.dmg</span></tt>. After the installation
+<tt class="docutils literal"><span class="pre">ROOT</span></tt> will be installed under <tt class="docutils literal"><span class="pre">/Application</span></tt> as owner root. In order to ease your life for the
+steps to follow and assuming you are the only guy working on your Mac, you could change the owner and group of the <tt class="docutils literal"><span class="pre">ROOT</span></tt> directory:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> /Applications
 $ sudo chown -R &lt;username&gt; root_v6.16.00
 $ sudo chgrp -R staff root_v6.16.00
 $ sudo ln -s root_v6.16.00 root
 </pre></div>
 </div>
 </div>
-<div class="section" id="id20">
-<h5>ROOT installed from source<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h5>
-<p>The best way to get <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> exactly the way needed for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> is to install it from source.
+<div class="section" id="id13">
+<h5>ROOT installed from source<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h5>
+<p>The best way to get <tt class="docutils literal"><span class="pre">ROOT</span></tt> exactly the way needed for <tt class="docutils literal"><span class="pre">musrfit</span></tt> is to install it from source.
 Before describing it, please make sure that you have installed all required packages listed under
-<a class="reference internal" href="#supported-operating-systems"><span class="std std-ref">Requested Software</span></a> (<em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">fftw</span></code>, <code class="docutils literal notranslate"><span class="pre">gsl</span></code>, etc).</p>
-<p>For the following it is assumed that <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> shall be installed under <code class="docutils literal notranslate"><span class="pre">$HOME/Applications</span></code>. If you want
+<a class="reference internal" href="#supported-operating-systems"><em>Requested Software</em></a> (<em>e.g.</em> <tt class="docutils literal"><span class="pre">fftw</span></tt>, <tt class="docutils literal"><span class="pre">gsl</span></tt>, etc).</p>
+<p>For the following it is assumed that <tt class="docutils literal"><span class="pre">ROOT</span></tt> shall be installed under <tt class="docutils literal"><span class="pre">$HOME/Applications</span></tt>. If you want
 to install it somewhere else, just systematically replace the related terms of the following description.
-For the following list of commands the ‘$’ will be given, the command prompt. Do not enter it! Also some
-comments will be added starting with a ‘#’ which can be omitted. They are only there to explain what is going on.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Applications
+For the following list of commands the &#8216;$&#8217; will be given, the command prompt. Do not enter it! Also some
+comments will be added starting with a &#8216;#&#8217; which can be omitted. They are only there to explain what is going on.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Applications
 $ git clone http://github.com/root-project/root.git
 $ <span class="nb">cd</span> root
 $ git tag -l
@@ -995,17 +765,17 @@ $ make install
 </div>
 <p>For further details see <a class="reference external" href="https://root.cern.ch/building-root">Installing ROOT from Source</a>.</p>
 </div>
-<div class="section" id="id22">
-<h5>Setting up Environment Variables for ROOT and musrfit<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h5>
+<div class="section" id="id15">
+<h5>Setting up Environment Variables for ROOT and musrfit<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h5>
 <p>Since Apple in its wisdom decided that programs started from a shell are treated differently than Apps if it is coming to
 system variables, we need to work harder compared to a Linux system.</p>
 <p><strong>For Mac OS X &lt; 10.8:</strong></p>
-<p>In order to finalize the <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> installation and to prepare already the installation of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> and <code class="docutils literal notranslate"><span class="pre">musredit</span></code>
+<p>In order to finalize the <tt class="docutils literal"><span class="pre">ROOT</span></tt> installation and to prepare already the installation of <tt class="docutils literal"><span class="pre">musrfit</span></tt> and <tt class="docutils literal"><span class="pre">musredit</span></tt>
 this is a good time for setting necessary environment variables for the use in Mac OS X. Here it assumed that you
-installed <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> from source. If you downloaded the binary package, you will need to adopt the paths accordingly.
+installed <tt class="docutils literal"><span class="pre">ROOT</span></tt> from source. If you downloaded the binary package, you will need to adopt the paths accordingly.
 Put the following lines (without the comments in parentheses and with the paths adjusted to your local installation)
-into the file <code class="docutils literal notranslate"><span class="pre">~/.MacOSX/environment.plist</span></code> and re-login:</p>
-<div class="highlight-xml notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+into the file <tt class="docutils literal"><span class="pre">~/.MacOSX/environment.plist</span></tt> and re-login:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
 <span class="cp">&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;</span>
 <span class="nt">&lt;plist</span> <span class="na">version=</span><span class="s">&quot;1.0&quot;</span><span class="nt">&gt;</span>
 <span class="nt">&lt;dict&gt;</span>
@@ -1020,8 +790,8 @@ into the file <code class="docutils literal notranslate"><span class="pre">~/.Ma
 </pre></div>
 </div>
 <p><strong>For Mac OS X ≥ 10.8:</strong></p>
-<p>One needs to add some system variables in <code class="docutils literal notranslate"><span class="pre">~/.profile</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">ROOTSYS</span><span class="o">=</span><span class="nv">$HOME</span>/Applications/root/root_exec
+<p>One needs to add some system variables in <tt class="docutils literal"><span class="pre">~/.profile</span></tt>:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">ROOTSYS</span><span class="o">=</span><span class="nv">$HOME</span>/Applications/root/root_exec
 <span class="nb">export</span> <span class="nv">MUSRFITPATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin
 <span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin:<span class="nv">$QTDIR</span>/bin:<span class="nv">$PATH</span>
 <span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/lib:<span class="nv">$LD_LIBRARY_PATH</span>
@@ -1032,67 +802,67 @@ launchctl setenv PATH <span class="nv">$PATH</span>
 launchctl setenv LD_LIBRARY_PATH <span class="nv">$LD_LIBRARY_PATH</span>
 </pre></div>
 </div>
-<p>After this you will need to “execute” <code class="docutils literal notranslate"><span class="pre">.profile</span></code> before proceeding:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> <span class="nv">$HOME</span>/.profile
+<p>After this you will need to &#8220;execute&#8221; <tt class="docutils literal"><span class="pre">.profile</span></tt> before proceeding:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">source</span> <span class="nv">$HOME</span>/.profile
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-<div class="section" id="index-33">
-<span id="id23"></span><h3>musrfit<a class="headerlink" href="#index-33" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="index-27">
+<span id="id16"></span><h3>musrfit<a class="headerlink" href="#index-27" title="Permalink to this headline">¶</a></h3>
 <p>First, the most recent source code should be downloaded. First, the most recent source code should be downloaded.
-The preferred way of doing so is to clone the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> repository via git. Assuming the code should be located
-in <code class="docutils literal notranslate"><span class="pre">~/Applications/musrfit</span></code> this is achieved most easily calling from the termin</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~/Applications
+The preferred way of doing so is to clone the <tt class="docutils literal"><span class="pre">musrfit</span></tt> repository via git. Assuming the code should be located
+in <tt class="docutils literal"><span class="pre">~/Applications/musrfit</span></tt> this is achieved most easily calling from the termin</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~/Applications
 $ git clone https://bitbucket.org/muonspin/musrfit.git
 $ <span class="nb">cd</span> musrfit
 </pre></div>
 </div>
 <p>or</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~/Applications
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~/Applications
 $ git clone git://gitlab.psi.ch/nemu/musrfit.git
 $ <span class="nb">cd</span> musrfit
 </pre></div>
 </div>
 <p>If a local repository clone is already present, one can update it using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~/Applications/musrfit
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~/Applications/musrfit
 $ git pull
 </pre></div>
 </div>
 <p>As an alternative (<em>if git is not available</em>), the source code can also be downloaded from the following
 web-page: <a class="reference external" href="https://bitbucket.org/muonspin/musrfit/downloads">musrfit at bitbucket</a>.</p>
-<div class="section" id="index-34">
-<span id="id24"></span><h4>musrfit build with cmake<a class="headerlink" href="#index-34" title="Permalink to this headline">¶</a></h4>
-<p>Currently the following configuration switches for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> are available:</p>
-<dl class="simple">
-<dt><strong>-DCMAKE_INSTALL_PREFIX=&lt;prefix-path&gt;</strong></dt><dd><p>Specify the installation prefix, <em>i.e.</em> the place where <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> shall be installed, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">$ROOTSYS</span></code> if already defined (by default: <code class="docutils literal notranslate"><span class="pre">/usr/local</span></code>).</p>
-</dd>
-<dt><strong>-Dnexus=&lt;value&gt;</strong></dt><dd><p>enable/disable the support of <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> data files (requires the <code class="docutils literal notranslate"><span class="pre">HDF4</span></code>, <code class="docutils literal notranslate"><span class="pre">HDF5</span></code> and <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> libraries to be installed).
-&lt;value&gt;=1 enables <code class="docutils literal notranslate"><span class="pre">NeXus</span></code>, &lt;value&gt;=0 disables <code class="docutils literal notranslate"><span class="pre">NeXus</span></code>. The default setting, <em>i.e.</em> the switch is not provided is <code class="docutils literal notranslate"><span class="pre">NeXus</span></code> support is disabled.</p>
-</dd>
-<dt><strong>-DASlibs=&lt;value&gt;</strong></dt><dd><p>enable/disable the <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code>. &lt;value&gt;=1 enables the <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code>, &lt;value&gt;=0 disables the <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code>. The default setting, <em>i.e.</em> the
-switch is not provided is <code class="docutils literal notranslate"><span class="pre">ASlibs</span></code> support is disabled. For details see Documentation of <a class="reference internal" href="user-libs.html#user-libs"><span class="std std-ref">user libs</span></a>.</p>
-</dd>
-<dt><strong>-DBMWlibs=&lt;value&gt;</strong></dt><dd><p>enable/disable the <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code>. &lt;value&gt;=1 enables the <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code>, &lt;value&gt;=0 disables the <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code>. The default setting, <em>i.e.</em> the
-switch is not provided is <code class="docutils literal notranslate"><span class="pre">BMWlibs</span></code> support is disabled. For details see Documentation of <a class="reference internal" href="user-libs.html#user-libs"><span class="std std-ref">user libs</span></a>.</p>
-</dd>
-<dt><strong>-DBNMRlibs=&lt;value&gt;</strong></dt><dd><p>enable/disable the <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code>. &lt;value&gt;=1 enables the <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code>, &lt;value&gt;=0 disables the <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code>. The default setting,
-<em>i.e.</em> the switch is not provided is <code class="docutils literal notranslate"><span class="pre">BNMRlibs</span></code> support is disabled.</p>
-</dd>
-<dt><strong>-Dqt_based_tools=&lt;value&gt;</strong></dt><dd><p>Will try to get <code class="docutils literal notranslate"><span class="pre">musredit</span></code>, <code class="docutils literal notranslate"><span class="pre">musrWiz</span></code>, <code class="docutils literal notranslate"><span class="pre">musrStep</span></code>, and <code class="docutils literal notranslate"><span class="pre">mupp</span></code> installed, if <code class="docutils literal notranslate"><span class="pre">Qt</span></code> is found.
-By default this is enabled. Again &lt;value&gt;=0 means disabled, &lt;value&gt;=1 enabled.</p>
-</dd>
-<dt><strong>-Dqt_version=&lt;value&gt;</strong></dt><dd><p>Allows to specify which <code class="docutils literal notranslate"><span class="pre">Qt</span></code> version shall be tried. &lt;value&gt; can take the values: <code class="docutils literal notranslate"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6</span></code>.
-If the value is set to <code class="docutils literal notranslate"><span class="pre">AUTO</span></code>, this highest installed version is chosen, otherwise the specified version is used.</p>
-</dd>
-<dt><strong>-Dtry_OpenMP=&lt;value&gt;</strong></dt><dd><p>Will check if <code class="docutils literal notranslate"><span class="pre">OpenMP</span></code> support is possible, and if yes use it. The default is enabled</p>
-</dd>
+<div class="section" id="index-28">
+<span id="id17"></span><h4>musrfit build with cmake<a class="headerlink" href="#index-28" title="Permalink to this headline">¶</a></h4>
+<p>Currently the following configuration switches for <tt class="docutils literal"><span class="pre">musrfit</span></tt> are available:</p>
+<dl class="docutils">
+<dt><strong>-DCMAKE_INSTALL_PREFIX=&lt;prefix-path&gt;</strong></dt>
+<dd>Specify the installation prefix, <em>i.e.</em> the place where <tt class="docutils literal"><span class="pre">musrfit</span></tt> shall be installed, <em>e.g.</em> <tt class="docutils literal"><span class="pre">$ROOTSYS</span></tt> if already defined (by default: <tt class="docutils literal"><span class="pre">/usr/local</span></tt>).</dd>
+<dt><strong>-Dnexus=&lt;value&gt;</strong></dt>
+<dd>enable/disable the support of <tt class="docutils literal"><span class="pre">NeXus</span></tt> data files (requires the <tt class="docutils literal"><span class="pre">HDF4</span></tt>, <tt class="docutils literal"><span class="pre">HDF5</span></tt> and <tt class="docutils literal"><span class="pre">NeXus</span></tt> libraries to be installed).
+&lt;value&gt;=1 enables <tt class="docutils literal"><span class="pre">NeXus</span></tt>, &lt;value&gt;=0 disables <tt class="docutils literal"><span class="pre">NeXus</span></tt>. The default setting, <em>i.e.</em> the switch is not provided is <tt class="docutils literal"><span class="pre">NeXus</span></tt> support is disabled.</dd>
+<dt><strong>-DASlibs=&lt;value&gt;</strong></dt>
+<dd>enable/disable the <tt class="docutils literal"><span class="pre">ASlibs</span></tt>. &lt;value&gt;=1 enables the <tt class="docutils literal"><span class="pre">ASlibs</span></tt>, &lt;value&gt;=0 disables the <tt class="docutils literal"><span class="pre">ASlibs</span></tt>. The default setting, <em>i.e.</em> the
+switch is not provided is <tt class="docutils literal"><span class="pre">ASlibs</span></tt> support is disabled. For details see Documentation of <a class="reference internal" href="user-libs.html#user-libs"><em>user libs</em></a>.</dd>
+<dt><strong>-DBMWlibs=&lt;value&gt;</strong></dt>
+<dd>enable/disable the <tt class="docutils literal"><span class="pre">BMWlibs</span></tt>. &lt;value&gt;=1 enables the <tt class="docutils literal"><span class="pre">BMWlibs</span></tt>, &lt;value&gt;=0 disables the <tt class="docutils literal"><span class="pre">BMWlibs</span></tt>. The default setting, <em>i.e.</em> the
+switch is not provided is <tt class="docutils literal"><span class="pre">BMWlibs</span></tt> support is disabled. For details see Documentation of <a class="reference internal" href="user-libs.html#user-libs"><em>user libs</em></a>.</dd>
+<dt><strong>-DBNMRlibs=&lt;value&gt;</strong></dt>
+<dd>enable/disable the <tt class="docutils literal"><span class="pre">BNMRlibs</span></tt>. &lt;value&gt;=1 enables the <tt class="docutils literal"><span class="pre">BNMRlibs</span></tt>, &lt;value&gt;=0 disables the <tt class="docutils literal"><span class="pre">BNMRlibs</span></tt>. The default setting,
+<em>i.e.</em> the switch is not provided is <tt class="docutils literal"><span class="pre">BNMRlibs</span></tt> support is disabled.</dd>
+<dt><strong>-Dqt_based_tools=&lt;value&gt;</strong></dt>
+<dd>Will try to get <tt class="docutils literal"><span class="pre">musredit</span></tt>, <tt class="docutils literal"><span class="pre">musrWiz</span></tt>, <tt class="docutils literal"><span class="pre">musrStep</span></tt>, and <tt class="docutils literal"><span class="pre">mupp</span></tt> installed, if <tt class="docutils literal"><span class="pre">Qt</span></tt> is found.
+By default this is enabled. Again &lt;value&gt;=0 means disabled, &lt;value&gt;=1 enabled.</dd>
+<dt><strong>-Dqt_version=&lt;value&gt;</strong></dt>
+<dd>Allows to specify which <tt class="docutils literal"><span class="pre">Qt</span></tt> version shall be tried. &lt;value&gt; can take the values: <tt class="docutils literal"><span class="pre">AUTO,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6</span></tt>.
+If the value is set to <tt class="docutils literal"><span class="pre">AUTO</span></tt>, this highest installed version is chosen, otherwise the specified version is used.</dd>
+<dt><strong>-Dtry_OpenMP=&lt;value&gt;</strong></dt>
+<dd>Will check if <tt class="docutils literal"><span class="pre">OpenMP</span></tt> support is possible, and if yes use it. The default is enabled</dd>
 </dl>
-<p>Normally it should not be necessary to make use of any of the options except for specifying the installation path with <code class="docutils literal notranslate"><span class="pre">-DCMAKE_INSTALL_PREFIX</span></code>.
-<code class="docutils literal notranslate"><span class="pre">musrfit</span></code> build with <code class="docutils literal notranslate"><span class="pre">cmake</span></code> takes the <code class="docutils literal notranslate"><span class="pre">out-of-source</span></code> approach. Therefore a typical configuration / make / install process including
-<code class="docutils literal notranslate"><span class="pre">NeXus</span></code> support would look like</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit
+<p>Normally it should not be necessary to make use of any of the options except for specifying the installation path with <tt class="docutils literal"><span class="pre">-DCMAKE_INSTALL_PREFIX</span></tt>.
+<tt class="docutils literal"><span class="pre">musrfit</span></tt> build with <tt class="docutils literal"><span class="pre">cmake</span></tt> takes the <tt class="docutils literal"><span class="pre">out-of-source</span></tt> approach. Therefore a typical configuration / make / install process including
+<tt class="docutils literal"><span class="pre">NeXus</span></tt> support would look like</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit
 $ mkdir build
 $ <span class="nb">cd</span> build
 $ cmake ../ -DCMAKE_INSTALL_PREFIX<span class="o">=</span><span class="nv">$ROOTSYS</span> -Dnexus<span class="o">=</span><span class="m">1</span>
@@ -1103,67 +873,67 @@ $ /sbin/ldconfig                                  <span class="c1"># (as superus
 </pre></div>
 </div>
 </div>
-<div class="section" id="id25">
-<h4>musrfit last step of the installation<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h4>
-<p>In order to finish the installation of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> two more things should be done:</p>
+<div class="section" id="id18">
+<h4>musrfit last step of the installation<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h4>
+<p>In order to finish the installation of <tt class="docutils literal"><span class="pre">musrfit</span></tt> two more things should be done:</p>
 <ul class="simple">
-<li><p>Define the <code class="docutils literal notranslate"><span class="pre">MUSRFITPATH</span></code> environment variable containing the path to the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> executables and <code class="docutils literal notranslate"><span class="pre">XML</span></code> files.
-<em>E.g.</em> if the location of the example above is used append the following line to the <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> and <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code>
-(and then either restart the shell or call the same commands once more from the shell):</p></li>
+<li>Define the <tt class="docutils literal"><span class="pre">MUSRFITPATH</span></tt> environment variable containing the path to the <tt class="docutils literal"><span class="pre">musrfit</span></tt> executables and <tt class="docutils literal"><span class="pre">XML</span></tt> files.
+<em>E.g.</em> if the location of the example above is used append the following line to the <tt class="docutils literal"><span class="pre">~/.bashrc</span></tt> and <tt class="docutils literal"><span class="pre">~/.bash_profile</span></tt>
+(and then either restart the shell or call the same commands once more from the shell):</li>
 </ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">MUSRFITPATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">MUSRFITPATH</span><span class="o">=</span><span class="nv">$ROOTSYS</span>/bin
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>Adjust the paths where <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> will search for data files in the installed <code class="docutils literal notranslate"><span class="pre">musrfit_startup.xml</span></code>. For
-detailed information on this XML file refer to the <a class="reference internal" href="user-manual.html#musrfit-startup"><span class="std std-ref">manual</span></a>.</p></li>
+<li>Adjust the paths where <tt class="docutils literal"><span class="pre">musrfit</span></tt> will search for data files in the installed <tt class="docutils literal"><span class="pre">musrfit_startup.xml</span></tt>. For
+detailed information on this XML file refer to the <a class="reference internal" href="user-manual.html#musrfit-startup"><em>manual</em></a>.</li>
 </ul>
 </div>
 </div>
-<div class="section" id="index-35">
-<span id="id26"></span><h3>musredit<a class="headerlink" href="#index-35" title="Permalink to this headline">¶</a></h3>
-<p>In the latest version of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> the configure script tries to determine automatically the highest
-available Qt version. In case this is found, the editor <code class="docutils literal notranslate"><span class="pre">musredit</span></code> is built already together with <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>.
+<div class="section" id="index-29">
+<span id="id19"></span><h3>musredit<a class="headerlink" href="#index-29" title="Permalink to this headline">¶</a></h3>
+<p>In the latest version of <tt class="docutils literal"><span class="pre">musrfit</span></tt> the configure script tries to determine automatically the highest
+available Qt version. In case this is found, the editor <tt class="docutils literal"><span class="pre">musredit</span></tt> is built already together with <tt class="docutils literal"><span class="pre">musrfit</span></tt>.
 If not, try the following:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit/src/musredit_qt5
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> <span class="nv">$HOME</span>/Apps/musrfit/src/musredit_qt5
 $ <span class="c1"># for some distributions you will need qmake-qt5 for the next command</span>
 $ qmake musredit.pro
 </pre></div>
 </div>
-<p>If everything went fine, <code class="docutils literal notranslate"><span class="pre">musredit</span></code> can be compiled and installed:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ make
+<p>If everything went fine, <tt class="docutils literal"><span class="pre">musredit</span></tt> can be compiled and installed:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ make
 $ make install
 </pre></div>
 </div>
-<p>In case one does not like the executable <code class="docutils literal notranslate"><span class="pre">musredit</span></code> to be copied to the default installation directory
-<code class="docutils literal notranslate"><span class="pre">$ROOTSYS/bin</span></code> the last make install can be skipped and the executable can be copied somewhere else instead.</p>
+<p>In case one does not like the executable <tt class="docutils literal"><span class="pre">musredit</span></tt> to be copied to the default installation directory
+<tt class="docutils literal"><span class="pre">$ROOTSYS/bin</span></tt> the last make install can be skipped and the executable can be copied somewhere else instead.</p>
 </div>
 <div class="section" id="musrgui-obsolete">
 <h3>musrgui (obsolete)<a class="headerlink" href="#musrgui-obsolete" title="Permalink to this headline">¶</a></h3>
-<p>If Qt3 is set up the installation of the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> editor can be done as follows from within the shell:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~/Applications/musrfit/src/musrgui
+<p>If Qt3 is set up the installation of the <tt class="docutils literal"><span class="pre">musrfit</span></tt> editor can be done as follows from within the shell:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~/Applications/musrfit/src/musrgui
 $ qmake musrgui.pro
 $ make
 $ make install
 </pre></div>
 </div>
-<p>The last command copies <code class="docutils literal notranslate"><span class="pre">musrgui.app</span></code> to the standard program directory <code class="docutils literal notranslate"><span class="pre">/Applications</span></code>.</p>
-<p>Under some circumstances it might happen, that if <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> was called from Finder the necessary libraries
-for executing <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> could not be found. In that case, the only workaround for the moment is to export
-the environment variable <code class="docutils literal notranslate"><span class="pre">DYLD_LIBRARY_PATH</span></code> in the shell and call <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> from a terminal! In order to
-accomplish that, add the following lines to <code class="docutils literal notranslate"><span class="pre">~/.profile</span></code> and call <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> with the specified command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>/opt/root-system/lib:/sw/lib:<span class="nv">$DYLD_LIBRARY_PATH</span>
+<p>The last command copies <tt class="docutils literal"><span class="pre">musrgui.app</span></tt> to the standard program directory <tt class="docutils literal"><span class="pre">/Applications</span></tt>.</p>
+<p>Under some circumstances it might happen, that if <tt class="docutils literal"><span class="pre">musrgui</span></tt> was called from Finder the necessary libraries
+for executing <tt class="docutils literal"><span class="pre">musrfit</span></tt> could not be found. In that case, the only workaround for the moment is to export
+the environment variable <tt class="docutils literal"><span class="pre">DYLD_LIBRARY_PATH</span></tt> in the shell and call <tt class="docutils literal"><span class="pre">musrgui</span></tt> from a terminal! In order to
+accomplish that, add the following lines to <tt class="docutils literal"><span class="pre">~/.profile</span></tt> and call <tt class="docutils literal"><span class="pre">musrgui</span></tt> with the specified command:</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>/opt/root-system/lib:/sw/lib:<span class="nv">$DYLD_LIBRARY_PATH</span>
 <span class="nb">alias</span> <span class="nv">mgui</span><span class="o">=</span><span class="s1">&#39;/Applications/musrgui.app/Contents/MacOS/musrgui&#39;</span>
 </pre></div>
 </div>
 </div>
-<div class="section" id="id27">
-<h3>Check the installation<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="id20">
+<h3>Check the installation<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
 <p>In order to perform a quick test for finding out if the installation has been completed successfully, a few msr
-files together with the corresponding data files can be found in the musrfit source tree at <code class="docutils literal notranslate"><span class="pre">doc/examples/</span></code>.
-If <code class="docutils literal notranslate"><span class="pre">musrgui</span></code> has been installed, just open one of the <code class="docutils literal notranslate"><span class="pre">test-*.msr</span></code> files in the editor and test the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>
+files together with the corresponding data files can be found in the musrfit source tree at <tt class="docutils literal"><span class="pre">doc/examples/</span></tt>.
+If <tt class="docutils literal"><span class="pre">musrgui</span></tt> has been installed, just open one of the <tt class="docutils literal"><span class="pre">test-*.msr</span></tt> files in the editor and test the <tt class="docutils literal"><span class="pre">musrfit</span></tt>
 functionalities. Otherwise, if only the terminal should be used, as an initial test for instance the following could be done:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~/Applications/musrfit/doc/examples
+<div class="highlight-bash"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> ~/Applications/musrfit/doc/examples
 $ musrview test-histo-ROOT-NPP.msr
 </pre></div>
 </div>
@@ -1173,22 +943,22 @@ $ musrview test-histo-ROOT-NPP.msr
 
 
       </div>
-      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      <div class="bottomnav">
       
         <p>
         «&#160;&#160;<a href="user-libs.html">Documentation of user libs (user functions)</a>
         &#160;&#160;::&#160;&#160;
         <a class="uplink" href="index.html">Contents</a>
         &#160;&#160;::&#160;&#160;
-        <a href="setup-dks.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> / <code class="docutils literal notranslate"><span class="pre">DKS</span></code>: High Speed Fitting with GPU’s</a>&#160;&#160;»
+        <a href="setup-dks.html">Setting up <tt class="docutils literal"><span class="pre">musrfit</span></tt> / <tt class="docutils literal"><span class="pre">DKS</span></tt>: High Speed Fitting with GPU&#8217;s</a>&#160;&#160;»
         </p>
 
       </div>
 
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2021, Andreas Suter.
-      Last updated on Oct 02, 2021.
-      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.4.3.
+    <div class="footer">
+        &copy; Copyright 2022, Andreas Suter.
+      Last updated on May 29, 2022.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>
