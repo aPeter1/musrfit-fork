@@ -101,7 +101,7 @@ double TMeanFieldsForScHalfSpace::operator()(double E, const std::vector<double>
     if (E > energies.back())
       return CalcMeanB(energies.back(), BofZ);
 
-    energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
+    energyIter = find_if(energies.begin(), energies.end(), [E](const double ee){ return E < ee; }); //as35: bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
 
     double E1(*(energyIter - 1));
@@ -201,7 +201,7 @@ double TMeanFieldsForScSingleLayer::operator()(double E, const std::vector<doubl
     if (E > energies.back())
       return CalcMeanB(energies.back(), interfaces, weights, BofZ);
 
-    energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
+    energyIter = find_if(energies.begin(), energies.end(), [E](const double ee){ return E < ee; }); //as35: bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
 
     double E1(*(energyIter - 1));
@@ -310,7 +310,7 @@ double TMeanFieldsForScBilayer::operator()(double E, const std::vector<double> &
     if (E > energies.back())
       return CalcMeanB(energies.back(), interfaces, weights, BofZ, width);
 
-    energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
+    energyIter = find_if(energies.begin(), energies.end(), [E](const double ee){ return E < ee; }); //as35: bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
 
     double E1(*(energyIter - 1));
@@ -425,7 +425,7 @@ double TMeanFieldsForScTrilayer::operator()(double E, const std::vector<double> 
     if (E > energies.back())
       return CalcMeanB(energies.back(), interfaces, weights, BofZ);
 
-    energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
+    energyIter = find_if(energies.begin(), energies.end(), [E](const double ee){ return E < ee; }); //as35: bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
 
     double E1(*(energyIter - 1));
@@ -530,7 +530,7 @@ double TMeanFieldsForScTrilayerWithInsulator::operator()(double E, const std::ve
     if (E > energies.back())
       return CalcMeanB(energies.back(), interfaces, weights, BofZ);
 
-    energyIter = find_if(energies.begin(), energies.end(), bind2nd( greater<double>(), E));
+    energyIter = find_if(energies.begin(), energies.end(), [E](const double ee){ return E < ee; }); //as35: bind2nd( greater<double>(), E));
 //    cout << *(energyIter - 1) << " " << *(energyIter) << endl;
 
     double E1(*(energyIter - 1));

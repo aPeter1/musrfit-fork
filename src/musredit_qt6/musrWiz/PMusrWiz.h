@@ -70,13 +70,13 @@
 #define T0_ENTER_WIZ    2
 
 //-------------------------------------------------------------------
-typedef struct {
+struct PParamGui {
   QLineEdit *paramName;
   QLineEdit *paramVal;
   QLineEdit *paramStep;
   QLineEdit *paramBoundLow;
   QLineEdit *paramBoundHigh;
-} PParamGui;
+};
 
 //-------------------------------------------------------------------
 class PMsrData
@@ -192,7 +192,7 @@ class PIntroPage : public QWizardPage
     PIntroPage(PAdmin *admin, PMsrData *data, QWidget *parent=0);
 
     int nextId() const Q_DECL_OVERRIDE;
-    bool validatePage();
+    bool validatePage() override;
 
   private slots:
     void handleInstituteChanged(int idx);
@@ -223,8 +223,8 @@ class PTheoPage : public QWizardPage
     PTheoPage(PAdmin *admin, PMsrData *data, QWidget *parent=0);
 
     int nextId() const Q_DECL_OVERRIDE;
-    void initializePage();
-    bool validatePage();
+    void initializePage() override;
+    bool validatePage() override;
 
   private slots:
     void templateState(int);
@@ -269,9 +269,9 @@ class PFuncPage : public QWizardPage
     PFuncPage(PMsrData *data, QWidget *parent=0);
 
     int nextId() const Q_DECL_OVERRIDE;
-    void initializePage();
-    void cleanupPage();
-    bool validatePage();
+    void initializePage() override;
+    void cleanupPage() override;
+    bool validatePage() override;
 
   private slots:
     void showTheo();
@@ -295,8 +295,8 @@ class PMapPage : public QWizardPage
     PMapPage(PMsrData *data, QWidget *parent=0);
 
     int nextId() const Q_DECL_OVERRIDE;
-    void initializePage();
-    bool validatePage();
+    void initializePage() override;
+    bool validatePage() override;
 
   private slots:
     void showTheo();
@@ -318,8 +318,8 @@ class PParamPage : public QWizardPage
     PParamPage(PMsrData *data, QWidget *parent=0);
 
     int nextId() const Q_DECL_OVERRIDE;
-    void initializePage();
-    bool validatePage();
+    void initializePage() override;
+    bool validatePage() override;
 
   private slots:
     void showTheo();
@@ -341,8 +341,8 @@ class PFitInfoPage : public QWizardPage
     PFitInfoPage(PMsrData *data, QWidget *parent=0);
 
     int nextId() const Q_DECL_OVERRIDE;
-    void initializePage();
-    bool validatePage();
+    void initializePage() override;
+    bool validatePage() override;
 
   private:
     PMsrData *fMsrData;

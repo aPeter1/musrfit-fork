@@ -50,20 +50,20 @@
 #define P_MENU_ID_ABOUT  10002
 
 //--------------------------------------------------------------------------
-typedef struct {
+struct PDataPoint {
   Double_t y;
   Double_t eYpos;
   Double_t eYneg;
-} PDataPoint;
+};
 
 //--------------------------------------------------------------------------
-typedef struct {
+struct PDataCollection {
   TString name; // collection name
   TString xLabel;
   PStringVector yLabel;
   PDoubleVector xValue;
   std::vector< std::vector<PDataPoint> > yValue;
-} PDataCollection;
+};
 
 //--------------------------------------------------------------------------
 class PMuppCanvas : public TObject, public  TQObject

@@ -43,13 +43,13 @@
 /**
  * <p>Keep a single rge table from TrimSP for a given energy.
  */
-typedef struct {
+struct PRgeData {
   Double_t energy;
   PDoubleVector depth;
   PDoubleVector amplitude;
   PDoubleVector nn; // normalized int n(z) dz = 1 amplitudes
   Double_t noOfParticles;
-} PRgeData;
+};
 
 //-----------------------------------------------------------------------------
 /**

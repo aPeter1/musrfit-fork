@@ -526,10 +526,10 @@ typedef std::vector<PRawRunData> PRawRunDataList;
 /**
  * <p>Helper structure for parsing. Keeps a msr-file line string and the corresponding line number.
  */
-typedef struct {
+struct PMsrLineStructure {
   Int_t   fLineNo; ///< original line number of the msr-file
   TString fLine;   ///< msr-file line
-} PMsrLineStructure;
+};
 
 //-------------------------------------------------------------
 /**
@@ -541,7 +541,7 @@ typedef std::vector<PMsrLineStructure> PMsrLines;
 /**
  * <p>Handles the information of a parameter.
  */
-typedef struct {
+struct PMsrParamStructure{
   Int_t fNoOfParams;              ///< how many parameters are given
   Int_t fNo;                      ///< parameter number
   TString fName;                  ///< name
@@ -554,7 +554,7 @@ typedef struct {
   Bool_t   fUpperBoundaryPresent; ///< flag showing if an upper boundary is present
   Double_t fUpperBoundary;        ///< upper boundary for the fit parameter
   Bool_t   fIsGlobal;             ///< flag showing if the parameter is a global one (used for msr2data global)
-} PMsrParamStructure;
+};
 
 //-------------------------------------------------------------
 /**
@@ -756,7 +756,7 @@ typedef std::vector<PMsrRunBlock> PMsrRunList;
 /**
  * <p>Holds the information of the Fourier block
  */
-typedef struct {
+struct PMsrFourierStructure {
   Bool_t fFourierBlockPresent; ///< flag indicating if a Fourier block is present in the msr-file
   Int_t  fUnits;               ///< flag used to indicate the units. 1=field units (G); 2=field units (T); 3=frequency units (MHz); 4=Mc/s
   Bool_t fDCCorrected;         ///< if set true, the dc offset of the signal/theory will be removed before the FFT is made.
@@ -769,13 +769,13 @@ typedef struct {
   Double_t fRangeForPhaseCorrection[2]; ///< field/frequency range for automatic phase correction
   Double_t fPlotRange[2];      ///< field/frequency plot range
   Double_t fPhaseIncrement;    ///< phase increment for manual phase optimization
-} PMsrFourierStructure;
+};
 
 //-------------------------------------------------------------
 /**
  * <p>Holds the information of a single plot block
  */
-typedef struct {
+struct PMsrPlotStructure{
   Int_t    fPlotType;      ///< plot type
   Bool_t   fLifeTimeCorrection; ///< needed for single histo. If yes, only the asymmetry is shown, otherweise the positron spectrum
   Bool_t   fUseFitRanges;  ///< yes -> use the fit ranges to plot the data, no (default) -> use range information if present
@@ -792,7 +792,7 @@ typedef struct {
   UInt_t fRRFUnit;         ///< RRF frequency unit. 0=kHz, 1=MHz, 2=Mc/s, 3=Gauss, 4=Tesla
   Int_t  fRRFPhaseParamNo; ///< parameter number if used instead of a RRF phase value
   Double_t fRRFPhase;      ///< RRF phase
-} PMsrPlotStructure;
+};
 
 //-------------------------------------------------------------
 /**
@@ -804,7 +804,7 @@ typedef std::vector<PMsrPlotStructure>  PMsrPlotList;
 /**
  * <p>Holds the informations for the statistics block.
  */
-typedef struct {
+struct PMsrStatisticStructure {
   Bool_t fValid;     ///< flag showing if the statistics block is valid, i.e. a fit took place which converged
   PMsrLines fStatLines; ///< statistics block in msr-file clear text
   TString fDate;     ///< string holding fitting date and time
@@ -815,13 +815,13 @@ typedef struct {
   Double_t fMinExpected; ///< expected total chi2 or max. likelihood
   PDoubleVector fMinExpectedPerHisto; ///< expected pre histo chi2 or max. likelihood
   PUIntVector fNdfPerHisto; ///< number of degrees of freedom per histo
-} PMsrStatisticStructure;
+};
 
 //-------------------------------------------------------------
 /**
  * <p>Holds the informations for the any2many converter program
  */
-typedef struct {
+struct PAny2ManyInfo {
   Bool_t useStandardOutput{false}; ///< flag showing if the converted shall be sent to the standard output
   TString inFormat{""};            ///< holds the information about the input data file format
   TString outFormat{""};           ///< holds the information about the output data file format
@@ -838,16 +838,16 @@ typedef struct {
   UInt_t compressionTag{0};        ///< 0=no compression, 1=gzip compression, 2=bzip2 compression
   TString compressFileName{""};    ///< holds the name of the outputfile name in case of compression is used
   UInt_t idf{0};                   ///< IDF version for NeXus files.
-} PAny2ManyInfo;
+};
 
 //-------------------------------------------------------------
 /**
  * <p>Holds information given at startup
  */
-typedef struct {
+struct PStartupOptions {
   Bool_t writeExpectedChisq; ///< if set to true, expected chisq and chisq per block will be written
   Bool_t estimateN0;         ///< if set to true, for single histogram fits N0 will be estimated
-} PStartupOptions;
+};
 
 //-------------------------------------------------------------
 /**
@@ -878,10 +878,10 @@ class PStringNumberList {
 /**
  * <p> Run name template structure.
  */
-typedef struct {
+struct PRunNameTemplate {
   TString instrument{""};
   TString runNameTemplate{""};
-} PRunNameTemplate;
+};
 
 //-------------------------------------------------------------
 /**

@@ -38,11 +38,11 @@
 #include "PVarHandler.h"
 
 //----------------------------------------------------------------------------
-typedef struct {
+struct PmuppPlotEntry {
   int collIdx; ///< collection index
   QString xLabel; ///< x-axis label
   QVector<QString> yLabel; ///< y-axis label(s)
-} PmuppPlotEntry;
+};
 
 //----------------------------------------------------------------------------
 /**

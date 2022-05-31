@@ -50,11 +50,11 @@ typedef std::vector<Double_t> PDoubleVector;
 /**
  * <p>
  */
-typedef struct {
+struct PMPRgeData {
   Double_t energy;
   PDoubleVector stoppingDistance;
   PDoubleVector stoppingAmplitude;
-} PMPRgeData;
+};
 
 //-------------------------------------------------------------
 /**

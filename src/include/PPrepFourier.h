@@ -43,14 +43,14 @@
  * <p>Data structure holding raw time domain uSR data together with some
  * necessary meta information.
  */
-typedef struct {
+struct musrFT_data {
   Int_t dataSetTag;        ///< tag to label the data set. Needed for average-per-data-set
   TString info;            ///< keeps all the meta information
   Double_t timeResolution; ///< time resolution in (usec)
   Int_t t0;                ///< keep the t0 bin
   Double_t timeRange[2];   ///< time range to be used, given in (usec).
   PDoubleVector rawData;   ///< a single time domain data vector
-} musrFT_data;
+};
 
 //----------------------------------------------------------------------------
 /**

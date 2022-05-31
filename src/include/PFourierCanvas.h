@@ -67,14 +67,14 @@
 /**
  * <p>Structure holding all necessary Fourier histograms.
  */
-typedef struct {
+struct PFourierCanvasDataSet {
   TH1F *dataFourierRe;           ///< real part of the Fourier transform of the data histogram
   TH1F *dataFourierIm;           ///< imaginary part of the Fourier transform of the data histogram
   TH1F *dataFourierPwr;          ///< power spectrum of the Fourier transform of the data histogram
   TH1F *dataFourierPhase;        ///< phase spectrum of the Fourier transform of the data histogram
   TH1F *dataFourierPhaseOptReal; ///< phase otpimized real Fourier transform of the data histogram
   std::vector<Double_t> optPhase;     ///< optimal phase which maximizes the real Fourier
-} PFourierCanvasDataSet;
+};
 
 //------------------------------------------------------------------------
 /**

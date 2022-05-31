@@ -38,7 +38,7 @@
 #include <QLabel>
 #include <QCheckBox>
 
-typedef struct {
+struct PParam {
   QString number;
   QString name;
   QString value;
@@ -46,7 +46,7 @@ typedef struct {
   QString posErr;
   QString boundLow;
   QString boundHigh;
-} PParam;
+};
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 class PModSelect : public QDialog

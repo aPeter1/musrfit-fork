@@ -45,14 +45,14 @@ class PAdmin;
  * <p>This structure is keeping informations necessary to handle musrfit
  * theory functions (see also <code>http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#the-theory-block</code>).
  */
-typedef struct {
+struct PTheory {
   QString name;
   QString comment;
   QString label;
   QString pixmapName;
   QPixmap pixmap;
   int     params;
-} PTheory;
+};
 
 //---------------------------------------------------------------------------
 /**

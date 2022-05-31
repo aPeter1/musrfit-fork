@@ -67,9 +67,9 @@ class PParam {
 };
 
 //-------------------------------------------------------------------
-typedef struct {
+struct PFunc {
   int number;
   QString fun;
-} PFunc;
+};
 
 #endif // _MUSRWIZ_H_

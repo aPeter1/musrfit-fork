@@ -118,7 +118,7 @@ class PMusrCanvasPlotRange : public TObject
  * <p>Structure holding all necessary histograms for a single plot block entry for
  * fit types: asymmetry fit and single histogram fit.
  */
-typedef struct {
+struct PMusrCanvasDataSet {
   TH1F *data;                ///< data histogram
   TH1F *dataFourierRe;       ///< real part of the Fourier transform of the data histogram
   TH1F *dataFourierIm;       ///< imaginary part of the Fourier transform of the data histogram
@@ -139,7 +139,7 @@ typedef struct {
   TH1F *diffFourierPhaseOptReal; ///< phase optimized real part spectrum Fourier transform of the diff histogram
   PMusrCanvasPlotRange *dataRange;    ///< keep the msr-file plot data range
   UInt_t diffFourierTag; ///< 0=not relevant, 1=d-f (Fourier of difference time spectra), 2=f-d (difference of Fourier spectra)
-} PMusrCanvasDataSet;
+};
 
 //------------------------------------------------------------------------
 /**
@@ -152,7 +152,7 @@ typedef std::vector<PMusrCanvasDataSet> PMusrCanvasDataList;
  * <p>Structure holding all necessary error graphs for a single plot block entry for
  * fit types: non-muSR fit.
  */
-typedef struct {
+struct PMusrCanvasNonMusrDataSet {
   TGraphErrors *data;               ///< data error graph
   TGraphErrors *dataFourierRe;      ///< real part of the Fourier transform of the data error graph
   TGraphErrors *dataFourierIm;      ///< imaginary part of the Fourier transform of the data error graph
@@ -170,7 +170,7 @@ typedef struct {
   TGraphErrors *diffFourierPhase;   ///< phase spectrum of the Fourier transform of the diff error graph
   PMusrCanvasPlotRange *dataRange;    ///< keep the msr-file plot data range
   UInt_t diffFourierTag; ///< 0=not relevant, 1=d-f (Fourier of difference time spectra), 2=f-d (difference of Fourier spectra)
-} PMusrCanvasNonMusrDataSet;
+};
 
 //------------------------------------------------------------------------
 /**
@@ -182,11 +182,11 @@ typedef std::vector<PMusrCanvasNonMusrDataSet> PMusrCanvasNonMusrDataList;
 /**
  * <p> data structure needed for ascii dump within musrview.
  */
-typedef struct {
+struct PMusrCanvasAsciiDump {
   PDoubleVector dataX;   ///< x-axis data set
   PDoubleVector data;    ///< y-axis data set
   PDoubleVector dataErr; ///< error of the y-axis data set
-} PMusrCanvasAsciiDump;
+};
 
 //------------------------------------------------------------------------
 /**

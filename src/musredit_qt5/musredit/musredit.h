@@ -40,7 +40,7 @@
  * parameters to handle <code>msr2data</code>. For a detailed description of the meaning of these
  * parameters see <code>msr2data --help</code> and the online documentation.
  */
-typedef struct {
+struct PMsr2DataParam {
   QString runList;             ///< list of run numbers (usage 3 of msr2data)
   QString runListFileName;     ///< run list filename (usage 4 of msr2data)
   QString msrFileExtension;    ///< msr filename extension, e.g. '0100_h13.msr' -> '_h13'
@@ -61,13 +61,13 @@ typedef struct {
   bool fitOnly;                ///< flag: true = just perform the fits wihtout generating any msr-files ('fit' in msr2data).
   bool global;                 ///< flag: true = 'global' option
   bool globalPlus;             ///< flag: true = 'global+' option
-} PMsr2DataParam;
+};
 
 //-------------------------------------------------------------------------------------------------
 /**
  * This structure is used to handle find (and replace) within <code>musredit</code> properly.
  */
-typedef struct {
+struct PFindReplaceData {
   QString findText;     ///< text to be found
   QString replaceText;  ///< replacement string
   bool caseSensitive;   ///< true = case sensitive
@@ -76,6 +76,6 @@ typedef struct {
   bool findBackwards;   ///< true = reversed search
   bool selectedText;    ///< true = handle only the selected text
   bool promptOnReplace; ///< true = request on OK from the user before performing the replace action
-} PFindReplaceData;
+};
 
 #endif // _MUSREDIT_H_
