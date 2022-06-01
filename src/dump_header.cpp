@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2007-2021 by Andreas Suter                              *
+ *   Copyright (C) 2007-2022 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -57,6 +57,7 @@
 #include "git-revision.h"
 #endif
 
+#include "PFindRun.h"
 #include "PStartupHandler.h"
 #include "TMusrRunHeader.h"
 #include "TLemRunHeader.h"
@@ -72,7 +73,7 @@
 
 //------------------------------------------------------------------------
 /**
- *
+ * <p>dump help to stdout.
  */
 void dump_header_syntax()
 {
@@ -94,9 +95,8 @@ void dump_header_syntax()
   std::cout << std::endl << "                     year is used. If a file name is given, this option has no effect.";
   std::cout << std::endl << "       -s, --summary : this option is used for LE-uSR data sets only. It will, additionally";
   std::cout << std::endl << "                     to the header information, print the summary file content.";
-  std::cout << std::endl << "       --psi-bulk <opt> : where <opt> consists of two items: (i) pta or tdc, ";
-  std::cout << std::endl << "                     (ii) gps | ltf | dolly | gpd | hifi. This is needed in combination with";
-  std::cout << std::endl << "                     the file formats PSI-BIN and PSI-MDU.";
+  std::cout << std::endl << "       -i, --instrument <inst> : where <inst> is the requested instroment:";
+  std::cout << std::endl << "                     lem (default) | gps | ltf | dolly | gpd | hifi.";
   std::cout << std::endl << "       -h, --help    : will show this help";
   std::cout << std::endl << "       -v, --version : will show the current version.";
   std::cout << std::endl << std::endl;
@@ -104,13 +104,21 @@ void dump_header_syntax()
 
 //------------------------------------------------------------------------
 /**
+ * <p>dumps header of a ROOT file.
  *
+ * @param fileName file name of the ROOT file
+ * @param summary bool, if true dump the summary
+ *
+ * @return 0 on success, otherwise 1.
  */
-int dump_header_root(const std::string fileName, const std::string fileFormat, const bool summary)
+int dump_header_root(const std::string fileName, const bool summary)
 {
   TFile f(fileName.c_str());
   if (f.IsZombie()) {
-    return false;
+    std::cerr << std::endl;
+    std::cerr << "**ERROR** couldn't invoke ROOT/MusrRoot file object." << std::endl;
+    std::cerr << std::endl;
+    return 1;
   }
 
   UInt_t fileType = DH_MUSR_ROOT;
@@ -142,7 +150,7 @@ int dump_header_root(const std::string fileName, const std::string fileFormat, c
     }
 
     std::cout << std::endl << "-------------------";
-    std::cout << std::endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
+    std::cout << std::endl << "fileName = " << fileName << ", fileFormat = ROOT (PSI LEM).";
     std::cout << std::endl << "-------------------";
     std::cout << std::endl << "Run Title          : " << runHeader->GetRunTitle().GetString().Data();
     std::cout << std::endl << "Run Number         : " << runHeader->GetRunNumber();
@@ -231,15 +239,31 @@ int dump_header_root(const std::string fileName, const std::string fileFormat, c
 
 //------------------------------------------------------------------------
 /**
+ * <p>dumps the header information of a NeXus file.
  *
+ * @param fileName file name of the NeXus file.
+ *
+ * @return  0 on success, 1 otherwise
  */
 int dump_header_nexus(const std::string fileName) {
 
 #ifdef PNEXUS_ENABLED
   PNeXus *nxs_file = new PNeXus(fileName.c_str());
 
+  if (nxs_file == nullptr) {
+    std::cerr << std::endl;
+    std::cerr << "**ERROR** couldn't invoke NeXus file object." << std::endl;
+    std::cerr << std::endl;
+    return 1;
+  }
+
   if (nxs_file->IsValid(false)) {
     nxs_file->Dump();
+  } else {
+    std::cerr << std::endl;
+    std::cerr << "**ERROR** found invalid NeXus file." << std::endl;
+    std::cerr << std::endl;
+    return 1;
   }
 
   if (nxs_file)
@@ -253,7 +277,11 @@ int dump_header_nexus(const std::string fileName) {
 
 //------------------------------------------------------------------------
 /**
+ * <p>dump the instrument specific info for the PSI-BIN format.
  *
+ * @param fileName file name of the PSI-BIN.
+ *
+ * @return string vector with the instrument specific info.
  */
 std::vector<std::string> dump_header_instrument_info(std::string fileName)
 {
@@ -312,7 +340,12 @@ std::vector<std::string> dump_header_instrument_info(std::string fileName)
 
 //------------------------------------------------------------------------
 /**
+ * <p>dump the header information of a PSI-BIN file.
  *
+ * @param fileName file name of the PSI-BIN
+ * @param fileFormat either PSI-BIN or PSI-MDU
+ *
+ * @return 0 on success, 1 otherwise
  */
 int dump_header_psi_bin(const std::string fileName, const std::string fileFormat)
 {
@@ -415,9 +448,12 @@ int dump_header_psi_bin(const std::string fileName, const std::string fileFormat
 
 //------------------------------------------------------------------------
 /**
+ * <p>dump the header information of a MUD file.
+ * @param fileName file name of the MUD file
  *
+ * @return 0 on success, 1 otherwise
  */
-int dump_header_mud(const std::string fileName, const std::string fileFormat)
+int dump_header_mud(const std::string fileName)
 {
   int    fh;
   UINT32 type, val;
@@ -433,7 +469,7 @@ int dump_header_mud(const std::string fileName, const std::string fileFormat)
   }
 
   std::cout << std::endl << "-------------------";
-  std::cout << std::endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
+  std::cout << std::endl << "fileName = " << fileName << ", fileFormat = MUD";
   std::cout << std::endl << "-------------------";
   // run title
   success = MUD_getTitle( fh, str, sizeof(str) );
@@ -593,9 +629,12 @@ int dump_header_mud(const std::string fileName, const std::string fileFormat)
 
 //------------------------------------------------------------------------
 /**
+ * <p>dump the header information of a WKM file.
+ * @param fileName file name of the WKM file.
  *
+ * @return 0 on success, 1 otherwise
  */
-int dump_header_wkm(const std::string fileName, const std::string fileFormat)
+int dump_header_wkm(const std::string fileName)
 {
   std::ifstream fin(fileName.c_str(), std::ifstream::in);
   if (!fin.is_open()) {
@@ -603,7 +642,7 @@ int dump_header_wkm(const std::string fileName, const std::string fileFormat)
     return 1;
   }
   std::cout << std::endl << "-------------------";
-  std::cout << std::endl << "fileName = " << fileName << ", fileFormat = " << fileFormat;
+  std::cout << std::endl << "fileName = " << fileName << ", fileFormat = WKM";
   std::cout << std::endl << "-------------------";
   char header[256];
   while (fin.good()) {
@@ -620,9 +659,11 @@ int dump_header_wkm(const std::string fileName, const std::string fileFormat)
 
 //------------------------------------------------------------------------
 /**
- * @brief is_number
- * @param s
- * @return
+ * <p>checks if a string is a number
+ *
+ * @param s number string to be checked
+ *
+ * @return true if 's' is a number, false otherwise
  */
 bool dump_is_number(const char *s)
 {
@@ -642,8 +683,9 @@ bool dump_is_number(const char *s)
 
 //------------------------------------------------------------------------
 /**
- * @brief dump_current_year
- * @return
+ * <p>reads the current year from the system and converts it to a string.
+ *
+ * @return the current year as a string.
  */
 int dump_current_year()
 {
@@ -660,109 +702,13 @@ int dump_current_year()
 
 //------------------------------------------------------------------------
 /**
- * @brief dump_create_fln
- * @param runNo
- * @param year
- * @param fileFormat
- * @return
- */
-std::string dump_create_fln(std::string runNo, std::string year, std::string fileFormat, bool pta, std::string instrument)
-{
-  std::string result = "??";
-  int yearShort=0;
-  int iRunNo=0;
-
-  if (fileFormat.empty())
-    fileFormat = "MusrRoot";
-
-  // make sure that a 'legal' file format has been found
-  if (!boost::iequals(fileFormat, "MusrRoot") &&
-      !boost::iequals(fileFormat, "NeXus") &&
-      !boost::iequals(fileFormat, "ROOT") &&
-      !boost::iequals(fileFormat, "PSI-BIN") &&
-      !boost::iequals(fileFormat, "PSI-MDU") &&
-      !boost::iequals(fileFormat, "MDU") &&
-      !boost::iequals(fileFormat, "WKM")) {
-    return result;
-  }
-
-  // if year is an empty string get the current year
-  int yy=-1;
-  std::stringstream ss;
-  if (year.empty()) {
-    yy = dump_current_year();
-    ss << yy;
-    year = ss.str();
-  }
-  yy = atoi(year.c_str());
-  if (yy > 2000)
-    yearShort = yy - 2000;
-  else
-    yearShort = yy - 1900;
-
-  iRunNo = atoi(runNo.c_str());
-
-  char fln[64];
-  char ptatdc[8];
-  memset(ptatdc, '\0', sizeof(ptatdc));
-  if (pta)
-    strcpy(ptatdc, "pta");
-  else
-    strcpy(ptatdc, "tdc");
-  if (boost::iequals(fileFormat, "MusrRoot") || boost::iequals(fileFormat, "ROOT")) {
-    if (instrument == "") // i.e. LEM
-      snprintf(fln, sizeof(fln), "lem%02d_his_%04d.root", yearShort, iRunNo);
-    else
-      snprintf(fln, sizeof(fln), "deltat_%s_%s_%s_%04d.root", ptatdc, instrument.c_str(), year.c_str(), iRunNo);
-  } else if (boost::iequals(fileFormat, "NeXus")) {
-    snprintf(fln, sizeof(fln), "%s.nxs", runNo.c_str());
-  } else if (boost::iequals(fileFormat, "PSI-BIN")) {
-    snprintf(fln, sizeof(fln), "deltat_%s_%s_%04d.bin", ptatdc, instrument.c_str(), iRunNo);
-  } else if (boost::iequals(fileFormat, "PSI-MDU")) {
-    snprintf(fln, sizeof(fln), "%s_%s_%s_%05d.mdu", ptatdc, instrument.c_str(), year.c_str(), iRunNo);
-  } else if (boost::iequals(fileFormat, "MUD")) {
-    snprintf(fln, sizeof(fln), "%06d.msr", iRunNo);
-  } else if (boost::iequals(fileFormat, "WKM")) {
-
-  }
-  result = fln;
-
-  return result;
-}
-
-//------------------------------------------------------------------------
-/**
- * @brief dump_file_exists
- * @param pathName
- * @return
- */
-bool dump_file_exists(const std::string pathName)
-{
-  bool exists = true;
-
-  int res = access(pathName.c_str(), R_OK);
-  if (res < 0) {
-    if (errno == ENOENT) {
-      // file does not exist
-      exists = false;
-    } else if (errno == EACCES) {
-      // file exists but is not readable
-      exists = false;
-    } else {
-      // FAIL
-      exists = false;
-    }
-  }
-
-  return exists;
-}
-
-//------------------------------------------------------------------------
-/**
- * @brief main
- * @param argc
- * @param argv
- * @return
+ * <p>dump_header allows to dump the header (meta) information for various
+ * muSR specific file formats.
+ *
+ * @param argc argument count
+ * @param argv argument list
+ *
+ * @return 0 on success, 1 otherwise
  */
 int main(int argc, char *argv[])
 {
@@ -775,8 +721,7 @@ int main(int argc, char *argv[])
   std::string fileName("");
   std::string fileFormat("");
   std::string year("");
-  bool pta(false);
-  std::string instrument("");
+  std::string instrument("lem");
   bool summary(false);
 
   for (int i=1; i<argc; i++) {
@@ -867,29 +812,20 @@ int main(int argc, char *argv[])
       i++;
     } else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--summary")) {
       summary = true;
-    } else if (!strcmp(argv[i], "--psi-bulk")) {
-      if (i+2 >= argc) {
-        std::cerr << std::endl << "**ERROR** found --psi-bulk with insufficient input!" << std::endl;
+    } else if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--instrument")) {
+      if (i+1 >= argc) {
+        std::cerr << std::endl << "**ERROR** found option --instrument without <instrument> input!" << std::endl;
         dump_header_syntax();
         return 1;
       }
-      if (!strcmp(argv[i+1], "pta"))
-        pta = true;
-      else if (!strcmp(argv[i+1], "tdc"))
-        pta = false;
-      else {
-        std::cerr << std::endl << "**ERROR** found --psi-bulk with 1st argument '" << argv[i+1] << "'! Allowed is 'pta' or 'tdc'." << std::endl;
+      if (strcmp(argv[i+1], "lem") && strcmp(argv[i+1], "gps") && strcmp(argv[i+1], "ltf") &&
+          strcmp(argv[i+1], "dolly") && strcmp(argv[i+1], "gpd") && strcmp(argv[i+1], "hifi")) {
+        std::cerr << std::endl << "**ERROR** found --instrument with unkown instrument name: '" << argv[i+1] << "'!" << std::endl;
         dump_header_syntax();
         return 1;
       }
-      if (strcmp(argv[i+2], "gps") && strcmp(argv[i+2], "ltf") && strcmp(argv[i+2], "dolly") &&
-          strcmp(argv[i+2], "gpd") && strcmp(argv[i+2], "hifi")) {
-        std::cerr << std::endl << "**ERROR** found --psi-bulk with 2nd argument '" << argv[i+2] << "'! This is an unkown instrument." << std::endl;
-        dump_header_syntax();
-        return 1;
-      }
-      instrument = argv[i+2];
-      i += 2;
+      instrument = argv[i+1];
+      i++;
     } else {
       std::cerr << std::endl << "**ERROR** found unkown option '" << argv[i] << "'." << std::endl;
       dump_header_syntax();
@@ -949,70 +885,25 @@ int main(int argc, char *argv[])
     }
   }
 
-  // runNo given, hence try to create the necessary file name based on the provided information
-  if (runNo != "") {
-     std::string str = dump_create_fln(runNo, year, fileFormat, pta, instrument);
-     if (str == "??") {
-       std::cerr << std::endl << "**ERROR** couldn't get a proper file name." << std::endl;
-       return 1;
-     }
-     fileName = str;
-  }
-
-  bool found_fln = false;
+  // try to find path-file-name via run name templates
   std::string pathFln("");
-  // 1st check if the file name is the full path-file name and the file exists
-  pathFln = fileName;
-  if (dump_file_exists(pathFln))
-    found_fln = true;
-
-  // 2nd check if the file name is found in the current directory
-  if (!found_fln) {
-    pathFln = "./" + fileName;
-    if (dump_file_exists(pathFln))
-      found_fln = true;
-  }
-
-  // 3rd check if file name is found in any default search paths if not already found in the current directory
-  if (!found_fln) {
-    PStringVector pathList = startupHandler->GetDataPathList();
-    for (unsigned int i=0; i<pathList.size(); i++) {
-      if (boost::iequals(fileFormat, "MusrRoot") || boost::iequals(fileFormat, "ROOT") ||
-          boost::iequals(fileFormat, "WKM")) {
-        if (instrument == "") // i.e. LEM
-          pathFln = pathList[i] + "/" + year + "/" + fileName;
-        else
-          pathFln = pathList[i] + "/d" + year + "/tdc/root/" + fileName;
-      } else {
-        if (pta)
-          pathFln = pathList[i] + "/d" + year + "/pta/" + fileName;
-        else
-          pathFln = pathList[i] + "/d" + year + "/tdc/" + fileName;
-      }
-      if (dump_file_exists(pathFln)) {
-        found_fln = true;
-        break;
-      }
+  if (fileName == "") { // only look for runs if the file name is not explicitly given
+    int yy = static_cast<int>(strtod(year.c_str(), static_cast<char**>(nullptr)));
+    int run = static_cast<int>(strtod(runNo.c_str(), static_cast<char**>(nullptr)));
+    PFindRun findRun(startupHandler->GetDataPathList(), startupHandler->GetRunNameTemplateList(), instrument, yy, run);
+    if (findRun.FoundPathName()) {
+      pathFln = findRun.GetPathName().Data();
+    } else {
+      std::cout << "debug> Couldn't find run: " << run << " for instrument " << instrument << ", and year: " << year << std::endl;
+      return 1;
     }
-  }
-
-  if (!found_fln) {
-    std::cerr << "**ERROR** couldn't find any appropriate file." << std::endl;
-    // cleanup
-    if (saxParser) {
-      delete saxParser;
-      saxParser = 0;
-    }
-    if (startupHandler) {
-      delete startupHandler;
-      startupHandler = nullptr;
-    }
-    return 1;
+  } else { // file name explicitly provided, hence use this as pathFln
+    pathFln = fileName;
   }
 
   // if file format is not given explicitly try to guess it based on the file name extension
-  if ((fileFormat == "") && (fileName != "")) {
-    std::string fln(fileName);
+  if (fileFormat == "") {
+    std::string fln(pathFln);
     boost::to_lower(fln);
     if (fln.find(".root") != std::string::npos)
       fileFormat = "MusrRoot"; // could be old ROOT (LEM) as well
@@ -1038,7 +929,7 @@ int main(int argc, char *argv[])
   boost::to_lower(fileFormat);
 
   if (boost::iequals(fileFormat, "MusrRoot") || boost::iequals(fileFormat, "ROOT")) {
-    dump_header_root(pathFln, fileFormat, summary);
+    dump_header_root(pathFln, summary);
   } else if (boost::iequals(fileFormat, "NeXus")) {
 #ifdef PNEXUS_ENABLED
     dump_header_nexus(pathFln);
@@ -1048,9 +939,9 @@ int main(int argc, char *argv[])
   } else if (boost::iequals(fileFormat, "PSI-BIN") || boost::iequals(fileFormat, "PSI-MDU")) {
     dump_header_psi_bin(pathFln, fileFormat);
   } else if (boost::iequals(fileFormat, "MUD")) {
-    dump_header_mud(pathFln, fileFormat);
+    dump_header_mud(pathFln);
   } else if (boost::iequals(fileFormat, "WKM")) {
-    dump_header_wkm(pathFln, fileFormat);
+    dump_header_wkm(pathFln);
   }
 
   // cleanup
