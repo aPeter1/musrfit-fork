@@ -95,7 +95,7 @@ void dump_header_syntax()
   std::cout << std::endl << "                     year is used. If a file name is given, this option has no effect.";
   std::cout << std::endl << "       -s, --summary : this option is used for LE-uSR data sets only. It will, additionally";
   std::cout << std::endl << "                     to the header information, print the summary file content.";
-  std::cout << std::endl << "       -i, --instrument <inst> : where <inst> is the requested instroment:";
+  std::cout << std::endl << "       -i, --instrument <inst> : where <inst> is the requested instrument:";
   std::cout << std::endl << "                     lem (default) | gps | ltf | dolly | gpd | hifi.";
   std::cout << std::endl << "       -h, --help    : will show this help";
   std::cout << std::endl << "       -v, --version : will show the current version.";
