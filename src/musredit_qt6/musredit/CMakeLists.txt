@@ -2,9 +2,9 @@
 
 #--- check if project source is repo ------------------------------------------
 if (IS_GIT_REPO)
-  set(HAVE_GIT_REV_H "-DHAVE_GIT_REV_H")  
+  set(HAVE_GIT_REV_H "-DHAVE_GIT_REV_H")
 else (IS_GIT_REPO)
-  set(HAVE_GIT_REV_H "")  
+  set(HAVE_GIT_REV_H "")
 endif (IS_GIT_REPO)
 
 #--- instruct CMake to run moc automatically when needed ----------------------
@@ -63,7 +63,7 @@ set(musredit_ui
   forms/PGetFourierBlockDialog.ui
   forms/PGetPlotBlockDialog.ui
   forms/PMsr2DataDialog.ui
-  forms/PChangeDefaultPathsDialog.ui  
+  forms/PChangeDefaultPathsDialog.ui
 )
 
 if (APPLE)
@@ -72,7 +72,7 @@ if (APPLE)
   else()
     set(macosx_icon_name musredit.icns)
   endif()
-  set(macosx_icon "icons/${macosx_icon_name}")      	
+  set(macosx_icon "icons/${macosx_icon_name}")
   add_executable(musredit MACOSX_BUNDLE
     ${musredit_src}
     ${musredit_ui}
@@ -80,7 +80,7 @@ if (APPLE)
     ${macosx_icon}
   )
 else (APPLE)
-  add_executable(musredit 
+  add_executable(musredit
     ${musredit_src}
     ${musredit_ui}
     musredit.qrc
@@ -99,7 +99,7 @@ target_include_directories(musredit
 
 target_compile_options(musredit
   PRIVATE
-    "${HAVE_GIT_REV_H}"  
+    "${HAVE_GIT_REV_H}"
 )
 
 target_link_libraries(musredit PRIVATE ${qt_libs})
@@ -115,6 +115,7 @@ if (APPLE)
     MACOSX_BUNDLE_GUI_IDENTIFIER "ch.psi.lmu.musredit"
     MACOSX_BUNDLE_COPYRIGHT "Andreas Suter"
     RESOURCE ${macosx_icon}
+    INSTALL_RPATH "${Qt6_DIR}/../.."
   )
 endif (APPLE)
 
@@ -138,4 +139,3 @@ install(
     ${CMAKE_INSTALL_PREFIX}/share/doc/musrfit
   MESSAGE_NEVER
 )
-

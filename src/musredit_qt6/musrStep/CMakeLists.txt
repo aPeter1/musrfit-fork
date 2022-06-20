@@ -2,9 +2,9 @@
 
 #--- check if project source is repo ------------------------------------------
 if (IS_GIT_REPO)
-  set(HAVE_GIT_REV_H "-DHAVE_GIT_REV_H")  
+  set(HAVE_GIT_REV_H "-DHAVE_GIT_REV_H")
 else (IS_GIT_REPO)
-  set(HAVE_GIT_REV_H "")  
+  set(HAVE_GIT_REV_H "")
 endif (IS_GIT_REPO)
 
 #--- instruct CMake to run moc automatically when needed ----------------------
@@ -29,7 +29,7 @@ if (APPLE)
     ${macosx_icon}
   )
 else (APPLE)
-  add_executable(musrStep 
+  add_executable(musrStep
     ${musrStep_src}
     musrStep.qrc
   )
@@ -46,7 +46,7 @@ target_include_directories(musrStep
 
 target_compile_options(musrStep
   PRIVATE
-    "${HAVE_GIT_REV_H}"  
+    "${HAVE_GIT_REV_H}"
 )
 
 target_link_libraries(musrStep PRIVATE ${qt_libs})
@@ -62,6 +62,7 @@ if (APPLE)
     MACOSX_BUNDLE_GUI_IDENTIFIER "ch.psi.lmu.musrStep"
     MACOSX_BUNDLE_COPYRIGHT "Andreas Suter"
     RESOURCE ${macosx_icon}
+    INSTALL_RPATH "${Qt6_DIR}/../.."
   )
 endif (APPLE)
 
@@ -74,4 +75,3 @@ else (APPLE)
     RUNTIME DESTINATION bin
   )
 endif (APPLE)
-

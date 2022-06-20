@@ -1,4 +1,4 @@
-# - musrfit 
+# - musrfit
 cmake_minimum_required(VERSION 3.9)
 
 if (CMAKE_VERSION GREATER_EQUAL 3.12)
@@ -21,7 +21,7 @@ set_property(CACHE qt_version PROPERTY STRINGS AUTO 3 4 5 6)
 
 #--- set a default build type if none was specified ---------------------------
 set(default_build_type "Release")
-  
+
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
   set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
@@ -35,7 +35,7 @@ endif ()
 
 #--- the next two lines are needed that the math functions are found ----------
 set(CMAKE_REQUIRED_INCLUDES math.h)
-set(CMAKE_REQUIRED_LIBRARIES m) 
+set(CMAKE_REQUIRED_LIBRARIES m)
 
 include(CheckTypeSize)
 include(CheckIncludeFiles)
@@ -84,17 +84,17 @@ if (ROOT_mathmore_FOUND)
 endif (ROOT_mathmore_FOUND)
 
 #--- the next check is need to set a flag, since root 6.24 (minuit2) breaks
-#--- the backwards compatibility. --------------------------------------------- 
+#--- the backwards compatibility. ---------------------------------------------
 if (ROOT_VERSION VERSION_LESS "6.23")
   set(ROOT_GRTEQ_24 0)
-else ()  
+else ()
   set(ROOT_GRTEQ_24 1)
 endif ()
 set(ROOT_GRTEQ_24 ${ROOT_GRTEQ_24} CACHE INTERNAL "ROOT Version check")
 
 #--- check for boost ----------------------------------------------------------
 find_package(Boost REQUIRED
-  COMPONENTS 
+  COMPONENTS
     system
     filesystem
 )
@@ -135,7 +135,7 @@ if (qt_based_tools)
       find_package(Qt6Xml CONFIG REQUIRED)
       find_package(Qt6Network CONFIG REQUIRED)
       find_package(Qt6Svg CONFIG REQUIRED)
-      find_package(Qt6PrintSupport CONFIG REQUIRED)      
+      find_package(Qt6PrintSupport CONFIG REQUIRED)
     endif (Qt6Core_FOUND)
     # try Qt5
     if (NOT Qt6Core_FOUND)
@@ -232,7 +232,7 @@ endif ()
 #--- propagate to the sub-directories -----------------------------------------
 add_subdirectory(src)
 
-#--- write summary of the installation 
+#--- write summary of the installation
 message("")
 message("|-----------------------------------------------------------------------|")
 message("|                                                                       |")
@@ -264,14 +264,14 @@ endif (OpenMP_FOUND)
 
 if (nexus)
   message("")
-  message(" HDF4   found in ${HDF4_INCLUDE_DIRS}")
+  message(" HDF4    found in ${HDF4_INCLUDE_DIRS}")
   message(" HDF5    found in ${HDF5_INCLUDE_DIRS}")
-  message(" NeXus   found in ${NEXUS_INCLUDE_DIR}") 
+  message(" NeXus   found in ${NEXUS_INCLUDE_DIR}")
 endif (nexus)
 
 message("")
 if (qt_based_tools)
-  if (Qt6Core_FOUND)	
+  if (Qt6Core_FOUND)
     message(" Qt      found in  ${Qt6Core_INCLUDE_DIRS} (Version: ${Qt6Core_VERSION})")
   else (Qt6Core_FOUND)
     if (Qt5Core_FOUND)
@@ -363,8 +363,8 @@ message("-----------------------------------------------------------------------
 message("")
 
 #--- cpack specific info ......................................................
-file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_DIR_NATIVE) 
-file(TO_NATIVE_PATH ${PROJECT_BINARY_DIR} PROJECT_BINARY_DIR_NATIVE) 
+file(TO_NATIVE_PATH ${PROJECT_SOURCE_DIR} PROJECT_SOURCE_DIR_NATIVE)
+file(TO_NATIVE_PATH ${PROJECT_BINARY_DIR} PROJECT_BINARY_DIR_NATIVE)
 string(REPLACE "\\" "\\\\" PROJECT_SOURCE_DIR_NATIVE_D ${PROJECT_SOURCE_DIR_NATIVE})
 string(REPLACE "\\" "\\\\" PROJECT_BINARY_DIR_NATIVE_D ${PROJECT_BINARY_DIR_NATIVE})
 
