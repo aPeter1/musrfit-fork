@@ -12,7 +12,7 @@ root_generate_dictionary(
   TLFRelaxationDict 
   TLFRelaxation.h
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${MUSRFIT_INC}
     -I${BMW_TOOLS_INC}
     -inlineInputHeader
@@ -46,7 +46,7 @@ set_target_properties(LFRelaxation
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   LFRelaxation BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${BMW_TOOLS_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -63,7 +63,7 @@ if (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
 endif (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
 target_link_libraries(LFRelaxation 
    ${gomp}
-   ${GSL_LIBRARIES} ${FFTW3F_LIBRARY} 
+   ${GSL_LIBRARIES} FFTW3::FFTW3F
    ${ROOT_LIBRARIES} PUserFcnBase cuba BMWtools
 )
 

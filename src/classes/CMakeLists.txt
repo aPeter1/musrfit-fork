@@ -12,7 +12,7 @@ root_generate_dictionary(
   PFourierCanvas.h 
   OPTIONS 
     -I${MUSRFIT_INC} 
-    -I${FFTW3_INCLUDE_DIR}
+    -I${FFTW3_INCLUDE}
     -inlineInputHeader
   LINKDEF ${MUSRFIT_INC}/PFourierCanvasLinkDef.h
   MODULE PFourierCanvas
@@ -22,7 +22,7 @@ root_generate_dictionary(
   PMusrCanvas.h  
   LINKDEF ${MUSRFIT_INC}/PMusrCanvasLinkDef.h
   OPTIONS 
-    -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC}
+    -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE} -I${MUSRFIT_INC}
     -inlineInputHeader
   MODULE PMusrCanvas
 )
@@ -31,7 +31,7 @@ root_generate_dictionary(
   PMusrT0.h
   LINKDEF ${MUSRFIT_INC}/PMusrT0LinkDef.h
   OPTIONS 
-    -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC}
+    -I${Boost_INCLUDE_DIR} -I${FFTW3_INCLUDE} -I${MUSRFIT_INC}
     -inlineInputHeader
   MODULE PMusrT0
 )
@@ -40,7 +40,7 @@ root_generate_dictionary(
   PStartupHandler.h 
   LINKDEF ${MUSRFIT_INC}/PStartupHandlerLinkDef.h
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC}
+    -I${FFTW3_INCLUDE} -I${MUSRFIT_INC}
     -inlineInputHeader
   MODULE PStartupHandler
 )
@@ -50,7 +50,7 @@ root_generate_dictionary(
   LINKDEF ${MUSRFIT_INC}/PUserFcnBaseLinkDef.h
   OPTIONS
     -inlineInputHeader
-    -I${FFTW3_INCLUDE_DIR} -I${MUSRFIT_INC}
+    -I${FFTW3_INCLUDE} -I${MUSRFIT_INC}
   MODULE PUserFcnBase
 )
 root_generate_dictionary(
@@ -59,7 +59,7 @@ root_generate_dictionary(
   OPTIONS 
     -I${NONLOCAL_INC} 
     -I${MUSRFIT_INC}
-    -I${FFTW3_INCLUDE_DIR}
+    -I${FFTW3_INCLUDE}
     -I${CMAKE_CURRENT_SOURCE_DIR}
     -inlineInputHeader
   LINKDEF ${MUSRFIT_INC}/PRgeHandlerLinkDef.h
@@ -118,7 +118,7 @@ add_library(PMusr SHARED
 target_include_directories(
   PMusr BEFORE PRIVATE
     $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${NEXUS_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/MusrRoot>
@@ -176,7 +176,8 @@ endif (OpenMP_FOUND)
 
 #--- add library dependencies -------------------------------------------------
 set(DependOnLibs ${ROOT_LIBARIES})
-set(DependOnLibs ${DependOnLibs} ${FFTW3_LIBRARY})
+#set(DependOnLibs ${DependOnLibs} ${FFTW3_LIBRARY})
+set(DependOnLibs ${DependOnLibs} FFTW3::FFTW3)
 set(DependOnLibs ${DependOnLibs} PUserFcnBase)
 set(DependOnLibs ${DependOnLibs} mud)
 set(DependOnLibs ${DependOnLibs} TMusrRunHeader)

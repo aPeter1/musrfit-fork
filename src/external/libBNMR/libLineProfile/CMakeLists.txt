@@ -11,7 +11,7 @@ root_generate_dictionary(
   LineProfileDict 
   LineProfile.h 
   OPTIONS
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${MUSRFIT_INC}
   LINKDEF LineProfileLinkDef.h
   MODULE LineProfile

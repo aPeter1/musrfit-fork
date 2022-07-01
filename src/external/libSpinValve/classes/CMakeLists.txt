@@ -12,7 +12,7 @@ root_generate_dictionary(
   PSkewedLorentzianDict 
   PSkewedLorentzian.h 
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${MUSRFIT_INC}
     -I${SPIN_VALVE_INC}
     -inlineInputHeader
@@ -55,13 +55,13 @@ set_target_properties(PSpinValve
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PSpinValve BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PSpinValve ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
+target_link_libraries(PSpinValve FFTW3::FFTW3 ${ROOT_LIBRARIES} PUserFcnBase)
 
 #--- install PSpinValve solib -------------------------------------------------
 install(TARGETS PSpinValve DESTINATION lib)

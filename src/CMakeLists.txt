@@ -60,7 +60,6 @@ target_compile_options(addRun BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H
 target_include_directories(addRun 
   BEFORE PRIVATE
     $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
@@ -72,7 +71,6 @@ target_compile_options(any2many BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV
 target_include_directories(any2many 
   BEFORE PRIVATE
     $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
@@ -84,7 +82,6 @@ target_compile_options(dump_header BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_
 target_include_directories(dump_header 
   BEFORE PRIVATE 
     $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${NEXUS_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
@@ -102,7 +99,6 @@ target_compile_options(msr2data BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV
 target_include_directories(msr2data 
   BEFORE PRIVATE 
     $<BUILD_INTERFACE:${Boost_INCLUDE_DIRS}>
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
@@ -117,7 +113,6 @@ target_compile_options(musrfit BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_
 target_include_directories(musrfit 
   BEFORE PRIVATE 
     $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
@@ -129,18 +124,17 @@ target_compile_options(musrFT BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H
 target_include_directories(musrFT 
   BEFORE PRIVATE 
     $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}>
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
 )
-target_link_libraries(musrFT  ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
+target_link_libraries(musrFT  FFTW3::FFTW3 ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 
 add_executable(musrRootValidation ${GIT_REV_H} musrRootValidation.cpp)
 target_compile_options(musrRootValidation BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(musrRootValidation 
   BEFORE PRIVATE
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
@@ -153,7 +147,6 @@ target_compile_options(musrt0 BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H
 target_include_directories(musrt0 
   BEFORE PRIVATE 
     $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
@@ -165,18 +158,17 @@ target_compile_options(musrview BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV
 target_include_directories(musrview 
   BEFORE PRIVATE
     $<BUILD_INTERFACE:${Boost_INCLUDE_DIR}>
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>
 )
-target_link_libraries(musrview  ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
+target_link_libraries(musrview FFTW3::FFTW3 ${ROOT_LIBRARIES} ${MUSRFIT_LIBS})
 
 add_executable(write_musrRoot_runHeader ${GIT_REV_H} write_musrRoot_runHeader.cpp)
 target_compile_options(write_musrRoot_runHeader BEFORE PRIVATE "-DHAVE_CONFIG_H" "${HAVE_GIT_REV_H}")
 target_include_directories(write_musrRoot_runHeader 
   BEFORE PRIVATE
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/include>

@@ -12,7 +12,6 @@ root_generate_dictionary(
   PDummyUserFcnDict 
   PDummyUserFcn.h 
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} 
     -I${MUSRFIT_INC}
     -I${DUMMY_USER_FUNC_INC}
     -inlineInputHeader
@@ -44,13 +43,12 @@ set_target_properties(PDummyUserFcn
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PDummyUserFcn BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../inc>
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PDummyUserFcn ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
+target_link_libraries(PDummyUserFcn ${ROOT_LIBRARIES} PUserFcnBase)
 
 #--- install PDummyUserFcn solib -------------------------------------------------
 install(TARGETS PDummyUserFcn DESTINATION lib)

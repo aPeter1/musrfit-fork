@@ -31,7 +31,7 @@ add_library(PGbGLF SHARED
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PGbGLF BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
 )
@@ -43,7 +43,7 @@ set_target_properties(PGbGLF
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PGbGLF ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
+target_link_libraries(PGbGLF FFTW3::FFTW3 ${ROOT_LIBRARIES} PUserFcnBase)
 
 #--- install PGbGLF solib -----------------------------------------------------
 install(TARGETS PGbGLF DESTINATION lib)

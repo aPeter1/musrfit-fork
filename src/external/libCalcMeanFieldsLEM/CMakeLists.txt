@@ -13,7 +13,7 @@ root_generate_dictionary(
   TCalcMeanFieldsLEMDict 
   TCalcMeanFieldsLEM.h
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${MUSRFIT_INC} 
     -I${BMW_TOOLS_INC} 
     -I${POFB_INC}
@@ -48,7 +48,7 @@ set_target_properties(CalcMeanFieldsLEM
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   CalcMeanFieldsLEM BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${BMW_TOOLS_INC}>
     $<BUILD_INTERFACE:${POFB_INC}>
@@ -57,7 +57,7 @@ target_include_directories(
 
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(CalcMeanFieldsLEM 
-  ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} BMWtools FitPofB PUserFcnBase
+  FFTW3::FFTW3 ${ROOT_LIBRARIES} BMWtools FitPofB PUserFcnBase
 )
 
 #--- install CalcMeanFieldsLEM solib ------------------------------------------

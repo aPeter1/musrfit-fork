@@ -13,7 +13,7 @@ root_generate_dictionary(
   TLondon1DDict 
   TLondon1D.h 
   OPTIONS
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${MUSRFIT_INC}
     -I${BMW_TOOLS_INC}
     -I${FIT_P_OF_B_INC}
@@ -25,7 +25,7 @@ root_generate_dictionary(
   TVortexDict 
   TVortex.h 
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${MUSRFIT_INC}
     -I${BMW_TOOLS_INC}
     -I${FIT_P_OF_B_INC}
@@ -37,7 +37,7 @@ root_generate_dictionary(
   TSkewedGssDict 
   TSkewedGss.h 
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${MUSRFIT_INC}
     -I${BMW_TOOLS_INC}
     -I${POFB_INC}
@@ -82,7 +82,7 @@ set_target_properties(FitPofB
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   FitPofB BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/TLemRunHeader>
     $<BUILD_INTERFACE:${BMW_TOOLS_INC}>
@@ -101,7 +101,7 @@ if (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
 endif (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
 target_link_libraries(FitPofB 
     ${gomp}
-    ${FFTW3_LIBRARY} ${FFTW3F_LIBRARY} ${ROOT_LIBRARIES} 
+    FFTW3::FFTW3 FFTW3::FFTW3F ${ROOT_LIBRARIES} 
     TLemRunHeader PUserFcnBase BMWtools
 )
 

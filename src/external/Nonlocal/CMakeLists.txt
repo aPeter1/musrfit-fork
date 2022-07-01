@@ -14,7 +14,7 @@ root_generate_dictionary(
   PNL_PippardFitterDict 
   PNL_PippardFitter.h 
   OPTIONS
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${MUSRFIT_INC} 
     -I${NONLOCAL_INC} 
     -I${CMAKE_CURRENT_SOURCE_DIR}
@@ -52,7 +52,7 @@ add_library(PNL_PippardFitter SHARED
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PNL_PippardFitter BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>
 )
@@ -64,7 +64,7 @@ set_target_properties(PNL_PippardFitter
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PNL_PippardFitter ${Boost_LIBRARIES} ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PRgeHandler PUserFcnBase)
+target_link_libraries(PNL_PippardFitter ${Boost_LIBRARIES} FFTW3::FFTW3 ${ROOT_LIBRARIES} PRgeHandler PUserFcnBase)
 
 #--- install PNL_PippardFitter solib ------------------------------------------
 install(TARGETS PNL_PippardFitter DESTINATION lib)

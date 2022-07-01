@@ -7,7 +7,7 @@ root_generate_dictionary(
   PMagProximityFitterDict 
   PMagProximityFitter.h 
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR}
+    -I${FFTW3_INCLUDE}
     -I${MUSRFIT_INC}
     -I${CMAKE_CURRENT_SOURCE_DIR}
     -inlineInputHeader
@@ -44,7 +44,7 @@ add_library(PMagProximityFitter SHARED
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PMagProximityFitter BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
@@ -56,7 +56,7 @@ set_target_properties(PMagProximityFitter
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PMagProximityFitter ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PRgeHandler PUserFcnBase)
+target_link_libraries(PMagProximityFitter FFTW3::FFTW3 ${ROOT_LIBRARIES} PRgeHandler PUserFcnBase)
 
 #--- install PMagProximityFitter solib ----------------------------------------
 install(TARGETS PMagProximityFitter DESTINATION lib)

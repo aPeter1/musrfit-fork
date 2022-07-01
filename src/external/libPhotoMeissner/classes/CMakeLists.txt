@@ -12,7 +12,7 @@ root_generate_dictionary(
   PPhotoMeissnerDict
   PPhotoMeissner.h 
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${GSL_INCLUDE_DIRS} 
     -I${ROOT_INCLUDE_DIRS}
     -I${MUSRFIT_INC}
@@ -46,7 +46,7 @@ set_target_properties(PPhotoMeissner
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PPhotoMeissner BEFORE PRIVATE
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${GSL_INCLUDE_DIRS}> 
     $<BUILD_INTERFACE:${ROOT_INCLUDE_DIRS}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
@@ -55,7 +55,7 @@ target_include_directories(
 
 #--- add library dependencies -------------------------------------------------
 target_link_libraries(PPhotoMeissner 
-   ${FFTW3_LIBRARY} ${GSL_LIBRARY} ${ROOT_LIBRARIES} PRgeHandler PUserFcnBase
+   FFTW3::FFTW3 ${GSL_LIBRARY} ${ROOT_LIBRARIES} PRgeHandler PUserFcnBase
 )
 
 #--- install PPhotoMeissner solib ---------------------------------------------

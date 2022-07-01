@@ -47,7 +47,6 @@ set_target_properties(BMWtools
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   BMWtools BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
     $<BUILD_INTERFACE:${CUBA_INC}>
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>

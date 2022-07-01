@@ -14,7 +14,6 @@ root_generate_dictionary(
   TBNMRDict 
   TBNMR.h 
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} 
     -I${MUSRFIT_INC}
     -inlineInputHeader
   LINKDEF TBNMRLinkDef.h

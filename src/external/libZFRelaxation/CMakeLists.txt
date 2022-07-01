@@ -12,7 +12,7 @@ root_generate_dictionary(
   ZFRelaxationDict 
   ZFRelaxation.h
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${MUSRFIT_INC}
     -I${BMW_TOOLS_INC}
     -inlineInputHeader
@@ -46,7 +46,7 @@ set_target_properties(ZFRelaxation
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   ZFRelaxation BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${BMW_TOOLS_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
@@ -62,7 +62,7 @@ if (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
   set(gomp gomp)
 endif (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
 target_link_libraries(ZFRelaxation 
-  ${gomp} ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase cuba BMWtools
+  ${gomp} FFTW3::FFTW3 ${ROOT_LIBRARIES} PUserFcnBase cuba BMWtools
 ) 
 
 #--- install ZFRelaxation solib -----------------------------------------------
