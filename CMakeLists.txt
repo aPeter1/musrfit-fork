@@ -1,9 +1,5 @@
 # - musrfit
-cmake_minimum_required(VERSION 3.9)
-
-if (CMAKE_VERSION GREATER_EQUAL 3.12)
-  cmake_policy(SET CMP0075 NEW)
-endif (CMAKE_VERSION GREATER_EQUAL 3.12)
+cmake_minimum_required(VERSION 3.17)
 
 project(musrfit VERSION 1.8.0 LANGUAGES C CXX)
 
