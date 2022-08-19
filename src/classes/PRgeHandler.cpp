@@ -489,15 +489,16 @@ Double_t PRgeHandler::GetZmax(const Double_t energy)
 {
   int idx=-1;
   for (int i=0; i<fData.size(); i++) {
-    if (fabs(fData[i].energy-energy) < 1.0) {
+    if (fabs(fData[i].energy-energy)*0.001 < 0.9){
       idx = i;
       break;
     }
-  }
+    }
+  
   if (idx != -1)
-    return GetZmax(idx);
+      return GetZmax(idx);
 
-  return -1.0;
+  return -1;
 }
 
 //--------------------------------------------------------------------------
@@ -531,7 +532,7 @@ Double_t PRgeHandler::Get_n(const Double_t energy, const Double_t z)
 {
   int idx=-1;
   for (int i=0; i<fData.size(); i++) {
-    if (fabs(fData[i].energy-energy) < 1.0) {
+    if (fabs(fData[i].energy-energy)*0.001 < 0.90) {
       idx = i;
       break;
     }
@@ -593,7 +594,7 @@ Int_t PRgeHandler::GetEnergyIndex(const Double_t energy)
 {
   int idx=-1;
   for (int i=0; i<fData.size(); i++) {
-    if (fabs(fData[i].energy-energy) < 1.0) {
+    if (fabs(fData[i].energy-energy)*0.001 < 0.90) {
       idx = i;
       break;
     }

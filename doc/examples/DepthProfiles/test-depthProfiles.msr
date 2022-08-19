@@ -1,0 +1,61 @@
+Test step fits with SiC data
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries   
+        1 f1          0.5427    0.0010      none        
+        2 f2          0.24120   0.00048     none        
+        3 f3          0.0514    0.0014      none        
+        4 x1          105.30    0.94        none             
+        5 x2          66.00     0.93        none    
+     
+
+###############################################################
+THEORY
+userFcn  libPDepthProfile PDepthProfile 1 2 3 4 5
+
+###############################################################
+RUN data/steps_SiC-test_1 PIM3 PSI ASCII   (name beamline institute data-file-format)
+fittype         8         (non muSR fit)
+map             0    0    0    0    0    0    0    0    0    0
+xy-data         1       2       
+fit             1       20     
+packing         1
+
+
+###############################################################
+COMMANDS
+MINIMIZE
+#HESSE
+MINOS
+SAVE
+
+###############################################################
+PLOT 8   (non muSR plot)
+runs     1   
+range    1   22
+
+
+
+###############################################################
+STATISTIC --- 2022-08-15 17:52:11
+*** FIT DID NOT CONVERGE ***
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

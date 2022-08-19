@@ -44,9 +44,11 @@ class PDepthProfileGlobal
     Bool_t IsValid() { return fValid; }
     virtual Int_t GetEnergyIndex(const Double_t energy) { return fRgeHandler->GetEnergyIndex(energy); }
     virtual Double_t GetMuonStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->Get_n(energyIndex, z); }
+    virtual double GetStoppingProbability(double a, double b, Double_t energy) const;
 
   private:
     Bool_t fValid{true};
+    
 
     mutable std::vector<Double_t> fPreviousParam;
 
@@ -72,6 +74,7 @@ class PDepthProfile : public PUserFcnBase
     Bool_t fInvokedGlobal{false};
     Int_t fIdxGlobal;
 
+    mutable std::vector<Double_t> fPreviousParam;
     PDepthProfileGlobal *fDepthProfileGlobal{nullptr};
 
   // definition of the class for the ROOT dictionary

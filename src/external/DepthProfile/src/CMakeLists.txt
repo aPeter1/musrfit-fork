@@ -50,7 +50,7 @@ target_include_directories(
 )
 
 #--- add library dependencies -------------------------------------------------
-target_link_libraries(PDepthProfile ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PUserFcnBase)
+target_link_libraries(PDepthProfile ${FFTW3_LIBRARY} ${ROOT_LIBRARIES} PRgeHandler PUserFcnBase)
 
 #--- install PDepthProfile solib ----------------------------------------------
 install(TARGETS PDepthProfile DESTINATION lib)

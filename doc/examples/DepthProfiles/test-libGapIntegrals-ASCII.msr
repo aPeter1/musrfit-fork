@@ -1,0 +1,38 @@
+Test superconductor data
+###############################################################
+FITPARAMETER
+#      Nr. Name        Value     Step      Pos_Error  Boundaries
+        1 lambdaInvSq0 7.983     -0.042      0.042       
+        2 Tc          4.470     -0.015      0.016       0       5       
+        3 Delta0      1.547     -0.026      0.027       
+        4 c0          1.468     0           none        
+        5 aG          1.33333   0           none        
+
+###############################################################
+THEORY
+asymmetry      1
+userFcn  libPDepthProfile PDepthProfile 2 3 4 5
+
+###############################################################
+RUN data/libGapIntegrals-test PIM3 PSI ASCII   (name beamline institute data-file-format)
+fittype         8         (non muSR fit)
+map             0    0    0    0    0    0    0    0    0    0
+xy-data         1       2       
+fit             0       10     
+packing         1
+
+###############################################################
+COMMANDS
+MINIMIZE
+#HESSE
+MINOS
+SAVE
+
+###############################################################
+PLOT 8   (non muSR plot)
+runs     1   
+range    0   6
+
+###############################################################
+STATISTIC --- 2022-06-24 14:06:15
+  chisq = 58.3, NDF = 19, chisq/NDF = 3.066201
