@@ -2859,12 +2859,15 @@ void PTextEdit::musrSwapMsrMlog()
     return;
   }
 
+  if (QMessageBox::information(this, "INFO",
+                               QString("Will now swap files: %1 <-> %2").arg(currentFileName).arg(swapFileName),
+                               QMessageBox::Ok, QMessageBox::Cancel) == QMessageBox::Cancel)
+    return;
+
   // check if the file needs to be saved
   if (fTabWidget->tabText(fTabWidget->currentIndex()).indexOf("*") > 0) { // needs to be saved first
     fileSave();
   }
-
-  QMessageBox::information(nullptr, "INFO", QString("Will now swap files: %1 <-> %2").arg(currentFileName).arg(swapFileName));
 
   // swap files
 
