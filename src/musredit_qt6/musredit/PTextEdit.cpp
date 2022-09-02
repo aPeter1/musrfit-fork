@@ -2288,7 +2288,7 @@ void PTextEdit::musrMsr2Data()
     // parameter export list
     if (!fMsr2DataParam->paramList.isEmpty()) {
       cmd.append("paramList");
-      QStringList list = fMsr2DataParam->paramList.split(' ');
+      QStringList list = fMsr2DataParam->paramList.split(QRegExp("[(\\s|,|;)]"), Qt::SkipEmptyParts);
       for (int i=0; i<list.size(); i++)
         cmd.append(list[i]);
     }

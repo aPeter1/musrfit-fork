@@ -61,6 +61,7 @@
 #include <QFileSystemWatcher>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QRegExp>
 
 #include <QtDebug>
 
@@ -2287,7 +2288,11 @@ void PTextEdit::musrMsr2Data()
     // parameter export list
     if (!fMsr2DataParam->paramList.isEmpty()) {
       cmd.append("paramList");
-      QStringList list = fMsr2DataParam->paramList.split(' ');
+#if (QT_VERSION < QT_VERSION_CHECK(5, 14, 0))
+      QStringList list = fMsr2DataParam->paramList.split(QRegExp("[(\\s|,|;)]"), QString::SkipEmptyParts);
+#else
+      QStringList list = fMsr2DataParam->paramList.split(QRegExp("[(\\s|,|;)]"), Qt::SkipEmptyParts);
+#endif
       for (int i=0; i<list.size(); i++)
         cmd.append(list[i]);
     }
