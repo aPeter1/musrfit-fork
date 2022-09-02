@@ -39,6 +39,8 @@
 #include <QDoubleValidator>
 #include <QTextStream>
 #include <QPixmap>
+#include <QGuiApplication>
+#include <QScreen>
 
 #include <QDebug>
 
@@ -175,6 +177,11 @@ PMusrStep::PMusrStep(const char *fln, QWidget *parent) :
     height = 20*fParamVec.size();
   else
     height = 900;
+  // make sure that the minimal height is not larger than the screen resolution height
+  QScreen *screen = QGuiApplication::primaryScreen();
+  int hh = screen->geometry().height();
+  if (height > hh)
+    height = hh - 70;
   setMinimumSize(400, height);
 
   // populate dialog
