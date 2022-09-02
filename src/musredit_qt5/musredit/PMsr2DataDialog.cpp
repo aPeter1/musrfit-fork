@@ -103,7 +103,7 @@ PMsr2DataDialog::PMsr2DataDialog(PMsr2DataParam *msr2DataParam, const QString he
 
 //----------------------------------------------------------------------------------------------------
 /**
- * <p>returns the msr2data relavant parameters from the GUI.
+ * <p>returns the msr2data relevant parameters from the GUI.
  */
 PMsr2DataParam* PMsr2DataDialog::getMsr2DataParam()
 {
