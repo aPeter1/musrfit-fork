@@ -543,7 +543,7 @@ void PMusrCanvas::UpdateParamTheoryPad()
   for (UInt_t i=0; i<param.size(); i++) {
     str = "";
     accuracy = GetNeededAccuracy(param[i]);
-    sprintf(accStr, "%%.%dlf", accuracy);
+    snprintf(accStr, sizeof(accStr), "%%.%dlf", accuracy);
     // parameter no
     str += param[i].fNo;
     if (param[i].fNo<10)
@@ -556,9 +556,9 @@ void PMusrCanvas::UpdateParamTheoryPad()
       str += " ";
     // parameter value
     if (round(param[i].fValue)-param[i].fValue==0)
-      sprintf(cnum, "%.1lf", param[i].fValue);
+      snprintf(cnum, sizeof(cnum), "%.1lf", param[i].fValue);
     else
-      sprintf(cnum, accStr, param[i].fValue);
+      snprintf(cnum, sizeof(cnum), accStr, param[i].fValue);
     str += cnum;
     for (Int_t j=0; j<9-(Int_t)strlen(cnum); j++) // fill spaces
       str += " ";
@@ -572,22 +572,22 @@ void PMusrCanvas::UpdateParamTheoryPad()
       if ((fabs(fabs(param[i].fStep) - param[i].fPosError) < 0.1*fabs(param[i].fStep)) &&
           (fabs(fabs(param[i].fStep) - param[i].fPosError) < 0.1*param[i].fPosError)) {
         if (round(err)-err==0)
-          sprintf(cnum, "%.1lf", err);
+          snprintf(cnum, sizeof(cnum), "%.1lf", err);
         else
-          sprintf(cnum, accStr, err);
+          snprintf(cnum, sizeof(cnum), accStr, err);
       } else {
-        sprintf(accStr, "%%.%dlf!!", accuracy);
+        snprintf(accStr, sizeof(accStr), "%%.%dlf!!", accuracy);
         if (round(err)-err==0)
-          sprintf(cnum, "%.1lf!!", err);
+          snprintf(cnum, sizeof(cnum), "%.1lf!!", err);
         else
-          sprintf(cnum, accStr, err);
+          snprintf(cnum, sizeof(cnum), accStr, err);
       }
       str += cnum;
     } else { // minos was not used
       if (round(param[i].fStep)-param[i].fStep==0)
-        sprintf(cnum, "%.1lf", param[i].fStep);
+        snprintf(cnum, sizeof(cnum), "%.1lf", param[i].fStep);
       else
-        sprintf(cnum, accStr, param[i].fStep);
+        snprintf(cnum, sizeof(cnum), accStr, param[i].fStep);
       str += cnum;
     }
     ypos = 0.98-i*yoffset;
@@ -936,13 +936,13 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += TString("??,");
     } else if (ddvec->size() == 1){
       tstr += TString("T=");
-      sprintf(sval, "%0.2lf", ddvec->at(0).first);
+      snprintf(sval, sizeof(sval), "%0.2lf", ddvec->at(0).first);
       tstr += TString(sval) + TString("K,");
     } else {
       for(UInt_t i(0); i<ddvec->size(); ++i){
-        sprintf(sval, "T%u=", i);
+        snprintf(sval, sizeof(sval), "T%u=", i);
         tstr += TString(sval);
-        sprintf(sval, "%0.2lf", ddvec->at(i).first);
+        snprintf(sval, sizeof(sval), "%0.2lf", ddvec->at(i).first);
         tstr += TString(sval) + TString("K,");
       }
     }
@@ -953,10 +953,10 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += TString("??,");
     } else {
       if (dval < 1.0e4) { // Gauss makes sense as a unit
-        sprintf(sval, "%0.2lf", dval);
+        snprintf(sval, sizeof(sval), "%0.2lf", dval);
         tstr += TString(sval) + TString("G,");
       } else { // Tesla makes sense as a unit
-        sprintf(sval, "%0.2lf", dval/1.0e4);
+        snprintf(sval, sizeof(sval), "%0.2lf", dval/1.0e4);
         tstr += TString(sval) + TString("T,");
       }
     }
@@ -967,10 +967,10 @@ void PMusrCanvas::UpdateInfoPad()
       tstr += TString("??,");
     } else {
       if (dval < 1.0e3) { // keV makes sense as a unit
-        sprintf(sval, "%0.2lf", dval);
+        snprintf(sval, sizeof(sval), "%0.2lf", dval);
         tstr += TString(sval) + TString("keV,");
       } else { // MeV makes sense as a unit
-        sprintf(sval, "%0.2lf", dval/1.0e3);
+        snprintf(sval, sizeof(sval), "%0.2lf", dval/1.0e3);
         tstr += TString(sval) + TString("MeV,");
       }
     }
@@ -1579,13 +1579,13 @@ void PMusrCanvas::SaveGraphicsAndQuit(Char_t *fileName, Char_t *graphicsFormat)
   }
 
   if (fStartWithFourier)
-    sprintf(ext, "_%d_F", fPlotNumber);
+    snprintf(ext, sizeof(ext), "_%d_F", fPlotNumber);
   else
-    sprintf(ext, "_%d", fPlotNumber);
+    snprintf(ext, sizeof(ext), "_%d", fPlotNumber);
   str.Replace(idx, size, ext, strlen(ext));
   idx += strlen(ext);
   size = strlen(ext);
-  sprintf(ext, ".%s", graphicsFormat);
+  snprintf(ext, sizeof(ext), ".%s", graphicsFormat);
   str.Replace(idx, size, ext, strlen(ext));
 
   std::cout << std::endl << ">> SaveGraphicsAndQuit: " << str.Data() << std::endl;
@@ -6539,7 +6539,7 @@ UInt_t PMusrCanvas::GetNeededAccuracy(PMsrParamStructure param)
   if (param.fStep == 0.0) { // check if fit parameter is a constant, i.e. step==0
     char str[128];
 
-    sprintf(str, "%lf", param.fValue);
+    snprintf(str, sizeof(str), "%lf", param.fValue);
 
     // find decimal point
     for (UInt_t i=0; i<strlen(str); i++) {

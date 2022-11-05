@@ -75,7 +75,7 @@ Extern void SUFFIX(cubafork)(Spin **pspin)
   }
 
   if( cubaverb_ ) {
-    sprintf(out, "using %d cores %d accelerators via "
+    snprintf(out, sizeof(out), "using %d cores %d accelerators via "
 #ifdef HAVE_SHMGET
       "shared memory",
 #else

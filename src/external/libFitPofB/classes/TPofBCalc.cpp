@@ -317,7 +317,7 @@ void TPofBCalc::Calculate(const TBofZCalc *BofZ, const TTrimSPData *dataTrimSP, 
   seconds = time (NULL);
 
   char debugfile[50];
-  int n = sprintf (debugfile, "test_Bz_%ld_%f.dat", seconds, fBmin);
+  int n = snprintf (debugfile, sizeof(debugfile), "test_Bz_%ld_%f.dat", seconds, fBmin);
 
   if (n > 0) {
     ofstream of(debugfile);
@@ -330,10 +330,10 @@ void TPofBCalc::Calculate(const TBofZCalc *BofZ, const TTrimSPData *dataTrimSP, 
   }
 
   char debugfile1[50];
-  int n1 = sprintf (debugfile1, "test_NZ_%ld_%f.dat", seconds, para[2]);
+  int n1 = snprintf (debugfile1, sizeof(debugfile1), "test_NZ_%ld_%f.dat", seconds, para[2]);
 
   char debugfile2[50];
-  int n2 = sprintf (debugfile2, "test_NZgss_%ld_%f.dat", seconds, para[2]);
+  int n2 = snprintf (debugfile2, sizeof(debugfile2), "test_NZgss_%ld_%f.dat", seconds, para[2]);
 
   if (n1 > 0) {
     ofstream of1(debugfile1);

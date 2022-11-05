@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
     char canvasName[32];
     for (unsigned int i=0; i<canvasVector.size(); i++) {
       // check if canvas is still there before calling the destructor **TO BE DONE**
-      sprintf(canvasName, "fMainCanvas%d", i);
+      snprintf(canvasName, sizeof(canvasName), "fMainCanvas%d", i);
       if (gROOT->GetListOfCanvases()->FindObject(canvasName) != nullptr) {
         canvasVector[i]->~PMusrCanvas();
       }

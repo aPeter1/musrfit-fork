@@ -62,7 +62,7 @@ namespace mupp
        Iterator line_start = get_pos(err_pos, line);
        const char *homeStr = getenv("HOME");
        char fln[1024];
-       sprintf(fln, "%s/.musrfit/mupp/mupp_err.log", homeStr);
+       snprintf(fln, sizeof(fln), "%s/.musrfit/mupp/mupp_err.log", homeStr);
        std::ofstream fout(fln, std::ofstream::app);
        if (err_pos != last) {
          fout << message << what << ':' << std::endl;

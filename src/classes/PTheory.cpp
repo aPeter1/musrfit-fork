@@ -841,12 +841,12 @@ void PTheory::MakeCleanAndTidyTheoryBlock(PMsrLines *fullTheoryBlock)
     if (static_cast<UInt_t>(tokens->GetEntries()) < fgTheoDataBase[idx].fNoOfParam + 1)
       return;
     // make tidy string
-    sprintf(substr, "%-10s", fgTheoDataBase[idx].fName.Data());
+    snprintf(substr, sizeof(substr), "%-10s", fgTheoDataBase[idx].fName.Data());
     tidy = TString(substr);
     for (Int_t j=1; j<tokens->GetEntries(); j++) {
       ostr = dynamic_cast<TObjString*>(tokens->At(j));
       str = ostr->GetString();
-      sprintf(substr, "%6s", str.Data());
+      snprintf(substr, sizeof(substr), "%6s", str.Data());
       tidy += TString(substr);
     }
     if (fgTheoDataBase[idx].fComment.Length() != 0) {
@@ -913,7 +913,7 @@ void PTheory::MakeCleanAndTidyPolynom(UInt_t i, PMsrLines *fullTheoryBlock)
   for (Int_t j=1; j<max; j++) {
     ostr = dynamic_cast<TObjString*>(tokens->At(j));
     str = ostr->GetString();
-    sprintf(substr, "%6s", str.Data());
+    snprintf(substr, sizeof(substr), "%6s", str.Data());
     tidy += TString(substr);
   }
 

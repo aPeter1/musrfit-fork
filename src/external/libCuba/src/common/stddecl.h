@@ -94,7 +94,7 @@ enum { uninitialized = 0x61627563 };
       var = atoi(env); \
       if( cubaverb_ ) { \
         char out[64]; \
-        sprintf(out, "env " name " = %d", (int)var); \
+        snprintf(out, sizeof(out), "env " name " = %d", (int)var); \
         Print(out); \
       } \
     } \
@@ -280,7 +280,7 @@ enum { signature = 0x41425543 };
   } \
   if( ini | statemsg ) { \
     char s[512]; \
-    sprintf(s, ini ? \
+    snprintf(s, sizeof(s), ini ? \
       "\nError restoring state from %s, starting from scratch." : \
       "\nRestored state from %s.", (t)->statefile); \
     Print(s); \
@@ -307,7 +307,7 @@ enum { signature = 0x41425543 };
   } \
   if( fail | statemsg ) { \
     char s[512]; \
-    sprintf(s, fail ? \
+    snprintf(s, sizeof(s), fail ? \
       "\nError saving state to %s." : \
       "\nSaved state to %s.", (t)->statefile); \
     Print(s); \

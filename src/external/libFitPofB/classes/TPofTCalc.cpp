@@ -357,7 +357,7 @@ void TPofTCalc::FakeData(const string &rootOutputFileName, const std::vector<dou
   // create run info folder and content
   TFolder *runInfoFolder = new TFolder("RunInfo", "Run Info");
   TLemRunHeader *runHeader = new TLemRunHeader();
-  //sprintf(str, "Fake Data generated from %s", pBFileName.Data());
+  //snprintf(str, sizeof(str), "Fake Data generated from %s", pBFileName.Data());
   runHeader->SetRunTitle("Fake Data");
   if (optPar && (optPar->size() > 1)) { // set energy and field if they were specified
     runHeader->SetImpEnergy((*optPar)[1]);

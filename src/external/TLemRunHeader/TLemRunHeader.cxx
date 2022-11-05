@@ -91,7 +91,7 @@ void TLemRunHeader::SetStopTimeString(const Char_t *stop){
 void TLemRunHeader::SetModeratorHV(Float_t modHV, Float_t error){
  TString str;
  char s[80];
- sprintf(s, "05 Moderator HV: %8.2f(%5.2f)", modHV, error);
+ snprintf(s, sizeof(s), "05 Moderator HV: %8.2f(%5.2f)", modHV, error);
  str = s;
  fModeratorHVString.SetString(str);
  fModeratorHV = modHV;
@@ -101,7 +101,7 @@ void TLemRunHeader::SetModeratorHV(Float_t modHV, Float_t error){
 void TLemRunHeader::SetSampleHV(Float_t value, Float_t error){
  TString str;
  char s[80];
- sprintf(s,"06 Sample HV: %8.2f(%5.2f)", value, error);
+ snprintf(s, sizeof(s), "06 Sample HV: %8.2f(%5.2f)", value, error);
  str = s;
  fSampleHVString.SetString(str);
  fSampleHV = value;
@@ -111,7 +111,7 @@ void TLemRunHeader::SetSampleHV(Float_t value, Float_t error){
 void TLemRunHeader::SetImpEnergy(Float_t value){
  TString str;
  char s[80];
- sprintf(s,"07 Impl. Energy: %8.2f", value);
+ snprintf(s, sizeof(s), "07 Impl. Energy: %8.2f", value);
  str = s;
  fImpEnergyString.SetString(str);
  fImpEnergy = value;
@@ -120,7 +120,7 @@ void TLemRunHeader::SetImpEnergy(Float_t value){
 void TLemRunHeader::SetSampleTemperature(Float_t value, Float_t error){
  TString str;
  char s[80];
- sprintf(s,"08 Sample T: %8.2f(%5.2f)", value, error);
+ snprintf(s, sizeof(s), "08 Sample T: %8.2f(%5.2f)", value, error);
  str = s;
  fSampleTemperatureString.SetString(str);
  fSampleTemperature      = value;
@@ -130,7 +130,7 @@ void TLemRunHeader::SetSampleTemperature(Float_t value, Float_t error){
 void TLemRunHeader::SetSampleBField(Float_t value, Float_t error){
  TString str;
  char s[80];
- sprintf(s,"09 Sample B: %8.2f(%5.2f)", value, error);
+ snprintf(s, sizeof(s), "09 Sample B: %8.2f(%5.2f)", value, error);
  str = s;
  fSampleBFieldString.SetString(str);
  fSampleBField      = value;
@@ -140,7 +140,7 @@ void TLemRunHeader::SetSampleBField(Float_t value, Float_t error){
 void TLemRunHeader::SetTimeResolution(Float_t value){
  TString str;
  char s[80];
- sprintf(s,"10 Time Res.: %10.7f", value);
+ snprintf(s, sizeof(s), "10 Time Res.: %10.7f", value);
  str = s;
  fTimeResolutionString.SetString(str);
  fTimeResolution = value;
@@ -149,7 +149,7 @@ void TLemRunHeader::SetTimeResolution(Float_t value){
 void TLemRunHeader::SetNChannels(Int_t value){
  TString str;
  char s[80];
- sprintf(s,"11 N Channels: %8d", value);
+ snprintf(s, sizeof(s), "11 N Channels: %8d", value);
  str = s;
  fNChannelsString.SetString(str);
  fNChannels = value;
@@ -158,7 +158,7 @@ void TLemRunHeader::SetNChannels(Int_t value){
 void TLemRunHeader::SetNHist(Int_t value){
  TString str;
  char s[80];
- sprintf(s,"12 N Histograms: %6d", value);
+ snprintf(s, sizeof(s), "12 N Histograms: %6d", value);
  str = s;
  fNHistString.SetString(str);
  fNHist = value;
@@ -168,7 +168,7 @@ void TLemRunHeader::SetNHist(Int_t value){
 void TLemRunHeader::SetOffsetPPCHistograms(UInt_t value){
  TString str;
  char s[80];
- sprintf(s,"13 Offset PPC Histograms: %6d", value);
+ snprintf(s, sizeof(s), "13 Offset PPC Histograms: %6d", value);
  str = s;
  fOffsetPPCHistogramsString.SetString(str);
  fOffsetPPCHistograms = value;
@@ -364,25 +364,25 @@ void TLemRunHeader::DrawHeader() const {
  strcpy(str, "Run Stop: ");
  strcat(str, runStop);
  text = pt->AddText(str);
- sprintf(str, "Run Number:   %10d", GetRunNumber());
+ snprintf(str, sizeof(str), "Run Number:   %10d", GetRunNumber());
  text = pt->AddText(str);
- sprintf(str, "Moderator HV: %10.2f kV", fModeratorHV);
+ snprintf(str, sizeof(str), "Moderator HV: %10.2f kV", fModeratorHV);
  text = pt->AddText(str);
- sprintf(str, "Sample HV:    %10.2f kV", fSampleHV);
+ snprintf(str, sizeof(str), "Sample HV:    %10.2f kV", fSampleHV);
  text = pt->AddText(str);
- sprintf(str, "Impl. Energy: %10.2f keV", fImpEnergy);
+ snprintf(str, sizeof(str), "Impl. Energy: %10.2f keV", fImpEnergy);
  text = pt->AddText(str);
- sprintf(str, "Sample T:     %10.2f K", fSampleTemperature);
+ snprintf(str, sizeof(str), "Sample T:     %10.2f K", fSampleTemperature);
  text = pt->AddText(str);
- sprintf(str, "Sample B:     %10.2f G", fSampleBField);
+ snprintf(str, sizeof(str), "Sample B:     %10.2f G", fSampleBField);
  text = pt->AddText(str);
- sprintf(str, "Time Res.:    %10.7f ns", fTimeResolution);
+ snprintf(str, sizeof(str), "Time Res.:    %10.7f ns", fTimeResolution);
  text = pt->AddText(str);
- sprintf(str, "N Channels:   %10d", fNChannels);
+ snprintf(str, sizeof(str), "N Channels:   %10d", fNChannels);
  text = pt->AddText(str);
- sprintf(str, "N Histograms: %10d", fNHist);
+ snprintf(str, sizeof(str), "N Histograms: %10d", fNHist);
  text = pt->AddText(str);
- sprintf(str, "Offset PPC Histograms: %10d", fOffsetPPCHistograms);
+ snprintf(str, sizeof(str), "Offset PPC Histograms: %10d", fOffsetPPCHistograms);
  text = pt->AddText(str);
  strcpy(str, "Cuts: ");
  strcat(str, cuts);
@@ -393,7 +393,7 @@ void TLemRunHeader::DrawHeader() const {
 
  strcpy(str,"t0: ");
  for (Int_t i=0; i<fNHist; i++){
-   sprintf(helpstr, " %7.2f ", fTimeZero[i]);
+   snprintf(helpstr, sizeof(helpstr), " %7.2f ", fTimeZero[i]);
    strcat(str, helpstr);
  }
  text = pt->AddText(str);

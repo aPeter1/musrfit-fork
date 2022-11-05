@@ -5,8 +5,6 @@
   Author: Andreas Suter
   e-mail: andreas.suter@psi.ch
 
-  $Id$
-
 ***************************************************************************/
 
 /***************************************************************************
@@ -443,7 +441,7 @@ int main(int argc, char *argv[])
   // create run info folder and content
   TFolder *runInfoFolder = new TFolder("RunInfo", "Run Info");
   TLemRunHeader *runHeader = new TLemRunHeader();
-  sprintf(str, "Fake Data generated from %s", pBFileName.Data());
+  snprintf(str, sizeof(str), "Fake Data generated from %s", pBFileName.Data());
   runHeader->SetRunTitle(str);
   Float_t fval = timeResolution;
   runHeader->SetTimeResolution(fval);

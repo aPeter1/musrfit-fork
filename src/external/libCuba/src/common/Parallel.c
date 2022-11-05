@@ -47,7 +47,7 @@ static inline void DoSampleParallel(This *t, number n, creal *x, real *f
   t->neval += n;
 
   if( VERBOSE > 2 ) {
-    sprintf(out, "sampling " NUMBER " points each on %d cores",
+    snprintf(out, sizeof(out), "sampling " NUMBER " points each on %d cores",
       pcores, ncores);
     Print(out);
   }

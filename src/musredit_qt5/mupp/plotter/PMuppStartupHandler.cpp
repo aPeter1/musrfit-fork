@@ -103,7 +103,7 @@ PMuppStartupHandler::PMuppStartupHandler()
     // check if the startup file is found under $HOME/.musrfit/mupp
     home = getenv("HOME");
     if (home != 0) {
-      sprintf(startup_path_name, "%s/.musrfit/mupp/mupp_startup.xml", home);
+      snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/mupp/mupp_startup.xml", home);
       if (StartupFileExists(startup_path_name)) {
         fStartupFilePath = TString(startup_path_name);
         fStartupFileFound = true;

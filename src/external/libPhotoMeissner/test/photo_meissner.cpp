@@ -163,7 +163,7 @@ int generateRgeFln(const string prefix, const string elist, vector<string> &rgeF
     }
     ival = start;
     do {
-      sprintf(istr, "%d", ival);
+      snprintf(istr, sizeof(istr), "%d", ival);
       str = prefix + istr + ".rge";
       rgeFln.push_back(str);
       ival += step;

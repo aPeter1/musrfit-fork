@@ -823,9 +823,9 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
       else // bzip2
         fln += TString(".tar.bz2");
       if (fAny2ManyInfo->compressionTag == 1) // gzip
-        sprintf(cmd, "tar -zcf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[0].Data());
+        snprintf(cmd, sizeof(cmd), "tar -zcf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[0].Data());
       else // bzip2
-        sprintf(cmd, "tar -jcf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[0].Data());
+        snprintf(cmd, sizeof(cmd), "tar -jcf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[0].Data());
       if (system(cmd) == -1) {
         std::cerr << "**ERROR** cmd: " << cmd << " failed." << std::endl;
       }
@@ -833,19 +833,19 @@ Bool_t PRunDataHandler::ReadWriteFilesList()
       fln += TString(".tar");
       for (UInt_t i=0; i<fAny2ManyInfo->outPathFileName.size(); i++) {
         if (i==0) {
-          sprintf(cmd, "tar -cf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[i].Data());
+          snprintf(cmd, sizeof(cmd), "tar -cf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[i].Data());
         } else {
-          sprintf(cmd, "tar -rf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[i].Data());
+          snprintf(cmd, sizeof(cmd), "tar -rf %s %s", fln.Data(), fAny2ManyInfo->outPathFileName[i].Data());
         }
         if (system(cmd) == -1) {
           std::cerr << "**ERROR** cmd: " << cmd << " failed." << std::endl;
         }
       }
       if (fAny2ManyInfo->compressionTag == 1) { // gzip
-        sprintf(cmd, "gzip %s", fln.Data());
+        snprintf(cmd, sizeof(cmd), "gzip %s", fln.Data());
         fln += ".gz";
       } else {
-        sprintf(cmd, "bzip2 -z %s", fln.Data());
+        snprintf(cmd, sizeof(cmd), "bzip2 -z %s", fln.Data());
         fln += ".bz2";
       }
       if (system(cmd) == -1) {
@@ -1642,7 +1642,7 @@ Bool_t PRunDataHandler::ReadRootFile()
     // get all the data
     Char_t histoName[32];
     for (Int_t i=0; i<noOfHistos; i++) {
-      sprintf(histoName, "hDecay%02d", i);
+      snprintf(histoName, sizeof(histoName), "hDecay%02d", i);
       TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
       if (!histo) {
         std::cerr << std::endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
@@ -1671,14 +1671,14 @@ Bool_t PRunDataHandler::ReadRootFile()
       histoData.clear();
     }
     // check if any post pileup histos are present at all (this is not the case for LEM data 2006 and earlier)
-    sprintf(histoName, "hDecay%02d", POST_PILEUP_HISTO_OFFSET);
+    snprintf(histoName, sizeof(histoName), "hDecay%02d", POST_PILEUP_HISTO_OFFSET);
     if (!folder->FindObjectAny(histoName)) {
       std::cerr << std::endl << ">> PRunDataHandler::ReadRootFile: **WARNING** Couldn't get histo " << histoName;
       std::cerr << std::endl << ">>   most probably this is an old (2006 or earlier) LEM file without post pileup histos.";
       std::cerr << std::endl;
     } else {
       for (Int_t i=0; i<noOfHistos; i++) {
-        sprintf(histoName, "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
+        snprintf(histoName, sizeof(histoName), "hDecay%02d", i+POST_PILEUP_HISTO_OFFSET);
         TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
         if (!histo) {
           std::cerr << std::endl << ">> PRunDataHandler::ReadRootFile: **ERROR** Couldn't get histo " << histoName;
@@ -4676,7 +4676,7 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
          return false;
        }
        size = dataSet->GetData()->size();
-       sprintf(str, "hDecay%02d", static_cast<Int_t>(i));
+       snprintf(str, sizeof(str), "hDecay%02d", static_cast<Int_t>(i));
        histo = new TH1F(str, str, size+1, -0.5, static_cast<Double_t>(size)+0.5);
        for (UInt_t j=0; j<size; j++) {
          histo->SetBinContent(j+1, dataSet->GetData()->at(j));
@@ -4694,7 +4694,7 @@ Bool_t PRunDataHandler::WriteRootFile(TString fln)
         return false;
       }
       size = dataSet->GetData()->size();
-      sprintf(str, "hDecay%02d", static_cast<Int_t>(i));
+      snprintf(str, sizeof(str), "hDecay%02d", static_cast<Int_t>(i));
       histo = new TH1F(str, str, static_cast<UInt_t>(size/fAny2ManyInfo->rebin)+1, -0.5, static_cast<Double_t>(size)/static_cast<Double_t>(fAny2ManyInfo->rebin)+0.5);
       dataCount = 0;
       for (UInt_t j=0; j<size; j++) {
@@ -5558,9 +5558,9 @@ Bool_t PRunDataHandler::WriteMudFile(TString fln)
   MUD_setOrient(fd, (char *)fData[0].GetOrientation()->Data());
   MUD_setDas(fd, dummy);
   MUD_setExperimenter(fd, dummy);
-  sprintf(info, "%lf+-%lf (K)", fData[0].GetTemperature(0), fData[0].GetTempError(0));
+  snprintf(info, sizeof(info), "%lf+-%lf (K)", fData[0].GetTemperature(0), fData[0].GetTempError(0));
   MUD_setTemperature(fd, info);
-  sprintf(info, "%lf", fData[0].GetField());
+  snprintf(info, sizeof(info), "%lf", fData[0].GetField());
   MUD_setField(fd, info);
 
   // generate the histograms
@@ -6219,7 +6219,7 @@ TString PRunDataHandler::FileNameFromTemplate(TString &fileNameTemplate, Int_t r
       if (idx == str.Length()) { // 'r' only
         TString runStr("");
         char fmt[128];
-        sprintf(fmt , "%%0%dd", str.Length());
+        snprintf(fmt, sizeof(fmt), "%%0%dd", str.Length());
         runStr.Form(fmt, run);
         result += runStr;
       } else { // not only 'r'

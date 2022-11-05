@@ -78,8 +78,9 @@ void msr2msr_syntax()
  * - false otherwise
  *
  * \param str msr-file line
+ * \param size size of str
  */
-bool msr2msr_run(char *str)
+bool msr2msr_run(char *str, const std::size_t size)
 {
   // not the RUN line itself, hence nothing to be done
   if (!strstr(str, "RUN"))
@@ -109,27 +110,27 @@ bool msr2msr_run(char *str)
   }
 
   if (tokens->GetEntries() == 5) { // already a new msr file, do only add the proper run comment
-    sprintf(str, "%s (name beamline institute data-file-format)", line.Data());
+    snprintf(str, size, "%s (name beamline institute data-file-format)", line.Data());
     return true;
   }
 
   if (run.Contains("NEMU")) {
     ostr[0] = dynamic_cast<TObjString*>(tokens->At(1)); // file name
-    sprintf(str, "RUN %s MUE4 PSI WKM   (name beamline institute data-file-format)", ostr[0]->GetString().Data());
+    snprintf(str, size, "RUN %s MUE4 PSI WKM   (name beamline institute data-file-format)", ostr[0]->GetString().Data());
   } else if (run.Contains("PSI")) {
     ostr[0] = dynamic_cast<TObjString*>(tokens->At(1)); // file name
     ostr[1] = dynamic_cast<TObjString*>(tokens->At(2)); // beamline
-    sprintf(str, "RUN %s %s PSI PSI-BIN   (name beamline institute data-file-format)", 
+    snprintf(str, size, "RUN %s %s PSI PSI-BIN   (name beamline institute data-file-format)",
             ostr[0]->GetString().Data(), ostr[1]->GetString().Data());
   } else if (run.Contains("TRIUMF")) {
     ostr[0] = dynamic_cast<TObjString*>(tokens->At(1)); // file name
     ostr[1] = dynamic_cast<TObjString*>(tokens->At(2)); // beamline
-    sprintf(str, "RUN %s %s TRIUMF MUD   (name beamline institute data-file-format)", 
+    snprintf(str, size, "RUN %s %s TRIUMF MUD   (name beamline institute data-file-format)",
             ostr[0]->GetString().Data(), ostr[1]->GetString().Data());
   } else if (run.Contains("RAL")) {
     ostr[0] = dynamic_cast<TObjString*>(tokens->At(1)); // file name
     ostr[1] = dynamic_cast<TObjString*>(tokens->At(2)); // beamline
-    sprintf(str, "RUN %s %s RAL NEXUS   (name beamline institute data-file-format)", 
+    snprintf(str, size, "RUN %s %s RAL NEXUS   (name beamline institute data-file-format)",
             ostr[0]->GetString().Data(), ostr[1]->GetString().Data());
   }
 
@@ -175,7 +176,7 @@ bool msr2msr_param(char *str)
     for (unsigned int i=0; i<4; i++)
       ostr[i] = dynamic_cast<TObjString*>(tokens->At(i));
     // number
-    sprintf(sstr, "%10s", ostr[0]->GetString().Data());
+    snprintf(sstr, sizeof(sstr), "%10s", ostr[0]->GetString().Data());
     // name
     strcat(sstr, " ");
     strcat(sstr, ostr[1]->GetString().Data());
@@ -206,7 +207,7 @@ bool msr2msr_param(char *str)
     for (unsigned int i=0; i<6; i++)
       ostr[i] = dynamic_cast<TObjString*>(tokens->At(i));
     // number
-    sprintf(sstr, "%10s", ostr[0]->GetString().Data());
+    snprintf(sstr, sizeof(sstr), "%10s", ostr[0]->GetString().Data());
     // name
     strcat(sstr, " ");
     strcat(sstr, ostr[1]->GetString().Data());
@@ -480,7 +481,7 @@ void msr2msr_replace(char *str, int paramNo)
 
   memset(temp, 0, sizeof(temp));
 
-  sprintf(no, "%d", paramNo);
+  snprintf(no, sizeof(no), "%d", paramNo);
 
   int j=0;
   for (unsigned int i=0; i<strlen(str); i++) {
@@ -573,7 +574,7 @@ bool msr2msr_finalize_theory(char *fln, int theoryTag, int noOfAddionalParams)
 
 
   // cp __temp.msr fln
-  sprintf(str, "cp __temp.msr %s", fln);
+  snprintf(str, sizeof(str), "cp __temp.msr %s", fln);
   if (system(str) == -1) {
     std::cerr << "**ERROR** cmd: " << str << " failed." << std::endl;
     return false;
@@ -598,8 +599,9 @@ bool msr2msr_finalize_theory(char *fln, int theoryTag, int noOfAddionalParams)
  * - false otherwise
  *
  * \param str msr-file statistic block line
+ * \param size size of str
  */
-bool msr2msr_statistic(char *str) {
+bool msr2msr_statistic(char *str, const std::size_t size) {
   bool success = true;
 
   char *pstr;
@@ -621,7 +623,7 @@ bool msr2msr_statistic(char *str) {
       }
     }
     if (success) {
-      sprintf(str, "  chisq = %lf, NDF = %d, chisq/NDF = %lf", chisq, static_cast<int>(chisq/chisqred), chisqred);
+      snprintf(str, size, "  chisq = %lf, NDF = %d, chisq/NDF = %lf", chisq, static_cast<int>(chisq/chisqred), chisqred);
     }
   }
 
@@ -691,10 +693,10 @@ int main(int argc, char *argv[])
         success = msr2msr_theory(str, theoryTag, noOfAddionalParams);
         break;
       case MSR_TAG_RUN:
-        success = msr2msr_run(str);
+        success = msr2msr_run(str, sizeof(str));
         break;
       case MSR_TAG_STATISTIC:
-        success = msr2msr_statistic(str);
+        success = msr2msr_statistic(str, sizeof(str));
         break;
       default:
         break;
@@ -709,7 +711,7 @@ int main(int argc, char *argv[])
 
   // check if conversion seems to be OK
   if (!success) {
-    sprintf(str, "rm -rf %s", argv[2]);
+    snprintf(str, sizeof(str), "rm -rf %s", argv[2]);
     if (system(str) == -1) {
       std::cerr << "**ERROR** cmd: " << str << " failed." << std::endl;
       return 0;

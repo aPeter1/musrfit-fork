@@ -3863,7 +3863,7 @@ Bool_t PMsrHandler::FilterNumber(TString str, const Char_t *filter, Int_t offset
   Char_t *cstr, filterStr[32];
   cstr = new Char_t[str.Sizeof()];
   strncpy(cstr, str.Data(), str.Sizeof());
-  sprintf(filterStr, "%s%%d", filter);
+  snprintf(filterStr, sizeof(filterStr), "%s%%d", filter);
 
   // get number if present
   found = sscanf(cstr, filterStr, &no_found);
@@ -6609,7 +6609,7 @@ UInt_t PMsrHandler::LastSignificant(Double_t dval, UInt_t precLimit)
 
   char str[128];
 
-  sprintf(str, "%lf", dval);
+  snprintf(str, sizeof(str), "%lf", dval);
 
   // find decimal point
   for (UInt_t i=0; i<strlen(str); i++) {

@@ -85,7 +85,7 @@ PDumpOutputHandler::~PDumpOutputHandler()
   }
   if (fProc->isRunning()) { // try low level kill
     char cmd[128];
-    sprintf(cmd, "kill -9 %ld", fProcPID);
+    snprintf(cmd, sizeof(cnd), "kill -9 %ld", fProcPID);
     system(cmd);
   }
   if (fProc) {

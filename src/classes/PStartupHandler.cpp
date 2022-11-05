@@ -114,7 +114,7 @@ PStartupHandler::PStartupHandler()
     // check if the startup file is found under $HOME/.musrfit
     home = getenv("HOME");
     if (home != nullptr) {
-      sprintf(startup_path_name, "%s/.musrfit/musrfit_startup.xml", home);
+      snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/musrfit_startup.xml", home);
       if (StartupFileExists(startup_path_name)) {
         fStartupFilePath = TString(startup_path_name);
         fStartupFileFound = true;
@@ -125,7 +125,7 @@ PStartupHandler::PStartupHandler()
     // check if the MUSRFITPATH system variable is set
     pmusrpath = getenv("MUSRFITPATH");
     if (pmusrpath != nullptr) {
-      sprintf(startup_path_name, "%s/musrfit_startup.xml", pmusrpath);
+      snprintf(startup_path_name, sizeof(startup_path_name), "%s/musrfit_startup.xml", pmusrpath);
       if (StartupFileExists(startup_path_name)) {
         fStartupFilePath = TString(startup_path_name);
         fStartupFileFound = true;
@@ -135,9 +135,9 @@ PStartupHandler::PStartupHandler()
   if (!fStartupFileFound) { // MUSRFITPATH not set or empty, will try $ROOTSYS/bin
     home = getenv("ROOTSYS");
     if (home != nullptr) {
-      sprintf(musrpath, "%s/bin", home);
+      snprintf(musrpath, sizeof(musrpath), "%s/bin", home);
       std::cerr << std::endl << "**WARNING** MUSRFITPATH environment variable not set will try " << musrpath << std::endl;
-      sprintf(startup_path_name, "%s/musrfit_startup.xml", musrpath);
+      snprintf(startup_path_name, sizeof(startup_path_name), "%s/musrfit_startup.xml", musrpath);
       if (StartupFileExists(startup_path_name)) {
         fStartupFilePath = TString(startup_path_name);
         fStartupFileFound = true;
@@ -153,7 +153,7 @@ PStartupHandler::PStartupHandler()
     } else {
       home = getenv("HOME");
       if (home != nullptr) {
-        sprintf(startup_path_name, "%s/.musrfit/musrfit_startup.xml", home);
+        snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/musrfit_startup.xml", home);
         if (StartupFileExists(startup_path_name)) {
           fStartupFilePath = TString(startup_path_name);
           fStartupFileFound = true;
@@ -620,7 +620,7 @@ Bool_t PStartupHandler::WriteDefaultStartupFile()
   // first check that $HOME/.musrfit exists and if NOT create it
   struct stat info;
 
-  sprintf(startup_path_name, "%s/.musrfit", home);
+  snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit", home);
   if (!stat(startup_path_name, &info)) {
     if (!(info.st_mode & S_IFDIR))
       return false;
@@ -632,7 +632,7 @@ Bool_t PStartupHandler::WriteDefaultStartupFile()
   }
 
   // set path-name for musrfit_startup.xml
-  sprintf(startup_path_name, "%s/.musrfit/musrfit_startup.xml", home);
+  snprintf(startup_path_name, sizeof(startup_path_name), "%s/.musrfit/musrfit_startup.xml", home);
 
   std::ofstream fout(startup_path_name, std::ofstream::out);
   if (!fout.is_open()) {

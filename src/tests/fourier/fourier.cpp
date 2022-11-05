@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
   // get data histo
   char histoName[32];
   // read first the data which are NOT post pileup corrected
-  sprintf(histoName, "hDecay%02d", histoNo);
+  snprintf(histoName, sizeof(histoName), "hDecay%02d", histoNo);
   TH1F *histo = dynamic_cast<TH1F*>(folder->FindObjectAny(histoName));
   if (!histo) {
     cout << endl << "PRunDataHandler::ReadRootFile: Couldn't get histo " << histoName;

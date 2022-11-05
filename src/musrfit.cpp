@@ -283,10 +283,10 @@ void musrfit_write_root(TFile &f, TString fln, PRunData *data, int runCounter)
   char name[128];
 
   TString title = fln.Copy();
-  sprintf(name, "_%d", runCounter);
+  snprintf(name, sizeof(name), "_%d", runCounter);
   title.ReplaceAll(".root", name);
 
-  sprintf(name, "c%d", runCounter);
+  snprintf(name, sizeof(name),"c%d", runCounter);
 
   TCanvas *c = new TCanvas(name, title.Data(), 10, 10, 800, 600);
 

@@ -403,7 +403,7 @@ void BMWStartupHandler::CheckLists()
            << "BMWStartupHandler::CheckLists: Most probably this will go wrong and should therefore be fixed in the xml-file!" << std::endl;
       char eChar[5];
       for(unsigned int i(0); i<fEnergyList.size(); i++) {
-        sprintf(eChar, "%02.1f", fEnergyList[i]);
+        snprintf(eChar, sizeof(eChar), "%02.1f", fEnergyList[i]);
         fEnergyLabelList.push_back(std::string(eChar));
       }
     }

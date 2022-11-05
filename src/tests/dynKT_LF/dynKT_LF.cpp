@@ -168,9 +168,9 @@ int main(int argc, char *argv[])
 
   char fln[128];
   if (gaussian)
-    sprintf(fln, "dynKT_LF_w0_%1.1f_width%1.1f_nu%1.1f_N%d_G.dat", param[0], param[1], param[2], N);
+    snprintf(fln, sizeof(fln), "dynKT_LF_w0_%1.1f_width%1.1f_nu%1.1f_N%d_G.dat", param[0], param[1], param[2], N);
   else 
-    sprintf(fln, "dynKT_LF_w0_%1.1f_width%1.1f_nu%1.1f_N%d_L.dat", param[0], param[1], param[2], N);
+    snprintf(fln, sizeof(fln), "dynKT_LF_w0_%1.1f_width%1.1f_nu%1.1f_N%d_L.dat", param[0], param[1], param[2], N);
 
   const double H = Tmax/N;
 
