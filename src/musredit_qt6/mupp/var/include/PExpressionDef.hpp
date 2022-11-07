@@ -33,7 +33,7 @@
 #include "PExpression.hpp"
 #include "PErrorHandler.hpp"
 #include "PAnnotation.hpp"
-#include <boost/spirit/include/phoenix_function.hpp>
+#include <boost/phoenix/function.hpp>
 
 namespace mupp { namespace parser
 {
