@@ -544,7 +544,7 @@ int PMusrStep::writeMsrFile()
   bool paramBlock = false;
   do {
     line = getLine(data, idx);
-    if ((idx == -1) || (idx == data.count())) {
+    if ((idx == -1) || (idx == data.size())) {
       done = true;
     } else {
       if (line.startsWith("FITPARAMETER")) {
