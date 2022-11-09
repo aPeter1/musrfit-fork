@@ -1,0 +1,6 @@
+// config.h
+
+#define PACKAGE_VERSION "@PROJECT_VERSION@"
+#define ROOT_VERSION_USED "@ROOT_VERSION@"
+#define BUILD_TYPE "@CMAKE_BUILD_TYPE@"
+

@@ -1,0 +1,36 @@
+The rge handler expects a xml-input-file which is used to identify where to 
+find the necessary rge-files, their names and energies. The relevant xml-tags
+are:
+
+<data_path>   : path to the place of the rge-files.
+
+The rge-files naming has the structure <pre><energy>.rge, where <pre> is a
+sensible string characterizing the material, e.g. 'SiC_E'. The '_E' is needed
+by convention. <energy> is the value of the implantation energy in (eV), e.g.
+1000. This information has to be provided in the xml-file in the following way:
+
+<rge_fln_pre> : is the <pre> of the rge-file name.
+
+Typically one is working with a set of energies. This energy list can be 
+provided in two different ways:
+
+(i) as an list of energies
+
+    <energy_list>
+       <energy>1000</energy>
+       <energy>2000</energy>
+       <energy>3000</energy>
+       <energy>4500</energy>
+       ....
+    </energy_list>
+
+of, in case the energy are equally stepped by
+
+(ii) an energy vector
+
+    <energy_vect start="1000" stop="22000" step="1000"/>
+
+This would try to read all rge-files with energies starting from 1000 (eV)
+up to 22000 (eV) in steps of 1000 (eV).
+
+See also the file depth_profile_startup.xml in this directory.
