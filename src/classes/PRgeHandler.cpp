@@ -35,6 +35,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <TXMLAttr.h>
 #include "PRgeHandler.h"
 
 ClassImpQ(PXmlRgeHandler)
@@ -99,6 +100,80 @@ void PXmlRgeHandler::OnStartElement(const Char_t *str, const TList *attributes)
     fKey = eFlnPre;
   } else if (!strcmp(str, "energy") && isTrimSp) {
     fKey = eEnergy;
+  } else if (!strcmp(str, "energy_vect") && isTrimSp) {
+    std::string msg("");
+    if (attributes == nullptr) {
+      fIsValid = false;
+      msg = "Found energy_list without attributes";
+      OnError(msg.c_str());
+      return;
+    }
+    if (attributes->GetEntries() != 3) {
+      fIsValid = false;
+      msg = "energy_list: expect 3 attributes (start, stop, step), found " + std::to_string(attributes->GetEntries());
+      OnError(msg.c_str());
+      return;
+    }
+
+    TXMLAttr *attr;
+
+    int start=-1, stop=-1, step=-1, ival;
+    TIter next(attributes);
+    while ((attr = (TXMLAttr*) next())) {
+      char sval[256];
+      strncpy(sval, attr->GetValue(), sizeof(sval));
+      try {
+        ival = std::stoi(sval);
+      } catch(std::invalid_argument& e) {
+        fIsValid = false;
+        msg = "The found energy_list attribute '" + std::string(sval) + "' which is not a number";
+        OnError(msg.c_str());
+        return;
+      } catch(std::out_of_range& e) {
+        fIsValid = false;
+        msg = "The found energy_list attribute '" + std::string(sval) + "' which is out-of-range.";
+        OnError(msg.c_str());
+        return;
+      } catch(...) {
+        fIsValid = false;
+        msg = "The found energy_list attribute '" + std::string(sval) + "' which generates an error.";
+        OnError(msg.c_str());
+        return;
+      }
+      if (!strcmp(attr->GetName(), "start")) {
+        start = ival;
+      } else if (!strcmp(attr->GetName(), "stop")) {
+        stop = ival;
+      } else if (!strcmp(attr->GetName(), "step")) {
+        step = ival;
+      }
+    }
+    // make sure I do have start, stop, and step values set
+    if ((start == -1) || (stop == -1) || (step == -1)) {
+      fIsValid = false;
+      msg = "Found energy_list with missing attributes. Needed start, stop and step.";
+      OnError(msg.c_str());
+      return;
+    }
+    // more checks: start < stop, and step > 0.
+    if ((start > stop)) {
+      fIsValid = false;
+      msg = "Found energy_list with start > stop. Not allowed in the context.";
+      OnError(msg.c_str());
+      return;
+    }
+    if (step < 0) {
+      fIsValid = false;
+      msg = "Found energy_list with step < 0. Not allowed in the context.";
+      OnError(msg.c_str());
+      return;
+    }
+    // generate the fTrimSpDataEnergyList vector
+    ival = start;
+    do {
+      fTrimSpDataEnergyList.push_back(ival);
+      ival += step;
+    } while (ival <= stop);
   }
 }
 
