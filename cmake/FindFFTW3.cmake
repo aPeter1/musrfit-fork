@@ -213,7 +213,8 @@ if (FFTW3Q_THREAD_FOUND)
   add_imported_library("FFTW3Q_THREAD" "${FFTW3Q_THREAD_LIBRARY}" "${FFTW3_INCLUDE}")
 endif()
 
+pkg_check_modules(FFTW fftw3 QUIET)
 
 if (FFTW3_FOUND)
-  message("-- Found FFTW3: ${FFTW3_INCLUDE}")
+  message("-- Found FFTW3: ${FFTW3_INCLUDE}, Version: ${FFTW_VERSION}")
 endif (FFTW3_FOUND)
