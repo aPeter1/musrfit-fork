@@ -43,6 +43,7 @@ void syntax()
   std::cout << "  -x, --xml <fln>: path-name of the xml-startup file." << std::endl;
   std::cout << "  -d, --dump     : dump rge-infos." << std::endl;
   std::cout << "  -s, --set <no> : dump rge-vector number <no>." << std::endl;
+  std::cout << "  -c, --cum-freq <no> : dump vector of the cumulative frequency of rge set <no>." << std::endl;
   std::cout << "  -v, --version  : rgeHandlerTest version" << std::endl;
   std::cout << "  -h, --help     : this help." << std::endl;
   std::cout << std::endl;
@@ -58,6 +59,7 @@ int main(int argc, char* argv[])
   std::string fln("");
   bool dump(false);
   int set_no = -1;
+  bool cumFreq(false);
   for (int i=1; i<argc; i++) {
     if (!strcmp(argv[i], "-x") || !strcmp(argv[i], "--xml")) {
       if (i+1 >= argc) {
@@ -72,7 +74,7 @@ int main(int argc, char* argv[])
     } else if (!strcmp(argv[i], "-d") || !strcmp(argv[i], "--dump")) {
       dump = true;
     } else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--set")) {
-      if (i+1 > argc) {
+      if (i+1 >= argc) {
         std::cout << std::endl;
         std::cout << "**ERROR** found -s/--set without rge set number." << std::endl;
         std::cout << std::endl;
@@ -98,6 +100,34 @@ int main(int argc, char* argv[])
         return 3;
       }
       i++;
+    } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--cum-freq")) {
+        if (i+1 >= argc) {
+          std::cout << std::endl;
+          std::cout << "**ERROR** found -c/--cum-freq without rge set number." << std::endl;
+          std::cout << std::endl;
+          syntax();
+          return 1;
+        }
+        try {
+          set_no = std::stoi(argv[i+1]);
+        } catch(std::invalid_argument& e) {
+          std::cout << std::endl;
+          std::cout << "**ERROR** set number '" << argv[i+1] << "' is not a number." << std::endl;
+          std::cout << std::endl;
+          return 3;
+        } catch(std::out_of_range& e) {
+          std::cout << std::endl;
+          std::cout << "**ERROR** set number '" << argv[i+1] << "' is out-of-range." << std::endl;
+          std::cout << std::endl;
+          return 3;
+        } catch(...) {
+          std::cout << std::endl;
+          std::cout << "**ERROR** set number '" << argv[i+1] << "' leads to an unexpected error." << std::endl;
+          std::cout << std::endl;
+          return 3;
+        }
+        cumFreq=true;
+        i++;
     } else if (!strcmp(argv[i], "-v") || !strcmp(argv[i], "--version")) {
       std::cout << std::endl;
 #ifdef HAVE_CONFIG_H
@@ -135,7 +165,7 @@ int main(int argc, char* argv[])
     }
     std::cout << std::endl;
   }
-  if (set_no != -1) {
+  if ((set_no != -1) && !cumFreq) { // dump rge-set
     PRgeDataList list = rgeHandler->GetRgeData();
     if (set_no > list.size()) {
       std::cout << std::endl;
@@ -150,11 +180,34 @@ int main(int argc, char* argv[])
       delete rgeHandler;
       return 4;
     }
-    std::cout << "rge-data set " << set_no << ": energy: " << list[set_no-1].energy << " (eV), no-of-particles: " << list[set_no-1].noOfParticles << std::endl;
-    std::cout << "depth (nm), ampl, amplNorm" << std::endl;
+    std::cout << "# rge-data set " << set_no << ": energy: " << list[set_no-1].energy << " (eV), no-of-particles: " << list[set_no-1].noOfParticles << std::endl;
+    std::cout << "# depth (nm), ampl, amplNorm" << std::endl;
     for (int i=0; i<list[set_no-1].depth.size(); i++) {
       std::cout << list[set_no-1].depth[i] << ", " << list[set_no-1].amplitude[i] << ", " << list[set_no-1].nn[i] << std::endl;
     }
+  }
+  if ((set_no != -1) && cumFreq) { // dump cumulative frequency of rge-set
+      PRgeDataList list = rgeHandler->GetRgeData();
+      if (set_no > list.size()) {
+        std::cout << std::endl;
+        std::cout << "**ERROR** requested set number " << set_no << " > number of rge-data sets (" << list.size() << ")." << std::endl;
+        std::cout << std::endl;
+        delete rgeHandler;
+        return 4;
+      } else if (set_no == 0) {
+        std::cout << std::endl;
+        std::cout << "**ERROR** rge set-number count start at 1 not 0." << std::endl;
+        std::cout << std::endl;
+        delete rgeHandler;
+        return 4;
+      }
+      std::cout << "# cumulative frequency of rge-data set " << set_no << ": energy: " << list[set_no-1].energy << " (eV), no-of-particles: " << list[set_no-1].noOfParticles << std::endl;
+      std::cout << "# depth (nm), ampl, amplNorm, cumFreq" << std::endl;
+      double cumFreqVal(0.0);
+      for (int i=0; i<list[set_no-1].depth.size(); i++) {
+        cumFreqVal += list[set_no-1].nn[i];
+        std::cout << list[set_no-1].depth[i] << ", " << list[set_no-1].amplitude[i] << ", " << list[set_no-1].nn[i] << ", " << cumFreqVal << std::endl;
+      }
   }
 
   if (rgeHandler) {
