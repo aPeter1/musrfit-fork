@@ -2495,12 +2495,14 @@ void PMsr2Data::WriteValue(std::fstream &outFile, const double &value, const uns
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Write a value to the outFile stream. The string length is determined on its error.
+ * E.g. 17.0023 +- 0.0018, or 73212.081 +- 0.033, etc.
  *
- * \param outFile
- * \param value
- * \param errValue
- * \param width
+ * \param outFile output stream object
+ * \param value to be written to stream outFile
+ * \param errValue error of the value. needed to determine the needed accuracy
+ * \param width field width for outFile for formatted output
+ * \param db true for db-file output, false for dat-file output. Needed to have at least on space between numbers for dat-file output
  */
 void PMsr2Data::WriteValue(std::fstream &outFile, const double &value, const double &errValue, const unsigned int &width, const bool &db) const
 {
@@ -2528,9 +2530,12 @@ void PMsr2Data::WriteValue(std::fstream &outFile, const double &value, const dou
 
 //-------------------------------------------------------------
 /**
- * <p>
+ * <p>Determines the first significant digit of the provided number value.
+ * E.g. for value=2.03 it will return 1, for value=0.00023 it will return 4, etc.
  *
- * \param value
+ * \param value for which the first significant digit needs to be determined.
+ *
+ * \return first significant digit of the provided number value
  */
 int PMsr2Data::GetFirstSignificantDigit(const double &value) const
 {
@@ -2554,7 +2559,13 @@ int PMsr2Data::GetFirstSignificantDigit(const double &value) const
 
 //-------------------------------------------------------------
 /**
+ * <p>Checks paramValue is found in the paramList. If paramList
+ * is empty, ALL paramValues will be accepted, i.e. return true.
  *
+ * \param paramValue paramValue to be checked
+ * \param paramList parameter list
+ *
+ * \return true if the paramValue if found in paramList, or true if paramList is empty.
  */
 bool PMsr2Data::InParameterList(const unsigned int &paramValue, const std::vector<unsigned int> &paramList) const
 {
