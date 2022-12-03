@@ -169,6 +169,9 @@ void PMuppCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
     Done(0);
   } else if (x == 'b') { // about
     new TGMsgBox(gClient->GetRoot(), 0, "About mupp", "created by Andreas Suter\nPSI/NUM/LMU/LEM\n2018", kMBIconAsterisk);
+  } else if (x == 'l') { // draw with lines
+    fWithLines = !fWithLines;
+    UpdateGraphs();
   }
 }
 
@@ -182,7 +185,10 @@ void PMuppCanvas::HandleCmdKey(Int_t event, Int_t x, Int_t y, TObject *selected)
  */
 void PMuppCanvas::HandleMenuPopup(Int_t id)
 {
-  if (id == P_MENU_ID_EXPORT) {
+  if (id == P_MENU_ID_WITH_LINE) {
+    fWithLines = !fWithLines;
+    UpdateGraphs();
+  } else if (id == P_MENU_ID_EXPORT) {
     ExportData();
   } else if (id == P_MENU_ID_ABOUT) {
     new TGMsgBox(gClient->GetRoot(), 0, "About mupp", "created by Andreas Suter\nPSI/NUM/LMU/LEM\n2017", kMBIconAsterisk);
@@ -267,6 +273,7 @@ void PMuppCanvas::InitMuppCanvas(const Char_t *title, Int_t wtopx, Int_t wtopy, 
   fBar = fImp->GetMenuBar();
   fPopupMain = fBar->AddPopup("&Mupp");
 
+  fPopupMain->AddEntry("Toggle with&Line", P_MENU_ID_WITH_LINE);
   fPopupMain->AddEntry("Export &Data", P_MENU_ID_EXPORT);
   fPopupMain->AddSeparator();
   fPopupMain->AddEntry("A&bout", P_MENU_ID_ABOUT);
@@ -599,10 +606,14 @@ void PMuppCanvas::UpdateGraphs()
     }
 
     for (UInt_t i=0; i<fGraphE.size(); i++) {
-      fMultiGraph->Add(fGraphE[i], "p");
+      fMultiGraph->Add(fGraphE[i]);
     }
 
-    fMultiGraph->Draw("a");
+    if (fWithLines) {
+      fMultiGraph->Draw("ALP");
+    } else {
+      fMultiGraph->Draw("AP");
+    }
 
     // set x-axis limits. This is needed that the graphs x-axis starts at 0.0
     Double_t xmin=fMultiGraph->GetXaxis()->GetXmin();

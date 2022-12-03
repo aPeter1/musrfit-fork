@@ -46,8 +46,9 @@
 #include "mupp.h"
 
 // Canvas menu id's
-#define P_MENU_ID_EXPORT 10001
-#define P_MENU_ID_ABOUT  10002
+#define P_MENU_ID_WITH_LINE 10001
+#define P_MENU_ID_EXPORT    10002
+#define P_MENU_ID_ABOUT     10003
 
 //--------------------------------------------------------------------------
 struct PDataPoint {
@@ -112,6 +113,8 @@ private:
   PIntVector    fMarkerStyleList;
   PDoubleVector fMarkerSizeList;
   PIntVector    fColorList;
+
+  bool fWithLines{false};
 
   virtual void CreateStyle();
   virtual void InitMuppCanvas(const Char_t* title, Int_t wtopx, Int_t wtopy, Int_t ww, Int_t wh);
