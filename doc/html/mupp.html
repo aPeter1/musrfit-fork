@@ -1,60 +1,178 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mupp - μSR Parameter Plotter &mdash; musrfit 1.8.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
     
-    <title>mupp - μSR Parameter Plotter &mdash; musrfit 1.8.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.8.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="musrfit 1.8.0 documentation" href="index.html" />
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="msr2data - A Program for Automatically Processing Multiple musrfit msr Files" href="msr2data.html" />
     <link rel="prev" title="musredit: the GUI Based Interface to musrfit" href="musredit.html" /> 
-  </head>
-  <body>
-      <div class="header"><h1 class="heading"><a href="index.html">
-          <span>musrfit 1.8.0 documentation</span></a></h1>
-        <h2 class="heading"><span>mupp - μSR Parameter Plotter</span></h2>
-      </div>
-      <div class="topnav">
-      
-        <p>
-        «&#160;&#160;<a href="musredit.html"><tt class="docutils literal"><span class="pre">musredit</span></tt>: the GUI Based Interface to <tt class="docutils literal"><span class="pre">musrfit</span></tt></a>
-        &#160;&#160;::&#160;&#160;
-        <a class="uplink" href="index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="msr2data.html">msr2data - A Program for Automatically Processing Multiple <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr Files</a>&#160;&#160;»
-        </p>
 
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> musrfit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cite.html">How to Cite <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-manual.html">User manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-libs.html">Documentation of user libs (user functions)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup-standard.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> on Different Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup-dks.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> / <code class="docutils literal notranslate"><span class="pre">DKS</span></code>: High Speed Fitting with GPU’s</a></li>
+<li class="toctree-l1"><a class="reference internal" href="musredit.html"><code class="docutils literal notranslate"><span class="pre">musredit</span></code>: the GUI Based Interface to <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">mupp - μSR Parameter Plotter</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-graphical-user-interface">The Graphical User Interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#define-variable-dialog">Define Variable Dialog</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#the-scripting-interface">The Scripting Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-usage-summary">The Usage Summary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="msr2data.html">msr2data - A Program for Automatically Processing Multiple <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> msr Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="any2many.html">any2many - a Universal μSR-file-format converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="musr-root.html">MusrRoot - an Extensible Open File Format for μSR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bugtracking.html">Bugtracking</a></li>
+</ul>
+
+            
+          
+        </div>
       </div>
-      <div class="content">
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
         
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">musrfit</a>
         
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>mupp - μSR Parameter Plotter</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/mupp.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
   <div class="section" id="mupp-mgrsr-parameter-plotter">
 <span id="mupp"></span><span id="index-0"></span><h1>mupp - μSR Parameter Plotter<a class="headerlink" href="#mupp-mgrsr-parameter-plotter" title="Permalink to this headline">¶</a></h1>
-<p><tt class="docutils literal"><span class="pre">mupp</span></tt> is a little helper program which allows to quickly plot a collection of msr-file parameters,
-as for instance generated by <a class="reference internal" href="msr2data.html#msr2data"><em>msr2data</em></a>. It can handle <tt class="docutils literal"><span class="pre">db</span></tt>- and <tt class="docutils literal"><span class="pre">dat</span></tt>-files.
-Also a collection of <tt class="docutils literal"><span class="pre">msr</span></tt>-files can be invoked. <tt class="docutils literal"><span class="pre">mupp</span></tt> is heavily inspired by μView (see
+<p><code class="docutils literal notranslate"><span class="pre">mupp</span></code> is a little helper program which allows to quickly plot a collection of msr-file parameters,
+as for instance generated by <a class="reference internal" href="msr2data.html#msr2data"><span class="std std-ref">msr2data</span></a>. It can handle <code class="docutils literal notranslate"><span class="pre">db</span></code>- and <code class="docutils literal notranslate"><span class="pre">dat</span></code>-files.
+Also a collection of <code class="docutils literal notranslate"><span class="pre">msr</span></code>-files can be invoked. <code class="docutils literal notranslate"><span class="pre">mupp</span></code> is heavily inspired by μView (see
 <a class="reference external" href="http://musr.org/muview/">here</a>).</p>
-<p><tt class="docutils literal"><span class="pre">mupp</span></tt> can be operated from within as graphical user interface or via a command line scripting interface.
-The <tt class="docutils literal"><span class="pre">mupp</span></tt> GUI can be invoked either directly from the command line or from within <a class="reference internal" href="musredit.html#musredit-sec"><em>musredit</em></a>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">mupp</span></code> can be operated from within as graphical user interface or via a command line scripting interface.
+The <code class="docutils literal notranslate"><span class="pre">mupp</span></code> GUI can be invoked either directly from the command line or from within <a class="reference internal" href="musredit.html#musredit-sec"><span class="std std-ref">musredit</span></a>.</p>
 <p>Each collection bundles a number of runs, where a run is a single μSR measurement.
 A run is analyzed by a number of parameters (defined in the msr-files), and complemented by
 additional physical parameters as the temperature, magnetic field, implantation energy, etc.
@@ -62,56 +180,56 @@ Hence parameters can be seen as vectors and can be plot against each other.</p>
 <div class="section" id="the-graphical-user-interface">
 <span id="index-1"></span><h2>The Graphical User Interface<a class="headerlink" href="#the-graphical-user-interface" title="Permalink to this headline">¶</a></h2>
 <p>A typical setting could look like this</p>
-<img src="_images/mupp-gui-0.svg" /><ol class="arabic">
-<li><p class="first">shows the list of loaded collections. A collection is defined as <tt class="docutils literal"><span class="pre">db</span></tt>- or <tt class="docutils literal"><span class="pre">dat</span></tt>-file (typically the
-output from <a class="reference internal" href="msr2data.html#msr2data"><em>msr2data</em></a>). If you call the open-dialog and select a collection of
-<tt class="docutils literal"><span class="pre">msr</span></tt>-files, <tt class="docutils literal"><span class="pre">mupp</span></tt> will call <tt class="docutils literal"><span class="pre">msr2data</span></tt> and tries to generate a collection on-the-fly.</p>
+<img alt="_images/mupp-gui-0.svg" src="_images/mupp-gui-0.svg" /><ol class="arabic">
+<li><p class="first">shows the list of loaded collections. A collection is defined as <code class="docutils literal notranslate"><span class="pre">db</span></code>- or <code class="docutils literal notranslate"><span class="pre">dat</span></code>-file (typically the
+output from <a class="reference internal" href="msr2data.html#msr2data"><span class="std std-ref">msr2data</span></a>). If you call the open-dialog and select a collection of
+<code class="docutils literal notranslate"><span class="pre">msr</span></code>-files, <code class="docutils literal notranslate"><span class="pre">mupp</span></code> will call <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> and tries to generate a collection on-the-fly.</p>
 </li>
 <li><p class="first">in this list, the data-tags of the currently selected collection is presented. The data-tags can be
-directly dragged over to the <tt class="docutils literal"><span class="pre">x</span></tt>- and <tt class="docutils literal"><span class="pre">y</span></tt>-axis list. Another way is to select the data-tag
-wished and click <tt class="docutils literal"><span class="pre">add</span> <span class="pre">X</span></tt> to add the selected data-tag to the <tt class="docutils literal"><span class="pre">x</span></tt>-axis list. Analogous it is done
-for the <tt class="docutils literal"><span class="pre">y</span></tt>-axis.</p>
+directly dragged over to the <code class="docutils literal notranslate"><span class="pre">x</span></code>- and <code class="docutils literal notranslate"><span class="pre">y</span></code>-axis list. Another way is to select the data-tag
+wished and click <code class="docutils literal notranslate"><span class="pre">add</span> <span class="pre">X</span></code> to add the selected data-tag to the <code class="docutils literal notranslate"><span class="pre">x</span></code>-axis list. Analogous it is done
+for the <code class="docutils literal notranslate"><span class="pre">y</span></code>-axis.</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">x</span></tt>-axis list. The labels are followed by <tt class="docutils literal"><span class="pre">(-X-)</span></tt> where the number <tt class="docutils literal"><span class="pre">X</span></tt> corresponds to the
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">x</span></code>-axis list. The labels are followed by <code class="docutils literal notranslate"><span class="pre">(-X-)</span></code> where the number <code class="docutils literal notranslate"><span class="pre">X</span></code> corresponds to the
 selection it corresponds to. The numbering of the collection is as given in the collection list.</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">y</span></tt>-axis list. The labels are followed by <tt class="docutils literal"><span class="pre">(-X-)</span></tt> where the number <tt class="docutils literal"><span class="pre">X</span></tt> corresponds to the
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">y</span></code>-axis list. The labels are followed by <code class="docutils literal notranslate"><span class="pre">(-X-)</span></code> where the number <code class="docutils literal notranslate"><span class="pre">X</span></code> corresponds to the
 selection it corresponds to. The numbering of the collection is as given in the collection list.</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">add</span> <span class="pre">X</span></tt> allows to add the currently selected data-tag to the <tt class="docutils literal"><span class="pre">x</span></tt>-axis list.</p>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">add</span> <span class="pre">X</span></code> allows to add the currently selected data-tag to the <code class="docutils literal notranslate"><span class="pre">x</span></code>-axis list.</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">add</span> <span class="pre">Y</span></tt> allows to add the currently selected data-tag to the <tt class="docutils literal"><span class="pre">y</span></tt>-axis list.</p>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">add</span> <span class="pre">Y</span></code> allows to add the currently selected data-tag to the <code class="docutils literal notranslate"><span class="pre">y</span></code>-axis list.</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">remove</span> <span class="pre">X</span></tt> will remove the selected <tt class="docutils literal"><span class="pre">x</span></tt>-axis tag.</p>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">remove</span> <span class="pre">X</span></code> will remove the selected <code class="docutils literal notranslate"><span class="pre">x</span></code>-axis tag.</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">remove</span> <span class="pre">Y</span></tt> will remove the selected <tt class="docutils literal"><span class="pre">y</span></tt>-axis tag.</p>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">remove</span> <span class="pre">Y</span></code> will remove the selected <code class="docutils literal notranslate"><span class="pre">y</span></code>-axis tag.</p>
 </li>
 <li><p class="first">Often one would like to compare trends of different settings. In the above example each collections
 holds an energy scans for a given temperature. Each collection is measured at a different temperature.
-Now, instead of adding <tt class="docutils literal"><span class="pre">x</span></tt>- and <tt class="docutils literal"><span class="pre">y</span></tt>-axis tags for each collection, you can do the following:
-you add <tt class="docutils literal"><span class="pre">x</span></tt>- and <tt class="docutils literal"><span class="pre">y</span></tt>-axis data-tags for the first collection. Afterwards you select all the other
-collections of interest and click on <tt class="docutils literal"><span class="pre">Add</span> <span class="pre">Ditto</span></tt>. <tt class="docutils literal"><span class="pre">mupp</span></tt> will then add the corresponding
-<tt class="docutils literal"><span class="pre">x</span></tt>- and <tt class="docutils literal"><span class="pre">y</span></tt>-axis data-tags accordingly. This is less error prone and quicker!</p>
+Now, instead of adding <code class="docutils literal notranslate"><span class="pre">x</span></code>- and <code class="docutils literal notranslate"><span class="pre">y</span></code>-axis tags for each collection, you can do the following:
+you add <code class="docutils literal notranslate"><span class="pre">x</span></code>- and <code class="docutils literal notranslate"><span class="pre">y</span></code>-axis data-tags for the first collection. Afterwards you select all the other
+collections of interest and click on <code class="docutils literal notranslate"><span class="pre">Add</span> <span class="pre">Ditto</span></code>. <code class="docutils literal notranslate"><span class="pre">mupp</span></code> will then add the corresponding
+<code class="docutils literal notranslate"><span class="pre">x</span></code>- and <code class="docutils literal notranslate"><span class="pre">y</span></code>-axis data-tags accordingly. This is less error prone and quicker!</p>
 </li>
-<li><p class="first">Clicking the <tt class="docutils literal"><span class="pre">Plot</span></tt> button will invoke <tt class="docutils literal"><span class="pre">mupp_plot</span></tt> (a <tt class="docutils literal"><span class="pre">ROOT</span></tt> based application) which will
+<li><p class="first">Clicking the <code class="docutils literal notranslate"><span class="pre">Plot</span></code> button will invoke <code class="docutils literal notranslate"><span class="pre">mupp_plot</span></code> (a <code class="docutils literal notranslate"><span class="pre">ROOT</span></code> based application) which will
 present the data, as shown here</p>
-<a class="reference internal image-reference" href="_images/mupp-plot-0.svg"><img height="600px" src="_images/mupp-plot-0.svg" /></a>
+<a class="reference internal image-reference" href="_images/mupp-plot-0.svg"><img alt="_images/mupp-plot-0.svg" height="600px" src="_images/mupp-plot-0.svg" /></a>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">Remove</span> <span class="pre">Collection</span></tt>: will remove the selected collection</p>
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">Remove</span> <span class="pre">Collection</span></code>: will remove the selected collection</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">Refresh</span> <span class="pre">Collection</span></tt>: will reload the collection (<tt class="docutils literal"><span class="pre">db</span></tt>- or <tt class="docutils literal"><span class="pre">dat</span></tt>-file). This is often useful
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">Refresh</span> <span class="pre">Collection</span></code>: will reload the collection (<code class="docutils literal notranslate"><span class="pre">db</span></code>- or <code class="docutils literal notranslate"><span class="pre">dat</span></code>-file). This is often useful
 during beamtime where the collection is growing run-by-run.</p>
 </li>
 <li><p class="first">Command history window.</p>
 </li>
 <li><p class="first">This is the script command line. Currently it allows to perform the tasks without mouse gambling.
-In the future much more commands are planed. See the <tt class="docutils literal"><span class="pre">Help</span> <span class="pre">/</span> <span class="pre">Cmd's</span></tt> for the currently available
+In the future much more commands are planed. See the <code class="docutils literal notranslate"><span class="pre">Help</span> <span class="pre">/</span> <span class="pre">Cmd's</span></code> for the currently available
 commands.</p>
 </li>
 </ol>
 <div class="section" id="define-variable-dialog">
 <h3>Define Variable Dialog<a class="headerlink" href="#define-variable-dialog" title="Permalink to this headline">¶</a></h3>
-<img src="_images/mupp-add-var.svg" /><ol class="arabic simple">
+<img alt="_images/mupp-add-var.svg" src="_images/mupp-add-var.svg" /><ol class="arabic simple">
 <li>Variable text edit window.</li>
 <li>Collection link window.</li>
 <li>Shows the parameters of the selected collection.</li>
@@ -121,54 +239,54 @@ commands.</p>
 <p>A variable defined here is a mathematical expression defined by parameters of loaded collections.
 Since a parameter also has an associated error, also newly defined variables <strong>always</strong> need
 to be defined together with a corresponding error variable. If the name of a variable is defined
-as <tt class="docutils literal"><span class="pre">SigmaSC_10</span></tt> (see the above snapshot), the error variable need to be named as <tt class="docutils literal"><span class="pre">SigmaSC_10Err</span></tt>.</p>
-<p>Currently the following mathematical functions are defined: <tt class="docutils literal"><span class="pre">max</span></tt>, <tt class="docutils literal"><span class="pre">min</span></tt>, <tt class="docutils literal"><span class="pre">abs</span></tt>, <tt class="docutils literal"><span class="pre">sin</span></tt>, <tt class="docutils literal"><span class="pre">cos</span></tt>,
-<tt class="docutils literal"><span class="pre">tan</span></tt>, <tt class="docutils literal"><span class="pre">exp</span></tt>, <tt class="docutils literal"><span class="pre">log</span></tt>, <tt class="docutils literal"><span class="pre">ln</span></tt>, <tt class="docutils literal"><span class="pre">pow</span></tt>.</p>
+as <code class="docutils literal notranslate"><span class="pre">SigmaSC_10</span></code> (see the above snapshot), the error variable need to be named as <code class="docutils literal notranslate"><span class="pre">SigmaSC_10Err</span></code>.</p>
+<p>Currently the following mathematical functions are defined: <code class="docutils literal notranslate"><span class="pre">max</span></code>, <code class="docutils literal notranslate"><span class="pre">min</span></code>, <code class="docutils literal notranslate"><span class="pre">abs</span></code>, <code class="docutils literal notranslate"><span class="pre">sin</span></code>, <code class="docutils literal notranslate"><span class="pre">cos</span></code>,
+<code class="docutils literal notranslate"><span class="pre">tan</span></code>, <code class="docutils literal notranslate"><span class="pre">exp</span></code>, <code class="docutils literal notranslate"><span class="pre">log</span></code>, <code class="docutils literal notranslate"><span class="pre">ln</span></code>, <code class="docutils literal notranslate"><span class="pre">pow</span></code>.</p>
 </div>
 </div>
 <div class="section" id="the-scripting-interface">
 <span id="index-2"></span><h2>The Scripting Interface<a class="headerlink" href="#the-scripting-interface" title="Permalink to this headline">¶</a></h2>
-<p><tt class="docutils literal"><span class="pre">mupp</span></tt> can also be operated in a scripting like manner. The use cases are plot updates during run time,
-or web-based interaction which requests figures. A script is invoked by the command line option <tt class="docutils literal"><span class="pre">-s</span></tt> (see
-<a class="reference internal" href="#mupp-usage"><em>mupp command line summary</em></a>. Currently the following scripting commands are available:</p>
+<p><code class="docutils literal notranslate"><span class="pre">mupp</span></code> can also be operated in a scripting like manner. The use cases are plot updates during run time,
+or web-based interaction which requests figures. A script is invoked by the command line option <code class="docutils literal notranslate"><span class="pre">-s</span></code> (see
+<a class="reference internal" href="#mupp-usage"><span class="std std-ref">mupp command line summary</span></a>. Currently the following scripting commands are available:</p>
 <dl class="docutils">
 <dt><strong>loadPath &lt;dir&gt;</strong></dt>
-<dd>set the load path to <tt class="docutils literal"><span class="pre">&lt;dir&gt;</span></tt>. Bash variables like $HOME are accepted. This is the path where to look for collection files (<tt class="docutils literal"><span class="pre">db</span></tt>- and <tt class="docutils literal"><span class="pre">dat</span></tt>-files).</dd>
+<dd>set the load path to <code class="docutils literal notranslate"><span class="pre">&lt;dir&gt;</span></code>. Bash variables like $HOME are accepted. This is the path where to look for collection files (<code class="docutils literal notranslate"><span class="pre">db</span></code>- and <code class="docutils literal notranslate"><span class="pre">dat</span></code>-files).</dd>
 <dt><strong>load &lt;coll&gt;</strong></dt>
-<dd>will load the collection <tt class="docutils literal"><span class="pre">&lt;coll&gt;</span></tt>.</dd>
+<dd>will load the collection <code class="docutils literal notranslate"><span class="pre">&lt;coll&gt;</span></code>.</dd>
 <dt><strong>selectAll</strong></dt>
 <dd>will select all loaded collections. This means every plot of variable x/y will be carried out to <em>ALL</em> collections.</dd>
 <dt><strong>select &lt;nn&gt;</strong></dt>
-<dd>selects collection <tt class="docutils literal"><span class="pre">&lt;nn&gt;</span></tt>, where <tt class="docutils literal"><span class="pre">&lt;nn&gt;</span></tt> is either the <em>number</em> of the collections, or its <em>name</em>, <em>e.g.</em>
+<dd>selects collection <code class="docutils literal notranslate"><span class="pre">&lt;nn&gt;</span></code>, where <code class="docutils literal notranslate"><span class="pre">&lt;nn&gt;</span></code> is either the <em>number</em> of the collections, or its <em>name</em>, <em>e.g.</em>
 select YBCO-40nm-T5K-FC150mT-Escan.db.</dd>
 <dt><strong>x &lt;label&gt;</strong></dt>
-<dd>add <tt class="docutils literal"><span class="pre">&lt;label&gt;</span></tt> as a <em>x</em>-variable. Only <em>one</em> is allowed.</dd>
+<dd>add <code class="docutils literal notranslate"><span class="pre">&lt;label&gt;</span></code> as a <em>x</em>-variable. Only <em>one</em> is allowed.</dd>
 <dt><strong>y &lt;label(s)&gt;</strong></dt>
-<dd>add <tt class="docutils literal"><span class="pre">&lt;label(s)&gt;</span></tt> as <em>y</em>-variable. <em>Multiple</em> labels are possible.</dd>
+<dd>add <code class="docutils literal notranslate"><span class="pre">&lt;label(s)&gt;</span></code> as <em>y</em>-variable. <em>Multiple</em> labels are possible.</dd>
 <dt><strong>norm</strong></dt>
 <dd>this will normalize all the <em>y</em>-variables by their maximum.</dd>
 <dt><strong>savePath &lt;dir&gt;</strong></dt>
-<dd>set the save path to <tt class="docutils literal"><span class="pre">&lt;dir&gt;</span></tt>. The place where the macros, and/or the plot output will be saved.</dd>
+<dd>set the save path to <code class="docutils literal notranslate"><span class="pre">&lt;dir&gt;</span></code>. The place where the macros, and/or the plot output will be saved.</dd>
 <dt><strong>plot &lt;fln&gt;</strong></dt>
-<dd>where <tt class="docutils literal"><span class="pre">&lt;fln&gt;</span></tt> is the file name with extension under which the plot should be saved.</dd>
+<dd>where <code class="docutils literal notranslate"><span class="pre">&lt;fln&gt;</span></code> is the file name with extension under which the plot should be saved.</dd>
 <dt><strong>macro &lt;fln&gt;</strong></dt>
-<dd>where <tt class="docutils literal"><span class="pre">&lt;fln&gt;</span></tt> is the file name under which the root macro should be saved.</dd>
+<dd>where <code class="docutils literal notranslate"><span class="pre">&lt;fln&gt;</span></code> is the file name under which the root macro should be saved.</dd>
 <dt><strong>var &lt;var_name&gt; = &lt;expr&gt;</strong></dt>
 <dd><p class="first">defines a variable.
 &lt;expr&gt; is a mathematical expression where collection variables are addressed
-via the &#8216;$&#8217;, e.g. <tt class="docutils literal"><span class="pre">dataT</span></tt> is addressed by <tt class="docutils literal"><span class="pre">$dataT</span></tt>, etc. An example:</p>
-<p><tt class="docutils literal"><span class="pre">var</span> <span class="pre">invT</span> <span class="pre">=</span> <span class="pre">1000.0</span> <span class="pre">/</span> <span class="pre">$dataT</span></tt></p>
+via the ‘$’, e.g. <code class="docutils literal notranslate"><span class="pre">dataT</span></code> is addressed by <code class="docutils literal notranslate"><span class="pre">$dataT</span></code>, etc. An example:</p>
+<p><code class="docutils literal notranslate"><span class="pre">var</span> <span class="pre">invT</span> <span class="pre">=</span> <span class="pre">1000.0</span> <span class="pre">/</span> <span class="pre">$dataT</span></code></p>
 <p>Each variable has to be accompanied by its error variable. An error variable
-is defined by the <tt class="docutils literal"><span class="pre">&lt;var_name&gt;</span></tt> followed by <tt class="docutils literal"><span class="pre">Err</span></tt>
+is defined by the <code class="docutils literal notranslate"><span class="pre">&lt;var_name&gt;</span></code> followed by <code class="docutils literal notranslate"><span class="pre">Err</span></code>
 For the above example the error variable is</p>
-<p class="last"><tt class="docutils literal"><span class="pre">var</span> <span class="pre">invTErr</span> <span class="pre">=</span> <span class="pre">$invT</span> <span class="pre">*</span> <span class="pre">$dataTErr</span> <span class="pre">/</span> <span class="pre">$dataT</span></tt></p>
+<p class="last"><code class="docutils literal notranslate"><span class="pre">var</span> <span class="pre">invTErr</span> <span class="pre">=</span> <span class="pre">$invT</span> <span class="pre">*</span> <span class="pre">$dataTErr</span> <span class="pre">/</span> <span class="pre">$dataT</span></code></p>
 </dd>
 <dt><strong>col &lt;nn&gt; : &lt;var_name&gt;</strong></dt>
 <dd>links &lt;var_name&gt; to the collection &lt;nn&gt;, where &lt;nn&gt; is the number of the
 collection as defined by the order of load, starting with 0.</dd>
 </dl>
-<p>An example script file <tt class="docutils literal"><span class="pre">sigmaSC-vs-temp.txt</span></tt> might look like this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span># This is a comment
+<p>An example script file <code class="docutils literal notranslate"><span class="pre">sigmaSC-vs-temp.txt</span></code> might look like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># This is a comment
 # Script: sigmaSC-vs-temp.txt
 
 loadPath ./
@@ -216,7 +334,7 @@ macro SigmaSCVsTemp.C
 </div>
 <div class="section" id="the-usage-summary">
 <span id="mupp-usage"></span><span id="index-3"></span><h2>The Usage Summary<a class="headerlink" href="#the-usage-summary" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python"><div class="highlight"><pre><span></span>usage: mupp [OPTIONS] [[--path &lt;fit-param-path&gt;] &lt;fit-param-file-names&gt;]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>usage: mupp [OPTIONS] [[--path &lt;fit-param-path&gt;] &lt;fit-param-file-names&gt;]
 
 OPTIONS:
   -h, --help: this help
@@ -263,23 +381,73 @@ SCRIPT COMMANDS:
 </div>
 
 
-      </div>
-      <div class="bottomnav">
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <p>
-        «&#160;&#160;<a href="musredit.html"><tt class="docutils literal"><span class="pre">musredit</span></tt>: the GUI Based Interface to <tt class="docutils literal"><span class="pre">musrfit</span></tt></a>
-        &#160;&#160;::&#160;&#160;
-        <a class="uplink" href="index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="msr2data.html">msr2data - A Program for Automatically Processing Multiple <tt class="docutils literal"><span class="pre">musrfit</span></tt> msr Files</a>&#160;&#160;»
-        </p>
+        <a href="msr2data.html" class="btn btn-neutral float-right" title="msr2data - A Program for Automatically Processing Multiple musrfit msr Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="musredit.html" class="btn btn-neutral" title="musredit: the GUI Based Interface to musrfit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Andreas Suter.
+      Last updated on Dec 12, 2022.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
       </div>
 
-    <div class="footer">
-        &copy; Copyright 2022, Andreas Suter.
-      Last updated on May 29, 2022.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.8.2',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

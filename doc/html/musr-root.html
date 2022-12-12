@@ -1,127 +1,263 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>MusrRoot - an Extensible Open File Format for μSR &mdash; musrfit 1.8.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
     
-    <title>MusrRoot - an Extensible Open File Format for μSR &mdash; musrfit 1.8.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.8.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="musrfit 1.8.0 documentation" href="index.html" />
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Acknowledgements" href="acknowledgement.html" />
     <link rel="prev" title="any2many - a Universal μSR-file-format converter" href="any2many.html" /> 
-  </head>
-  <body>
-      <div class="header"><h1 class="heading"><a href="index.html">
-          <span>musrfit 1.8.0 documentation</span></a></h1>
-        <h2 class="heading"><span>MusrRoot - an Extensible Open File Format for μSR</span></h2>
-      </div>
-      <div class="topnav">
-      
-        <p>
-        «&#160;&#160;<a href="any2many.html">any2many - a Universal μSR-file-format converter</a>
-        &#160;&#160;::&#160;&#160;
-        <a class="uplink" href="index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="acknowledgement.html">Acknowledgements</a>&#160;&#160;»
-        </p>
 
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> musrfit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cite.html">How to Cite <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-manual.html">User manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-libs.html">Documentation of user libs (user functions)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup-standard.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> on Different Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup-dks.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> / <code class="docutils literal notranslate"><span class="pre">DKS</span></code>: High Speed Fitting with GPU’s</a></li>
+<li class="toctree-l1"><a class="reference internal" href="musredit.html"><code class="docutils literal notranslate"><span class="pre">musredit</span></code>: the GUI Based Interface to <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mupp.html">mupp - μSR Parameter Plotter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="msr2data.html">msr2data - A Program for Automatically Processing Multiple <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> msr Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="any2many.html">any2many - a Universal μSR-file-format converter</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MusrRoot - an Extensible Open File Format for μSR</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#some-basics-concerning-root-files">Some Basics Concerning ROOT Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">MusrRoot an Extensible Open File Format for μSR</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#run-information-contained-in-runheader">Run Information Contained in <code class="docutils literal notranslate"><span class="pre">RunHeader</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#runinfo-overview"><code class="docutils literal notranslate"><span class="pre">RunInfo</span></code> Overview</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#tmusrrunheader-concept">TMusrRunHeader Concept</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#user-interface-for-musrroot-run-header">User Interface for MusrRoot Run Header</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#writing-a-musrroot-run-header">Writing a MusrRoot Run Header</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#reading-a-musrroot-run-header">Reading a MusrRoot Run Header</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#validation-of-a-musrroot-file">Validation of a MusrRoot File</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#runinfo-required">RunInfo (Required)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#detectorinfo-required">DetectorInfo (Required)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sampleenvironmentinfo-required">SampleEnvironmentInfo (Required)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#magneticfieldenvironmentinfo-required">MagneticFieldEnvironmentInfo (Required)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#beamlineinfo-required">BeamlineInfo (Required)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#exhaustive-musrroot-tree-including-everything-required">Exhaustive MusrRoot Tree Including Everything Required</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tmusrrunphysicalquantity-possible-representations">TMusrRunPhysicalQuantity - Possible Representations</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bugtracking.html">Bugtracking</a></li>
+</ul>
+
+            
+          
+        </div>
       </div>
-      <div class="content">
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
         
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">musrfit</a>
         
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>MusrRoot - an Extensible Open File Format for μSR</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/musr-root.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
   <div class="section" id="musrroot-an-extensible-open-file-format-for-mgrsr">
 <span id="musrroot"></span><span id="index-0"></span><h1>MusrRoot - an Extensible Open File Format for μSR<a class="headerlink" href="#musrroot-an-extensible-open-file-format-for-mgrsr" title="Permalink to this headline">¶</a></h1>
 <p>Until 2011 different μSR file formats were used within PSI. The bulk-μSR instruments were
-writing their data in the <tt class="docutils literal"><span class="pre">PSI-BIN</span></tt> file format, which is a fixed binary format with rather stringent
+writing their data in the <code class="docutils literal notranslate"><span class="pre">PSI-BIN</span></code> file format, which is a fixed binary format with rather stringent
 limitations. The LE-μSR (LEM) instrument was using a ROOT (CERN) based file format which was tightly
 tailored to the special needs of the LEM instrument. This situation was unsatisfactorily and hence it
-was decided to move forward to a open file format called <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> to be described in the following.</p>
+was decided to move forward to a open file format called <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> to be described in the following.</p>
 <div class="section" id="some-basics-concerning-root-files">
 <h2>Some Basics Concerning ROOT Files<a class="headerlink" href="#some-basics-concerning-root-files" title="Permalink to this headline">¶</a></h2>
 <p>The μSR data acquisition systems at PSI are utilizing MIDAS (see <a class="reference external" href="https://midas.triumf.ca/MidasWiki/index.php/Main_Page">Midas Home Page</a>).
 The MIDAS analyzer, which is responsible to build histograms, especially the μSR decay histograms, makes
 it very easy to build ROOT (see <a class="reference external" href="https://root.cern.ch">ROOT/CERN home page</a> ) histogram objects (these
-are <tt class="docutils literal"><span class="pre">TH1F</span></tt> objects for μSR decay histograms). ROOT is a <tt class="docutils literal"><span class="pre">C++</span></tt> object-oriented data mining and
-analysis frame work. These histograms can be collected and saved in ROOT files (<tt class="docutils literal"><span class="pre">TFile</span></tt>). In order to ease
+are <code class="docutils literal notranslate"><span class="pre">TH1F</span></code> objects for μSR decay histograms). ROOT is a <code class="docutils literal notranslate"><span class="pre">C++</span></code> object-oriented data mining and
+analysis frame work. These histograms can be collected and saved in ROOT files (<code class="docutils literal notranslate"><span class="pre">TFile</span></code>). In order to ease
 the understanding of the upcoming definitions, a few ROOT related things shall be summaries here. For details
 concerning the ROOT frame work documentation please check <a class="reference external" href="https://root.cern.ch/root-user-guides-and-manuals">ROOT/CERN Users Guide(s)</a>
 and <a class="reference external" href="https://root.cern.ch/guides/reference-guide">ROOT/CERN Reference Guide</a>.</p>
-<p>ROOT files (<tt class="docutils literal"><span class="pre">TFile</span></tt>) are binary files which can hold any kind of objects. A <tt class="docutils literal"><span class="pre">TFile</span></tt> is organized similarly
-to a directory structure of an operating system. Within the ROOT framework, there is a <tt class="docutils literal"><span class="pre">TFile</span></tt> browser available
-which allows to inspect these files. This browser (<tt class="docutils literal"><span class="pre">TBrowser</span></tt>) will show all object saved in the <tt class="docutils literal"><span class="pre">TFile</span></tt> directly,
-if they derive from <tt class="docutils literal"><span class="pre">TObject</span></tt>.</p>
-<p>The <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file format to be described below is only using a small subset of possible ROOT objects, namely:</p>
+<p>ROOT files (<code class="docutils literal notranslate"><span class="pre">TFile</span></code>) are binary files which can hold any kind of objects. A <code class="docutils literal notranslate"><span class="pre">TFile</span></code> is organized similarly
+to a directory structure of an operating system. Within the ROOT framework, there is a <code class="docutils literal notranslate"><span class="pre">TFile</span></code> browser available
+which allows to inspect these files. This browser (<code class="docutils literal notranslate"><span class="pre">TBrowser</span></code>) will show all object saved in the <code class="docutils literal notranslate"><span class="pre">TFile</span></code> directly,
+if they derive from <code class="docutils literal notranslate"><span class="pre">TObject</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file format to be described below is only using a small subset of possible ROOT objects, namely:</p>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">TFolder</span></tt>: this are the top level objects in the <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file.</li>
-<li><tt class="docutils literal"><span class="pre">TH1F</span></tt>: Hold the μ-decay-histograms.</li>
-<li><tt class="docutils literal"><span class="pre">TObjArray</span></tt>: Holding collection of header information.</li>
-<li><tt class="docutils literal"><span class="pre">TObjString</span></tt>: Holding the content of any header information.</li>
+<li><code class="docutils literal notranslate"><span class="pre">TFolder</span></code>: this are the top level objects in the <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file.</li>
+<li><code class="docutils literal notranslate"><span class="pre">TH1F</span></code>: Hold the μ-decay-histograms.</li>
+<li><code class="docutils literal notranslate"><span class="pre">TObjArray</span></code>: Holding collection of header information.</li>
+<li><code class="docutils literal notranslate"><span class="pre">TObjString</span></code>: Holding the content of any header information.</li>
 </ul>
-<p>Since all these objects are deriving form <tt class="docutils literal"><span class="pre">TObject</span></tt>, they will be directly accessible via the <tt class="docutils literal"><span class="pre">TBrowser</span></tt>-object.
+<p>Since all these objects are deriving form <code class="docutils literal notranslate"><span class="pre">TObject</span></code>, they will be directly accessible via the <code class="docutils literal notranslate"><span class="pre">TBrowser</span></code>-object.
 For instance, the μ-decay-histograms can be directly plotted, are even fitted, out of the box.</p>
 </div>
 <div class="section" id="id1">
 <h2>MusrRoot an Extensible Open File Format for μSR<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>As mentioned before, ROOT files are open-file-format files meaning that they can contain more entries (and most probably will) than the ones specified in the following. The specified ones will be the mandatory ones for all instruments. Before defining all mandatory entries, the MusrRoot file structure shall be sketched.</p>
 <p>The MusrRoot file structure looks like:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>histos ---|
-          |- DecayAnaModule ---|
-          |                    |- hDecay001
-          |                    |- hDecay002
-          |                    ...
-          |
-          |- SCAnaModule ---|
-          ...               |- hSampleTemperature
-                            |- hSampleMagneticField
-                            ...
-RunHeader ---|
-             |- RunInfo
-             |- DetectorInfo ---|
-             |                  |- Detector001
-             |                  |- Detector002
-             |                  ...
-             |
-             |- SampleEnvironmentInfo
-             |- MagneticFieldEnvironmentInfo
-             |- BeamlineInfo
-             ...
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">histos</span> <span class="o">---|</span>
+          <span class="o">|-</span> <span class="n">DecayAnaModule</span> <span class="o">---|</span>
+          <span class="o">|</span>                    <span class="o">|-</span> <span class="n">hDecay001</span>
+          <span class="o">|</span>                    <span class="o">|-</span> <span class="n">hDecay002</span>
+          <span class="o">|</span>                    <span class="o">...</span>
+          <span class="o">|</span>
+          <span class="o">|-</span> <span class="n">SCAnaModule</span> <span class="o">---|</span>
+          <span class="o">...</span>               <span class="o">|-</span> <span class="n">hSampleTemperature</span>
+                            <span class="o">|-</span> <span class="n">hSampleMagneticField</span>
+                            <span class="o">...</span>
+<span class="n">RunHeader</span> <span class="o">---|</span>
+             <span class="o">|-</span> <span class="n">RunInfo</span>
+             <span class="o">|-</span> <span class="n">DetectorInfo</span> <span class="o">---|</span>
+             <span class="o">|</span>                  <span class="o">|-</span> <span class="n">Detector001</span>
+             <span class="o">|</span>                  <span class="o">|-</span> <span class="n">Detector002</span>
+             <span class="o">|</span>                  <span class="o">...</span>
+             <span class="o">|</span>
+             <span class="o">|-</span> <span class="n">SampleEnvironmentInfo</span>
+             <span class="o">|-</span> <span class="n">MagneticFieldEnvironmentInfo</span>
+             <span class="o">|-</span> <span class="n">BeamlineInfo</span>
+             <span class="o">...</span>
 </pre></div>
 </div>
-<p>where <tt class="docutils literal"><span class="pre">hDecay001</span></tt>, etc. are ROOT histograms (to be more specific: <tt class="docutils literal"><span class="pre">TH1F</span></tt>), containing the μSR decay histograms. There can be as many as needed, especially there is no limitation about their length. The histogram object names will be <tt class="docutils literal"><span class="pre">hDecayXXX</span></tt>, where <tt class="docutils literal"><span class="pre">XXX</span></tt> (leading zero int, <em>i.e.</em> <tt class="docutils literal"><span class="pre">%03d</span></tt>
-in <tt class="docutils literal"><span class="pre">C/C++</span></tt> notation, starting with &#8216;1&#8217;) is the histogram number. The title and name of the histogram (see description of the <tt class="docutils literal"><span class="pre">TH1F</span></tt> ROOT class) contains the label of the histogram, like &#8216;top&#8217;, &#8216;forward&#8217;, etc. How many of these histograms are present is accessible through the <tt class="docutils literal"><span class="pre">RunInfo</span></tt> folder in which the necessary header information are found (details see next sections). The folder <tt class="docutils literal"><span class="pre">SCAnaModule</span></tt> contains histograms of some of the slow-control parameters, as for instance the sample temperature versus time, the applied field versus time, etc. Again the label of the histogram will give more specific information about its content.</p>
+<p>where <code class="docutils literal notranslate"><span class="pre">hDecay001</span></code>, etc. are ROOT histograms (to be more specific: <code class="docutils literal notranslate"><span class="pre">TH1F</span></code>), containing the μSR decay histograms. There can be as many as needed, especially there is no limitation about their length. The histogram object names will be <code class="docutils literal notranslate"><span class="pre">hDecayXXX</span></code>, where <code class="docutils literal notranslate"><span class="pre">XXX</span></code> (leading zero int, <em>i.e.</em> <code class="docutils literal notranslate"><span class="pre">%03d</span></code>
+in <code class="docutils literal notranslate"><span class="pre">C/C++</span></code> notation, starting with ‘1’) is the histogram number. The title and name of the histogram (see description of the <code class="docutils literal notranslate"><span class="pre">TH1F</span></code> ROOT class) contains the label of the histogram, like ‘top’, ‘forward’, etc. How many of these histograms are present is accessible through the <code class="docutils literal notranslate"><span class="pre">RunInfo</span></code> folder in which the necessary header information are found (details see next sections). The folder <code class="docutils literal notranslate"><span class="pre">SCAnaModule</span></code> contains histograms of some of the slow-control parameters, as for instance the sample temperature versus time, the applied field versus time, etc. Again the label of the histogram will give more specific information about its content.</p>
 <div class="section" id="run-information-contained-in-runheader">
-<h3>Run Information Contained in <tt class="docutils literal"><span class="pre">RunHeader</span></tt><a class="headerlink" href="#run-information-contained-in-runheader" title="Permalink to this headline">¶</a></h3>
-<p>The <tt class="docutils literal"><span class="pre">RunHeader</span></tt> contains all needed meta-information to describe a μSR-run. The list of the minimal number of required &#8220;folders&#8221; of the <tt class="docutils literal"><span class="pre">RunHeader</span></tt> is given in the following structure:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>RunHeader (TFolder) ---|
-                       |- RunInfo (TObjArray)
-                       |- DetectorInfo (TObjArray)
-                       |- SampleEnvironmentInfo (TObjArray)
-                       |- MagneticFieldEnvironmentInfo (TObjArray)
-                       |- BeamlineInfo (TObjArray)
+<h3>Run Information Contained in <code class="docutils literal notranslate"><span class="pre">RunHeader</span></code><a class="headerlink" href="#run-information-contained-in-runheader" title="Permalink to this headline">¶</a></h3>
+<p>The <code class="docutils literal notranslate"><span class="pre">RunHeader</span></code> contains all needed meta-information to describe a μSR-run. The list of the minimal number of required “folders” of the <code class="docutils literal notranslate"><span class="pre">RunHeader</span></code> is given in the following structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RunHeader</span> <span class="p">(</span><span class="n">TFolder</span><span class="p">)</span> <span class="o">---|</span>
+                       <span class="o">|-</span> <span class="n">RunInfo</span> <span class="p">(</span><span class="n">TObjArray</span><span class="p">)</span>
+                       <span class="o">|-</span> <span class="n">DetectorInfo</span> <span class="p">(</span><span class="n">TObjArray</span><span class="p">)</span>
+                       <span class="o">|-</span> <span class="n">SampleEnvironmentInfo</span> <span class="p">(</span><span class="n">TObjArray</span><span class="p">)</span>
+                       <span class="o">|-</span> <span class="n">MagneticFieldEnvironmentInfo</span> <span class="p">(</span><span class="n">TObjArray</span><span class="p">)</span>
+                       <span class="o">|-</span> <span class="n">BeamlineInfo</span> <span class="p">(</span><span class="n">TObjArray</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>In brackets the object type is given. <tt class="docutils literal"><span class="pre">RunInfo</span></tt> contains most information relevant for the user and will be itemized in <a class="reference internal" href="#musr-root-overview"><em>RunInfo Overview</em></a> and <a class="reference internal" href="#run-info-required"><em>RunInfo Required</em></a>. <tt class="docutils literal"><span class="pre">DetectorInfo</span></tt> contains detector specific information, like detector name, time zero bin, etc. (details is found under <a class="reference internal" href="#detector-info-required"><em>DetectorInfo Required</em></a>). <tt class="docutils literal"><span class="pre">SampleEnvironmentInfo</span></tt> (details under <a class="reference internal" href="#sample-environment-info-required"><em>SampleEnvironmentInfo Required</em></a>), and <tt class="docutils literal"><span class="pre">MagneticFieldEnvironmentInfo</span></tt> (details under <a class="reference internal" href="#magnetic-field-environment-info-required"><em>MagneticFieldEnvironmentInfo Required</em></a>) store additional, more detailed information concerning the sample environment. <tt class="docutils literal"><span class="pre">BeamlineInfo</span></tt> stores beamline relevant information (details under <a class="reference internal" href="#beamline-info-required"><em>BeamlineInfo Required</em></a>).</p>
-<p>Before elaborating more on the required items within this structure, a few words on the ROOT types used here: <tt class="docutils literal"><span class="pre">RunHeader</span></tt> is a <tt class="docutils literal"><span class="pre">TFolder</span></tt> object. All the &#8220;sub-directory&#8221; entries are of type <tt class="docutils literal"><span class="pre">TObjArray</span></tt> and collect items of type <tt class="docutils literal"><span class="pre">TObjString</span></tt> or other <tt class="docutils literal"><span class="pre">TObjArray</span></tt> (<em>i.e.</em> sub-directories and sub-sub-directories, etc.).</p>
+<p>In brackets the object type is given. <code class="docutils literal notranslate"><span class="pre">RunInfo</span></code> contains most information relevant for the user and will be itemized in <a class="reference internal" href="#musr-root-overview"><span class="std std-ref">RunInfo Overview</span></a> and <a class="reference internal" href="#run-info-required"><span class="std std-ref">RunInfo Required</span></a>. <code class="docutils literal notranslate"><span class="pre">DetectorInfo</span></code> contains detector specific information, like detector name, time zero bin, etc. (details is found under <a class="reference internal" href="#detector-info-required"><span class="std std-ref">DetectorInfo Required</span></a>). <code class="docutils literal notranslate"><span class="pre">SampleEnvironmentInfo</span></code> (details under <a class="reference internal" href="#sample-environment-info-required"><span class="std std-ref">SampleEnvironmentInfo Required</span></a>), and <code class="docutils literal notranslate"><span class="pre">MagneticFieldEnvironmentInfo</span></code> (details under <a class="reference internal" href="#magnetic-field-environment-info-required"><span class="std std-ref">MagneticFieldEnvironmentInfo Required</span></a>) store additional, more detailed information concerning the sample environment. <code class="docutils literal notranslate"><span class="pre">BeamlineInfo</span></code> stores beamline relevant information (details under <a class="reference internal" href="#beamline-info-required"><span class="std std-ref">BeamlineInfo Required</span></a>).</p>
+<p>Before elaborating more on the required items within this structure, a few words on the ROOT types used here: <code class="docutils literal notranslate"><span class="pre">RunHeader</span></code> is a <code class="docutils literal notranslate"><span class="pre">TFolder</span></code> object. All the “sub-directory” entries are of type <code class="docutils literal notranslate"><span class="pre">TObjArray</span></code> and collect items of type <code class="docutils literal notranslate"><span class="pre">TObjString</span></code> or other <code class="docutils literal notranslate"><span class="pre">TObjArray</span></code> (<em>i.e.</em> sub-directories and sub-sub-directories, etc.).</p>
 <div class="section" id="runinfo-overview">
-<span id="musr-root-overview"></span><span id="index-1"></span><h4><tt class="docutils literal"><span class="pre">RunInfo</span></tt> Overview<a class="headerlink" href="#runinfo-overview" title="Permalink to this headline">¶</a></h4>
+<span id="musr-root-overview"></span><span id="index-1"></span><h4><code class="docutils literal notranslate"><span class="pre">RunInfo</span></code> Overview<a class="headerlink" href="#runinfo-overview" title="Permalink to this headline">¶</a></h4>
 <table border="1" class="docutils">
 <colgroup>
 <col width="20%" />
@@ -136,122 +272,122 @@ in <tt class="docutils literal"><span class="pre">C/C++</span></tt> notation, st
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>Version</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>GIT version of <tt class="docutils literal"><span class="pre">TMusrRunHeader</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>GIT version of <code class="docutils literal notranslate"><span class="pre">TMusrRunHeader</span></code></td>
 </tr>
 <tr class="row-odd"><td>Generic Validator URL</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>URL of the generic <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> validation xsd-file.</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>URL of the generic <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> validation xsd-file.</td>
 </tr>
 <tr class="row-even"><td>Specific Validator URL</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td>URL of the instrument specific validation xsd-file.</td>
 </tr>
 <tr class="row-odd"><td>Generator</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>Program which wrote the <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file, <em>e.g.</em> <tt class="docutils literal"><span class="pre">nemu_analyzer</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>Program which wrote the <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">nemu_analyzer</span></code></td>
 </tr>
 <tr class="row-even"><td>File Name</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>File name of the <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file, <em>e.g.</em> <tt class="docutils literal"><span class="pre">deltat_tdc_gps_4295.root</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>File name of the <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">deltat_tdc_gps_4295.root</span></code></td>
 </tr>
 <tr class="row-odd"><td>Run Title</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>Run Number</td>
-<td><tt class="docutils literal"><span class="pre">Int_t</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">Int_t</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>Run Start Time</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td>ISO 8601 date time</td>
 </tr>
 <tr class="row-even"><td>Run Stop Time</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td>ISO 8601 date time</td>
 </tr>
 <tr class="row-odd"><td>Run Duration</td>
-<td><tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></td>
 <td>run duration in sec</td>
 </tr>
 <tr class="row-even"><td>Laboratory</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td><em>e.g.</em> PSI</td>
 </tr>
 <tr class="row-odd"><td>Instrument</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td><em>e.g.</em> GPS</td>
 </tr>
 <tr class="row-even"><td>Muon Beam Momentum</td>
-<td><tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></td>
 <td><em>e.g.</em> 28.1 MeV/c</td>
 </tr>
 <tr class="row-odd"><td>Muon Species</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td>positive, or negative muon</td>
 </tr>
 <tr class="row-even"><td>Muon Source</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td><em>e.g.</em> Target E - Low Energy Muons or &#8220;Target M&#8221; ...</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td><em>e.g.</em> Target E - Low Energy Muons or “Target M” …</td>
 </tr>
 <tr class="row-odd"><td>Setup</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>Comment</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>Sample Name</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>Sample Temperature</td>
-<td><tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></td>
 <td><em>e.g.</em> 3.21 +- 0.05 K; SP: 3.2; CF1</td>
 </tr>
 <tr class="row-odd"><td>Sample Magnetic Field</td>
-<td><tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></td>
 <td><em>e.g.</em> 350.002 +- 0.005 G; SP: 350; WXY</td>
 </tr>
 <tr class="row-even"><td>No of Histos</td>
-<td><tt class="docutils literal"><span class="pre">Int_t</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">Int_t</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>Time Resolution</td>
-<td><tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></td>
 <td><em>e.g.</em> 0.1953125 ns</td>
 </tr>
 <tr class="row-even"><td>RedGreen Offsets</td>
-<td><tt class="docutils literal"><span class="pre">TIntVector</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TIntVector</span></code></td>
 <td><em>e.g.</em> 0; 20</td>
 </tr>
 </tbody>
 </table>
-<p>These entries should be clear except for the <tt class="docutils literal"><span class="pre">RedGreen</span> <span class="pre">Offsets</span></tt> and the column &#8220;Internal Type&#8221; which shortly will be discussed before specifying the content of the other required folders.</p>
+<p>These entries should be clear except for the <code class="docutils literal notranslate"><span class="pre">RedGreen</span> <span class="pre">Offsets</span></code> and the column “Internal Type” which shortly will be discussed before specifying the content of the other required folders.</p>
 <ol class="arabic">
-<li><p class="first"><tt class="docutils literal"><span class="pre">RedGreen</span> <span class="pre">Offsets</span></tt>: in case experiments are performed with external stimuli, there will be a collection of related histograms.
+<li><p class="first"><code class="docutils literal notranslate"><span class="pre">RedGreen</span> <span class="pre">Offsets</span></code>: in case experiments are performed with external stimuli, there will be a collection of related histograms.
 For instance for electrical field experiments, there will be histograms for field on/off, doubling the number of needed histograms.
-In order to distinguish them easier in the data file, the <tt class="docutils literal"><span class="pre">RedGreen</span> <span class="pre">Offsets</span></tt> were introduced. One selection of histograms
+In order to distinguish them easier in the data file, the <code class="docutils literal notranslate"><span class="pre">RedGreen</span> <span class="pre">Offsets</span></code> were introduced. One selection of histograms
 (assuming for the moment 8 detectors) will be numbered from 1 to 8 (lets say the field off ones). The other set of histograms
 (field on in this example) will then start with 21 through 28 (see table above). The same will be true for the detector information
-(see <a class="reference internal" href="#detector-info-required"><em>DetectorInfo Required</em></a>). The entry <tt class="docutils literal"><span class="pre">No</span> <span class="pre">of</span> <span class="pre">Histos</span></tt> will only give 8 for the given example,
-meaning that red/green multiplication is defined rather via <tt class="docutils literal"><span class="pre">RedGreen</span> <span class="pre">Offsets</span></tt> than the number of histograms.</p>
+(see <a class="reference internal" href="#detector-info-required"><span class="std std-ref">DetectorInfo Required</span></a>). The entry <code class="docutils literal notranslate"><span class="pre">No</span> <span class="pre">of</span> <span class="pre">Histos</span></code> will only give 8 for the given example,
+meaning that red/green multiplication is defined rather via <code class="docutils literal notranslate"><span class="pre">RedGreen</span> <span class="pre">Offsets</span></code> than the number of histograms.</p>
 </li>
-<li><p class="first">Internal Types: in order to ease the handling of the <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> run header, a class <tt class="docutils literal"><span class="pre">TMusrRunHeader</span></tt> is available which deals
-with it. The &#8220;Internal Type&#8221; specified, corresponds to the internal representation in within this class. In the <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file
-these entries are all saved as browsable ROOT strings (<tt class="docutils literal"><span class="pre">TObjStringv).</span> <span class="pre">The</span> <span class="pre">only</span> <span class="pre">special</span> <span class="pre">type</span> <span class="pre">is</span> <span class="pre">``TMusrRunPhysicalQuantity</span></tt> which
+<li><p class="first">Internal Types: in order to ease the handling of the <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> run header, a class <code class="docutils literal notranslate"><span class="pre">TMusrRunHeader</span></code> is available which deals
+with it. The “Internal Type” specified, corresponds to the internal representation in within this class. In the <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file
+these entries are all saved as browsable ROOT strings (<code class="docutils literal notranslate"><span class="pre">TObjStringv).</span> <span class="pre">The</span> <span class="pre">only</span> <span class="pre">special</span> <span class="pre">type</span> <span class="pre">is</span> <span class="pre">``TMusrRunPhysicalQuantity</span></code> which
 is introduced to deal with physical quantities. They always can be represented in the following way:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>&lt;property name&gt; &lt;value&gt; +- &lt;estimated error&gt; &lt;unit&gt;; SP: &lt;demand&gt;; &lt;description&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="nb">property</span> <span class="n">name</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span> <span class="o">+-</span> <span class="o">&lt;</span><span class="n">estimated</span> <span class="n">error</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">unit</span><span class="o">&gt;</span><span class="p">;</span> <span class="n">SP</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">demand</span><span class="o">&gt;</span><span class="p">;</span> <span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 </li>
 </ol>
-<p>Not all of these values are needed to be given and depending on which are given, the representation in the <tt class="docutils literal"><span class="pre">MusrRootv</span> <span class="pre">file</span> <span class="pre">will</span> <span class="pre">be</span> <span class="pre">different</span> <span class="pre">(handled</span> <span class="pre">by</span> <span class="pre">``TMusrRunHeader</span></tt>). Examples are given in the comment column of the table above. For details see  <a class="reference internal" href="#musr-run-physical-quantity"><em>TMusrRunPhysicalQuantity - Possible Representations</em></a>.</p>
-<p>A mock-up <tt class="docutils literal"><span class="pre">TBrowser</span></tt> print-out would look like the one shown in the following figure. You might notice, that at the end of each entry you find a <tt class="docutils literal"><span class="pre">-&#64;X</span></tt>, where <tt class="docutils literal"><span class="pre">X</span></tt> is a number. This is an encoding of the internal type of the entry and is the price to be payed not using derived types. The next section will explain this in much more detail.</p>
+<p>Not all of these values are needed to be given and depending on which are given, the representation in the <code class="docutils literal notranslate"><span class="pre">MusrRootv</span> <span class="pre">file</span> <span class="pre">will</span> <span class="pre">be</span> <span class="pre">different</span> <span class="pre">(handled</span> <span class="pre">by</span> <span class="pre">``TMusrRunHeader</span></code>). Examples are given in the comment column of the table above. For details see  <a class="reference internal" href="#musr-run-physical-quantity"><span class="std std-ref">TMusrRunPhysicalQuantity - Possible Representations</span></a>.</p>
+<p>A mock-up <code class="docutils literal notranslate"><span class="pre">TBrowser</span></code> print-out would look like the one shown in the following figure. You might notice, that at the end of each entry you find a <code class="docutils literal notranslate"><span class="pre">-&#64;X</span></code>, where <code class="docutils literal notranslate"><span class="pre">X</span></code> is a number. This is an encoding of the internal type of the entry and is the price to be payed not using derived types. The next section will explain this in much more detail.</p>
 <img alt="_images/MusrRoot-RunInfo.png" src="_images/MusrRoot-RunInfo.png" />
-<p><tt class="docutils literal"><span class="pre">TMusrRunHeader</span></tt> mock up. The red shaded entries are of type <tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></p>
+<p><code class="docutils literal notranslate"><span class="pre">TMusrRunHeader</span></code> mock up. The red shaded entries are of type <code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></p>
 </div>
 </div>
 </div>
@@ -263,35 +399,35 @@ is introduced to deal with physical quantities. They always can be represented i
 is derived which is extending the base class to the needs of the instrument.</li>
 <li>The base class is defined in a more abstract way, and some external, text-based description is given which defines the details of the instrument.</li>
 </ul>
-<p>Even though the first approach is very clean, it would mean a lot of maintenance work. The 2nd approach is slightly more demanding for the handling class (<tt class="docutils literal"><span class="pre">TMusrRunHeader</span></tt> and helper classes), but having the advantage of easy maintainability and expandability. The idea is that all header information can be classified into 7 groups (see previous and following section(s))</p>
+<p>Even though the first approach is very clean, it would mean a lot of maintenance work. The 2nd approach is slightly more demanding for the handling class (<code class="docutils literal notranslate"><span class="pre">TMusrRunHeader</span></code> and helper classes), but having the advantage of easy maintainability and expandability. The idea is that all header information can be classified into 7 groups (see previous and following section(s))</p>
 <ol class="arabic simple">
-<li>Strings, represented by <tt class="docutils literal"><span class="pre">TString</span></tt></li>
-<li>Integers, represented by <tt class="docutils literal"><span class="pre">Int_t</span></tt></li>
-<li>Floating point numbers, represented by <tt class="docutils literal"><span class="pre">Double_t</span></tt></li>
-<li>Physical quantities, represented by <a class="reference internal" href="#musr-run-physical-quantity"><em>TMusrRunPhysicalQuantity - Possible Representations</em></a></li>
-<li>Collection of strings, represented by <tt class="docutils literal"><span class="pre">TStringVector</span></tt></li>
-<li>Collection of integers, represented by <tt class="docutils literal"><span class="pre">TIntVector</span></tt></li>
-<li>Collection of floating point numbers, represented by <tt class="docutils literal"><span class="pre">TDoubleVector</span></tt></li>
+<li>Strings, represented by <code class="docutils literal notranslate"><span class="pre">TString</span></code></li>
+<li>Integers, represented by <code class="docutils literal notranslate"><span class="pre">Int_t</span></code></li>
+<li>Floating point numbers, represented by <code class="docutils literal notranslate"><span class="pre">Double_t</span></code></li>
+<li>Physical quantities, represented by <a class="reference internal" href="#musr-run-physical-quantity"><span class="std std-ref">TMusrRunPhysicalQuantity - Possible Representations</span></a></li>
+<li>Collection of strings, represented by <code class="docutils literal notranslate"><span class="pre">TStringVector</span></code></li>
+<li>Collection of integers, represented by <code class="docutils literal notranslate"><span class="pre">TIntVector</span></code></li>
+<li>Collection of floating point numbers, represented by <code class="docutils literal notranslate"><span class="pre">TDoubleVector</span></code></li>
 </ol>
-<p>These properties can be collected by themselves in form of vectors. This way any needed information can be written into the ROOT file. The class <tt class="docutils literal"><span class="pre">TMusrRunHeader</span></tt> is implementing this run header concept. In following section code snippets will be discussed, showing how this is used on level of the <tt class="docutils literal"><span class="pre">MIDAS</span></tt> analyzer, <tt class="docutils literal"><span class="pre">musrfit</span></tt> reader routine, and <tt class="docutils literal"><span class="pre">any2many</span></tt> conversion routines. The section <a class="reference internal" href="#musr-root-validation"><em>Validation</em></a> will discuss how to validate <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> files.</p>
+<p>These properties can be collected by themselves in form of vectors. This way any needed information can be written into the ROOT file. The class <code class="docutils literal notranslate"><span class="pre">TMusrRunHeader</span></code> is implementing this run header concept. In following section code snippets will be discussed, showing how this is used on level of the <code class="docutils literal notranslate"><span class="pre">MIDAS</span></code> analyzer, <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> reader routine, and <code class="docutils literal notranslate"><span class="pre">any2many</span></code> conversion routines. The section <a class="reference internal" href="#musr-root-validation"><span class="std std-ref">Validation</span></a> will discuss how to validate <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> files.</p>
 <div class="section" id="user-interface-for-musrroot-run-header">
 <h3>User Interface for MusrRoot Run Header<a class="headerlink" href="#user-interface-for-musrroot-run-header" title="Permalink to this headline">¶</a></h3>
-<p>There are two things needed to deal with the <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> run header, namely writing it and reading it. I will start with the writing as will be done in the <tt class="docutils literal"><span class="pre">MIDAS</span></tt> analyzer.</p>
+<p>There are two things needed to deal with the <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> run header, namely writing it and reading it. I will start with the writing as will be done in the <code class="docutils literal notranslate"><span class="pre">MIDAS</span></code> analyzer.</p>
 <div class="section" id="writing-a-musrroot-run-header">
 <h4>Writing a MusrRoot Run Header<a class="headerlink" href="#writing-a-musrroot-run-header" title="Permalink to this headline">¶</a></h4>
-<p>An example program <tt class="docutils literal"><span class="pre">write_musrRoot_runHeader</span></tt> which is writing a full run header is part of the <tt class="docutils literal"><span class="pre">musrfit</span></tt> package. Here I will concentrate just on the most essential parts. First one needs an instance of <tt class="docutils literal"><span class="pre">TMusrRunHeader</span></tt></p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">TMusrRunHeader</span> <span class="o">*</span><span class="n">header</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TMusrRunHeader</span><span class="p">();</span>
+<p>An example program <code class="docutils literal notranslate"><span class="pre">write_musrRoot_runHeader</span></code> which is writing a full run header is part of the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> package. Here I will concentrate just on the most essential parts. First one needs an instance of <code class="docutils literal notranslate"><span class="pre">TMusrRunHeader</span></code></p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">TMusrRunHeader</span> <span class="o">*</span><span class="n">header</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TMusrRunHeader</span><span class="p">();</span>
 <span class="n">TMusrRunPhysicalQuantity</span> <span class="n">prop</span><span class="p">;</span>
 </pre></div>
 </div>
-<p><tt class="docutils literal"><span class="pre">header</span></tt> is the instance of <tt class="docutils literal"><span class="pre">TMusrRunHeader</span></tt>. <tt class="docutils literal"><span class="pre">prop</span></tt> is an instance of <tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt> which will be needed further down in the description. In the next step some run header entries will be added</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;RunInfo/File Name&quot;</span><span class="p">,</span> <span class="s">&quot;deltat_tdc_gps_2871.root&quot;</span><span class="p">);</span>
+<p><code class="docutils literal notranslate"><span class="pre">header</span></code> is the instance of <code class="docutils literal notranslate"><span class="pre">TMusrRunHeader</span></code>. <code class="docutils literal notranslate"><span class="pre">prop</span></code> is an instance of <code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code> which will be needed further down in the description. In the next step some run header entries will be added</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;RunInfo/File Name&quot;</span><span class="p">,</span> <span class="s">&quot;deltat_tdc_gps_2871.root&quot;</span><span class="p">);</span>
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;RunInfo/Run Title&quot;</span><span class="p">,</span> <span class="s">&quot;here comes the run title&quot;</span><span class="p">);</span>
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;RunInfo/Run Number&quot;</span><span class="p">,</span> <span class="mi">2871</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Adding information is done via the multiple overloaded <tt class="docutils literal"><span class="pre">Set(&lt;pathName&gt;,&lt;value&gt;)</span></tt> method. Here <tt class="docutils literal"><span class="pre">&lt;pathName&gt;</span></tt> is a string representing the &#8220;path&#8221; like representation in the <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file structure, followed by the &#8220;value&#8221; to be set, <em>e.g.</em> &#8220;=File Name=&#8221;. <tt class="docutils literal"><span class="pre">&lt;value&gt;</span></tt> can be any of the types listed at the beginning of <a class="reference internal" href="#musr-run-header-concept"><em>Sec. TMusrRunHeader Concept</em></a>. Here a few examples how to set <tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt>.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;Sample Temperature&quot;</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">,</span> <span class="mf">3.21</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s">&quot;K&quot;</span><span class="p">,</span> <span class="s">&quot;CF1&quot;</span><span class="p">);</span>
+<p>Adding information is done via the multiple overloaded <code class="docutils literal notranslate"><span class="pre">Set(&lt;pathName&gt;,&lt;value&gt;)</span></code> method. Here <code class="docutils literal notranslate"><span class="pre">&lt;pathName&gt;</span></code> is a string representing the “path” like representation in the <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file structure, followed by the “value” to be set, <em>e.g.</em> “=File Name=”. <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code> can be any of the types listed at the beginning of <a class="reference internal" href="#musr-run-header-concept"><span class="std std-ref">Sec. TMusrRunHeader Concept</span></a>. Here a few examples how to set <code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code>.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;Sample Temperature&quot;</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">,</span> <span class="mf">3.21</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="s">&quot;K&quot;</span><span class="p">,</span> <span class="s">&quot;CF1&quot;</span><span class="p">);</span>
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;RunInfo/Sample Temperature&quot;</span><span class="p">,</span> <span class="n">prop</span><span class="p">);</span>
 
 <span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;Time Resolution&quot;</span><span class="p">,</span> <span class="mf">0.1953125</span><span class="p">,</span> <span class="s">&quot;ns&quot;</span><span class="p">,</span> <span class="s">&quot;TDC 9999&quot;</span><span class="p">);</span>
@@ -301,13 +437,13 @@ is derived which is extending the base class to the needs of the instrument.</li
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;SampleEnvironmentInfo/CF3&quot;</span><span class="p">,</span> <span class="n">prop</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Here <tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt> objects are fed via the use of the overloaded set-method. For details see <a class="reference internal" href="#musr-run-physical-quantity"><em>TMusrRunPhysicalQuantity - Possible Representations</em></a>.</p>
-<p>To set some property within &#8220;sub-sub-directories&#8221; it would like this:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;DetectorInfo/Detector001/Time Zero Bin&quot;</span><span class="p">,</span> <span class="mf">3419.0</span><span class="p">);</span>
+<p>Here <code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code> objects are fed via the use of the overloaded set-method. For details see <a class="reference internal" href="#musr-run-physical-quantity"><span class="std std-ref">TMusrRunPhysicalQuantity - Possible Representations</span></a>.</p>
+<p>To set some property within “sub-sub-directories” it would like this:</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;DetectorInfo/Detector001/Time Zero Bin&quot;</span><span class="p">,</span> <span class="mf">3419.0</span><span class="p">);</span>
 </pre></div>
 </div>
 <p>To write the whole run header into a file would look something like this:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">TFile</span> <span class="o">*</span><span class="n">f</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TFile</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s">&quot;RECREATE&quot;</span><span class="p">,</span> <span class="s">&quot;write_musrRoot_runHeader&quot;</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">TFile</span> <span class="o">*</span><span class="n">f</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TFile</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s">&quot;RECREATE&quot;</span><span class="p">,</span> <span class="s">&quot;write_musrRoot_runHeader&quot;</span><span class="p">);</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">IsZombie</span><span class="p">())</span> <span class="p">{</span>
   <span class="k">delete</span> <span class="n">f</span><span class="p">;</span>
   <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
@@ -327,8 +463,8 @@ is derived which is extending the base class to the needs of the instrument.</li
 </div>
 <div class="section" id="reading-a-musrroot-run-header">
 <h4>Reading a MusrRoot Run Header<a class="headerlink" href="#reading-a-musrroot-run-header" title="Permalink to this headline">¶</a></h4>
-<p>The following code snippet shows how the extract the full run header from the <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file.</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">TFile</span> <span class="o">*</span><span class="n">f</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TFile</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s">&quot;READ&quot;</span><span class="p">,</span> <span class="s">&quot;read_musrRoot_runHeader&quot;</span><span class="p">);</span>
+<p>The following code snippet shows how the extract the full run header from the <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">TFile</span> <span class="o">*</span><span class="n">f</span> <span class="o">=</span> <span class="k">new</span> <span class="n">TFile</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="s">&quot;READ&quot;</span><span class="p">,</span> <span class="s">&quot;read_musrRoot_runHeader&quot;</span><span class="p">);</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">f</span><span class="o">-&gt;</span><span class="n">IsZombie</span><span class="p">())</span> <span class="p">{</span>
   <span class="k">delete</span> <span class="n">f</span><span class="p">;</span>
   <span class="k">return</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
@@ -354,8 +490,8 @@ is derived which is extending the base class to the needs of the instrument.</li
 <span class="k">delete</span> <span class="n">f</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>The routine <tt class="docutils literal"><span class="pre">ExtractAll(TFolder</span> <span class="pre">*runHeader)</span></tt> decodes all the <tt class="docutils literal"><span class="pre">TObjString</span></tt> objects and fills internal data structures. This means when reading a MusrRoot -file the above handling is always needed. After the <tt class="docutils literal"><span class="pre">ExtractAll</span></tt> call, parameters can be extracted via the getter routines available. For instance to read the Run Number, the code would look like</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">Bool_t</span> <span class="n">ok</span><span class="p">;</span>
+<p>The routine <code class="docutils literal notranslate"><span class="pre">ExtractAll(TFolder</span> <span class="pre">*runHeader)</span></code> decodes all the <code class="docutils literal notranslate"><span class="pre">TObjString</span></code> objects and fills internal data structures. This means when reading a MusrRoot -file the above handling is always needed. After the <code class="docutils literal notranslate"><span class="pre">ExtractAll</span></code> call, parameters can be extracted via the getter routines available. For instance to read the Run Number, the code would look like</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">Bool_t</span> <span class="n">ok</span><span class="p">;</span>
 <span class="n">Int_t</span> <span class="n">ival</span><span class="p">;</span>
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Get</span><span class="p">(</span><span class="s">&quot;RunInfo/Run Number&quot;</span><span class="p">,</span> <span class="n">ival</span><span class="p">,</span> <span class="n">ok</span><span class="p">);</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">ok</span><span class="p">)</span>
@@ -364,8 +500,8 @@ is derived which is extending the base class to the needs of the instrument.</li
   <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span> <span class="o">&lt;&lt;</span> <span class="s">&quot;**ERROR** Couldn&#39;t obtain the &#39;Run Number&#39;.&quot;</span><span class="p">;</span>
 </pre></div>
 </div>
-<p>Reading a <tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt> object, <em>e.g.</em> the sample temperature looks like this</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">TMusrRunPhysicalQuantity</span> <span class="n">prop</span><span class="p">;</span>
+<p>Reading a <code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code> object, <em>e.g.</em> the sample temperature looks like this</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">TMusrRunPhysicalQuantity</span> <span class="n">prop</span><span class="p">;</span>
 
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Get</span><span class="p">(</span><span class="s">&quot;RunInfo/Sample Temperature&quot;</span><span class="p">,</span> <span class="n">prop</span><span class="p">,</span> <span class="n">ok</span><span class="p">);</span>
 <span class="k">if</span> <span class="p">(</span><span class="n">ok</span><span class="p">)</span> <span class="p">{</span>
@@ -381,22 +517,22 @@ is derived which is extending the base class to the needs of the instrument.</li
 </div>
 <div class="section" id="validation-of-a-musrroot-file">
 <span id="musr-root-validation"></span><span id="index-2"></span><h3>Validation of a MusrRoot File<a class="headerlink" href="#validation-of-a-musrroot-file" title="Permalink to this headline">¶</a></h3>
-<p>Since <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> is an open and extensible file format a mechanism is needed to validate that a given file is indeed holding the minimum of required entries. To check this the following scheme is implemented in the program <tt class="docutils literal"><span class="pre">musrRootValidation</span></tt>:</p>
+<p>Since <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> is an open and extensible file format a mechanism is needed to validate that a given file is indeed holding the minimum of required entries. To check this the following scheme is implemented in the program <code class="docutils literal notranslate"><span class="pre">musrRootValidation</span></code>:</p>
 <img alt="_images/MusrRootValidationScheme.png" src="_images/MusrRootValidationScheme.png" />
-<p><tt class="docutils literal"><span class="pre">MusrRoot</span></tt> validation scheme</p>
-<p>In the following this validation scheme will be discussed as it is implemented in <tt class="docutils literal"><span class="pre">musrRootValidation</span></tt>:</p>
+<p><code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> validation scheme</p>
+<p>In the following this validation scheme will be discussed as it is implemented in <code class="docutils literal notranslate"><span class="pre">musrRootValidation</span></code>:</p>
 <ol class="arabic simple">
-<li>It is checked if the given file name is a <tt class="docutils literal"><span class="pre">TFile</span></tt></li>
+<li>It is checked if the given file name is a <code class="docutils literal notranslate"><span class="pre">TFile</span></code></li>
 <li>The file structure is recursively parsed and mapped into an temporary XML file. XML is used
 since there are ample of parser and validation frameworks at hand. For details check any decent
-book about XML. Here the <tt class="docutils literal"><span class="pre">libxml2</span></tt> is used, because also ROOT is requiring it.</li>
-<li>In a next step the XML file (holding the structure of the supposed <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file is validated
-against a XML schema. The minimum of required entries is described by <tt class="docutils literal"><span class="pre">MusrRoot.xsd</span></tt> which is
-part of <tt class="docutils literal"><span class="pre">musrfit</span></tt> but also available from the PSI/LMU web-page.</li>
+book about XML. Here the <code class="docutils literal notranslate"><span class="pre">libxml2</span></code> is used, because also ROOT is requiring it.</li>
+<li>In a next step the XML file (holding the structure of the supposed <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file is validated
+against a XML schema. The minimum of required entries is described by <code class="docutils literal notranslate"><span class="pre">MusrRoot.xsd</span></code> which is
+part of <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> but also available from the PSI/LMU web-page.</li>
 <li>If the schema validation is successful additional semantic checks (like is the number of decay
 histograms the same as the number of detector entries, etc.) will be preformed.</li>
 </ol>
-<p>This validation scheme is useful for people which define instrument specific extensions of the base <tt class="docutils literal"><span class="pre">MusrRoot</span></tt>, as for instance the LEM instrument at PSI. It is also useful for people writing file converters in order to cross check if the generated file is valid.</p>
+<p>This validation scheme is useful for people which define instrument specific extensions of the base <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code>, as for instance the LEM instrument at PSI. It is also useful for people writing file converters in order to cross check if the generated file is valid.</p>
 </div>
 </div>
 <div class="section" id="runinfo-required">
@@ -415,97 +551,97 @@ histograms the same as the number of detector entries, etc.) will be preformed.<
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>Version</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>GIT version of <tt class="docutils literal"><span class="pre">TMusrRunHeader</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>GIT version of <code class="docutils literal notranslate"><span class="pre">TMusrRunHeader</span></code></td>
 </tr>
 <tr class="row-odd"><td>Generic Validator URL</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>URL of the generic <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> validation xsd-file.
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>URL of the generic <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> validation xsd-file.
 <em>e.g.</em> <a class="reference external" href="http://lmu.web.psi.ch/facilities/software/MusrRoot/Validation/MusrRoot.xsd">http://lmu.web.psi.ch/facilities/software/MusrRoot/Validation/MusrRoot.xsd</a></td>
 </tr>
 <tr class="row-even"><td>Specific Validator URL</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td>URL of the instrument specific validation xsd-file.
 <em>e.g.</em> for LEM: <a class="reference external" href="http://lmu.web.psi.ch/facilities/software/MusrRoot/Validation/MusrRootLEM.xsd">http://lmu.web.psi.ch/facilities/software/MusrRoot/Validation/MusrRootLEM.xsd</a></td>
 </tr>
 <tr class="row-odd"><td>Generator</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>Program which wrote the <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file, <em>e.g.</em> <tt class="docutils literal"><span class="pre">nemu_analyzer</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>Program which wrote the <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">nemu_analyzer</span></code></td>
 </tr>
 <tr class="row-even"><td>File Name</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>File name of the <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file, <em>e.g.</em> <tt class="docutils literal"><span class="pre">deltat_tdc_gps_4295.root</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>File name of the <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">deltat_tdc_gps_4295.root</span></code></td>
 </tr>
 <tr class="row-odd"><td>Run Title</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>Run Number</td>
-<td><tt class="docutils literal"><span class="pre">Int_t</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">Int_t</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>Run Start Time</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td>ISO 8601 date time</td>
 </tr>
 <tr class="row-even"><td>Run Stop Time</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td>ISO 8601 date time</td>
 </tr>
 <tr class="row-odd"><td>Run Duration</td>
-<td><tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></td>
 <td>run duration in sec</td>
 </tr>
 <tr class="row-even"><td>Laboratory</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td><em>e.g.</em> PSI</td>
 </tr>
 <tr class="row-odd"><td>Instrument</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td><em>e.g.</em> GPS</td>
 </tr>
 <tr class="row-even"><td>Muon Beam Momentum</td>
-<td><tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></td>
 <td><em>e.g.</em> 28.1 MeV/c</td>
 </tr>
 <tr class="row-odd"><td>Muon Species</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td>poitive or negative muon</td>
 </tr>
 <tr class="row-even"><td>Muon Source</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td><em>e.g.</em> &#8220;Target E - Low Energy Muons&#8221; or &#8220;Target M&#8221; ...</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td><em>e.g.</em> “Target E - Low Energy Muons” or “Target M” …</td>
 </tr>
 <tr class="row-odd"><td>Setup</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>Comment</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>Sample Name</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-even"><td>Sample Temperature</td>
-<td><tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></td>
 <td><em>e.g.</em> 3.21 +- 0.05 K; SP: 3.2; CF1</td>
 </tr>
 <tr class="row-odd"><td>Sample Magnetic Field</td>
-<td><tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></td>
 <td><em>e.g.</em> 350.002 +- 0.005 G; SP: 350; WEW</td>
 </tr>
 <tr class="row-even"><td>No of Histos</td>
-<td><tt class="docutils literal"><span class="pre">Int_t</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">Int_t</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>Time Resolution</td>
-<td><tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code></td>
 <td><em>e.g.</em> 0.1953125 ns</td>
 </tr>
 <tr class="row-even"><td>RedGreen Offsets</td>
-<td><tt class="docutils literal"><span class="pre">TIntVector</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TIntVector</span></code></td>
 <td><em>e.g.</em> 0; 20</td>
 </tr>
 </tbody>
@@ -513,16 +649,16 @@ histograms the same as the number of detector entries, etc.) will be preformed.<
 </div>
 <div class="section" id="detectorinfo-required">
 <span id="detector-info-required"></span><h2>DetectorInfo (Required)<a class="headerlink" href="#detectorinfo-required" title="Permalink to this headline">¶</a></h2>
-<p>The <tt class="docutils literal"><span class="pre">DetectorInfo</span></tt> is organized in a sub-tree like</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>DetectorInfo ---|
-                |- Detector001
-                |- Detector002
-                ...
+<p>The <code class="docutils literal notranslate"><span class="pre">DetectorInfo</span></code> is organized in a sub-tree like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DetectorInfo</span> <span class="o">---|</span>
+                <span class="o">|-</span> <span class="n">Detector001</span>
+                <span class="o">|-</span> <span class="n">Detector002</span>
+                <span class="o">...</span>
 </pre></div>
 </div>
-<p>For each histogram in the <tt class="docutils literal"><span class="pre">histos/DecayAnaModule</span></tt> corresponds detector entry here.</p>
-<p>The numbering of the detectors has to correspond the its histogram, <em>e.g.</em> <tt class="docutils literal"><span class="pre">hDecay023</span> <span class="pre">&lt;=&gt;</span> <span class="pre">Detector023</span></tt>, <em>i.e.</em> potentially discontinuous to show red / green breaks.</p>
-<p><tt class="docutils literal"><span class="pre">Detector&lt;XXX&gt;</span></tt> has the elements</p>
+<p>For each histogram in the <code class="docutils literal notranslate"><span class="pre">histos/DecayAnaModule</span></code> corresponds detector entry here.</p>
+<p>The numbering of the detectors has to correspond the its histogram, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">hDecay023</span> <span class="pre">&lt;=&gt;</span> <span class="pre">Detector023</span></code>, <em>i.e.</em> potentially discontinuous to show red / green breaks.</p>
+<p><code class="docutils literal notranslate"><span class="pre">Detector&lt;XXX&gt;</span></code> has the elements</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="22%" />
@@ -537,30 +673,30 @@ histograms the same as the number of detector entries, etc.) will be preformed.<
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>Name</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
 <td>detector name, <em>e.g.</em> Left-NPP</td>
 </tr>
 <tr class="row-odd"><td>Histo Number</td>
-<td><tt class="docutils literal"><span class="pre">Int_t</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">Int_t</span></code></td>
 <td>histogram number. This number corresponds to the histogram
-number in the <tt class="docutils literal"><span class="pre">histos/DecayAnaModule</span></tt> sub-tree.</td>
+number in the <code class="docutils literal notranslate"><span class="pre">histos/DecayAnaModule</span></code> sub-tree.</td>
 </tr>
 <tr class="row-even"><td>Histo Length</td>
-<td><tt class="docutils literal"><span class="pre">Int_t</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">Int_t</span></code></td>
 <td>length of the histogram (in bins)</td>
 </tr>
 <tr class="row-odd"><td>Time Zero Bin</td>
-<td><tt class="docutils literal"><span class="pre">Double_t</span></tt></td>
-<td>The type is <tt class="docutils literal"><span class="pre">Double_t</span></tt> since for the high-field spectrometer
-at PSI an <tt class="docutils literal"><span class="pre">Int_t</span></tt> representation would be not good enough.</td>
+<td><code class="docutils literal notranslate"><span class="pre">Double_t</span></code></td>
+<td>The type is <code class="docutils literal notranslate"><span class="pre">Double_t</span></code> since for the high-field spectrometer
+at PSI an <code class="docutils literal notranslate"><span class="pre">Int_t</span></code> representation would be not good enough.</td>
 </tr>
 <tr class="row-even"><td>First Good Bin</td>
-<td><tt class="docutils literal"><span class="pre">Int_t</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">Int_t</span></code></td>
+<td>&#160;</td>
 </tr>
 <tr class="row-odd"><td>Last Good Bin</td>
-<td><tt class="docutils literal"><span class="pre">Int_t</span></tt></td>
-<td>&nbsp;</td>
+<td><code class="docutils literal notranslate"><span class="pre">Int_t</span></code></td>
+<td>&#160;</td>
 </tr>
 </tbody>
 </table>
@@ -582,8 +718,8 @@ at PSI an <tt class="docutils literal"><span class="pre">Int_t</span></tt> repre
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>Cryo</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>name of the used cryostat/oven, <em>e.g.</em> <tt class="docutils literal"><span class="pre">Konti-2</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>name of the used cryostat/oven, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">Konti-2</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -605,8 +741,8 @@ at PSI an <tt class="docutils literal"><span class="pre">Int_t</span></tt> repre
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>Magnet Name</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>name of the used magnet, <em>e.g.</em> <tt class="docutils literal"><span class="pre">WEW</span></tt>.
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>name of the used magnet, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">WEW</span></code>.
 In case of ZF measurements, there might be an entry like ZF.</td>
 </tr>
 </tbody>
@@ -629,8 +765,8 @@ In case of ZF measurements, there might be an entry like ZF.</td>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>Name</td>
-<td><tt class="docutils literal"><span class="pre">TString</span></tt></td>
-<td>name of the beamline, <em>e.g.</em> <tt class="docutils literal"><span class="pre">piM3.2</span></tt></td>
+<td><code class="docutils literal notranslate"><span class="pre">TString</span></code></td>
+<td>name of the beamline, <em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">piM3.2</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -638,49 +774,49 @@ In case of ZF measurements, there might be an entry like ZF.</td>
 <div class="section" id="exhaustive-musrroot-tree-including-everything-required">
 <h2>Exhaustive MusrRoot Tree Including Everything Required<a class="headerlink" href="#exhaustive-musrroot-tree-including-everything-required" title="Permalink to this headline">¶</a></h2>
 <p>Here it is assumed that there are hypothetical <em>red / green data</em> with electric field on/off and light on/off,
-and hence 4 data sets per detector, and 8 detectors of the instrument: <tt class="docutils literal"><span class="pre">left/forward</span></tt>, <tt class="docutils literal"><span class="pre">top/forward</span></tt>, <tt class="docutils literal"><span class="pre">right/forward</span></tt>,
-<tt class="docutils literal"><span class="pre">bottom/forward</span></tt>, <tt class="docutils literal"><span class="pre">left/backward</span></tt>, <tt class="docutils literal"><span class="pre">top/backward</span></tt>, <tt class="docutils literal"><span class="pre">right/backward</span></tt>, <tt class="docutils literal"><span class="pre">bottom/backward</span></tt>. To show the whole
+and hence 4 data sets per detector, and 8 detectors of the instrument: <code class="docutils literal notranslate"><span class="pre">left/forward</span></code>, <code class="docutils literal notranslate"><span class="pre">top/forward</span></code>, <code class="docutils literal notranslate"><span class="pre">right/forward</span></code>,
+<code class="docutils literal notranslate"><span class="pre">bottom/forward</span></code>, <code class="docutils literal notranslate"><span class="pre">left/backward</span></code>, <code class="docutils literal notranslate"><span class="pre">top/backward</span></code>, <code class="docutils literal notranslate"><span class="pre">right/backward</span></code>, <code class="docutils literal notranslate"><span class="pre">bottom/backward</span></code>. To show the whole
 tree structure, it will be split in the representation afterwards, but keep in mind: this will be all part of a
-single <tt class="docutils literal"><span class="pre">MusrRoot</span></tt> file. I will add comments in the tree structure by the symbol <tt class="docutils literal"><span class="pre">#</span></tt>. Lets start with the μSR data histograms:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>histos -|
-        |- DecayAnaModule -|
-                           |- hDecay001 # left/forward, electric field off, light off
-                           |- hDecay002 # top/forward, electric field off, light off
-                           |- hDecay003 # right/forward, electric field off, light off
-                           |- hDecay004 # bottom/forward, electric field off, light off
-                           ...
-                           |- hDecay007 # right/backward, electric field off, light off
-                           |- hDecay008 # bottom/backward, electric field off, light off
-                           |- hDecay011 # left/forward, electric field on, light off
-                           |- hDecay012 # top/forward, electric field on, light off
-                           |- hDecay013 # right/forward, electric field on, light off
-                           |- hDecay014 # bottom/forward, electric field on, light off
-                           ...
-                           |- hDecay017 # right/backward, electric field on, light off
-                           |- hDecay018 # bottom/backward, electric field on, light off
-                           |- hDecay021 # left/forward, electric field off, light on
-                           |- hDecay022 # top/forward, electric field off, light on
-                           |- hDecay023 # right/forward, electric field off, light on
-                           |- hDecay024 # bottom/forward, electric field off, light on
-                           ...
-                           |- hDecay027 # right/backward, electric field off, light on
-                           |- hDecay028 # bottom/backward, electric field off, light on
-                           |- hDecay031 # left/forward, electric field on, light on
-                           |- hDecay032 # top/forward, electric field on, light on
-                           |- hDecay033 # right/forward, electric field on, light on
-                           |- hDecay034 # bottom/forward, electric field on, light on
-                           ...
-                           |- hDecay037 # right/backward, electric field on, light on
-                           |- hDecay038 # bottom/backward, electric field on, light on
-                           ...
+single <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code> file. I will add comments in the tree structure by the symbol <code class="docutils literal notranslate"><span class="pre">#</span></code>. Lets start with the μSR data histograms:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">histos</span> <span class="o">-|</span>
+        <span class="o">|-</span> <span class="n">DecayAnaModule</span> <span class="o">-|</span>
+                           <span class="o">|-</span> <span class="n">hDecay001</span> <span class="c1"># left/forward, electric field off, light off</span>
+                           <span class="o">|-</span> <span class="n">hDecay002</span> <span class="c1"># top/forward, electric field off, light off</span>
+                           <span class="o">|-</span> <span class="n">hDecay003</span> <span class="c1"># right/forward, electric field off, light off</span>
+                           <span class="o">|-</span> <span class="n">hDecay004</span> <span class="c1"># bottom/forward, electric field off, light off</span>
+                           <span class="o">...</span>
+                           <span class="o">|-</span> <span class="n">hDecay007</span> <span class="c1"># right/backward, electric field off, light off</span>
+                           <span class="o">|-</span> <span class="n">hDecay008</span> <span class="c1"># bottom/backward, electric field off, light off</span>
+                           <span class="o">|-</span> <span class="n">hDecay011</span> <span class="c1"># left/forward, electric field on, light off</span>
+                           <span class="o">|-</span> <span class="n">hDecay012</span> <span class="c1"># top/forward, electric field on, light off</span>
+                           <span class="o">|-</span> <span class="n">hDecay013</span> <span class="c1"># right/forward, electric field on, light off</span>
+                           <span class="o">|-</span> <span class="n">hDecay014</span> <span class="c1"># bottom/forward, electric field on, light off</span>
+                           <span class="o">...</span>
+                           <span class="o">|-</span> <span class="n">hDecay017</span> <span class="c1"># right/backward, electric field on, light off</span>
+                           <span class="o">|-</span> <span class="n">hDecay018</span> <span class="c1"># bottom/backward, electric field on, light off</span>
+                           <span class="o">|-</span> <span class="n">hDecay021</span> <span class="c1"># left/forward, electric field off, light on</span>
+                           <span class="o">|-</span> <span class="n">hDecay022</span> <span class="c1"># top/forward, electric field off, light on</span>
+                           <span class="o">|-</span> <span class="n">hDecay023</span> <span class="c1"># right/forward, electric field off, light on</span>
+                           <span class="o">|-</span> <span class="n">hDecay024</span> <span class="c1"># bottom/forward, electric field off, light on</span>
+                           <span class="o">...</span>
+                           <span class="o">|-</span> <span class="n">hDecay027</span> <span class="c1"># right/backward, electric field off, light on</span>
+                           <span class="o">|-</span> <span class="n">hDecay028</span> <span class="c1"># bottom/backward, electric field off, light on</span>
+                           <span class="o">|-</span> <span class="n">hDecay031</span> <span class="c1"># left/forward, electric field on, light on</span>
+                           <span class="o">|-</span> <span class="n">hDecay032</span> <span class="c1"># top/forward, electric field on, light on</span>
+                           <span class="o">|-</span> <span class="n">hDecay033</span> <span class="c1"># right/forward, electric field on, light on</span>
+                           <span class="o">|-</span> <span class="n">hDecay034</span> <span class="c1"># bottom/forward, electric field on, light on</span>
+                           <span class="o">...</span>
+                           <span class="o">|-</span> <span class="n">hDecay037</span> <span class="c1"># right/backward, electric field on, light on</span>
+                           <span class="o">|-</span> <span class="n">hDecay038</span> <span class="c1"># bottom/backward, electric field on, light on</span>
+                           <span class="o">...</span>
 </pre></div>
 </div>
 <p><em>Comments</em>: as can be seen the histograms are continuous numbered until there is a red / green mode switch where
-the histogram number &#8220;jumps&#8221; (<em>e.g.</em> from <tt class="docutils literal"><span class="pre">008</span></tt> to <tt class="docutils literal"><span class="pre">011</span></tt>). In order to fill in the different red / green
+the histogram number “jumps” (<em>e.g.</em> from <code class="docutils literal notranslate"><span class="pre">008</span></code> to <code class="docutils literal notranslate"><span class="pre">011</span></code>). In order to fill in the different red / green
 histograms an offset is added (here 10, 20, and 30).</p>
-<p>Next the whole <tt class="docutils literal"><span class="pre">RunHeader</span></tt>. Here the information will be grouped in different folders collecting related information,
+<p>Next the whole <code class="docutils literal notranslate"><span class="pre">RunHeader</span></code>. Here the information will be grouped in different folders collecting related information,
 like general run info, detector info, sample and magnetic field environment info, beamline info, etc.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>RunInfo:
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>RunInfo:
   000 - Version: $Id: TMusrRunHeader.cpp 5092 2012-03-13 07:47:00Z nemu $ -@0
   001 - Generic Validator URL: http://lmu.web.psi.ch/facilities/software/MusrRoot/Validation/MusrRoot.xsd -@0
   002 - Specific Validator URL: http://lmu.web.psi.ch/facilities/software/MusrRoot/Validation/MusrRootLEM.xsd -@0
@@ -758,109 +894,159 @@ RunSummary:
   ...
 </pre></div>
 </div>
-<p><em>Comment</em>: the last sub-tree <tt class="docutils literal"><span class="pre">RunSummary</span></tt> is not following <tt class="docutils literal"><span class="pre">TMusrRunHeader</span></tt> rule <tt class="docutils literal"><span class="pre">&lt;number&gt;</span> <span class="pre">-</span> <span class="pre">&lt;label&gt;:</span> <span class="pre">&lt;value&gt;</span> <span class="pre">-&#64;&lt;type&gt;</span></tt>.
-It is added in the instrument analyzer directly by other means than the <tt class="docutils literal"><span class="pre">TMusrRunHeader::Set</span></tt>-method. This is no problem!
-Since <tt class="docutils literal"><span class="pre">RunSummary</span></tt> is not part of the required <tt class="docutils literal"><span class="pre">MusrRoot</span></tt>-file. One is quite free in adding any ROOT based information here.</p>
+<p><em>Comment</em>: the last sub-tree <code class="docutils literal notranslate"><span class="pre">RunSummary</span></code> is not following <code class="docutils literal notranslate"><span class="pre">TMusrRunHeader</span></code> rule <code class="docutils literal notranslate"><span class="pre">&lt;number&gt;</span> <span class="pre">-</span> <span class="pre">&lt;label&gt;:</span> <span class="pre">&lt;value&gt;</span> <span class="pre">-&#64;&lt;type&gt;</span></code>.
+It is added in the instrument analyzer directly by other means than the <code class="docutils literal notranslate"><span class="pre">TMusrRunHeader::Set</span></code>-method. This is no problem!
+Since <code class="docutils literal notranslate"><span class="pre">RunSummary</span></code> is not part of the required <code class="docutils literal notranslate"><span class="pre">MusrRoot</span></code>-file. One is quite free in adding any ROOT based information here.</p>
 </div>
 <div class="section" id="tmusrrunphysicalquantity-possible-representations">
 <span id="musr-run-physical-quantity"></span><span id="index-3"></span><h2>TMusrRunPhysicalQuantity - Possible Representations<a class="headerlink" href="#tmusrrunphysicalquantity-possible-representations" title="Permalink to this headline">¶</a></h2>
 <p>A physical property can be described as</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>&lt;property name&gt;: &lt;value&gt; +- &lt;estimated error&gt; &lt;unit&gt;; SP: &lt;demand&gt;; &lt;description&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="nb">property</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span> <span class="o">+-</span> <span class="o">&lt;</span><span class="n">estimated</span> <span class="n">error</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">unit</span><span class="o">&gt;</span><span class="p">;</span> <span class="n">SP</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">demand</span><span class="o">&gt;</span><span class="p">;</span> <span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<p>where <tt class="docutils literal"><span class="pre">&lt;property</span> <span class="pre">name&gt;</span></tt> is the name of the quantity, <em>e.g.</em> Sample Temperature, <tt class="docutils literal"><span class="pre">&lt;value&gt;</span></tt> the value
-of the quantity, <tt class="docutils literal"><span class="pre">&lt;estimated</span> <span class="pre">error&gt;</span></tt> the error estimate, <em>e.g.</em> the standard deviation, <tt class="docutils literal"><span class="pre">&lt;unit&gt;</span></tt> the unit,
-<em>e.g.</em> K, <tt class="docutils literal"><span class="pre">&lt;demand&gt;</span></tt> a demand value, <em>e.g.</em> the set point of the temperature. <tt class="docutils literal"><span class="pre">&lt;description&gt;</span></tt> is a
+<p>where <code class="docutils literal notranslate"><span class="pre">&lt;property</span> <span class="pre">name&gt;</span></code> is the name of the quantity, <em>e.g.</em> Sample Temperature, <code class="docutils literal notranslate"><span class="pre">&lt;value&gt;</span></code> the value
+of the quantity, <code class="docutils literal notranslate"><span class="pre">&lt;estimated</span> <span class="pre">error&gt;</span></code> the error estimate, <em>e.g.</em> the standard deviation, <code class="docutils literal notranslate"><span class="pre">&lt;unit&gt;</span></code> the unit,
+<em>e.g.</em> K, <code class="docutils literal notranslate"><span class="pre">&lt;demand&gt;</span></code> a demand value, <em>e.g.</em> the set point of the temperature. <code class="docutils literal notranslate"><span class="pre">&lt;description&gt;</span></code> is a
 possible additional comment for this quantity.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Not <em>all</em> of these quantities are always needed. The list of handled combination are given
-hereafter together with the <tt class="docutils literal"><span class="pre">C++</span></tt> code snipped how to set it. It is assumed that <tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span> <span class="pre">prop;</span></tt>
+hereafter together with the <code class="docutils literal notranslate"><span class="pre">C++</span></code> code snipped how to set it. It is assumed that <code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span> <span class="pre">prop;</span></code>
 is somewhere defined.</p>
 </div>
 <p><strong>Possibility 1</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>&lt;property name&gt;: &lt;value&gt; &lt;unit&gt; [; &lt;description&gt;]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="nb">property</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">unit</span><span class="o">&gt;</span> <span class="p">[;</span> <span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Code snippet:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;Muon Beam Momentum&quot;</span><span class="p">,</span> <span class="mf">28.1</span><span class="p">,</span> <span class="s">&quot;MeV/c&quot;</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;Muon Beam Momentum&quot;</span><span class="p">,</span> <span class="mf">28.1</span><span class="p">,</span> <span class="s">&quot;MeV/c&quot;</span><span class="p">);</span>
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;RunInfo/Muon Beam Momentum&quot;</span><span class="p">,</span> <span class="n">prop</span><span class="p">);</span>
 
 <span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;Time Resolution&quot;</span><span class="p">,</span> <span class="mf">0.1953125</span><span class="p">,</span> <span class="s">&quot;ns&quot;</span><span class="p">,</span> <span class="s">&quot;TDC 9999&quot;</span><span class="p">);</span>
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;RunInfo/Time Resolution&quot;</span><span class="p">,</span> <span class="n">prop</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Result in the <tt class="docutils literal"><span class="pre">RunHeader/RunInfo</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>011 - Muon Beam Momentum: 28.1 MeV/c -@3
-013 - Time Resolution: 0.1953125 ns; TDC 9999 -@3
+<p>Result in the <code class="docutils literal notranslate"><span class="pre">RunHeader/RunInfo</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">011</span> <span class="o">-</span> <span class="n">Muon</span> <span class="n">Beam</span> <span class="n">Momentum</span><span class="p">:</span> <span class="mf">28.1</span> <span class="n">MeV</span><span class="o">/</span><span class="n">c</span> <span class="o">-</span><span class="nd">@3</span>
+<span class="mi">013</span> <span class="o">-</span> <span class="n">Time</span> <span class="n">Resolution</span><span class="p">:</span> <span class="mf">0.1953125</span> <span class="n">ns</span><span class="p">;</span> <span class="n">TDC</span> <span class="mi">9999</span> <span class="o">-</span><span class="nd">@3</span>
 </pre></div>
 </div>
-<p>The number on front of the token (<em>e.g.</em> <tt class="docutils literal"><span class="pre">011</span></tt> in front of Muon Beam Momentum) will depend on the position where
-the entry has been added. The last token, <tt class="docutils literal"><span class="pre">-&#64;3</span></tt>, is the encoding of the type: here <tt class="docutils literal"><span class="pre">TMusrRunPhysicalQuantity</span></tt>.</p>
+<p>The number on front of the token (<em>e.g.</em> <code class="docutils literal notranslate"><span class="pre">011</span></code> in front of Muon Beam Momentum) will depend on the position where
+the entry has been added. The last token, <code class="docutils literal notranslate"><span class="pre">-&#64;3</span></code>, is the encoding of the type: here <code class="docutils literal notranslate"><span class="pre">TMusrRunPhysicalQuantity</span></code>.</p>
 <p><strong>Possibility 2</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>&lt;property name&gt;: &lt;val&gt; +- &lt;err&gt; &lt;unit&gt;[; &lt;description&gt;]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="nb">property</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">val</span><span class="o">&gt;</span> <span class="o">+-</span> <span class="o">&lt;</span><span class="n">err</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">unit</span><span class="o">&gt;</span><span class="p">[;</span> <span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Code snippet:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;CF3&quot;</span><span class="p">,</span> <span class="n">MRH_UNDEFINED</span><span class="p">,</span> <span class="mf">3.27</span><span class="p">,</span> <span class="mf">0.09</span><span class="p">,</span> <span class="s">&quot;K&quot;</span><span class="p">,</span> <span class="s">&quot;strange temperature&quot;</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;CF3&quot;</span><span class="p">,</span> <span class="n">MRH_UNDEFINED</span><span class="p">,</span> <span class="mf">3.27</span><span class="p">,</span> <span class="mf">0.09</span><span class="p">,</span> <span class="s">&quot;K&quot;</span><span class="p">,</span> <span class="s">&quot;strange temperature&quot;</span><span class="p">);</span>
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;SampleEnvironmentInfo/CF3&quot;</span><span class="p">,</span> <span class="n">prop</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Result in the <tt class="docutils literal"><span class="pre">RunHeader/SampleEnvironmentInfo</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>033 - CF3: 3.27 +- 0.09 K; strange temperature -@3
+<p>Result in the <code class="docutils literal notranslate"><span class="pre">RunHeader/SampleEnvironmentInfo</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">033</span> <span class="o">-</span> <span class="n">CF3</span><span class="p">:</span> <span class="mf">3.27</span> <span class="o">+-</span> <span class="mf">0.09</span> <span class="n">K</span><span class="p">;</span> <span class="n">strange</span> <span class="n">temperature</span> <span class="o">-</span><span class="nd">@3</span>
 </pre></div>
 </div>
 <p><strong>Possibility 3</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>&lt;property name&gt;: &lt;val&gt; &lt;unit&gt;; SP: &lt;demand&gt;[; &lt;description&gt;]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="nb">property</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">val</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">unit</span><span class="o">&gt;</span><span class="p">;</span> <span class="n">SP</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">demand</span><span class="o">&gt;</span><span class="p">[;</span> <span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span><span class="p">]</span>
 </pre></div>
 </div>
 <p>Code snippet:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;CF4&quot;</span><span class="p">,</span> <span class="mf">3.25</span><span class="p">,</span> <span class="mf">3.28</span><span class="p">,</span> <span class="s">&quot;K&quot;</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;CF4&quot;</span><span class="p">,</span> <span class="mf">3.25</span><span class="p">,</span> <span class="mf">3.28</span><span class="p">,</span> <span class="s">&quot;K&quot;</span><span class="p">);</span>
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;SampleEnvironmentInfo/CF4&quot;</span><span class="p">,</span> <span class="n">prop</span><span class="p">);</span>
 
 <span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;CF5&quot;</span><span class="p">,</span> <span class="mf">3.26</span><span class="p">,</span> <span class="mf">3.29</span><span class="p">,</span> <span class="s">&quot;K&quot;</span><span class="p">,</span> <span class="s">&quot;another strange temperature&quot;</span><span class="p">);</span>
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;SampleEnvironmentInfo/CF5&quot;</span><span class="p">,</span> <span class="n">prop</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Result in the <tt class="docutils literal"><span class="pre">RunHeader/SampleEnvironmentInfo</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>034 - CF4: 3.28 K; SP: 3.25 -@3
-035 - CF5: 3.29 K; SP: 3.26; another strange temperature -@3
+<p>Result in the <code class="docutils literal notranslate"><span class="pre">RunHeader/SampleEnvironmentInfo</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">034</span> <span class="o">-</span> <span class="n">CF4</span><span class="p">:</span> <span class="mf">3.28</span> <span class="n">K</span><span class="p">;</span> <span class="n">SP</span><span class="p">:</span> <span class="mf">3.25</span> <span class="o">-</span><span class="nd">@3</span>
+<span class="mi">035</span> <span class="o">-</span> <span class="n">CF5</span><span class="p">:</span> <span class="mf">3.29</span> <span class="n">K</span><span class="p">;</span> <span class="n">SP</span><span class="p">:</span> <span class="mf">3.26</span><span class="p">;</span> <span class="n">another</span> <span class="n">strange</span> <span class="n">temperature</span> <span class="o">-</span><span class="nd">@3</span>
 </pre></div>
 </div>
 <p><strong>Possibility 4</strong></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>&lt;property name&gt;: &lt;value&gt; +- &lt;estimated error&gt; &lt;unit&gt;; SP: &lt;demand&gt;; &lt;description&gt;
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="nb">property</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">value</span><span class="o">&gt;</span> <span class="o">+-</span> <span class="o">&lt;</span><span class="n">estimated</span> <span class="n">error</span><span class="o">&gt;</span> <span class="o">&lt;</span><span class="n">unit</span><span class="o">&gt;</span><span class="p">;</span> <span class="n">SP</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">demand</span><span class="o">&gt;</span><span class="p">;</span> <span class="o">&lt;</span><span class="n">description</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>Code snippet:</p>
-<div class="highlight-c++"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;Sample Magnetic Field&quot;</span><span class="p">,</span> <span class="mf">350.0</span><span class="p">,</span> <span class="mf">350.002</span><span class="p">,</span> <span class="mf">0.005</span><span class="p">,</span> <span class="s">&quot;G&quot;</span><span class="p">,</span> <span class="s">&quot;WXY&quot;</span><span class="p">);</span>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">prop</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;Sample Magnetic Field&quot;</span><span class="p">,</span> <span class="mf">350.0</span><span class="p">,</span> <span class="mf">350.002</span><span class="p">,</span> <span class="mf">0.005</span><span class="p">,</span> <span class="s">&quot;G&quot;</span><span class="p">,</span> <span class="s">&quot;WXY&quot;</span><span class="p">);</span>
 <span class="n">header</span><span class="o">-&gt;</span><span class="n">Set</span><span class="p">(</span><span class="s">&quot;RunInfo/Sample Magnetic Field&quot;</span><span class="p">,</span> <span class="n">prop</span><span class="p">);</span>
 </pre></div>
 </div>
-<p>Result in the <tt class="docutils literal"><span class="pre">RunHeader/SampleEnvironmentInfo</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>017 - Sample Magnetic Field: 350.002 +- 0.005 G; SP: 350.0; WXY -@3
+<p>Result in the <code class="docutils literal notranslate"><span class="pre">RunHeader/SampleEnvironmentInfo</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">017</span> <span class="o">-</span> <span class="n">Sample</span> <span class="n">Magnetic</span> <span class="n">Field</span><span class="p">:</span> <span class="mf">350.002</span> <span class="o">+-</span> <span class="mf">0.005</span> <span class="n">G</span><span class="p">;</span> <span class="n">SP</span><span class="p">:</span> <span class="mf">350.0</span><span class="p">;</span> <span class="n">WXY</span> <span class="o">-</span><span class="nd">@3</span>
 </pre></div>
 </div>
 </div>
 </div>
 
 
-      </div>
-      <div class="bottomnav">
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <p>
-        «&#160;&#160;<a href="any2many.html">any2many - a Universal μSR-file-format converter</a>
-        &#160;&#160;::&#160;&#160;
-        <a class="uplink" href="index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="acknowledgement.html">Acknowledgements</a>&#160;&#160;»
-        </p>
+        <a href="acknowledgement.html" class="btn btn-neutral float-right" title="Acknowledgements" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="any2many.html" class="btn btn-neutral" title="any2many - a Universal μSR-file-format converter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Andreas Suter.
+      Last updated on Dec 12, 2022.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
       </div>
 
-    <div class="footer">
-        &copy; Copyright 2022, Andreas Suter.
-      Last updated on May 29, 2022.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.8.2',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

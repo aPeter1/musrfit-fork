@@ -1,291 +1,413 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial for musrfit &mdash; musrfit 1.8.2 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
     
-    <title>Tutorial for musrfit &mdash; musrfit 1.8.0 documentation</title>
-    
-    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.8.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
-    <script type="text/javascript" src="_static/jquery.js"></script>
-    <script type="text/javascript" src="_static/underscore.js"></script>
-    <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="musrfit 1.8.0 documentation" href="index.html" />
+
+  
+
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="User manual" href="user-manual.html" />
     <link rel="prev" title="How to Cite musrfit?" href="cite.html" /> 
-  </head>
-  <body>
-      <div class="header"><h1 class="heading"><a href="index.html">
-          <span>musrfit 1.8.0 documentation</span></a></h1>
-        <h2 class="heading"><span>Tutorial for musrfit</span></h2>
-      </div>
-      <div class="topnav">
-      
-        <p>
-        «&#160;&#160;<a href="cite.html">How to Cite <tt class="docutils literal"><span class="pre">musrfit</span></tt>?</a>
-        &#160;&#160;::&#160;&#160;
-        <a class="uplink" href="index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="user-manual.html">User manual</a>&#160;&#160;»
-        </p>
 
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> musrfit
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="cite.html">How to Cite <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#single-histogram-fit-tutorial">Single-histogram-fit tutorial</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-msr-file">The msr file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#determine-t0-and-the-data-range-using-musrt0">Determine t0 and the data range using musrt0</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fit-the-model-to-the-data-using-musrfit">Fit the model to the data using <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#view-the-data-and-the-fit-using-musrview">View the data and the fit using <code class="docutils literal notranslate"><span class="pre">musrview</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#process-multiple-msr-files-using-msr2data">Process multiple msr files using <code class="docutils literal notranslate"><span class="pre">msr2data</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#further-reading">Further reading</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#asymmtery-fit-tutorial">Asymmtery-fit tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="user-manual.html">User manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user-libs.html">Documentation of user libs (user functions)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup-standard.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> on Different Platforms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup-dks.html">Setting up <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> / <code class="docutils literal notranslate"><span class="pre">DKS</span></code>: High Speed Fitting with GPU’s</a></li>
+<li class="toctree-l1"><a class="reference internal" href="musredit.html"><code class="docutils literal notranslate"><span class="pre">musredit</span></code>: the GUI Based Interface to <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="mupp.html">mupp - μSR Parameter Plotter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="msr2data.html">msr2data - A Program for Automatically Processing Multiple <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> msr Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="any2many.html">any2many - a Universal μSR-file-format converter</a></li>
+<li class="toctree-l1"><a class="reference internal" href="musr-root.html">MusrRoot - an Extensible Open File Format for μSR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgement.html">Acknowledgements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="bugtracking.html">Bugtracking</a></li>
+</ul>
+
+            
+          
+        </div>
       </div>
-      <div class="content">
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
         
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">musrfit</a>
         
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Tutorial for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/tutorial.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
   <div class="section" id="tutorial-for-musrfit">
-<span id="index-0"></span><h1>Tutorial for <tt class="docutils literal"><span class="pre">musrfit</span></tt><a class="headerlink" href="#tutorial-for-musrfit" title="Permalink to this headline">¶</a></h1>
+<span id="index-0"></span><h1>Tutorial for <code class="docutils literal notranslate"><span class="pre">musrfit</span></code><a class="headerlink" href="#tutorial-for-musrfit" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="single-histogram-fit-tutorial">
 <h2>Single-histogram-fit tutorial<a class="headerlink" href="#single-histogram-fit-tutorial" title="Permalink to this headline">¶</a></h2>
 <p>The μSR-data-analysis process using musrfit is based on so-called msr files. These files contain all
 information needed for the analysis such as names of the data files, a theory function, fit and plot parameters,
 and so on. It is the idea of this page to explain the basic use of an msr file and the different programs
-of the <tt class="docutils literal"><span class="pre">musrfit</span></tt> suite using the example of a single-histogram fit to time-differential transverse-field
-μSR data. For a complete description of all options please refer to the <a class="reference internal" href="user-manual.html#user-manual"><em>manual</em></a>.</p>
+of the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> suite using the example of a single-histogram fit to time-differential transverse-field
+μSR data. For a complete description of all options please refer to the <a class="reference internal" href="user-manual.html#user-manual"><span class="std std-ref">manual</span></a>.</p>
 <p>The example deals with a diamagnetic sample that has been measured in an applied field of approximately 150 G in
-the <a class="reference external" href="https://www.psi.ch/smus/gps">GPS spectrometer</a> at <a class="reference external" href="https://www.psi.ch">PSI</a> using the &#8220;transverse geometry&#8221;.
+the <a class="reference external" href="https://www.psi.ch/smus/gps">GPS spectrometer</a> at <a class="reference external" href="https://www.psi.ch">PSI</a> using the “transverse geometry”.
 In this geometry the muon spin is rotated about 50° up and the field is applied parallel to the muon momentum.
 Hence, the relevant positron counters (to detect the spin precession) are placed above (histogram 3), below (histogram 4) and right of (histogram 5) the sample. The run numbers start from 3110.</p>
-<p>To analyze these data (in a simple way) one starts out from the msr file <tt class="docutils literal"><span class="pre">3110_tutorial.msr</span></tt> provided together
-with the source-code distribution in the sub-directory <tt class="docutils literal"><span class="pre">doc/examples/</span></tt>. This ASCII file can be edited using any
-text editor. For convenience the editor <tt class="docutils literal"><span class="pre">musredit</span></tt> is provided which offer some msr-file-specific functionalities
+<p>To analyze these data (in a simple way) one starts out from the msr file <code class="docutils literal notranslate"><span class="pre">3110_tutorial.msr</span></code> provided together
+with the source-code distribution in the sub-directory <code class="docutils literal notranslate"><span class="pre">doc/examples/</span></code>. This ASCII file can be edited using any
+text editor. For convenience the editor <code class="docutils literal notranslate"><span class="pre">musredit</span></code> is provided which offer some msr-file-specific functionalities
 and additionally serve as front ends to the underlying programs. In the following it is assumed that the file is
-open within <tt class="docutils literal"><span class="pre">musredit</span></tt>.</p>
+open within <code class="docutils literal notranslate"><span class="pre">musredit</span></code>.</p>
 <div class="section" id="the-msr-file">
 <h3>The msr file<a class="headerlink" href="#the-msr-file" title="Permalink to this headline">¶</a></h3>
-<p>The msr file itself is divided into different blocks; a full description of the format can be found <a class="reference internal" href="user-manual.html#msr-file-format"><em>here</em></a>.
-In the file <tt class="docutils literal"><span class="pre">3110_tutorial.msr</span></tt> these blocks are successively:</p>
-<p><a class="reference internal" href="user-manual.html#msr-title-block"><em>The title</em></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>sample XYZ
+<p>The msr file itself is divided into different blocks; a full description of the format can be found <a class="reference internal" href="user-manual.html#msr-file-format"><span class="std std-ref">here</span></a>.
+In the file <code class="docutils literal notranslate"><span class="pre">3110_tutorial.msr</span></code> these blocks are successively:</p>
+<p><a class="reference internal" href="user-manual.html#msr-title-block"><span class="std std-ref">The title</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sample</span> <span class="n">XYZ</span>
 </pre></div>
 </div>
 <p>A descriptive title of the file.</p>
-<p><a class="reference internal" href="user-manual.html#msr-fitparameter-block"><em>The FITPARAMETER block</em></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>FITPARAMETER
-#    No Name        Value     Step        Pos_Error   Boundaries
-      1 NormUp      4500      5           none        0       none
-      2 BgUp        200       1           none        0       none
-      3 PhaseUp     15        1           none
+<p><a class="reference internal" href="user-manual.html#msr-fitparameter-block"><span class="std std-ref">The FITPARAMETER block</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FITPARAMETER</span>
+<span class="c1">#    No Name        Value     Step        Pos_Error   Boundaries</span>
+      <span class="mi">1</span> <span class="n">NormUp</span>      <span class="mi">4500</span>      <span class="mi">5</span>           <span class="n">none</span>        <span class="mi">0</span>       <span class="n">none</span>
+      <span class="mi">2</span> <span class="n">BgUp</span>        <span class="mi">200</span>       <span class="mi">1</span>           <span class="n">none</span>        <span class="mi">0</span>       <span class="n">none</span>
+      <span class="mi">3</span> <span class="n">PhaseUp</span>     <span class="mi">15</span>        <span class="mi">1</span>           <span class="n">none</span>
 
-      4 NormDown    4500      5           none        0       none
-      5 BgDown      200       1           none        0       none
-      6 PhaseDown   195       1           none
+      <span class="mi">4</span> <span class="n">NormDown</span>    <span class="mi">4500</span>      <span class="mi">5</span>           <span class="n">none</span>        <span class="mi">0</span>       <span class="n">none</span>
+      <span class="mi">5</span> <span class="n">BgDown</span>      <span class="mi">200</span>       <span class="mi">1</span>           <span class="n">none</span>        <span class="mi">0</span>       <span class="n">none</span>
+      <span class="mi">6</span> <span class="n">PhaseDown</span>   <span class="mi">195</span>       <span class="mi">1</span>           <span class="n">none</span>
 
-      7 NormRight   600       5           none        0       none
-      8 BgRight     40        1           none        0       none
-      9 PhaseRight  285       1           none
+      <span class="mi">7</span> <span class="n">NormRight</span>   <span class="mi">600</span>       <span class="mi">5</span>           <span class="n">none</span>        <span class="mi">0</span>       <span class="n">none</span>
+      <span class="mi">8</span> <span class="n">BgRight</span>     <span class="mi">40</span>        <span class="mi">1</span>           <span class="n">none</span>        <span class="mi">0</span>       <span class="n">none</span>
+      <span class="mi">9</span> <span class="n">PhaseRight</span>  <span class="mi">285</span>       <span class="mi">1</span>           <span class="n">none</span>
 
-     10 AsymSig1    0.17      0.01        none        0       0.33
-     11 RateSig1    2.5       0.1         none        0       none
-     12 FieldSig1   100       1           none
+     <span class="mi">10</span> <span class="n">AsymSig1</span>    <span class="mf">0.17</span>      <span class="mf">0.01</span>        <span class="n">none</span>        <span class="mi">0</span>       <span class="mf">0.33</span>
+     <span class="mi">11</span> <span class="n">RateSig1</span>    <span class="mf">2.5</span>       <span class="mf">0.1</span>         <span class="n">none</span>        <span class="mi">0</span>       <span class="n">none</span>
+     <span class="mi">12</span> <span class="n">FieldSig1</span>   <span class="mi">100</span>       <span class="mi">1</span>           <span class="n">none</span>
 
-     13 AsymSig2    0.02      0.01        none        0       0.33
-     14 RateSig2    0.5       0.1         none
-     15 FieldSig2   150       1           none
+     <span class="mi">13</span> <span class="n">AsymSig2</span>    <span class="mf">0.02</span>      <span class="mf">0.01</span>        <span class="n">none</span>        <span class="mi">0</span>       <span class="mf">0.33</span>
+     <span class="mi">14</span> <span class="n">RateSig2</span>    <span class="mf">0.5</span>       <span class="mf">0.1</span>         <span class="n">none</span>
+     <span class="mi">15</span> <span class="n">FieldSig2</span>   <span class="mi">150</span>       <span class="mi">1</span>           <span class="n">none</span>
 </pre></div>
 </div>
 <p>The list of parameters used in the theory function to describe the set of data.
 Each parameter has a number, a name, an initial value and an initial step (for
 the fitting process). If a parameter should be fixed, the initial step is set
 to 0. After a fit (see below), this block contains the determined parameter values
-and uncertainties (in the <tt class="docutils literal"><span class="pre">Step</span></tt> column). If asymmetric errors are determined, these
-will be listed in the <tt class="docutils literal"><span class="pre">Step</span></tt> column (negative) and the <tt class="docutils literal"><span class="pre">Pos_Error</span></tt> column (positive).
+and uncertainties (in the <code class="docutils literal notranslate"><span class="pre">Step</span></code> column). If asymmetric errors are determined, these
+will be listed in the <code class="docutils literal notranslate"><span class="pre">Step</span></code> column (negative) and the <code class="docutils literal notranslate"><span class="pre">Pos_Error</span></code> column (positive).
 Optionally, lower and upper boundaries for the parameters can be specified as
 shown above.</p>
 <p>The meaning of the parameters above is explained in the following:</p>
-<p>Since a <a class="reference internal" href="user-manual.html#single-histogram-fit"><em>single-histogram fit</em></a> should be done, some
+<p>Since a <a class="reference internal" href="user-manual.html#single-histogram-fit"><span class="std std-ref">single-histogram fit</span></a> should be done, some
 histogram-specific parameters are needed. These are a normalization constant (parameter 1),
 a parameter describing the background of uncorrelated events (parameter 2) and the initial
 phase of the spin precession with respect to the detector (parameter 3). As stated above,
-there are three histograms containing useful information (&#8220;Up&#8221;, &#8220;Down&#8221;, &#8220;Right&#8221;); hence,
+there are three histograms containing useful information (“Up”, “Down”, “Right”); hence,
 this set of parameters has to be present for each of them (parameters 1–9).
 The remaining parameters are used to model the decay asymmetry which is assumed to be equal
 for all histograms. In this example one has two signals (<em>e.g.</em> from the sample and the
 sample holder), each with an amplitude (parameters 10 and 13), a depolarization rate
 (parameters 11 and 14) and a mean field (here given in Gauss, parameters 12 and 15).</p>
-<p><a class="reference internal" href="user-manual.html#msr-theory-block"><em>The THEORY block</em></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>THEORY
-asymmetry     10
-simplExpo     11          (rate)
-TFieldCos   map1  fun1       (phase frequency)
-+
-asymmetry     13
-simpleGss     14          (rate)
-TFieldCos   map1  fun2       (phase frequency)
+<p><a class="reference internal" href="user-manual.html#msr-theory-block"><span class="std std-ref">The THEORY block</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">THEORY</span>
+<span class="n">asymmetry</span>     <span class="mi">10</span>
+<span class="n">simplExpo</span>     <span class="mi">11</span>          <span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+<span class="n">TFieldCos</span>   <span class="n">map1</span>  <span class="n">fun1</span>       <span class="p">(</span><span class="n">phase</span> <span class="n">frequency</span><span class="p">)</span>
+<span class="o">+</span>
+<span class="n">asymmetry</span>     <span class="mi">13</span>
+<span class="n">simpleGss</span>     <span class="mi">14</span>          <span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+<span class="n">TFieldCos</span>   <span class="n">map1</span>  <span class="n">fun2</span>       <span class="p">(</span><span class="n">phase</span> <span class="n">frequency</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The THEORY block is used to define a fit-parameter-dependent theory function used to model
-the decay asymmetry. Different <a class="reference internal" href="user-manual.html#msr-theory-block"><em>predefined</em></a> and <a class="reference internal" href="user-manual.html#id38"><em>user-defined</em></a>
+the decay asymmetry. Different <a class="reference internal" href="user-manual.html#msr-theory-block"><span class="std std-ref">predefined</span></a> and <a class="reference internal" href="user-manual.html#id38"><span class="std std-ref">user-defined</span></a>
 functions can be combined here. Theory lines following each other are <em>multiplied</em> and the <strong>+</strong> sign
 is used to add different (here: two) signal contributions. The numbers are the parameter numbers
-according to the <tt class="docutils literal"><span class="pre">FITPARAMETER</span> <span class="pre">block</span></tt>. <tt class="docutils literal"><span class="pre">map</span></tt> and <tt class="docutils literal"><span class="pre">fun</span></tt> are used to refer to
+according to the <code class="docutils literal notranslate"><span class="pre">FITPARAMETER</span> <span class="pre">block</span></code>. <code class="docutils literal notranslate"><span class="pre">map</span></code> and <code class="docutils literal notranslate"><span class="pre">fun</span></code> are used to refer to
 histogram-dependent parameters and to interrelate fit parameters, respectively (see below).</p>
-<p><a class="reference internal" href="user-manual.html#msr-functions-block"><em>The FUNCTIONS block</em></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">FUNCTIONS</span>
+<p><a class="reference internal" href="user-manual.html#msr-functions-block"><span class="std std-ref">The FUNCTIONS block</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FUNCTIONS</span>
 <span class="n">fun1</span> <span class="o">=</span> <span class="n">gamma_mu</span> <span class="o">*</span> <span class="n">par12</span>
 <span class="n">fun2</span> <span class="o">=</span> <span class="n">gamma_mu</span> <span class="o">*</span> <span class="n">par15</span>
 </pre></div>
 </div>
 <p>Here functions interrelating different fit parameters and predefined constants can be defined for
-the use in the <tt class="docutils literal"><span class="pre">THEORY</span> <span class="pre">block</span></tt>. In the example, the functions are used to calculate the
-muon-spin-precession frequencies for the given fields [<span class="math">\(\nu = \gamma_\mu B / (2\pi)\)</span>]. One
+the use in the <code class="docutils literal notranslate"><span class="pre">THEORY</span> <span class="pre">block</span></code>. In the example, the functions are used to calculate the
+muon-spin-precession frequencies for the given fields [<span class="math notranslate nohighlight">\(\nu = \gamma_\mu B / (2\pi)\)</span>]. One
 function is used for each signal. Altogether, the theory function defined above is
-<span class="math">\(A(t) = p_{10} e^{-p_{11} t} \cos(\varphi_i \pi/180 + \gamma_\mu p_{12} t) + p_{13} e^{-(p_{14} t)^2/2} \cos(\varphi_i \pi/180 + \gamma_\mu p_{15} t)\)</span>, where the <em>p</em> are the parameters in the <tt class="docutils literal"><span class="pre">FITPARAMETER</span> <span class="pre">block</span></tt> and <span class="math">\(\varphi_i = p_3, p_6, p_9\)</span>
+<span class="math notranslate nohighlight">\(A(t) = p_{10} e^{-p_{11} t} \cos(\varphi_i \pi/180 + \gamma_\mu p_{12} t) + p_{13} e^{-(p_{14} t)^2/2} \cos(\varphi_i \pi/180 + \gamma_\mu p_{15} t)\)</span>, where the <em>p</em> are the parameters in the <code class="docutils literal notranslate"><span class="pre">FITPARAMETER</span> <span class="pre">block</span></code> and <span class="math notranslate nohighlight">\(\varphi_i = p_3, p_6, p_9\)</span>
 depending on the histogram as shall be seen later.</p>
-<p><a class="reference internal" href="user-manual.html#msr-run-block"><em>The RUN block</em></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>RUN data/deltat_pta_gps_3110 PIM3 PSI PSI-BIN   (name beamline institute data-file-format)
-fittype         0         (single histogram fit)
-norm            1
-backgr.fit      2
-map             3    0    0    0    0    0    0    0    0    0
-forward         3
-data            1       8000
-t0              1
-fit             0       4.9
-packing         20
+<p><a class="reference internal" href="user-manual.html#msr-run-block"><span class="std std-ref">The RUN block</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RUN</span> <span class="n">data</span><span class="o">/</span><span class="n">deltat_pta_gps_3110</span> <span class="n">PIM3</span> <span class="n">PSI</span> <span class="n">PSI</span><span class="o">-</span><span class="n">BIN</span>   <span class="p">(</span><span class="n">name</span> <span class="n">beamline</span> <span class="n">institute</span> <span class="n">data</span><span class="o">-</span><span class="n">file</span><span class="o">-</span><span class="nb">format</span><span class="p">)</span>
+<span class="n">fittype</span>         <span class="mi">0</span>         <span class="p">(</span><span class="n">single</span> <span class="n">histogram</span> <span class="n">fit</span><span class="p">)</span>
+<span class="n">norm</span>            <span class="mi">1</span>
+<span class="n">backgr</span><span class="o">.</span><span class="n">fit</span>      <span class="mi">2</span>
+<span class="nb">map</span>             <span class="mi">3</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>
+<span class="n">forward</span>         <span class="mi">3</span>
+<span class="n">data</span>            <span class="mi">1</span>       <span class="mi">8000</span>
+<span class="n">t0</span>              <span class="mi">1</span>
+<span class="n">fit</span>             <span class="mi">0</span>       <span class="mf">4.9</span>
+<span class="n">packing</span>         <span class="mi">20</span>
 </pre></div>
 </div>
 <p>The RUN blocks are used to collect information on the data to be analyzed. Specifically, these are:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>RUN data/deltat_pta_gps_3110 PIM3 PSI PSI-BIN   (name beamline institute data-file-format)
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">RUN</span> <span class="n">data</span><span class="o">/</span><span class="n">deltat_pta_gps_3110</span> <span class="n">PIM3</span> <span class="n">PSI</span> <span class="n">PSI</span><span class="o">-</span><span class="n">BIN</span>   <span class="p">(</span><span class="n">name</span> <span class="n">beamline</span> <span class="n">institute</span> <span class="n">data</span><span class="o">-</span><span class="n">file</span><span class="o">-</span><span class="nb">format</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The path to the data file and the file format (NEXUS, ROOT-NPP, ROOT-PPC, PSI-BIN, PSI-MDU, WKM, MUD, MDU-ASCII).</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>fittype         0         (single histogram fit)
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fittype</span>         <span class="mi">0</span>         <span class="p">(</span><span class="n">single</span> <span class="n">histogram</span> <span class="n">fit</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>the fit type (0 = single-histogram fit)</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>norm            1
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">norm</span>            <span class="mi">1</span>
 </pre></div>
 </div>
 <p>the number of the fit parameter representing the normalization constant</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>backgr.fit      2
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">backgr</span><span class="o">.</span><span class="n">fit</span>      <span class="mi">2</span>
 </pre></div>
 </div>
 <p>the number of the fit parameter representing the background</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>map             3    0    0    0    0    0    0    0    0    0
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">map</span>             <span class="mi">3</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>    <span class="mi">0</span>
 </pre></div>
 </div>
-<p>the definition of the <strong>maps</strong> used in the <tt class="docutils literal"><span class="pre">THEORY</span> <span class="pre">block</span></tt> — RUN-block-specific
+<p>the definition of the <strong>maps</strong> used in the <code class="docutils literal notranslate"><span class="pre">THEORY</span> <span class="pre">block</span></code> — RUN-block-specific
 parameters are given here; in this example, <strong>map1</strong> is substituted by <strong>parameter 3</strong>
-in the <tt class="docutils literal"><span class="pre">THEORY</span> <span class="pre">block</span></tt> for this RUN block and <strong>map2</strong>, <strong>map3</strong>, and so on are undefined.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>forward         3
+in the <code class="docutils literal notranslate"><span class="pre">THEORY</span> <span class="pre">block</span></code> for this RUN block and <strong>map2</strong>, <strong>map3</strong>, and so on are undefined.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">forward</span>         <span class="mi">3</span>
 </pre></div>
 </div>
-<p>the histogram number; in this example 3 corresponds to the histogram of the &#8220;Up&#8221; positron counter</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>data            1        8000
+<p>the histogram number; in this example 3 corresponds to the histogram of the “Up” positron counter</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data</span>            <span class="mi">1</span>        <span class="mi">8000</span>
 </pre></div>
 </div>
-<p>start and end bins of the range containing useful data in the histogram (to be adjusted, <em>e.g.</em> by using <tt class="docutils literal"><span class="pre">musrt0</span></tt>, see below)</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>t0              1
+<p>start and end bins of the range containing useful data in the histogram (to be adjusted, <em>e.g.</em> by using <code class="docutils literal notranslate"><span class="pre">musrt0</span></code>, see below)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">t0</span>              <span class="mi">1</span>
 </pre></div>
 </div>
-<p>histogram bin corresponding to the time zero (muon implantation time) (to be adjusted, <em>e.g.</em> by <tt class="docutils literal"><span class="pre">musrt0</span></tt>, see below)</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>fit             0       4.9
+<p>histogram bin corresponding to the time zero (muon implantation time) (to be adjusted, <em>e.g.</em> by <code class="docutils literal notranslate"><span class="pre">musrt0</span></code>, see below)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fit</span>             <span class="mi">0</span>       <span class="mf">4.9</span>
 </pre></div>
 </div>
 <p>start and end times (in μs) defining the fit range. <em>In case the fit range
 exceeds the range of useful data (specified above using the data tag), eventually
 this data range is used as fit range.</em></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>packing         20
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">packing</span>         <span class="mi">20</span>
 </pre></div>
 </div>
 <p>the packing of the histograms (in histogram bins)</p>
 <p>Since the data of three histograms is to be analyzed, the file contains not only one but
 three RUN blocks — each defining the histogram-specific information following the example given above.</p>
 </div></blockquote>
-<p><a class="reference internal" href="user-manual.html#msr-commands-block"><em>The COMMAND block</em></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">COMMANDS</span>
+<p><a class="reference internal" href="user-manual.html#msr-commands-block"><span class="std std-ref">The COMMAND block</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">COMMANDS</span>
 <span class="n">MINIMIZE</span>
 <span class="n">MINOS</span>
 <span class="n">SAVE</span>
 </pre></div>
 </div>
-<p>In the <tt class="docutils literal"><span class="pre">COMMANDS</span> <span class="pre">block</span></tt>, a sequence of operations that should be performed is defined.
-Here, the requested operations are the minimization of <span class="math">\(\chi^2\)</span> (MINIMIZE), the
+<p>In the <code class="docutils literal notranslate"><span class="pre">COMMANDS</span> <span class="pre">block</span></code>, a sequence of operations that should be performed is defined.
+Here, the requested operations are the minimization of <span class="math notranslate nohighlight">\(\chi^2\)</span> (MINIMIZE), the
 calculation of <em>asymmetric errors</em> (MINOS) as well as saving the found parameter values
 and uncertainties to the msr file (SAVE). A full description of the possible commands can
-be found <a class="reference internal" href="user-manual.html#msr-commands-block"><em>here</em></a>.</p>
-<p><a class="reference internal" href="user-manual.html#msr-fourier-block"><em>The FOURIER block</em></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>FOURIER
-units            Gauss   # units either &#39;Gauss&#39;, &#39;MHz&#39;, or &#39;Mc/s&#39;
-fourier_power    10
-apodization      WEAK    # NONE, WEAK, MEDIUM, STRONG
-plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
-phase            par3
-range            0.0    600.0
+be found <a class="reference internal" href="user-manual.html#msr-commands-block"><span class="std std-ref">here</span></a>.</p>
+<p><a class="reference internal" href="user-manual.html#msr-fourier-block"><span class="std std-ref">The FOURIER block</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FOURIER</span>
+<span class="n">units</span>            <span class="n">Gauss</span>   <span class="c1"># units either &#39;Gauss&#39;, &#39;MHz&#39;, or &#39;Mc/s&#39;</span>
+<span class="n">fourier_power</span>    <span class="mi">10</span>
+<span class="n">apodization</span>      <span class="n">WEAK</span>    <span class="c1"># NONE, WEAK, MEDIUM, STRONG</span>
+<span class="n">plot</span>             <span class="n">POWER</span>   <span class="c1"># REAL, IMAG, REAL_AND_IMAG, POWER, PHASE</span>
+<span class="n">phase</span>            <span class="n">par3</span>
+<span class="nb">range</span>            <span class="mf">0.0</span>    <span class="mf">600.0</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">FOURIER</span> <span class="pre">block</span></tt> is used to define basic settings for the Fourier transform available
-in <a class="reference internal" href="user-manual.html#musrview"><em>musrview</em></a>. These are:</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">FOURIER</span> <span class="pre">block</span></code> is used to define basic settings for the Fourier transform available
+in <a class="reference internal" href="user-manual.html#musrview"><span class="std std-ref">musrview</span></a>. These are:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>units            Gauss   # units either &#39;Gauss&#39;, &#39;MHz&#39;, or &#39;Mc/s&#39;
+<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">units</span>            <span class="n">Gauss</span>   <span class="c1"># units either &#39;Gauss&#39;, &#39;MHz&#39;, or &#39;Mc/s&#39;</span>
 </pre></div>
 </div>
 <p>the units of the Fourier domain</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>fourier_power    10
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">fourier_power</span>    <span class="mi">10</span>
 </pre></div>
 </div>
-<p>the number of data points used for the discrete transform, here <span class="math">\(2^{10}=1024\)</span>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>apodization      WEAK    # NONE, WEAK, MEDIUM, STRONG
+<p>the number of data points used for the discrete transform, here <span class="math notranslate nohighlight">\(2^{10}=1024\)</span>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">apodization</span>      <span class="n">WEAK</span>    <span class="c1"># NONE, WEAK, MEDIUM, STRONG</span>
 </pre></div>
 </div>
-<p>the <a class="reference internal" href="user-manual.html#msr-fourier-block-apodization"><em>apodization</em></a> to be used</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>plot             POWER   # REAL, IMAG, REAL_AND_IMAG, POWER, PHASE
+<p>the <a class="reference internal" href="user-manual.html#msr-fourier-block-apodization"><span class="std std-ref">apodization</span></a> to be used</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">plot</span>             <span class="n">POWER</span>   <span class="c1"># REAL, IMAG, REAL_AND_IMAG, POWER, PHASE</span>
 </pre></div>
 </div>
 <p>what should be plotted (real part, imaginary part, and so on)</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>phase            par3
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">phase</span>            <span class="n">par3</span>
 </pre></div>
 </div>
 <p>the initial phase of the input data is given here in degrees. Optionally, a phase parameter
-from the <tt class="docutils literal"><span class="pre">FITPARAMETER</span> <span class="pre">block</span></tt> can be given, here <strong>par3</strong> takes the value of <strong>parameter 3</strong>.</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>range            0.0    600.0
+from the <code class="docutils literal notranslate"><span class="pre">FITPARAMETER</span> <span class="pre">block</span></code> can be given, here <strong>par3</strong> takes the value of <strong>parameter 3</strong>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">range</span>            <span class="mf">0.0</span>    <span class="mf">600.0</span>
 </pre></div>
 </div>
 <p>the start and end points of the range of the Fourier transform in the units specified above</p>
 </div></blockquote>
-<p><a class="reference internal" href="user-manual.html#msr-plot-block"><em>The PLOT block</em></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>PLOT 0   (single histo plot)
-runs     1   2
-range    0   4  -0.2   0.2
+<p><a class="reference internal" href="user-manual.html#msr-plot-block"><span class="std std-ref">The PLOT block</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PLOT</span> <span class="mi">0</span>   <span class="p">(</span><span class="n">single</span> <span class="n">histo</span> <span class="n">plot</span><span class="p">)</span>
+<span class="n">runs</span>     <span class="mi">1</span>   <span class="mi">2</span>
+<span class="nb">range</span>    <span class="mi">0</span>   <span class="mi">4</span>  <span class="o">-</span><span class="mf">0.2</span>   <span class="mf">0.2</span>
 </pre></div>
 </div>
-<p>The <tt class="docutils literal"><span class="pre">PLOT</span> <span class="pre">block</span></tt> defines which data (corresponding to the given RUN blocks) is plotted when
-<a class="reference internal" href="user-manual.html#musrview"><em>musrview</em></a> is called. In the given example, a canvas would be drawn containing
-the (life-time-corrected) data of the first two <tt class="docutils literal"><span class="pre">RUN</span> <span class="pre">blocks</span></tt> (&#8220;Up&#8221; and &#8220;Down&#8221; positron counters).
+<p>The <code class="docutils literal notranslate"><span class="pre">PLOT</span> <span class="pre">block</span></code> defines which data (corresponding to the given RUN blocks) is plotted when
+<a class="reference internal" href="user-manual.html#musrview"><span class="std std-ref">musrview</span></a> is called. In the given example, a canvas would be drawn containing
+the (life-time-corrected) data of the first two <code class="docutils literal notranslate"><span class="pre">RUN</span> <span class="pre">blocks</span></code> (“Up” and “Down” positron counters).
 The abscissa would range from 0 to 4 μs, the axis of ordinates from -0.2 to 0.2.
-It is possible to define more than one <tt class="docutils literal"><span class="pre">PLOT</span> <span class="pre">block</span></tt>. Each <tt class="docutils literal"><span class="pre">PLOT</span> <span class="pre">block</span></tt> corresponds to a
-separate canvas. Therefore, the second <tt class="docutils literal"><span class="pre">PLOT</span> <span class="pre">block</span></tt> in the file</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>PLOT 0   (single histo plot)
-runs     3
-use_fit_ranges
+It is possible to define more than one <code class="docutils literal notranslate"><span class="pre">PLOT</span> <span class="pre">block</span></code>. Each <code class="docutils literal notranslate"><span class="pre">PLOT</span> <span class="pre">block</span></code> corresponds to a
+separate canvas. Therefore, the second <code class="docutils literal notranslate"><span class="pre">PLOT</span> <span class="pre">block</span></code> in the file</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PLOT</span> <span class="mi">0</span>   <span class="p">(</span><span class="n">single</span> <span class="n">histo</span> <span class="n">plot</span><span class="p">)</span>
+<span class="n">runs</span>     <span class="mi">3</span>
+<span class="n">use_fit_ranges</span>
 </pre></div>
 </div>
-<p>produces an additional window containing the (not life-time-corrected) data of the third <tt class="docutils literal"><span class="pre">RUN</span> <span class="pre">block</span></tt>
-(&#8220;Right&#8221; positron counter). The abscissa ranges from 0 to 4.9 μs (according to the fit range given
-in the <tt class="docutils literal"><span class="pre">RUN</span> <span class="pre">block</span></tt>).</p>
-<p><a class="reference internal" href="user-manual.html#msr-statistic-block"><em>The STATISTIC block</em></a></p>
-<div class="highlight-python"><div class="highlight"><pre><span></span>STATISTIC --- 2011-07-09 10:58:44
-chisq = 1348.1764, NDF = 1146, chisq/NDF = 1.176419
+<p>produces an additional window containing the (not life-time-corrected) data of the third <code class="docutils literal notranslate"><span class="pre">RUN</span> <span class="pre">block</span></code>
+(“Right” positron counter). The abscissa ranges from 0 to 4.9 μs (according to the fit range given
+in the <code class="docutils literal notranslate"><span class="pre">RUN</span> <span class="pre">block</span></code>).</p>
+<p><a class="reference internal" href="user-manual.html#msr-statistic-block"><span class="std std-ref">The STATISTIC block</span></a></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">STATISTIC</span> <span class="o">---</span> <span class="mi">2011</span><span class="o">-</span><span class="mi">07</span><span class="o">-</span><span class="mi">09</span> <span class="mi">10</span><span class="p">:</span><span class="mi">58</span><span class="p">:</span><span class="mi">44</span>
+<span class="n">chisq</span> <span class="o">=</span> <span class="mf">1348.1764</span><span class="p">,</span> <span class="n">NDF</span> <span class="o">=</span> <span class="mi">1146</span><span class="p">,</span> <span class="n">chisq</span><span class="o">/</span><span class="n">NDF</span> <span class="o">=</span> <span class="mf">1.176419</span>
 </pre></div>
 </div>
 <p>This block is the last block of a msr file. It contains some information on the fit: the
-date and time as well as the absolute and normalized values of <span class="math">\(\chi^2\)</span> and the
+date and time as well as the absolute and normalized values of <span class="math notranslate nohighlight">\(\chi^2\)</span> and the
 number of degrees of freedom in the fit.
 These information only have a meaning if the fitting procedure has been executed at
 least once and the fit has converged!</p>
@@ -293,9 +415,9 @@ least once and the fit has converged!</p>
 <div class="section" id="determine-t0-and-the-data-range-using-musrt0">
 <h3>Determine t0 and the data range using musrt0<a class="headerlink" href="#determine-t0-and-the-data-range-using-musrt0" title="Permalink to this headline">¶</a></h3>
 <p>Before the given model can be fitted to the data, the data ranges and time zeros of the different
-<tt class="docutils literal"><span class="pre">RUN</span> <span class="pre">blocks</span></tt> have to be set correctly. This can be achieved using <a class="reference internal" href="user-manual.html#musrt0"><em>musrt0</em></a>.
-Starting this program by selecting the <tt class="docutils literal"><span class="pre">musrt0</span></tt> button in <tt class="docutils literal"><span class="pre">musredit</span></tt> or calling from a terminal</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrt0 3110_tutorial.msr
+<code class="docutils literal notranslate"><span class="pre">RUN</span> <span class="pre">blocks</span></code> have to be set correctly. This can be achieved using <a class="reference internal" href="user-manual.html#musrt0"><span class="std std-ref">musrt0</span></a>.
+Starting this program by selecting the <code class="docutils literal notranslate"><span class="pre">musrt0</span></code> button in <code class="docutils literal notranslate"><span class="pre">musredit</span></code> or calling from a terminal</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ musrt0 3110_tutorial.msr
 </pre></div>
 </div>
 <p>opens an interactive window plotting the data of the first RUN block:</p>
@@ -310,65 +432,65 @@ when the cursor is found at a suitable location:</p>
 <img alt="_images/tutorial-musrt0-2.png" src="_images/tutorial-musrt0-2.png" />
 <p>After all lines have been adjusted for the first histogram, one can go on to the second by pressing <strong>q</strong>.
 This procedure is repeated until all ranges have been set correctly. When finished with the last histogram
-the new t0 and data-range values will be written to the msr file. A full description of <tt class="docutils literal"><span class="pre">musrt0</span></tt> can be
-found <a class="reference internal" href="user-manual.html#musrt0"><em>here</em></a>.</p>
+the new t0 and data-range values will be written to the msr file. A full description of <code class="docutils literal notranslate"><span class="pre">musrt0</span></code> can be
+found <a class="reference internal" href="user-manual.html#musrt0"><span class="std std-ref">here</span></a>.</p>
 </div>
 <div class="section" id="fit-the-model-to-the-data-using-musrfit">
-<h3>Fit the model to the data using <tt class="docutils literal"><span class="pre">musrfit</span></tt><a class="headerlink" href="#fit-the-model-to-the-data-using-musrfit" title="Permalink to this headline">¶</a></h3>
+<h3>Fit the model to the data using <code class="docutils literal notranslate"><span class="pre">musrfit</span></code><a class="headerlink" href="#fit-the-model-to-the-data-using-musrfit" title="Permalink to this headline">¶</a></h3>
 <p>Now that the basics of the msr file have been introduced and the necessary adjustments have been done one
-can proceed with fitting the specified model to the data. This is done by selecting the <tt class="docutils literal"><span class="pre">musrfit</span></tt> icon
-in <tt class="docutils literal"><span class="pre">musredit</span></tt> or calling from a terminal</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrfit 3110_tutorial.msr
+can proceed with fitting the specified model to the data. This is done by selecting the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> icon
+in <code class="docutils literal notranslate"><span class="pre">musredit</span></code> or calling from a terminal</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ musrfit 3110_tutorial.msr
 </pre></div>
 </div>
 <p>After the fitting procedure has finished the msr file is updated and contains the newly determined values
 of the fit parameters.</p>
 </div>
 <div class="section" id="view-the-data-and-the-fit-using-musrview">
-<h3>View the data and the fit using <tt class="docutils literal"><span class="pre">musrview</span></tt><a class="headerlink" href="#view-the-data-and-the-fit-using-musrview" title="Permalink to this headline">¶</a></h3>
-<p>The data and the corresponding fit can be visualized by choosing the <tt class="docutils literal"><span class="pre">musrview</span></tt> icon in <tt class="docutils literal"><span class="pre">musredit</span></tt> or
+<h3>View the data and the fit using <code class="docutils literal notranslate"><span class="pre">musrview</span></code><a class="headerlink" href="#view-the-data-and-the-fit-using-musrview" title="Permalink to this headline">¶</a></h3>
+<p>The data and the corresponding fit can be visualized by choosing the <code class="docutils literal notranslate"><span class="pre">musrview</span></code> icon in <code class="docutils literal notranslate"><span class="pre">musredit</span></code> or
 calling from a terminal</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ musrview 3110_tutorial.msr
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ musrview 3110_tutorial.msr
 </pre></div>
 </div>
 <p>This creates the windows according to the given PLOT blocks in the msr file:</p>
 <img alt="_images/tutorial-musrview-1.png" src="_images/tutorial-musrview-1.png" />
-<p>The basic features of <tt class="docutils literal"><span class="pre">musrview</span></tt> can be found in the <tt class="docutils literal"><span class="pre">Musrfit</span> <span class="pre">menu</span></tt>. They include:</p>
+<p>The basic features of <code class="docutils literal notranslate"><span class="pre">musrview</span></code> can be found in the <code class="docutils literal notranslate"><span class="pre">Musrfit</span> <span class="pre">menu</span></code>. They include:</p>
 <ul class="simple">
 <li>export the shown data and the model to an ASCII file with comma-separated values</li>
 <li>presenting the difference between the shown data and the model (keyboard shortcut: <strong>d</strong>)</li>
 <li>calculate and show the Fourier transform of the shown data (keyboard shortcut: <strong>f</strong>), <em>e.g.</em> for
-the asymmetry of the &#8220;Up&#8221; and &#8220;Down&#8221; detectors:</li>
+the asymmetry of the “Up” and “Down” detectors:</li>
 </ul>
 <img alt="_images/tutorial-musrview-FT.png" src="_images/tutorial-musrview-FT.png" />
 </div>
 <div class="section" id="process-multiple-msr-files-using-msr2data">
-<h3>Process multiple msr files using <tt class="docutils literal"><span class="pre">msr2data</span></tt><a class="headerlink" href="#process-multiple-msr-files-using-msr2data" title="Permalink to this headline">¶</a></h3>
-<p>This short introduction is concluded by calling attention to the program <a class="reference internal" href="msr2data.html#msr2data"><em>msr2data</em></a>.
-As the name indicates the main purpose of this program is to extract the <tt class="docutils literal"><span class="pre">FITPARAMETER</span></tt> block
+<h3>Process multiple msr files using <code class="docutils literal notranslate"><span class="pre">msr2data</span></code><a class="headerlink" href="#process-multiple-msr-files-using-msr2data" title="Permalink to this headline">¶</a></h3>
+<p>This short introduction is concluded by calling attention to the program <a class="reference internal" href="msr2data.html#msr2data"><span class="std std-ref">msr2data</span></a>.
+As the name indicates the main purpose of this program is to extract the <code class="docutils literal notranslate"><span class="pre">FITPARAMETER</span></code> block
 information from multiple msr files with the same structure and to summarize them in a single
-ASCII file (either in <tt class="docutils literal"><span class="pre">TRIUMF</span> <span class="pre">DB</span></tt> format or simple columns). However, as described in detail
+ASCII file (either in <code class="docutils literal notranslate"><span class="pre">TRIUMF</span> <span class="pre">DB</span></code> format or simple columns). However, as described in detail
 in the manual, it is not only possible to collect data from msr files but also to create new
-msr files from a template and to process these files using <tt class="docutils literal"><span class="pre">musrfit</span></tt> on the fly.</p>
+msr files from a template and to process these files using <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> on the fly.</p>
 <p>Assuming the successive runs <strong>3111</strong> through <strong>3114</strong> can be analyzed using the same model introduced
 above for run <strong>3110</strong> (<em>e.g.</em> in the case one has done measurements at different temperatures) one can
-use the file <tt class="docutils literal"><span class="pre">3110_tutorial.msr</span></tt> as template, generate the files <tt class="docutils literal"><span class="pre">3111_tutorial.msr</span></tt> through
-<tt class="docutils literal"><span class="pre">3114_tutorial.msr</span></tt> with the corresponding updates in the RUN blocks, call for each one <tt class="docutils literal"><span class="pre">musrfit</span></tt>
+use the file <code class="docutils literal notranslate"><span class="pre">3110_tutorial.msr</span></code> as template, generate the files <code class="docutils literal notranslate"><span class="pre">3111_tutorial.msr</span></code> through
+<code class="docutils literal notranslate"><span class="pre">3114_tutorial.msr</span></code> with the corresponding updates in the RUN blocks, call for each one <code class="docutils literal notranslate"><span class="pre">musrfit</span></code>
 and finally summarize the FITPARAMETER block information of all processed files in an ASCII output
-file <tt class="docutils literal"><span class="pre">tutorial-T-dependence.dat</span></tt> (simple columns). If further information on the temperature or the
+file <code class="docutils literal notranslate"><span class="pre">tutorial-T-dependence.dat</span></code> (simple columns). If further information on the temperature or the
 applied field is available in the data files these will be included as well in the resulting ASCII file.
 From the terminal this would be done as follows:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>$ msr2data <span class="m">3110</span> <span class="m">3114</span> _tutorial fit-3110 -o tutorial-T-dependence.dat data
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ msr2data <span class="m">3110</span> <span class="m">3114</span> _tutorial fit-3110 -o tutorial-T-dependence.dat data
 </pre></div>
 </div>
-<p>To achieve the same in <tt class="docutils literal"><span class="pre">musredit</span></tt> (in this snapshot in the <em>dark theme</em>) one selects the <tt class="docutils literal"><span class="pre">msr2data</span></tt> icon and fills the form accordingly:</p>
+<p>To achieve the same in <code class="docutils literal notranslate"><span class="pre">musredit</span></code> (in this snapshot in the <em>dark theme</em>) one selects the <code class="docutils literal notranslate"><span class="pre">msr2data</span></code> icon and fills the form accordingly:</p>
 <img alt="_images/tutorial-musredit-msr2data.png" src="_images/tutorial-musredit-msr2data.png" />
 </div>
 <div class="section" id="further-reading">
 <h3>Further reading<a class="headerlink" href="#further-reading" title="Permalink to this headline">¶</a></h3>
-<p>This page only summarizes the very basic features and options of the programs contained in the <tt class="docutils literal"><span class="pre">musrfit</span></tt> suite.
-For a complete description please refer to the manuals of <a class="reference internal" href="user-manual.html#musrfit"><em>musrfit</em></a> (including <a class="reference internal" href="user-manual.html#musrview"><em>musrview</em></a>,
-<a class="reference internal" href="user-manual.html#musrt0"><em>musrt0</em></a>, and <a class="reference internal" href="user-manual.html#musrft"><em>musrFT</em></a>), <a class="reference internal" href="mupp.html#mupp"><em>mupp</em></a>, <a class="reference internal" href="musredit.html#musredit-sec"><em>musredit</em></a>, and <a class="reference internal" href="msr2data.html#msr2data"><em>msr2data</em></a>.</p>
+<p>This page only summarizes the very basic features and options of the programs contained in the <code class="docutils literal notranslate"><span class="pre">musrfit</span></code> suite.
+For a complete description please refer to the manuals of <a class="reference internal" href="user-manual.html#musrfit"><span class="std std-ref">musrfit</span></a> (including <a class="reference internal" href="user-manual.html#musrview"><span class="std std-ref">musrview</span></a>,
+<a class="reference internal" href="user-manual.html#musrt0"><span class="std std-ref">musrt0</span></a>, and <a class="reference internal" href="user-manual.html#musrft"><span class="std std-ref">musrFT</span></a>), <a class="reference internal" href="mupp.html#mupp"><span class="std std-ref">mupp</span></a>, <a class="reference internal" href="musredit.html#musredit-sec"><span class="std std-ref">musredit</span></a>, and <a class="reference internal" href="msr2data.html#msr2data"><span class="std std-ref">msr2data</span></a>.</p>
 </div>
 </div>
 <div class="section" id="asymmtery-fit-tutorial">
@@ -378,23 +500,73 @@ For a complete description please refer to the manuals of <a class="reference in
 </div>
 
 
-      </div>
-      <div class="bottomnav">
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <p>
-        «&#160;&#160;<a href="cite.html">How to Cite <tt class="docutils literal"><span class="pre">musrfit</span></tt>?</a>
-        &#160;&#160;::&#160;&#160;
-        <a class="uplink" href="index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="user-manual.html">User manual</a>&#160;&#160;»
-        </p>
+        <a href="user-manual.html" class="btn btn-neutral float-right" title="User manual" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cite.html" class="btn btn-neutral" title="How to Cite musrfit?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2022, Andreas Suter.
+      Last updated on Dec 12, 2022.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
       </div>
 
-    <div class="footer">
-        &copy; Copyright 2022, Andreas Suter.
-      Last updated on May 29, 2022.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
-    </div>
-  </body>
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.8.2',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>
