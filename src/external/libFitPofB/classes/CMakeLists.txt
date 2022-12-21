@@ -5,15 +5,15 @@ set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 set(BMW_TOOLS_INC ${CMAKE_SOURCE_DIR}/src/external/BMWtools)
 set(FIT_P_OF_B_INC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 # ROOT requires that the dictonary header files are found at configuration time.
-# Hence, target_include_directories cannot be used here because, targets are 
+# Hence, target_include_directories cannot be used here because, targets are
 # setup only afterwards.
 include_directories(${FIT_P_OF_B_INC})
 
 root_generate_dictionary(
-  TLondon1DDict 
-  TLondon1D.h 
+  TLondon1DDict
+  TLondon1D.h
   OPTIONS
-    -I${FFTW3_INCLUDE} 
+    -I${FFTW3_INCLUDE}
     -I${MUSRFIT_INC}
     -I${BMW_TOOLS_INC}
     -I${FIT_P_OF_B_INC}
@@ -22,10 +22,10 @@ root_generate_dictionary(
   MODULE TLondon1D
 )
 root_generate_dictionary(
-  TVortexDict 
-  TVortex.h 
-  OPTIONS 
-    -I${FFTW3_INCLUDE} 
+  TVortexDict
+  TVortex.h
+  OPTIONS
+    -I${FFTW3_INCLUDE}
     -I${MUSRFIT_INC}
     -I${BMW_TOOLS_INC}
     -I${FIT_P_OF_B_INC}
@@ -34,10 +34,10 @@ root_generate_dictionary(
   MODULE TVortex
 )
 root_generate_dictionary(
-  TSkewedGssDict 
-  TSkewedGss.h 
-  OPTIONS 
-    -I${FFTW3_INCLUDE} 
+  TSkewedGssDict
+  TSkewedGss.h
+  OPTIONS
+    -I${FFTW3_INCLUDE}
     -I${MUSRFIT_INC}
     -I${BMW_TOOLS_INC}
     -I${POFB_INC}
@@ -49,10 +49,10 @@ root_generate_dictionary(
 
 #--- create pkg-config info ---------------------------------------------------
 #[==[ //as35 for now do not create a pkgconfig file
-set(prefix "${CMAKE_INSTALL_PREFIX}")   
+set(prefix "${CMAKE_INSTALL_PREFIX}")
 set(exec_prefix "\$\{prefix\}")
 set(libdir "\$\{exec_prefix\}/lib")
-set(includedir "\$\{prefix\}/include")   
+set(includedir "\$\{prefix\}/include")
 set(FIT_P_OF_B_VERSION "1.0.0")
 set(FIT_P_OF_B_LIBRARY_NAME "FitPofB")
 configure_file("FitPofB.pc.in" "FitPofB.pc" @ONLY)
@@ -62,7 +62,7 @@ configure_file("FitPofB.pc.in" "FitPofB.pc" @ONLY)
 add_library(FitPofB SHARED
   TBofZCalc.cpp
   TBulkTriVortexFieldCalc.cpp
-  TFilmTriVortexFieldCalc.cpp 
+  TFilmTriVortexFieldCalc.cpp
   TLondon1D.cpp
   TLondon1DDict.cxx
   TPofBCalc.cpp
@@ -81,8 +81,8 @@ set_target_properties(FitPofB
 
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
-  FitPofB BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
+  FitPofB BEFORE PRIVATE
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}>
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src/external/TLemRunHeader>
     $<BUILD_INTERFACE:${BMW_TOOLS_INC}>
@@ -96,12 +96,16 @@ if (OpenMP_FOUND)
 endif (OpenMP_FOUND)
 
 set(gomp "")
-if (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
-  set(gomp gomp)
-endif (OpenMP_FOUND AND (${CMAKE_HOST_SYSTEM_NAME} STREQUAL Linux))
+if (OpenMP_FOUND)
+  if (OpenMP_CXX_LIBRARIES)
+    set(gomp ${OpenMP_CXX_LIBRARIES})
+  else (OpenMP_CXX_LIBRARIES)
+    set(gomp ${OpenMP_CXX_FLAGS}) # for older cmake OpenMP_CXX_LIBRARIES is not defined
+  endif (OpenMP_CXX_LIBRARIES)
+endif (OpenMP_FOUND)
 target_link_libraries(FitPofB 
     ${gomp}
-    FFTW3::FFTW3 FFTW3::FFTW3F ${ROOT_LIBRARIES} 
+    FFTW3::FFTW3 FFTW3::FFTW3F ${ROOT_LIBRARIES}
     TLemRunHeader PUserFcnBase BMWtools
 )
 
@@ -121,7 +125,7 @@ install(
 
 #--- install FitPofB header ---------------------------------------------------
 install(
-  FILES 
+  FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/../include/TBofZCalc.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../include/TBulkTriVortexFieldCalc.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../include/TFilmTriVortexFieldCalc.h
@@ -130,7 +134,7 @@ install(
     ${CMAKE_CURRENT_SOURCE_DIR}/../include/TPofTCalc.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../include/TSkewedGss.h
     ${CMAKE_CURRENT_SOURCE_DIR}/../include/TVortex.h
-  DESTINATION 
+  DESTINATION
     include
 )
 
@@ -141,4 +145,3 @@ install(
   DESTINATION lib/pkgconfig
 )
 #]==]
-
