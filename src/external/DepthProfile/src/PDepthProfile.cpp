@@ -2,8 +2,8 @@
 
   PDepthProfile.cpp
 
-  Author: Andreas Suter
-  e-mail: andreas.suter@psi.ch
+  Authors: Maria Martins, Andreas Suter
+  e-mail: maria.martins@psi.ch, andreas.suter@psi.ch
 
 ***************************************************************************/
 
@@ -46,14 +46,28 @@ ClassImp(PDepthProfileGlobal)
  * <p>Constructor. Reads the necessary rge-files based on the depth_profile_startup.xml
  */
 PDepthProfileGlobal::PDepthProfileGlobal() {
-    // load all the TRIM.SP rge-files
-    fRgeHandler = new PRgeHandler("./depth_profile_startup.xml");
-    if (!fRgeHandler->IsValid()) {
-        std::cout << std::endl << ">> PDepthProfileGlobal::PDepthProfileGlobal **PANIC ERROR**";
-        std::cout << std::endl << ">>  rge data handler too unhappy. Will terminate unfriendly, sorry.";
-        std::cout << std::endl;
-        fValid = false;
+  // load all the TRIM.SP rge-files
+  fRgeHandler = new PRgeHandler("./depth_profile_startup.xml");
+  if (!fRgeHandler->IsValid()) {
+    std::cout << std::endl << ">> PDepthProfileGlobal::PDepthProfileGlobal **PANIC ERROR**";
+    std::cout << std::endl << ">>  rge data handler too unhappy. Will terminate unfriendly, sorry.";
+    std::cout << std::endl;
+    fValid = false;
+  }
+
+  // calculate cumulative frequency distribution of all the rge-files
+  PRgeDataList rgeData = fRgeHandler->GetRgeData();
+  fCfd.resize(fRgeHandler->GetNoOfRgeDataSets());
+  for (unsigned int i=0; i<fCfd.size(); i++) {
+    fCfd[i].energy = rgeData[i].energy;
+    fCfd[i].depth = rgeData[i].depth;
+    fCfd[i].nn.resize(rgeData[i].nn.size());
+    double dval=0.0;
+    for (unsigned int j=0; j<fCfd[i].nn.size(); j++) {
+      dval += rgeData[i].nn[j];
+      fCfd[i].nn[j] = dval;
     }
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -63,10 +77,10 @@ PDepthProfileGlobal::PDepthProfileGlobal() {
  * <p>Clean up the rge-handler.
  */
 PDepthProfileGlobal::~PDepthProfileGlobal() {
-    if (fRgeHandler) {
-        delete fRgeHandler;
-        fRgeHandler = nullptr;
-    }
+  if (fRgeHandler) {
+    delete fRgeHandler;
+    fRgeHandler = nullptr;
+  }
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -80,10 +94,10 @@ ClassImp(PDepthProfile)
  * <p>Clean up the global part.
  */
 PDepthProfile::~PDepthProfile() {
-    if ((fDepthProfileGlobal != 0) && fInvokedGlobal) {
-        delete fDepthProfileGlobal;
-        fDepthProfileGlobal = nullptr;
-    }
+  if ((fDepthProfileGlobal != nullptr) && fInvokedGlobal) {
+    delete fDepthProfileGlobal;
+    fDepthProfileGlobal = nullptr;
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -98,31 +112,31 @@ PDepthProfile::~PDepthProfile() {
  * \param idx
  */
 void PDepthProfile::SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) {
-    fIdxGlobal = static_cast<Int_t>(idx);
+  fIdxGlobal = static_cast<Int_t>(idx);
 
-    if ((Int_t) globalPart.size() <= fIdxGlobal) {
-        fDepthProfileGlobal = new PDepthProfileGlobal();
-        if (fDepthProfileGlobal == nullptr) {
-            fValid = false;
-            std::cerr << std::endl
-                      << ">> PDepthProfile::SetGlobalPart(): **ERROR** Couldn't invoke global user function object, sorry ..."
-                      << std::endl;
-        } else if (!fDepthProfileGlobal->IsValid()) {
-            fValid = false;
-            std::cerr << std::endl
-                      << ">> PDepthProfile::SetGlobalPart(): **ERROR** initialization of global user function object failed, sorry ..."
-                      << std::endl;
-        } else {
-            fValid = true;
-            fInvokedGlobal = true;
-            globalPart.resize(fIdxGlobal + 1);
-            globalPart[fIdxGlobal] = dynamic_cast<PDepthProfileGlobal *>(fDepthProfileGlobal);
-        }
+  if ((Int_t) globalPart.size() <= fIdxGlobal) {
+    fDepthProfileGlobal = new PDepthProfileGlobal();
+    if (fDepthProfileGlobal == nullptr) {
+      fValid = false;
+      std::cerr << std::endl
+                << ">> PDepthProfile::SetGlobalPart(): **ERROR** Couldn't invoke global user function object, sorry ..."
+                << std::endl;
+    } else if (!fDepthProfileGlobal->IsValid()) {
+      fValid = false;
+      std::cerr << std::endl
+                << ">> PDepthProfile::SetGlobalPart(): **ERROR** initialization of global user function object failed, sorry ..."
+                << std::endl;
     } else {
-        fValid = true;
-        fDepthProfileGlobal = (PDepthProfileGlobal * )
-        globalPart[fIdxGlobal];
+      fValid = true;
+      fInvokedGlobal = true;
+      globalPart.resize(fIdxGlobal + 1);
+      globalPart[fIdxGlobal] = dynamic_cast<PDepthProfileGlobal *>(fDepthProfileGlobal);
     }
+  } else {
+    fValid = true;
+    fDepthProfileGlobal = (PDepthProfileGlobal * )
+        globalPart[fIdxGlobal];
+  }
 }
 
 //--------------------------------------------------------------------------
@@ -134,13 +148,19 @@ void PDepthProfile::SetGlobalPart(std::vector<void *> &globalPart, UInt_t idx) {
  * <b>return:</b>
  */
 Bool_t PDepthProfile::GlobalPartIsValid() const {
-    return (fValid && fDepthProfileGlobal->IsValid());
+  return (fValid && fDepthProfileGlobal->IsValid());
 }
 
 //--------------------------------------------------------------------------
 // GetStoppingProbability()
 //--------------------------------------------------------------------------
-
+/**
+ * @brief PDepthProfileGlobal::GetStoppingProbability
+ * @param a
+ * @param b
+ * @param energy
+ * @return
+ */
 double PDepthProfileGlobal::GetStoppingProbability(double a, double b, Double_t energy) const {
 
     // calculation of stopping probability for a given  z interval and experimental energy
@@ -175,94 +195,97 @@ double PDepthProfileGlobal::GetStoppingProbability(double a, double b, Double_t 
 //--------------------------------------------------------------------------
 // operator()
 //--------------------------------------------------------------------------
-
+/**
+ * @brief PDepthProfile::operator ()
+ * @param t
+ * @param param
+ * @return
+ */
 Double_t PDepthProfile::operator()(Double_t t, const std::vector <Double_t> &param) const {
-    //verify number of parameters: 2n+1
-    // parameters: {E,f1, f2, ..., f_n, x1, ..., x_(n-1)}
-    assert(param.size() > 2);
-    assert(((param.size() - 1) % 2) == 0);
-    //number of steps: n+1
-    int n = (param.size() - 1) / 2;
-    std::vector<double> parameters;
+  // verify number of parameters: 2n+1, i.e. it has to be an odd number of parameters
+  // parameters: {f1, f2, ..., f_n, x1, ..., x_(n-1)}
+  assert(param.size() > 2);
+  assert(((param.size() - 1) % 2) == 0);
 
-    if (fPreviousParam.size() == 0) {
-        for (int i = 0; i < param.size(); i++) {
-            fPreviousParam.push_back(param[i]);
+  //number of steps: n+1
+  int n = (param.size() - 1) / 2;
+  std::vector<double> parameters;
+
+  if (fPreviousParam.size() == 0) {
+    for (int i = 0; i < param.size(); i++) {
+      fPreviousParam.push_back(param[i]);
+      parameters.push_back(param[i]);
+    }
+  } else {
+    for (int i = 0;  i <(n+1); i++) {
+      if (param[i]>=0 & param[i] <=1) {
+        parameters.push_back(param[i]);
+      } else{
+        parameters.push_back(fPreviousParam[i]);
+      }
+    }
+    if (n==1) {
+      if (param[n + 1]>0) {
+        parameters.push_back(param[n+1]);
+      } else {
+        parameters.push_back(fPreviousParam[n+1]);
+      }
+    } else {
+      for (int i=n+1; i<param.size(); i++) {
+        //std::cout << "param[i]: " << param[i] << "param[i+1]: " << param[i + 1] << std::endl;
+        if (i != (param.size() -1)){
+          if (param[i] > param[i+1]) {
+            parameters.push_back(fPreviousParam[i+1]);
+          } else {
+            //std::cout<<"bem" << std::endl;
             parameters.push_back(param[i]);
-        }
-    }else{
-        for (int i = 0;  i <(n+1); i++) {
-            if (param[i]>=0 & param[i] <=1) {
-                parameters.push_back(param[i]);
-            } else{
-                parameters.push_back(fPreviousParam[i]);
-            }
-        }
-        if (n==1){
-            if(param[n + 1]>0) {
-                parameters.push_back(param[n+1]);
-            } else{
-                parameters.push_back(fPreviousParam[n+1]);
-            }
+          }
         } else {
-            for (int i = n + 1; i < param.size() ; i++) {
-            //std::cout << "param[i]: " << param[i] << "param[i+1]: " << param[i + 1] << std::endl;
-                if (i!=(param.size() -1)){
-                    if (param[i] > param[i + 1]) {
-                        parameters.push_back(fPreviousParam[i+1]);
-                    } else {
-                    //std::cout<<"bem" << std::endl;
-                        parameters.push_back(param[i]);
-                    }
-                } else{
-                    if (param[i] < param[i - 1])  {
-                        parameters.push_back(fPreviousParam[i-1]);
-                    } else {
-                        //std::cout<<"bem" << std::endl;
-                        parameters.push_back(param[i]);
-                    }
-                }
-            }
+          if (param[i] < param[i-1]) {
+            parameters.push_back(fPreviousParam[i-1]);
+          } else {
+            //std::cout<<"bem" << std::endl;
+            parameters.push_back(param[i]);
+          }
         }
-        for (int i = 0; i < param.size(); i++) {
-            fPreviousParam.push_back(parameters[i]);
-            std::cout << "param[i]: " << fPreviousParam[i] << std::endl;
-        }
+      }
     }
-
-    Double_t energy = t;
-    std::vector<double> probability;
-
-    // get stopping probability
-    //int l=0;
-    for (int i = 0; i < n + 1; i++) {
-        double probE;
-        double a;
-        double b;
-        if (i == 0) { //prob between 0 and x_1
-            a = 0;
-            b = parameters[n + 1];
-        } else if (i == n) { //prob between x_(n-1) and inf
-            a = parameters[2 * n];
-            b = 179;
-        } else {//prob between x_1-x_2, ..., x_n-x_(n-1)
-            a = parameters[n + i];
-            b = parameters[n + 1 + i];
-        }
-        probE = fDepthProfileGlobal->GetStoppingProbability(a, b, energy);
-        probability.push_back(probE);
+    for (int i = 0; i < param.size(); i++) {
+      fPreviousParam.push_back(parameters[i]);
+      std::cout << "param[i]: " << fPreviousParam[i] << std::endl;
     }
+  }
 
-    double fit=0;
+  Double_t energy = t;
+  std::vector<double> probability;
 
-    for (int j = 0; j < n + 1; j++) {
-        fit = fit + parameters[j] * probability[j];
+  // get stopping probability
+  //int l=0;
+  for (int i=0; i<n+1; i++) {
+    double probE;
+    double a;
+    double b;
+    if (i == 0) { //prob between 0 and x_1
+      a = 0;
+      b = parameters[n + 1];
+    } else if (i == n) { //prob between x_(n-1) and inf
+      a = parameters[2 * n];
+      b = 179;
+    } else { //prob between x_1-x_2, ..., x_n-x_(n-1)
+      a = parameters[n+i];
+      b = parameters[n+1+i];
     }
+    probE = fDepthProfileGlobal->GetStoppingProbability(a, b, energy);
+    probability.push_back(probE);
+  }
 
-   /* std::cout << "Energy  " << energy << std::endl;
-    std::cout << "FRACTION  " << fit << std::endl;*/
-    return fit;
+  double fit=0;
 
+  for (int j=0; j<n+1; j++) {
+    fit = fit + parameters[j] * probability[j];
+  }
+
+  return fit;
 }
 
 

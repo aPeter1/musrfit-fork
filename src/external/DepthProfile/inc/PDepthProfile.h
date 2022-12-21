@@ -53,6 +53,7 @@ class PDepthProfileGlobal
     mutable std::vector<Double_t> fPreviousParam;
 
     PRgeHandler *fRgeHandler{nullptr};
+    PRgeDataList fCfd;
 
   ClassDef(PDepthProfileGlobal, 1)
 };
