@@ -44,8 +44,8 @@ class PDepthProfileGlobal
     Bool_t IsValid() { return fValid; }
     virtual Int_t GetEnergyIndex(const Double_t energy) { return fRgeHandler->GetEnergyIndex(energy); }
     virtual Double_t GetMuonStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->Get_n(energyIndex, z); }
-    virtual double GetStoppingProbability(double a, double b, Double_t energy) const;
-    virtual double GetZmax(Double_t energy) const { return fRgeHandler->GetZmax(energy); }
+    virtual Double_t GetStoppingProbability(double a, double b, Double_t energy) const;
+    virtual Double_t GetZmax(const Double_t energy);
 
   private:
     Bool_t fValid{true};
