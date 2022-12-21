@@ -65,7 +65,7 @@ PDepthProfileGlobal::PDepthProfileGlobal() {
     double dval=0.0;
     for (unsigned int j=0; j<fCfd[i].nn.size(); j++) {
       dval += rgeData[i].nn[j];
-      fCfd[i].nn[j] = dval;
+      fCfd[i].nn[j] = dval; // store cfd value in nn
     }
   }
 }
@@ -152,20 +152,61 @@ Bool_t PDepthProfile::GlobalPartIsValid() const {
 }
 
 //--------------------------------------------------------------------------
+// GetPosIdx()
+//--------------------------------------------------------------------------
+/**
+ * <p>Get the position index for a given distance 'a' and a given implantation
+ * energy index.
+ *
+ * @param z distance for which the index is requested
+ * @param energyIdx implantation energy index
+ *
+ * @return position index
+ */
+Int_t PDepthProfileGlobal::GetPosIdx(const double z, const Int_t energyIdx) const
+{
+  Int_t idx=0;
+
+  for (UInt_t i=0; i<fCfd[energyIdx].depth.size(); i++) {
+    if (z <= fCfd[energyIdx].depth[i]) {
+      idx = i;
+      break;
+    }
+  }
+
+  return idx;
+}
+
+//--------------------------------------------------------------------------
 // GetStoppingProbability()
 //--------------------------------------------------------------------------
 /**
- * @brief PDepthProfileGlobal::GetStoppingProbability
- * @param a
- * @param b
- * @param energy
- * @return
+ * <p>Calculates the stopping probability from a to b for a given implantation
+ * energy, i.e.
+ *
+ * p = int_a^b n(z, E) dz
+ *
+ * @param a starting point in distance
+ * @param b stopping point in distance
+ * @param energy implantation energy in keV
+ *
+ * @return stopping probability p.
  */
 double PDepthProfileGlobal::GetStoppingProbability(double a, double b, Double_t energy) const {
 
-    // calculation of stopping probability for a given  z interval and experimental energy
-    // \int n(z, E) dz ~ dz [1/2 n_0 + n_1 + n_2 + ... + n_(N-1) + 1/2 n_N]
-    energy = energy * 1000;
+  energy = energy * 1000;
+  Int_t idx = fRgeHandler->GetEnergyIndex(energy);
+  if (idx == -1) {
+    std::cerr << "**WARNING** couldn't find energy " << energy << " (eV) in the rge-files provided." << std::endl;
+    return 0.0;
+  }
+
+  const Int_t idx_a = GetPosIdx(a, idx); // get index for distance a from cfd(z, E)
+  const Int_t idx_b = GetPosIdx(b, idx); // get index for distance b from cfd(z, E)
+
+  return fCfd[idx].nn[idx_b] - fCfd[idx].nn[idx_a];
+
+/* //as35
     double zMax = fRgeHandler->GetZmax(energy);
 
     std::vector<double> z;
@@ -189,6 +230,7 @@ double PDepthProfileGlobal::GetStoppingProbability(double a, double b, Double_t 
     }
 
     return probability;
+*/ //as35
 }
 
 
@@ -196,19 +238,34 @@ double PDepthProfileGlobal::GetStoppingProbability(double a, double b, Double_t 
 // operator()
 //--------------------------------------------------------------------------
 /**
- * @brief PDepthProfile::operator ()
- * @param t
- * @param param
- * @return
+ * <p> calculate the stopping fraction amplitude f(E) for the given parameter:
+ *
+ * f(E) = [cfd(x1, E)-cfd(0, E)] f(0, x1) + [cfd(x2, E)-cfd(x1, E)] f(x1, x2) + ...
+ *
+ * @param energy in (keV)
+ * @param param {f1, f2, ..., f_n, x1, ..., x_(n-1)}
+ *
+ * @return f(E)
  */
-Double_t PDepthProfile::operator()(Double_t t, const std::vector <Double_t> &param) const {
+Double_t PDepthProfile::operator()(Double_t energy, const std::vector <Double_t> &param) const {
   // verify number of parameters: 2n+1, i.e. it has to be an odd number of parameters
   // parameters: {f1, f2, ..., f_n, x1, ..., x_(n-1)}
   assert(param.size() > 2);
   assert(((param.size() - 1) % 2) == 0);
 
-  //number of steps: n+1
+  // number of steps: n+1
   int n = (param.size() - 1) / 2;
+
+  double fE = param[0]*fDepthProfileGlobal->GetStoppingProbability(0.0, param[n+1], energy); // z=0..x_1
+
+  for (int i=n+1; i<param.size()-1; i++) {
+    fE += param[i-n]*fDepthProfileGlobal->GetStoppingProbability(param[i], param[i+1], energy); // z=x_i..x_(i+1)
+  }
+
+  double zMax = fDepthProfileGlobal->GetZmax(energy);
+  fE += param[n]*fDepthProfileGlobal->GetStoppingProbability(param[param.size()-1], zMax, energy); // z=x_(n-1)..infinity
+
+/* //as35
   std::vector<double> parameters;
 
   if (fPreviousParam.size() == 0) {
@@ -256,7 +313,6 @@ Double_t PDepthProfile::operator()(Double_t t, const std::vector <Double_t> &par
     }
   }
 
-  Double_t energy = t;
   std::vector<double> probability;
 
   // get stopping probability
@@ -284,8 +340,9 @@ Double_t PDepthProfile::operator()(Double_t t, const std::vector <Double_t> &par
   for (int j=0; j<n+1; j++) {
     fit = fit + parameters[j] * probability[j];
   }
+*/ //as35
 
-  return fit;
+  return fE;
 }
 
 

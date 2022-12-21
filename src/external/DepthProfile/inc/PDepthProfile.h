@@ -45,6 +45,7 @@ class PDepthProfileGlobal
     virtual Int_t GetEnergyIndex(const Double_t energy) { return fRgeHandler->GetEnergyIndex(energy); }
     virtual Double_t GetMuonStoppingDensity(const Int_t energyIndex, const Double_t z) const { return fRgeHandler->Get_n(energyIndex, z); }
     virtual double GetStoppingProbability(double a, double b, Double_t energy) const;
+    virtual double GetZmax(Double_t energy) const { return fRgeHandler->GetZmax(energy); }
 
   private:
     Bool_t fValid{true};
@@ -54,6 +55,8 @@ class PDepthProfileGlobal
 
     PRgeHandler *fRgeHandler{nullptr};
     PRgeDataList fCfd;
+
+    Int_t GetPosIdx(const double z, const Int_t energyIdx) const;
 
   ClassDef(PDepthProfileGlobal, 1)
 };
@@ -68,7 +71,7 @@ class PDepthProfile : public PUserFcnBase
     virtual void SetGlobalPart(std::vector<void*> &globalPart, UInt_t idx);
     virtual Bool_t GlobalPartIsValid() const;
 
-    virtual Double_t operator()(Double_t t, const std::vector<Double_t> &param) const;
+    virtual Double_t operator()(Double_t energy, const std::vector<Double_t> &param) const;
 
   private:
     Bool_t fValid{true};
