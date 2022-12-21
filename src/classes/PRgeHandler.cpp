@@ -568,7 +568,7 @@ Double_t PRgeHandler::GetZmax(const Double_t energy)
       idx = i;
       break;
     }
-    }
+  }
   
   if (idx != -1)
       return GetZmax(idx);
