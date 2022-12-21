@@ -583,7 +583,6 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
   QStringList token;
   bool done = false, ok;
   double dval = 0;
-  int ival;
   PmuppParam param;
   run.SetName(fln);
 
@@ -630,10 +629,7 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
       return collection;
     }
     for (int i=0; i<token.size(); i++) {
-      if (headerCode[i] == PMUPP_RUN)
-        ival = token[i].toInt(&ok);
-      else
-        dval = token[i].toDouble(&ok);
+      dval = token[i].toDouble(&ok);
       if (!ok) {
         errorMsg = QString("unrecognized token ('%1') in line %2 (line number: %3)").arg(token[i].toLatin1().data()).arg(line.toLatin1().data()).arg(lineNo);
         std::cerr << std::endl;
@@ -669,20 +665,19 @@ PmuppCollection PParamDataHandler::ReadColumnParamFile(const QString fln, bool &
         param.ResetParam();
       } else if (headerCode[i] == PMUPP_RUN) {
         param.ResetParam();
-        run.SetNumber(ival);
-        run.SetName(QString("%1").arg(ival));
-        QString collName("");
-        int pos = fln.lastIndexOf("/");
-        if (pos == -1)
-          collName = fln;
-        else
-          collName = fln.right(fln.length()-pos-1);
-        collection.SetName(collName);
-        collection.AddRun(run);
-        run.Clear();
+        run.SetNumber((int)dval);
+        run.SetName(QString("%1").arg((int)dval));
       }
-
     }
+    QString collName("");
+    int pos = fln.lastIndexOf("/");
+    if (pos == -1)
+      collName = fln;
+    else
+      collName = fln.right(fln.length()-pos-1);
+    collection.SetName(collName);
+    collection.AddRun(run);
+    run.Clear();
   }
   file.close();
 
