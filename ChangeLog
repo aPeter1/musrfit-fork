@@ -12,6 +12,16 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.8.2, 2022/12/03
+=============================
+
+add feature that mupp_plotter can show/hide lines between the data points.
+
+Release of V1.8.1, 2022/11/07
+=============================
+
+adopted to the newer Qt versions.
+
 Release of V1.8.0, 2022/05/22
 =============================
 
