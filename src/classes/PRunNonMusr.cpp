@@ -60,7 +60,8 @@ PRunNonMusr::PRunNonMusr() : PRunBase()
  * \param runNo number of the run within the msr-file
  * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
-PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
+PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag, Bool_t theoAsData) :
+  PRunBase(msrInfo, rawData, runNo, tag), fTheoAsData(theoAsData)
 {
   // get the proper run
   fRawRunData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
@@ -440,7 +441,7 @@ Bool_t PRunNonMusr::PrepareViewData()
 
   // typically take 1000 points to calculate the theory, except if there are more data points, than take that number
   Double_t xStep;
-  if (fData.GetX()->size() > 1000.0)
+  if ((fData.GetX()->size() > 1000.0) || fTheoAsData)
     xStep = (xMax-xMin)/fData.GetX()->size();
   else
     xStep = (xMax-xMin)/1000.0;
