@@ -13,7 +13,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2008-2014 by Bastian M. Wojek, Andreas Suter            *
+ *   Copyright (C) 2008-2023 by Bastian M. Wojek, Andreas Suter            *
  *                                                                         *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
