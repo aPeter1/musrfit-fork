@@ -1,1 +1,23 @@
-Will describe what this is all about...
+For details about the idea behind see:
+
+A.F.A. Simões, et al.
+Muon implantation experiments in films: obtaining depth-resolved information
+Review of Scientific Instruments. 2020; 91(2): 023906 (7 pp.).
+
+A few words about the details of the current implementation:
+
+1) In order to handle the necessary rge-files (trim.sp stopping profiles), a
+   file depth_profile_startup.xml has to be present in the working directory.
+   In this xml-file the path to the rge-files and its energies are described.
+   Details about the xml startup file can be found here:
+   http://lmu.web.psi.ch/musrfit/user/html/user-manual.html#rge-file-handler-for-low-energy-mgrsr
+   
+2) For all these models, rather than the rge-files, the normalized cumulative 
+   frequency distributions, i.e. cfd[i] = sum_{k=0}^i rge[k] / sum_{k=0}^max rge[k]
+   are needed. Hence the cfd's are calculated in the constructor and used
+   throughout afterwards.
+ 
+3) under ./test you will find one example. 
+   
+4) Under <musrfit>/doc/example/DepthProfiles, where <musrfit> is the home
+   directory of musrfit, you will find a couple more examples.
