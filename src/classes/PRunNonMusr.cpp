@@ -441,20 +441,31 @@ Bool_t PRunNonMusr::PrepareViewData()
 
   // typically take 1000 points to calculate the theory, except if there are more data points, than take that number
   Double_t xStep;
-  if ((fData.GetX()->size() > 1000.0) || fTheoAsData)
+  if (fData.GetX()->size() > 1000.0)
     xStep = (xMax-xMin)/fData.GetX()->size();
   else
     xStep = (xMax-xMin)/1000.0;
 
-  Double_t xx = xMin;
-  do {
-    // fill x-vector
-    fData.AppendXTheoryValue(xx);
-    // fill y-vector
-    fData.AppendTheoryValue(fTheory->Func(xx, par, fFuncValues));
-    // calculate next xx
-    xx += xStep;
-  } while (xx < xMax);
+  if (fTheoAsData) {
+    Double_t xx;
+    for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetData()->at(xIndex).size(); i++) {
+      // fill x-vector
+      xx = fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i);
+      fData.AppendXTheoryValue(xx);
+      // fill y-vector
+      fData.AppendTheoryValue(fTheory->Func(xx, par, fFuncValues));
+    }
+  } else {
+    Double_t xx = xMin;
+    do {
+      // fill x-vector
+      fData.AppendXTheoryValue(xx);
+      // fill y-vector
+      fData.AppendTheoryValue(fTheory->Func(xx, par, fFuncValues));
+      // calculate next xx
+      xx += xStep;
+    } while (xx < xMax);
+  }
 
   // clean up
   par.clear();
