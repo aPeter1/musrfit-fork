@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2013-2022 by Andreas Suter                              *
+ *   Copyright (C) 2013-2023 by Andreas Suter                              *
  *   andreas.suter@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
