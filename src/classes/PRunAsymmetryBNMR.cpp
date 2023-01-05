@@ -9,7 +9,7 @@
 ***************************************************************************/
 
 /***************************************************************************
- *   Copyright (C) 2018-2021 by Zaher Salman                              *
+ *   Copyright (C) 2018-2023 by Zaher Salman                              *
  *   zaher.salman@psi.ch                                                  *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *

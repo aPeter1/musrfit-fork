@@ -4,7 +4,7 @@
  * mud.h  Declarations for MUD 
  * v1.3
  *
- *   Copyright (C) 1994-2021 TRIUMF (Vancouver, Canada)
+ *   Copyright (C) 1994-2023 TRIUMF (Vancouver, Canada)
  *
  *   Authors: T. Whidden, D. Arseneau, S. Daviel
  *   
