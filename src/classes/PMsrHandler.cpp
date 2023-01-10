@@ -6171,7 +6171,7 @@ Bool_t PMsrHandler::CheckMaps()
           if (FilterNumber(str, "map", MSR_PARAM_MAP_OFFSET, no)) {
             mapVec.push_back(no);
             mapBlock.push_back(1); // 1 = theory-block
-            mapLineNo.push_back(fTheory[i].fLineNo);
+            mapLineNo.push_back(fFunctions[i].fLineNo);
           }
         }
       }
