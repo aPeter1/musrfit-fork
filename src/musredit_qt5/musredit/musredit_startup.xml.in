@@ -201,7 +201,7 @@
     <func>
       <name>bessel</name>
       <comment>(phase frequency)</comment>
-      <label>spherical Bessel 0th order</label>
+      <label>Bessel 0th order</label>
       <pixmap>bessel.png</pixmap>
       <params>2</params>
     </func>
