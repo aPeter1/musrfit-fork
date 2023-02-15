@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Class_MuSR_PSI
+Description: C++ shared library providing the MuSR_td_PSI_bin class
+Version: 0.1.0
+Libs: -L${libdir} -lClass_MuSR_PSI
+Cflags: -I${includedir}

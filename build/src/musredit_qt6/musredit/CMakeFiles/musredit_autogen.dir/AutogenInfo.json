@@ -1,0 +1,353 @@
+{
+	"BUILD_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musredit/musredit_autogen",
+	"CMAKE_BINARY_DIR" : "/Users/maria/Applications/musrfit/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musredit",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/Users/maria/Applications/musrfit/src/musredit_qt6/musredit",
+	"CMAKE_EXECUTABLE" : "/opt/homebrew/Cellar/cmake/3.25.1/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/CMakeLists.txt",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/musredit.qrc"
+	],
+	"CMAKE_SOURCE_DIR" : "/Users/maria/Applications/musrfit",
+	"DEP_FILE" : "",
+	"DEP_FILE_RULE_NAME" : "",
+	"HEADERS" : 
+	[
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PAdmin.h",
+			"MU",
+			"EWIEGA46WW/moc_PAdmin.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PChangeDefaultPathsDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PChangeDefaultPathsDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PDumpOutputHandler.h",
+			"MU",
+			"EWIEGA46WW/moc_PDumpOutputHandler.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PFindDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PFindDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PFitOutputHandler.h",
+			"MU",
+			"EWIEGA46WW/moc_PFitOutputHandler.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetAsymmetryRunBlockDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PGetAsymmetryRunBlockDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetFourierBlockDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PGetFourierBlockDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetFunctionsBlockDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PGetFunctionsBlockDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetMusrFTOptionsDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PGetMusrFTOptionsDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetNonMusrRunBlockDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PGetNonMusrRunBlockDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetParameterBlockDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PGetParameterBlockDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetPlotBlockDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PGetPlotBlockDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetSingleHistoRunBlockDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PGetSingleHistoRunBlockDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetTheoryBlockDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PGetTheoryBlockDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetTitleBlockDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PGetTitleBlockDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PMsr2DataDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PMsr2DataDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PMusrEditAbout.h",
+			"MU",
+			"EWIEGA46WW/moc_PMusrEditAbout.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PPrefsDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PPrefsDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PReplaceConfirmationDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PReplaceConfirmationDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PReplaceDialog.h",
+			"MU",
+			"EWIEGA46WW/moc_PReplaceDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PSubTextEdit.h",
+			"MU",
+			"EWIEGA46WW/moc_PSubTextEdit.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PTextEdit.h",
+			"MU",
+			"EWIEGA46WW/moc_PTextEdit.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musredit/musredit_autogen/include",
+	"MOC_COMPILATION_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musredit/musredit_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NETWORK_LIB",
+		"QT_NO_DEBUG",
+		"QT_PRINTSUPPORT_LIB",
+		"QT_SVG_LIB",
+		"QT_WIDGETS_LIB",
+		"QT_XML_LIB"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/Users/maria/Applications/musrfit/build/src/musredit_qt6/musredit",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit",
+		"/Users/maria/Applications/musrfit/build/src/musredit_qt6",
+		"/Users/maria/Applications/musrfit/build/src",
+		"/Users/maria/Applications/musrfit/build",
+		"/Users/maria/Applications/musrfit/src/include",
+		"/opt/homebrew/Cellar/root/6.26.06_2/include/root",
+		"/opt/homebrew/lib/QtCore.framework/Headers",
+		"/opt/homebrew/lib/QtCore.framework",
+		"/opt/homebrew/share/qt/mkspecs/macx-clang",
+		"/opt/homebrew/include",
+		"/opt/homebrew/lib/QtWidgets.framework/Headers",
+		"/opt/homebrew/lib/QtWidgets.framework",
+		"/opt/homebrew/lib/QtGui.framework/Headers",
+		"/opt/homebrew/lib/QtGui.framework",
+		"/opt/homebrew/lib/QtNetwork.framework/Headers",
+		"/opt/homebrew/lib/QtNetwork.framework",
+		"/opt/homebrew/lib/QtXml.framework/Headers",
+		"/opt/homebrew/lib/QtXml.framework",
+		"/opt/homebrew/lib/QtSvg.framework/Headers",
+		"/opt/homebrew/lib/QtSvg.framework",
+		"/opt/homebrew/lib/QtPrintSupport.framework/Headers",
+		"/opt/homebrew/lib/QtPrintSupport.framework",
+		"/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include",
+		"/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1",
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/14.0.0/include",
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
+	],
+	"MOC_MACRO_NAMES" : 
+	[
+		"Q_OBJECT",
+		"Q_GADGET",
+		"Q_GADGET_EXPORT",
+		"Q_NAMESPACE",
+		"Q_NAMESPACE_EXPORT"
+	],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++",
+		"-dM",
+		"-E",
+		"-c",
+		"/opt/homebrew/Cellar/cmake/3.25.1/share/cmake/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musredit/musredit_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 8,
+	"PARSE_CACHE_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musredit/CMakeFiles/musredit_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/opt/homebrew/share/qt/libexec/moc",
+	"QT_UIC_EXECUTABLE" : "/opt/homebrew/share/qt/libexec/uic",
+	"QT_VERSION_MAJOR" : 6,
+	"QT_VERSION_MINOR" : 4,
+	"SETTINGS_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musredit/CMakeFiles/musredit_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PAdmin.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PChangeDefaultPathsDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PDumpOutputHandler.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PFindDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PFitOutputHandler.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetAsymmetryRunBlockDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetFourierBlockDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetFunctionsBlockDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetMusrFTOptionsDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetNonMusrRunBlockDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetParameterBlockDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetPlotBlockDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetSingleHistoRunBlockDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetTheoryBlockDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PGetTitleBlockDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PMsr2DataDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PMusrEditAbout.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PPrefsDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PReplaceConfirmationDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PReplaceDialog.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PSubTextEdit.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/PTextEdit.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/main.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [ "/Users/maria/Applications/musrfit/src/musredit_qt6/musredit/forms" ],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"VERBOSITY" : 0
+}

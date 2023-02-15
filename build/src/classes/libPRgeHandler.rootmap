@@ -1,0 +1,4 @@
+[ libPRgeHandler.dylib ]
+# List of selected classes
+class PRgeHandler
+class PXmlRgeHandler

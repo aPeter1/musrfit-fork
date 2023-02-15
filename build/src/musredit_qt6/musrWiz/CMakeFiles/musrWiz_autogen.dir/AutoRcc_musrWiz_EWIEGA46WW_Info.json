@@ -1,0 +1,29 @@
+{
+	"BUILD_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musrWiz/musrWiz_autogen",
+	"CMAKE_BINARY_DIR" : "/Users/maria/Applications/musrfit/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musrWiz",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/Users/maria/Applications/musrfit/src/musredit_qt6/musrWiz",
+	"CMAKE_SOURCE_DIR" : "/Users/maria/Applications/musrfit",
+	"INCLUDE_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musrWiz/musrWiz_autogen/include",
+	"INPUTS" : 
+	[
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrWiz/musrWiz.xml",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrWiz/func_defs/musrfit_funcs.xml",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrWiz/instrument_defs/instrument_def_psi.xml",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrWiz/instrument_defs/instrument_def_isis.xml",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrWiz/icons/musrWiz-22x22-dark.svg",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrWiz/icons/musrWiz-32x32.svg",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrWiz/icons/musrWiz-32x32-dark.svg",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrWiz/icons/musrWiz-22x22.svg"
+	],
+	"LOCK_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musrWiz/CMakeFiles/musrWiz_autogen.dir/AutoRcc_musrWiz_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "musrWiz" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_musrWiz.cpp",
+	"RCC_EXECUTABLE" : "/opt/homebrew/share/qt/libexec/rcc",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musrWiz/CMakeFiles/musrWiz_autogen.dir/AutoRcc_musrWiz_EWIEGA46WW_Used.txt",
+	"SOURCE" : "/Users/maria/Applications/musrfit/src/musredit_qt6/musrWiz/musrWiz.qrc",
+	"VERBOSITY" : 0
+}

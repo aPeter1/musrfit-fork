@@ -1,0 +1,3 @@
+[ libPNL_StartupHandler.dylib ]
+# List of selected classes
+class PNL_StartupHandler

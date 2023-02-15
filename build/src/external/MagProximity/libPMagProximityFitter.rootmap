@@ -1,0 +1,4 @@
+[ libPMagProximityFitter.dylib ]
+# List of selected classes
+class PMagProximityFitter
+class PMagProximityFitterGlobal

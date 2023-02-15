@@ -1,0 +1,42 @@
+module "PFourierCanvas" {
+  requires cplusplus
+  module "PFourierCanvas.h" { header "PFourierCanvas.h" export * }
+  link "libPFourierCanvas.dylib"
+  export *
+}
+
+module "PMusrCanvas" {
+  requires cplusplus
+  module "PMusrCanvas.h" { header "PMusrCanvas.h" export * }
+  link "libPMusrCanvas.dylib"
+  export *
+}
+
+module "PMusrT0" {
+  requires cplusplus
+  module "PMusrT0.h" { header "PMusrT0.h" export * }
+  link "libPMusrT0.dylib"
+  export *
+}
+
+module "PStartupHandler" {
+  requires cplusplus
+  module "PStartupHandler.h" { header "PStartupHandler.h" export * }
+  link "libPStartupHandler.dylib"
+  export *
+}
+
+module "PUserFcnBase" {
+  requires cplusplus
+  module "PUserFcnBase.h" { header "PUserFcnBase.h" export * }
+  link "libPUserFcnBase.dylib"
+  export *
+}
+
+module "PRgeHandler" {
+  requires cplusplus
+  module "PRgeHandler.h" { header "PRgeHandler.h" export * }
+  link "libPRgeHandler.dylib"
+  export *
+}
+

@@ -1,0 +1,7 @@
+module "TMusrRunHeader" {
+  requires cplusplus
+  module "TMusrRunHeader.h" { header "TMusrRunHeader.h" export * }
+  link "libTMusrRunHeader.dylib"
+  export *
+}
+

@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: TMusrRunHeader
+Description: C++ shared library providing the MusrRoot Run Header class
+Version: 1.0.0
+Libs: -L${libdir} -lTMusrRunHeader
+Cflags: -I${includedir}

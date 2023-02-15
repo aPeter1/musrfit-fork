@@ -1,0 +1,4 @@
+[ libPNL_PippardFitter.dylib ]
+# List of selected classes
+class PNL_PippardFitter
+class PNL_PippardFitterGlobal

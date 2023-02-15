@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: PRgeHandler
+Description: C++ shared library providing the support for handling of TrimSP rge-files
+Version: 1.3.0
+Libs: -L${libdir} -lPRgeHandler
+Cflags: -I${includedir}

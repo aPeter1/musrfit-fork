@@ -1,0 +1,7 @@
+module "PPhotoMeissner" {
+  requires cplusplus
+  module "PPhotoMeissner.h" { header "PPhotoMeissner.h" export * }
+  link "libPPhotoMeissner.dylib"
+  export *
+}
+

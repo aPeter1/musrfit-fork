@@ -1,0 +1,14 @@
+module "PMuppCanvas" {
+  requires cplusplus
+  module "PMuppCanvas.h" { header "PMuppCanvas.h" export * }
+  link "libPMuppCanvas.dylib"
+  export *
+}
+
+module "PMuppStartupHandler" {
+  requires cplusplus
+  module "PMuppStartupHandler.h" { header "PMuppStartupHandler.h" export * }
+  link "libPMuppStartupHandler.dylib"
+  export *
+}
+

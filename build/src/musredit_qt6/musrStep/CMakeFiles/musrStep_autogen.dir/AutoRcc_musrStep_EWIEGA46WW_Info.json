@@ -1,0 +1,25 @@
+{
+	"BUILD_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musrStep/musrStep_autogen",
+	"CMAKE_BINARY_DIR" : "/Users/maria/Applications/musrfit/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musrStep",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/Users/maria/Applications/musrfit/src/musredit_qt6/musrStep",
+	"CMAKE_SOURCE_DIR" : "/Users/maria/Applications/musrfit",
+	"INCLUDE_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musrStep/musrStep_autogen/include",
+	"INPUTS" : 
+	[
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrStep/icons/musrStep-32x32.svg",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrStep/icons/musrStep-22x22-dark.svg",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrStep/icons/musrStep-22x22.svg",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/musrStep/icons/musrStep-32x32-dark.svg"
+	],
+	"LOCK_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musrStep/CMakeFiles/musrStep_autogen.dir/AutoRcc_musrStep_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "-name", "musrStep" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_musrStep.cpp",
+	"RCC_EXECUTABLE" : "/opt/homebrew/share/qt/libexec/rcc",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/musrStep/CMakeFiles/musrStep_autogen.dir/AutoRcc_musrStep_EWIEGA46WW_Used.txt",
+	"SOURCE" : "/Users/maria/Applications/musrfit/src/musredit_qt6/musrStep/musrStep.qrc",
+	"VERBOSITY" : 0
+}

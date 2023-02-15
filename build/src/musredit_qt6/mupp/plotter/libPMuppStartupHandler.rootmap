@@ -1,0 +1,3 @@
+[ libPMuppStartupHandler.dylib ]
+# List of selected classes
+class PMuppStartupHandler

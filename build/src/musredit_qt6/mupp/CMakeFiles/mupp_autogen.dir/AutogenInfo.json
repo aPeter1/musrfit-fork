@@ -1,0 +1,181 @@
+{
+	"BUILD_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/mupp/mupp_autogen",
+	"CMAKE_BINARY_DIR" : "/Users/maria/Applications/musrfit/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/mupp",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/Users/maria/Applications/musrfit/src/musredit_qt6/mupp",
+	"CMAKE_EXECUTABLE" : "/opt/homebrew/Cellar/cmake/3.25.1/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/CMakeLists.txt",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/cmake/configure_mupp_version_file.cmake.in",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/mupp.qrc"
+	],
+	"CMAKE_SOURCE_DIR" : "/Users/maria/Applications/musrfit",
+	"DEP_FILE" : "",
+	"DEP_FILE_RULE_NAME" : "",
+	"HEADERS" : 
+	[
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/PVarDialog.h",
+			"Mu",
+			"EWIEGA46WW/moc_PVarDialog.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/Pmupp.h",
+			"Mu",
+			"EWIEGA46WW/moc_Pmupp.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/PmuppAdmin.h",
+			"Mu",
+			"EWIEGA46WW/moc_PmuppAdmin.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/PmuppGui.h",
+			"Mu",
+			"EWIEGA46WW/moc_PmuppGui.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/PmuppScript.h",
+			"Mu",
+			"EWIEGA46WW/moc_PmuppScript.cpp",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/mupp.h",
+			"Mu",
+			"EWIEGA46WW/moc_mupp.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/mupp/mupp_autogen/include",
+	"MOC_COMPILATION_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/mupp/mupp_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"QT_CORE_LIB",
+		"QT_GUI_LIB",
+		"QT_NO_DEBUG",
+		"QT_WIDGETS_LIB",
+		"QT_XML_LIB"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/Users/maria/Applications/musrfit/build/src/musredit_qt6/mupp",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp",
+		"/Users/maria/Applications/musrfit/build/src",
+		"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/var/include",
+		"/opt/homebrew/Cellar/root/6.26.06_2/include/root",
+		"/opt/homebrew/include",
+		"/opt/homebrew/lib/QtWidgets.framework/Headers",
+		"/opt/homebrew/lib/QtWidgets.framework",
+		"/opt/homebrew/lib/QtCore.framework/Headers",
+		"/opt/homebrew/lib/QtCore.framework",
+		"/opt/homebrew/share/qt/mkspecs/macx-clang",
+		"/opt/homebrew/lib/QtGui.framework/Headers",
+		"/opt/homebrew/lib/QtGui.framework",
+		"/opt/homebrew/lib/QtXml.framework/Headers",
+		"/opt/homebrew/lib/QtXml.framework",
+		"/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include/c++/v1",
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/14.0.0/include",
+		"/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX13.1.sdk/usr/include",
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include"
+	],
+	"MOC_MACRO_NAMES" : 
+	[
+		"Q_OBJECT",
+		"Q_GADGET",
+		"Q_GADGET_EXPORT",
+		"Q_NAMESPACE",
+		"Q_NAMESPACE_EXPORT"
+	],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++",
+		"-dM",
+		"-E",
+		"-c",
+		"/opt/homebrew/Cellar/cmake/3.25.1/share/cmake/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/mupp/mupp_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : 
+	[
+		"/Users/maria/Applications/musrfit/build/src/musredit_qt6/mupp/mupp_version.h"
+	],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 8,
+	"PARSE_CACHE_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/mupp/CMakeFiles/mupp_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/opt/homebrew/share/qt/libexec/moc",
+	"QT_UIC_EXECUTABLE" : "",
+	"QT_VERSION_MAJOR" : 6,
+	"QT_VERSION_MINOR" : 4,
+	"SETTINGS_FILE" : "/Users/maria/Applications/musrfit/build/src/musredit_qt6/mupp/CMakeFiles/mupp_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/PVarDialog.cpp",
+			"Mu",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/Pmupp.cpp",
+			"Mu",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/PmuppAdmin.cpp",
+			"Mu",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/PmuppGui.cpp",
+			"Mu",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/PmuppScript.cpp",
+			"Mu",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/mupp.cpp",
+			"Mu",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/var/src/PExpression.cpp",
+			"Mu",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/var/src/PProgram.cpp",
+			"Mu",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/var/src/PStatement.cpp",
+			"Mu",
+			null
+		],
+		[
+			"/Users/maria/Applications/musrfit/src/musredit_qt6/mupp/var/src/PVarHandler.cpp",
+			"Mu",
+			null
+		]
+	],
+	"VERBOSITY" : 0
+}

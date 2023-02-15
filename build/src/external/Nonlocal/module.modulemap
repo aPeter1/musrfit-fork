@@ -1,0 +1,14 @@
+module "PNL_PippardFitter" {
+  requires cplusplus
+  module "PNL_PippardFitter.h" { header "PNL_PippardFitter.h" export * }
+  link "libPNL_PippardFitter.dylib"
+  export *
+}
+
+module "PNL_StartupHandler" {
+  requires cplusplus
+  module "PNL_StartupHandler.h" { header "PNL_StartupHandler.h" export * }
+  link "libPNL_StartupHandler.dylib"
+  export *
+}
+

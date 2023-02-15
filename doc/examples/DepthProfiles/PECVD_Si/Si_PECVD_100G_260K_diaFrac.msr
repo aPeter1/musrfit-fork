@@ -1,0 +1,58 @@
+n/a
+###############################################################
+FITPARAMETER
+#      Nr.   Name        Value     Step      Pos_Error  Boundaries    
+        1 f1          0.49618   0.00062     none        0       1       
+        2 f2          0.26731   0.00052     none        
+        3 x1          107.3     4.8         none        
+
+###############################################################
+THEORY
+userFcn  libPDepthProfile PDepthProfile 1 2 3
+
+###############################################################
+RUN data/Si10_260K_Escan_100GTF_withDiaFrac PIM3 PSI DAT   (name beamline institute data-file-format)
+fittype         8         (non muSR fit)
+map             0    0    0    0    0    0    0    0    0    0
+xy-data         3       30      
+fit             5       22     
+packing         1
+
+
+########################################64#######################
+COMMANDS
+MINIMIZE
+#HESSE
+MINOS
+SAVE
+
+###############################################################
+PLOT 8   (non muSR plot)
+runs     1   
+range    0   25
+
+
+
+###############################################################
+STATISTIC --- 2023-01-30 14:25:21
+  chisq = 13.2, NDF = 8, chisq/NDF = 1.651215
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
