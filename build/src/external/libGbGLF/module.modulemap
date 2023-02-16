@@ -1,7 +1,0 @@
-module "PGbGLF" {
-  requires cplusplus
-  module "PGbGLF.h" { header "PGbGLF.h" export * }
-  link "libPGbGLF.dylib"
-  export *
-}
-

@@ -1,7 +1,0 @@
-module "PDepthProfile" {
-  requires cplusplus
-  module "PDepthProfile.h" { header "PDepthProfile.h" export * }
-  link "libPDepthProfile.dylib"
-  export *
-}
-
