@@ -2,24 +2,23 @@ n/a
 ###############################################################
 FITPARAMETER
 #      Nr. Name        Value     Step      Pos_Error  Boundaries    
-        1 f1          0.07038   0.00096     none        
-        2 f2          0.0325    0.0011      none        -0.5    1       
-        3 x1          86.7      18.5        none        
+        1 f1          0.07038   0.00053     none        
+        2 f2          0.03252   0.00055     none        -0.5    1       
+        3 x1          86.7      10.8        none        
 
 ###############################################################
 THEORY
 userFcn  libPDepthProfile PDepthProfile 1 2 3
 
 ###############################################################
-RUN data/1300x_PECVD_Escan_260K_5G_noDiaFrac PIM3 PSI DAT   (name beamline institute data-file-format)
+RUN data/1300x_PECVD_Escan_260K_5G_noDiaFrac MUE4 PSI DAT   (name beamline institute data-file-format)
 fittype         8         (non muSR fit)
 map             0    0    0    0    0    0    0    0    0    0
-xy-data         3       11      
+xy-data         dataE    Asym_muon
 fit             1       22     
 packing         1
 
-
-########################################64#######################
+###############################################################
 COMMANDS
 MINIMIZE
 #HESSE
@@ -34,8 +33,8 @@ range    0   22
 
 
 ###############################################################
-STATISTIC --- 2023-01-30 14:24:30
-  chisq = 42.1, NDF = 6, chisq/NDF = 7.024731
+STATISTIC --- 2023-02-16 15:29:27
+  chisq = 42.1, NDF = 6, chisq/NDF = 7.024748
 
 
 

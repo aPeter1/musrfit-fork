@@ -13,15 +13,14 @@ THEORY
 userFcn  libPDepthProfile PDepthProfile 1 2 3 4 5
 
 ###############################################################
-RUN data/1300x_PECVD_Escan_260K_100G_withDiaFrac PIM3 PSI DAT   (name beamline institute data-file-format)
+RUN data/1300x_PECVD_Escan_260K_100G_withDiaFrac MUE4 PSI DAT   (name beamline institute data-file-format)
 fittype         8         (non muSR fit)
 map             0    0    0    0    0    0    0    0    0    0
 xy-data         dataE    DiaFrac 
 fit             1       22     
 packing         1
 
-
-########################################64#######################
+###############################################################
 COMMANDS
 MINIMIZE
 #HESSE
@@ -32,8 +31,6 @@ SAVE
 PLOT 8   (non muSR plot)
 runs     1   
 range    2.5   22
-
-
 
 ###############################################################
 STATISTIC --- 2023-01-31 11:22:41
