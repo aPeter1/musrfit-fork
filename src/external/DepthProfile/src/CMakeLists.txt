@@ -6,6 +6,7 @@ set(DEPTH_PROFILE_INC ${CMAKE_CURRENT_SOURCE_DIR}/../inc)
 # ROOT requires that the dictonary header files are found at configuration time.
 # Hence, target_include_directories cannot be used here because, targets are 
 # setup only afterwards.
+include_directories(${MUSRFIT_INC})
 include_directories(${DEPTH_PROFILE_INC})
 
 root_generate_dictionary(
