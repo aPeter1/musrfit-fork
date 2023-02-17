@@ -4,6 +4,7 @@ if (ASlibs)
   add_subdirectory(libPhotoMeissner)
   add_subdirectory(libSpinValve)
   add_subdirectory(libGbGLF)
+  add_subdirectory(DepthProfile)
 endif (ASlibs)
 
 if (BMWlibs)

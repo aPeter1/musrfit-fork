@@ -151,6 +151,32 @@ PNonMusrRawRunData::~PNonMusrRawRunData()
 }
 
 //--------------------------------------------------------------------------
+// SetSize (public)
+//--------------------------------------------------------------------------
+/**
+ * <p>Allows to set the number of data sets before filling it. This is
+ * needed when reading dat-files generated from msr2data.
+ *
+ * @param size number of data sets
+ */
+void PNonMusrRawRunData::SetSize(const UInt_t size)
+{
+  // first clean up
+  for (UInt_t i=0; i<fData.size(); i++) {
+    fData[i].clear();
+  }
+  fData.clear();
+  for (UInt_t i=0; i<fErrData.size(); i++) {
+    fErrData[i].clear();
+  }
+  fErrData.clear();
+
+  // set size
+  fData.resize(size);
+  fErrData.resize(size);
+}
+
+//--------------------------------------------------------------------------
 // SetLabel (public)
 //--------------------------------------------------------------------------
 /**

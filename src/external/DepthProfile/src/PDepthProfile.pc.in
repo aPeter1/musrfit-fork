@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: PDepthProfile
+Description: C++ shared library providing the depth profile fitter class
+Version: @P_DEPTH_PROFILE_VERSION@
+Libs: -L${libdir} -l@P_DEPTH_PROFILE_LIBRARY_NAME@
+Cflags: -I${includedir}

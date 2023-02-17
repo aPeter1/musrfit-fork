@@ -109,6 +109,7 @@ class PRgeHandler : public TObject
     virtual ~PRgeHandler() {}
 
     virtual bool IsValid() { return fValid; }
+    virtual UInt_t GetNoOfRgeDataSets() { return (UInt_t)fData.size(); }
     virtual PRgeDataList GetRgeData() { return fData; }
     virtual Double_t GetZmax(const Double_t energy);
     virtual Double_t GetZmax(const Int_t idx);

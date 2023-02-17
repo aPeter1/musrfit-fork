@@ -531,6 +531,9 @@ void PRunAsymmetryRRF::CalcTheory()
  */
 Bool_t PRunAsymmetryRRF::PrepareData()
 {
+  if (!fValid)
+    return false;
+
   // keep the Global block info
   PMsrGlobalBlock *globalBlock = fMsrInfo->GetMsrGlobal();
 

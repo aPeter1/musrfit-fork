@@ -89,6 +89,7 @@ class PRunDataHandler
     virtual Bool_t ReadMduAsciiFile();
     virtual Bool_t ReadAsciiFile();
     virtual Bool_t ReadDBFile();
+    virtual Bool_t ReadDatFile();
 
     virtual Bool_t WriteMusrRootFile(TString fln="");
     virtual Bool_t WriteRootFile(TString fln="");

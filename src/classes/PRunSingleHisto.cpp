@@ -700,6 +700,9 @@ Bool_t PRunSingleHisto::PrepareData()
 {
   Bool_t success = true;
 
+  if (!fValid)
+    return false;
+
   // keep the Global block info
   PMsrGlobalBlock *globalBlock = fMsrInfo->GetMsrGlobal();
 

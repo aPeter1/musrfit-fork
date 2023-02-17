@@ -151,7 +151,7 @@ Bool_t PRunListCollection::Add(Int_t runNo, EPMusrHandleTag tag)
         success = false;
       break;
     case PRUN_NON_MUSR:
-      fRunNonMusrList.push_back(new PRunNonMusr(fMsrInfo, fData, runNo, tag));
+      fRunNonMusrList.push_back(new PRunNonMusr(fMsrInfo, fData, runNo, tag, fTheoAsData));
       if (!fRunNonMusrList[fRunNonMusrList.size()-1]->IsValid())
         success = false;
       break;

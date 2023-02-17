@@ -60,7 +60,8 @@ PRunNonMusr::PRunNonMusr() : PRunBase()
  * \param runNo number of the run within the msr-file
  * \param tag tag showing what shall be done: kFit == fitting, kView == viewing
  */
-PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag) : PRunBase(msrInfo, rawData, runNo, tag)
+PRunNonMusr::PRunNonMusr(PMsrHandler *msrInfo, PRunDataHandler *rawData, UInt_t runNo, EPMusrHandleTag tag, Bool_t theoAsData) :
+  PRunBase(msrInfo, rawData, runNo, tag), fTheoAsData(theoAsData)
 {
   // get the proper run
   fRawRunData = fRawData->GetRunData(*(fRunInfo->GetRunName()));
@@ -197,6 +198,9 @@ UInt_t PRunNonMusr::GetNoOfFitBins()
 Bool_t PRunNonMusr::PrepareData()
 {
   Bool_t success = true;
+
+  if (!fValid)
+    return false;
 
   if (fRunInfo->GetRunNameSize() > 1) { // ADDRUN present which is not supported for NonMusr
     std::cerr << std::endl << ">> PRunNonMusr::PrepareData(): **WARNING** ADDRUN NOT SUPPORTED FOR THIS FIT TYPE, WILL IGNORE IT." << std::endl;
@@ -442,15 +446,26 @@ Bool_t PRunNonMusr::PrepareViewData()
   else
     xStep = (xMax-xMin)/1000.0;
 
-  Double_t xx = xMin;
-  do {
-    // fill x-vector
-    fData.AppendXTheoryValue(xx);
-    // fill y-vector
-    fData.AppendTheoryValue(fTheory->Func(xx, par, fFuncValues));
-    // calculate next xx
-    xx += xStep;
-  } while (xx < xMax);
+  if (fTheoAsData) {
+    Double_t xx;
+    for (UInt_t i=0; i<fRawRunData->fDataNonMusr.GetData()->at(xIndex).size(); i++) {
+      // fill x-vector
+      xx = fRawRunData->fDataNonMusr.GetData()->at(xIndex).at(i);
+      fData.AppendXTheoryValue(xx);
+      // fill y-vector
+      fData.AppendTheoryValue(fTheory->Func(xx, par, fFuncValues));
+    }
+  } else {
+    Double_t xx = xMin;
+    do {
+      // fill x-vector
+      fData.AppendXTheoryValue(xx);
+      // fill y-vector
+      fData.AppendTheoryValue(fTheory->Func(xx, par, fFuncValues));
+      // calculate next xx
+      xx += xStep;
+    } while (xx < xMax);
+  }
 
   // clean up
   par.clear();

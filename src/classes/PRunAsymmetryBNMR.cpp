@@ -587,6 +587,9 @@ void PRunAsymmetryBNMR::CalcTheory()
  */
 Bool_t PRunAsymmetryBNMR::PrepareData()
 {
+  if (!fValid)
+    return false;
+
   // keep the Global block info
   PMsrGlobalBlock *globalBlock = fMsrInfo->GetMsrGlobal();
 

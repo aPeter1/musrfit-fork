@@ -294,6 +294,7 @@ class PNonMusrRawRunData {
     virtual const std::vector<PDoubleVector>* GetErrData() { return &fErrData; }
 
     virtual void SetFromAscii(const Bool_t bval) { fFromAscii = bval; }
+    virtual void SetSize(const UInt_t size);
     virtual void AppendLabel(const TString str) { fLabels.push_back(str); }
     virtual void SetLabel(const UInt_t idx, const TString str);
     virtual void AppendDataTag(const TString str) { fDataTags.push_back(str); }
@@ -303,7 +304,7 @@ class PNonMusrRawRunData {
     virtual void AppendSubErrData(const UInt_t idx, const Double_t dval);
 
   private:
-    Bool_t fFromAscii;              ///< if true: data file was an ascii input file, otherwise it is a db input file
+    Bool_t fFromAscii;              ///< if true: data file was an ascii input file, otherwise it is a db/dat input file
     PStringVector fLabels;          ///< vector of all labels (used for x-, y-axis title in view)
     PStringVector fDataTags;        ///< vector of all data tags
     std::vector<PDoubleVector> fData;    ///< vector of all data
