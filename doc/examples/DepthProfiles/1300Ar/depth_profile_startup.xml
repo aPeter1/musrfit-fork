@@ -6,30 +6,6 @@
     <trim_sp>
         <data_path>./TRIMSP/</data_path>
         <rge_fln_pre>SiC_1300x_52nm_48nm_E</rge_fln_pre>
-        <energy_list>
-            <energy>1000</energy>
-            <energy>2000</energy>
-            <energy>3000</energy>
-            <energy>4000</energy>
-            <energy>5000</energy>
-            <energy>6000</energy>
-            <energy>7000</energy>
-            <energy>8000</energy>
-            <energy>9000</energy>
-            <energy>10000</energy>
-            <energy>11000</energy>
-            <energy>12000</energy>
-            <energy>13000</energy>
-            <energy>14000</energy>
-            <energy>15000</energy>
-            <energy>16000</energy>
-            <energy>17000</energy>
-            <energy>17000</energy>
-            <energy>18000</energy>
-            <energy>19000</energy>
-            <energy>20000</energy>
-            <energy>21000</energy>
-            <energy>22000</energy>
-        </energy_list>
+        <energy_vect start="1000" stop="22000" step="1000"/>
     </trim_sp>
 </nonlocal>
