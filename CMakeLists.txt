@@ -1,7 +1,7 @@
 # - musrfit
 cmake_minimum_required(VERSION 3.17)
 
-project(musrfit VERSION 1.8.2 LANGUAGES C CXX)
+project(musrfit VERSION 1.9.0 LANGUAGES C CXX)
 
 #--- musrfit specific options -------------------------------------------------
 option(nexus "build optional NeXus support. Needed for ISIS" OFF)
@@ -235,6 +235,9 @@ message("|----------------------------------------------------------------------
 message("")
 message(" System: ${CMAKE_HOST_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR} - ${CMAKE_HOST_SYSTEM_VERSION}")
 message(" -------")
+message("")
+message(" musrfit Version: ${musrfit_VERSION}")
+message(" ----------------")
 message("")
 message(" Build Type: ${CMAKE_BUILD_TYPE}")
 message(" -----------")
