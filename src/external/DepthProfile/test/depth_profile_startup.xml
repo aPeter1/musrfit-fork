@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<nonlocal xmlns="http://nemu.web.psi.ch/musrfit/nonlocal">
+<depthProf xmlns="http://nemu.web.psi.ch/musrfit/depthProf">
     <comment>
         TrimSp information
     </comment>
@@ -31,5 +31,7 @@
             <energy>21000</energy>
             <energy>22000</energy>
         </energy_list>
+<!--        <energy_vect start="1000" stop="22000" step="1000"/> 
+-->
     </trim_sp>
-</nonlocal>
+</depthProf>
