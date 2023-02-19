@@ -6,6 +6,7 @@ set(DEPTH_PROFILE_INC ${CMAKE_CURRENT_SOURCE_DIR}/../inc)
 # ROOT requires that the dictonary header files are found at configuration time.
 # Hence, target_include_directories cannot be used here because, targets are 
 # setup only afterwards.
+include_directories(${FFTW3_INCLUDE})
 include_directories(${MUSRFIT_INC})
 include_directories(${DEPTH_PROFILE_INC})
 
@@ -13,7 +14,7 @@ root_generate_dictionary(
   PDepthProfileDict 
   PDepthProfile.h 
   OPTIONS 
-    -I${FFTW3_INCLUDE_DIR} 
+    -I${FFTW3_INCLUDE} 
     -I${MUSRFIT_INC}
     -I${DEPTH_PROFILE_INC}
     -inlineInputHeader
@@ -45,7 +46,7 @@ set_target_properties(PDepthProfile
 #--- make sure that the include directory is found ----------------------------
 target_include_directories(
   PDepthProfile BEFORE PRIVATE 
-    $<BUILD_INTERFACE:${FFTW3_INCLUDE_DIR}> 
+    $<BUILD_INTERFACE:${FFTW3_INCLUDE}> 
     $<BUILD_INTERFACE:${MUSRFIT_INC}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../inc>
 )

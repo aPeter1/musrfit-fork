@@ -6,6 +6,7 @@ set(MUSRFIT_INC ${CMAKE_SOURCE_DIR}/src/include)
 # Hence, target_include_directories cannot be used here because, targets are 
 # setup only afterwards.
 include_directories(${MUSRFIT_INC})
+include_directories(${FFTW3_INCLUDE})
 
 root_generate_dictionary(
   PFourierCanvasDict 
