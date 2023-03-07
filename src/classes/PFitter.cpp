@@ -2530,7 +2530,7 @@ Bool_t PFitter::ExecuteSave(Bool_t firstSave)
     fitStartTime = run->at(0).GetFitRange(0);
     fitEndTime = run->at(0).GetFitRange(1);
   }
-  fout.setf(std::ios::floatfield);
+  fout.setf(std::ios::fixed, std::ios::floatfield);
   fout << std::endl << " Time Range: " << fitStartTime << ", " << fitEndTime << std::endl;
   if (fUseChi2) {
     fout.setf(std::ios::fixed, std::ios::floatfield);
