@@ -75,7 +75,7 @@ endfunction()
 #as35 endif()
 
 find_path(FFTW3_INCLUDE NAMES fftw3.h
-  HINTS "/usr/include" "/opt/local/include"
+  HINTS "/usr/include" "/opt/local/include" "/app/include"
 )
 
 find_library(FFTW3_LIBRARY fftw3)
