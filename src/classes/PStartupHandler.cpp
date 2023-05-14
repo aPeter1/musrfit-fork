@@ -703,6 +703,8 @@ Bool_t PStartupHandler::WriteDefaultStartupFile()
   fout << "    <!-- LEM/PSI -->" << std::endl;
   fout << "    <run_name_template inst=\"lem\">%yyyy%/lem%yy%_his_%rrrr%.root</run_name_template>" << std::endl;
   fout << "    <run_name_template inst=\"lem\">d%yyyy%/tdc/lem%yy%_his_%rrrr%.root</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"lem\">%yyyy%/lem%yy%_his_%rrrrr%.root</run_name_template>" << std::endl;
+  fout << "    <run_name_template inst=\"lem\">d%yyyy%/tdc/lem%yy%_his_%rrrrr%.root</run_name_template>" << std::endl;
   fout << "    <fourier_settings>" << std::endl;
   fout << "        <units>Gauss</units>" << std::endl;
   fout << "        <fourier_power>0</fourier_power>" << std::endl;
