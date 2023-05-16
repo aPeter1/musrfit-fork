@@ -12,6 +12,13 @@ or
 
 https://bitbucket.org/muonspin/musrfit/commits/all
 
+Release of V1.9.1, 2023/05/16
+=============================
+
+add option [-c, --count] to dump_header which will dump the number of counts
+per detector and the total number of counts. Currently for MusrRoot data format
+only. For the other data formats it will be implement asap
+
 Release of V1.9.0, 2023/02/17
 =============================
 

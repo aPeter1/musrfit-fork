@@ -52,6 +52,8 @@
 #include <TFile.h>
 #include <TFolder.h>
 #include <TString.h>
+#include <TFolder.h>
+#include <TH1F.h>
 
 #ifdef HAVE_GIT_REV_H
 #include "git-revision.h"
@@ -78,7 +80,8 @@
 void dump_header_syntax()
 {
   std::cout << std::endl << "usage: dump_header [-rn <runNo> | -fn <fileName>] [-ff, --fileFormat <fileFormat>]";
-  std::cout << std::endl << "                   [-y, --year <year>] [-s, --summary] [--psi-bulk <opt>] |";
+  std::cout << std::endl << "                   [-y, --year <year>] [-s, --summary] [-i, --instrument <inst>]";
+  std::cout << std::endl << "                   [-c, --counts] | ";
   std::cout << std::endl << "                   --help | --version";
   std::cout << std::endl;
   std::cout << std::endl << "       Dumps the header information of a given muSR data file onto the standard output.";
@@ -97,6 +100,7 @@ void dump_header_syntax()
   std::cout << std::endl << "                     to the header information, print the summary file content.";
   std::cout << std::endl << "       -i, --instrument <inst> : where <inst> is the requested instrument:";
   std::cout << std::endl << "                     lem (default) | gps | ltf | dolly | gpd | hifi.";
+  std::cout << std::endl << "       -c, --counts  : will show detector counts as well.";
   std::cout << std::endl << "       -h, --help    : will show this help";
   std::cout << std::endl << "       -v, --version : will show the current version.";
   std::cout << std::endl << std::endl;
@@ -108,10 +112,11 @@ void dump_header_syntax()
  *
  * @param fileName file name of the ROOT file
  * @param summary bool, if true dump the summary
+ * @param counts bool, if true dump detector counts
  *
  * @return 0 on success, otherwise 1.
  */
-int dump_header_root(const std::string fileName, const bool summary)
+int dump_header_root(const std::string fileName, const bool summary, const bool counts)
 {
   TFile f(fileName.c_str());
   if (f.IsZombie()) {
@@ -122,6 +127,8 @@ int dump_header_root(const std::string fileName, const bool summary)
   }
 
   UInt_t fileType = DH_MUSR_ROOT;
+  UInt_t noOfHistos{0};
+  PIntVector redGreenOffset;
 
   TFolder *folder;
   f.GetObject("RunInfo", folder); // try first LEM-ROOT style file (used until 2011).
@@ -208,6 +215,18 @@ int dump_header_root(const std::string fileName, const bool summary)
 
     header->DumpHeader();
 
+    if (counts) {
+      bool ok;
+      Int_t ival;
+      PIntVector ivec;
+      header->Get("RunInfo/No of Histos", ival, ok);
+      if (ok)
+        noOfHistos = ival;
+      header->Get("RunInfo/RedGreen Offsets", ivec, ok);
+      if (ok)
+        redGreenOffset = ivec;
+    }
+
     delete header;
   }
 
@@ -229,6 +248,38 @@ int dump_header_root(const std::string fileName, const bool summary)
       tstr = static_cast<TObjString*>(runSum->At(i));
       str = tstr->String();
       std::cout << str;
+    }
+  }
+
+  // detector counts as well?
+  if (counts && (fileType == DH_MUSR_ROOT)) {
+    // dump the detector counts
+    std::cout << "Detector counts" << std::endl;
+    f.GetObject("histos", folder);
+    if (folder != nullptr) {
+      char detectorLabel[64];
+      TH1F *histo{nullptr};
+      UInt_t total{0};
+      for (UInt_t i=0; i<redGreenOffset.size(); i++) {
+        std::cout << "  Group " << i+1 << " (Offset=" << redGreenOffset[i] << ") : " << std::endl;
+        total = 0;
+        for (UInt_t j=0; j<noOfHistos; j++) {
+          snprintf(detectorLabel, sizeof(detectorLabel), "hDecay%03d", redGreenOffset[i]+j+1);
+          histo = (TH1F*) folder->FindObjectAny(detectorLabel);
+          if (histo != nullptr) {
+            std::cout << "    " << histo->GetTitle() << ":\t " << histo->GetEntries() << std::endl;
+            total += histo->GetEntries();
+          }
+        }
+        if (i % 2 == 0)
+          std::cout << "    total counts of group " << i+1 << ":\t\t\t " << total << std::endl;
+        else
+          std::cout << "    total counts of group " << i+1 << ":\t\t\t\t\t " << total << std::endl;
+      }
+    } else {
+      std::cout << "Sorry, no histos folder found" << std::endl;
+      f.Close();
+      return 0;
     }
   }
 
@@ -723,6 +774,7 @@ int main(int argc, char *argv[])
   std::string year("");
   std::string instrument("lem");
   bool summary(false);
+  bool counts(false);
 
   for (int i=1; i<argc; i++) {
     if (!strcmp(argv[i], "--help") || !strcmp(argv[i], "-h")) {
@@ -812,6 +864,8 @@ int main(int argc, char *argv[])
       i++;
     } else if (!strcmp(argv[i], "-s") || !strcmp(argv[i], "--summary")) {
       summary = true;
+    } else if (!strcmp(argv[i], "-c") || !strcmp(argv[i], "--counts")) {
+      counts = true;
     } else if (!strcmp(argv[i], "-i") || !strcmp(argv[i], "--instrument")) {
       if (i+1 >= argc) {
         std::cerr << std::endl << "**ERROR** found option --instrument without <instrument> input!" << std::endl;
@@ -929,7 +983,7 @@ int main(int argc, char *argv[])
   boost::to_lower(fileFormat);
 
   if (boost::iequals(fileFormat, "MusrRoot") || boost::iequals(fileFormat, "ROOT")) {
-    dump_header_root(pathFln, summary);
+    dump_header_root(pathFln, summary, counts);
   } else if (boost::iequals(fileFormat, "NeXus")) {
 #ifdef PNEXUS_ENABLED
     dump_header_nexus(pathFln);
