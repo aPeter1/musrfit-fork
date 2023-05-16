@@ -213,11 +213,12 @@ int PMsr2Data::DetermineRunNumberDigits(unsigned int runNo, bool normalMode) con
  */
 int PMsr2Data::CheckRunNumbersInRange() const
 {
-  double max(pow(static_cast<double>(10), static_cast<int>(fRunNumberDigits)) - 1.0);
+  // since 2023, we encounter in LEM run numbers > 9999, hence this check has been loosened
+  // by replacing static_cast<int>(fRunNumberDigits)) by static_cast<int>(fRunNumberDigits+1)).
+  double max(pow(static_cast<double>(10), static_cast<int>(fRunNumberDigits+1)) - 1.0);
   unsigned int max_UInt;
   max > static_cast<double>(std::numeric_limits<unsigned int>::max()) ? max_UInt = std::numeric_limits<unsigned int>::max()
                                                                  : max_UInt = static_cast<unsigned int>(max);
-
   for (std::vector<unsigned int>::const_iterator iter(fRunVector.begin()); iter != fRunVector.end(); ++iter) {
     if (*iter > max_UInt) {
       return -1;
