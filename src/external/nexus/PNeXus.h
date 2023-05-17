@@ -254,6 +254,7 @@ class PNeXusData1 {
     virtual void GetHistoName(unsigned int idx, std::string &name, bool &ok);
     virtual unsigned int GetNoOfHistos() { return fHisto.size(); }
     virtual unsigned int GetHistoLength(unsigned int histoNo=0);
+    virtual unsigned int GetHistoCounts(unsigned int histoNo=0);
     virtual std::vector<unsigned int> *GetHisto(unsigned int histoNo);
     virtual std::vector<int> *GetGrouping() { return &fGrouping; }
     virtual std::vector<PNeXusAlpha1> *GetAlpha() { return &fAlpha; }
@@ -399,6 +400,7 @@ class PNeXusDetector2 {
     virtual int GetNoOfPeriods() { return fNoOfPeriods; }
     virtual int GetNoOfSpectra() { return fNoOfSpectra; }
     virtual int GetNoOfBins() { return fNoOfBins; }
+    virtual unsigned int GetHistoCounts(int idx_p, int idx_s);
     virtual int GetHistoValue(int idx_p, int idx_s, int idx_b);
     virtual int* GetHistos() { return fHisto; }
     virtual unsigned int GetSpectrumIndexSize() { return fSpectrumIndex.size(); }
@@ -586,7 +588,7 @@ class PNeXus {
 
     virtual void SetCreator(std::string str) { fCreator = str; }
 
-    virtual void Dump();
+    virtual void Dump(const bool counts);
 
   private:
     bool fValid;

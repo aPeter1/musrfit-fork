@@ -293,10 +293,11 @@ int dump_header_root(const std::string fileName, const bool summary, const bool 
  * <p>dumps the header information of a NeXus file.
  *
  * @param fileName file name of the NeXus file.
+ * @param counts bool, if true dump detector counts
  *
  * @return  0 on success, 1 otherwise
  */
-int dump_header_nexus(const std::string fileName) {
+int dump_header_nexus(const std::string fileName, const bool counts) {
 
 #ifdef PNEXUS_ENABLED
   PNeXus *nxs_file = new PNeXus(fileName.c_str());
@@ -309,7 +310,7 @@ int dump_header_nexus(const std::string fileName) {
   }
 
   if (nxs_file->IsValid(false)) {
-    nxs_file->Dump();
+    nxs_file->Dump(counts);
   } else {
     std::cerr << std::endl;
     std::cerr << "**ERROR** found invalid NeXus file." << std::endl;
@@ -395,10 +396,11 @@ std::vector<std::string> dump_header_instrument_info(std::string fileName)
  *
  * @param fileName file name of the PSI-BIN
  * @param fileFormat either PSI-BIN or PSI-MDU
+ * @param counts bool, if true dump detector counts
  *
  * @return 0 on success, 1 otherwise
  */
-int dump_header_psi_bin(const std::string fileName, const std::string fileFormat)
+int dump_header_psi_bin(const std::string fileName, const std::string fileFormat, const bool counts)
 {
   MuSR_td_PSI_bin psiBin;
   int status;
@@ -490,7 +492,8 @@ int dump_header_psi_bin(const std::string fileName, const std::string fileFormat
     std::cout << std::endl << "Time Zero Bin      : " << psiBin.GetT0Int(i);
     std::cout << std::endl << "First Good Bin     : " << psiBin.GetFirstGoodInt(i);
     std::cout << std::endl << "Last Good Bin      : " << psiBin.GetLastGoodInt(i);
-    std::cout << std::endl << "No of Events       : " << psiBin.GetEventsHistoLong(i);
+    if (counts)
+      std::cout << std::endl << "No of Events       : " << psiBin.GetEventsHistoLong(i);
   }
   std::cout << std::endl << "-------------------" << std::endl << std::endl;
 
@@ -501,10 +504,11 @@ int dump_header_psi_bin(const std::string fileName, const std::string fileFormat
 /**
  * <p>dump the header information of a MUD file.
  * @param fileName file name of the MUD file
+ * @param counts bool, if true dump detector counts
  *
  * @return 0 on success, 1 otherwise
  */
-int dump_header_mud(const std::string fileName)
+int dump_header_mud(const std::string fileName, const bool counts)
 {
   int    fh;
   UINT32 type, val;
@@ -669,6 +673,12 @@ int dump_header_mud(const std::string fileName)
       std::cout << std::endl << "Last Good Bin  : " << val;
     else
       std::cout << std::endl << "Last Good Bin  : ???";
+    if (counts) {
+      success = MUD_getHistNumEvents( fh, i+1, &val );
+      if (success) {
+        std::cout << std::endl << "#Events        : " << val;
+      }
+    }
   }
 
   std::cout << std::endl << "-------------------" << std::endl << std::endl;
@@ -986,14 +996,14 @@ int main(int argc, char *argv[])
     dump_header_root(pathFln, summary, counts);
   } else if (boost::iequals(fileFormat, "NeXus")) {
 #ifdef PNEXUS_ENABLED
-    dump_header_nexus(pathFln);
+    dump_header_nexus(pathFln, counts);
 #else
     std::cout << std::endl << "Sorry, NeXus is not enabled, hence I cannot help you." << std::endl;
 #endif
   } else if (boost::iequals(fileFormat, "PSI-BIN") || boost::iequals(fileFormat, "PSI-MDU")) {
-    dump_header_psi_bin(pathFln, fileFormat);
+    dump_header_psi_bin(pathFln, fileFormat, counts);
   } else if (boost::iequals(fileFormat, "MUD")) {
-    dump_header_mud(pathFln);
+    dump_header_mud(pathFln, counts);
   } else if (boost::iequals(fileFormat, "WKM")) {
     dump_header_wkm(pathFln);
   }

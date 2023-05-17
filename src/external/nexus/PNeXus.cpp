@@ -636,6 +636,21 @@ unsigned int PNeXusData1::GetHistoLength(unsigned int histoNo)
 }
 
 //------------------------------------------------------------------------------------------
+// GetHistoLength (public)
+//------------------------------------------------------------------------------------------
+unsigned int PNeXusData1::GetHistoCounts(unsigned int histoNo)
+{
+  if (histoNo >= fHisto.size())
+    return 0;
+
+  unsigned int counts=0;
+  for (unsigned int i=0; i<fHisto[histoNo].size(); i++)
+    counts += fHisto[histoNo][i];
+
+  return counts;
+}
+
+//------------------------------------------------------------------------------------------
 // GetHisto (public)
 //------------------------------------------------------------------------------------------
 /**
@@ -1256,6 +1271,36 @@ int PNeXusDetector2::SetLastGoodBin(int *lgb)
   }
 
   return result;
+}
+
+//------------------------------------------------------------------------------------------
+// GetHistoCounts (public)
+//------------------------------------------------------------------------------------------
+/**
+ * <p>Get number of counts in a given histogram histoNo
+ *
+ * \param idx_p period index
+ * \param idx_s spectrum index
+ *
+ * \return the number of entries in the selected histogram histoNo, or 0 if the histoNo is out of scope.
+ */
+unsigned int PNeXusDetector2::GetHistoCounts(int idx_p, int idx_s)
+{
+   unsigned counts = 0;
+
+   if (idx_p > 0)
+     if (idx_p > fNoOfPeriods)
+       return counts;
+
+   if (idx_s > 0)
+     if (idx_s > fNoOfSpectra)
+       return counts;
+
+   for (int i=0; i<fNoOfBins; i++) {
+     counts += GetHistoValue(idx_p,idx_s,i);
+   }
+
+   return counts;
 }
 
 //------------------------------------------------------------------------------------------
@@ -2151,8 +2196,9 @@ int PNeXus::WriteFile(const char *fileName, const char *fileType, const unsigned
 /**
  * <p>Write the content of the NeXus file to stdout. Used for debugging purposes.
  *
+ * \param counts flag, if true, also dump the counts for all the histograms
  */
-void PNeXus::Dump()
+void PNeXus::Dump(const bool counts)
 {
   double dval;
   std::string str;
@@ -2259,6 +2305,8 @@ void PNeXus::Dump()
           std::cout << fNxEntry1->GetData()->GetHisto(i)->at(j) << ", ";
         }
         std::cout << "...";
+        if (counts)
+          std::cout << " total no of entries: " << fNxEntry1->GetData()->GetHistoCounts(i);
       }
     }
     if (fNxEntry1->GetData()->GetAlpha()->size() == 0) {
@@ -2408,6 +2456,8 @@ void PNeXus::Dump()
             std::cout << fNxEntry2->GetInstrument()->GetDetector()->GetHistoValue(i,j,k) << ", ";
           }
           std::cout << "...";
+          if (counts)
+            std::cout << " total number of entries: " << fNxEntry2->GetInstrument()->GetDetector()->GetHistoCounts(i,j);
         }
       }
     } else {
@@ -2421,6 +2471,8 @@ void PNeXus::Dump()
             std::cout << fNxEntry2->GetInstrument()->GetDetector()->GetHistoValue(0,j,k) << ", ";
           }
           std::cout << "...";
+          if (counts)
+            std::cout << " total number of entries: " << fNxEntry2->GetInstrument()->GetDetector()->GetHistoCounts(0,j);
         }
       } else {  // counts[ntc]
         std::cout << std::endl << "      (#bins=" << fNxEntry2->GetInstrument()->GetDetector()->GetNoOfBins() << ")";
@@ -2431,6 +2483,8 @@ void PNeXus::Dump()
           std::cout << fNxEntry2->GetInstrument()->GetDetector()->GetHistoValue(0,0,k) << ", ";
         }
         std::cout << "...";
+        if (counts)
+          std::cout << " total number of entries: " << fNxEntry2->GetInstrument()->GetDetector()->GetHistoCounts(0,0);
       }
     }
     std::cout << std::endl << "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++";
