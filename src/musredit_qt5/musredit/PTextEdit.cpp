@@ -2949,6 +2949,7 @@ void PTextEdit::musrDump()
   cmd.append(str);
   cmd.append("-fn");
   cmd.append(fileName);
+  cmd.append("-c");
 
   PDumpOutputHandler dumpOutputHandler(cmd);
   dumpOutputHandler.setModal(false);
